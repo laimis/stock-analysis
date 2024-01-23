@@ -1,6 +1,7 @@
 module studies.Trading
 
 open System
+open System.Collections.Generic
 open core.fs.Adapters.Stocks
 open studies.Types
 
@@ -155,9 +156,9 @@ let strategyWithTrailingStop verbose positionType stopLossPercent (signal:Signal
         let refValue, stopReached =
             match positionType with
             | core.fs.Stocks.StockPositionType.Long ->
-                System.Math.Max(bar.Close, stopLossReferencePrice.Value), bar.Close < stopLossReferencePrice.Value * (1m - stopLossPercent)
+                Math.Max(bar.Close, stopLossReferencePrice.Value), bar.Close < stopLossReferencePrice.Value * (1m - stopLossPercent)
             | core.fs.Stocks.StockPositionType.Short ->
-                System.Math.Min(bar.Close, stopLossReferencePrice.Value), bar.Close > stopLossReferencePrice.Value * (1m + stopLossPercent)
+                Math.Min(bar.Close, stopLossReferencePrice.Value), bar.Close > stopLossReferencePrice.Value * (1m + stopLossPercent)
                 
         stopLossReferencePrice.Value <- refValue
         
@@ -187,6 +188,7 @@ let private prepareSignalsForTradeSimulations (priceFunc:string -> Async<PriceBa
             | None -> None
             | Some _ -> Some (r, prices)
         )
+        |> Seq.sortBy (fun (r,_) -> r.Date)
         |> Seq.toList
     
     printfn "Ensured that data has prices"
@@ -207,7 +209,28 @@ let runTrades getPricesFunc signals strategies = async {
     let allOutcomes =
         strategies
         |> List.map (fun strategy ->
-            signalsWithPriceBars |> List.map strategy
+            
+            // track outcomes by ticker and open/close dates
+            let map = Dictionary<string, List<TradeOutcomeOutput.Row>>()
+            
+            signalsWithPriceBars
+            |> List.map strategy
+            |> List.map (fun (outcome:TradeOutcomeOutput.Row) ->
+                match map.TryGetValue(outcome.Ticker) with
+                | false, _ ->
+                    let list = List<TradeOutcomeOutput.Row>()
+                    list.Add(outcome)
+                    map.Add(outcome.Ticker, list)
+                    Some outcome
+                | true, list ->
+                    let fallsInsideExistingTrade = list |> Seq.exists (fun (x:TradeOutcomeOutput.Row) -> outcome.Opened >= x.Opened && outcome.Opened <= x.Closed)
+                    match fallsInsideExistingTrade with
+                    | true -> None
+                    | false ->
+                        list.Add(outcome)
+                        Some outcome
+            )
+            |> List.choose id
         )
         |> List.concat
         

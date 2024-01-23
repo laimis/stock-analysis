@@ -10,9 +10,7 @@ open testutils
 
 let round (number:decimal) = Math.Round(number, 4)
 
-let runTradesSetupWithSpecificEntryDate date strategies = async {
-    let signals = [Signal.Row(date = date, ticker = "NET", screenerid = 1)]
-    
+let runTradesSetupWithSignals signals strategies = async {
     let getPricesFunc = DataHelpersTests.setupGetPricesWithNoBrokerageAccess
     
     let! transformed = PriceTransformation.transform getPricesFunc signals
@@ -21,6 +19,9 @@ let runTradesSetupWithSpecificEntryDate date strategies = async {
     
     return outcomes
 }
+
+let runTradesSetupWithSpecificEntryDate date =
+    [Signal.Row(date = date, ticker = "NET", screenerid = 1)] |> runTradesSetupWithSignals
 
 let runTradesSetup = runTradesSetupWithSpecificEntryDate "2022-08-05"
 
@@ -271,7 +272,7 @@ let ``Specific test``() = async {
     
     let! transformed = PriceTransformation.transform getPricesFunc signals
     
-    let strategies = [studies.Trading.strategyWithStopLossPercent false StockPositionType.Short None None]
+    let strategies = [Trading.strategyWithStopLossPercent false StockPositionType.Short None None]
     
     let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv "d:\\studies\\") transformed.Rows strategies
     
@@ -281,4 +282,38 @@ let ``Specific test``() = async {
     
     outcome.Opened |> should equal "2023-08-17"
     outcome.Closed |> should equal "2023-08-17"
+}
+
+[<Fact>]
+let ``Using signal that doesn't have a price bar, ignores it`` () = async {
+    let signals = [
+        Signal.Row(date = "2022-08-06", ticker = "NET", screenerid = 1)
+    ]
+    
+    let strategies = [
+        Trading.strategyWithStopLossPercent false StockPositionType.Long None None
+    ]
+    
+    let! outcomes = strategies |> runTradesSetupWithSignals signals
+    
+    outcomes |> List.length |> should equal 0
+}
+
+[<Fact>]
+let ``Trading multiple signals that overlap in dates, should return only non overlapping trades`` () = async {
+    let signals = [
+        Signal.Row(date = "2022-08-05", ticker = "NET", screenerid = 1)
+        Signal.Row(date = "2022-08-08", ticker = "NET", screenerid = 2)
+        Signal.Row(date = "2022-08-09", ticker = "NET", screenerid = 2)
+        Signal.Row(date = "2022-08-09", ticker = "MSFT", screenerid = 2)
+        Signal.Row(date = "2022-08-10", ticker = "NET", screenerid = 2)
+    ]
+    
+    let strategies = [
+        Trading.strategyWithStopLossPercent false StockPositionType.Long (Some 2) None
+    ]
+    
+    let! outcomes = strategies |> runTradesSetupWithSignals signals
+    
+    outcomes |> List.length |> should equal 2
 }

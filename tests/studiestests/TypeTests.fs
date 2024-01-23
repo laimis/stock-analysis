@@ -79,7 +79,7 @@ let ``Manual trade outcomes``() =
     
     summary.Gains |> Seq.map (fun g -> Math.Round(g, 4)) |> should equal [0.02m; 0.01m; 1m; -0.05m; -0.08m]
     summary.Losers |> should equal 2
-    summary.Total |> should equal 5
+    summary.NumberOfTrades |> should equal 5
     summary.Winners |> should equal 3
     summary.AvgLoss |> round |> should equal -0.065m
     summary.AvgWin |> round |> should equal 0.3433m

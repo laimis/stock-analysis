@@ -86,17 +86,22 @@ module Unified =
             | Output row -> row.Screenerid
         
         let numberOfRecords = records |> Seq.length
-        let dates = records |> Seq.map (fun r -> r |> getDate) |> Seq.distinct |> Seq.length
-        let tickers = records |> Seq.map (fun r -> r |> getTicker) |> Seq.distinct |> Seq.length
-        let screenerIds = records |> Seq.map (fun r -> r |> getScreenerId) |> Seq.distinct |> Seq.length
         
-        let minimumDate = records |> Seq.minBy (fun r -> r |> getDate) |> getDate
-        let maximumDate = records |> Seq.maxBy (fun r -> r |> getDate) |> getDate
-        
-        printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
-        printfn $"Minimum date: %A{minimumDate}"
-        printfn $"Maximum date: %A{maximumDate}"
-        printfn ""
+        match numberOfRecords with
+        | x when x > 0 ->
+            let dates = records |> Seq.map (fun r -> r |> getDate) |> Seq.distinct |> Seq.length
+            let tickers = records |> Seq.map (fun r -> r |> getTicker) |> Seq.distinct |> Seq.length
+            let screenerIds = records |> Seq.map (fun r -> r |> getScreenerId) |> Seq.distinct |> Seq.length
+            
+            let minimumDate = records |> Seq.minBy (fun r -> r |> getDate) |> getDate
+            let maximumDate = records |> Seq.maxBy (fun r -> r |> getDate) |> getDate
+            
+            printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
+            printfn $"Minimum date: %A{minimumDate}"
+            printfn $"Maximum date: %A{maximumDate}"
+            printfn ""
+        | _ ->
+            printfn $"No records found in the input"
     
 module TradeOutcomeOutput =
     
@@ -136,9 +141,10 @@ module TradeOutcomeOutput =
 
 type TradeSummary = {
     StrategyName:string
-    Total:int
+    NumberOfTrades:int
     Winners:int
     Losers:int
+    TotalGain:decimal
     WinPct:decimal
     AvgWin:decimal
     AvgLoss:decimal
@@ -151,26 +157,28 @@ type TradeSummary = {
 module TradeSummary =
     let create name (outcomes:TradeOutcomeOutput.Row seq) =
         // summarize the outcomes
-        let total = outcomes |> Seq.length
+        let numberOfTrades = outcomes |> Seq.length
         let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
         let losers = outcomes |> Seq.filter (fun o -> o.PercentGain < 0m)
         let numberOfWinners = winners |> Seq.length
         let numberOfLosers = losers |> Seq.length
-        let win_pct = decimal numberOfWinners / decimal total
+        let win_pct = decimal numberOfWinners / decimal numberOfTrades
         let avg_win = winners |> Seq.averageBy (_.PercentGain)
         let avg_loss = losers |> Seq.averageBy (_.PercentGain)
         let avg_gain_loss = avg_win / avg_loss |> Math.Abs
         let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> Math.Abs)
+        let totalGain = outcomes |> Seq.sumBy (_.PercentGain)
 
-        let gains = outcomes |> Seq.map (fun o -> o.PercentGain)
+        let gains = outcomes |> Seq.map (_.PercentGain)
         let gainDistribution = core.fs.Services.Analysis.DistributionStatistics.calculate gains
         
         // return trade summary 
         {
             StrategyName = name
-            Total = total
+            NumberOfTrades = numberOfTrades
             Winners = numberOfWinners
             Losers = numberOfLosers
+            TotalGain = totalGain
             WinPct = win_pct
             AvgWin = avg_win
             AvgLoss = avg_loss
