@@ -73,7 +73,7 @@ type StockPositionState =
         Version: int
         Events: AggregateEvent list
     }
-    member this.IsShort = this.StockPositionType = Short
+    // member this.IsShort = this.StockPositionType = Short
     member this.IsClosed = this.Closed.IsSome
     member this.IsOpen = this.Closed.IsNone
     member this.HasStopPrice = this.StopPrice.IsSome
@@ -257,7 +257,7 @@ module StockPosition =
             
         date |> failIfInvalidDate
         
-        if stockPosition.IsShort && stockPosition.NumberOfShares + numberOfShares > 0m then
+        if stockPosition.StockPositionType = Short && stockPosition.NumberOfShares + numberOfShares > 0m then
             failwith "Cannot buy more than short position"
         
         if price <= 0.0m then
@@ -272,7 +272,7 @@ module StockPosition =
         if numberOfShares <= 0m then
             failwith "Number of shares must be greater than zero"
         
-        if stockPosition.IsShort |> not && stockPosition.NumberOfShares - numberOfShares < 0m then failwith $"Cannot sell more than long position: {stockPosition.NumberOfShares} - {numberOfShares} < 0"
+        if stockPosition.StockPositionType = Short |> not && stockPosition.NumberOfShares - numberOfShares < 0m then failwith $"Cannot sell more than long position: {stockPosition.NumberOfShares} - {numberOfShares} < 0"
         
         if price <= 0.0m then
             failwith "Price must be greater than zero"
@@ -320,7 +320,7 @@ module StockPosition =
         | Some stopPrice ->
             let riskAmount = 
                 withStop.ShareTransactions
-                |> List.takeWhile (fun x -> match withStop.IsShort with | true -> x.Type = Sell | false -> x.Type = Buy)
+                |> List.takeWhile (fun x -> match withStop.StockPositionType with | Short -> x.Type = Sell | Long -> x.Type = Buy)
                 |> List.sumBy (fun x -> x.NumberOfShares * (x.Price - stopPrice)) |> abs
                 
             withStop |> setRiskAmount riskAmount date
@@ -357,9 +357,9 @@ module StockPosition =
         match stockPosition.IsClosed with
         | true -> failwith "Position is already closed"
         | false ->
-            match stockPosition.IsShort with
-            | true -> buy (stockPosition.NumberOfShares |> abs) price date stockPosition
-            | false -> sell stockPosition.NumberOfShares price date stockPosition
+            match stockPosition.StockPositionType with
+            | Short -> buy (stockPosition.NumberOfShares |> abs) price date stockPosition
+            | Long -> sell stockPosition.NumberOfShares price date stockPosition
         
     let addNotes = applyNotesIfApplicable
         
@@ -414,15 +414,15 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     
     let liquidationSource, liquidationSlots, acquisitionSource, acquisitionSlots = 
-        match stockPosition.IsShort with
-        | true -> buys, buySlots, sells, sellSlots
-        | false -> sells, sellSlots, buys, buySlots
+        match stockPosition.StockPositionType with
+        | Short -> buys, buySlots, sells, sellSlots
+        | Long -> sells, sellSlots, buys, buySlots
     
     let completedPositionTransactions =
         stockPosition.ShareTransactions
-        |> List.takeWhile (fun x -> match stockPosition.IsShort with | true -> x.Type = Sell | false -> x.Type = Buy)
+        |> List.takeWhile (fun x -> match stockPosition.StockPositionType with | Short -> x.Type = Sell | Long -> x.Type = Buy)
             
-    member this.IsShort = stockPosition.IsShort
+    member this.IsShort = stockPosition.StockPositionType = Short
     member this.PositionId = stockPosition.PositionId
     member this.Ticker = stockPosition.Ticker
     member this.NumberOfShares = stockPosition.NumberOfShares

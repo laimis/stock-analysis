@@ -145,7 +145,7 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
             let checks =
                 stockPositions
                 |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
-                |> Seq.map (fun p -> {ticker=p.Ticker; stopPrice=p.StopPrice.Value; user=user.State; isShort = p.IsShort })
+                |> Seq.map (fun p -> {ticker=p.Ticker; stopPrice=p.StopPrice.Value; user=user.State; isShort = p.StockPositionType = Short })
                 |> Seq.toList
                 
             logger.LogInformation("done")

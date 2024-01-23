@@ -166,9 +166,9 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
     member this.ExecuteProfitTake sellPrice date (position:StockPositionState) =
         
         let executeProfitTake portion price date (position:StockPositionState) =
-            match position.IsShort with
-            | true -> position |> StockPosition.buy portion price date
-            | false -> position |> StockPosition.sell portion price date
+            match position.StockPositionType with
+            | Short -> position |> StockPosition.buy portion price date
+            | Long -> position |> StockPosition.sell portion price date
             
         // figure out how much to sell based on the number of profit points
         // and how many shares we have left
@@ -206,15 +206,15 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
         let stopReached price (position:StockPositionState) =
             match position.StopPrice with
             | Some stopPrice ->
-                match position.IsShort with
-                | true -> price >= stopPrice
-                | false -> price <= stopPrice
+                match position.StockPositionType with
+                | Short -> price >= stopPrice
+                | Long -> price <= stopPrice
             | _ -> false
             
         let profitTakeReached (bar:PriceBar) (position:StockPositionState) =
-            match position.IsShort with
-            | true -> bar.Low < profitPrice
-            | false -> bar.High > profitPrice
+            match position.StockPositionType with
+            | Short -> bar.Low < profitPrice
+            | Long -> bar.High > profitPrice
         
         let executeProfitTakeIfNecessary (position:StockPositionState) =
             match profitTakeReached bar position with
@@ -359,9 +359,9 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             | _ -> calculations.FirstStop
             
         let numberOfShares =
-            match position.IsShort with
-            | true -> calculations.CompletedPositionShares * -1m
-            | false -> calculations.CompletedPositionShares
+            match position.StockPositionType with
+            | Short -> calculations.CompletedPositionShares * -1m
+            | Long -> calculations.CompletedPositionShares
                 
         this.Run(
             user=user,
