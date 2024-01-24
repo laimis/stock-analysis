@@ -126,14 +126,15 @@ module PositionAnalysis =
             |> Seq.map snd
             |> DistributionStatistics.calculate
             
-        let withStopLossAndLongFilters = [
+        let positionSizeUnbalancedFilter = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value < 14m)
         ]
         
         let tickersAndTheirCosts =
             tickerOutcomes // we are only interested in this for positions that have stops set, and right now only longs
-            |> TickerOutcomes.filter withStopLossAndLongFilters
+            |> TickerOutcomes.filter positionSizeUnbalancedFilter
             |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.PositionSize)))
             |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value))
             
@@ -196,7 +197,7 @@ module PositionAnalysis =
                 OutcomeType.Negative,
                 PositionAnalysisKeys.PositionSize,
                 tickerOutcomes |> TickerOutcomes.filter [
-                    yield! withStopLossAndLongFilters
+                    yield! positionSizeUnbalancedFilter
                     (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
                 ]
             )
