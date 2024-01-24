@@ -262,10 +262,7 @@ export class StockTradingPositionsComponent {
             if (Number.isFinite(this.metricFunc(a))) {
               const bNumber = this.metricFunc(b)
               const aNumber = this.metricFunc(a)
-
-              const val = bNumber - aNumber
-              console.log(`${b.ticker}[${bNumber}]` + " - " + `${a.ticker}[${aNumber}]` + " = " + val)
-              return val
+              return bNumber - aNumber
             }
             return String(this.getMetricToRender(a)).localeCompare(String(this.getMetricToRender(b)))
           })
