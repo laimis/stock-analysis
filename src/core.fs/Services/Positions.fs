@@ -110,7 +110,10 @@ module PositionAnalysis =
         let recentlyOpenThreshold = TimeSpan.FromDays(5)
         let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
         
-        let withRiskAmountFilters = [(fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0.0m)]
+        let withRiskAmountFilters = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
+            (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
+        ]
         
         let tickersAndTheirRiskAmounts = 
             tickerOutcomes
@@ -184,9 +187,8 @@ module PositionAnalysis =
                 OutcomeType.Negative,
                 PositionAnalysisKeys.RiskAmount,
                 tickerOutcomes |> TickerOutcomes.filter [
-                    (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
-                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
-                    (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && (riskAmountAnalysis.mean / o.Value < 0.9m || riskAmountAnalysis.mean / o.Value > 1.1m))
+                    yield! withRiskAmountFilters
+                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (riskAmountAnalysis.mean / o.Value < 0.9m || riskAmountAnalysis.mean / o.Value > 1.1m))
                 ]
             )
             AnalysisOutcomeEvaluation(
