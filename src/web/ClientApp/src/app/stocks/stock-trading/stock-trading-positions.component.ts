@@ -18,7 +18,7 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 export class StockTradingPositionsComponent {
     sortedPositions: PositionInstance[];
     _positions: PositionInstance[];
-    metricFunc: (p: PositionInstance) => any = (p:PositionInstance) => p.rr;
+    metricFunc: (p: PositionInstance) => number = this.calculateUnrealizedRR;
     metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number
     strategies: { key: string; value: string }[] = []
 
@@ -184,7 +184,7 @@ export class StockTradingPositionsComponent {
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
             case "unrealizedRR":
-                this.metricFunc = (p:PositionInstance) => (p.profit + p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
+                this.metricFunc = (p:PositionInstance) => this.calculateUnrealizedRR(p)
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
           case "percentToStopFromCost":
@@ -214,6 +214,10 @@ export class StockTradingPositionsComponent {
           } else {
             return this.decimalPipe.transform(val)
           }
+    }
+
+    calculateUnrealizedRR(p:PositionInstance) {
+      return (p.profit + p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
     }
 
     matchesStrategyCheck(p:PositionInstance, strategy:string) {
