@@ -18,8 +18,8 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 export class StockTradingPositionsComponent {
     sortedPositions: PositionInstance[];
     _positions: PositionInstance[];
-    metricFunc: (p: PositionInstance) => number = this.calculateUnrealizedRR;
-    metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number
+    metricFunc: (p: PositionInstance) => any;
+    metricType: OutcomeValueTypeEnum;
     strategies: { key: string; value: string }[] = []
 
     private NO_LONG_TERM_STRATEGY = "nolongterm"
@@ -28,7 +28,8 @@ export class StockTradingPositionsComponent {
     private LONGS = "longs"
     private RR = "rr"
     private UnrealizedRR = "unrealizedRR"
-    metricToRender: string = this.UnrealizedRR
+
+    metricToRender: string
     strategyToFilter = this.NO_LONG_TERM_STRATEGY
 
     @Input()
@@ -52,17 +53,8 @@ export class StockTradingPositionsComponent {
             }
         )
 
-        let shorts = input.filter(
-            (p) => {
-                return p.isShort
-            }
-        )
-
-        let longs = input.filter(
-            (p) => {
-                return !p.isShort
-            }
-        )
+        let shorts = input.filter((p) => p.isShort)
+        let longs = input.filter((p) => !p.isShort)
 
         let noStrategy = input.filter(i => this.matchesStrategyCheck(i, this.NONE))
 
@@ -73,14 +65,21 @@ export class StockTradingPositionsComponent {
         this.strategies = this.strategies.concat(
             stratsWithCounts
         )
-        this.updatePositions()
+        this.metricChanged(this.UnrealizedRR)
     }
 
     @Input()
     orders:BrokerageOrder[];
 
+    private _quotes : Map<string, StockQuote>;
     @Input()
-    quotes:Map<string, StockQuote>
+    set quotes(val:Map<string, StockQuote>) {
+      this._quotes = val
+      this.updatePositions()
+    }
+    get quotes() {
+      return this._quotes
+    }
 
     // constructor that takes stock service
     constructor(
@@ -137,66 +136,66 @@ export class StockTradingPositionsComponent {
       this.updatePositions()
     }
 
-    metricChanged(elem: EventTarget) {
-        let value = (elem as HTMLInputElement).value
+    metricChanged(value:string) {
 
-        this.metricToRender = value
+      console.log("metric changed to " + value)
+      this.metricToRender = value
 
-        switch (value) {
-            case "pl":
-                this.metricFunc = (p:PositionInstance) => p.profit
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break;
-            case "plPercent":
-                this.metricFunc = (p:PositionInstance) => p.gainPct
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break;
-            case "plUnrealized":
-                this.metricFunc = (p:PositionInstance) => p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare) + p.profit
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break;
-            case "plUnrealizedPercent":
-                this.metricFunc = (p:PositionInstance) => (this.getPrice(p) - p.averageCostPerShare) / p.averageCostPerShare
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break;
-            case "cost":
-                this.metricFunc = (p:PositionInstance) => p.cost
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break;
-            case "ticker":
-                this.metricFunc = (p:PositionInstance) => p.ticker
-                this.metricType = OutcomeValueTypeEnum.String
-                break
-            case "daysSinceLastTransaction":
-                this.metricFunc = (p:PositionInstance) => p.daysSinceLastTransaction
-                this.metricType = OutcomeValueTypeEnum.Number
-                break
-            case "riskedAmount":
-                this.metricFunc = (p:PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break
-            case "riskedAmountFromStop":
-                this.metricFunc = (p:PositionInstance) => (p.stopPrice - p.averageCostPerShare) * p.numberOfShares
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break
-            case "daysHeld":
-                this.metricFunc = (p:PositionInstance) => p.daysHeld
-                this.metricType = OutcomeValueTypeEnum.Number
-                break
-            case "unrealizedRR":
-                this.metricFunc = (p:PositionInstance) => this.calculateUnrealizedRR(p)
-                this.metricType = OutcomeValueTypeEnum.Number
-                break
-          case "percentToStopFromCost":
-                this.metricFunc = (p:PositionInstance) => p.percentToStopFromCost
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break
-            default:
-                this.metricFunc = (p:PositionInstance) => p.rr
-                this.metricType = OutcomeValueTypeEnum.Number
-        }
+      switch (value) {
+          case "pl":
+              this.metricFunc = (p:PositionInstance) => p.profit
+              this.metricType = OutcomeValueTypeEnum.Currency
+              break;
+          case "plPercent":
+              this.metricFunc = (p:PositionInstance) => p.gainPct
+              this.metricType = OutcomeValueTypeEnum.Percentage
+              break;
+          case "plUnrealized":
+              this.metricFunc = (p:PositionInstance) => p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare) + p.profit
+              this.metricType = OutcomeValueTypeEnum.Currency
+              break;
+          case "plUnrealizedPercent":
+              this.metricFunc = (p:PositionInstance) => (this.getPrice(p) - p.averageCostPerShare) / p.averageCostPerShare
+              this.metricType = OutcomeValueTypeEnum.Percentage
+              break;
+          case "cost":
+              this.metricFunc = (p:PositionInstance) => p.cost
+              this.metricType = OutcomeValueTypeEnum.Currency
+              break;
+          case "ticker":
+              this.metricFunc = (p:PositionInstance) => p.ticker
+              this.metricType = OutcomeValueTypeEnum.String
+              break
+          case "daysSinceLastTransaction":
+              this.metricFunc = (p:PositionInstance) => p.daysSinceLastTransaction
+              this.metricType = OutcomeValueTypeEnum.Number
+              break
+          case "riskedAmount":
+              this.metricFunc = (p:PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
+              this.metricType = OutcomeValueTypeEnum.Currency
+              break
+          case "riskedAmountFromStop":
+              this.metricFunc = (p:PositionInstance) => (p.stopPrice - p.averageCostPerShare) * p.numberOfShares
+              this.metricType = OutcomeValueTypeEnum.Currency
+              break
+          case "daysHeld":
+              this.metricFunc = (p:PositionInstance) => p.daysHeld
+              this.metricType = OutcomeValueTypeEnum.Number
+              break
+          case this.UnrealizedRR:
+              this.metricFunc = (p:PositionInstance) => this.calculateUnrealizedRR(p)
+              this.metricType = OutcomeValueTypeEnum.Number
+              break
+        case "percentToStopFromCost":
+              this.metricFunc = (p:PositionInstance) => p.percentToStopFromCost
+              this.metricType = OutcomeValueTypeEnum.Percentage
+              break
+          default:
+              this.metricFunc = (p:PositionInstance) => p.rr
+              this.metricType = OutcomeValueTypeEnum.Number
+      }
 
-        this.updatePositions()
+      this.updatePositions()
     }
 
     getMetricToRender(p:PositionInstance) {
@@ -227,12 +226,10 @@ export class StockTradingPositionsComponent {
     }
 
     updatePositions() {
-      this.sortedPositions = this._positions.sort((a, b) => {
-          if (Number.isFinite(this.metricFunc(a))) {
-            return this.metricFunc(b) - this.metricFunc(a)
-          }
-          return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
-        })
+
+      console.log(this.metricToRender)
+
+      this.sortedPositions = this._positions
           .filter(p => {
             if (this.strategyToFilter === "all") {
               return true
@@ -260,6 +257,17 @@ export class StockTradingPositionsComponent {
             }
 
             return positionStrategy.value === this.strategyToFilter
+          })
+          .sort((a, b) => {
+            if (Number.isFinite(this.metricFunc(a))) {
+              const bNumber = this.metricFunc(b)
+              const aNumber = this.metricFunc(a)
+
+              const val = bNumber - aNumber
+              console.log(`${b.ticker}[${bNumber}]` + " - " + `${a.ticker}[${aNumber}]` + " = " + val)
+              return val
+            }
+            return String(this.getMetricToRender(a)).localeCompare(String(this.getMetricToRender(b)))
           })
     }
 }
