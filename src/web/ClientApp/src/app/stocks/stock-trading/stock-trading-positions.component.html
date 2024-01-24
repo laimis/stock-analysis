@@ -22,7 +22,7 @@
       <div class="row">
         <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
         <div class="col-sm-10">
-          <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target.value)">
+          <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target['value'])">
             @for (so of sortOptions; track so.value) {
               <option value="{{so.value}}" [selected]="so.value === metricToRender">{{so.name}}</option>
             }
