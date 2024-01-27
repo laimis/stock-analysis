@@ -38,20 +38,20 @@
       </div>
     </div>
     <div class="col-md-3" #riskReadonlyDiv>
-      <div class="stat-label">
-        Risk Amount
-        <span class="bi bi-pencil" role="button" (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
-      </div>
-      <div>{{candidateRiskAmount | currency}}</div>
+        <div class="stat-label">
+            Risk Amount
+            <span class="bi bi-pencil" role="button" (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
+        </div>
+        <div>{{candidateRiskAmount | currency}}</div>
+        <div>
+            <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
+        </div>
     </div>
     <div class="col-md-3 visually-hidden" #riskEditDiv>
       <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
       <div class="input-group">
         <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount" type="number">
         <button class="btn btn-outline-secondary" (click)="setRiskAmount([riskReadonlyDiv,riskEditDiv])">Update</button>
-      </div>
-      <div>
-        <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
       </div>
     </div>
     <div class="col-md-3" #strategyReadonyDiv>

@@ -13,7 +13,11 @@
 @REM cmd /c .\dev_secret.bat -pt -f "signals_toplosers.csv" -o %outputFile%
 @REM cmd /c .\dev_secret.bat -pt -f "signals_newlows.csv" -o %outputFile%
 
-jupyter nbconvert --execute --allow-errors --to html --no-input .\notebook.ipynb
+jupyter nbconvert --execute --to html --no-input .\notebook.ipynb
+
+@REM if last exit code is not 0, exit
+if not %errorlevel% == 0 exit /b %errorlevel%
+
 jupyter nbconvert --clear-output .\notebook.ipynb
 
 move notebook.html notebook_secret.html
