@@ -56,12 +56,13 @@ namespace testutils
         private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public static Ticker GenerateRandomTicker(Random random)
         {
-            var length = random.Next(3, 5);
+            var length = random.Next(3, 5) + 1; // inserting '0' at the end to make sure we don't generate real tickers 
             var ticker = new char[length];
             for (var i = 0; i < length; i++)
             {
                 ticker[i] = Chars[random.Next(Chars.Length)];
             }
+            ticker[length - 1] = '0';
 
             return new Ticker(new string(ticker));
         }

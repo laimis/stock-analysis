@@ -13,7 +13,7 @@ let round (number:decimal) = Math.Round(number, 4)
 let runTradesSetupWithSignals signals strategies = async {
     let getPricesFunc = DataHelpersTests.setupGetPricesWithNoBrokerageAccess
     
-    let! transformed = PriceTransformation.transform getPricesFunc signals
+    let! transformed = PriceTransformation.transform getPricesFunc DataHelpersTests.testDataPath signals
     
     let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv TestDataGenerator.TestDataPath) transformed.Rows strategies
     
@@ -260,17 +260,13 @@ let ``Specific test``() = async {
     
     let mock =
         {
-            new core.fs.Adapters.Brokerage.IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` = task {
+            new DataHelpers.IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker = task {
                     return [||] |> core.fs.Adapters.Stocks.PriceBars |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
                 }
         }
         
-    let user = core.fs.Accounts.User.Create("email", "first", "last")
-    
-    let getPricesFunc = DataHelpers.getPricesWithBrokerage user mock "d:\\studies\\"
-    
-    let! transformed = PriceTransformation.transform getPricesFunc signals
+    let! transformed = PriceTransformation.transform mock "d:\\studies\\" signals
     
     let strategies = [Trading.strategyWithStopLossPercent false StockPositionType.Short None None]
     
@@ -302,11 +298,11 @@ let ``Using signal that doesn't have a price bar, ignores it`` () = async {
 [<Fact>]
 let ``Trading multiple signals that overlap in dates, should return only non overlapping trades`` () = async {
     let signals = [
-        Signal.Row(date = "2022-08-05", ticker = "NET", screenerid = 1)
-        Signal.Row(date = "2022-08-08", ticker = "NET", screenerid = 2)
-        Signal.Row(date = "2022-08-09", ticker = "NET", screenerid = 2)
-        Signal.Row(date = "2022-08-09", ticker = "MSFT", screenerid = 2)
-        Signal.Row(date = "2022-08-10", ticker = "NET", screenerid = 2)
+        Signal.Row(date = "2022-08-05", ticker = TestDataGenerator.NET.Value, screenerid = 1)
+        Signal.Row(date = "2022-08-08", ticker = TestDataGenerator.NET.Value, screenerid = 2)
+        Signal.Row(date = "2022-08-09", ticker = TestDataGenerator.NET.Value, screenerid = 2)
+        Signal.Row(date = "2022-08-09", ticker = TestDataGenerator.AMD.Value, screenerid = 2)
+        Signal.Row(date = "2022-08-10", ticker = TestDataGenerator.NET.Value, screenerid = 2)
     ]
     
     let strategies = [

@@ -4,29 +4,24 @@ open System
 open System.IO
 open Xunit
 open FsUnit
-open core.fs.Accounts
-open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open studies
 open testutils
 
 let testDataPath = TestDataGenerator.TestDataPath
-
-let setupGetPricesWithBrokerageMock mock =
-    let user = User.Create("email", "first", "last")
+let transactionRateErrorMessage = "Individual App's transactions per seconds restriction reached"
     
-    DataHelpers.getPricesWithBrokerage user mock testDataPath
+let setupGetPricesWithBrokerageMock mock = DataHelpers.getPricesWithBrokerage mock testDataPath
     
 let setupGetPricesWithNoBrokerageAccess =
-    let mock =
-        {
-            new IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` = task {
-                    return [||] |> PriceBars |> core.fs.ServiceResponse<PriceBars>
-                }
-        }
+    {
+        new DataHelpers.IGetPriceHistory with 
+            member this.GetPriceHistory start ``end`` ticker = task {
+                return [||] |> PriceBars |> core.fs.ServiceResponse<PriceBars>
+            }
+    }
         
-    setupGetPricesWithBrokerageMock mock
+    // setupGetPricesWithBrokerageMock mock
 
 [<Fact>]
 let ``Append csv, appends instead of overwriting`` () = async {
@@ -57,7 +52,6 @@ let ``Save csv, overwrites instead of appending`` () = async {
     
     File.Delete path
 }
-
     
 [<Fact>]
 let ``Reading prices from csv works`` () = async {
@@ -77,8 +71,8 @@ let ``Get prices with brokerage should not go to brokerage if price exists on fi
     
     let mock =
         {
-            new IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
+            new DataHelpers.IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
                     failwith "Should not have called brokerage"
         }
 
@@ -96,8 +90,8 @@ let ``Get prices with brokerage should go to brokerage if price does not exists 
         
     let mock =
         {
-            new IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
+            new DataHelpers.IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
                     task {
                         callCount <- callCount + 1
                         
@@ -130,10 +124,10 @@ let ``Make sure error is recorded if brokerage fails``() = async {
     
     let mock =
         {
-            new IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
+            new DataHelpers.IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
                     task {
-                        return core.fs.ServiceError("error") |> core.fs.ServiceResponse<PriceBars>
+                        return core.fs.ServiceError(transactionRateErrorMessage) |> core.fs.ServiceResponse<PriceBars>
                     }
         }
         
@@ -148,7 +142,7 @@ let ``Make sure error is recorded if brokerage fails``() = async {
     
     let contents = File.ReadAllText priceFile
     
-    contents |> should equal "ERROR: error"
+    contents |> should equal $"ERROR: {transactionRateErrorMessage}"
     priceBars |> Option.isNone |> should equal true
 }
 
@@ -158,8 +152,8 @@ let ``When prices are not available for perpetuity, brokerage is not pinged``() 
     
     let mock =
         {
-            new IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
+            new DataHelpers.IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
                     task {
                         call <- call + 1
                         return core.fs.ServiceError("No candles for historical prices for " + ticker.Value) |> core.fs.ServiceResponse<PriceBars>
@@ -186,9 +180,9 @@ let ``If getting price data throws, it gets recorded``() = async {
     ServiceHelperTests.initServiceHelper [||]
     let mock =
         {
-            new IBrokerageGetPriceHistory with 
-                member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
-                    failwith "record this error"
+            new DataHelpers.IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
+                    failwith transactionRateErrorMessage
         }
     
     let getPriceBars = setupGetPricesWithBrokerageMock mock DateTimeOffset.UtcNow DateTimeOffset.UtcNow
@@ -202,6 +196,6 @@ let ``If getting price data throws, it gets recorded``() = async {
     
     let contents = File.ReadAllText priceFile
     
-    contents |> should equal "ERROR: record this error"
+    contents |> should equal $"ERROR: {transactionRateErrorMessage}"
     priceBars |> Option.isNone |> should equal true
 }

@@ -2,9 +2,15 @@ module studiestests.PriceTransformationTests
 
 open Xunit
 open FsUnit
+open studies
+open studies.DataHelpers
 open studies.Types
+open testutils
 
-let transform rows = rows |> studies.PriceTransformation.transform DataHelpersTests.setupGetPricesWithNoBrokerageAccess
+let transform rows =
+    let mock = DataHelpersTests.setupGetPricesWithNoBrokerageAccess
+    rows
+    |> studies.PriceTransformation.transform mock DataHelpersTests.testDataPath
     
 [<Fact>]
 let ``Price transformation means adding price, gap, and SMA data``() = async {
@@ -53,6 +59,34 @@ let ``Transform when price information is not available, should skip that signal
     
     transformed.Rows |> Seq.length |> should equal 0
 }
+
+[<Fact>]
+let ``Transform retries fetching the prices until all the price feeds are available``() = async {
+    
+    let mutable callCount = 0
+    let mock =
+        {
+            new IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
+                    task {
+                        
+                        callCount <- callCount + 1
+                        
+                        return
+                            match callCount with
+                            | x when x >= 2 ->
+                                TestDataGenerator.PriceBars(TestDataGenerator.NET) |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
+                            | _ ->
+                                core.fs.ServiceError(DataHelpersTests.transactionRateErrorMessage) |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
+                    }
+        }
+        
+    let! transformed = 
+        [Signal.Row(date = "2022-08-05", ticker = "ABRACADABRA", screenerid = 1)]
+        |> PriceTransformation.transform mock DataHelpersTests.testDataPath
+        
+    transformed.Rows |> Seq.length |> should equal 1
+}    
     
     
     

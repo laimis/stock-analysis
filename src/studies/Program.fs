@@ -4,6 +4,7 @@ open System
 open FSharp.Data
 open studies
 open Microsoft.Extensions.Logging
+open studies.DataHelpers
 open studies.Types
 
 Environment.GetCommandLineArgs() |> ServiceHelper.init None
@@ -31,19 +32,27 @@ let actions = [
             | Text text -> text
             | _ -> failwith "Unexpected response from screener"
         let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
-        do! csv |> DataHelpers.saveCsv outputFilename
+        do! csv |> saveCsv outputFilename
     }
     if ServiceHelper.hasArgument "-pt" then fun () -> async {
-        let getPricesWithBrokerage = DataHelpers.getPricesWithBrokerage user.Value (ServiceHelper.brokerage()) studiesDirectory
+        
+        let brokerage = ServiceHelper.brokerage()
+        
+        let pricesWrapper =
+            {
+                new IGetPriceHistory with 
+                    member this.GetPriceHistory start ``end`` ticker =
+                        brokerage.GetPriceHistory user.Value.State ticker core.fs.Adapters.Stocks.PriceFrequency.Daily start ``end``
+            }
         
         let! transformed =
             ServiceHelper.inputFilename()
             |> generateFilePathInStudiesDirectory
             |> Signal.Load |> _.Rows
-            |> PriceTransformation.transform getPricesWithBrokerage
+            |> PriceTransformation.transform pricesWrapper studiesDirectory
             
         let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
-        do! transformed.SaveToString() |> DataHelpers.appendCsv outputFilename
+        do! transformed.SaveToString() |> appendCsv outputFilename
     }
     if ServiceHelper.hasArgument "-trade" then fun () -> async {
         let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory

@@ -2,10 +2,11 @@ module studies.PriceTransformation
 
 open System
 open core.Shared
-open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
+open studies.DataHelpers
 open studies.Types
+open Microsoft.Extensions.Logging
     
 let private getEarliestDateByTicker (records:Signal.Row seq) =
     
@@ -15,8 +16,43 @@ let private getEarliestDateByTicker (records:Signal.Row seq) =
             let earliestDate = records |> Seq.minBy _.Date
             (ticker, earliestDate)
         )
+    
+let private fetchPriceFeeds (brokerage:IGetPriceHistory) studiesDirectory tickerDatePairs = async {
+    
+    let runFetch() =
+        tickerDatePairs
+        |> Seq.map (fun (ticker, earliestDate:Signal.Row) -> async {
+            
+            let earliestDateMinus365 = earliestDate.Date |> DateTimeOffset.Parse |> _.AddDays(-365)
+            let today = DateTimeOffset.UtcNow
+            
+            // first try to get prices from local file
+            let! prices = tryGetPricesFromCsv studiesDirectory ticker
+            match prices with
+            | Available _ -> return (ticker, prices)
+            | NotAvailableForever -> return (ticker, prices)
+            | _ ->
+                // if not available, try pinging brokerage and record to csv 
+                let! prices = ticker |> Ticker |> getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory earliestDateMinus365 today
+                return (ticker, prices)
+        })
+        |> Async.Sequential
         
-let transform (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<PriceBars option>) signals = async {
+    // run the fetch at least 10 times, until there are non NotAvailable records left
+    let rec runFetchUntilAllAvailable (count:int) = async {
+        let! results = runFetch()
+        let failed = results |> Seq.filter (fun (_, prices) -> match prices with | NotAvailable -> true | _ -> false) |> Seq.length
+        if failed = 0 || count = 0 then
+            return results
+        else
+            callLogFuncIfSetup _.LogCritical($"Failed to get {failed} prices, retrying...")
+            return! runFetchUntilAllAvailable (count - 1)
+    }   
+            
+    return! runFetchUntilAllAvailable 10
+}
+        
+let transform (brokerage:IGetPriceHistory) studiesDirectory signals = async {
         
     // generate a pair of ticker and the earliest data it is seen
     let tickerDatePairs = signals |> getEarliestDateByTicker
@@ -27,27 +63,16 @@ let transform (priceFunc:DateTimeOffset -> DateTimeOffset -> Ticker -> Async<Pri
     // when ready, for each ticker, get historical prices from price provider
     // starting with 365 days before the earliest date through today
     
-    let! results =
-        tickerDatePairs
-        |> Seq.map (fun (ticker, earliestDate) -> async {
-            
-            let earliestDateMinus365 = earliestDate.Date |> DateTimeOffset.Parse |> _.AddDays(-365)
-            let today = DateTimeOffset.UtcNow
-            
-            let! prices = ticker |> Ticker |> priceFunc earliestDateMinus365 today
-            return (ticker, prices)
-        })
-        |> Async.Sequential
+    let! results = fetchPriceFeeds brokerage studiesDirectory tickerDatePairs
         
-    let failed = results |> Array.filter (fun (_, prices) -> prices.IsNone)
+    let failed = results |> Array.filter (fun (_, prices) -> match prices with | Available _ -> false | _ -> true)
     let prices =
         results
         |> Array.choose (fun (ticker, prices) ->
             match prices with
-            | Some prices ->
+            | Available prices ->
                 Some (ticker, (prices, prices |> SMAContainer.Generate))
-            | None ->
-                None
+            | _ -> None
         )
         |> Map.ofArray
     
