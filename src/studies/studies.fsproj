@@ -12,7 +12,6 @@
     <Compile Include="DataHelpers.fs" />
     <Compile Include="PriceTransformation.fs" />
     <Compile Include="Program.fs" />
-    <Content Include="transform.bat" />
   </ItemGroup>
 
   <ItemGroup>

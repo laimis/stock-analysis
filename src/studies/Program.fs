@@ -31,13 +31,13 @@ let actions = [
             match response.Body with
             | Text text -> text
             | _ -> failwith "Unexpected response from screener"
-        let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
+        let outputFilename = ServiceHelper.outputFilename()
         do! csv |> saveCsv outputFilename
     }
+    
     if ServiceHelper.hasArgument "-pt" then fun () -> async {
         
-        let brokerage = ServiceHelper.brokerage()
-        
+        let brokerage = ServiceHelper.brokerage()    
         let pricesWrapper =
             {
                 new IGetPriceHistory with 
@@ -47,16 +47,15 @@ let actions = [
         
         let! transformed =
             ServiceHelper.inputFilename()
-            |> generateFilePathInStudiesDirectory
             |> Signal.Load |> _.Rows
             |> PriceTransformation.transform pricesWrapper studiesDirectory
             
-        let outputFilename = ServiceHelper.outputFilename() |> generateFilePathInStudiesDirectory
+        let outputFilename = ServiceHelper.outputFilename()
         do! transformed.SaveToString() |> appendCsv outputFilename
     }
+    
     if ServiceHelper.hasArgument "-trade" then fun () -> async {
-        let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory
-        
+        let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory    
         let strategies = [
             Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 5) None
             Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 10) None
