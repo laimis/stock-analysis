@@ -19,9 +19,6 @@
       <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]="" (click)="activateTab('openreview')">
         Open Review
       </a>
-      <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
-        Analysis
-      </a>
       <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]="" (click)="activateTab('violations')">
         Violations
         @if (violations && violations.length > 0) {
@@ -58,9 +55,6 @@
       (purchaseRequested)="purchaseRequested($event)"
       (refreshRequested)="refresh()"
     ></app-stock-violations>
-  }
-  @if (isActive('analysis') && positions) {
-    <app-stock-trading-outcomes-reports       [allTimeAnalysis]="positions"></app-stock-trading-outcomes-reports>
   }
   @if (isActive('summary')) {
     <app-stock-trading-summary [quotes]="quotes" [positions]="positions" [brokerageAccount]="brokerageAccount" ></app-stock-trading-summary>
