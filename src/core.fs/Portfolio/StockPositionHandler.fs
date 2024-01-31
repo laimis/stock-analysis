@@ -729,7 +729,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 stocks
                 |> Seq.filter _.StopPrice.IsSome
                 |> Seq.sortByDescending (fun p -> match p.Closed with | Some c -> c | None -> DateTimeOffset.MinValue)
-                |> Seq.take command.NumberOfTrades
+                |> Seq.truncate command.NumberOfTrades
                 |> Seq.toList
                 
             let runner = TradingStrategyRunner(brokerage, marketHours)
