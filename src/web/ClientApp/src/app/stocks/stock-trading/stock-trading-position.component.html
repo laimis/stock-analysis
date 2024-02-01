@@ -9,7 +9,7 @@
                 <div class="stat-label">Number of Shares</div>
                 <div>
                     @if (_position.isClosed) {
-                        {{ _position.numberOfShares }}
+                        {{ _position.completedPositionShares }}
                     } @else {
                         {{ _position.numberOfShares }} / {{ _position.completedPositionShares }}
                     }
@@ -17,7 +17,7 @@
             </div>
             <div class="col-md-3">
                 <div class="stat-label">Cost</div>
-                <div>{{ _position.cost | currency }}</div>
+                <div>{{ _position.cost | currency }} / {{ _position.co }}</div>
             </div>
             <div class="col-md-3">
                 <div class="stat-label">Opened</div>
