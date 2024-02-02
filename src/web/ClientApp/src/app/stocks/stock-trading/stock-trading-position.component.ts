@@ -27,6 +27,7 @@ export class StockTradingPositionComponent {
   positionOrders: BrokerageOrder[] = [];
   allOrders: BrokerageOrder[] = [];
   strategies: { key: string; value: string; }[];
+  showOrderForm: boolean = false;
 
   @Input()
   set position(v: PositionInstance) {
@@ -63,7 +64,14 @@ export class StockTradingPositionComponent {
 
   @Output()
   positionDeleted = new EventEmitter()
+    
+    @Output()
+    brokerageOrderEntered = new EventEmitter<string>()
 
+    sendBrokerageOrderEntered($event:string) {
+        this.brokerageOrderEntered.emit($event)
+    }
+    
   // constructor that takes stock service
   constructor(
     private stockService: StockPositionsService

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GetStrategies, isLongTermStrategy, toggleVisuallyHidden} from 'src/app/services/utils';
 import {
   BrokerageOrder,
@@ -70,7 +70,7 @@ export class StockTradingPositionsComponent {
 
     @Input()
     orders:BrokerageOrder[];
-
+    
     private _quotes : Map<string, StockQuote>;
     @Input()
     set quotes(val:Map<string, StockQuote>) {
@@ -79,6 +79,12 @@ export class StockTradingPositionsComponent {
     }
     get quotes() {
       return this._quotes
+    }
+    
+    @Output()
+    brokerageOrderEntered = new EventEmitter<string>()
+    sendBrokerageOrderEntered($event:string) {
+        this.brokerageOrderEntered.emit($event)
     }
 
     // constructor that takes stock service

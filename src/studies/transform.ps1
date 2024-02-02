@@ -2,6 +2,9 @@ $ErrorActionPreference = "Stop"
 
 $studyDirectory = "d:\\studies"
 
+# create timestamp based on date and time
+$timestampPortion = [System.DateTime]::Now.ToString("yyyyMMdd_hhmmss")
+
 write-host "I continue to execute happily!"
 
 # write a function that fetches the data from the API
@@ -37,20 +40,30 @@ function ExecuteNotebook() {
 
     $filterFile = "filter.txt"
     $filterDirectionFile = "filter_direction.txt"
-    $resultsDirectory = "d:\\studies\\results"
+    $resultsDirectoryFile = "results_directory.txt"
+    $resultsDirectory = "$($studyDirectory)\\results_$($timestampPortion)"
 
     #ensure results directory exists
     if (-not (Test-Path $resultsDirectory)) {
         New-Item -ItemType Directory -Path $resultsDirectory
     }
+    
+    #ensure results subdirectory with format filter_filterDirection exists
+    $resultsSubDirectory = "$resultsDirectory\\$($filter)_$($filterDirection)"
+    if (-not (Test-Path $resultsSubDirectory)) {
+        New-Item -ItemType Directory -Path $resultsSubDirectory
+    }
 
-    Write-Host "Executing notebook with filter $filter and filter direction $filterDirection"
+    Write-Host "Executing notebook with filter $filter and filter direction $filterDirection, output to $resultsDirectory"
 
     # write filter to file
     $filter | Out-File -FilePath $filterFile -Force -NoNewline
 
     # write filter direction to file
     $filterDirection | Out-File -FilePath $filterDirectionFile -Force -NoNewline
+    
+    # write results directory to file
+    $resultsDirectory | Out-File -FilePath $resultsDirectoryFile -Force -NoNewline
 
     # execute notebook
     jupyter nbconvert --ExecutePreprocessor.timeout=None --InteractiveShell.iopub_timeout=0 --execute --to html --no-input .\notebook.ipynb
@@ -69,6 +82,7 @@ function ExecuteNotebook() {
     # remove filter files
     Remove-Item -Path $filterFile -ErrorAction SilentlyContinue
     Remove-Item -Path $filterDirectionFile -ErrorAction SilentlyContinue
+    Remove-Item -Path $resultsDirectoryFile -ErrorAction SilentlyContinue
 }
 
 # call fetch data funclearction if command line param --fetch is passed

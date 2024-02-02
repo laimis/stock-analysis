@@ -62,7 +62,7 @@
               }
             </div>
             <div class="card-text visually-hidden" #detailDiv>
-              <app-stock-trading-position [position]="position" [orders]="orders" [quote]="getQuote(position)" ></app-stock-trading-position>
+              <app-stock-trading-position [position]="position" [orders]="orders" [quote]="getQuote(position)" (brokerageOrderEntered)="sendBrokerageOrderEntered($event)" ></app-stock-trading-position>
             </div>
           </div>
         </div>
