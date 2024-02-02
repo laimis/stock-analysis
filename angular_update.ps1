@@ -13,15 +13,16 @@ if ($updates.Count -eq 0) {
     exit
 }
 
+
+Write-Host "There are updates available:"
+
 # use voice to tell that there are updates available
 $voice = New-Object -ComObject Sapi.spvoice
 $voice.rate = 0
 $voice.speak("There are updates available")
 
-# ask if to continue
-Write-Host "The following updates are available:"
 $updates | ForEach-Object { Write-Host $_ }
-Write-Host "Continue? (y/n)"
+Write-Host "Apply them? (y/n)"
 $answer = Read-Host
 
 # if answer is not y, exit
