@@ -128,9 +128,16 @@ let ``Cost at risk based on stop price is accurate`` () =
     let afterSell =
         position
         |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25"))
-        |> StockPositionWithCalculations
     
-    afterSell.CostAtRiskBasedOnStopPrice.Value |> should equal 150m
+    afterSell |> StockPositionWithCalculations |> _.CostAtRiskBasedOnStopPrice.Value |> should equal 150m
+    
+    // now move the stop and risk should be reduced to zero
+    let afterStopMove =
+        afterSell
+        |> StockPosition.setStop (Some 40m) (DateTimeOffset.Parse("2020-02-25"))
+        |> StockPositionWithCalculations
+        
+    afterStopMove.CostAtRiskBasedOnStopPrice.Value |> should equal 0m
     
 [<Fact>]
 let ``Average buy cost per share is accurate``() =
@@ -274,3 +281,30 @@ let ``Losing short position, profit calculation is accurate`` () =
     let transaction = calculated.PLTransactions |> List.head
     
     transaction.Profit |> should equal -1m
+    
+    
+[<Fact>]
+let ``Cost at risk based on stop is accurate for short positions``() =
+    
+    let position =
+        StockPosition.openShort ticker (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.sell 2m 5m (DateTimeOffset.UtcNow.AddDays(-5))
+        |> StockPosition.setStop (Some 7m) (DateTimeOffset.UtcNow.AddDays(-2))
+        
+    let calculated = position |> StockPositionWithCalculations
+    
+    calculated.CostAtRiskBasedOnStopPrice.Value |> should equal 4m
+    
+    let afterSell = position |> StockPosition.buy 1m 4m DateTimeOffset.UtcNow
+    
+    let calculated = afterSell |> StockPositionWithCalculations
+    
+    calculated.CostAtRiskBasedOnStopPrice.Value |> should equal 2m
+    
+    // now move the stop and risk should be reduced to zero
+    let afterStopMove =
+        afterSell
+        |> StockPosition.setStop (Some 5m) (DateTimeOffset.UtcNow)
+        |> StockPositionWithCalculations
+        
+    afterStopMove.CostAtRiskBasedOnStopPrice.Value |> should equal 0m

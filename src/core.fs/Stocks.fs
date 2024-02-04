@@ -599,8 +599,16 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.CostAtRiskBasedOnStopPrice =
         match this.StopPrice with
         | None -> None
-        | Some stopPrice when this.AverageCostPerShare < stopPrice -> Some 0m
-        | Some stopPrice -> (this.AverageCostPerShare - stopPrice) * this.NumberOfShares |> Some
+        | Some stopPrice ->
+            match this.IsShort with
+            | false ->
+                match stopPrice with
+                | x when this.AverageCostPerShare < x -> Some 0m
+                | _ -> (this.AverageCostPerShare - stopPrice) * this.NumberOfShares |> Some
+            | true ->
+                match stopPrice with
+                | x when this.AverageCostPerShare > x -> Some 0m
+                | _ -> (this.AverageCostPerShare - stopPrice) * this.NumberOfShares |> Some
         
     member this.PercentToStop fromPrice =
         match this.StopPrice with
