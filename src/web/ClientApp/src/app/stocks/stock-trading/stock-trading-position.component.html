@@ -151,10 +151,10 @@
                     <div>{{ _position.daysSinceLastTransaction }} days ago</div>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label stat-label" for="candidateRiskAmount">Profit Points</label>
+                    <label class="form-label stat-label" for="candidateRiskAmount"></label>
                     <div>
-                        <button class="btn btn-outline-secondary btn-sm" (click)="fetchProfitPoints()">fetch profit points</button>
-                        <button class="btn btn-outline-secondary btn-sm" (click)="showOrderForm = !showOrderForm">Order Form</button>
+                        <button class="btn btn-outline-secondary btn-sm" (click)="fetchProfitPoints()">Profit Points</button>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showOrderForm = !showOrderForm">Order Form</button>
                     </div>
                 </div>
             </div>
@@ -187,19 +187,11 @@
         }
         <div class="row mt-3">
             <div class="col">
-                <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(ordersContainer)">Orders
-                    ({{ positionOrders.length }})
-                </div>
-                <div #ordersContainer>
-                    @for (order of positionOrders; track order) {
-                        <div class="row">
-                            <div class="col">
-                                {{ order.status }} {{ order.type }} {{ order.quantity }}
-                                &#64; {{ order.price === 0 ? "MARKET" : order.price | currency }}
-                            </div>
-                        </div>
-                    }
-                </div>
+                @if (positionOrders.length > 0) {
+                <app-brokerage-orders [justOrders]="true" [orders]="positionOrders" [filteredTickers]="[_position.ticker]" (cancelRequested)="sendBrokerageOrderEntered($event)"></app-brokerage-orders>
+                } @else {
+                    <span class="text-muted">No Orders</span>
+                }
             </div>
         </div>
         <div class="row mt-3">

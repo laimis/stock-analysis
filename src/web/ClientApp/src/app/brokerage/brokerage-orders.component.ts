@@ -24,6 +24,8 @@ export class BrokerageOrdersComponent {
   purchaseRequested:EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
   @Output()
   sellRequested:EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
+    @Output()
+    cancelRequested:EventEmitter<string> = new EventEmitter<string>()
 
   @Input()
   justOrders: boolean = false;
@@ -61,11 +63,14 @@ export class BrokerageOrdersComponent {
   }
 
   cancelOrder(orderId: string) {
-    this.brokerage.brokerageCancelOrder(orderId)
+    this.brokerage.cancelOrder(orderId)
       .subscribe(
         () => {
           this.brokerage.brokerageAccount().subscribe(
-            a => this.orders = a.orders,
+            a => {
+                this.cancelRequested.emit(orderId)
+                this.orders = a.orders
+            },
             err => this.errors = GetErrors(err)
           )
         },

@@ -23,7 +23,7 @@ export class OptionBrokerageOrdersComponent {
 
   cancelOrder(order:BrokerageOrder){
 
-    this.service.brokerageCancelOrder(order.orderId).subscribe( r => {
+    this.service.cancelOrder(order.orderId).subscribe(r => {
         this.ordersUpdated.emit()
       }, err => {
         this.errors = GetErrors(err)

@@ -43,7 +43,7 @@ export class BrokerageService {
     return this.http.post('/api/brokerage/buytocover', obj)
   }
 
-  brokerageCancelOrder(orderId:string) : Observable<any> {
+  cancelOrder(orderId:string) : Observable<any> {
     this.brokerageAccountData = null
     return this.http.delete('/api/brokerage/orders/' + orderId)
   }
