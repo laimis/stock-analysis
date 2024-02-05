@@ -19,6 +19,14 @@ export function charts_getTradingViewLink(ticker:string) {
     return `https://www.tradingview.com/chart/kQn4rgoA/?symbol=${ticker}`
 }
 
-export function pendingpositions_export() {
+export function stockPendingPositionExportLink() {
     return '/api/stocks/pendingpositions/export'
+}
+
+export function stockOpenPositionExportLink() {
+    return '/api/portfolio/stockpositions/export/open'
+}
+
+export function stockClosedPositionExportLink() {
+    return '/api/portfolio/stockpositions/export/closed'
 }

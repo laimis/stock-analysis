@@ -55,7 +55,7 @@
       <form>
         <div class="row">
           <div class="col">
-            <a href="/api/stocks/export/closed" class="btn btn-link">Export trades</a>
+            <a [href]="getClosedPositionExportLink()" class="btn btn-link">Export trades</a>
           </div>
           <div class="col">
             <div class="form-check form-switch float-end">

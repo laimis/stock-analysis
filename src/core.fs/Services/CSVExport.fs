@@ -12,6 +12,9 @@ open core.fs.Stocks
 module CSVExport =
     
     let private DATE_FORMAT = "yyyy-MM-dd"
+    let private CURRENCY_FORMAT = "C"
+    let private PERCENT_FORMAT = "P"
+    let private NUMBER_FORMAT = "G"
     
     type PendingPositionRecord =
         {
@@ -73,15 +76,16 @@ module CSVExport =
     type TradesRecord =
         {
             Symbol:string
+            NumberOfShares:string
             Opened:string
             Closed:string
             DaysHeld:int
-            FirstBuyCost:decimal
-            Cost:decimal
-            Profit:decimal
-            ReturnPct:decimal
-            RR:decimal
-            RiskedAmount:decimal option
+            FirstBuyCost:string
+            Cost:string
+            Profit:string
+            ReturnPct:string
+            RR:string
+            RiskedAmount:string
             Grade:string
             GradeNote:string
         }
@@ -174,15 +178,16 @@ module CSVExport =
             |> Seq.map (fun t ->
                 {
                     Symbol = t.Ticker.Value
+                    NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> _.ToString(NUMBER_FORMAT)
                     Opened = t.Opened.ToString(DATE_FORMAT)
                     Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT) else "")
                     DaysHeld = t.DaysHeld
-                    FirstBuyCost = t.CompletedPositionCostPerShare
-                    Cost = t.Cost
-                    Profit = t.Profit
-                    ReturnPct = t.GainPct
-                    RR = t.RR
-                    RiskedAmount = t.RiskedAmount
+                    FirstBuyCost = t.CompletedPositionCostPerShare.ToString(CURRENCY_FORMAT)
+                    Cost = t.Cost.ToString(CURRENCY_FORMAT)
+                    Profit = t.Profit.ToString(CURRENCY_FORMAT)
+                    ReturnPct = t.GainPct.ToString(PERCENT_FORMAT)
+                    RR = t.RR.ToString(NUMBER_FORMAT)
+                    RiskedAmount = (if t.RiskedAmount.IsSome then t.RiskedAmount.Value.ToString(CURRENCY_FORMAT) else "")
                     Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
                     GradeNote = ""
                 }

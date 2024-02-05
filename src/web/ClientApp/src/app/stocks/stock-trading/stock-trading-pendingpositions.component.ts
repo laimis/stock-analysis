@@ -1,7 +1,7 @@
 import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import {BrokerageOrder, PendingStockPosition, StocksService} from 'src/app/services/stocks.service';
 import { GetErrors } from 'src/app/services/utils';
-import {pendingpositions_export} from "../../services/links.service";
+import {stockPendingPositionExportLink} from "../../services/links.service";
 import {BrokerageService} from "../../services/brokerage.service";
 
 @Component({
@@ -69,7 +69,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
   }
 
   getPendingPositionExportUrl() {
-    return pendingpositions_export()
+    return stockPendingPositionExportLink()
   }
 }
 

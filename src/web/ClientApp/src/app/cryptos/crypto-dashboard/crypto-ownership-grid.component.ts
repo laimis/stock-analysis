@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { OwnedCrypto } from '../../services/stocks.service';
+import {stockOpenPositionExportLink} from "../../services/links.service";
 
 
 @Component({

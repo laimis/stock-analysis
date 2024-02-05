@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { PositionInstance } from 'src/app/services/stocks.service';
+import {stockClosedPositionExportLink} from "../../services/links.service";
 
 
 @Component({
@@ -60,6 +61,10 @@ export class StockTradingClosedPositionsComponent {
   get positions(): PositionInstance[] {
     return this._positions
   }
+
+    getClosedPositionExportLink() {
+        return stockClosedPositionExportLink()
+    }
 
   matchesFilter(position:PositionInstance) {
 

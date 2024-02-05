@@ -7,6 +7,7 @@ import {
   StockQuote
 } from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {stockOpenPositionExportLink} from "../../services/links.service";
 
 
 @Component({
@@ -85,6 +86,10 @@ export class StockTradingPositionsComponent {
     brokerageOrderEntered = new EventEmitter<string>()
     sendBrokerageOrderEntered($event:string) {
         this.brokerageOrderEntered.emit($event)
+    }
+    
+    getOpenPositionExportLink() {
+        return stockOpenPositionExportLink()
     }
 
     // constructor that takes stock service
