@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
   BrokerageOrder,
@@ -53,6 +53,13 @@ export class StockTradingReviewComponent {
 
   @Input()
   orders:BrokerageOrder[]
+    
+    @Output()
+    brokerageOrderEntered: EventEmitter<string>
+
+    issueBrokerageOrderEntered(ticker:string) {
+        this.brokerageOrderEntered.emit(ticker)
+    }
 
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]

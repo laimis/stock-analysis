@@ -45,7 +45,7 @@
     <app-stock-trading-positions [positions]=positions [orders]="brokerageAccount.orders" [quotes]="quotes" (brokerageOrderEntered)="refresh()"></app-stock-trading-positions>
   }
   @if (isActive('openreview')) {
-    <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=positions [quotes]="quotes"></app-stock-trading-review>
+    <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=positions [quotes]="quotes" (brokerageOrderEntered)="refresh()"></app-stock-trading-review>
   }
   @if (isActive('violations')) {
     <app-stock-violations

@@ -123,7 +123,7 @@
 
         <section>
           <h5>Position Information</h5>
-          <app-stock-trading-position [position]="currentPosition" [orders]="orders" [quote]="getQuote(currentPosition)"></app-stock-trading-position>
+          <app-stock-trading-position [position]="currentPosition" [orders]="orders" [quote]="getQuote(currentPosition)" (brokerageOrderEntered)="issueBrokerageOrderEntered($event)"></app-stock-trading-position>
         </section>
         <section>
           <h5>Stock chart</h5>

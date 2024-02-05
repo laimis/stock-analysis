@@ -119,28 +119,30 @@ export class BrokerageNewOrderComponent {
     this.execute(cmd => this.brokerage.sellShort(cmd))
   }
 
-  execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
-    this.errorMessage = null
-    this.submittingOrder = true
-    var cmd : brokerageordercommand = {
-      ticker: this.selectedTicker,
-      numberOfShares: this.numberOfShares,
-      price: this.price,
-      type: this.brokerageOrderType,
-      duration: this.brokerageOrderDuration
+    execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
+        this.errorMessage = null
+        this.submittingOrder = true
+        const cmd : brokerageordercommand = {
+          ticker: this.selectedTicker,
+          numberOfShares: this.numberOfShares,
+          price: this.price,
+          type: this.brokerageOrderType,
+          duration: this.brokerageOrderDuration
+        }
+    
+        fn(cmd).subscribe(
+            _ => {
+                this.submittingOrder = false
+                this.submittedOrder = true
+                this.reset()
+                this.brokerageOrderEntered.emit(this.selectedTicker)
+            },
+            err => {
+                this.submittingOrder = false
+                this.submittedOrder = true
+                this.errorMessage = GetErrors(err)[0]
+                console.error(err)
+            }
+        )
     }
-
-    fn(cmd).subscribe(
-      _ => {
-        this.submittingOrder = false
-        this.submittedOrder = true
-        this.reset()
-        this.brokerageOrderEntered.emit(this.selectedTicker)
-    },
-      err => {
-        this.errorMessage = GetErrors(err)[0]
-        console.error(err)
-      }
-    )
-  }
 }
