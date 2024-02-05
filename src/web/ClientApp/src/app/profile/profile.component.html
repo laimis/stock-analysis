@@ -94,23 +94,22 @@
           {{importProgress}}
         </div>
       }
-      <input hidden (change)="importShares($event)"  #shareInput type="file" id="file">
+      <input hidden (change)="importShares($event)"  #shareInput type="file" id="shareInput">
       <button class="btn btn-secondary me-2 mb-1" (click)="shareInput.click()">Shares</button>
-      <input hidden (change)="importCrypto($event)"  #cryptoInput type="file" id="file">
+      <input hidden (change)="importCrypto($event)"  #cryptoInput type="file" id="cryptoInput">
       <button class="btn btn-secondary me-2 mb-1" (click)="cryptoInput.click()">Crypto</button>
-      <input hidden (change)="importOptions($event)"  #optionInput type="file" id="file">
+      <input hidden (change)="importOptions($event)"  #optionInput type="file" id="optionsInput">
       <button class="btn btn-secondary me-2 mb-1" (click)="optionInput.click()">Options</button>
-      <input hidden (change)="importTransactions($event)"  #transactionInput type="file" id="file">
+      <input hidden (change)="importTransactions($event)"  #transactionInput type="file" id="transactionsInput">
       <button class="btn btn-secondary me-2 mb-1" (click)="transactionInput.click()">Transactions</button>
     </div>
   </div>
   <div class="card mb-3">
     <div class="card-header">Exports</div>
     <div class="card-body">
-      <a href="/api/stocks/export" class="btn btn-secondary me-2 mb-1">Shares</a>
+      <a href="/api/portfolio/stockpositions/export/transactions" class="btn btn-secondary me-2 mb-1">Shares</a>
       <a href="/api/options/export" class="btn btn-secondary me-2 mb-1">Options</a>
       <a href="/api/cryptos/export" class="btn btn-secondary me-2 mb-1">Crypto</a>
-      <a href="/api/notes/export" class="btn btn-secondary me-2 mb-1">Notes</a>
     </div>
   </div>
   <div class="card mb-5">
@@ -121,7 +120,7 @@
       @if (showDelete) {
         <div class="mt-1">
           <form>
-            <label for="reason">Any feedback you would like to pass along?</label>
+            <label for="deleteFeedback">Any feedback you would like to pass along?</label>
             <textarea class="form-control mb-2" name="deleteFeedback" id="deleteFeedback" autofocus [(ngModel)]="deleteFeedback"></textarea>
             <button class="btn btn-danger me-2" (click)="deleteFinal()">confirm delete</button>
             <button class="btn btn-primary" (click)="undoDelete()">nevermind</button>
