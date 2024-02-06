@@ -13,7 +13,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
 RUN apk add --no-cache -U \
     curl \
-    tzdata
+    tzdata \
+    icu-libs
 
 WORKDIR /app
 COPY --from=build-env /app/out /app

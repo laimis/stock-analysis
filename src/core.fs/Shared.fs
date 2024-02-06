@@ -30,6 +30,9 @@ type ServiceResponse<'a>(success:'a option,error:ServiceError option) =
         | Some s -> Result.Ok s
         | None -> Result.Error this.Error.Value
     
+module CultureUtils =
+    let DefaultCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US")
+    
 module ResponseUtils =
             
     let failedTyped<'a> (message: string) =

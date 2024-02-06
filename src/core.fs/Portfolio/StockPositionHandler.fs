@@ -301,7 +301,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
             let filename = CSVExport.generateFilename("positions")
             
-            let response = ExportResponse(filename, CSVExport.trades csvWriter sorted)
+            let response = ExportResponse(filename, CSVExport.trades CultureUtils.DefaultCulture csvWriter sorted)
             
             return ServiceResponse<ExportResponse>(response)
     }

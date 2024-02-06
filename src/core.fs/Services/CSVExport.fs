@@ -14,7 +14,7 @@ module CSVExport =
     let private DATE_FORMAT = "yyyy-MM-dd"
     let private CURRENCY_FORMAT = "C"
     let private PERCENT_FORMAT = "P"
-    let private NUMBER_FORMAT = "G"
+    let private NUMBER_FORMAT = "G2"
     
     type PendingPositionRecord =
         {
@@ -76,6 +76,7 @@ module CSVExport =
     type TradesRecord =
         {
             Symbol:string
+            PositionType:string
             NumberOfShares:string
             Opened:string
             Closed:string
@@ -171,25 +172,26 @@ module CSVExport =
         | false -> writer.Generate(list.Tickers |> Seq.map (fun s -> { Ticker = s.Ticker.Value; Created = s.When.ToString(DATE_FORMAT); Notes = s.Note }))
         
     
-    let trades (writer:ICSVWriter) (trades:seq<StockPositionWithCalculations>) =
+    let trades culture (writer:ICSVWriter) (trades:seq<StockPositionWithCalculations>) =
         
         let rows =
             trades
             |> Seq.map (fun t ->
                 {
                     Symbol = t.Ticker.Value
-                    NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> _.ToString(NUMBER_FORMAT)
-                    Opened = t.Opened.ToString(DATE_FORMAT)
-                    Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT) else "")
+                    PositionType = t.StockPositionType.ToString() 
+                    NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> _.ToString(NUMBER_FORMAT, culture)
+                    Opened = t.Opened.ToString(DATE_FORMAT, culture)
+                    Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT, culture) else "")
                     DaysHeld = t.DaysHeld
-                    FirstBuyCost = t.CompletedPositionCostPerShare.ToString(CURRENCY_FORMAT)
-                    Cost = t.Cost.ToString(CURRENCY_FORMAT)
-                    Profit = t.Profit.ToString(CURRENCY_FORMAT)
-                    ReturnPct = t.GainPct.ToString(PERCENT_FORMAT)
-                    RR = t.RR.ToString(NUMBER_FORMAT)
-                    RiskedAmount = (if t.RiskedAmount.IsSome then t.RiskedAmount.Value.ToString(CURRENCY_FORMAT) else "")
+                    FirstBuyCost = t.CompletedPositionCostPerShare.ToString(CURRENCY_FORMAT, culture)
+                    Cost = t.Cost.ToString(CURRENCY_FORMAT, culture)
+                    Profit = t.Profit.ToString(CURRENCY_FORMAT, culture)
+                    ReturnPct = t.GainPct.ToString(PERCENT_FORMAT, culture)
+                    RR = t.RR.ToString(NUMBER_FORMAT, culture)
+                    RiskedAmount = (if t.RiskedAmount.IsSome then t.RiskedAmount.Value.ToString(CURRENCY_FORMAT, culture) else "")
                     Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
-                    GradeNote = ""
+                    GradeNote = (if t.GradeNote.IsSome then t.GradeNote.Value else "")
                 }
             )
             
