@@ -179,7 +179,7 @@ module CSVExport =
             |> Seq.map (fun t ->
                 {
                     Symbol = t.Ticker.Value
-                    PositionType = t.StockPositionType.ToString() 
+                    PositionType = t.StockPositionType
                     NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> _.ToString(NUMBER_FORMAT, culture)
                     Opened = t.Opened.ToString(DATE_FORMAT, culture)
                     Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT, culture) else "")

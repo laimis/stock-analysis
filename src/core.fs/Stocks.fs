@@ -423,7 +423,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         |> List.takeWhile (fun x -> match stockPosition.StockPositionType with | Short -> x.Type = Sell | Long -> x.Type = Buy)
             
     member this.IsShort = stockPosition.StockPositionType = Short
-    member this.StockPositionType = stockPosition.StockPositionType
+    member this.StockPositionType = stockPosition.StockPositionType.ToString()
     member this.PositionId = stockPosition.PositionId
     member this.Ticker = stockPosition.Ticker
     member this.NumberOfShares = stockPosition.NumberOfShares
