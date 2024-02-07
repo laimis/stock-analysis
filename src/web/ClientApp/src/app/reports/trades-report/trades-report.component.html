@@ -1,0 +1,31 @@
+<div>
+    <app-error-display [errors]="errors"></app-error-display>
+    
+    @for (tradeRecommendation of tradeRecommendations; track tradeRecommendation.recommendation) {
+    <section>
+        <h3><span>{{tradeRecommendation.recommendation}}</span></h3>
+        
+        @if (tradeRecommendation.matchingOutcomes.length > 0) {
+            <div>Cycles:
+                @for (cycle of tradeRecommendation.cycles; track cycle) {
+                    <span class="badge bg-positive" >{{cycle}}</span>
+                }
+            </div>
+            
+            <ul>
+                @for (note of tradeRecommendation.notes; track note) {
+                    <li>{{note}}</li>
+                } @empty {
+                    <li>No notes</li>
+                }
+            </ul>
+            
+            <app-outcomes [outcomes]="tradeRecommendation.matchingOutcomes"></app-outcomes>
+        } @else {
+            No matching outcomes found
+        }
+    </section>
+    } @empty {
+        <app-loading></app-loading>
+    }
+</div>

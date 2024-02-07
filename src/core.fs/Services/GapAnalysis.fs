@@ -91,7 +91,7 @@ let private generateInternal (prices: PriceBars) (volumeStats: core.fs.Services.
         }
     )
     
-let detectGaps (prices: PriceBars) (numberOfBarsToAnalyze: int) =
+let detectGaps (numberOfBarsToAnalyze: int) (prices: PriceBars) =
     
     let barsForAnalysis = numberOfBarsToAnalyze |> prices.LatestOrAll
     let barsForVolume = Constants.NumberOfDaysForRecentAnalysis |> prices.LatestOrAll 

@@ -107,7 +107,7 @@ let transform (brokerage:IGetPriceHistory) studiesDirectory signals = async {
         |> Map.keys
         |> Seq.collect (fun ticker ->
             let bars, _ = prices[ticker]
-            let gaps = detectGaps bars bars.Length
+            let gaps = bars |> detectGaps bars.Length
             gaps
             |> Array.map (fun (g:Gap) ->
                 let gapKey = (ticker, g.Bar.DateStr)
