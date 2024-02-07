@@ -96,6 +96,7 @@ import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
 import {BrokerageAccountComponent} from "./brokerage/brokerage-account.component";
+import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
 
 
 let routes: Routes = [
@@ -140,7 +141,7 @@ let routes: Routes = [
 
   {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
   {path: 'stocks/lists/:name', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
-  {path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard]},
+  {path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard], title: 'New Position'},
   {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
   {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
 
@@ -152,6 +153,7 @@ let routes: Routes = [
   {path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard], title: 'Recent Sells'},
   {path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard], title: 'Outcomes Report'},
   {path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard], title : 'Gaps Report'},
+    {path: 'reports/trades', component: TradesReportComponent, canActivate: [AuthGuard], title: 'Trades Report'},
 
   {path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard], title: 'Routines'},
   {path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
@@ -242,6 +244,7 @@ let routes: Routes = [
     GapsComponent,
     PercentChangeDistributionComponent,
     DailyOutcomeScoresComponent,
+      TradesReportComponent,
 
     AlertsComponent,
     StockNewPositionComponent,

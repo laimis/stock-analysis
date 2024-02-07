@@ -1,0 +1,17 @@
+<div>
+    <app-error-display [errors]="errors"></app-error-display>
+    
+    @if(tradeRecommendation) {
+    <section>
+        <h3><span>{{tradeRecommendation.recommendation}}</span></h3>
+        
+        @if (tradeRecommendation.matchingOutcomes.length > 0) {
+        <app-outcomes [outcomes]="tradeRecommendation.matchingOutcomes"></app-outcomes>
+        } @else {
+        No matching outcomes found
+        }
+    </section>
+    } @else {
+        <app-loading></app-loading>
+    }
+</div>
