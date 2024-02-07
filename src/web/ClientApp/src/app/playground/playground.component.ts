@@ -50,6 +50,17 @@ export class PlaygroundComponent implements OnInit {
         this.errors = GetErrors(error)
       })
     )
+      
+      let multiBarDaily = this.stocks.reportOutcomesAllBars(this.tickers).pipe(
+          tap((data) => {
+          this.status = "Multi bar daily done"
+          console.log("Multi bar daily")
+          console.log(data)
+        }, (error) => {
+          console.log("Multi bar daily error")
+          this.errors = GetErrors(error)
+        })
+      )
 
     let singleBarWeekly = this.stocks.reportOutcomesSingleBarWeekly(this.tickers).pipe(
       tap((data) => {
@@ -69,7 +80,7 @@ export class PlaygroundComponent implements OnInit {
 
     this.status = "Running..."
 
-    concat(positionReport, gapReport, singleBarDaily, singleBarWeekly).subscribe(
+    concat(positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily).subscribe(
       (_) => {
         // this.status = "Done"
         // console.log("Done")
