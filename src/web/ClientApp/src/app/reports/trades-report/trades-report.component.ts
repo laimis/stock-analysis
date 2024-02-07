@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {OutcomesReport, StocksService, TickerOutcomes} from "../../services/stocks.service";
+import {OutcomesReport, StockAnalysisOutcome, StocksService, TickerOutcomes} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
 
 // this function will return tickers that match the new low trade candidates for buy side
@@ -8,35 +8,55 @@ import {GetErrors} from "../../services/utils";
 export type TradeRecommendation = {
     recommendation: string
     matchingOutcomes: TickerOutcomes[]
-} 
+}
 
-function getNewLowTradeCandidates(report:OutcomesReport): TradeRecommendation {
+function firstOutcomeMatchByKey(outcome: TickerOutcomes, key: string): StockAnalysisOutcome {
+    return outcome.outcomes.find(o => o.key === key)
+}
+
+function newLowBuyWhenPriceAbove20AND200(report:OutcomesReport): TradeRecommendation {
     let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = outcome.outcomes.find(o => o.key === 'CurrentPrice').value
-        let sma200 = outcome.outcomes.find(o => o.key === 'sma_200').value
-        let sma20 = outcome.outcomes.find(o => o.key === 'sma_20').value
-        
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
         return currentPrice > sma200 && currentPrice > sma20
     })
     
     // return trade recommendation instance
     return {
-        recommendation: 'Buy New Low when current price is above sma200 and sma20',
+        recommendation: 'Buy New Low when current price is above sma200 AND sma20',
         matchingOutcomes: matchingOutcomes
     }
 }
 
-function selectFunctionToUse(screenerId:string) {
+function newLowBuyWhenPriceAbove200(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        return currentPrice > sma200
+    })
+    
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy New Low when current price is above sma200',
+        matchingOutcomes: matchingOutcomes
+    }
+}
+
+
+function selectFunctionsToUse(screenerId:string) {
     switch (screenerId) {
         case '31':
-            return getNewLowTradeCandidates
+            return [newLowBuyWhenPriceAbove20AND200, newLowBuyWhenPriceAbove200]
         default:
-            return (_:OutcomesReport) => {
-                return {
-                    recommendation: 'No recommendation',
-                    matchingOutcomes: []
+            return [
+                (_:OutcomesReport) => {
+                    return {
+                        recommendation: 'No recommendation',
+                        matchingOutcomes: []
+                    }
                 }
-            }
+            ]
     }
 }
 
@@ -49,7 +69,7 @@ export class TradesReportComponent implements OnInit {
     tickers: string[];
     errors: string[];
     screenerId: string;
-    tradeRecommendation: TradeRecommendation
+    tradeRecommendations: TradeRecommendation[] = []
     
     constructor(private route: ActivatedRoute, private service: StocksService) {}
     
@@ -70,13 +90,15 @@ export class TradesReportComponent implements OnInit {
         
         this.tickers = this.route.snapshot.queryParamMap.get('tickers').split(',')
         
-        let func = selectFunctionToUse(this.screenerId)
+        let funcs = selectFunctionsToUse(this.screenerId)
         
         // multiple bar daily report
         this.service.reportOutcomesAllBars(this.tickers).subscribe(
             report => {
                 console.log(report)
-                this.tradeRecommendation = func(report)
+                funcs.forEach(func => {
+                    this.tradeRecommendations.push(func(report))
+                })
             },
             error => {
                 this.errors = GetErrors(error)

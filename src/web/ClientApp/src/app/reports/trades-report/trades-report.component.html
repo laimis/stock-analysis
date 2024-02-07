@@ -1,7 +1,7 @@
 <div>
     <app-error-display [errors]="errors"></app-error-display>
     
-    @if(tradeRecommendation) {
+    @for (tradeRecommendation of tradeRecommendations) {
     <section>
         <h3><span>{{tradeRecommendation.recommendation}}</span></h3>
         
