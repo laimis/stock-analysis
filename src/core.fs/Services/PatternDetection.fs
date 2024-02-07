@@ -27,7 +27,7 @@ let gapDown (bars: PriceBars) =
     match bars.Length with
     | 0 | 1 -> None
     | _ ->
-        let gaps = detectGaps bars 2
+        let gaps = bars |> detectGaps 2
         match gaps with
         | [|gap|] when gap.Type = GapType.Down ->
             let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString
@@ -48,7 +48,7 @@ let gapUp (bars: PriceBars) =
     match bars.Length with
     | 0 | 1 -> None
     | _ ->
-        let gaps = detectGaps bars 2
+        let gaps = bars |> detectGaps 2
         match gaps with
         | [|gap|] when gap.Type = GapType.Up ->
             let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString

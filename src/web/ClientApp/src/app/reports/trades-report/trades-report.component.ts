@@ -8,12 +8,109 @@ import {GetErrors} from "../../services/utils";
 export type TradeRecommendation = {
     recommendation: string
     matchingOutcomes: TickerOutcomes[]
+    notes: string[]
+    cycles: string[]
 }
 
 function firstOutcomeMatchByKey(outcome: TickerOutcomes, key: string): StockAnalysisOutcome {
     return outcome.outcomes.find(o => o.key === key)
 }
 
+
+// NEW HIGH BUY
+function newHighBuyWhenGapUp(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let gapUp = firstOutcomeMatchByKey(outcome, 'GapPercentage').value
+        return gapUp > 0
+    })
+    
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy New High when Gap Up into it',
+        matchingOutcomes: matchingOutcomes,
+        notes: [],
+        cycles: [
+            'My Cycle DOWN and UP',
+            'SPY ST DOWN and UP',
+            'SPY LT DOWN and UP'
+        ]
+    }
+}
+
+function newHighBuyWhenPriceAbove200(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        return currentPrice > sma200
+    })
+    
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy New High when current price is above sma200',
+        matchingOutcomes: matchingOutcomes,
+        notes: [''],
+        cycles: ['SPY LT UP']
+    }
+}
+// NEW HIGH BUY END
+
+// TOP GAINER BUY
+function topGainerBuyWhenPriceAbove200AndSpySTDown(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        return currentPrice > sma200
+    })
+    
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy Top Gainer when current price is above sma200 and SPY ST DOWN',
+        matchingOutcomes: matchingOutcomes,
+        notes: [],
+        cycles: ['SPY ST DOWN']
+    }
+}
+// TOP GAINER BUY END
+
+// TOP LOSER BUY
+function topLoserBuyWhenPriceAbove20or200(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        return currentPrice > sma200 || currentPrice > sma20
+    })
+
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy Top Loser when price is above sma20 OR sma200',
+        matchingOutcomes: matchingOutcomes,
+        notes: ['Stop Loss friendly in particularly in SPY LT UP cycle'],
+        cycles: ['All']
+    }
+}
+
+function topLoserBuyWhenPriceAboveSMAAlign(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        let sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
+        let sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        return currentPrice > sma20 && sma20 > sma50 && sma50 > sma150 && sma150 > sma200
+    })
+
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy Top Loser when current price is > SMAAlign',
+        matchingOutcomes: matchingOutcomes,
+        notes: ['Stop Loss friendly in SPY LT UP'],
+        cycles: ['My Cycle UP']
+    }
+}
+// TOP LOSER BUY END
+
+// NEW LOW BUY
 function newLowBuyWhenPriceAbove20AND200(report:OutcomesReport): TradeRecommendation {
     let matchingOutcomes = report.outcomes.filter(outcome => {
         let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
@@ -25,7 +122,9 @@ function newLowBuyWhenPriceAbove20AND200(report:OutcomesReport): TradeRecommenda
     // return trade recommendation instance
     return {
         recommendation: 'Buy New Low when current price is above sma200 AND sma20',
-        matchingOutcomes: matchingOutcomes
+        matchingOutcomes: matchingOutcomes,
+        notes: [],
+        cycles: ['All']
     }
 }
 
@@ -39,21 +138,52 @@ function newLowBuyWhenPriceAbove200(report:OutcomesReport): TradeRecommendation 
     // return trade recommendation instance
     return {
         recommendation: 'Buy New Low when current price is above sma200',
-        matchingOutcomes: matchingOutcomes
+        matchingOutcomes: matchingOutcomes,
+        notes: ['Stop Loss friendly in particularly in SPY LT UP cycle'],
+        cycles: ['All']
     }
 }
+
+function newLowBuyWhenGapDown(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let gapDown = firstOutcomeMatchByKey(outcome, 'GapPercentage').value
+        return gapDown < 0
+    })
+    
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy New Low when Gap Down into it',
+        matchingOutcomes: matchingOutcomes,
+        notes: [],
+        cycles: [
+            'My Cycle DOWN',
+            'SPY ST DOWN',
+            'SPY LT DOWN <-- suspect, maybe because of super recovery plays? need more investigation.'
+        ]
+    }
+}
+// NEW LOW BUY END
 
 
 function selectFunctionsToUse(screenerId:string) {
     switch (screenerId) {
+        case '28':
+            return [newHighBuyWhenGapUp, newHighBuyWhenPriceAbove200]
+        case '29':
+            return [topGainerBuyWhenPriceAbove200AndSpySTDown]
+        case '30':
+            return [topLoserBuyWhenPriceAbove20or200, topLoserBuyWhenPriceAboveSMAAlign]
         case '31':
-            return [newLowBuyWhenPriceAbove20AND200, newLowBuyWhenPriceAbove200]
+            return [newLowBuyWhenPriceAbove20AND200, newLowBuyWhenPriceAbove200, newLowBuyWhenGapDown]
+        
         default:
             return [
                 (_:OutcomesReport) => {
                     return {
                         recommendation: 'No recommendation',
-                        matchingOutcomes: []
+                        matchingOutcomes: [],
+                        stopLossFriendly: false,
+                        cycles: []
                     }
                 }
             ]

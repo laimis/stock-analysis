@@ -7,9 +7,8 @@ open testutils
 open FsUnit
 
 let gaps =
-    GapAnalysis.detectGaps
-        (TestDataGenerator.PriceBars(TestDataGenerator.NET))
-        Constants.NumberOfDaysForRecentAnalysis
+    TestDataGenerator.PriceBars(TestDataGenerator.NET)
+    |> GapAnalysis.detectGaps Constants.NumberOfDaysForRecentAnalysis
 
 
 [<Fact>]

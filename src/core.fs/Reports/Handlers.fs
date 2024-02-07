@@ -11,10 +11,8 @@ open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Analysis
-open core.fs.Services.Analysis.SingleBarPriceAnalysis
 open core.fs.Services.GapAnalysis
 open core.fs.Services.MultipleBarPriceAnalysis
-open core.fs.Adapters.Storage
 open core.fs.Stocks
 
 type ChainQuery =
@@ -294,7 +292,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             match priceResponse.Success with
             | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<GapReportView>
             | Some prices ->
-                let gaps = detectGaps prices Constants.NumberOfDaysForRecentAnalysis
+                let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
                 let response = {gaps=gaps; ticker=query.Ticker.Value}
                 return ServiceResponse<GapReportView>(response)
     }
@@ -344,7 +342,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             let gapsView =
                                 match query.IncludeGapAnalysis with
                                 | true ->
-                                    let gaps = detectGaps prices Constants.NumberOfDaysForRecentAnalysis
+                                    let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
                                     Some {gaps=gaps; ticker=t.Value}
                                 | false -> None
                                 
