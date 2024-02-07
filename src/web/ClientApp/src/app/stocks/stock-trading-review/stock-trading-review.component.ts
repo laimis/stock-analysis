@@ -55,7 +55,7 @@ export class StockTradingReviewComponent {
   orders:BrokerageOrder[]
     
     @Output()
-    brokerageOrderEntered: EventEmitter<string>
+    brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
 
     issueBrokerageOrderEntered(ticker:string) {
         this.brokerageOrderEntered.emit(ticker)
