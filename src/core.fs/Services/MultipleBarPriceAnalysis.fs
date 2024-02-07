@@ -3,6 +3,7 @@ namespace core.fs.Services
 open core.fs
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
+open core.fs.Services.GapAnalysis
 
 
 module MultipleBarPriceAnalysis =
@@ -27,6 +28,7 @@ module MultipleBarPriceAnalysis =
         let Gain = "Gain"
         let AverageTrueRange = "AverageTrueRange"
         let GreenStreak = "GreenStreak"
+        let GapPercentage = "GapPercentage"
         
         let SMA interval = $"sma_%i{interval}"
 
@@ -302,6 +304,32 @@ module MultipleBarPriceAnalysis =
                 message = $"Gain from earliest to latest: {gain}%%"
             )
             
+        let private generateGapOutcome (prices:PriceBars) =
+            let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
+            let gap = gaps |> Array.tryFind (fun x -> x.Bar = prices.Last)
+                    
+            let outcomeType =
+                match gap with
+                | Some x when x.Type = GapType.Up -> OutcomeType.Positive
+                | Some x when x.Type = GapType.Down -> OutcomeType.Negative
+                | _ -> OutcomeType.Neutral
+                
+            let gapValue =
+                match gap with
+                | Some x -> x.GapSizePct
+                | _ -> 0m
+                
+            AnalysisOutcome(
+                key = MultipleBarOutcomeKeys.GapPercentage,
+                outcomeType = outcomeType,
+                value = gapValue,
+                valueType = ValueFormat.Percentage,
+                message =
+                    match gap with
+                    | Some x -> $"Gap of {x:P2}"
+                    | _ -> "No gap detected"
+            )
+            
         let private generatePercentChangeAverageOutcome (prices: PriceBars) =
             
             let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
@@ -384,7 +412,7 @@ module MultipleBarPriceAnalysis =
         let generate (prices: PriceBars) =
             
             let atrOutcome = prices |> generateAverageTrueRangeOutcome
-            
+                    
             [
                 prices |> generateCurrentPriceOutcome
                 prices |> generateEarliestPriceOutcome
@@ -398,6 +426,7 @@ module MultipleBarPriceAnalysis =
                 prices |> generatePercentChangeAverageOutcome
                 prices |> generatePercentChangeStandardDeviationOutcome
                 if atrOutcome.IsSome then atrOutcome.Value
+                prices |> generateGapOutcome
                 prices |> generateGreenStreakOutcome
             ]
     
