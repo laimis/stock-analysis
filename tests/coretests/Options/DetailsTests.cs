@@ -50,7 +50,7 @@ namespace coretests.Options
 
             var result = await handler.Handle(query);
 
-            Assert.NotNull(result);
+            Assert.True(result.IsOk);
         }
     }
 }
