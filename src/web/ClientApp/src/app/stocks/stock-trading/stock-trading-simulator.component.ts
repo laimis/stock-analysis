@@ -15,7 +15,7 @@ class StockTransaction {
 }
 
 @Component({
-  selector: 'stock-trading-simulation',
+  selector: 'app-stock-trading-simulation',
   templateUrl: './stock-trading-simulator.component.html',
   styleUrls: ['./stock-trading-simulator.component.css']
 })

@@ -30,13 +30,7 @@ export class StockViolationsComponent {
   @Output()
   refreshRequested = new EventEmitter<string>()
 
-  @Output()
-  sellRequested = new EventEmitter<stocktransactioncommand>()
-
-  @Output()
-  purchaseRequested = new EventEmitter<stocktransactioncommand>()
-
-  activeTicker: string = null
+    activeTicker: string = null
   fixType : string = null
 
   constructor() { }

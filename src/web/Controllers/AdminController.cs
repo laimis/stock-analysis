@@ -13,16 +13,8 @@ namespace web.Controllers
     [ApiController]
     [Authorize("admin")]
     [Route("api/[controller]")]
-    public class AdminController : ControllerBase
+    public class AdminController(Handler handler) : ControllerBase
     {
-        private readonly Handler _handler;
-
-        public AdminController(
-            Handler handler)
-        {
-            _handler = handler;
-        }
-
         [HttpGet("test")]
         public ActionResult Test() => Ok();
 
@@ -53,7 +45,7 @@ namespace web.Controllers
         [HttpPost("email")]
         public Task<ActionResult> Email(EmailInput obj) =>
             this.OkOrError(
-                _handler.Handle(
+                handler.Handle(
                     new SendEmail(
                         obj
                     )
@@ -64,7 +56,7 @@ namespace web.Controllers
         [HttpGet("welcome")]
         public Task<ActionResult> Welcome([FromQuery]Guid userId) =>
             this.OkOrError(
-                _handler.Handle(
+                handler.Handle(
                     new SendWelcomeEmail(UserId.NewUserId(userId))
                 )
             );
@@ -73,7 +65,7 @@ namespace web.Controllers
         public Task<ActionResult> ActiveAccounts()
         {
             return this.OkOrError(
-                _handler.Handle(
+                handler.Handle(
                     new Query(true)
                 )
             );
@@ -81,7 +73,7 @@ namespace web.Controllers
 
         [HttpGet("users/export")]
         public async Task<ActionResult> Export() => this.GenerateExport(
-            await _handler.Handle(
+            await handler.Handle(
                 new Export()
             )
         );

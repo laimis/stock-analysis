@@ -66,8 +66,7 @@
       [filteredTickers]="[stock.ticker]"
       [orders]="orders"
       [positionId]="currentPosition?.positionId"
-      (purchaseRequested)="purchaseRequested($event)"
-      (sellRequested)="sellRequested($event)">
+      (ordersChanged)="brokerageOrderEntered($event)">
     </app-brokerage-orders>
   </section>
 
@@ -80,7 +79,7 @@
   <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote"></app-stock-ownership>
 }
 @if (isActive('options')) {
-  <stock-option [ticker]=stock.ticker [options]=options></stock-option>
+  <app-stock-option [ticker]=stock.ticker [options]=options></app-stock-option>
 }
 @if (isActive('fundamentals')) {
   <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>

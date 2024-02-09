@@ -81,7 +81,7 @@
               <div class="row">
                 <div class="col">
                   <label for="positionType">Trade type</label>
-                  <input class="form-control" type="text" readonly value="{{positionType}}" />
+                  <input class="form-control" id="positionType" type="text" readonly value="{{positionType}}" />
                 </div>
                 <div class="col">
                   <label for="numberOfContracts">Number of Contracts</label>
@@ -133,7 +133,7 @@
           <tbody>
             @for (t of option.transactions; track t) {
               <tr
-                [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount == 0}"
+                [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount === 0}"
                 >
                 <td>{{ t.date | date:'shortDate'}}</td>
                 <td>{{ t.description }}</td>
@@ -146,7 +146,7 @@
       <div class="mb-3">
         <label>Delete this option position from your portfolio</label>
         <div>
-          <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
+          <button type="button" class="btn btn-secondary mb-1 me-2 float-end" (click)="delete()">Delete</button>
         </div>
       </div>
     </div>

@@ -180,7 +180,7 @@
             @if (showOrderForm) {
             <div class="row mt-3">
                 <div class="col">
-                    <app-brokerage-new-order [ticker]="_position.ticker" (brokerageOrderEntered)="sendBrokerageOrderEntered($event)"></app-brokerage-new-order>
+                    <app-brokerage-new-order [ticker]="_position.ticker" (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
                 </div>
             </div>
             }
@@ -188,7 +188,7 @@
         <div class="row mt-3">
             <div class="col">
                 @if (positionOrders.length > 0) {
-                <app-brokerage-orders [justOrders]="true" [orders]="positionOrders" [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId" (cancelRequested)="sendBrokerageOrderEntered($event)"></app-brokerage-orders>
+                <app-brokerage-orders [justOrders]="true" [orders]="positionOrders" [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId" (ordersChanged)="brokerageOrdersChanged.emit($event)"></app-brokerage-orders>
                 } @else {
                     <span class="text-muted">No Orders</span>
                 }

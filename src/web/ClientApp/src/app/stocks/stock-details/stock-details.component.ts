@@ -92,30 +92,6 @@ export class StockDetailsComponent implements OnInit {
     this.loadOrders()
   }
 
-  purchaseRequested(command:stocktransactioncommand) {
-    this.stockPositions.purchase(command).subscribe(
-      () => {
-        this.loading.ownership = true;
-        this.loadStockOwnership()
-      },
-      error => {
-        this.errors.notes = GetErrors(error)
-      }
-    )
-  }
-
-  sellRequested(command:stocktransactioncommand) {
-    this.stockPositions.sell(command).subscribe(
-      () => {
-        this.loading.ownership = true;
-        this.loadStockOwnership()
-      },
-      error => {
-        this.errors.notes = GetErrors(error)
-      }
-    )
-  }
-
   loadStockDetails() {
     this.stocks.getStockDetails(this.ticker).subscribe(result => {
       this.loading.stock = false;

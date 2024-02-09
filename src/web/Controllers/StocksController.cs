@@ -12,17 +12,12 @@ namespace web.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class StocksController : ControllerBase
+    public class StocksController(StocksHandler service) : ControllerBase
     {
-        private readonly StocksHandler _service;
-
-        public StocksController(StocksHandler service) =>
-            _service = service;
-
         [HttpGet("{ticker}")]
         public Task<ActionResult> Details([FromRoute] string ticker)
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new DetailsQuery(new Ticker(ticker), User.Identifier())
                 )
             );
@@ -31,7 +26,7 @@ namespace web.Controllers
         public Task<ActionResult> Prices([FromRoute] string ticker, [FromQuery] int numberOfDays,
             [FromQuery] string frequency) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     PricesQuery.NumberOfDays(
                         frequency: PriceFrequency.FromString(frequency), numberOfDays: numberOfDays,
                         ticker: new Ticker(ticker), userId: User.Identifier()
@@ -42,7 +37,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/secfilings")]
         public Task<ActionResult> SecFilings([FromRoute] string ticker) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new CompanyFilingsQuery(
                         new Ticker(ticker), User.Identifier()
                     )
@@ -56,7 +51,7 @@ namespace web.Controllers
             [FromRoute] DateTimeOffset end,
             [FromQuery] string frequency) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new PricesQuery(
                         frequency: PriceFrequency.FromString(frequency), userId: User.Identifier(),
                         ticker: new Ticker(ticker), start: start, end: end
@@ -67,7 +62,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/price")]
         public Task<ActionResult> Price([FromRoute] string ticker) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new PriceQuery(userId: User.Identifier(), ticker: new Ticker(ticker))
                 )
             );
@@ -75,7 +70,7 @@ namespace web.Controllers
         [HttpGet("{ticker}/quote")]
         public Task<ActionResult> Quote([FromRoute] string ticker) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new QuoteQuery(
                         new Ticker(ticker), User.Identifier()
                     )
@@ -85,7 +80,7 @@ namespace web.Controllers
         [HttpGet("search/{term}")]
         public Task<ActionResult> Search([FromRoute] string term) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new SearchQuery(term, User.Identifier())
                 )
             );

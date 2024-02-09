@@ -10,30 +10,27 @@ namespace web.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/stocks/pendingpositions")]
-public class PendingPositionsController : ControllerBase
+public class PendingPositionsController(PendingStockPositionsHandler pendingStockPositionsHandler) : ControllerBase
 {
-    private readonly PendingStockPositionsHandler _pendingStockPositionsHandler;
-    public PendingPositionsController(PendingStockPositionsHandler pendingStockPositionsHandler) => _pendingStockPositionsHandler = pendingStockPositionsHandler;
-    
     [HttpGet]
     public Task<ActionResult> PendingStockPositions() =>
-        this.OkOrError(_pendingStockPositionsHandler.Handle(new Query(User.Identifier())));
+        this.OkOrError(pendingStockPositionsHandler.Handle(new Query(User.Identifier())));
         
     [HttpGet("export")]
     public Task<ActionResult> ExportPendingStockPositions() =>
         this.GenerateExport(
-            _pendingStockPositionsHandler.Handle(new Export(User.Identifier())
+            pendingStockPositionsHandler.Handle(new Export(User.Identifier())
             ));
         
     [HttpPost]
     public Task<ActionResult> CreatePendingStockPosition([FromBody]Create command) =>
         this.OkOrError(
-            _pendingStockPositionsHandler.HandleCreate(
+            pendingStockPositionsHandler.HandleCreate(
                 User.Identifier(), command
             )
         );
 
     [HttpDelete("{id}")]
     public Task<ActionResult> ClosePendingStockPosition([FromRoute] Guid id) =>
-        this.OkOrError(_pendingStockPositionsHandler.Handle(new Close(id, User.Identifier())));
+        this.OkOrError(pendingStockPositionsHandler.Handle(new Close(id, User.Identifier())));
 }

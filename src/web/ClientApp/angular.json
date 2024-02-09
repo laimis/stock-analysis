@@ -61,7 +61,7 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": true,
-              "aot": false,
+              "aot": true,
               "extractLicenses": false,
               "vendorChunk": true,
               "buildOptimizer": false

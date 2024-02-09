@@ -20,6 +20,4 @@ export class StockFundamentalsComponent {
   get stock(): StockDetails { return this.summary; }
 
 	constructor(){}
-
-	ngOnInit(): void {}
 }

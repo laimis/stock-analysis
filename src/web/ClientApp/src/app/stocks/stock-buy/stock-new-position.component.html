@@ -16,6 +16,6 @@
   </app-stock-trading-pendingpositions>
   <app-brokerage-orders
     [orders]="orders"
-    (purchaseRequested)="purchaseRequested($event)"
+    (ordersChanged)="getOrders()"
   ></app-brokerage-orders>
 </div>

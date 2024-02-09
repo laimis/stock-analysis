@@ -1,18 +1,18 @@
 @if (overallStats) {
   <div class="mb-5 container">
     <div class="row mb-2"><h5>Overall stats</h5></div>
-    <option-stats [stats]=overallStats></option-stats>
+    <app-option-stats [stats]=overallStats></app-option-stats>
   </div>
 }
 @if (sellStats) {
   <div class="mb-5 container">
     <div class="row mb-2"><h5>Sell stats</h5></div>
-    <option-stats [stats]=sellStats></option-stats>
+    <app-option-stats [stats]=sellStats></app-option-stats>
   </div>
 }
 @if (buyStats) {
   <div class="mb-5 container">
     <div class="row mb-2"><h5>Buy stats</h5></div>
-    <option-stats [stats]=buyStats></option-stats>
+    <app-option-stats [stats]=buyStats></app-option-stats>
   </div>
 }

@@ -13,9 +13,7 @@ export class StockNewPositionComponent implements OnInit {
   feedbackMessage: string;
   orders: BrokerageOrder[];
 
-  constructor(
-    private brokerage : BrokerageService,
-    private stocks : StockPositionsService) {}
+  constructor(private brokerage : BrokerageService) {}
 
   ngOnInit(): void {
     this.getOrders()
@@ -43,17 +41,5 @@ export class StockNewPositionComponent implements OnInit {
 
   pendingPositionClosed() {
     this.feedbackMessage = "Pending position closed";
-  }
-
-  purchaseRequested(command:stocktransactioncommand) {
-    console.log("Purchae requested in new position component")
-    console.log(command)
-    this.stocks.purchase(command).subscribe(
-      val => {
-        this.feedbackMessage = "Purchase procesed"
-        this.getOrders()
-      },
-      error => this.feedbackMessage = GetErrors(error)[0]
-    )
   }
 }

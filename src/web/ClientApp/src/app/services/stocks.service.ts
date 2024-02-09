@@ -484,7 +484,9 @@ export interface Chain {
 }
 
 export interface Link {
-  success: boolean
+    success: boolean
+    level: number
+    profit: number
 }
 
 export interface StockSearchResult {

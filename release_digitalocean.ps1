@@ -63,6 +63,15 @@ if ($exitCode -ne 0) {
     Exit-With-Error "Tests failed"
 }
 
+# ensure that the web project lint is clean
+push-location "src/web/ClientApp"
+invoke-expression "ng lint"
+$exitCode = $LASTEXITCODE
+Pop-Location
+if ($exitCode -ne 0) {
+    Exit-With-Error "Lint failed"
+}
+
 # ensure that the project can build by invoking npm run build -- --configuration production
 # in src/web/ClientApp directory
 push-location "src/web/ClientApp"

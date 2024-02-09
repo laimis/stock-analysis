@@ -4,7 +4,7 @@ import { DatePipe } from '@angular/common';
 import { GetErrors } from 'src/app/services/utils';
 
 @Component({
-  selector: 'stock-option',
+  selector: 'app-stock-option',
   templateUrl: './stock-option.component.html',
   providers: [DatePipe]
 })

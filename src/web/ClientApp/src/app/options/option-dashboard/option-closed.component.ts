@@ -13,6 +13,4 @@ export class OptionClosedComponent {
   closedOptions: OwnedOption[]
 
 	constructor(){}
-
-	ngOnInit(): void {}
 }

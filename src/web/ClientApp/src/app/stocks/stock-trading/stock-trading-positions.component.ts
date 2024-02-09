@@ -83,10 +83,7 @@ export class StockTradingPositionsComponent {
     }
     
     @Output()
-    brokerageOrderEntered = new EventEmitter<string>()
-    sendBrokerageOrderEntered($event:string) {
-        this.brokerageOrderEntered.emit($event)
-    }
+    brokerageOrdersChanged = new EventEmitter<string>()
     
     getOpenPositionExportLink() {
         return stockOpenPositionExportLink()

@@ -11,15 +11,8 @@ namespace web.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class TransactionsController : ControllerBase
+    public class TransactionsController(ImportTransactions.Handler service) : ControllerBase
     {
-        private readonly ImportTransactions.Handler _service;
-
-        public TransactionsController(ImportTransactions.Handler service)
-        {
-            _service = service;
-        }
-        
         [HttpPost("import")]
         public async Task<ActionResult> Import(IFormFile file)
         {
@@ -29,7 +22,7 @@ namespace web.Controllers
 
             var cmd = new ImportTransactions.Command(content, User.Identifier());
 
-            return await this.OkOrError(_service.Handle(cmd));
+            return await this.OkOrError(service.Handle(cmd));
         }
     }
 }

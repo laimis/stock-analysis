@@ -1,7 +1,8 @@
-import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
-import { BrokerageOrder, StocksService, stocktransactioncommand } from 'src/app/services/stocks.service';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { BrokerageOrder, stocktransactioncommand } from 'src/app/services/stocks.service';
 import { GetErrors } from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
+import {StockPositionsService} from "../services/stockpositions.service";
 
 let orderBy = (a:BrokerageOrder, b:BrokerageOrder) => a.ticker.localeCompare(b.ticker)
 
@@ -17,16 +18,10 @@ export class BrokerageOrdersComponent {
   isEmpty: boolean = false;
   errors: string[];
 
-  constructor(private brokerage:BrokerageService) {
+  constructor(private brokerage:BrokerageService, private stocks:StockPositionsService) {
   }
 
-  @Output()
-  purchaseRequested:EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
-  @Output()
-  sellRequested:EventEmitter<stocktransactioncommand> = new EventEmitter<stocktransactioncommand>()
-    @Output()
-    cancelRequested:EventEmitter<string> = new EventEmitter<string>()
-
+  
   @Input()
   justOrders: boolean = false;
 
@@ -48,17 +43,20 @@ export class BrokerageOrdersComponent {
   get filteredTickers():string[] {
     return this._filteredTickers
   }
+  
+  @Output()
+  ordersChanged = new EventEmitter()
 
   groupAndRenderOrders() {
     let isTickerVisible = (ticker:string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
 
     if (this._orders) {
-      var buys = this._orders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-      var sells = this._orders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-      var filledBuys = this._orders.filter(o => o.isBuyOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-      var filledSells = this._orders.filter(o => o.isSellOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-      this.groupedOrders = [buys, sells, filledBuys, filledSells]
-      this.isEmpty = this.groupedOrders.every(o => o.length == 0)
+        const buys = this._orders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+        const sells = this._orders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+        const filledBuys = this._orders.filter(o => o.isBuyOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+        const filledSells = this._orders.filter(o => o.isSellOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+        this.groupedOrders = [buys, sells, filledBuys, filledSells]
+        this.isEmpty = this.groupedOrders.every(o => o.length == 0)
     }
   }
 
@@ -68,11 +66,11 @@ export class BrokerageOrdersComponent {
         () => {
           this.brokerage.brokerageAccount().subscribe(
             a => {
-                this.cancelRequested.emit(orderId)
                 this.orders = a.orders
             },
             err => this.errors = GetErrors(err)
           )
+            this.ordersChanged.emit()
         },
         err => this.errors = GetErrors(err)
       )
@@ -89,10 +87,16 @@ export class BrokerageOrdersComponent {
     };
 
     if (order.isBuyOrder) {
-      this.purchaseRequested.emit(obj)
+        this.stocks.purchase(obj).subscribe(
+            _ => this.ordersChanged.emit(),
+            err => this.errors = GetErrors(err)
+        )
     }
     else if (order.isSellOrder) {
-      this.sellRequested.emit(obj)
+        this.stocks.sell(obj).subscribe(
+            _ => this.ordersChanged.emit(),
+            err => this.errors = GetErrors(err)
+        )
     }
   }
 

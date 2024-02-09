@@ -13,18 +13,11 @@ namespace web.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class ReportsController : ControllerBase
+    public class ReportsController(Handler service) : ControllerBase
     {
-        private readonly Handler _service;
-
-        public ReportsController(Handler service)
-        {
-            _service = service;
-        }
-        
         [HttpGet("chain")]
         public Task<ChainView> Chain() =>
-            _service.Handle(
+            service.Handle(
                 new ChainQuery(
                     User.Identifier()
                 )
@@ -33,7 +26,7 @@ namespace web.Controllers
         [HttpGet("sells")]
         public Task<ActionResult> Sells() =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new SellsQuery(
                         User.Identifier()
                     )
@@ -43,12 +36,12 @@ namespace web.Controllers
         [HttpPost("outcomes")]
         public Task<ActionResult> TickersOutcomes(
             [FromBody]OutcomesReportQuery query) =>
-            this.OkOrError(_service.HandleOutcomesReport(User.Identifier(), query));
+            this.OkOrError(service.HandleOutcomesReport(User.Identifier(), query));
 
         [HttpGet("percentChangeDistribution/tickers/{ticker}")]
         public Task<ActionResult> TickerPercentChangeDistribution(string ticker, [FromQuery] string frequency)
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new PercentChangeStatisticsQuery(
                         PriceFrequency.FromString(frequency ?? PriceFrequency.Daily.ToString()), new Ticker(ticker),
                         User.Identifier())
@@ -58,7 +51,7 @@ namespace web.Controllers
         [HttpGet("gaps/tickers/{ticker}")]
         public Task<ActionResult> TickerGaps(string ticker, [FromQuery] string frequency)
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new GapReportQuery(User.Identifier(), new Ticker(ticker), PriceFrequency.FromString(frequency))
                 )
             );
@@ -66,7 +59,7 @@ namespace web.Controllers
         [HttpGet("positions")]
         public Task<ActionResult> Portfolio() =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new OutcomesReportForPositionsQuery(User.Identifier())
                 )
             );
@@ -74,7 +67,7 @@ namespace web.Controllers
         [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
         public Task<ActionResult> DailyPositionReport(string ticker, string positionId) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new DailyPositionReportQuery(
                         User.Identifier(),
                         new Ticker(ticker),

@@ -14,19 +14,12 @@ namespace web.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class OptionsController : ControllerBase
+    public class OptionsController(Handler service) : ControllerBase
     {
-        private readonly Handler _service;
-
-        public OptionsController(Handler service)
-        {
-            _service = service;
-        }
-        
         [HttpGet("chain/{ticker}")]
         public Task<ActionResult> Chain([FromRoute] string ticker) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new ChainQuery(
                         ticker: new Ticker(ticker), userId: User.Identifier()
                     )
@@ -36,7 +29,7 @@ namespace web.Controllers
         [HttpGet("ownership/{ticker}")]
         public Task<ActionResult> Ownership([FromRoute] string ticker) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new OwnershipQuery(
                         ticker: new Ticker(ticker), userId: User.Identifier()
                     )
@@ -46,7 +39,7 @@ namespace web.Controllers
         [HttpGet("{optionId:guid}")]
         public Task<ActionResult> Get([FromRoute] Guid optionId) =>
             this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new DetailsQuery(optionId: optionId, userId: User.Identifier()
                     )
                 )
@@ -56,7 +49,7 @@ namespace web.Controllers
         public Task<ActionResult> Sell([FromBody]OptionTransaction cmd)
         {
             return this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     BuyOrSellCommand.NewSell(cmd, User.Identifier())
                 )
             );
@@ -66,7 +59,7 @@ namespace web.Controllers
         public Task<ActionResult> Buy([FromBody]OptionTransaction cmd)
         {
             return this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     BuyOrSellCommand.NewBuy(cmd, User.Identifier())
                 )
             );
@@ -75,7 +68,7 @@ namespace web.Controllers
         [HttpDelete("{id}")]
         public Task<ActionResult> Delete([FromRoute] Guid id)
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new DeleteCommand(id, User.Identifier())
                 )
             );
@@ -83,7 +76,7 @@ namespace web.Controllers
         [HttpPost("{optionId}/expire")]
         public Task<ActionResult> Expire([FromRoute] Guid optionId)
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     ExpireCommand.NewExpire(
                         new ExpireData(userId: User.Identifier(), optionId: optionId)
                     )
@@ -93,7 +86,7 @@ namespace web.Controllers
         [HttpPost("{optionId}/assign")]
         public Task<ActionResult> Assign([FromRoute] Guid optionId)
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     ExpireCommand.NewAssign(
                         new ExpireData(userId: User.Identifier(), optionId: optionId)
                     )
@@ -104,7 +97,7 @@ namespace web.Controllers
         public async Task<ActionResult> Export()
         {
             return this.GenerateExport(
-                await _service.Handle(
+                await service.Handle(
                     new ExportQuery(
                         User.Identifier()
                     )
@@ -130,7 +123,7 @@ namespace web.Controllers
         [HttpGet]
         public Task<ActionResult> Dashboard()
             => this.OkOrError(
-                _service.Handle(
+                service.Handle(
                     new DashboardQuery(
                         User.Identifier()
                     )

@@ -25,10 +25,10 @@ export class RoutinesActiveRoutineComponent {
   }
 
   @Output()
-  onDeactivate = new EventEmitter()
+  routineDeactivated = new EventEmitter()
 
   deactivate() {
-    this.onDeactivate.emit()
+    this.routineDeactivated.emit()
     this.activeStep = null
     this.currentStepIndex = 0
   }

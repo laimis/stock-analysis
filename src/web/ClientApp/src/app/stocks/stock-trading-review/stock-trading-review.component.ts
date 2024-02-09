@@ -55,11 +55,7 @@ export class StockTradingReviewComponent {
   orders:BrokerageOrder[]
     
     @Output()
-    brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
-
-    issueBrokerageOrderEntered(ticker:string) {
-        this.brokerageOrderEntered.emit(ticker)
-    }
+    brokerageOrdersChanged: EventEmitter<string> = new EventEmitter<string>()
 
   updateCurrentPosition() {
     this.currentPosition = this.positions[this._index]

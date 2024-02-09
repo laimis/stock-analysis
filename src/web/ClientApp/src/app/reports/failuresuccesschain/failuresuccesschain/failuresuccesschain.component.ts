@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { StocksService } from 'src/app/services/stocks.service';
+import {Chain, StocksService} from 'src/app/services/stocks.service';
 
 @Component({
   selector: 'app-failuresuccesschain',
@@ -7,7 +7,7 @@ import { StocksService } from 'src/app/services/stocks.service';
   styleUrls: ['./failuresuccesschain.component.css']
 })
 export class FailuresuccesschainComponent implements OnInit {
-  chain: any;
+  chain: Chain;
   render: string;
 
   constructor(private service : StocksService) { }

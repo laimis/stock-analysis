@@ -9,20 +9,16 @@ namespace web.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class RoutinesController : ControllerBase
+public class RoutinesController(Handler handler) : ControllerBase
 {
-    private readonly Handler _handler;
-    
-    public RoutinesController(Handler handler) => _handler = handler;
-    
     [HttpGet]
     public Task<ActionResult> GetRoutines() =>
-        this.OkOrError(_handler.Handle(new Query(User.Identifier())));
+        this.OkOrError(handler.Handle(new Query(User.Identifier())));
 
     [HttpPost]
     public Task<ActionResult> CreateRoutine([FromBody] Create command) =>
         this.OkOrError(
-            _handler.HandleCreate(
+            handler.HandleCreate(
                 User.Identifier(),
                 command
             )
@@ -31,7 +27,7 @@ public class RoutinesController : ControllerBase
     [HttpPut("{routineName}")]
     public Task UpdateRoutine([FromBody]Update command) =>
         this.OkOrError(
-            _handler.HandleUpdate(
+            handler.HandleUpdate(
                 User.Identifier(),
                 command
             )
@@ -40,7 +36,7 @@ public class RoutinesController : ControllerBase
     [HttpDelete("{routineName}")]
     public Task DeleteRoutine([FromRoute]string routineName) =>
         this.OkOrError(
-            _handler.Handle(
+            handler.Handle(
                 new Delete(User.Identifier(), routineName)
             )
         );
@@ -48,7 +44,7 @@ public class RoutinesController : ControllerBase
     [HttpPut("{routineName}/steps")]
     public Task<ActionResult> AddRoutineStep([FromBody]AddStep command) =>
         this.OkOrError(
-            _handler.HandleAddStep(
+            handler.HandleAddStep(
                 User.Identifier(), command
             )
         );
@@ -56,7 +52,7 @@ public class RoutinesController : ControllerBase
     [HttpPost("{routineName}/steps/{stepIndex}")]
     public Task<ActionResult> UpdateRoutineStep([FromBody]UpdateStep command) =>
         this.OkOrError(
-            _handler.HandleUpdateStep(
+            handler.HandleUpdateStep(
                 User.Identifier(), command
             )
         );
@@ -65,7 +61,7 @@ public class RoutinesController : ControllerBase
     [HttpDelete("{routineName}/steps/{stepIndex}")]
     public Task<ActionResult> RemoveRoutineStep([FromRoute] string routineName, [FromRoute] int stepIndex) =>
         this.OkOrError(
-            _handler.Handle(
+            handler.Handle(
                 new RemoveStep(routineName, stepIndex, User.Identifier())
             )
         );
@@ -73,7 +69,7 @@ public class RoutinesController : ControllerBase
     [HttpPost("{routineName}/steps/{stepIndex}/position")]
     public Task<ActionResult> MoveRoutineStep([FromBody] MoveStep cmd) =>
         this.OkOrError(
-            _handler.HandleMoveStep(
+            handler.HandleMoveStep(
                 User.Identifier(), cmd
             )
         );

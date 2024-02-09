@@ -66,11 +66,7 @@ export class StockTradingPositionComponent {
   positionDeleted = new EventEmitter()
     
     @Output()
-    brokerageOrderEntered = new EventEmitter<string>()
-
-    sendBrokerageOrderEntered($event:string) {
-        this.brokerageOrderEntered.emit($event)
-    }
+    brokerageOrdersChanged = new EventEmitter<string>()
     
   // constructor that takes stock service
   constructor(
@@ -168,8 +164,7 @@ export class StockTradingPositionComponent {
       this.stockService.closePosition(this._position.positionId)
         .subscribe(
           (_) => {
-            this._position = null
-            this.positionDeleted.emit()
+            this.brokerageOrdersChanged.emit()
           },
           err => {
             let errors = GetErrors(err)
@@ -198,12 +193,13 @@ export class StockTradingPositionComponent {
     }
 
     this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe(
-      (r) => {
+      _ => {
         this.positionStrategy = null
         elementVisibilityToToggle.forEach(this.toggleVisibility)
       },
       (err) => {
-        alert("Error clearing strategy")
+          const errors = GetErrors(err)
+          alert("Error clearing strategy: " + errors.join(", "))
       }
     )
 
@@ -222,13 +218,14 @@ export class StockTradingPositionComponent {
     }
 
     this.stockService.setLabel(this._position.positionId, label).subscribe(
-      (r) => {
+      _ => {
         this.positionStrategy = strategy
         elementVisibilityToToggle.forEach(this.toggleVisibility)
       },
-      (err) => {
-        alert("Error setting strategy")
-      }
+        (err) => {
+            const errors = GetErrors(err)
+            alert("Error setting strategy: " + errors.join(", "))
+        }
     )
   }
 

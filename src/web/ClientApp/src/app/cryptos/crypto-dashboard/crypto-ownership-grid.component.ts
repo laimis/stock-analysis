@@ -1,20 +1,16 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { OwnedCrypto } from '../../services/stocks.service';
-import {stockOpenPositionExportLink} from "../../services/links.service";
-
 
 @Component({
-  selector: 'crypto-ownership-grid',
+  selector: 'app-crypto-ownership-grid',
   templateUrl: './crypto-ownership-grid.component.html',
   styleUrls: ['./crypto-ownership-grid.component.css']
 })
-export class CryptoOwnershipGridComponent implements OnInit {
+export class CryptoOwnershipGridComponent {
 
 	public loaded : boolean = false;
 
   @Input() owned: OwnedCrypto[];
-
-	ngOnInit() {}
 
   sortColumn : string
   sortDirection : number = -1

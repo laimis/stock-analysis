@@ -12,26 +12,26 @@ namespace web.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class CryptosController : ControllerBase
+    public class CryptosController(Handler service) : ControllerBase
     {
         [HttpGet()]
-        public Task<ActionResult> Dashboard([FromServices] Handler service) =>
+        public Task<ActionResult> Dashboard() =>
             this.OkOrError(service.Handle(new DashboardQuery(User.Identifier())));
 
         [HttpGet("{token}")]
-        public Task<ActionResult> DetailsAsync([FromRoute] string token, [FromServices] Handler service) =>
+        public Task<ActionResult> DetailsAsync([FromRoute] string token) =>
             this.OkOrError(service.Handle(new Details(token)));
 
         [HttpGet("{token}/ownership")]
-        public Task<ActionResult> Ownership([FromRoute]string token,[FromServices] Handler service) =>
+        public Task<ActionResult> Ownership([FromRoute]string token) =>
             this.OkOrError(service.Handle(new OwnershipQuery(token, User.Identifier())));
 
         [HttpDelete("{token}/transactions/{transactionId}")]
-        public Task<ActionResult> DeleteTransaction([FromRoute]string token, [FromRoute]Guid transactionId, [FromServices] Handler service) =>
+        public Task<ActionResult> DeleteTransaction([FromRoute]string token, [FromRoute]Guid transactionId) =>
             this.OkOrError(service.Handle(new DeleteTransaction(token: token, transactionId: transactionId, userId:User.Identifier())));
 
         [HttpPost("import")]
-        public async Task<ActionResult> Import(IFormFile file, [FromServices]Handler service)
+        public async Task<ActionResult> Import(IFormFile file)
         {
             using var streamReader = new StreamReader(file.OpenReadStream());
 
@@ -43,7 +43,7 @@ namespace web.Controllers
         }
 
         [HttpGet("export")]
-        public Task<ActionResult> Export([FromServices] Handler service) =>
+        public Task<ActionResult> Export() =>
             this.GenerateExport(service.Handle(new Export(User.Identifier())));
     }
 }

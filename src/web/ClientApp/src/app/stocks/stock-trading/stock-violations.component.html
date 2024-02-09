@@ -54,8 +54,7 @@
                   [orders]="orders"
                   [filteredTickers]="[violation.ticker]"
                   [justOrders]="true"
-                  (sellRequested)="sellRequested.emit($event)"
-                  (purchaseRequested)="purchaseRequested.emit($event)"
+                  (ordersChanged)="refreshRequested.emit($event)"
                 ></app-brokerage-orders>
               </td>
             </tr>

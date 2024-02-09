@@ -106,5 +106,5 @@
   </div>
 }
 @if (activeRoutine) {
-  <app-routines-active-routine [routine]="activeRoutine" (onDeactivate)="deactivate()" ></app-routines-active-routine>
+  <app-routines-active-routine [routine]="activeRoutine" (routineDeactivated)="deactivate()" ></app-routines-active-routine>
 }

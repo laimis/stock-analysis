@@ -5,27 +5,27 @@
       <ul>
         @for (link of chain.links; track link) {
           <span
-            class="badge me-2"
+            class="badge me-2 text-white"
             [ngClass]="{
-            'bg-level-5-success': link.success && link.level == 5,
-            'bg-level-5-failure': !link.success && link.level == 5,
-            'bg-level-4-success': link.success && link.level == 4,
-            'bg-level-4-failure': !link.success && link.level == 4,
-            'bg-level-3-success': link.success && link.level == 3,
-            'bg-level-3-failure': !link.success && link.level == 3,
-            'bg-level-2-success': link.success && link.level == 2,
-            'bg-level-2-failure': !link.success && link.level == 2,
-            'bg-level-1-success': link.success && link.level == 1,
-            'bg-level-1-failure': !link.success && link.level == 1
+            'bg-level-5-success': link.success && link.level === 5,
+            'bg-level-5-failure': !link.success && link.level === 5,
+            'bg-level-4-success': link.success && link.level === 4,
+            'bg-level-4-failure': !link.success && link.level === 4,
+            'bg-level-3-success': link.success && link.level === 3,
+            'bg-level-3-failure': !link.success && link.level === 3,
+            'bg-level-2-success': link.success && link.level === 2,
+            'bg-level-2-failure': !link.success && link.level === 2,
+            'bg-level-1-success': link.success && link.level === 1,
+            'bg-level-1-failure': !link.success && link.level === 1
             }">
-            &nbsp;&nbsp;&nbsp;&nbsp;
+            {{ link.profit | currency }}
           </span>
         }
       </ul>
     </div>
   </div>
 }
-@if (chain && chain.links.length == 0) {
+@if (chain && chain.links.length === 0) {
   <div>
     Generate some trades to see links
   </div>

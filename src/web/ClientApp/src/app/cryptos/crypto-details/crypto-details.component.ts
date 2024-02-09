@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { StocksService, CryptoDetails, CryptoOwnership } from '../../services/stocks.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
 @Component({
-  selector: 'crypto-details',
+  selector: 'app-crypto-details',
   templateUrl: './crypto-details.component.html',
   styleUrls: ['./crypto-details.component.css']
 })
-export class CryptoDetailsComponent {
+export class CryptoDetailsComponent implements OnInit{
 
   token: string
 	loaded: boolean = false

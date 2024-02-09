@@ -9,66 +9,46 @@ namespace web.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class BrokerageController : ControllerBase
+    public class BrokerageController(BrokerageHandler brokerageHandler) : ControllerBase
     {
         [HttpPost("buy")]
-        public Task<ActionResult> Buy(
-            [FromBody] BuyOrSellData data,
-            [FromServices] BrokerageHandler brokerageHandler) =>
+        public Task<ActionResult> Buy([FromBody] BuyOrSellData data) =>
             this.OkOrError(
                 brokerageHandler.Handle(
-                    BrokerageTransaction.NewBuy(
-                        data,
-                        User.Identifier()
-                    )
+                    BrokerageTransaction.NewBuy(data, User.Identifier())
                 )
             );
         
         [HttpPost("buytocover")]
-        public Task<ActionResult> BuyToCover(
-            [FromBody] BuyOrSellData data,
-            [FromServices] BrokerageHandler brokerageHandler) =>
+        public Task<ActionResult> BuyToCover([FromBody] BuyOrSellData data) =>
             this.OkOrError(
                 brokerageHandler.Handle(
-                    BrokerageTransaction.NewBuyToCover(
-                        data,
-                        User.Identifier()
-                    )
+                    BrokerageTransaction.NewBuyToCover(data, User.Identifier())
                 )
             );
         
         [HttpPost("sellshort")]
-        public Task<ActionResult> SellShort(
-            [FromBody] BuyOrSellData data,
-            [FromServices] BrokerageHandler brokerageHandler) =>
+        public Task<ActionResult> SellShort([FromBody] BuyOrSellData data) =>
             this.OkOrError(
                 brokerageHandler.Handle(
-                    BrokerageTransaction.NewSellShort(
-                        data,
-                        User.Identifier()
-                    )
+                    BrokerageTransaction.NewSellShort(data,User.Identifier())
                 )
             );
 
         [HttpPost("sell")]
-        public Task<ActionResult> Sell(
-            [FromBody] BuyOrSellData data,
-            [FromServices] BrokerageHandler brokerageHandler) =>
+        public Task<ActionResult> Sell([FromBody] BuyOrSellData data) =>
             this.OkOrError(
-                brokerageHandler.Handle(
-                    BrokerageTransaction.NewSell(
-                        data,
-                        User.Identifier()
-                    )
-                )
+                brokerageHandler.Handle(BrokerageTransaction.NewSell(data, User.Identifier()))
             );
 
         [HttpDelete("orders/{orderId}")]
         public Task<ActionResult> Delete([FromRoute] string orderId, [FromServices] BrokerageHandler service) =>
-            this.OkOrError(service.Handle(new CancelOrder(User.Identifier(), orderId)));
+            this.OkOrError(
+                service.Handle(new CancelOrder(User.Identifier(), orderId)));
 
         [HttpGet("account")]
         public Task<ActionResult> GetAccount([FromServices] BrokerageHandler service) =>
-            this.OkOrError(service.Handle(new QueryAccount(User.Identifier())));
+            this.OkOrError(
+                service.Handle(new QueryAccount(User.Identifier())));
     }
 }
