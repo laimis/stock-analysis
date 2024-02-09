@@ -112,10 +112,10 @@ type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OwnedOptionVi
     member this.BuyStats = OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Bought"))
     member this.SellStats = OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Sold"))
 
-type OptionDetailsViewModel(price:Nullable<decimal>, chain:OptionChain) =
+type OptionDetailsViewModel(price:decimal option, chain:OptionChain) =
     
     member this.StockPrice = price
     member this.Options = chain.Options
-    member this.Expirations = chain.Options |> Seq.map (fun o -> o.ExpirationDate) |> Seq.distinct |> Seq.toArray
+    member this.Expirations = chain.Options |> Seq.map _.ExpirationDate |> Seq.distinct |> Seq.toArray
     member this.Volatility = chain.Volatility
     member this.NumberOfContracts = chain.NumberOfContracts

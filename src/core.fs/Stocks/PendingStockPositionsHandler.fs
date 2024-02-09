@@ -60,7 +60,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
         
         match user with
         | None ->
-            return "User not found" |> ResponseUtils.failed
+            return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! existing = portfolio.GetPendingStockPositions userId
@@ -69,7 +69,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
             
             match found with
             | Some _ ->
-                return "Position already exists" |> ResponseUtils.failed
+                return "Position already exists" |> ServiceError |> Error
             | None ->
                 
                 // create position here so that validation runs and fails if something is wrong
@@ -104,18 +104,18 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 
                 let! order = orderTask
                 
-                match order.Success with
-                | None -> return order |> ResponseUtils.toOkOrError
-                | Some _ ->    
+                match order with
+                | Error err -> return Error err
+                | Ok _ ->
                     do! portfolio.SavePendingPosition position userId
-                    return Ok
+                    return Ok ()
     }
     
     member this.Handle (command:Close) = task {
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! existing = portfolio.GetPendingStockPositions(command.UserId)
@@ -123,14 +123,14 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
             let found = existing |> Seq.tryFind (fun x -> x.State.Id = command.PositionId)
             
             match found with
-            | None -> return "Position not found" |> ResponseUtils.failed
+            | None -> return "Position not found" |> ServiceError |> Error
             | Some position ->
                 
                 let! account = brokerage.GetAccount(user.State)
                 
-                match account.Success with
-                | None -> return account |> ResponseUtils.toOkOrError
-                | Some account ->
+                match account with
+                | Error err -> return Error err
+                | Ok account ->
                     
                     let! _ =
                         account.Orders
@@ -143,14 +143,14 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 
                     do! portfolio.SavePendingPosition position command.UserId
                 
-                    return Ok
+                    return Ok ()
     }
     
     member this.Handle (command:Export) = task {
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some _ ->
             
             let! positions = portfolio.GetPendingStockPositions(command.UserId)
@@ -161,30 +161,27 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
 
             let response = ExportResponse(filename, CSVExport.pendingPositions csvWriter data);
             
-            return ServiceResponse<ExportResponse>(response)
+            return Ok response
     }
     
     member this.Handle (query:Query) = task {
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<PendingStockPositionState array>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! positions = portfolio.GetPendingStockPositions(query.UserId)
             
             let data =
                 positions
-                |> Seq.map(fun x -> x.State)
+                |> Seq.map _.State
                 |> Seq.filter (fun x -> x.IsClosed |> not)
-                |> Seq.sortByDescending(fun x -> x.Date)
+                |> Seq.sortByDescending _.Date
             
             let tickers = data |> Seq.map(fun x -> x.Ticker)
             let! priceResponse = brokerage.GetQuotes user.State tickers
-            let prices =
-                match priceResponse.Success with
-                | None -> Dictionary<Ticker, StockQuote>()
-                | Some prices -> prices
+            let prices = priceResponse |> Result.defaultValue (Dictionary<Ticker, StockQuote>())
                 
             let dataWithPrices =
                 data
@@ -195,7 +192,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 )
                 |> Seq.toArray
             
-            return ServiceResponse<PendingStockPositionState array>(dataWithPrices)
+            return Ok dataWithPrices
     }
     
     

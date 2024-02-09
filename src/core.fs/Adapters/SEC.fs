@@ -33,4 +33,4 @@ type CompanyFilings(ticker:Ticker, filings:seq<CompanyFiling>) =
 
 
 type ISECFilings =
- abstract GetFilings : ticker:Ticker  -> Task<ServiceResponse<CompanyFilings>>
+ abstract GetFilings : ticker:Ticker  -> Task<Result<CompanyFilings,ServiceError>>

@@ -64,27 +64,27 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage) =
         
         match user with
         | None ->
-            return "User not found" |> ResponseUtils.failed 
+            return "User not found" |> ServiceError |> Error 
         | Some user ->
             let! _ = user.State |> func data
-            return Ok
+            return Ok ()
     }
     
     member _.Handle (command:CancelOrder) = task {
         let! user = accounts.GetUser(command.UserId)
         
         match user with
-        | None -> return ResponseUtils.failed "User not found"
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! _ = brokerage.CancelOrder user.State command.OrderId
-            return Ok
+            return Ok ()
     }
     
     member _.Handle (query:QueryAccount) = task {
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return ResponseUtils.failedTyped<BrokerageAccount> "User not found"
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user -> return! brokerage.GetAccount(user.State)
     }
         

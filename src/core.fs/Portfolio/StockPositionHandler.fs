@@ -3,6 +3,7 @@ namespace core.fs.Portfolio
 open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
+open System.Threading.Tasks
 open Microsoft.FSharp.Core
 open core.Cryptos
 open core.Options
@@ -254,7 +255,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
     member _.Handle (query:OwnershipQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<{|positions:StockPositionWithCalculations seq|}>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some _ ->
             let! positions = storage.GetStockPositions query.UserId
             let positions =
@@ -263,9 +264,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.sortByDescending _.Opened
                 |> Seq.map StockPositionWithCalculations
                 
-            let obj = {|positions = positions|}
-            
-            return ServiceResponse<{|positions:StockPositionWithCalculations seq|}>(obj)
+            return {|positions = positions|} |> Ok
     }
     
     member _.Handle (query:ExportTransactions) = task {
@@ -274,16 +273,14 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         
         let filename = CSVExport.generateFilename("stocks")
         
-        let response = ExportResponse(filename, CSVExport.stocks csvWriter stocks)
-        
-        return ServiceResponse<ExportResponse>(response)
+        return ExportResponse(filename, CSVExport.stocks csvWriter stocks)
     }
     
     member _.Handle (query:ExportTrades) = task {
         
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<ExportResponse>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stocks = storage.GetStockPositions query.UserId
             
@@ -301,9 +298,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
             let filename = CSVExport.generateFilename("positions")
             
-            let response = ExportResponse(filename, CSVExport.trades CultureUtils.DefaultCulture csvWriter sorted)
-            
-            return ServiceResponse<ExportResponse>(response)
+            return ExportResponse(filename, CSVExport.trades CultureUtils.DefaultCulture csvWriter sorted) |> Ok
     }
     
     member _.Handle(cmd:BuyOrSell) = task {
@@ -321,12 +316,12 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let! user = accounts.GetUser(userId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition data.PositionId userId
             
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some position ->
                 
                 do!
@@ -334,14 +329,14 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     |> buyOrSellFunction
                     |> storage.SaveStockPosition userId stock
                 
-                return Ok
+                return Ok ()
     }
     
     member this.Handle (cmd:ImportStocks) = task {
         let records = csvParser.Parse<ImportRecord>(cmd.Content)
-        match records.Success with
-        | None -> return records |> ResponseUtils.toOkOrError
-        | Some records ->
+        match records with
+        | Error error -> return Error error
+        | Ok records ->
             let! results =
                 records
                 |> Seq.map (fun r -> async {
@@ -377,7 +372,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
     member _.Handle(userId:UserId, cmd:OpenStockPosition) = task {
         let! user = userId |> accounts.GetUser
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some _ ->
             let! stocks = storage.GetStockPositions userId
             
@@ -386,7 +381,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             match openPosition with
             | Some _ ->
-                return "Position already open" |> ResponseUtils.failedTyped<StockPositionWithCalculations>
+                return "Position already open" |> ServiceError |> Error
             | None ->
                 
                 let! pendingPositions = storage.GetPendingStockPositions userId
@@ -442,80 +437,76 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 | None ->
                     ()
                 
-                return withCalculations |> ResponseUtils.success
+                return withCalculations |> Ok
     }
 
     member this.Handle (command:DeletePosition) = task {
         let! user = accounts.GetUser(command.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! position = storage.GetStockPosition command.PositionId command.UserId
             
             match position with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some position ->
                 let deletedPosition = position |> StockPosition.delete 
                 do! deletedPosition |> storage.DeleteStockPosition command.UserId (Some position)
-                return Ok
+                return Ok ()
     }
     
     member this.Handle (command:ClosePosition) = task {
         let! user = accounts.GetUser(command.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! position = storage.GetStockPosition command.PositionId command.UserId
             match position with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some position ->
                 
                 // if short, we need to buy to cover
                 // if long, we need to sell
-                let taskToRun =
+                return!
                     match position.StockPositionType with
                     | Short -> brokerage.BuyToCoverOrder user.State position.Ticker (position.NumberOfShares |> abs) 0m BrokerageOrderType.Market BrokerageOrderDuration.Day
                     | Long -> brokerage.SellOrder user.State position.Ticker position.NumberOfShares 0m BrokerageOrderType.Market BrokerageOrderDuration.Day
-                
-                let! orderResponse = taskToRun
-                
-                return orderResponse |> ResponseUtils.toOkOrError
     }
     
     member _.Handle (userId:UserId, command:DeleteStop) = task {
         let! user = accounts.GetUser(userId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition command.PositionId userId
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some existing ->
                 do!
                     existing
                     |> StockPosition.deleteStop DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition userId stock
-                return Ok
+                return Ok ()
     }
     
     member _.Handle (cmd:DeleteTransaction) = task {
         let! user = accounts.GetUser(cmd.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition cmd.PositionId cmd.UserId
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some existing ->
                 do!
                     existing
                     |> StockPosition.deleteTransaction cmd.TransactionId DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition cmd.UserId stock
                     
-                return Ok
+                return Ok ()
     }
         
-    member this.Handle (query:Query) = task {
+    member this.Handle (query:Query) : Task<Result<PortfolioView,ServiceError>> = task {
         let! stocks = query.UserId |> storage.GetStockPositions
         
         let openStocks = stocks |> Seq.filter _.IsOpen
@@ -536,36 +527,36 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 OpenCryptoCount = cryptos |> Seq.length
             }
             
-        return view |> ResponseUtils.success    
+        return view |> Ok 
     }
     
     member _.HandleGradePosition userId (command:GradePosition) = task {
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition command.PositionId userId
                 
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 
                 do! stock
                     |> StockPosition.assignGrade command.Grade command.GradeNote DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition userId (Some stock)
                 
-                return Ok
+                return Ok ()
     }
     
     member _.Handle (command:RemoveLabel) = task {
         let! user = accounts.GetUser(command.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition command.PositionId command.UserId
             
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failed
+            | None -> return "Stock not found" |> ServiceError |> Error
             | Some stock ->
                 
                 do!
@@ -573,36 +564,36 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     |> StockPosition.deleteLabel command.Key DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition command.UserId (Some stock)
                 
-                return Ok
+                return Ok ()
     }
     
     member _.HandleAddLabel userId (command:AddLabel) = task {
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition command.PositionId userId
             
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failed
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 
                 do! stock
                     |> StockPosition.setLabel command.Key command.Value DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition userId (Some stock)
                 
-                return Ok
+                return Ok ()
     }
     
     member _.Handle (query:ProfitPointsQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition query.PositionId query.UserId 
             
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failedTyped<ProfitPoints.ProfitPointContainer []>
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 
                 let stock = stock |> StockPositionWithCalculations
@@ -617,23 +608,21 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     
                 let percentBased = ProfitPoints.getProfitPoints percentBased query.NumberOfPoints
                     
-                let arr =
+                return 
                     [|
                         ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
                         ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
-                    |]
-                
-                return ServiceResponse<ProfitPoints.ProfitPointContainer []>(arr)
+                    |] |> Ok
     }
     
     member _.HandleSetRisk userId (command:SetRisk) = task {
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failed
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! stock = storage.GetStockPosition command.PositionId userId
             match stock with
-            | None -> return "Stock not found" |> ResponseUtils.failed
+            | None -> return "Stock not found" |> ServiceError |> Error
             | Some stock ->
                 
                 do!
@@ -641,27 +630,27 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     |> StockPosition.setRiskAmount command.RiskAmount.Value DateTimeOffset.UtcNow
                     |> storage.SaveStockPosition userId (Some stock)
                 
-                return Ok
+                return Ok ()
     }
     
     member _.Handle (command:SimulateTrade) = task {
         let! user = accounts.GetUser(command.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! stock = storage.GetStockPosition command.PositionId command.UserId
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 let runner = TradingStrategyRunner(brokerage, marketHours)
                 let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=false)
-                return ServiceResponse<TradingStrategyResults>(simulation)
+                return simulation |> Ok
     }
     
     member _.Handle (command:SimulateTradeForTicker) = task {
         let! user = accounts.GetUser(command.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyResults>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let runner = TradingStrategyRunner(brokerage, marketHours)
                 
@@ -675,7 +664,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     closeIfOpenAtTheEnd=false
                 )
                 
-            return ServiceResponse<TradingStrategyResults>(results)
+            return results |> Ok
     }
     
     member _.Handle (command:SimulateUserTrades) = task {
@@ -720,7 +709,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         
         let! user = accounts.GetUser(command.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingStrategyPerformance array>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! stocks = storage.GetStockPositions command.UserId
@@ -740,14 +729,13 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
-            let results =
+            return
                 simulations
                 |> Seq.concat
                 |> Seq.groupBy (_.StrategyName)
                 |> Seq.map mapToStrategyPerformance
                 |> Seq.toArray
-                
-            return ServiceResponse<TradingStrategyPerformance array>(results)
+                |> Ok
     }
     
     member this.HandleExport (command:ExportUserSimulatedTrades) = task {
@@ -756,20 +744,20 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             NumberOfTrades = command.NumberOfTrades
             ClosePositionIfOpenAtTheEnd = command.ClosePositionIfOpenAtTheEnd}
         let! results = this.Handle(simulateCommand)
-        match results.IsOk with
-        | true ->
-            let content = CSVExport.strategyPerformance csvWriter results.Success.Value
-            let filename = CSVExport.generateFilename $"simulated-trades-{command.NumberOfTrades}"
-            let response = ExportResponse(filename, content);
-            return ServiceResponse<ExportResponse>(response);
-            
-        | false -> return results.Error.Value.Message |> ResponseUtils.failedTyped<ExportResponse>
+        
+        return
+            results
+            |> Result.map(fun results ->
+                let content = CSVExport.strategyPerformance csvWriter results
+                let filename = CSVExport.generateFilename $"simulated-trades-{command.NumberOfTrades}"
+                ExportResponse(filename, content)
+            ) 
     }
     
     member _.Handle (query:QueryTradingEntries) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<TradingEntriesView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! stocks = storage.GetStockPositions query.UserId
             
@@ -781,9 +769,9 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
             let! accountResponse = brokerage.GetAccount(user.State)
             let account =
-                match accountResponse.Success with
-                | Some acc -> acc
-                | None -> BrokerageAccount.Empty
+                match accountResponse with
+                | Ok acc -> acc
+                | Error _ -> BrokerageAccount.Empty
                 
             let tickers =
                 positions
@@ -793,9 +781,9 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
             let! pricesResponse = brokerage.GetQuotes user.State tickers
             let prices =
-                match pricesResponse.Success with
-                | Some prices -> prices
-                | None -> Dictionary<Ticker, StockQuote>()
+                match pricesResponse with
+                | Ok prices -> prices
+                | Error _ -> Dictionary<Ticker, StockQuote>()
                 
             let pricesWithStringAsKey = prices.Keys |> Seq.map (fun p -> p.Value, prices[p]) |> Map.ofSeq
             
@@ -810,13 +798,13 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     brokerageAccount=account
                     prices=pricesWithStringAsKey
                 }
-            return ServiceResponse<TradingEntriesView>(tradingEntries)
+            return tradingEntries |> Ok
     }
     
     member _.Handle (query:QueryPastTradingEntries) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<PastTradingEntriesView>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             
             let! stocks = storage.GetStockPositions query.UserId
@@ -833,13 +821,13 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     past=past;
                 }
                 
-            return ServiceResponse<PastTradingEntriesView>(tradingEntries)
+            return tradingEntries |> Ok
     }
     
     member _.Handle (query:QueryPastTradingPerformance) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<PastTradingPerformanceView>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             
             let! stocks = storage.GetStockPositions query.UserId
@@ -870,10 +858,10 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     strategyPerformance=strategyByPerformance;
                 }
                 
-            return ServiceResponse<PastTradingPerformanceView>(tradingEntries)
+            return tradingEntries |> Ok
     }
     
-    member _.Handle(query:QueryTransactions) = task {
+    member _.Handle(query:QueryTransactions) : Task<Result<TransactionsView, ServiceError>>  = task {
         
         let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
             Transaction.PLTx(Guid.NewGuid(), stock.Ticker, plTransaction.Ticker.Value, plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
@@ -916,9 +904,9 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let! options = storage.GetOwnedOptions(query.UserId)
         let! cryptos = storage.GetCryptos(query.UserId)
         
-        let transactionsView = toTransactionsView (stocks |> Seq.map StockPositionWithCalculations) options cryptos
+        let transactionsView = toTransactionsView (stocks |> Seq.map StockPositionWithCalculations) options cryptos 
         
-        return ServiceResponse<TransactionsView>(transactionsView)
+        return transactionsView |> Ok
     }
     
     member _.Handle (query:TransactionSummary) = task {
@@ -973,18 +961,18 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             plOptionTransactions=plOptionTransactions
         )
         
-        return ServiceResponse<TransactionSummaryView>(view)
+        return view
     }
     
     member _.HandleStop(userId,cmd:SetStop) = task {
         let! stock = storage.GetStockPosition cmd.PositionId userId
         match stock with
-        | None -> return "Stock position not found" |> ResponseUtils.failed
+        | None -> return "Stock position not found" |> ServiceError |> Error
         | Some existing ->
             do!
                 existing
                 |> StockPosition.setStop cmd.StopPrice DateTimeOffset.UtcNow
                 |> storage.SaveStockPosition userId stock
                 
-            return Ok
+            return Ok ()
     }

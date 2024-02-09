@@ -4,7 +4,6 @@ open System
 open System.Threading.Tasks
 open Xunit
 open core.Account
-open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Services.Trading
@@ -38,7 +37,7 @@ let createRunner numberOfBars priceFunction =
         {
             new IBrokerageGetPriceHistory with 
                 member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
-                    prices |> ServiceResponse<PriceBars> |> Task.FromResult
+                    prices |> Ok |> Task.FromResult
         }
     
     TradingStrategyRunner(mock, MarketHoursAlwaysOn()), prices

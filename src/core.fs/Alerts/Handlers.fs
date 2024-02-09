@@ -39,38 +39,32 @@ namespace core.fs.Alerts
 
             let recentlyTriggered = container.GetRecentlyTriggered(query.UserId)
             
-            {| alerts = alerts; recentlyTriggered = recentlyTriggered; messages = container.GetNotices() |}
-            |> ResponseUtils.success
-        
+            { alerts = alerts; recentlyTriggered = recentlyTriggered; messages = container.GetNotices() }
         
         member this.Handle (_:QueryAvailableMonitors) =
-            let available =
-                [
-                    {| name = Constants.MonitorNamePattern; tag = Constants.MonitorTagPattern |}
-                ]
-            available |> ResponseUtils.success
-        
-        member this.Handle (_:Run) =
+            [
+                {| name = Constants.MonitorNamePattern; tag = Constants.MonitorTagPattern |}
+            ]
+            
+        member this.Handle (_:Run) : Result<Unit,ServiceError> =
             // TODO: need to bring this functionality back, it should kick off pattern monitoring run
-            Ok
+            Ok ()
       
-        member this.Handle (send:SendSMS) = task {
+        member this.Handle (send:SendSMS) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
             do! smsService.SendSMS(send.Body)
-            return Ok
+            return Ok ()
         }
         
-        member this.Handle (_:TurnSMSOn) = task {
-            smsService.TurnOn()
-            return Ok
+        member this.Handle (_:TurnSMSOn) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
+            return smsService.TurnOn() |> Ok
         }
         
-        member this.Handle (_:TurnSMSOff) = task {
-            smsService.TurnOff()
-            return Ok
+        member this.Handle (_:TurnSMSOff) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
+            return smsService.TurnOff() |> Ok
         }
         
-        member this.Handle (_:SMSStatus) = task {
-            return smsService.IsOn |> ResponseUtils.success<bool>
+        member this.Handle (_:SMSStatus) : System.Threading.Tasks.Task<Result<bool, ServiceError>> = task {
+            return smsService.IsOn |> Ok
         }
             
             

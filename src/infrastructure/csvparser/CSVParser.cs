@@ -8,12 +8,13 @@ using core.fs;
 using core.fs.Adapters.CSV;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.FSharp.Core;
 
 namespace csvparser
 {
     public class CSVParser : ICSVParser
     {
-        public ServiceResponse<IEnumerable<T>> Parse<T>(string content)
+        public FSharpResult<IEnumerable<T>,ServiceError> Parse<T>(string content)
         {
             try
             {
@@ -36,12 +37,12 @@ namespace csvparser
 
                 var records = csvReader.GetRecords<T>().ToList(); // doing to list to make sure that the file is read
                 // before reader gets disposed
-                return new ServiceResponse<IEnumerable<T>>(records);
+                return FSharpResult<IEnumerable<T>, ServiceError>.NewOk(records);
             }
             catch(HeaderValidationException ex)
             {
                 var error = "Header validation failed: " + ex.Message;
-                return new ServiceResponse<IEnumerable<T>>(new ServiceError(error));
+                return FSharpResult<IEnumerable<T>, ServiceError>.NewError(new ServiceError(error));
             }
         }
     }

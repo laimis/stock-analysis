@@ -71,6 +71,12 @@ namespace core.fs.Alerts
                 alertType = pattern.sentimentType
                 valueFormat = pattern.valueFormat
             }
+    
+    type AlertsView = {
+        alerts: TriggeredAlert list
+        recentlyTriggered: TriggeredAlert list
+        messages: AlertContainerMessage seq
+    }
         
     type StockAlertContainer() =
         let alerts = ConcurrentDictionary<StockPositionMonitorKey, TriggeredAlert>()

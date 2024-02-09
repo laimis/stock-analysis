@@ -101,10 +101,10 @@ namespace web.Controllers
             );
         
         [HttpGet("export")]
-        public Task<ActionResult> Export()
+        public async Task<ActionResult> Export()
         {
             return this.GenerateExport(
-                _service.Handle(
+                await _service.Handle(
                     new ExportQuery(
                         User.Identifier()
                     )

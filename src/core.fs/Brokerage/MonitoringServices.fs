@@ -36,7 +36,7 @@ type AccountMonitoringService(
             |> Seq.map (fun user -> async {
                     
                 let! account = brokerage.GetAccount user.State |> Async.AwaitTask
-                match account.Result with
+                match account with
                 | Error e ->
                     logger.LogError $"Unable to get brokerage account for {user.State.Id}: {e.Message}"
                 | Ok account ->

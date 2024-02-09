@@ -2,6 +2,7 @@
 using core.fs.Adapters.SEC;
 using core.Shared;
 using Microsoft.Extensions.Logging;
+using Microsoft.FSharp.Core;
 using SecuritiesExchangeCommission.Edgar;
 
 namespace secedgar;
@@ -19,7 +20,7 @@ public class EdgarClient : ISECFilings
     }
         
 
-    public async Task<ServiceResponse<CompanyFilings>> GetFilings(Ticker symbol)
+    public async Task<FSharpResult<CompanyFilings,ServiceError>> GetFilings(Ticker symbol)
     {
         try
         {
@@ -44,13 +45,13 @@ public class EdgarClient : ISECFilings
 
             var result = new CompanyFilings(symbol, filings);
 
-            return new ServiceResponse<CompanyFilings>(result);
+            return FSharpResult<CompanyFilings, ServiceError>.NewOk(result);
         }
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Error getting SEC filings for {symbol}", symbol);
 
-            return new ServiceResponse<CompanyFilings>(
+            return FSharpResult<CompanyFilings, ServiceError>.NewError(
                 new ServiceError(ex.Message)
             );
         }

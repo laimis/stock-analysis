@@ -99,43 +99,41 @@ module ImportTransactions =
             
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | None -> return "User not found" |> ResponseUtils.failed
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 
                 let records = cmd.Content |> csvParser.Parse<TransactionRecord>
-                match records.Success with
-                | None -> return records.Error.Value.Message |> ResponseUtils.failed
-                | Some records ->
+                match records with
+                | Error err -> return Error err
+                | Ok records ->
                     do! sendEmail user "Started importing transactions" ""
                     
                     
                     let! processed =
                         records
                         |> Seq.rev
-                        |> Seq.filter(fun r -> r.Qualify())
+                        |> Seq.filter(_.Qualify())
                         |> Seq.map(fun r -> async {
                             match r.IsOption(),r.IsStock(),r.IsBuy(),r.IsSell() with
                             | true, _, true, _ -> // buy option
                                 let data = r |> createOptionTransaction
                                 let cmd = BuyOrSellCommand.Buy(data, cmd.UserId)
                                 let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
-                                return result |> ResponseUtils.toOkOrError
+                                return result |> Result.bind (fun _ -> Ok ())
                             | true, _, _, true -> // sell option
                                 let data = r |> createOptionTransaction
                                 let cmd = BuyOrSellCommand.Sell(data, cmd.UserId)
                                 let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
-                                return result |> ResponseUtils.toOkOrError
+                                return result |> Result.bind (fun _ -> Ok ())
                             | _, true, true, _ -> // buy stock
                                 let data = r |> createStockTransaction 
                                 let cmd = core.fs.Portfolio.Buy(data, cmd.UserId)
-                                let! result = stocksImport.Handle(cmd) |> Async.AwaitTask
-                                return result
+                                return! stocksImport.Handle(cmd) |> Async.AwaitTask
                             | _, true, _, true -> // sell stock
                                 let data = r |> createStockTransaction
                                 let cmd = core.fs.Portfolio.Sell(data, cmd.UserId)
-                                let! result = stocksImport.Handle(cmd) |> Async.AwaitTask
-                                return result
-                            | _ -> return Ok
+                                return! stocksImport.Handle(cmd) |> Async.AwaitTask
+                            | _ -> return Ok ()
                         })
                         |> Async.Sequential
                         |> Async.StartAsTask
@@ -143,9 +141,9 @@ module ImportTransactions =
                     let okOrError = processed |> ResponseUtils.toOkOrConcatErrors
                     
                     match okOrError with
-                    | Ok -> 
+                    | Ok _ -> 
                         do! sendEmail user "Finished importing transactions" ""
-                        return Ok
+                        return Ok ()
                     | Error err ->
-                        return $"Failed to import transactions: {err.Message}" |> ResponseUtils.failed
+                        return $"Failed to import transactions: {err.Message}" |> ServiceError |> Error
         }

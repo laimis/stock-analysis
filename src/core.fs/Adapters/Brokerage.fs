@@ -208,7 +208,7 @@ type IMarketHours =
 
 type IBrokerageGetPriceHistory =
     
-    abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset -> ``end``:DateTimeOffset -> Task<ServiceResponse<PriceBars>>
+    abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset -> ``end``:DateTimeOffset -> Task<Result<PriceBars,ServiceError>>
     
 type IBrokerage =
     inherit IBrokerageGetPriceHistory
@@ -216,15 +216,15 @@ type IBrokerage =
     abstract member ConnectCallback : code:string -> Task<OAuthResponse>
     abstract member GetAccessToken : state:UserState -> Task<OAuthResponse>
     abstract member RefreshAccessToken : state:UserState -> Task<OAuthResponse>
-    abstract member GetAccount : state:UserState -> Task<ServiceResponse<BrokerageAccount>>
-    abstract member BuyOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
-    abstract member BuyToCoverOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
-    abstract member SellOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
-    abstract member SellShortOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<ServiceResponse<bool>>
-    abstract member CancelOrder : state:UserState -> orderId:string -> Task<ServiceResponse<bool>>
-    abstract member GetQuote : state:UserState -> ticker:Ticker -> Task<ServiceResponse<StockQuote>>
-    abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<ServiceResponse<Dictionary<Ticker, StockQuote>>>
-    abstract member GetMarketHours : state:UserState -> start:DateTimeOffset -> Task<ServiceResponse<MarketHours>>
-    abstract member Search : state:UserState -> query:string -> limit:int -> Task<ServiceResponse<SearchResult[]>>
-    abstract member GetOptions : state:UserState -> ticker:Ticker -> expirationDate:DateTimeOffset option -> strikePrice:decimal option -> contractType:string option -> Task<ServiceResponse<OptionChain>>
-    abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<ServiceResponse<StockProfile>>
+    abstract member GetAccount : state:UserState -> Task<Result<BrokerageAccount,ServiceError>>
+    abstract member BuyOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<Result<unit,ServiceError>>
+    abstract member BuyToCoverOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<Result<unit,ServiceError>>
+    abstract member SellOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<Result<unit,ServiceError>>
+    abstract member SellShortOrder : state:UserState -> ticker:Ticker -> numberOfShares:decimal -> price:decimal -> ``type``:BrokerageOrderType -> duration:BrokerageOrderDuration -> Task<Result<unit,ServiceError>>
+    abstract member CancelOrder : state:UserState -> orderId:string -> Task<Result<unit,ServiceError>>
+    abstract member GetQuote : state:UserState -> ticker:Ticker -> Task<Result<StockQuote,ServiceError>>
+    abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<Result<Dictionary<Ticker, StockQuote>,ServiceError>>
+    abstract member GetMarketHours : state:UserState -> start:DateTimeOffset -> Task<Result<MarketHours,ServiceError>>
+    abstract member Search : state:UserState -> query:string -> limit:int -> Task<Result<SearchResult[],ServiceError>>
+    abstract member GetOptions : state:UserState -> ticker:Ticker -> expirationDate:DateTimeOffset option -> strikePrice:decimal option -> contractType:string option -> Task<Result<OptionChain,ServiceError>>
+    abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<Result<StockProfile,ServiceError>>

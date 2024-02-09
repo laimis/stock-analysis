@@ -145,12 +145,12 @@ namespace core.fs.Cryptos
                 
             let! user = accounts.GetUser(userId)
             match user with
-            | None -> return ResponseUtils.failed "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let! crypto = portfolio.GetCrypto data.Token.Value userId
                 
                 if crypto = null && isSell then
-                    return ResponseUtils.failed "Cannot sell crypto that is not owned"
+                    return "Cannot sell crypto that is not owned" |> ServiceError |> Error
                 else            
                     let cryptoToUse =
                         match crypto with
@@ -161,7 +161,7 @@ namespace core.fs.Cryptos
                     
                     do! portfolio.SaveCrypto cryptoToUse userId
                 
-                    return Ok
+                    return Ok ()
         }
         
         member _.Handle(query:DashboardQuery) = task {
@@ -169,7 +169,7 @@ namespace core.fs.Cryptos
             let! user = accounts.GetUser(query.UserId)
             match user with
             | None ->
-                return ResponseUtils.failedTyped<CryptoDashboardView> "User not found"
+                return "User not found" |> ServiceError |> Error
             | _ ->
                 let! cryptos = portfolio.GetCryptos(query.UserId)
                  
@@ -180,19 +180,19 @@ namespace core.fs.Cryptos
                     |> Seq.sortByDescending (fun c -> c.Cost)
                     |> Seq.toList
 
-                return CryptoDashboardView(owned) |> ResponseUtils.success<CryptoDashboardView>
+                return CryptoDashboardView(owned) |> Ok
         }
         
         member _.Handle(cmd:DeleteTransaction) = task {
             
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | None -> return ResponseUtils.failed "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let! crypto = portfolio.GetCrypto cmd.Token.Value cmd.UserId
                 crypto.DeleteTransaction(cmd.TransactionId)
                 do! portfolio.SaveCrypto crypto cmd.UserId
-                return Ok
+                return Ok ()
         }
         
         member _.Handle(query:Details) = task {
@@ -200,22 +200,22 @@ namespace core.fs.Cryptos
             let! prices = crypto.GetAll()
             return
                 match prices.TryGet(query.Token) with
-                | Some token -> CryptoDetailsView(query.Token, Price(token.quote.Value.USD.Value.price) |> Some) |> ResponseUtils.success<CryptoDetailsView>
-                | None -> $"Price not found for {query.Token.ToString()}" |> ResponseUtils.failedTyped<CryptoDetailsView>
+                | Some token -> CryptoDetailsView(query.Token, Price(token.quote.Value.USD.Value.price) |> Some) |> Ok
+                | None -> $"Price not found for {query.Token.ToString()}" |> ServiceError |> Error
         }
         
         member _.Handle(query:Export) = task {
             
             let! user = accounts.GetUser(query.UserId)
             match user with
-            | None -> return ResponseUtils.failedTyped<ExportResponse> "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let! cryptos = portfolio.GetCryptos(query.UserId)
                 
                 let filename = CSVExport.generateFilename "cryptos"
                 let csv = CSVExport.cryptos csvWriter cryptos
                 
-                return ExportResponse(filename, csv) |> ResponseUtils.success<ExportResponse>
+                return ExportResponse(filename, csv) |> Ok
         }
         
         member this.Handle(cmd:ImportBlockFi) = task {
@@ -234,13 +234,13 @@ namespace core.fs.Cryptos
                 
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | None -> return ResponseUtils.failed "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let parserResponse = csvParser.Parse<{|TransactionType:string; Cryptocurrency:string; Amount:decimal; ConfirmedAt:DateTimeOffset|}>(cmd.Content)
                 
-                match parserResponse.Success with
-                | None -> return parserResponse |> ResponseUtils.toOkOrError
-                | Some response  ->
+                match parserResponse with
+                | Error err -> return Error err
+                | Ok response  ->
                     let! commands =
                         response
                         |> Seq.map(fun obj -> createCommand (obj.TransactionType.ToLower()) obj.Amount obj.ConfirmedAt (Token obj.Cryptocurrency) cmd.UserId)
@@ -271,13 +271,13 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | None -> return ResponseUtils.failed "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let parserResponse = csvParser.Parse<{|Timestamp:DateTimeOffset; TransactionType:string; Asset:string; QuantityTransacted:decimal; USDSubtotal:decimal|}>(cmd.Content)
                 
-                match parserResponse.Success with
-                | None -> return parserResponse |> ResponseUtils.toOkOrError
-                | Some response ->
+                match parserResponse with
+                | Error err -> return Error err
+                | Ok response ->
                     let! commands =
                         response
                         |> Seq.map(fun obj -> createCommand obj.TransactionType obj.Timestamp obj.USDSubtotal obj.QuantityTransacted (Token obj.Asset) null cmd.UserId)
@@ -304,13 +304,13 @@ namespace core.fs.Cryptos
                 
             let! user = accounts.GetUser(cmd.UserId)
             match user with
-            | None -> return ResponseUtils.failed "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let parserResponse = csvParser.Parse<CoinbaseProRecord>(cmd.Content)
                 
-                match parserResponse.Success with
-                | None -> return parserResponse |> ResponseUtils.toOkOrError
-                | Some response ->
+                match parserResponse with
+                | Error err -> return Error err
+                | Ok response ->
                     let container = CoinbaseProContainer(response)
                     
                     let! _ =
@@ -325,7 +325,7 @@ namespace core.fs.Cryptos
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
-                    return Ok
+                    return Ok ()
         }
         
         member this.Handle(import:ImportCryptoCommand) =
@@ -338,11 +338,11 @@ namespace core.fs.Cryptos
             
             let! user = accounts.GetUser(query.UserId)
             match user with
-            | None -> return ResponseUtils.failedTyped<CryptoOwnershipView> "User not found"
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
                 let! crypto = portfolio.GetCrypto query.Token.Value query.UserId
                 
                 match crypto with
-                | null -> return ResponseUtils.failedTyped<CryptoOwnershipView> "Crypto not found"
-                | _ -> return CryptoOwnershipView(crypto.State) |> ResponseUtils.success<CryptoOwnershipView>
+                | null -> return "Crypto not found" |> ServiceError |> Error
+                | _ -> return CryptoOwnershipView(crypto.State) |> Ok
         }

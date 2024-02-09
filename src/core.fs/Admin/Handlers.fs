@@ -7,7 +7,6 @@ open core.fs.Adapters.CSV
 open core.fs.Adapters.Email
 open core.fs.Adapters.Storage
 open core.fs.Services
-open core.fs.Adapters.Storage
 open core.fs.Stocks
 
 type Query = {
@@ -49,14 +48,13 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                 
     interface IApplicationService
     
-    member _.Handle (cmd:SendEmail) = task {
+    member _.Handle (cmd:SendEmail) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
         do! cmd.input |> email.SendWithInput
-        return Ok
+        return Ok()
     }
     
-    member _.Handle sendWelcome = task {
+    member _.Handle sendWelcome : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
         let! user = sendWelcome.userId |> storage.GetUser 
-        
         match user with
         | Some user ->
             do! email.SendWithTemplate
@@ -65,13 +63,13 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                     EmailTemplate.NewUserWelcome
                     (System.Object())
                     
-            return ServiceResponse.Ok
+            return Ok ()
             
-        | None -> return ResponseUtils.failed "User not found"
+        | None -> return "User not found" |> ServiceError |> Error
         
     }
             
-    member _.Handle (_:Query) =
+    member _.Handle (_:Query) : System.Threading.Tasks.Task<Result<QueryResponse array,ServiceError>> =
         task {
             let! users = storage.GetUserEmailIdPairs()
             
@@ -81,7 +79,7 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                 |> Async.Parallel
                 |> Async.StartAsTask
                 
-            return ServiceResponse<QueryResponse seq>(result)
+            return result |> Ok
         }
         
     member _.Handle (_:Export) = task {
@@ -99,5 +97,5 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
             
         let filename = CSVExport.generateFilename "users"
         
-        return ExportResponse(filename, CSVExport.users csvWriter users) |> ResponseUtils.success<ExportResponse>
+        return ExportResponse(filename, CSVExport.users csvWriter users)
     }

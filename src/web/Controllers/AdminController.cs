@@ -31,12 +31,12 @@ namespace web.Controllers
         {
             var status = await handler.Handle(new LookupById(UserId.NewUserId(userId)));
 
-            if (status.IsOk == false)
+            if (status.IsError)
             {
                 return NotFound();
             }
             
-            await AccountController.EstablishSignedInIdentity(HttpContext, status.Success.Value);
+            await AccountController.EstablishSignedInIdentity(HttpContext, status.ResultValue);
 
             return Redirect("~/");
         }
@@ -80,8 +80,8 @@ namespace web.Controllers
         }
 
         [HttpGet("users/export")]
-        public Task<ActionResult> Export() => this.GenerateExport(
-            _handler.Handle(
+        public async Task<ActionResult> Export() => this.GenerateExport(
+            await _handler.Handle(
                 new Export()
             )
         );

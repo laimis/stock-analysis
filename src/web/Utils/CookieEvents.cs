@@ -50,7 +50,7 @@ namespace web.Utils
             }
 
             identity.AddClaim(
-                new Claim(IdentityExtensions.ID_CLAIM_NAME, response.Success.Value.Id.ToString())
+                new Claim(IdentityExtensions.ID_CLAIM_NAME, response.ResultValue.Id.ToString())
             );
         }
 

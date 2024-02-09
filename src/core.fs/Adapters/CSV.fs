@@ -11,5 +11,5 @@ type ICSVWriter =
     abstract Generate<'T> : rows:seq<'T> -> string
     
 type ICSVParser =
-    abstract Parse<'T> : content:string -> ServiceResponse<seq<'T>>
+    abstract Parse<'T> : content:string -> Result<seq<'T>,ServiceError>
     

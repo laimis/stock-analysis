@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using core.fs;
 using core.Shared;
+using Microsoft.FSharp.Core;
 using storage.shared;
 
 namespace web.Utils;
@@ -13,7 +15,7 @@ public class IncompleteOutbox : IOutbox
     // but it was without any ability to handle failures etc and dependent on
     // mediatr. I might still use simple outbox that does not offer failure handling
     // but it will not be dependent on mediatr
-    public Task<core.fs.ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
+    public Task<FSharpResult<Unit,ServiceError>> AddEvents(List<AggregateEvent> e, IDbTransaction tx)
     {
         foreach (var @event in e)
         {
@@ -53,7 +55,7 @@ public class IncompleteOutbox : IOutbox
             // }
         }
 
-        return Task.FromResult(core.fs.ServiceResponse.Ok);
+        return Task.FromResult(FSharpResult<Unit, ServiceError>.NewOk(null));
     }
 }
 
