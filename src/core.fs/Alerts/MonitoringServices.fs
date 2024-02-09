@@ -108,12 +108,12 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
     let runStopLossCheck (logger:ILogger) (check:StopLossCheck) = async {
         let! priceResponse = brokerage.GetQuote check.user check.ticker |> Async.AwaitTask
 
-        match priceResponse.Success with
-        | None ->
-            logger.LogError($"Could not get price for {check.ticker}: {priceResponse.Error.Value.Message}")
+        match priceResponse with
+        | Error err ->
+            logger.LogError($"Could not get price for {check.ticker}: {err.Message}")
             return None
 
-        | Some response ->
+        | Ok response ->
 
             let trigger =
                 match check.isShort with
@@ -288,17 +288,17 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
 
         match priceCache.TryGetValue(ticker) with
         | true, prices ->
-            return ServiceResponse<PriceBars>(prices)
+            return prices |> Ok
         | _ ->
             let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365))
             let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow)
 
             let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
 
-            match prices.Success with
-            | None ->
-                logger.LogError($"Pattern monitor could not get price history for {ticker}: {prices.Error.Value.Message}")
-            | Some response ->
+            match prices with
+            | Error err ->
+                logger.LogError($"Pattern monitor could not get price history for {ticker}: {err.Message}")
+            | Ok response ->
                 priceCache.Add(ticker, response)
 
             return prices
@@ -308,9 +308,9 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
 
         let! priceResponse = getPrices logger alertCheck.user alertCheck.ticker |> Async.AwaitTask
 
-        match priceResponse.Success with
-        | None -> return None
-        | Some prices ->
+        match priceResponse with
+        | Error _ -> return None
+        | Ok prices ->
 
             let userId = alertCheck.user.Id |> UserId
 
@@ -419,11 +419,11 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
         let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Weekly DateTimeOffset.MinValue DateTimeOffset.MinValue |> Async.AwaitTask
 
         return
-            match prices.Result with
-            | Result.Error err ->
+            match prices with
+            | Error err ->
                 logger.LogError($"Weekly job could not get price history for {ticker}: {err.Message}")
                 WeeklyUpsideCheckResult.Failure ticker
-            | Result.Ok bars ->
+            | Ok bars ->
                 WeeklyUpsideCheckResult.Success (ticker, PatternDetection.upsideReversal(bars))
     }
 

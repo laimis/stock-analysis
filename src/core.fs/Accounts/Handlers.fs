@@ -225,11 +225,11 @@ namespace core.fs.Accounts
         let INVALID_EMAIL_PASSWORD = "Invalid email/password combination"
     
         let success (user:User) =
-            user.State |> AccountStatusView.fromUserState (roles.IsAdmin(user.State)) |> ResponseUtils.success<AccountStatusView>
+            user.State |> AccountStatusView.fromUserState (roles.IsAdmin(user.State)) |> Ok
             
         let successOrNotFound (user:User option) =
             match user with
-                | None -> AccountStatusView.notFound() |> ResponseUtils.success<AccountStatusView> 
+                | None -> AccountStatusView.notFound() |> Ok 
                 | Some user -> user |> success
                 
         let attemptLogin (user:User) (command:Authenticate) = task {
@@ -239,7 +239,7 @@ namespace core.fs.Accounts
                 |> user.PasswordHashMatches
             
             match validPassword with
-            | false -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<AccountStatusView>
+            | false -> return INVALID_EMAIL_PASSWORD |> ServiceError |> Error
             | true -> return user |> success
         }
         
@@ -248,10 +248,10 @@ namespace core.fs.Accounts
             
             match result.CustomerId with
             | null ->
-                $"Failed to process the payment, please try again or use a different payment form" |> ResponseUtils.failed
+                $"Failed to process the payment, please try again or use a different payment form" |> ServiceError |> Error
             | _ ->
                 user.SubscribeToPlan paymentInfo.PlanId result.CustomerId result.SubscriptionId
-                Ok
+                Ok ()
         
         
         
@@ -260,7 +260,7 @@ namespace core.fs.Accounts
             let! user = storage.GetUserByEmail(command.Email)
             
             match user with
-            | None -> return INVALID_EMAIL_PASSWORD |> ResponseUtils.failedTyped<AccountStatusView>
+            | None -> return INVALID_EMAIL_PASSWORD |> ServiceError |> Error
             | Some user -> return! command |> attemptLogin user
         }
         
@@ -268,17 +268,17 @@ namespace core.fs.Accounts
             let! user = storage.GetUser(command.UserId)
             
             match user with
-            | None -> return "User not found" |> ResponseUtils.failed
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 do! portfolioStorage.Delete(user.Id |> UserId)
-                return Ok
+                return Ok ()
         }
         
         member this.HandleDelete userId (command:Delete)  = task {
             let! user = storage.GetUser(userId)
             
             match user with
-            | None -> return "User not found" |> ResponseUtils.failed
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 user.Delete(command.Feedback)
                 do! storage.Save(user)
@@ -291,20 +291,20 @@ namespace core.fs.Accounts
                     
                 do! storage.Delete(user)
                 do! portfolioStorage.Delete(user.Id |> UserId)
-                return Ok
+                return Ok ()
         }
         member this.Handle (command:Confirm) = task {
             let! association = storage.GetUserAssociation(command.Id)
             match association with
-            | None -> return "Invalid confirmation identifier." |> ResponseUtils.failedTyped<AccountStatusView>
+            | None -> return "Invalid confirmation identifier." |> ServiceError |> Error
             | Some association ->
                 let! user = storage.GetUser(association.UserId)
                 match user with
-                | None -> return "User not found" |> ResponseUtils.failedTyped<AccountStatusView>
+                | None -> return "User not found" |> ServiceError |> Error
                 | Some user ->
                     
                     match association.IsOlderThan(TimeSpan.FromDays(30)) with
-                    | true -> return "Confirmation link is expired. Please request a new one." |> ResponseUtils.failedTyped<AccountStatusView>
+                    | true -> return "Confirmation link is expired. Please request a new one." |> ServiceError |> Error
                     | false ->
                         user.Confirm()
                         do! storage.Save(user)
@@ -325,7 +325,7 @@ namespace core.fs.Accounts
             
             let! exists = storage.GetUserByEmail(command.UserInfo.Email)
             match exists with
-            | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ResponseUtils.failedTyped<AccountStatusView>
+            | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ServiceError |> Error
             | None ->
                 let u = User.Create(email=command.UserInfo.Email, firstname=command.UserInfo.FirstName, lastname=command.UserInfo.LastName)
                 
@@ -337,7 +337,7 @@ namespace core.fs.Accounts
                 
                 match paymentResponse with
                 | Error err ->
-                    return err.Message |> ResponseUtils.failedTyped<AccountStatusView>
+                    return err.Message |> ServiceError |> Error
                 | _ ->
                     do! storage.Save(u)
                     return u |> success
@@ -346,21 +346,21 @@ namespace core.fs.Accounts
         member this.Validate (userInfo:UserInfo) = task {
             let! exists = storage.GetUserByEmail(userInfo.Email)
             match exists with
-            | None -> return Ok
-            | Some _ -> return $"Account with {userInfo.Email} already exists" |> ResponseUtils.failed
+            | None -> return Ok ()
+            | Some _ -> return $"Account with {userInfo.Email} already exists" |> ServiceError |> Error
         }
         
         member this.Handle (reset:ResetPassword) = task {
             let! association = storage.GetUserAssociation(reset.Id)
             match association with
-            | None -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ResponseUtils.failedTyped<AccountStatusView>
+            | None -> return "Invalid password reset token. Check the link in the email or request a new password reset." |> ServiceError |> Error
             | Some association ->
                 let! user = association.UserId |>  storage.GetUser
                 match user with
-                | None -> return "User account is no longer valid" |> ResponseUtils.failedTyped<AccountStatusView>
+                | None -> return "User account is no longer valid" |> ServiceError |> Error
                 | Some user ->
                     match association.IsOlderThan(TimeSpan.FromMinutes(15)) with
-                    | true -> return "Password reset link is expired. Please request a new one." |> ResponseUtils.failedTyped<AccountStatusView>
+                    | true -> return "Password reset link is expired. Please request a new one." |> ServiceError |> Error
                     | false ->
                         let hashAndSalt = hashProvider.GenerateHashAndSalt reset.Password 32
                         user.SetPassword hashAndSalt.Hash hashAndSalt.Salt
@@ -372,7 +372,7 @@ namespace core.fs.Accounts
             
             let! user = storage.GetUser(createNotifications.UserId)
             match user with
-            | None -> return "User not found" |> ResponseUtils.failed
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 let request = ProcessIdToUserAssociation(createNotifications.UserId, createNotifications.Created)
                 
@@ -383,7 +383,7 @@ namespace core.fs.Accounts
                 do! email.SendWithTemplate (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply EmailTemplate.ConfirmAccount {|confirmurl = confirmUrl|}
                 do! email.SendWithTemplate (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply EmailTemplate.AdminNewUser {|email = user.State.Email; |}
                 
-                return Ok
+                return Ok ()
         }
     
         member this.Handle (request:RequestPasswordReset) = task {
@@ -421,34 +421,34 @@ namespace core.fs.Accounts
             
             let! user = storage.GetUser(cmd.UserId)
             match user with
-            None -> return "User not found" |> ResponseUtils.failed
+            None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 user.ConnectToBrokerage r.access_token r.refresh_token r.token_type r.expires_in r.scope r.refresh_token_expires_in
                 do! storage.Save(user)
-                return Ok
+                return Ok ()
         }
         
         member this.HandleDisconnect(cmd:BrokerageDisconnect) = task {
             let! user = storage.GetUser(cmd.UserId)
             match user with
-            | None -> return "User not found" |> ResponseUtils.failed
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 user.DisconnectFromBrokerage()
                 do! storage.Save(user)
-                return Ok
+                return Ok ()
         }
         
         member this.HandleInfo(cmd:BrokerageInfo) = task {
             let! user = storage.GetUser(cmd.UserId)
             match user with
-            | None -> return "User not found" |> ResponseUtils.failedTyped<OAuthResponse>
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 let! oauth = brokerage.GetAccessToken(user.State)
                 
                 return
                     match oauth.IsError with
-                    | true -> oauth.error |> ResponseUtils.failedTyped<OAuthResponse>
-                    | false -> ServiceResponse<OAuthResponse>(oauth)
+                    | true -> oauth.error |> ServiceError |> Error
+                    | false -> oauth |> Ok
         }
             
             
@@ -456,7 +456,7 @@ namespace core.fs.Accounts
             let! user = storage.GetUser(userId)
             
             match user with
-            | None -> return "User not found" |> ResponseUtils.failedTyped<AccountStatusView>
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 user.SetSetting command.Key command.Value
                 do! storage.Save(user)

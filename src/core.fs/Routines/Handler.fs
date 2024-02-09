@@ -80,119 +80,119 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some _ ->
             let! routine = storage.GetRoutine create.Name userId
             match routine with
             | null ->
                 let routine = Routine(name=create.Name,description=create.Description,userId=(userId |> IdentifierHelper.getUserId))
                 do! storage.SaveRoutine routine userId
-                return ServiceResponse<RoutineState>(routine.State)
-            | _ -> return "Routine already exists" |> ResponseUtils.failedTyped<RoutineState>
+                return routine.State |> Ok
+            | _ -> return "Routine already exists" |> ServiceError |> Error
     }
     
     member _.HandleUpdate userId (update:Update) = task {
         
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routine = storage.GetRoutine update.Name userId
             match routine with
-            | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
+            | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
                 routine.Update(name=update.NewName,description=update.Description)
                 do! storage.SaveRoutine routine userId
-                return ServiceResponse<RoutineState>(routine.State)
+                return routine.State |> Ok
     }
     
     member _.Handle (delete:Delete) = task {
         
         let! user = accounts.GetUser delete.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routine = storage.GetRoutine delete.Name delete.UserId
             match routine with
-            | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
+            | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
                 do! storage.DeleteRoutine routine delete.UserId
-                return ServiceResponse<RoutineState>(routine.State)
+                return routine.State |> Ok
     }
     
     member _.Handle (query:Query) = task {
         
         let! user = accounts.GetUser query.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState array>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routines = storage.GetRoutines query.UserId
-            let states =
+            return
                 routines
-                |> Seq.map (fun routine -> routine.State)
-                |> Seq.sortBy (fun state -> state.Name.ToLower())
+                |> Seq.map (_.State)
+                |> Seq.sortBy (_.Name.ToLower())
                 |> Seq.toArray
-            return ServiceResponse<RoutineState array>(states)
+                |> Ok
     }
     
     member _.HandleAddStep userId (add:AddStep) = task {
         
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routine = storage.GetRoutine add.RoutineName userId
             match routine with
-            | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
+            | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
                 routine.AddStep(label=add.Label,url=add.Url)
                 do! storage.SaveRoutine routine userId
-                return ServiceResponse<RoutineState>(routine.State)
+                return routine.State |> Ok
     }
     
     member _.HandleMoveStep userId (move:MoveStep) = task {
         
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routine = storage.GetRoutine move.RoutineName userId
             match routine with
-            | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
+            | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
                 routine.MoveStep(stepIndex=move.StepIndex.Value,direction=move.Direction.Value)
                 do! storage.SaveRoutine routine userId
-                return ServiceResponse<RoutineState>(routine.State)
+                return routine.State |> Ok
     }
     
     member _.Handle (remove:RemoveStep) = task {
         
         let! user = accounts.GetUser remove.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routine = storage.GetRoutine remove.RoutineName remove.UserId
             match routine with
-            | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
+            | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
                 routine.RemoveStep(index=remove.StepIndex.Value)
                 do! storage.SaveRoutine routine remove.UserId
-                return ServiceResponse<RoutineState>(routine.State)
+                return routine.State |> Ok
     }
     
     member _.HandleUpdateStep userId (update:UpdateStep) = task {
         
         let! user = accounts.GetUser userId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<RoutineState>
+        | None -> return "User not found" |> ServiceError |> Error
         | _ ->
             let! routine = storage.GetRoutine update.RoutineName userId
             match routine with
-            | null -> return "Routine not found" |> ResponseUtils.failedTyped<RoutineState>
+            | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
                 routine.UpdateStep(index=update.StepIndex.Value,label=update.Label,url=update.Url)
                 do! storage.SaveRoutine routine userId
-                return ServiceResponse<RoutineState>(routine.State)
+                return routine.State |> Ok
     }
     
     

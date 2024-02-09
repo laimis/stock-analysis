@@ -87,7 +87,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = request.UserId |> accounts.GetUser
             
             match user with
-            | None -> return "User not found" |> ResponseUtils.failedTyped<OptionDashboardView>
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 let! options = storage.GetOwnedOptions(UserId user.Id)
 
@@ -101,16 +101,16 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                 let openOptionsTasks =
                     options
                     |> Seq.filter (fun o -> o.State.Closed.HasValue |> not)
-                    |> Seq.map (fun o -> o.State)
+                    |> Seq.map _.State
                     |> Seq.sortBy (fun o -> o.Ticker.Value, o.Expiration)
                     |> Seq.map (fun o ->
                         task {
                             let! chain = brokerage.GetOptions user.State o.Ticker (Some o.Expiration) None None
 
                             let detail =
-                                match chain.IsOk with
-                                | true -> chain.Success.Value.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
-                                | false -> None
+                                match chain with
+                                | Ok chain -> chain.FindMatchingOption(o.StrikePrice, o.ExpirationDate, o.OptionType)
+                                | Error _ -> None
 
                             return OwnedOptionView(o, detail)
                         })
@@ -119,39 +119,30 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
                 let! brokerageAccount = brokerage.GetAccount(user.State)
 
-                let brokeragePositions =
-                    match brokerageAccount.IsOk with
-                    | true ->
-                        brokerageAccount.Success.Value.OptionPositions
-                        |> Seq.filter (fun p ->
+                let brokeragePositions, brokerageOrders =
+                    brokerageAccount
+                    |> Result.map (fun a ->
+                        a.OptionPositions |> Seq.filter (fun p ->
                             openOptions
                             |> Seq.exists (fun o ->
                                 o.Ticker.Value = p.Ticker.Value.Value
                                 && o.StrikePrice = p.StrikePrice
                                 && o.OptionType = p.OptionType)
-                            |> not)
-                    | false -> Seq.empty
+                            |> not), a.Orders)
+                    |> Result.defaultValue (Seq.empty, Array.empty)
 
-                let brokerageOrders =
-                    match brokerageAccount.Success with
-                    | Some orders -> orders.Orders
-                    | None -> Array.empty
-
-                let view =
-                    OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders)
-
-                return ServiceResponse<OptionDashboardView>(view)
+                return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok
         }
         
-    member _.Handle(ownership:OwnershipQuery) = task {
+    member _.Handle(ownership:OwnershipQuery) : System.Threading.Tasks.Task<Result<OwnedOptionState seq, ServiceError>> = task {
         let! options = ownership.UserId |> storage.GetOwnedOptions
         
-        let option =
+        let filteredOptions =
             options
             |> Seq.filter (fun o -> o.State.Ticker = ownership.Ticker && o.State.Active)
             |> Seq.map _.State
             
-        return ServiceResponse<OwnedOptionState seq>(option)
+        return filteredOptions |> Ok
     }
 
     member _.Handle(request: ExportQuery) =
@@ -160,9 +151,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
             let csv = options |> CSVExport.options csvWriter
 
-            return
-                ExportResponse("options" |> CSVExport.generateFilename, csv)
-                |> ResponseUtils.success<ExportResponse>
+            return ExportResponse("options" |> CSVExport.generateFilename, csv)
         }
 
     member this.Handle(command: ExpireCommand) =
@@ -178,11 +167,11 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | null ->
                 return
                     $"option for id {data.OptionId} not found"
-                    |> ResponseUtils.failedTyped<OwnedOption>
+                    |> ServiceError |> Error
             | _ ->
                 option.Expire(assign = assign)
                 do! storage.SaveOwnedOption option data.UserId
-                return ServiceResponse<OwnedOption>(option)
+                return option |> Ok
         }
 
     member this.Handle(command: ExpireViaLookupCommand) =
@@ -205,12 +194,12 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | Some o ->
                 o.Expire(assign = assigned)
                 do! storage.SaveOwnedOption o data.UserId
-                return ServiceResponse<OwnedOption>(o)
+                return o |> Ok
 
             | None ->
                 return
                     $"option for ticker {data.Ticker} strike {data.StrikePrice} expiration {data.Expiration} not found"
-                    |> ResponseUtils.failedTyped<OwnedOption>
+                    |> ServiceError |> Error
         }
 
     member this.Handle(command: DeleteCommand) =
@@ -222,7 +211,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | _ ->
                 opt.Delete()
                 do! storage.SaveOwnedOption opt command.UserId
-                return Ok
+                return Ok ()
         }
 
     member this.Handle(cmd: BuyOrSellCommand) =
@@ -241,7 +230,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = accounts.GetUser(userId)
 
             match user with
-            | None -> return "User not found" |> ResponseUtils.failedTyped<OwnedOption>
+            | None -> return "User not found" |> ServiceError |> Error
             | _ ->
 
                 let optionType = data.OptionType.ToEnum()
@@ -259,7 +248,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
                 do! storage.SaveOwnedOption option userId
 
-                return ServiceResponse<OwnedOption>(option)
+                return option |> Ok
         }
 
     member this.Handle(query: DetailsQuery) =
@@ -267,20 +256,21 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = accounts.GetUser(query.UserId)
 
             match user with
-            | None -> return "User not found" |> ResponseUtils.failedTyped<OwnedOptionView>
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
 
                 let! option = storage.GetOwnedOption query.OptionId query.UserId
                 let! chain = brokerage.GetOptions user.State option.State.Ticker None None None
-
-                let detail =
-                    chain.Success.Value.FindMatchingOption(
-                        strikePrice = option.State.StrikePrice,
-                        expirationDate = option.State.ExpirationDate,
-                        optionType = option.State.OptionType
+                
+                return
+                    chain |> Result.map (fun c ->
+                        let detail = c.FindMatchingOption(
+                            strikePrice = option.State.StrikePrice,
+                            expirationDate = option.State.ExpirationDate,
+                            optionType = option.State.OptionType
+                        )
+                        OwnedOptionView(option.State, optionDetail = detail)
                     )
-
-                return ServiceResponse<OwnedOptionView>(OwnedOptionView(option.State, optionDetail = detail))
         }
 
     member this.Handle(query: ChainQuery) =
@@ -288,22 +278,17 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             let! user = accounts.GetUser(userId = query.UserId)
 
             match user with
-            | None -> return "User not found" |> ResponseUtils.failedTyped<OptionDetailsViewModel>
+            | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
 
                 let! priceResult = brokerage.GetQuote user.State query.Ticker
 
                 let price =
-                    match priceResult.IsOk with
-                    | true -> Nullable<decimal>(priceResult.Success.Value.Price)
-                    | false -> Nullable<decimal>()
+                    match priceResult with
+                    | Ok price -> Some price.Price
+                    | Error _ -> None
 
                 let! details = brokerage.GetOptions user.State query.Ticker None None None
-
-                match details.Success with
-                | Some success ->
-                    let model = OptionDetailsViewModel(price, success)
-                    return ServiceResponse<OptionDetailsViewModel>(model)
-                | None ->
-                    return details.Error.Value.Message |> ResponseUtils.failedTyped<OptionDetailsViewModel>
+                
+                return details |> Result.map (fun d -> OptionDetailsViewModel(price, d))
         }

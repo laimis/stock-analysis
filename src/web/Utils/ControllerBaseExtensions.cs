@@ -3,30 +3,36 @@ using core.fs;
 using core.fs.Adapters.CSV;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Microsoft.FSharp.Core;
 
 namespace web.Utils
 {
     public static class ControllerBaseExtensions
     {
+        public static ActionResult GenerateExport(
+            this ControllerBase controller,
+            ExportResponse response)
+        {
+            controller.HttpContext.Response.Headers.ContentDisposition = new StringValues($"attachment; filename={response.Filename}");
+
+            return new ContentResult
+            {
+                Content = response.Content,
+                ContentType = response.ContentType
+            };
+        }
         public static async Task<ActionResult> GenerateExport(
             this ControllerBase controller,
-            Task<ServiceResponse<ExportResponse>> responseTask)
+            Task<FSharpResult<ExportResponse,ServiceError>> responseTask)
             {
                 var response = await responseTask;
 
-                if (response.IsOk)
+                if (response.IsError)
                 {
-                    var content = response.Success.Value;
-                    controller.HttpContext.Response.Headers["Content-Disposition"] = new StringValues($"attachment; filename={content.Filename}");
-
-                    return new ContentResult
-                    {
-                        Content = content.Content,
-                        ContentType = content.ContentType
-                    };
+                    return controller.Error(response.ErrorValue.Message);
                 }
 
-                return controller.Error(response.Error.Value.Message);
+                return controller.GenerateExport(response.ResultValue);
             }
 
         public static ActionResult Error(
@@ -41,26 +47,25 @@ namespace web.Utils
         
         public static async Task<ActionResult> OkOrError(
             this ControllerBase controller,
-            Task<ServiceResponse> r)
+            Task<FSharpResult<Unit,ServiceError>> r)
         {
             return controller.OkOrError(await r);
         }
         
         public static async Task<ActionResult> OkOrError<T>(
             this ControllerBase controller,
-            Task<ServiceResponse<T>> r)
+            Task<FSharpResult<T,ServiceError>> r)
         {
             return controller.OkOrError(await r);
         }
         
         public static ActionResult OkOrError(
             this ControllerBase controller,
-            ServiceResponse r)
+            FSharpResult<Unit,ServiceError> r)
         {
             if (r.IsError)
             {
-                var error = r as ServiceResponse.Error;
-                return controller.Error(error!.Item.Message);
+                return controller.Error(r.ErrorValue.Message);
             }
 
             return controller.Ok();
@@ -68,14 +73,14 @@ namespace web.Utils
         
         public static ActionResult OkOrError<T>(
             this ControllerBase controller,
-            ServiceResponse<T> r)
+            FSharpResult<T,ServiceError> r)
         {
             if (r.IsOk == false)
             {
-                return controller.Error(r.Error.Value.Message);
+                return controller.Error(r.ErrorValue.Message);
             }
 
-            return controller.Ok(r.Success);
+            return controller.Ok(r.ResultValue);
         }
     }
 }

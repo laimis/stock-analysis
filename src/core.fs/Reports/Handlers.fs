@@ -226,22 +226,20 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 }
             )
             
-        let response = {links=links}
-        
-        return ServiceResponse<ChainView>(response)
+        return {links=links}
     }
     
     member _.Handle(request:DailyPositionReportQuery) = task {
         
         let! user = accounts.GetUser request.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! stock = storage.GetStockPosition request.PositionId request.UserId
             
             match stock with
-            | None -> return "Stock position not found" |> ResponseUtils.failedTyped<DailyPositionReportView>
+            | None -> return "Stock position not found" |> ServiceError |> Error
             | Some position ->
                 
                 let position = position |> StockPositionWithCalculations
@@ -259,26 +257,23 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         PriceFrequency.Daily
                         start
                         ``end``
-                
-                match pricesResponse.Success with
-                | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<DailyPositionReportView>
-                | Some prices ->
+                        
+                return pricesResponse |> Result.map (fun prices ->
                     let profit, pct = PositionAnalysis.dailyPLAndGain prices position
                     
-                    let response = {
+                    {
                         DailyProfit = profit
                         DailyGainPct = pct
                         Ticker = request.Ticker.Value
                     }
-                    
-                    return ServiceResponse<DailyPositionReportView>(response)                   
+                )                   
     }
     
     member _.Handle (query:GapReportQuery) = task {
         
         let! user = accounts.GetUser query.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<GapReportView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! priceResponse =
@@ -289,19 +284,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     DateTimeOffset.MinValue
                     DateTimeOffset.MinValue
             
-            match priceResponse.Success with
-            | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<GapReportView>
-            | Some prices ->
+            return priceResponse |> Result.map (fun prices ->
                 let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
-                let response = {gaps=gaps; ticker=query.Ticker.Value}
-                return ServiceResponse<GapReportView>(response)
+                {gaps=gaps; ticker=query.Ticker.Value}
+            )
     }
     
     member _.HandleOutcomesReport userId (query:OutcomesReportQuery) = task {
         let! user = accounts.GetUser userId
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
             let! tasks =
@@ -328,9 +321,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                                 endDate
                             |> Async.AwaitTask
                         
-                        match priceResponse.Success with
-                        | None -> return None
-                        | Some prices ->
+                        match priceResponse with
+                        | Error _ -> return None
+                        | Ok prices ->
                             
                             let outcomes =
                                 match query.Duration with
@@ -351,7 +344,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             
                             return Some (tickerOutcome, gapsView, tickerPatterns)
                     with
-                    | ex ->
+                    | _ ->
                         return None
                     }
                 )
@@ -375,16 +368,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 | OutcomesReportDuration.SingleBar -> SingleBarPriceAnalysisEvaluation.evaluate outcomes
                 | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.evaluate outcomes
             
-            let response = OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns)
-            
-            return ServiceResponse<OutcomesReportView>(response)
+            return OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns) |> Ok
     }
     
     member _.Handle (query:OutcomesReportForPositionsQuery) = task {
         
         let! user = accounts.GetUser query.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<OutcomesReportView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! stocks = query.UserId |> storage.GetStockPositions
             
@@ -392,9 +383,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             
             let! account = brokerage.GetAccount user.State
             let orders =
-                match account.Success with
-                | None -> Array.Empty<Order>()
-                | Some account -> account.Orders
+                match account with
+                | Error _ -> Array.Empty<Order>()
+                | Ok account -> account.Orders
                 
             let! tasks =
                 positions
@@ -411,9 +402,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             DateTimeOffset.UtcNow
                         |> Async.AwaitTask
                     
-                    match priceResponse.Success with
-                    | None -> return None
-                    | Some prices ->
+                    match priceResponse with
+                    | Error _ -> return None
+                    | Ok prices ->
                         
                         let outcomes = PositionAnalysis.generate calculations prices orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
@@ -436,15 +427,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let evaluations = PositionAnalysis.evaluate outcomes
             
-            let response = OutcomesReportView(evaluations, outcomes, [], patterns)
-            
-            return ServiceResponse<OutcomesReportView>(response)
+            return OutcomesReportView(evaluations, outcomes, [], patterns) |> Ok
     }
     
     member _.Handle (query:PercentChangeStatisticsQuery) = task {
         let! user = accounts.GetUser query.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! pricesResponse =
                 brokerage.GetPriceHistory
@@ -454,19 +443,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     DateTimeOffset.MinValue
                     DateTimeOffset.MinValue
             
-            match pricesResponse.Success with
-            | None -> return pricesResponse.Error.Value.Message |> ResponseUtils.failedTyped<PercentChangeStatisticsView>
-            | Some prices ->
+            return pricesResponse |> Result.map (fun prices ->
                 let recent = 30 |> prices.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
                 let allTime = prices |> PercentChangeAnalysis.calculateForPriceBars
-                let response = {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
-                return ServiceResponse<PercentChangeStatisticsView>(response)
+                {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
+            )
     }
     
     member _.Handle (query:SellsQuery) = task {
         let! user = accounts.GetUser query.UserId
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<SellsView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! stocks = storage.GetStockPositions query.UserId
             
@@ -476,10 +463,9 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     (stocks |> Seq.map (_.Ticker))
             
             let prices =
-                match priceResult.Success with
-                | None -> Dictionary<Ticker,StockQuote>()
-                | Some prices -> prices
+                match priceResult with
+                | Error _ -> Dictionary<Ticker,StockQuote>()
+                | Ok prices -> prices
                 
-            let response = SellsView(stocks, prices)
-            return ServiceResponse<SellsView>(response)
+            return SellsView(stocks, prices) |> Ok
     }

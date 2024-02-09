@@ -99,7 +99,7 @@ public class TDAmeritradeClient : IBrokerage
         return Task.FromResult(url);
     }
 
-    public async Task<ServiceResponse<StockProfile>> GetStockProfile(UserState state, Ticker ticker)
+    public async Task<FSharpResult<StockProfile,ServiceError>> GetStockProfile(UserState state, Ticker ticker)
     {
         if (state.ConnectedToBrokerage == false)
         {
@@ -478,12 +478,12 @@ public class TDAmeritradeClient : IBrokerage
         };
     }
 
-    private static ServiceResponse<T> NotConnectedToBrokerageError<T>()
+    private static FSharpResult<T,ServiceError> NotConnectedToBrokerageError<T>()
     {
-        return new ServiceResponse<T>(new ServiceError("User is not connected to brokerage"));
+        return FSharpResult<T,ServiceError>.NewError(new ServiceError("User is not connected to brokerage"));
     }
 
-    public async Task<ServiceResponse<core.fs.Adapters.Options.OptionChain>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
+    public async Task<FSharpResult<core.fs.Adapters.Options.OptionChain, ServiceError>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
     {
         if (state.ConnectedToBrokerage == false)
         {
@@ -512,7 +512,7 @@ public class TDAmeritradeClient : IBrokerage
 
         if (chainResponse.IsOk == false)
         {
-            return new ServiceResponse<core.fs.Adapters.Options.OptionChain>(chainResponse.Error.Value);
+            return FSharpResult<core.fs.Adapters.Options.OptionChain,ServiceError>.NewError(chainResponse.Error.Value);
         }
 
         static IEnumerable<core.fs.Adapters.Options.OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
@@ -549,7 +549,7 @@ public class TDAmeritradeClient : IBrokerage
             options: ToOptionDetails(chain.callExpDateMap!, chain.underlyingPrice).Union(ToOptionDetails(chain.putExpDateMap!, chain.underlyingPrice)).ToArray()
         );
 
-        return new ServiceResponse<core.fs.Adapters.Options.OptionChain>(response);
+        return FSharpResult<core.fs.Adapters.Options.OptionChain,ServiceError>.NewOk(response);
     }
 
     public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)

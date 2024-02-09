@@ -9,59 +9,25 @@ type IApplicationService = interface end
    
 type ServiceError(message:string) =
     member this.Message = message
-    
-type ServiceResponse =
-    | Ok
-    | Error of ServiceError
-    
-type ServiceResponse<'a>(success:'a option,error:ServiceError option) =
-    
-    new(success:'a) =
-        ServiceResponse<'a>(success = Some(success),error = None)
-    
-    new(error:ServiceError) =
-        ServiceResponse<'a>(success = None,error = Some(error))
-        
-    member this.Success = success
-    member this.Error = error
-    member this.IsOk = match this.Success with | Some _ -> true | None -> false
-    member this.Result =
-        match this.Success with
-        | Some s -> Result.Ok s
-        | None -> Result.Error this.Error.Value
-    
+
 module CultureUtils =
     let DefaultCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US")
     
 module ResponseUtils =
             
-    let failedTyped<'a> (message: string) =
-        message |> ServiceError |> ServiceResponse<'a>
-        
-    let failed (message: string) : ServiceResponse =
-        message |> ServiceError |> Error
-        
-    let success<'a> (data: 'a) =
-        ServiceResponse<'a>(data)
-    
-    let toOkOrError (response: ServiceResponse<'a>) : ServiceResponse =
-        match response.IsOk with
-        | true -> Ok
-        | false -> Error response.Error.Value
-        
-    let toOkOrConcatErrors serviceResponses : ServiceResponse =
+    let toOkOrConcatErrors serviceResponses : Result<Unit,ServiceError> =
         let failures =
             serviceResponses
-            |> Seq.map (fun (r:ServiceResponse) ->
+            |> Seq.map (fun (r:Result<unit,ServiceError>) ->
                 match r with
-                | Ok -> None
+                | Ok _ -> None
                 | Error err -> Some err
             )
             |> Seq.choose id
         
         match failures |> Seq.isEmpty with
-        | true -> Ok
-        | false -> failed (failures |> Seq.map (fun r -> r.Message) |> String.concat "\n")
+        | true -> Ok ()
+        | false -> (failures |> Seq.map _.Message |> String.concat "\n") |> ServiceError |> Error
         
    
 type ValueWithFrequency =

@@ -90,76 +90,58 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
     member _.Handle (query:DetailsQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<DetailsView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! profileResponse = brokerage.GetStockProfile user.State query.Ticker
             let! quoteResponse = brokerage.GetQuote user.State query.Ticker
                 
             let view = {
                 Ticker = query.Ticker.Value
-                Quote = quoteResponse.Success
-                Profile = profileResponse.Success
+                Quote = quoteResponse |> Result.toOption
+                Profile = profileResponse |> Result.toOption
             }
             
-            return ServiceResponse<DetailsView>(view)
+            return Ok view
     }
     
     member _.Handle (query:PriceQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<decimal option>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! priceResponse = brokerage.GetQuote user.State query.Ticker
-            let price =
-                match priceResponse.Success with
-                | Some price -> Some price.Price
-                | None -> None
-                
-            return ServiceResponse<decimal option>(price)
+            return priceResponse |> Result.map (_.Price)
     }
     
     member _.Handle (query:PricesQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<PricesView>
+        | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker query.Frequency query.Start query.End
-            match priceResponse.Success with
-            | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<PricesView>
-            | Some prices -> return prices |> PricesView |> ResponseUtils.success
+            return priceResponse |> Result.map PricesView
     }
     
     member _.Handle (query:QuoteQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<StockQuote>
-        | Some user ->
-            let! priceResponse = brokerage.GetQuote user.State query.Ticker
-            match priceResponse.Success with
-            | None -> return priceResponse.Error.Value.Message |> ResponseUtils.failedTyped<StockQuote>
-            | Some _ -> return priceResponse
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user -> return! brokerage.GetQuote user.State query.Ticker
     }
     
     member _.Handle (query:SearchQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
-        | None -> return "User not found" |> ResponseUtils.failedTyped<SearchResult array>
-        | Some user ->
-            let! matches = brokerage.Search user.State query.Term 10
-            
-            match matches.Success with
-            | None -> return matches.Error.Value.Message |> ResponseUtils.failedTyped<SearchResult array>
-            | Some _ -> return matches
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user -> return! brokerage.Search user.State query.Term 10
     }
     
     member _.Handle (query:CompanyFilingsQuery) = task {
         let! response = secFilings.GetFilings(query.Ticker)
-        match response.Success with
-        | None -> return response.Error.Value.Message |> ResponseUtils.failedTyped<CompanyFiling seq>
-        | Some response -> return ServiceResponse<CompanyFiling seq>(response.Filings)
+        return response |> Result.map (_.Filings)
     }
     
     

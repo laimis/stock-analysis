@@ -4,11 +4,12 @@ using System.Data;
 using System.Threading.Tasks;
 using core.fs;
 using core.Shared;
+using Microsoft.FSharp.Core;
 
 namespace storage.shared
 {
     public interface IOutbox
     {
-        Task<ServiceResponse> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
+        Task<FSharpResult<Unit,ServiceError>> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
     }
 }
