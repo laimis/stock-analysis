@@ -109,7 +109,7 @@ export class StockTradingPositionsComponent {
 
     getPrice(p:PositionInstance) {
       if (this.quotes) {
-        return this.quotes[p.ticker].price
+        return this.quotes[p.ticker]?.price
       }
       return 0
     }
