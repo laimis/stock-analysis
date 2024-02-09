@@ -9,18 +9,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FSharp.Core;
 using web.Utils;
 
 namespace web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController : ControllerBase
+    public class AccountController(Handler handler) : ControllerBase
     {
-        private readonly Handler _handler;
-        
-        public AccountController(Handler handler) => _handler = handler;
-        
         [HttpGet("status")]
         public Task<ActionResult> Identity()
         {
@@ -31,7 +28,7 @@ namespace web.Controllers
             }
 
             return this.OkOrError(
-                _handler.Handle(
+                handler.Handle(
                     new LookupById(User.Identifier())
                 )
             );
@@ -43,7 +40,7 @@ namespace web.Controllers
         {
             return User.Identity is { IsAuthenticated: true } ?
                 Task.FromResult<ActionResult>(BadRequest("User already has an account")) 
-                : this.OkOrError(_handler.Validate(command));
+                : this.OkOrError(handler.Validate(command));
         }
 
         [HttpPost]
@@ -54,10 +51,10 @@ namespace web.Controllers
                 return BadRequest("User already has an account");
             }
 
-            var r = await _handler.Handle(cmd);
+            var r = await handler.Handle(cmd);
             if (r.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, r.Success.Value);
+                await EstablishSignedInIdentity(HttpContext, r.ResultValue);
             }
 
             return this.OkOrError(r);
@@ -94,7 +91,7 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> TdAmeritrade()
         {
-            var url = await _handler.Handle(new Connect());
+            var url = await handler.Handle(new Connect());
 
             return Redirect(url);
         }
@@ -103,18 +100,17 @@ namespace web.Controllers
         [Authorize]
         public Task<ActionResult> TdAmeritradeInfo() =>
             this.OkOrError(
-                _handler.HandleInfo(
+                handler.HandleInfo(
                     new BrokerageInfo(User.Identifier()
                     )
                 )
             );
         
-        private ActionResult RedirectOrError(ServiceResponse result)
+        private ActionResult RedirectOrError<T>(FSharpResult<T,ServiceError> result)
         {
             if (result.IsError)
             {
-                var error = result as ServiceResponse.Error;
-                return BadRequest(error!.Item.Message);
+                return BadRequest(result.ErrorValue.Message);
             }
             
             return Redirect("~/profile");
@@ -124,7 +120,7 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> TdAmeritradeDisconnect()
         {
-            var result = await _handler.HandleDisconnect(
+            var result = await handler.HandleDisconnect(
                 new BrokerageDisconnect(User.Identifier())
             );
             return RedirectOrError(result);
@@ -134,29 +130,33 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code)
         {
-            var result = await _handler.HandleConnectCallback(
+            var result = await handler.HandleConnectCallback(
                 new ConnectCallback(code, User.Identifier()));
 
             return RedirectOrError(result);
         }
 
         [HttpPost("requestpasswordreset")]
-        public Task<ActionResult> RequestPasswordReset([FromBody]RequestPasswordReset cmd) => this.OkOrError(_handler.Handle(cmd));
+        public ActionResult RequestPasswordReset([FromBody] RequestPasswordReset cmd)
+        {
+            handler.Handle(cmd);
+            return Ok();
+        }
 
         [HttpPost("login")]
         public async Task<ActionResult> Authenticate([FromBody]Authenticate cmd)
         {
-            var response = await _handler.Handle(cmd);
+            var response = await handler.Handle(cmd);
             if (response.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, response.Success.Value);
+                await EstablishSignedInIdentity(HttpContext, response.ResultValue);
             }
             
             return this.OkOrError(response);
         }
 
         [HttpPost("contact")]
-        public Task<ActionResult> Contact([FromBody]Contact cmd) => this.OkOrError(_handler.Handle(cmd));
+        public Task<ActionResult> Contact([FromBody]Contact cmd) => this.OkOrError(handler.Handle(cmd));
 
         [HttpGet("logout")]
         [Authorize]
@@ -171,12 +171,11 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> Delete([FromBody]Delete cmd)
         {
-            var result = await _handler.HandleDelete(User.Identifier(), cmd);
+            var result = await handler.HandleDelete(User.Identifier(), cmd);
             
             if (result.IsError)
             {
-                var error = result as ServiceResponse.Error;
-                return this.Error(error!.Item.Message);
+                return this.Error(result.ErrorValue);
             }
 
             await HttpContext.SignOutAsync();
@@ -187,7 +186,7 @@ namespace web.Controllers
         [Authorize]
         public async Task<ActionResult> Clear()
         {
-            await _handler.Handle(new Clear(User.Identifier()));
+            await handler.Handle(new Clear(User.Identifier()));
 
             await HttpContext.SignOutAsync();
 
@@ -197,11 +196,11 @@ namespace web.Controllers
         [HttpPost("resetpassword")]
         public async Task<ActionResult> ResetPassword([FromBody] ResetPassword cmd)
         {
-            var result = await _handler.Handle(cmd);
+            var result = await handler.Handle(cmd);
 
             if (result.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, result.Success.Value);
+                await EstablishSignedInIdentity(HttpContext, result.ResultValue);
             }
 
             return this.OkOrError(result);
@@ -210,22 +209,22 @@ namespace web.Controllers
         [HttpGet("confirm/{id}")]
         public async Task<ActionResult> Confirm(Guid id)
         {
-            var result = await _handler.Handle(
+            var result = await handler.Handle(
                 new Confirm(id)
             );
 
             if (result.IsOk)
             {
-                await EstablishSignedInIdentity(HttpContext, result.Success.Value);
+                await EstablishSignedInIdentity(HttpContext, result.ResultValue);
                 return Redirect("~/");
             }
             
-            return this.Error(result.Error.Value.Message);
+            return this.Error(result.ErrorValue);
         }
         
         [HttpPost("settings")]
         [Authorize]
         public Task<ActionResult> Settings([FromBody]SetSetting cmd)
-            => this.OkOrError(_handler.HandleSettings(User.Identifier(), cmd));
+            => this.OkOrError(handler.HandleSettings(User.Identifier(), cmd));
     }
 }

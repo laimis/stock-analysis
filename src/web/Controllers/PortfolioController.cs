@@ -38,12 +38,9 @@ public class PortfolioController : ControllerBase
         );
 
     [HttpGet("transactionsummary")]
-    public Task<ActionResult> Review(string period) =>
-        this.OkOrError(
-            _stockPositionHandler.Handle(
-                new TransactionSummary(period: period, userId: User.Identifier()
-                )
-            )
+    public Task<TransactionSummaryView> Review(string period) =>
+        _stockPositionHandler.Handle(
+            new TransactionSummary(period: period, userId: User.Identifier())
         );
 
     [HttpGet("stockpositions/export/closed")]
@@ -63,9 +60,9 @@ public class PortfolioController : ControllerBase
         );
     
     [HttpGet("stockpositions/export/transactions")]
-    public Task<ActionResult> Export() =>
+    public async Task<ActionResult> Export() =>
         this.GenerateExport(
-            _stockPositionHandler.Handle(
+            await _stockPositionHandler.Handle(
                 new ExportTransactions(User.Identifier())
             )
         );

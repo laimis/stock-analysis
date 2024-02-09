@@ -9,7 +9,6 @@ namespace core.fs.Accounts
     open core.fs.Adapters.Email
     open core.fs.Adapters.Storage
     open core.fs.Adapters.Subscriptions
-    open core.fs.Adapters.Storage
     
     type AccountStatusView =
         {
@@ -312,13 +311,13 @@ namespace core.fs.Accounts
                         return user |> success
         }
     
-        member this.Handle (command:Contact) = task {
+        member this.Handle (command:Contact) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
             do! email.SendWithTemplate
                     (Recipient(email=roles.GetAdminEmail(), name=null))
                     Sender.NoReply
                     EmailTemplate.AdminContact
                     {|message = command.Message; email = command.Email|}
-            return Ok
+            return Ok ()
         }
         
         member this.Handle (command:CreateAccount) = task {
@@ -390,7 +389,7 @@ namespace core.fs.Accounts
             let! user = storage.GetUserByEmail(request.Email)
             
             match user with
-            | None -> return Ok // don't return an error so that user accounts can't be enumerated
+            | None -> return () // don't return an error so that user accounts can't be enumerated
             | Some user ->
                 let association = ProcessIdToUserAssociation(user.Id |> UserId, DateTimeOffset.UtcNow)
                 
@@ -400,15 +399,15 @@ namespace core.fs.Accounts
                 
                 do! email.SendWithTemplate (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply EmailTemplate.PasswordReset {|reseturl = resetUrl|}
                 
-                return Ok
+                return ()
         }
         
-        member this.Handle (query:LookupById) = task {
+        member this.Handle (query:LookupById) : System.Threading.Tasks.Task<Result<AccountStatusView,ServiceError>> = task {
             let! user = storage.GetUser(query.UserId)
             return user |> successOrNotFound
         }
         
-        member this.Handle (query:LookupByEmail) = task {
+        member this.Handle (query:LookupByEmail) : System.Threading.Tasks.Task<Result<AccountStatusView,ServiceError>> = task {
             let! user = storage.GetUserByEmail(query.Email)
             return user |> successOrNotFound
         }

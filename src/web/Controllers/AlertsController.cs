@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.fs.Alerts;
 using Microsoft.AspNetCore.Authorization;
@@ -41,9 +42,9 @@ namespace web.Controllers
         public ActionResult Run() => this.OkOrError(_handler.Handle(new Run()));
 
         [HttpGet]
-        public ActionResult Index() => this.OkOrError(_handler.Handle(new QueryAlerts(User.Identifier())));
+        public AlertsView Index() => _handler.Handle(new QueryAlerts(User.Identifier()));
 
         [HttpGet("monitors")]
-        public ActionResult Monitors() => this.OkOrError(_handler.Handle(new QueryAvailableMonitors()));
+        public IEnumerable<object> Monitors() => _handler.Handle(new QueryAvailableMonitors());
     }
 }

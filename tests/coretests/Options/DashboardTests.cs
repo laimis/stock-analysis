@@ -43,14 +43,14 @@ namespace coretests.Options
             var brokerage = new Mock<IBrokerage>();
             brokerage.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<Ticker>>()))
                 .Returns(Task.FromResult(
-                    new ServiceResponse<Dictionary<Ticker, StockQuote>>(
+                    FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>.NewOk(
                         new Dictionary<Ticker, StockQuote>()
                     )
                 ));
 
             brokerage.Setup(x => x.GetAccount(It.IsAny<UserState>()))
                 .Returns(Task.FromResult(
-                    new ServiceResponse<BrokerageAccount>(
+                    FSharpResult<BrokerageAccount,ServiceError>.NewOk(
                         new BrokerageAccount {
                             OptionPositions = Array.Empty<OptionPosition>(),
                             StockPositions = Array.Empty<StockPosition>(),
@@ -62,7 +62,7 @@ namespace coretests.Options
 
             var result = await handler.Handle(query);
 
-            Assert.Equal(0, result.Success.Value.BuyStats.Count);
+            Assert.Equal(0, result.ResultValue.BuyStats.Count);
         }
     }
 }

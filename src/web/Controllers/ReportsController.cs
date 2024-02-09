@@ -23,12 +23,10 @@ namespace web.Controllers
         }
         
         [HttpGet("chain")]
-        public Task<ActionResult> Chain() =>
-            this.OkOrError(
-                _service.Handle(
-                    new ChainQuery(
-                        User.Identifier()
-                    )
+        public Task<ChainView> Chain() =>
+            _service.Handle(
+                new ChainQuery(
+                    User.Identifier()
                 )
             );
 

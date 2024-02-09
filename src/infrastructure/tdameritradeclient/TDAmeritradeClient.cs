@@ -45,6 +45,7 @@ public class TDAmeritradeClient : IBrokerage
     private readonly AsyncPolicy _wrappedPolicy = Policy.WrapAsync(
         _retryPolicy, _rateLimit, _timeoutPolicy
     );
+    
 
     private readonly IBlobStorage _blogStorage;
 
@@ -56,6 +57,15 @@ public class TDAmeritradeClient : IBrokerage
         _logger = logger;
         _httpClient = new HttpClient();
     }
+    
+    private static FSharpResult<T,ServiceError> ToFSharpError<T>(ServiceError error) =>
+        FSharpResult<T,ServiceError>.NewError(error);
+
+    private static FSharpResult<T, ServiceError> ToFSharpError<T>(string message) =>
+        ToFSharpError<T>(new ServiceError(message));
+    
+    private static FSharpResult<T, ServiceError> ToFSharpResult<T>(T value) =>
+        FSharpResult<T, ServiceError>.NewOk(value);
 
     public async Task<OAuthResponse?> ConnectCallback(string code)
     {
@@ -112,13 +122,13 @@ public class TDAmeritradeClient : IBrokerage
             state, function, HttpMethod.Get
         );
 
-        if (results.IsOk == false)
+        if (results.IsError)
         {
-            return new ServiceResponse<StockProfile>(results.Error.Value);
+            return ToFSharpError<StockProfile>(results.ErrorValue);
         }
 
-        var fundamentals = results.Success.Value![ticker.Value].fundamental ?? new Dictionary<string, object>();
-        var data = results.Success.Value[ticker.Value];
+        var fundamentals = results.ResultValue[ticker.Value].fundamental ?? new Dictionary<string, object>();
+        var data = results.ResultValue[ticker.Value];
 
         var mapped = new StockProfile {
             Symbol = data.symbol,
@@ -132,11 +142,11 @@ public class TDAmeritradeClient : IBrokerage
                 f => f.Value.ToString()
             )
         };
-        
-        return new ServiceResponse<StockProfile>(mapped);
+
+        return ToFSharpResult(mapped);
     }
 
-    public async Task<ServiceResponse<SearchResult[]>> Search(UserState state, string query, int limit)
+    public async Task<FSharpResult<SearchResult[], ServiceError>> Search(UserState state, string query, int limit)
     {
         if (state.ConnectedToBrokerage == false)
         {
@@ -148,10 +158,10 @@ public class TDAmeritradeClient : IBrokerage
         var results = await CallApi<Dictionary<string, SearchItem>>(state, function, HttpMethod.Get);
         if (results.IsOk == false)
         {
-            return new ServiceResponse<SearchResult[]>(results.Error.Value);
+            return ToFSharpError<SearchResult[]>(results.ErrorValue);
         }
 
-        var converted = results.Success.Value.Values.Select(
+        var converted = results.ResultValue.Values.Select(
             i => new SearchResult
             {
                 Symbol = i.symbol,
@@ -181,10 +191,10 @@ public class TDAmeritradeClient : IBrokerage
             .Take(limit)
             .ToArray();
 
-        return new ServiceResponse<SearchResult[]>(converted);
+        return ToFSharpResult(converted);
     }
 
-    public async Task<ServiceResponse<BrokerageAccount>> GetAccount(UserState user)
+    public async Task<FSharpResult<BrokerageAccount,ServiceError>> GetAccount(UserState user)
     {
         if (user.ConnectedToBrokerage == false)
         {
@@ -197,12 +207,12 @@ public class TDAmeritradeClient : IBrokerage
             HttpMethod.Get
         );
 
-        if (response.IsOk == false)
+        if (response.IsError)
         {
-            return new ServiceResponse<BrokerageAccount>(response.Error.Value);
+            return ToFSharpError<BrokerageAccount>(response.ErrorValue);
         }
 
-        var accounts = response.Success.Value;
+        var accounts = response.ResultValue;
 
         var tdPositions = (accounts[0].securitiesAccount?.positions)
             ?? throw new Exception("Could not find positions in response");
@@ -277,25 +287,25 @@ public class TDAmeritradeClient : IBrokerage
             ShortMarketValue = accounts[0].securitiesAccount?.currentBalances?.shortMarketValue,
         };
 
-        return new ServiceResponse<BrokerageAccount>(account);
+        return ToFSharpResult(account);
     }
 
-    public async Task<ServiceResponse<bool>> CancelOrder(UserState user, string orderId)
+    public async Task<FSharpResult<Unit,ServiceError>> CancelOrder(UserState user, string orderId)
     {
         if (user.ConnectedToBrokerage == false)
         {
-            return NotConnectedToBrokerageError<bool>();
+            return NotConnectedToBrokerageError<Unit>();
         }
         
         // get account first
         var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
 
-        if (response.IsOk == false)
+        if (response.IsError)
         {
-            return new ServiceResponse<bool>(response.Error.Value);
+            return ToFSharpError<Unit>(response.ErrorValue);
         }
 
-        var accounts = response.Success.Value;
+        var accounts = response.ResultValue;
 
         var accountId = accounts[0].securitiesAccount?.accountId;
 
@@ -304,12 +314,12 @@ public class TDAmeritradeClient : IBrokerage
         var (cancelResponse, content) = await CallApiWithoutSerialization(user, url, HttpMethod.Delete);
         return cancelResponse.IsSuccessStatusCode switch
         {
-            true => new ServiceResponse<bool>(true),
-            false => new ServiceResponse<bool>(new ServiceError(content))
+            true => ToFSharpResult<Unit>(null!),
+            false => ToFSharpError<Unit>(content)
         };
     }
 
-    public Task<ServiceResponse<bool>> BuyOrder(
+    public Task<FSharpResult<Unit,ServiceError>> BuyOrder(
         UserState user,
         Ticker ticker,
         decimal numberOfShares,
@@ -340,7 +350,7 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
     
-    public Task<ServiceResponse<bool>> BuyToCoverOrder(
+    public Task<FSharpResult<Unit,ServiceError>> BuyToCoverOrder(
         UserState user,
         Ticker ticker,
         decimal numberOfShares,
@@ -371,7 +381,7 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
     
-    public Task<ServiceResponse<bool>> SellShortOrder(
+    public Task<FSharpResult<Unit,ServiceError>> SellShortOrder(
         UserState user,
         Ticker ticker,
         decimal numberOfShares,
@@ -402,7 +412,7 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public Task<ServiceResponse<bool>> SellOrder(
+    public Task<FSharpResult<Unit,ServiceError>> SellOrder(
         UserState user,
         Ticker ticker,
         decimal numberOfShares,
@@ -432,7 +442,7 @@ public class TDAmeritradeClient : IBrokerage
         return EnterOrder(user, postData);
     }
 
-    public async Task<ServiceResponse<StockQuote>> GetQuote(UserState user, Ticker ticker)
+    public async Task<FSharpResult<StockQuote,ServiceError>> GetQuote(UserState user, Ticker ticker)
     {
         if (user.ConnectedToBrokerage == false)
         {
@@ -442,20 +452,20 @@ public class TDAmeritradeClient : IBrokerage
         var function = $"marketdata/{ticker.Value}/quotes";
 
         var response = await CallApi<Dictionary<string, StockQuote>>(user, function, HttpMethod.Get);
-        if (response.IsOk == false)
+        if (response.IsError)
         {
-            return new ServiceResponse<StockQuote>(response.Error.Value);
+            return ToFSharpError<StockQuote>(response.ErrorValue);
         }
 
-        if (!response.Success.Value.TryGetValue(ticker.Value, out var quote))
+        if (!response.ResultValue.TryGetValue(ticker.Value, out var quote))
         {
-            return new ServiceResponse<StockQuote>(new ServiceError("Could not find quote for ticker"));
+            return ToFSharpError<StockQuote>("Could not find quote for ticker");
         }
 
-        return new ServiceResponse<StockQuote>(quote);
+        return ToFSharpResult(quote);
     }
 
-    public async Task<ServiceResponse<Dictionary<Ticker, StockQuote>>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
+    public async Task<FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
     {
         if (user.ConnectedToBrokerage == false)
         {
@@ -471,16 +481,16 @@ public class TDAmeritradeClient : IBrokerage
         // but that did not work, seems like you had to add dictionary converter and it got ugly pretty quickly
         return result.IsOk switch
         {
-            false => new ServiceResponse<Dictionary<Ticker, StockQuote>>(result.Error.Value),
-            true => new ServiceResponse<Dictionary<Ticker, StockQuote>>(
-                result.Success.Value.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
+            false => ToFSharpError<Dictionary<Ticker, StockQuote>>(result.ErrorValue),
+            true => ToFSharpResult(
+                result.ResultValue.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
             )
         };
     }
 
     private static FSharpResult<T,ServiceError> NotConnectedToBrokerageError<T>()
     {
-        return FSharpResult<T,ServiceError>.NewError(new ServiceError("User is not connected to brokerage"));
+        return ToFSharpError<T>("User is not connected to brokerage");
     }
 
     public async Task<FSharpResult<core.fs.Adapters.Options.OptionChain, ServiceError>> GetOptions(UserState state, Ticker ticker, FSharpOption<DateTimeOffset> expirationDate, FSharpOption<decimal> strikePrice, FSharpOption<string> contractType)
@@ -510,9 +520,9 @@ public class TDAmeritradeClient : IBrokerage
 
         var chainResponse = await CallApi<OptionChain>(state, function, HttpMethod.Get);
 
-        if (chainResponse.IsOk == false)
+        if (chainResponse.IsError)
         {
-            return FSharpResult<core.fs.Adapters.Options.OptionChain,ServiceError>.NewError(chainResponse.Error.Value);
+            return ToFSharpError<core.fs.Adapters.Options.OptionChain>(chainResponse.ErrorValue);
         }
 
         static IEnumerable<core.fs.Adapters.Options.OptionDetail> ToOptionDetails(Dictionary<string, OptionDescriptorMap> map, decimal? underlyingPrice) =>
@@ -540,7 +550,7 @@ public class TDAmeritradeClient : IBrokerage
                 UnderlyingPrice = underlyingPrice
             });
 
-        var chain = chainResponse.Success.Value;
+        var chain = chainResponse.ResultValue;
 
         var response = new core.fs.Adapters.Options.OptionChain(
             symbol: chain.symbol!,
@@ -552,7 +562,7 @@ public class TDAmeritradeClient : IBrokerage
         return FSharpResult<core.fs.Adapters.Options.OptionChain,ServiceError>.NewOk(response);
     }
 
-    public async Task<ServiceResponse<MarketHours>> GetMarketHours(UserState state, DateTimeOffset date)
+    public async Task<FSharpResult<MarketHours, ServiceError>> GetMarketHours(UserState state, DateTimeOffset date)
     {
         if (state.ConnectedToBrokerage == false)
         {
@@ -563,26 +573,26 @@ public class TDAmeritradeClient : IBrokerage
         var function = $"marketdata/EQUITY/hours?date={dateStr}";
 
         var wrapper = await CallApi<MarketHoursWrapper>(state, function, HttpMethod.Get, jsonData: null);
-        if (wrapper.IsOk == false)
+        if (wrapper.IsError)
         {
-            return new ServiceResponse<MarketHours>(wrapper.Error.Value);
+            return ToFSharpError<MarketHours>(wrapper.ErrorValue);
         }
 
-        if (wrapper.Success.Value.equity == null)
+        if (wrapper.ResultValue.equity == null)
         {
-            return new ServiceResponse<MarketHours>(new ServiceError("Could not find market hours for date"));
+            return ToFSharpError<MarketHours>("Could not find market hours for date");
         }
 
-        if (wrapper.Success.Value.equity.EQ == null)
+        if (wrapper.ResultValue.equity.EQ == null)
         {
-            return new ServiceResponse<MarketHours>(new ServiceError("Could not find market hours for date (EQ)"));
+            return ToFSharpError<MarketHours>("Could not find market hours for date (EQ)");
         }
 
-        return new ServiceResponse<MarketHours>(wrapper.Success.Value.equity.EQ);
+        return ToFSharpResult(wrapper.ResultValue.equity.EQ);
     }
 
 
-    public async Task<ServiceResponse<PriceBars>> GetPriceHistory(
+    public async Task<FSharpResult<PriceBars,ServiceError>> GetPriceHistory(
         UserState state,
         Ticker ticker,
         PriceFrequency frequency,
@@ -612,12 +622,12 @@ public class TDAmeritradeClient : IBrokerage
             HttpMethod.Get
         );
 
-        if (response.IsOk == false)
+        if (response.IsError)
         {
-            return new ServiceResponse<PriceBars>(response.Error.Value);
+            return ToFSharpError<PriceBars>(response.ErrorValue);
         }
 
-        var prices = response.Success.Value;
+        var prices = response.ResultValue;
 
         if (prices.candles == null)
         {
@@ -634,26 +644,24 @@ public class TDAmeritradeClient : IBrokerage
         )).ToArray();
 
         return payload.Length == 0
-            ? new ServiceResponse<PriceBars>(
-                new ServiceError(
-                    $"No candles for historical prices for {ticker.Value}"
-                )
+            ? ToFSharpError<PriceBars>(
+                $"No candles for historical prices for {ticker.Value}"
             )
-            : new ServiceResponse<PriceBars>(
+            : ToFSharpResult(
                 new PriceBars(payload)
             );
     }
 
-    private async Task<ServiceResponse<bool>> EnterOrder(UserState user, object postData)
+    private async Task<FSharpResult<Unit,ServiceError>> EnterOrder(UserState user, object postData)
     {
         var response = await CallApi<AccountsResponse[]>(user, "/accounts", HttpMethod.Get);
 
-        if (response.IsOk == false)
+        if (response.IsError)
         {
-            return new ServiceResponse<bool>(response.Error.Value);
+            return ToFSharpError<Unit>(response.ErrorValue);
         }
 
-        var accounts = response.Success.Value;
+        var accounts = response.ResultValue;
 
         var accountId = accounts[0].securitiesAccount?.accountId;
 
@@ -665,8 +673,8 @@ public class TDAmeritradeClient : IBrokerage
         
         return enterResponse.IsSuccessStatusCode switch
         {
-            true => new ServiceResponse<bool>(true),
-            false => new ServiceResponse<bool>(new ServiceError(content))
+            true => ToFSharpResult<Unit>(null!),
+            false => ToFSharpError<Unit>(content)
         };
     }
 
@@ -725,7 +733,7 @@ public class TDAmeritradeClient : IBrokerage
             _ => throw new ArgumentException("Unknown order type: " + duration)
         };
 
-    private async Task<ServiceResponse<T>> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null, bool debug = false)
+    private async Task<FSharpResult<T,ServiceError>> CallApi<T>(UserState user, string function, HttpMethod method, string? jsonData = null, bool debug = false)
     {
         try
         {
@@ -743,21 +751,21 @@ public class TDAmeritradeClient : IBrokerage
                 var error = JsonSerializer.Deserialize<ErrorResponse>(content);
                 if (error?.error == null)
                 {
-                    return new ServiceResponse<T>(new ServiceError(content));
+                    return ToFSharpError<T>(content);
                 }
 
-                return new ServiceResponse<T>(new ServiceError(error.error));
+                return ToFSharpError<T>(error.error);
             }
 
             var deserialized = JsonSerializer.Deserialize<T>(content)
                 ?? throw new Exception($"Could not deserialize response for {function}: {content}");
-            return new ServiceResponse<T>(deserialized);
+            return ToFSharpResult<T>(deserialized);
         }
         catch (TimeoutRejectedException e)
         {
             _logger?.LogError(e, "Failed to call {function}", function);
 
-            return new ServiceResponse<T>(new ServiceError(e.Message));
+            return ToFSharpError<T>(e.Message);
         }
     }
 

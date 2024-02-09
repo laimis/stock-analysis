@@ -4,10 +4,11 @@ open System
 open System.Collections.Concurrent
 open System.Threading.Tasks
 open Microsoft.Extensions.Logging
+open core.fs
 open core.fs.Adapters.Stocks
 
 type IGetPriceHistory =
-    abstract member GetPriceHistory : start:DateTimeOffset -> ``end``:DateTimeOffset -> ticker:core.Shared.Ticker -> Task<core.fs.ServiceResponse<PriceBars>>
+    abstract member GetPriceHistory : start:DateTimeOffset -> ``end``:DateTimeOffset -> ticker:core.Shared.Ticker -> Task<Result<PriceBars,ServiceError>>
 
 type PriceAvailability =
     | Available of PriceBars
@@ -88,8 +89,7 @@ let getPricesFromBrokerageAndRecordToCsv (brokerage:IGetPriceHistory) studiesDir
     try
         callLogFuncIfSetup _.LogInformation("Getting price history for {ticker} from {startDate} to {endDate}", ticker, startDate, endDate)
         let! response = brokerage.GetPriceHistory startDate endDate ticker |> Async.AwaitTask
-        let result = response.Result
-        match result with
+        match response with
         | Ok prices ->
             recordPrices prices
             return Available prices

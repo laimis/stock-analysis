@@ -262,7 +262,7 @@ let ``Specific test``() = async {
         {
             new DataHelpers.IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker = task {
-                    return [||] |> core.fs.Adapters.Stocks.PriceBars |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
+                    return [||] |> core.fs.Adapters.Stocks.PriceBars |> Ok
                 }
         }
         

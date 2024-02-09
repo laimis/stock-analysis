@@ -17,7 +17,7 @@ let setupGetPricesWithNoBrokerageAccess =
     {
         new DataHelpers.IGetPriceHistory with 
             member this.GetPriceHistory start ``end`` ticker = task {
-                return [||] |> PriceBars |> core.fs.ServiceResponse<PriceBars>
+                return [||] |> PriceBars |> Ok
             }
     }
         
@@ -99,7 +99,7 @@ let ``Get prices with brokerage should go to brokerage if price does not exists 
                             [|PriceBar(DateTimeOffset.UtcNow, 1.0M, 1.0M, 1.0M, 1.0M, 1)|]
                             |> PriceBars
                             
-                        return bars |> core.fs.ServiceResponse<PriceBars>
+                        return bars |> Ok
                     }
         }
     
@@ -127,7 +127,7 @@ let ``Make sure error is recorded if brokerage fails``() = async {
             new DataHelpers.IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker =
                     task {
-                        return core.fs.ServiceError(transactionRateErrorMessage) |> core.fs.ServiceResponse<PriceBars>
+                        return core.fs.ServiceError(transactionRateErrorMessage) |> Error
                     }
         }
         
@@ -156,7 +156,7 @@ let ``When prices are not available for perpetuity, brokerage is not pinged``() 
                 member this.GetPriceHistory start ``end`` ticker =
                     task {
                         call <- call + 1
-                        return core.fs.ServiceError("No candles for historical prices for " + ticker.Value) |> core.fs.ServiceResponse<PriceBars>
+                        return core.fs.ServiceError("No candles for historical prices for " + ticker.Value) |> Error
                     }
         }
     

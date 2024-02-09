@@ -3,6 +3,7 @@ namespace core.fs.Portfolio
 open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
+open System.Threading.Tasks
 open Microsoft.FSharp.Core
 open core.Cryptos
 open core.Options
@@ -505,7 +506,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 return Ok ()
     }
         
-    member this.Handle (query:Query) = task {
+    member this.Handle (query:Query) : Task<Result<PortfolioView,ServiceError>> = task {
         let! stocks = query.UserId |> storage.GetStockPositions
         
         let openStocks = stocks |> Seq.filter _.IsOpen
@@ -860,7 +861,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             return tradingEntries |> Ok
     }
     
-    member _.Handle(query:QueryTransactions) = task {
+    member _.Handle(query:QueryTransactions) : Task<Result<TransactionsView, ServiceError>>  = task {
         
         let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
             Transaction.PLTx(Guid.NewGuid(), stock.Ticker, plTransaction.Ticker.Value, plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)

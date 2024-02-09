@@ -48,12 +48,12 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                 
     interface IApplicationService
     
-    member _.Handle (cmd:SendEmail) = task {
+    member _.Handle (cmd:SendEmail) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
         do! cmd.input |> email.SendWithInput
-        return Ok
+        return Ok()
     }
     
-    member _.Handle sendWelcome = task {
+    member _.Handle sendWelcome : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
         let! user = sendWelcome.userId |> storage.GetUser 
         match user with
         | Some user ->
@@ -65,11 +65,11 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                     
             return Ok ()
             
-        | None -> return "User not found" |> Error
+        | None -> return "User not found" |> ServiceError |> Error
         
     }
             
-    member _.Handle (_:Query) =
+    member _.Handle (_:Query) : System.Threading.Tasks.Task<Result<QueryResponse array,ServiceError>> =
         task {
             let! users = storage.GetUserEmailIdPairs()
             
@@ -79,7 +79,7 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                 |> Async.Parallel
                 |> Async.StartAsTask
                 
-            return result
+            return result |> Ok
         }
         
     member _.Handle (_:Export) = task {

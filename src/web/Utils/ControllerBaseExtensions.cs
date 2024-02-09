@@ -29,7 +29,7 @@ namespace web.Utils
 
                 if (response.IsError)
                 {
-                    return controller.Error(response.ErrorValue.Message);
+                    return controller.Error(response.ErrorValue);
                 }
 
                 return controller.GenerateExport(response.ResultValue);
@@ -37,11 +37,11 @@ namespace web.Utils
 
         public static ActionResult Error(
             this ControllerBase controller,
-            string error)
+            ServiceError error)
         {
             
             var dict = new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary();
-            dict.AddModelError("error", error);
+            dict.AddModelError("error", error.Message);
             return controller.BadRequest(dict);
         }
         
@@ -65,7 +65,7 @@ namespace web.Utils
         {
             if (r.IsError)
             {
-                return controller.Error(r.ErrorValue.Message);
+                return controller.Error(r.ErrorValue);
             }
 
             return controller.Ok();
@@ -77,7 +77,7 @@ namespace web.Utils
         {
             if (r.IsOk == false)
             {
-                return controller.Error(r.ErrorValue.Message);
+                return controller.Error(r.ErrorValue);
             }
 
             return controller.Ok(r.ResultValue);

@@ -75,9 +75,9 @@ let ``Transform retries fetching the prices until all the price feeds are availa
                         return
                             match callCount with
                             | x when x >= 2 ->
-                                TestDataGenerator.PriceBars(TestDataGenerator.NET) |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
+                                TestDataGenerator.PriceBars(TestDataGenerator.NET) |> Ok
                             | _ ->
-                                core.fs.ServiceError(DataHelpersTests.transactionRateErrorMessage) |> core.fs.ServiceResponse<core.fs.Adapters.Stocks.PriceBars>
+                                core.fs.ServiceError(DataHelpersTests.transactionRateErrorMessage) |> Error
                     }
         }
         
