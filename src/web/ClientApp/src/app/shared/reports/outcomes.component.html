@@ -7,6 +7,9 @@
 
       <h5>
         @if (title) {{{title}}: } {{outcomes.length}} results
+          @if (failures && failures.length > 0) {
+            <span class="text-danger">({{failures.length}} failures)</span>
+          }
 
         <!-- float right button to copy to clipboard -->
         <button class="btn btn-sm btn-outline-secondary float-end" (click)="copyOutcomesToClipboard()">

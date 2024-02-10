@@ -66,6 +66,7 @@
     <app-outcomes
       [outcomes]="singleBarReportDaily.outcomes"
       [tickerFilter]="activeTicker"
+      [failures]="singleBarReportDaily.failed"
       title="Single Bar Outcome (daily)">
     </app-outcomes>
   }
@@ -79,6 +80,7 @@
     <app-outcomes
       [outcomes]="singleBarReportWeekly.outcomes"
       [tickerFilter]="activeTicker"
+      [failures]="singleBarReportDaily.failed"
       title="Single Bar Outcome (weekly)">
     </app-outcomes>
   }
@@ -86,6 +88,7 @@
     <app-outcomes
       [outcomes]="allBarsReport.outcomes"
       [tickerFilter]="activeTicker"
+      [failures]="allBarsReport.failed"
       title="All Bar Outcomes (daily)">
     </app-outcomes>
   }

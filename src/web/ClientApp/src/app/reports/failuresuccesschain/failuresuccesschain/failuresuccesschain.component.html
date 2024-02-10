@@ -21,7 +21,7 @@
     <div class="mt-5">
         <ul>
         @for (link of chain.links; track link) {
-          <span title="level {{ link.level }} profit: {{ link.profit | currency }} on {{ link.date | date: 'shortDate' }}"
+          <span title="{{link.ticker}} level {{ link.level }} profit: {{ link.profit | currency }} on {{ link.date | date: 'shortDate' }}"
             class="badge me-2 text-white"
             [ngClass]="{
             'bg-level-5-success': link.success && link.level === 5 && (render === 'all' || render === 'success'),

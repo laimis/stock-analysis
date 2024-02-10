@@ -21,6 +21,7 @@
     <app-outcomes
       [title]="'Mutliple bar outcomes'"
       [tickerFilter]="tickerFilter"
+      [failures]="allBarsReport.failed"
       [outcomes]="allBarsReport.outcomes">
     </app-outcomes>
   }
@@ -43,6 +44,7 @@
     <app-outcomes
       [title]="'Positions outcomes'"
       [tickerFilter]="tickerFilter"
+      [failures]="positionsReport.failed"
       [outcomes]="positionsReport.outcomes">
     </app-outcomes>
   }
@@ -65,6 +67,7 @@
     <app-outcomes
       [title]="'Daily outcomes'"
       [tickerFilter]="tickerFilter"
+      [failures]="singleBarReportDaily.failed"
       [outcomes]="singleBarReportDaily.outcomes">
     </app-outcomes>
   }
@@ -87,6 +90,7 @@
     <app-outcomes
       [title]="'Weekly outcomes'"
       [tickerFilter]="tickerFilter"
+      [failures]="singleBarReportWeekly.failed"
       [outcomes]="singleBarReportWeekly.outcomes">
     </app-outcomes>
   }

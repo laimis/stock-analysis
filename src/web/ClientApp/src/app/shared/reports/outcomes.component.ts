@@ -25,6 +25,9 @@ export class OutcomesComponent {
 
   @Input()
   outcomes: TickerOutcomes[]
+    
+    @Input()
+    failures: string[]
 
   @Input()
   tickerFilter: string

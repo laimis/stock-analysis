@@ -488,6 +488,7 @@ export interface Link {
     level: number
     profit: number
     date: string
+    ticker: string
 }
 
 export interface StockSearchResult {
@@ -813,7 +814,8 @@ export interface OutcomesReport {
   gaps: StockGaps[],
   tickerSummary: TickerCountPair[],
   evaluationSummary: EvaluationCountPair[],
-  patterns: TickerPatterns[]
+  patterns: TickerPatterns[],
+    failed: string[]
 }
 export interface DailyOutcomeScoresReport {
   ticker: string

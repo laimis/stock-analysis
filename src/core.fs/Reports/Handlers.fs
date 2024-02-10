@@ -97,6 +97,20 @@ type OutcomesReportQuery =
         EndDate: string
     }
     
+    with 
+        
+        member this.DateRange (marketHours:IMarketHours) =
+            let tryParse (date:string) func =
+                match DateTimeOffset.TryParse(date) with
+                | false, _ -> DateTimeOffset.MinValue
+                | true, dt -> func(dt)
+            
+            let start = tryParse this.StartDate marketHours.GetMarketStartOfDayTimeInUtc
+            let ``end`` = tryParse this.EndDate marketHours.GetMarketEndOfDayTimeInUtc
+            
+            start, ``end``
+            
+    
 type OutcomesReportForPositionsQuery =
     {
         UserId: UserId
@@ -115,12 +129,13 @@ type OutcomesReportViewEvaluationCountPair =
         Count: int
     }
     
-type OutcomesReportView(evaluations,outcomes,gaps,patterns) =
+type OutcomesReportView(evaluations,outcomes,gaps,patterns,failed) =
     
     member _.Evaluations: AnalysisOutcomeEvaluation seq = evaluations
     member _.Outcomes: TickerOutcomes seq = outcomes
     member _.Gaps: GapReportView seq = gaps
     member _.Patterns: TickerPatterns seq = patterns
+    member _.Failed: Ticker seq = failed
     
     member _.TickerSummary: OutcomesReportViewTickerCountPair seq =
         evaluations
@@ -295,6 +310,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
     member _.HandleOutcomesReport userId (query:OutcomesReportQuery) = task {
         let! user = accounts.GetUser userId
         
+        let startDate, endDate = query.DateRange marketHours
+        
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
@@ -302,15 +319,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let! tasks =
                 query.Tickers
                 |> Seq.map( fun t -> async {
-                    let startDate =
-                        match DateTimeOffset.TryParse(query.StartDate) with
-                        | false, _ -> DateTimeOffset.MinValue
-                        | true, dt -> marketHours.GetMarketStartOfDayTimeInUtc(dt)
-                    
-                    let endDate =
-                        match DateTimeOffset.TryParse(query.EndDate) with
-                        | false, _ -> DateTimeOffset.MinValue
-                        | true, dt -> marketHours.GetMarketEndOfDayTimeInUtc(dt)
                     
                     try
                         
@@ -324,7 +332,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             |> Async.AwaitTask
                         
                         match priceResponse with
-                        | Error _ -> return None
+                        | Error _ -> return Error t
                         | Ok prices ->
                             
                             let outcomes =
@@ -344,10 +352,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             let patterns = PatternDetection.generate prices
                             let tickerPatterns = {patterns = patterns; ticker = t}
                             
-                            return Some (tickerOutcome, gapsView, tickerPatterns)
+                            return (tickerOutcome, gapsView, tickerPatterns) |> Ok
                     with
                     | _ ->
-                        return None
+                        return Error t
                     }
                 )
                 |> Async.Sequential
@@ -355,6 +363,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let outcomes, gaps, patterns =
                 tasks
+                |> Seq.map Result.toOption
                 |> Seq.choose id
                 |> Seq.fold (fun (outcomes, gaps, patterns) (outcome, gap, pattern) ->
                     let newOutcomes = outcomes @ [outcome]
@@ -365,12 +374,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let cleanedGaps = gaps |> Seq.choose id
             
+            let failed = tasks |> Seq.map (fun t -> match t with | Error e -> Some e | _ -> None) |> Seq.choose id
+            
             let evaluations =
                 match query.Duration with
                 | OutcomesReportDuration.SingleBar -> SingleBarPriceAnalysisEvaluation.evaluate outcomes
                 | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.evaluate outcomes
             
-            return OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns) |> Ok
+            return OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns, failed) |> Ok
     }
     
     member _.Handle (query:OutcomesReportForPositionsQuery) = task {
@@ -405,14 +416,14 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         |> Async.AwaitTask
                     
                     match priceResponse with
-                    | Error _ -> return None
+                    | Error _ -> return Error position
                     | Ok prices ->
                         
                         let outcomes = PositionAnalysis.generate calculations prices orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
                         let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
                         
-                        return Some (tickerOutcome, tickerPatterns)
+                        return Ok (tickerOutcome, tickerPatterns)
                     }
                 )
                 |> Async.Sequential
@@ -420,6 +431,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let outcomes, patterns =
                 tasks
+                |> Seq.map Result.toOption
                 |> Seq.choose id
                 |> Seq.fold (fun (outcomes, patterns) (outcome, pattern) ->
                     let newOutcomes = outcomes @ [outcome]
@@ -427,9 +439,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     (newOutcomes, newPatterns)
                 ) ([], [])
                 
+            let failed = tasks |> Seq.map (fun t -> match t with | Error e -> Some e | _ -> None) |> Seq.choose id |> Seq.map (fun p -> p.Ticker)
+                
             let evaluations = PositionAnalysis.evaluate outcomes
             
-            return OutcomesReportView(evaluations, outcomes, [], patterns) |> Ok
+            return OutcomesReportView(evaluations, outcomes, [], patterns, failed) |> Ok
     }
     
     member _.Handle (query:PercentChangeStatisticsQuery) = task {
