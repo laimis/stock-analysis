@@ -140,7 +140,7 @@ export class StockTradingPositionComponent {
   }
 
   getCssClassForEvent(e: PositionEvent) {
-    return "event-" + e.type.toLowerCase()
+    return "event-" + e.type
   }
 
   deletePosition() {
