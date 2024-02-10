@@ -16,7 +16,9 @@
             'bg-level-2-success': link.success && link.level === 2,
             'bg-level-2-failure': !link.success && link.level === 2,
             'bg-level-1-success': link.success && link.level === 1,
-            'bg-level-1-failure': !link.success && link.level === 1
+            'bg-level-1-failure': !link.success && link.level === 1,
+            'bg-level-0-success': link.success && link.level === 0,
+            'bg-level-0-failure': !link.success && link.level === 0
             }">
             {{ link.profit | currency }}
           </span>

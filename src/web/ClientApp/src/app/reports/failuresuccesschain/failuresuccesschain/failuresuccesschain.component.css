@@ -13,6 +13,12 @@
 .bg-level-1-success {
   background-color: #AFE1AF;
 }
+.bg-level-0-success {
+    background-color: #DFF8DF;
+}
+.bg-level-0-failure {
+  background-color: #FFDFDF;
+}
 .bg-level-1-failure {
   background-color: #FAA0A0;
 }
