@@ -26,6 +26,7 @@ type ChainLinkView =
         ticker: Ticker
         level: int
         profit: decimal
+        date: DateTimeOffset
     }
     
 type ChainView =
@@ -223,6 +224,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     ticker=position.Ticker
                     level = position |> getLevel
                     profit = position.Profit
+                    date = position.Closed.Value
                 }
             )
             

@@ -8,7 +8,7 @@ import {Chain, StocksService} from 'src/app/services/stocks.service';
 })
 export class FailuresuccesschainComponent implements OnInit {
   chain: Chain;
-  render: string;
+  render: string = "all";
 
   constructor(private service : StocksService) { }
 
@@ -23,5 +23,17 @@ export class FailuresuccesschainComponent implements OnInit {
       console.log("failed: " + error);
 		})
   }
+  
+    showAllLinks() {
+        this.render = "all"
+    }
+    
+    showSuccessLinks() {
+        this.render = "success"
+    }
+  
+    showFailureLinks() {
+        this.render = "failure"
+    }
 
 }

@@ -487,6 +487,7 @@ export interface Link {
     success: boolean
     level: number
     profit: number
+    date: string
 }
 
 export interface StockSearchResult {
