@@ -27,21 +27,23 @@
       </div>
     </div>
   }
-  <section>
-    <h5>Actual vs Trading Strategies</h5>
-    @if (simulationErrors) {
-      <app-error-display [errors]="simulationErrors"></app-error-display>
+    @if(currentPosition && currentPosition.isClosed) {
+      <section>
+        <h5>Actual vs Trading Strategies</h5>
+        @if (simulationErrors) {
+          <app-error-display [errors]="simulationErrors"></app-error-display>
+        }
+        @if (!simulationResults && !simulationErrors) {
+          <app-loading></app-loading>
+        }
+        @if (simulationResults) {
+          <app-trading-actual-vs-simulated
+            [simulations]="simulationResults"
+            [simulationErrors]="simulationErrors">
+          </app-trading-actual-vs-simulated>
+        }
+      </section>
     }
-    @if (!simulationResults && !simulationErrors) {
-      <app-loading></app-loading>
-    }
-    @if (simulationResults) {
-      <app-trading-actual-vs-simulated
-        [simulations]="simulationResults"
-        [simulationErrors]="simulationErrors">
-      </app-trading-actual-vs-simulated>
-    }
-  </section>
   @if (currentPosition && currentPosition.isClosed) {
     <section>
       <h5>Grade</h5>
