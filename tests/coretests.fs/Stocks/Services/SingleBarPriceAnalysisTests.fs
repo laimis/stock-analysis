@@ -90,5 +90,9 @@ let ``PriceAbove20SMA is correct`` () =
     SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove20SMA |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 4 |> should equal 0.0396m
     
 [<Fact>]
+let ``PriceAbove200SMA is correct`` () =
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove200SMA |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 4 |> should equal -0.2918m
+    
+[<Fact>]
 let ``TrueRange is correct`` () =
     SingleBarPriceAnalysis.SingleBarOutcomeKeys.TrueRange |> firstOutcome |> should equal 6m

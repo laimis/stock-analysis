@@ -11,6 +11,8 @@ module SingleBarPriceAnalysis =
     module SingleBarOutcomeKeys =
         let PriceAbove20SMA = "PriceAbove20SMA"
         let PriceAbove20SMADays = "PriceAbove20SMADays"
+        let PriceAbove200SMA = "PriceAbove200SMA"
+        let PriceAbove200SMADays = "PriceAbove200SMADays"
         let PriceBelow20SMADays = "PriceBelow20SMADays"
         let RelativeVolume = "RelativeVolume"
         let Volume = "Volume"
@@ -31,6 +33,7 @@ module SingleBarPriceAnalysis =
         
         let sma20Above50Outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Days)
         let sma20outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
+        let sma200outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(200))
         let priceAbove20SMAOutcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.PriceAbove20SMADays)
         
         [
@@ -42,6 +45,12 @@ module SingleBarPriceAnalysis =
                 let pctDiff = (currentBar.Close - sma20outcome.Value.Value) / sma20outcome.Value.Value
                 
                 AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
+                
+            if sma200outcome.IsSome && sma200outcome.Value.Value <> 0m then
+                let currentBar = bars.Last        
+                let pctDiff = (currentBar.Close - sma200outcome.Value.Value) / sma200outcome.Value.Value
+                
+                AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove200SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 200 day SMA")
                 
             if priceAbove20SMAOutcome.IsSome then
                 AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMADays, priceAbove20SMAOutcome.Value.OutcomeType, priceAbove20SMAOutcome.Value.Value, priceAbove20SMAOutcome.Value.ValueType, priceAbove20SMAOutcome.Value.Message)

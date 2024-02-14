@@ -1,10 +1,10 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-  StockDetails,
-  StockOwnership,
-  PositionInstance,
-  StockQuote,
-  stocktransactioncommand
+    StockDetails,
+    StockOwnership,
+    PositionInstance,
+    StockQuote,
+    stocktransactioncommand, BrokerageOrder
 } from '../../services/stocks.service';
 import { Router } from '@angular/router';
 
@@ -20,5 +20,11 @@ export class StockOwnershipComponent {
 
   @Input()
   quote: StockQuote
+    
+    @Input()
+    orders: BrokerageOrder[]
+    
+    @Output()
+    ordersChanged: EventEmitter<string> = new EventEmitter<string>();
 
 }

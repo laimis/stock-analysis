@@ -76,7 +76,7 @@
   </section>
 }
 @if (stock && stockOwnership && isActive('stocks')) {
-  <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote"></app-stock-ownership>
+  <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote" [orders]="orders" (ordersChanged)="brokerageOrderEntered($event)"></app-stock-ownership>
 }
 @if (isActive('options')) {
   <app-stock-option [ticker]=stock.ticker [options]=options></app-stock-option>
