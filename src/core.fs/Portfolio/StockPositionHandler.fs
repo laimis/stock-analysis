@@ -934,10 +934,10 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
         let plOptionTransactions =
             options
-            |> Seq.collect (fun o -> o.State.Transactions)
+            |> Seq.collect _.State.Transactions
             |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
-            |> Seq.filter (fun t -> t.IsPL)
-            |> Seq.sortBy (fun t -> t.Ticker)
+            |> Seq.filter _.IsPL
+            |> Seq.sortBy _.Ticker
             |> Seq.toList
             
         let closedPositions =

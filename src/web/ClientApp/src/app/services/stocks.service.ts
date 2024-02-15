@@ -1025,6 +1025,7 @@ export interface PositionInstance {
   closed: string,
   cost: number,
   completedPositionShares: number,
+    completedPositionCostPerShare: number,
   daysHeld: number,
   daysSinceLastTransaction: number,
   firstBuyCost: number,

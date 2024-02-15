@@ -71,7 +71,7 @@
               <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
             </td>
             <td style="width: 140px">{{p.completedPositionShares}}</td>
-            <td style="width: 140px">{{p.cost  | number:'1.0-2'}}</td>
+            <td style="width: 140px">{{p.completedPositionCostPerShare * p.completedPositionShares  | number:'1.0-2'}}</td>
             <td style="width: 140px">{{p.opened | date: 'MM/dd/yyyy'}}</td>
           </tr>
         }
