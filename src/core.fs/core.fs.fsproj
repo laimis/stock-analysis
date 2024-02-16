@@ -29,8 +29,8 @@
         <Compile Include="Services\Analysis.fs" />
         <Compile Include="Services\GapAnalysis.fs" />
         <Compile Include="Services\MultipleBarPriceAnalysis.fs" />
-        <Compile Include="Services\Positions.fs" />
         <Compile Include="Services\SingleBarPriceAnalysis.fs" />
+        <Compile Include="Services\Positions.fs" />
         <Compile Include="Services\PatternDetection.fs" />
         <Compile Include="Services\CSVExport.fs" />
         <Compile Include="Options\Views.fs"/>

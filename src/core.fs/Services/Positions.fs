@@ -5,7 +5,7 @@ open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
-
+open core.fs.Services.MultipleBarPriceAnalysis
 open core.fs.Stocks
 
 module PositionAnalysis =
@@ -13,7 +13,6 @@ module PositionAnalysis =
     module PositionAnalysisKeys =
         
         let PercentToStopLoss = "PercentToStopLoss"
-        let DaysSinceOpened = "DaysSinceOpened"
         let RecentFilings = "RecentFilings"
         let GainPct = "GainPct"
         let AverageCost = "AverageCost"
@@ -35,6 +34,7 @@ module PositionAnalysis =
         let GainDiffLast10 = "GainDiffLast10"
         let StrategyLabel = "StrategyLabel"
         let HasSellOrder = "HasSellOrder"
+        let StopDiff20SMAPct = "StopDiff20SMAPct"
 
     let generate (position:StockPositionWithCalculations) (bars:PriceBars) orders =
         
@@ -51,26 +51,20 @@ module PositionAnalysis =
             | p when p < 0.0m -> OutcomeType.Negative
             | _ -> OutcomeType.Neutral
             
-        let max = bars.Bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> fun b -> b.High
+        let max = bars.Bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> _.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
-        let min = bars.Bars |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
+        let min = bars.Bars |> Array.minBy (_.Low) |> _.Low
         let drawdown = (min - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
         let last10 = 10 |> bars.LatestOrAll
-        let last10Max = last10.Bars |> Array.maxBy (fun b -> b.High) |> fun b -> b.High
+        let last10Max = last10.Bars |> Array.maxBy _.High |> _.High
         let last10Gain = (last10Max - last10.First.Close) / last10.First.Close
         
-        let last10Min = last10.Bars |> Array.minBy (fun b -> b.Low) |> fun b -> b.Low
+        let last10Min = last10.Bars |> Array.minBy _.Low |> _.Low
         let last10Drawdown = (last10Min - last10.First.Close) / last10.First.Close
         
         let last10MaxGainDrawdownDiff = last10Gain + last10Drawdown
-        
-        let daysSinceOpened = 
-            position.Opened
-            |> DateTimeOffset.UtcNow.Subtract
-            |> fun ts -> ts.TotalDays
-            |> Math.Ceiling
         
         let hasSellOrderInOrders = 
             orders
@@ -79,29 +73,33 @@ module PositionAnalysis =
         let unrealizedProfit =  position.Profit + position.NumberOfShares * (bars.Last.Close - position.AverageCostPerShare)
         let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
         
+        let multipleBarOutcomes = MultipleBarPriceAnalysis.run bars
+        let sma20 = multipleBarOutcomes |> Seq.find (fun o -> o.Key = MultipleBarOutcomeKeys.SMA(20)) |> _.Value
+        let stopDiff20SMAPct = (stopLoss - sma20) / sma20
+        
         [
             AnalysisOutcome(PositionAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
             AnalysisOutcome(PositionAnalysisKeys.StopLoss, OutcomeType.Neutral, stopLoss, ValueFormat.Currency, $"Stop loss is {stopLoss:C2}")
-            AnalysisOutcome(PositionAnalysisKeys.PercentToStopLoss, (if pctToStop < 0.0m then OutcomeType.Neutral else OutcomeType.Negative), pctToStop, ValueFormat.Percentage, $"%% difference to stop loss {stopLoss} is {pctToStop}")
             AnalysisOutcome(PositionAnalysisKeys.AverageCost, OutcomeType.Neutral, Math.Round(position.AverageCostPerShare, 2), ValueFormat.Currency, $"Average cost per share is {position.AverageCostPerShare:C2}")
+            AnalysisOutcome(PositionAnalysisKeys.PercentToStopLoss, (if pctToStop < 0.0m then OutcomeType.Neutral else OutcomeType.Negative), pctToStop, ValueFormat.Percentage, $"%% difference to stop loss {stopLoss} is {pctToStop}")
             AnalysisOutcome(PositionAnalysisKeys.GainPct, (if position.GainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.GainPct, ValueFormat.Percentage, $"{position.GainPct:P}")
             AnalysisOutcome(PositionAnalysisKeys.RR, rrOutcomeType, Math.Round(position.RR, 2), ValueFormat.Number, $"{position.RR:N2}")
             AnalysisOutcome(PositionAnalysisKeys.Profit, (if position.Profit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), position.Profit, ValueFormat.Currency, $"{position.Profit}")
             AnalysisOutcome(PositionAnalysisKeys.UnrealizedProfit, (if unrealizedProfit >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedProfit, ValueFormat.Currency, $"{unrealizedProfit}")
             AnalysisOutcome(PositionAnalysisKeys.UnrealizedGain, (if unrealizedGainPct >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), unrealizedGainPct, ValueFormat.Percentage, $"{unrealizedGainPct:P}")
+            AnalysisOutcome(PositionAnalysisKeys.RiskAmount, OutcomeType.Neutral, (if position.RiskedAmount.IsSome then position.RiskedAmount.Value else 0.0m), ValueFormat.Currency, $"Risk amount is {position.RiskedAmount:C2}")
+            AnalysisOutcome(PositionAnalysisKeys.DaysHeld, OutcomeType.Neutral, position.DaysHeld, ValueFormat.Number, $"Days held: {position.DaysHeld}")
+            AnalysisOutcome(PositionAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
+            AnalysisOutcome(PositionAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
+            AnalysisOutcome(PositionAnalysisKeys.StopDiff20SMAPct, OutcomeType.Neutral, stopDiff20SMAPct, ValueFormat.Percentage, $"Stop diff to 20SMA is {stopDiff20SMAPct:P}")
+            AnalysisOutcome(PositionAnalysisKeys.StrategyLabel, OutcomeType.Negative, (if position.ContainsLabel("strategy") then 1 else 0), ValueFormat.Boolean, $"Missing strategy label")
+            AnalysisOutcome(PositionAnalysisKeys.HasSellOrder, OutcomeType.Neutral, (if hasSellOrderInOrders then 1 else 0), ValueFormat.Boolean, $"Has sell order")
             AnalysisOutcome(PositionAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
             AnalysisOutcome(PositionAnalysisKeys.MaxDrawdown, OutcomeType.Neutral, drawdown, ValueFormat.Percentage, $"Max drawdown is {drawdown:P}")
             AnalysisOutcome(PositionAnalysisKeys.GainAndDrawdownDiff, (if gain + drawdown >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), gain + drawdown, ValueFormat.Percentage, $"Max gain drawdown diff is {(gain - drawdown) * -1.0m:P}")
             AnalysisOutcome(PositionAnalysisKeys.MaxGainLast10, OutcomeType.Neutral, last10Gain, ValueFormat.Percentage, $"Max gain in last 10 bars is {last10Gain:P}")
             AnalysisOutcome(PositionAnalysisKeys.MaxDrawdownLast10, OutcomeType.Neutral, last10Drawdown, ValueFormat.Percentage, $"Max drawdown in last 10 bars is {last10Drawdown:P}")
             AnalysisOutcome(PositionAnalysisKeys.GainDiffLast10, (if last10MaxGainDrawdownDiff >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), last10MaxGainDrawdownDiff, ValueFormat.Percentage, $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}")
-            AnalysisOutcome(PositionAnalysisKeys.RiskAmount, OutcomeType.Neutral, (if position.RiskedAmount.IsSome then position.RiskedAmount.Value else 0.0m), ValueFormat.Currency, $"Risk amount is {position.RiskedAmount:C2}")
-            AnalysisOutcome(PositionAnalysisKeys.DaysHeld, OutcomeType.Neutral, position.DaysHeld, ValueFormat.Number, $"Days held: {position.DaysHeld}")
-            AnalysisOutcome(PositionAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
-            AnalysisOutcome(PositionAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
-            AnalysisOutcome(PositionAnalysisKeys.DaysSinceOpened, OutcomeType.Neutral, decimal daysSinceOpened, ValueFormat.Number, $"Days since opened: {daysSinceOpened}")
-            AnalysisOutcome(PositionAnalysisKeys.StrategyLabel, OutcomeType.Negative, (if position.ContainsLabel("strategy") then 1 else 0), ValueFormat.Boolean, $"Missing strategy label")
-            AnalysisOutcome(PositionAnalysisKeys.HasSellOrder, OutcomeType.Neutral, (if hasSellOrderInOrders then 1 else 0), ValueFormat.Boolean, $"Has sell order")
         ]
         
     let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
@@ -132,10 +130,20 @@ module PositionAnalysis =
             (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value < 14m)
         ]
         
+        let shortsAndStopAboveSMA20 = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopDiff20SMAPct && o.Value > 0.0m)
+        ]
+        
+        let longsAndStopBelowSMA20 = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopDiff20SMAPct && o.Value < 0.0m)
+        ]
+        
         let tickersAndTheirCosts =
             tickerOutcomes // we are only interested in this for positions that have stops set, and right now only longs
             |> TickerOutcomes.filter positionSizeUnbalancedFilter
-            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.PositionSize)))
+            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)))
             |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value))
             
         let costAnalysis =
@@ -160,13 +168,13 @@ module PositionAnalysis =
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PositionAnalysisKeys.UnrealizedProfit,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysSinceOpened && o.Value <= decimal recentlyOpenThreshold.TotalDays) ]
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value <= decimal recentlyOpenThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {withinTwoWeeksThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PositionAnalysisKeys.UnrealizedProfit,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysSinceOpened && o.Value <= decimal withinTwoWeeksThreshold.TotalDays) ]
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value <= decimal withinTwoWeeksThreshold.TotalDays) ]
             )
             AnalysisOutcomeEvaluation(
                 "No Strategy",
@@ -200,6 +208,18 @@ module PositionAnalysis =
                     yield! positionSizeUnbalancedFilter
                     (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
                 ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Shorts with stop above 20SMA",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.StopDiff20SMAPct,
+                tickerOutcomes |> TickerOutcomes.filter shortsAndStopAboveSMA20
+            )
+            AnalysisOutcomeEvaluation(
+                "Longs with stop below 20SMA",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.StopDiff20SMAPct,
+                tickerOutcomes |> TickerOutcomes.filter longsAndStopBelowSMA20
             )
         ]
 
