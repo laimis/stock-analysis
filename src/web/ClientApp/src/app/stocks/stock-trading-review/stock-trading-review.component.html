@@ -27,6 +27,19 @@
       </div>
     </div>
   }
+    <section>
+        <h5>Stock chart</h5>
+        @if (pricesErrors) {
+            <app-error-display [errors]="pricesErrors"></app-error-display>
+        }
+        @if (!positionChartInformation && !pricesErrors) {
+            <app-loading></app-loading>
+        }
+        @if (positionChartInformation) {
+            <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
+        }
+    </section>
+    
     @if(currentPosition && currentPosition.isClosed) {
       <section>
         <h5>Actual vs Trading Strategies</h5>
@@ -127,16 +140,5 @@
           <h5>Position Information</h5>
           <app-stock-trading-position [position]="currentPosition" [orders]="orders" [quote]="getQuote(currentPosition)" (brokerageOrdersChanged)="brokerageOrdersChanged.emit($event)"></app-stock-trading-position>
         </section>
-        <section>
-          <h5>Stock chart</h5>
-          @if (pricesErrors) {
-            <app-error-display [errors]="pricesErrors"></app-error-display>
-          }
-          @if (!positionChartInformation && !pricesErrors) {
-            <app-loading></app-loading>
-          }
-          @if (positionChartInformation) {
-            <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
-          }
-        </section>
+        
       </div>
