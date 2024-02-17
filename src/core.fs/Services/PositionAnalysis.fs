@@ -54,8 +54,14 @@ module PositionAnalysis =
         let barsFromOpen =
             match barAtOpen with
             | Some (_,index) -> bars.Bars[index..]
-            | None -> [||]
-            
+            | None ->
+                // position might be opened before the first bar in the dataset
+                match position.Opened with
+                | x when x < bars.Bars[0].Date -> bars.Bars
+                | _ ->
+                    Console.WriteLine($"Unable to find start bar for {position.Ticker} on {position.Opened}")
+                    [||]
+                
         let max = barsFromOpen |> Array.maxBy (fun (b:PriceBar) -> b.High) |> _.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
@@ -145,6 +151,7 @@ module PositionAnalysis =
         
         let longsAndStopBelowSMA20 = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value < 0.0m)
         ]
         

@@ -150,3 +150,18 @@ let ``Stop above sma 20 does not blow up with no sma20`` () =
     let outcomes = PositionAnalysis.generate position smallAmountOfBars [||]
     
     outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value = 0m) |> should equal true
+    
+[<Fact>]
+let ``When position is opened before the available data, analysis takes all bars`` () =
+    
+    let _, bars, _ = createTestData()
+    
+    let position =
+        StockPosition.openLong (Ticker("SHEL")) (bars.First.Date.AddDays(-1))
+        |> StockPosition.buy 10m 100m (bars.First.Date.AddDays(-1))
+        |> StockPosition.setStop (Some 90m) (bars.First.Date.AddDays(-1))
+        |> StockPositionWithCalculations
+        
+    let outcomes = PositionAnalysis.generate position bars [||]
+    
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.DaysHeld && o.Value > 0m) |> should equal true
