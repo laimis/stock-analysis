@@ -76,7 +76,7 @@ let ``Get prices with brokerage should not go to brokerage if price exists on fi
                     failwith "Should not have called brokerage"
         }
 
-    let! priceBars = setupGetPricesWithBrokerageMock mock DateTimeOffset.UtcNow DateTimeOffset.UtcNow TestDataGenerator.NET
+    let! priceBars = setupGetPricesWithBrokerageMock mock None None TestDataGenerator.NET
     
     priceBars |> Option.isSome |> should equal true
     priceBars.Value.Length |> should equal 505
@@ -105,7 +105,7 @@ let ``Get prices with brokerage should go to brokerage if price does not exists 
     
     let ticker = Random() |> TestDataGenerator.GenerateRandomTicker
     
-    let getPriceBars = setupGetPricesWithBrokerageMock mock DateTimeOffset.UtcNow DateTimeOffset.UtcNow
+    let getPriceBars = setupGetPricesWithBrokerageMock mock None None
     
     let! priceBars = ticker |> getPriceBars
     
@@ -131,7 +131,7 @@ let ``Make sure error is recorded if brokerage fails``() = async {
                     }
         }
         
-    let getPriceBars = setupGetPricesWithBrokerageMock mock DateTimeOffset.UtcNow DateTimeOffset.UtcNow
+    let getPriceBars = setupGetPricesWithBrokerageMock mock None None
             
     let ticker = Random() |> TestDataGenerator.GenerateRandomTicker
     
@@ -160,7 +160,7 @@ let ``When prices are not available for perpetuity, brokerage is not pinged``() 
                     }
         }
     
-    let getPriceBars = setupGetPricesWithBrokerageMock mock DateTimeOffset.UtcNow DateTimeOffset.UtcNow
+    let getPriceBars = setupGetPricesWithBrokerageMock mock None None
     
     let ticker = Random() |> TestDataGenerator.GenerateRandomTicker
     
@@ -185,7 +185,7 @@ let ``If getting price data throws, it gets recorded``() = async {
                     failwith transactionRateErrorMessage
         }
     
-    let getPriceBars = setupGetPricesWithBrokerageMock mock DateTimeOffset.UtcNow DateTimeOffset.UtcNow
+    let getPriceBars = setupGetPricesWithBrokerageMock mock None None
     
     let ticker = Random() |> TestDataGenerator.GenerateRandomTicker
     

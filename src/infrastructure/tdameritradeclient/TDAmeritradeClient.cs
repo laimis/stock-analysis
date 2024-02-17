@@ -592,21 +592,31 @@ public class TDAmeritradeClient : IBrokerage
     }
 
 
-    public async Task<FSharpResult<PriceBars,ServiceError>> GetPriceHistory(
+    public async Task<FSharpResult<PriceBars, ServiceError>> GetPriceHistory(
         UserState state,
         Ticker ticker,
         PriceFrequency frequency,
-        DateTimeOffset start,
-        DateTimeOffset end)
+        FSharpOption<DateTimeOffset> start,
+        FSharpOption<DateTimeOffset> end)
     {
         if (state.ConnectedToBrokerage == false)
         {
             return NotConnectedToBrokerageError<PriceBars>();
         }
-        
-        var startUnix = start == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.AddYears(-2).ToUnixTimeMilliseconds() : start.ToUnixTimeMilliseconds();
-        var endUnix = end == DateTimeOffset.MinValue ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : end.ToUnixTimeMilliseconds();
 
+        long FromOption(FSharpOption<DateTimeOffset> option, DateTimeOffset defaultValue)
+        {
+            var value = (FSharpOption<DateTimeOffset>.get_IsSome(option)) switch {
+                true => option.Value,
+                false => defaultValue
+            };
+            
+            return value.ToUnixTimeMilliseconds();
+        }
+
+        var startUnix = FromOption(start, DateTimeOffset.UtcNow.AddYears(-2));
+        var endUnix = FromOption(end, DateTimeOffset.UtcNow);
+        
         var frequencyType = frequency.Tag switch {
             PriceFrequency.Tags.Daily => "daily",
             PriceFrequency.Tags.Weekly => "weekly",

@@ -102,8 +102,8 @@ type OutcomesReportQuery =
         member this.DateRange (marketHours:IMarketHours) =
             let tryParse (date:string) func =
                 match DateTimeOffset.TryParse(date) with
-                | false, _ -> DateTimeOffset.MinValue
-                | true, dt -> func(dt)
+                | false, _ -> None
+                | true, dt -> func(dt) |> Some
             
             let start = tryParse this.StartDate marketHours.GetMarketStartOfDayTimeInUtc
             let ``end`` = tryParse this.EndDate marketHours.GetMarketEndOfDayTimeInUtc
@@ -261,11 +261,11 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
                 let position = position |> StockPositionWithCalculations
                 
-                let start = position.Opened |> marketHours.GetMarketStartOfDayTimeInUtc
+                let start = position.Opened |> marketHours.GetMarketStartOfDayTimeInUtc |> Some
                 let ``end`` =
                     match position.Closed with
-                    | Some closed -> closed |> marketHours.GetMarketEndOfDayTimeInUtc
-                    | None -> DateTimeOffset.MinValue
+                    | Some closed -> closed |> marketHours.GetMarketEndOfDayTimeInUtc |> Some
+                    | None -> None
                 
                 let! pricesResponse =
                     brokerage.GetPriceHistory
@@ -298,8 +298,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     user.State
                     query.Ticker
                     query.Frequency
-                    DateTimeOffset.MinValue
-                    DateTimeOffset.MinValue
+                    None
+                    None
             
             return priceResponse |> Result.map (fun prices ->
                 let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
@@ -411,8 +411,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             user.State
                             position.Ticker
                             PriceFrequency.Daily
-                            position.Opened
-                            DateTimeOffset.UtcNow
+                            None
+                            None
                         |> Async.AwaitTask
                     
                     match priceResponse with
@@ -456,8 +456,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     user.State
                     query.Ticker
                     query.Frequency
-                    DateTimeOffset.MinValue
-                    DateTimeOffset.MinValue
+                    None
+                    None
             
             return pricesResponse |> Result.map (fun prices ->
                 let recent = 30 |> prices.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars

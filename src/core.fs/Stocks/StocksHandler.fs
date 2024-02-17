@@ -34,15 +34,15 @@ type PricesQuery =
     {
         UserId:UserId
         Ticker:Ticker
-        Start:DateTimeOffset
-        End:DateTimeOffset
+        Start:DateTimeOffset option
+        End:DateTimeOffset option
         Frequency:PriceFrequency
     }
     
     static member NumberOfDays(frequency, numberOfDays, ticker, userId) =
         let totalDays = numberOfDays + 200 // to make sure we have enough for the moving averages
-        let start = DateTimeOffset.UtcNow.AddDays(-totalDays)
-        let ``end`` = DateTimeOffset.UtcNow
+        let start = DateTimeOffset.UtcNow.AddDays(-totalDays) |> Some
+        let ``end`` = DateTimeOffset.UtcNow |> Some
         
         {
             Ticker = ticker

@@ -136,11 +136,7 @@ type PriceBars(bars:PriceBar array) =
     member this.Length = bars.Length
     member this.First = bars[0]
     member this.Last = bars[this.Length - 1]
-    member this.LatestOrAll numberOfBars =
-        match numberOfBars > this.Length with
-        | true -> this.Bars
-        | false -> this.Bars[this.Length - numberOfBars ..]
-        |> PriceBars
+    member this.LatestOrAll numberOfBars = this.Bars[^(numberOfBars-1)..] |> PriceBars
     member this.AllButLast() = this.Bars[0 .. this.Length - 2] |> PriceBars
     member this.ClosingPrices() = this.Bars |> Array.map (_.Close)
     member this.Volumes() = this.Bars |> Array.map (fun bar -> bar.Volume |> decimal)

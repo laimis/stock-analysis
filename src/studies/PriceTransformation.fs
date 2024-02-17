@@ -23,8 +23,8 @@ let private fetchPriceFeeds (brokerage:IGetPriceHistory) studiesDirectory ticker
         tickerDatePairs
         |> Seq.map (fun (ticker, earliestDate:Signal.Row) -> async {
             
-            let earliestDateMinus365 = earliestDate.Date |> DateTimeOffset.Parse |> _.AddDays(-365)
-            let today = DateTimeOffset.UtcNow
+            let earliestDateMinus365 = earliestDate.Date |> DateTimeOffset.Parse |> _.AddDays(-365) |> Some
+            let today = DateTimeOffset.UtcNow |> Some
             
             // first try to get prices from local file
             let! prices = tryGetPricesFromCsv studiesDirectory ticker

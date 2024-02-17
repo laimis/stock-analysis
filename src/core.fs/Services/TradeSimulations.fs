@@ -296,8 +296,8 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                     user
                     ticker
                     PriceFrequency.Daily
-                    convertedWhen
-                    (TradingStrategyConstants.MaxNumberOfDaysToSimulate |> convertedWhen.AddDays)
+                    (Some convertedWhen)
+                    (TradingStrategyConstants.MaxNumberOfDaysToSimulate |> convertedWhen.AddDays |> Some)
                     
             let results = TradingStrategyResults()
             

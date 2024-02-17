@@ -3,6 +3,7 @@ module coretests.fs.Stocks.Services.PositionAnalysisTests
 open Xunit
 open core.Shared
 open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Stocks
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Stocks
@@ -117,3 +118,35 @@ let ``Stop price set, for short position, percent to stop matches stop level`` (
     let outcomes = setStopAndReturnOutcomes (bars.Last.Close - 2m)
     
     outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.PercentToStopLoss && o.Value > 0m) |> should equal true
+    
+    
+[<Fact>]
+let ``Stop above sma20 outcome is added`` () =
+    
+    let position, bars, _ = createTestData()
+    
+    let withStop =
+        position
+        |> StockPosition.setStop (Some bars.Last.Close) bars.Last.Date
+        |> StockPositionWithCalculations
+    
+    let outcomes = PositionAnalysis.generate withStop bars [||]
+    
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value > 0m) |> should equal true
+    
+[<Fact>]
+let ``Stop above sma 20 does not blow up with no sma20`` () =
+    
+    let _, bars, _ = createTestData()
+    
+    let smallAmountOfBars = bars.LatestOrAll 5
+    
+    let position =
+        StockPosition.openLong (Ticker("SHEL")) smallAmountOfBars.First.Date
+        |> StockPosition.buy 10m 100m smallAmountOfBars.First.Date
+        |> StockPosition.setStop (Some smallAmountOfBars.Last.Close) smallAmountOfBars.Last.Date
+        |> StockPositionWithCalculations
+    
+    let outcomes = PositionAnalysis.generate position smallAmountOfBars [||]
+    
+    outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value = 0m) |> should equal true

@@ -208,7 +208,7 @@ type IMarketHours =
 
 type IBrokerageGetPriceHistory =
     
-    abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset -> ``end``:DateTimeOffset -> Task<Result<PriceBars,ServiceError>>
+    abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset option -> ``end``:DateTimeOffset option -> Task<Result<PriceBars,ServiceError>>
     
 type IBrokerage =
     inherit IBrokerageGetPriceHistory

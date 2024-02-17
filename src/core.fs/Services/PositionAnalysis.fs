@@ -5,7 +5,6 @@ open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
-open core.fs.Services.MultipleBarPriceAnalysis
 open core.fs.Stocks
 
 module PositionAnalysis =
@@ -34,7 +33,7 @@ module PositionAnalysis =
         let GainDiffLast10 = "GainDiffLast10"
         let StrategyLabel = "StrategyLabel"
         let HasSellOrder = "HasSellOrder"
-        let StopDiff20SMAPct = "StopDiff20SMAPct"
+        let StopDiffToSMA20Pct = "StopDiffToSMA20Pct"
 
     let generate (position:StockPositionWithCalculations) (bars:PriceBars) orders =
         
@@ -51,18 +50,24 @@ module PositionAnalysis =
             | p when p < 0.0m -> OutcomeType.Negative
             | _ -> OutcomeType.Neutral
             
-        let max = bars.Bars |> Array.maxBy (fun (b:PriceBar) -> b.High) |> _.High
+        let barAtOpen = bars.TryFindByDate position.Opened
+        let barsFromOpen =
+            match barAtOpen with
+            | Some (_,index) -> bars.Bars[index..]
+            | None -> [||]
+            
+        let max = barsFromOpen |> Array.maxBy (fun (b:PriceBar) -> b.High) |> _.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
-        let min = bars.Bars |> Array.minBy (_.Low) |> _.Low
+        let min = barsFromOpen |> Array.minBy (_.Low) |> _.Low
         let drawdown = (min - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare
         
-        let last10 = 10 |> bars.LatestOrAll
-        let last10Max = last10.Bars |> Array.maxBy _.High |> _.High
-        let last10Gain = (last10Max - last10.First.Close) / last10.First.Close
+        let last10 = barsFromOpen[^9..]
+        let last10Max = last10 |> Array.maxBy _.High |> _.High
+        let last10Gain = (last10Max - last10[0].Close) / last10[0].Close
         
-        let last10Min = last10.Bars |> Array.minBy _.Low |> _.Low
-        let last10Drawdown = (last10Min - last10.First.Close) / last10.First.Close
+        let last10Min = last10 |> Array.minBy _.Low |> _.Low
+        let last10Drawdown = (last10Min - last10[0].Close) / last10[0].Close
         
         let last10MaxGainDrawdownDiff = last10Gain + last10Drawdown
         
@@ -74,8 +79,11 @@ module PositionAnalysis =
         let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
         
         let multipleBarOutcomes = MultipleBarPriceAnalysis.run bars
-        let sma20 = multipleBarOutcomes |> Seq.find (fun o -> o.Key = MultipleBarOutcomeKeys.SMA(20)) |> _.Value
-        let stopDiff20SMAPct = (stopLoss - sma20) / sma20
+        let sma20 = multipleBarOutcomes |> Seq.find (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA(20)) |> _.Value
+        let stopDiffToSMA20Pct =
+            match sma20 with
+            | x when x = 0m -> 0.0m
+            | _ -> (stopLoss - sma20) / sma20
         
         [
             AnalysisOutcome(PositionAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
@@ -91,7 +99,7 @@ module PositionAnalysis =
             AnalysisOutcome(PositionAnalysisKeys.DaysHeld, OutcomeType.Neutral, position.DaysHeld, ValueFormat.Number, $"Days held: {position.DaysHeld}")
             AnalysisOutcome(PositionAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
             AnalysisOutcome(PositionAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
-            AnalysisOutcome(PositionAnalysisKeys.StopDiff20SMAPct, OutcomeType.Neutral, stopDiff20SMAPct, ValueFormat.Percentage, $"Stop diff to 20SMA is {stopDiff20SMAPct:P}")
+            AnalysisOutcome(PositionAnalysisKeys.StopDiffToSMA20Pct, OutcomeType.Neutral, stopDiffToSMA20Pct, ValueFormat.Percentage, $"Stop diff to SMA20 is {stopDiffToSMA20Pct:P}")
             AnalysisOutcome(PositionAnalysisKeys.StrategyLabel, OutcomeType.Negative, (if position.ContainsLabel("strategy") then 1 else 0), ValueFormat.Boolean, $"Missing strategy label")
             AnalysisOutcome(PositionAnalysisKeys.HasSellOrder, OutcomeType.Neutral, (if hasSellOrderInOrders then 1 else 0), ValueFormat.Boolean, $"Has sell order")
             AnalysisOutcome(PositionAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
@@ -132,12 +140,12 @@ module PositionAnalysis =
         
         let shortsAndStopAboveSMA20 = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopDiff20SMAPct && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value > 0.0m)
         ]
         
         let longsAndStopBelowSMA20 = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopDiff20SMAPct && o.Value < 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value < 0.0m)
         ]
         
         let tickersAndTheirCosts =
@@ -212,13 +220,13 @@ module PositionAnalysis =
             AnalysisOutcomeEvaluation(
                 "Shorts with stop above 20SMA",
                 OutcomeType.Negative,
-                PositionAnalysisKeys.StopDiff20SMAPct,
+                PositionAnalysisKeys.StopDiffToSMA20Pct,
                 tickerOutcomes |> TickerOutcomes.filter shortsAndStopAboveSMA20
             )
             AnalysisOutcomeEvaluation(
                 "Longs with stop below 20SMA",
                 OutcomeType.Negative,
-                PositionAnalysisKeys.StopDiff20SMAPct,
+                PositionAnalysisKeys.StopDiffToSMA20Pct,
                 tickerOutcomes |> TickerOutcomes.filter longsAndStopBelowSMA20
             )
         ]

@@ -290,8 +290,8 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         | true, prices ->
             return prices |> Ok
         | _ ->
-            let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365))
-            let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow)
+            let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365)) |> Some
+            let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow) |> Some
 
             let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
 
@@ -416,7 +416,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
     }
 
     let runCheckForUserTicker (logger:ILogger) (_:CancellationToken) user ticker = async {
-        let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Weekly DateTimeOffset.MinValue DateTimeOffset.MinValue |> Async.AwaitTask
+        let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Weekly None None |> Async.AwaitTask
 
         return
             match prices with

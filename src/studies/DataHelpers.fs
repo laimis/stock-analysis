@@ -8,7 +8,7 @@ open core.fs
 open core.fs.Adapters.Stocks
 
 type IGetPriceHistory =
-    abstract member GetPriceHistory : start:DateTimeOffset -> ``end``:DateTimeOffset -> ticker:core.Shared.Ticker -> Task<Result<PriceBars,ServiceError>>
+    abstract member GetPriceHistory : start:DateTimeOffset option -> ``end``:DateTimeOffset option -> ticker:core.Shared.Ticker -> Task<Result<PriceBars,ServiceError>>
 
 type PriceAvailability =
     | Available of PriceBars
