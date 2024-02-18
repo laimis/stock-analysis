@@ -320,3 +320,16 @@ let ``Close already closed position fails``() =
         
     (fun () -> position |> StockPosition.close 1m DateTimeOffset.UtcNow |> ignore)
     |> should throw typeof<Exception>
+    
+[<Fact>]
+let ``Notes are appended with most recent last``() =
+    
+    let position =
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.addNotes (Some "this is a note") DateTimeOffset.UtcNow
+        |> StockPosition.addNotes (Some "this is another note") DateTimeOffset.UtcNow
+        
+    position.Notes |> should haveLength 2
+    position.Notes |> List.head |> should equal "this is a note"
+    position.Notes |> List.last |> should equal "this is another note"

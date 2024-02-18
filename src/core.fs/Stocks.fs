@@ -180,7 +180,7 @@ module StockPosition =
             { p with Transactions = newTransactions; StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? StockPositionNotesAdded as x ->
-            { p with Notes = x.Notes :: p.Notes; Version = p.Version + 1; Events = p.Events @ [x] }
+            { p with Notes = p.Notes @ [x.Notes]; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockPurchased as x ->
             let newTransactions = p.Transactions @ [Share { Ticker = p.Ticker; TransactionId = x.Id; Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
