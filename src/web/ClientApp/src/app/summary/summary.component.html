@@ -13,7 +13,7 @@
       <h5 class="mt-5">Closed Positions : {{result.closedPositions.length}}</h5>
     </section>
     @for (p of result.closedPositions; track p) {
-      <div class="row">
+      <div class="row" [ngClass]="{'bg-danger-subtle': p.profit < 0, 'bg-success-subtle': p.profit >= 0}">
         <div class="col">
           <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
           <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
@@ -28,7 +28,7 @@
         <div class="col">
           @for (t of p.plTransactions; track t) {
             <div>
-              sell {{t.numberOfShares}} &#64; {{t.sellPrice | currency}} for <span class="badge bg-success" [ngClass]="{'bg-success': t.profit >= 0, 'bg-danger': t.profit < 0}" >{{t.gainPct | percent}} gain ({{t.profit | currency}})</span> {{t.date | date: 'MM/dd/yyyy'}}
+              sell {{t.numberOfShares}} &#64; {{t.sellPrice | currency}} for <span class="badge bg-success" [ngClass]="{'bg-success-subtle': t.profit >= 0, 'bg-danger-subtle': t.profit < 0}" >{{t.gainPct | percent}} gain ({{t.profit | currency}})</span> {{t.date | date: 'MM/dd/yyyy'}}
             </div>
           }
         </div>

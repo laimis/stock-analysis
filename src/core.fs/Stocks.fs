@@ -421,6 +421,107 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     let completedPositionTransactions =
         stockPosition.ShareTransactions
         |> List.takeWhile (fun x -> match stockPosition.StockPositionType with | Short -> x.Type = Sell | Long -> x.Type = Buy)
+        
+    let transactions =
+        stockPosition.ShareTransactions
+        |> List.map (fun s ->
+            let ``type`` = (match s.Type with | Buy -> "Buy" | Sell -> "Sell") |> _.ToLower()
+            let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
+            let date = s.Date.ToString("yyyy-MM-dd")
+            {|transactionId = s.TransactionId; date = date; price = s.Price; ``type`` = ``type``; description = description; numberOfShares = s.NumberOfShares |}
+        )
+        
+    let plTransactions =
+        // we fold over sells, and for each sell create a PLTransaction
+        liquidationSource
+        |> List.fold (fun (acc:PLTransaction list) (liquidation:StockPositionShareTransaction) ->
+            
+            let offset =
+                match acc with
+                [] -> 0m
+                | _ -> acc |> List.sumBy _.NumberOfShares
+            
+            let slotsOfInterest =
+                acquisitionSlots
+                |> List.skip (int offset)
+                |> List.take (liquidation.NumberOfShares |> abs |> int)
+                
+            let averageAcquisitionPrice = slotsOfInterest |> List.average
+            let profitPerShare, gainPct =
+                match stockPosition.StockPositionType with
+                | Long ->
+                    (
+                        liquidation.Price - averageAcquisitionPrice,
+                        (liquidation.Price - averageAcquisitionPrice) / averageAcquisitionPrice
+                    )
+                | Short ->
+                    (
+                        averageAcquisitionPrice - liquidation.Price,
+                        (averageAcquisitionPrice - liquidation.Price) / liquidation.Price
+                    )
+            let profit = liquidation.NumberOfShares * profitPerShare
+            
+            // we then create a PLTransaction
+            let pl = {
+                Ticker = stockPosition.Ticker
+                Date = liquidation.Date
+                Profit = profit
+                BuyPrice = averageAcquisitionPrice
+                GainPct = gainPct
+                SellPrice = liquidation.Price
+                NumberOfShares = liquidation.NumberOfShares 
+            }
+            
+            // and add it to the accumulator
+            acc @ [pl]
+        ) []
+        
+    let profit = 
+        // profit is generating whenever we sell shares of a long position or buy shares of a short position
+        liquidationSlots
+        |> List.indexed
+        |> List.fold (fun (acc:decimal) (index, liquidationPrice) ->
+            
+            let acquisitionPrice = acquisitionSlots[index]
+            let profit =
+                match stockPosition.StockPositionType with
+                | Long -> liquidationPrice - acquisitionPrice
+                | Short -> acquisitionPrice - liquidationPrice
+            acc + profit
+        ) 0m
+    
+    let averageBuyCostPerShare =
+        match acquisitionSlots with
+            | [] -> 0m
+            | _ -> acquisitionSlots |> List.average
+        
+    let averageCostPerShare =
+        let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
+        let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
+        match remainingShares with
+        | [] -> averageBuyCostPerShare
+        | _ -> remainingShares |> List.average
+        
+    let events =
+        stockPosition.Transactions
+        |> List.map (fun t ->
+            match t with
+            | Share s ->
+               let ``type`` = match s.Type with | Buy -> "buy" | Sell -> "sell" |> _.ToLower()
+               let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
+               {|id = s.TransactionId; date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
+            | Risk r ->
+                let ``type`` = "risk"
+                let description = $"risk amount set to {r.RiskAmount}"
+                {|id = r.TransactionId; date = r.Date; value = r.RiskAmount; ``type`` = ``type``; description = description; quantity = 0m |}
+            | Stop s ->
+               let ``type`` = "stop"
+               let description =
+                   match s.StopPrice with
+                   | Some stopPrice -> $"stop price set to {stopPrice}"
+                   | None -> "stop deleted"
+               {|id = s.TransactionId; date = s.Date; value = (s.StopPrice |> Option.defaultValue 0m); ``type`` = ``type``; description = description; quantity = 0m |}
+        )
             
     member this.IsShort = stockPosition.StockPositionType = Short
     member this.StockPositionType = stockPosition.StockPositionType.ToString()
@@ -436,13 +537,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.Grade = stockPosition.Grade
     member this.GradeNote = stockPosition.GradeNote
     
-    member this.AverageCostPerShare =
-        
-        let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
-        let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
-        match remainingShares with
-        | [] -> this.AverageBuyCostPerShare
-        | _ -> remainingShares |> List.average
+    member this.AverageCostPerShare = averageCostPerShare
         
     member this.Cost =
         match this.IsOpen with
@@ -464,24 +559,9 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 
         DateTimeOffset.UtcNow.Subtract(date).TotalDays |> int
         
-    member this.Profit =
-        // profit is generating whenever we sell shares of a long position or buy shares of a short position
-        liquidationSlots
-        |> List.indexed
-        |> List.fold (fun (acc:decimal) (index, liquidationPrice) ->
-            
-            let acquisitionPrice = acquisitionSlots[index]
-            let profit =
-                match this.IsShort with
-                | false -> liquidationPrice - acquisitionPrice
-                | true -> acquisitionPrice - liquidationPrice
-            acc + profit
-        ) 0m
+    member this.Profit = profit
         
-    member this.AverageBuyCostPerShare =
-        match acquisitionSlots with
-            | [] -> 0m
-            | _ -> acquisitionSlots |> List.average
+    member this.AverageBuyCostPerShare = averageBuyCostPerShare
             
     member this.AverageSaleCostPerShare =
         match liquidationSlots with
@@ -499,60 +579,9 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | true -> 0m
             | false -> (this.AverageSaleCostPerShare - this.AverageBuyCostPerShare) / this.AverageBuyCostPerShare
         
-    member this.Transactions =
+    member this.Transactions = transactions
         
-        stockPosition.ShareTransactions
-        |> List.map (fun s ->
-            let ``type`` = (match s.Type with | Buy -> "Buy" | Sell -> "Sell") |> _.ToLower()
-            let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
-            let date = s.Date.ToString("yyyy-MM-dd")
-            {|transactionId = s.TransactionId; date = date; price = s.Price; ``type`` = ``type``; description = description; numberOfShares = s.NumberOfShares |}
-        )
-        
-    member this.PLTransactions =
-        // we fold over sells, and for each sell create a PLTransaction
-        liquidationSource
-        |> List.fold (fun (acc:PLTransaction list) (liquidation:StockPositionShareTransaction) ->
-            
-            let offset =
-                match acc with
-                [] -> 0m
-                | _ -> acc |> List.sumBy _.NumberOfShares
-            
-            let slotsOfInterest =
-                acquisitionSlots
-                |> List.skip (int offset)
-                |> List.take (liquidation.NumberOfShares |> abs |> int)
-                
-            let averageAcquisitionPrice = slotsOfInterest |> List.average
-            let profitPerShare, gainPct =
-                match this.IsShort with
-                | false ->
-                    (
-                        liquidation.Price - averageAcquisitionPrice,
-                        (liquidation.Price - averageAcquisitionPrice) / averageAcquisitionPrice
-                    )
-                | true ->
-                    (
-                        averageAcquisitionPrice - liquidation.Price,
-                        (averageAcquisitionPrice - liquidation.Price) / liquidation.Price
-                    )
-            let profit = liquidation.NumberOfShares * profitPerShare
-            
-            // we then create a PLTransaction
-            let pl = {
-                Ticker = stockPosition.Ticker
-                Date = liquidation.Date
-                Profit = profit
-                BuyPrice = averageAcquisitionPrice
-                GainPct = gainPct
-                SellPrice = liquidation.Price
-                NumberOfShares = liquidation.NumberOfShares 
-            }
-            
-            // and add it to the accumulator
-            acc @ [pl]
-        ) []
+    member this.PLTransactions = plTransactions
         
     member this.RiskedAmount = stockPosition.RiskAmount
     
@@ -627,23 +656,4 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.Labels = stockPosition.Labels |> Seq.map id
     
-    member this.Events =
-        stockPosition.Transactions
-        |> List.map (fun t ->
-            match t with
-            | Share s ->
-               let ``type`` = match s.Type with | Buy -> "buy" | Sell -> "sell" |> _.ToLower()
-               let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
-               {|id = s.TransactionId; date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
-            | Risk r ->
-                let ``type`` = "risk"
-                let description = $"risk amount set to {r.RiskAmount}"
-                {|id = r.TransactionId; date = r.Date; value = r.RiskAmount; ``type`` = ``type``; description = description; quantity = 0m |}
-            | Stop s ->
-               let ``type`` = "stop"
-               let description =
-                   match s.StopPrice with
-                   | Some stopPrice -> $"stop price set to {stopPrice}"
-                   | None -> "stop deleted"
-               {|id = s.TransactionId; date = s.Date; value = (s.StopPrice |> Option.defaultValue 0m); ``type`` = ``type``; description = description; quantity = 0m |}
-        )
+    member this.Events = events
