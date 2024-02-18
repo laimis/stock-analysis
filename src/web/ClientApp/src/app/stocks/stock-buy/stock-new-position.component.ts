@@ -1,8 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {BrokerageOrder, StocksService, stocktransactioncommand} from "../../services/stocks.service";
+import {Component, OnInit} from '@angular/core';
+import {BrokerageOrder} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
-import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
   selector: 'app-stock-new-position',

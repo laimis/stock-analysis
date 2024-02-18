@@ -709,9 +709,10 @@ export interface ChartMarker {
 export interface PositionChartInformation {
   ticker: string
   prices: Prices
-  markers: ChartMarker[]
   averageBuyPrice: number | null
   stopPrice: number | null
+    transactions:StockTransaction[]
+    markers: ChartMarker[]
 }
 
 export interface SMAContainer {

@@ -187,6 +187,7 @@ export class StockTradingNewPositionComponent {
       ticker: ticker,
       prices: prices,
       markers: [],
+        transactions: [],
       averageBuyPrice: null,
       stopPrice: this.chartStop
     }

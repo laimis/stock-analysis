@@ -1,13 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {
-  StocksService,
-  StockDetails,
-  OwnedOption,
-  StockOwnership,
-  BrokerageOrder, PositionInstance, stocktransactioncommand
+    BrokerageOrder,
+    OwnedOption, PositionChartInformation,
+    PositionInstance,
+    PriceFrequency, Prices,
+    StockDetails,
+    StockOwnership,
+    StocksService
 } from '../../services/stocks.service';
-import { ActivatedRoute } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+import {ActivatedRoute} from '@angular/router';
+import {Title} from '@angular/platform-browser';
 import {GetErrors} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {BrokerageService} from "../../services/brokerage.service";
@@ -23,7 +25,9 @@ export class StockDetailsComponent implements OnInit {
 	stock: StockDetails
   stockOwnership: StockOwnership
   currentPosition: PositionInstance
+    currentPositionChartInfo: PositionChartInformation
   options: OwnedOption[]
+    prices: Prices
   orders: BrokerageOrder[]
   activeTab: string = ''
 
@@ -59,7 +63,7 @@ export class StockDetailsComponent implements OnInit {
         this.errors.stock = ['No ticker provided']
       }
 
-      this.activeTab = param['tab'] || 'trade'
+      this.activeTab = param['tab'] || 'stocks'
     })
 	}
 
@@ -115,14 +119,34 @@ export class StockDetailsComponent implements OnInit {
   }
 
   loadStockOwnership() {
-    this.stockPositions.getStockOwnership(this.ticker).subscribe(result => {
-      this.stockOwnership = result
-      this.currentPosition = result.positions.filter(p => p.isOpen)[0]
-      this.loading.ownership = false;
-    }, err => {
-      this.loading.ownership = false;
-      this.errors.ownership = GetErrors(err)
-    })
+      this.stocks.getStockPrices(this.ticker, 365, PriceFrequency.Daily)
+          .subscribe(
+              result => {
+                  this.prices = result
+                  this.stockPositions.getStockOwnership(this.ticker).subscribe(result => {
+                      this.stockOwnership = result
+                      this.currentPosition = result.positions.filter(p => p.isOpen)[0]
+                      if (this.currentPosition) {
+                          this.currentPositionChartInfo = {
+                              averageBuyPrice: this.currentPosition.averageCostPerShare,
+                              stopPrice: this.currentPosition.stopPrice,
+                              transactions: this.currentPosition.transactions,
+                              markers: [],
+                              prices: this.prices,
+                              ticker: this.currentPosition.ticker
+                          }
+                      }
+                      this.loading.ownership = false;
+                  }, err => {
+                      this.loading.ownership = false;
+                      this.errors.ownership = GetErrors(err)
+                  })
+              },
+              error => {
+                  this.errors.stock = GetErrors(error)
+                  this.loading.stock = false;
+              }
+          );
   }
 
   isActive(tabName:string) {

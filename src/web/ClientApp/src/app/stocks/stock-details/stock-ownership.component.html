@@ -10,6 +10,9 @@
           </span>
         }
       </h5>
+        @if (positionChartInformation && position.isOpen) {
+            <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
+        }
       <app-stock-trading-position [position]="position" [quote]="quote" [orders]="orders" (brokerageOrdersChanged)="ordersChanged.emit($event)"></app-stock-trading-position>
     </section>
   } @empty {

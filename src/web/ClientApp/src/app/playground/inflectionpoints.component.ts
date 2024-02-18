@@ -63,6 +63,7 @@ export class InflectionPointsComponent implements OnInit {
           ticker: this.tickers[0],
           prices: result,
           markers: inflectionPoints.map(toChartMarker),
+            transactions: [],
           averageBuyPrice: null,
           stopPrice: null
         }

@@ -1,16 +1,16 @@
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
-  DataPointContainer,
-  OutcomesReport,
-  OutcomeValueTypeEnum,
-  PositionChartInformation,
-  PriceFrequency,
-  StockAnalysisOutcome,
-  StockGaps,
-  StockPercentChangeResponse,
-  StocksService,
-  TickerOutcomes
+    DataPointContainer,
+    OutcomesReport,
+    OutcomeValueTypeEnum,
+    PositionChartInformation,
+    PriceFrequency, Prices,
+    StockAnalysisOutcome,
+    StockGaps,
+    StockPercentChangeResponse,
+    StocksService,
+    TickerOutcomes
 } from 'src/app/services/stocks.service';
 
 @Component({
@@ -27,10 +27,8 @@ export class StockAnalysisComponent {
 
   gaps: StockGaps;
   percentChangeDistribution: StockPercentChangeResponse;
-  private _ticker: string;
   chartInfo: PositionChartInformation
-  atrContainer : DataPointContainer;
-
+  
   constructor(
     private stockService : StocksService,
     private percentPipe: PercentPipe,
@@ -39,28 +37,20 @@ export class StockAnalysisComponent {
   ) { }
 
   @Input()
-  set ticker(value:string) {
-    this._ticker = value;
-    this.getPrices();
-  }
-  get ticker() {
-    return this._ticker;
-  }
-
-  private getPrices() {
-    this.stockService.getStockPrices(this.ticker, 365, PriceFrequency.Daily).subscribe(
-      data => {
+  ticker : string
+    
+    @Input()
+    set prices(prices: Prices) {
         this.chartInfo = {
-          ticker: this.ticker,
-          prices: data,
-          markers: [],
-          averageBuyPrice: null,
-          stopPrice: null
+            ticker: this.ticker,
+            prices: prices,
+            transactions: [],
+            markers: [],
+            averageBuyPrice: null,
+            stopPrice: null
         }
         this.getOutcomesReportAllBars();
-      }
-    );
-  }
+    }
 
   getValue(o:StockAnalysisOutcome) {
     if (o.valueType === OutcomeValueTypeEnum.Percentage) {

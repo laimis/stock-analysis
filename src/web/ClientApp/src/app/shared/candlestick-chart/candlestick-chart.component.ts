@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import {ChartMarker, PositionChartInformation, PriceBar, SMA} from 'src/app/services/stocks.service';
+import {ChartMarker, PositionChartInformation, PriceBar, SMA, StockTransaction} from 'src/app/services/stocks.service';
 import {IChartApi, PriceLineOptions, createChart, SeriesMarker, Time} from 'lightweight-charts';
 
 const numberOfVisibleBars = 60
@@ -114,11 +114,29 @@ export class CandlestickChartComponent implements OnDestroy {
     addLineSeries(this.chart, info.prices.sma.sma150, lightblue, info.prices.sma.sma150.interval, priceBars);
     addLineSeries(this.chart, info.prices.sma.sma200, blue, info.prices.sma.sma200.interval, priceBars);
 
-    if (info.markers) {
-      let markers = info.markers.map(toSeriesMarker)
-      console.log(markers)
-      markers.sort((a, b) => a.time.toLocaleString().localeCompare(b.time.toLocaleString()))
-      barSeries.setMarkers(markers)
+    let markers = []
+      
+      info.transactions
+          .filter((t: StockTransaction) => t.type == 'buy')
+          .forEach((t: StockTransaction) => {
+              markers.push({date: t.date, label: 'Buy ' + t.numberOfShares, color: green, shape: 'arrowUp'})
+          })
+
+      info.transactions
+          .filter((t: StockTransaction) => t.type == 'sell')
+          .forEach((t: StockTransaction) => {
+              markers.push({date: t.date, label: 'Sell ' + t.numberOfShares, color: red, shape: 'arrowDown'})
+          })
+
+      info.markers.forEach((m: ChartMarker) => markers.push(m))
+      
+      console.log("markers: " + markers.length)
+
+    if (markers.length > 0) {
+      let seriesMarkers = markers.map(toSeriesMarker)
+      console.log(seriesMarkers)
+        seriesMarkers.sort((a, b) => a.time.toLocaleString().localeCompare(b.time.toLocaleString()))
+      barSeries.setMarkers(seriesMarkers)
     }
 
     barSeries.priceScale().applyOptions({

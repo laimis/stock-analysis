@@ -23,14 +23,14 @@
 }
 
 <div class="tab-container mt-2">
-  <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
+    <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
+        Stocks @if (currentPosition) {
+        <span class="badge rounded-pill bg-info">{{ currentPosition.numberOfShares }}</span>
+    }
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
     Trade @if (options && options.length > 0) {
     <span class="badge rounded-pill bg-info">{{ options.length }}</span>
-  }
-  </a>
-  <a class="tab" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" (click)="activateTab('stocks')">
-    Stocks @if (currentPosition) {
-    <span class="badge rounded-pill bg-info">{{ currentPosition.numberOfShares }}</span>
   }
   </a>
   <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
@@ -76,7 +76,13 @@
   </section>
 }
 @if (stock && stockOwnership && isActive('stocks')) {
-  <app-stock-ownership [positions]=stockOwnership.positions [quote]="stock.quote" [orders]="orders" (ordersChanged)="brokerageOrderEntered($event)"></app-stock-ownership>
+  <app-stock-ownership 
+      [positions]=stockOwnership.positions
+      [quote]="stock.quote"
+      [orders]="orders"
+      [positionChartInformation]="currentPositionChartInfo"
+      (ordersChanged)="brokerageOrderEntered($event)">
+  </app-stock-ownership>
 }
 @if (isActive('options')) {
   <app-stock-option [ticker]=stock.ticker [options]=options></app-stock-option>
@@ -85,5 +91,5 @@
   <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
 }
 @if (isActive('analysis')) {
-  <app-stock-analysis [ticker]=stock.ticker></app-stock-analysis>
+  <app-stock-analysis [ticker]=stock.ticker [prices]="prices"></app-stock-analysis>
 }
