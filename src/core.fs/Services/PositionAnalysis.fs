@@ -146,13 +146,13 @@ module PositionAnalysis =
         
         let shortsAndStopAboveSMA20 = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value > 0.01m) // more than 1% above the 20SMA
         ]
         
         let longsAndStopBelowSMA20 = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value < 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value < -0.01m) // more than 1% below the 20SMA
         ]
         
         let tickersAndTheirCosts =
