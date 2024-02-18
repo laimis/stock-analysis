@@ -119,13 +119,13 @@ export class CandlestickChartComponent implements OnDestroy {
       info.transactions
           .filter((t: StockTransaction) => t.type == 'buy')
           .forEach((t: StockTransaction) => {
-              markers.push({date: t.date, label: 'Buy ' + t.numberOfShares, color: green, shape: 'arrowUp'})
+              markers.push({date: t.date, label: 'B ' + t.numberOfShares, color: green, shape: 'arrowUp'})
           })
 
       info.transactions
           .filter((t: StockTransaction) => t.type == 'sell')
           .forEach((t: StockTransaction) => {
-              markers.push({date: t.date, label: 'Sell ' + t.numberOfShares, color: red, shape: 'arrowDown'})
+              markers.push({date: t.date, label: 'S ' + t.numberOfShares, color: red, shape: 'arrowDown'})
           })
 
       info.markers.forEach((m: ChartMarker) => markers.push(m))
