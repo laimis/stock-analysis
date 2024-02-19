@@ -332,10 +332,31 @@ module SingleBarPriceAnalysisEvaluation =
             )
             
             AnalysisOutcomeEvaluation(
-                "SMA 20 below SMA 50",
+                "SMA20 < SMA50 (short-term down)",
                 OutcomeType.Neutral,
                 SingleBarOutcomeKeys.SMA20Above50Bars,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Bars && o.Value < 0m) ]
+            )
+            
+            AnalysisOutcomeEvaluation(
+                "SMA20 > SMA50 (short-term up)",
+                OutcomeType.Neutral,
+                SingleBarOutcomeKeys.SMA20Above50Bars,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Bars && o.Value > 0m) ]
+            )
+            
+            AnalysisOutcomeEvaluation(
+                "SMA50 < SMA200 (long-term down)",
+                OutcomeType.Neutral,
+                SingleBarOutcomeKeys.SMA50Above200Bars,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA50Above200Bars && o.Value < 0m) ]
+            )
+            
+            AnalysisOutcomeEvaluation(
+                "SMA50 > SMA200 (long-term up)",
+                OutcomeType.Neutral,
+                SingleBarOutcomeKeys.SMA50Above200Bars,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA50Above200Bars && o.Value > 0m) ]
             )
             
             AnalysisOutcomeEvaluation(

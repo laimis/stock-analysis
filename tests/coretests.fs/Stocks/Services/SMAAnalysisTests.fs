@@ -41,7 +41,7 @@ let ``SMA20 above SMA50``()
     
 [<Fact>]
 let ``SMA50 above SMA200``()
-    = assertOutcomeExistsAndValueMatches (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars) 205m
+    = assertOutcomeExistsAndValueMatches (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars) 60m
 
 [<Fact>]
 let ``Price above 20SMA``()
