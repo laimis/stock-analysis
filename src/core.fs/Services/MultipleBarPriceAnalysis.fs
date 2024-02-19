@@ -21,7 +21,7 @@ module MultipleBarPriceAnalysis =
         let PercentAboveLow = "PercentAboveLow"
         let SMA20Above50Bars = "SMA20Above50Bars"
         let SMA50Above200Bars = "SMA50Above200Bars"
-        let PriceAbove20SMADays = "PriceAbove20SMADays"
+        let PriceAbove20SMABars = "PriceAbove20SMADays"
         let CurrentPrice = "CurrentPrice"
         let PercentChangeAverage = "PercentChangeAverage"
         let PercentChangeStandardDeviation = "PercentChangeStandardDeviation"
@@ -118,7 +118,7 @@ module MultipleBarPriceAnalysis =
             | None -> None
             | Some (outcomeType, value) ->
                 AnalysisOutcome(
-                    key = MultipleBarOutcomeKeys.PriceAbove20SMADays,
+                    key = MultipleBarOutcomeKeys.PriceAbove20SMABars,
                     outcomeType = outcomeType,
                     value = value,
                     valueType = ValueFormat.Number,

@@ -17,7 +17,7 @@ let assertOutcomeExistsAndValueMatches key value =
 let ``SMAAnalysis Adds AllOutcomes`` () =
     outcomes
     |> Seq.length
-    |> should equal 6
+    |> should equal 7
     
 [<Fact>]
 let ``SMA20 present and valid``()
@@ -38,10 +38,14 @@ let ``SMA200 present and valid``()
 [<Fact>]
 let ``SMA20 above SMA50``()
     = assertOutcomeExistsAndValueMatches (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA20Above50Bars) 210m
+    
+[<Fact>]
+let ``SMA50 above SMA200``()
+    = assertOutcomeExistsAndValueMatches (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars) 205m
 
 [<Fact>]
 let ``Price above 20SMA``()
-    = assertOutcomeExistsAndValueMatches (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMADays) 240m
+    = assertOutcomeExistsAndValueMatches (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMABars) 240m
     
 [<Fact>]
 let ``SMA20 above SMA50 positive``()

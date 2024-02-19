@@ -83,7 +83,7 @@ let ``SMA20 above SMA50 is negative and matches`` () =
     
 [<Fact>]
 let ``Price above SMA20 bars is positive and matches`` () =
-    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMADays |> should equal 1m
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMABars |> should equal 1m
 
 [<Fact>]
 let ``SMA50 above SMA200 bars is positive and matches`` () =

@@ -20,7 +20,8 @@ module SingleBarPriceAnalysis =
         let ClosingRange = "ClosingRange"
         let Open = "Open"
         let Close = "Close"
-        let SMA20Above50Days = "SMA20Above50Days"
+        let SMA20Above50Bars = "SMA20Above50Bars"
+        let SMA50Above200Bars = "SMA50Above200Bars"
         let GapPercentage = "GapPercentage"
         let NewHigh = "NewHigh"
         let NewLow = "NewLow"
@@ -31,30 +32,43 @@ module SingleBarPriceAnalysis =
         
         let outcomes =  bars |> SMAAnalysis.generate
         
-        let sma20Above50Outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Bars)
-        let sma20outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
-        let sma200outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(200))
-        let priceAbove20SMAOutcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.PriceAbove20SMADays)
+        let sma20Above50Outcome =
+            outcomes
+            |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Bars)
+            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA20Above50Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+            
+        let sma50Above200Outcome =
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA50Above200Bars)
+            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50Above200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+            
+        let sma20outcome =
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
+            |> Option.filter (fun o -> o.Value = 0m |> not)
+            |> Option.map (fun o ->
+                let currentBar = bars.Last        
+                let pctDiff = (currentBar.Close - o.Value) / o.Value
+                AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
+            )
+        let sma200outcome =
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(200))
+            |> Option.filter (fun o -> o.Value = 0m |> not)
+            |> Option.map (fun o ->
+                let currentBar = bars.Last        
+                let pctDiff = (currentBar.Close - o.Value) / o.Value
+                AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove200SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 200 day SMA")   
+            )
+            
+        let priceAbove20SMAOutcome =
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.PriceAbove20SMABars)
+            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMADays, o.OutcomeType, o.Value, o.ValueType, o.Message))
         
         [
-            if sma20Above50Outcome.IsSome then
-                AnalysisOutcome (SingleBarOutcomeKeys.SMA20Above50Days, sma20Above50Outcome.Value.OutcomeType, sma20Above50Outcome.Value.Value, sma20Above50Outcome.Value.ValueType, sma20Above50Outcome.Value.Message)
-                
-            if sma20outcome.IsSome && sma20outcome.Value.Value <> 0m then
-                let currentBar = bars.Last        
-                let pctDiff = (currentBar.Close - sma20outcome.Value.Value) / sma20outcome.Value.Value
-                
-                AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
-                
-            if sma200outcome.IsSome && sma200outcome.Value.Value <> 0m then
-                let currentBar = bars.Last        
-                let pctDiff = (currentBar.Close - sma200outcome.Value.Value) / sma200outcome.Value.Value
-                
-                AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove200SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 200 day SMA")
-                
-            if priceAbove20SMAOutcome.IsSome then
-                AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMADays, priceAbove20SMAOutcome.Value.OutcomeType, priceAbove20SMAOutcome.Value.Value, priceAbove20SMAOutcome.Value.ValueType, priceAbove20SMAOutcome.Value.Message)
-        ]
+            sma20Above50Outcome
+            sma50Above200Outcome
+            sma20outcome
+            sma200outcome
+            priceAbove20SMAOutcome
+        ] |> List.choose id
         
     let priceAnalysis (bars:PriceBars) =
         
@@ -320,8 +334,8 @@ module SingleBarPriceAnalysisEvaluation =
             AnalysisOutcomeEvaluation(
                 "SMA 20 below SMA 50",
                 OutcomeType.Neutral,
-                SingleBarOutcomeKeys.SMA20Above50Days,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Days && o.Value < 0m) ]
+                SingleBarOutcomeKeys.SMA20Above50Bars,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Bars && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
