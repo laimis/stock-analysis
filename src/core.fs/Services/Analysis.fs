@@ -97,7 +97,7 @@ type SMA(values,interval) =
                     
                 sma[i] <- Some (System.Math.Round(sum / decimal interval, 2))
         
-        SMA(sma, interval)        
+        SMA(sma, interval)
         
 type SMAContainer(all:SMA array) =
     

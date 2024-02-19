@@ -31,7 +31,7 @@ module SingleBarPriceAnalysis =
         
         let outcomes =  bars |> SMAAnalysis.generate
         
-        let sma20Above50Outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Days)
+        let sma20Above50Outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Bars)
         let sma20outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
         let sma200outcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(200))
         let priceAbove20SMAOutcome = outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.PriceAbove20SMADays)

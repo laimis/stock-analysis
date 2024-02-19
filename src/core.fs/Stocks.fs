@@ -219,7 +219,7 @@ module StockPosition =
             { p with StopPrice = None; Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionDeleted as _ ->
-           p // no op right now, not sure if I want to keep those around and marked as deleted but right now I am deleting them
+            p // no op right now, not sure if I want to keep those around and marked as deleted but right now I am deleting them
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     

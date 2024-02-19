@@ -19,7 +19,8 @@ module MultipleBarPriceAnalysis =
         let AverageVolume = "AverageVolume"
         let PercentBelowHigh = "PercentBelowHigh"
         let PercentAboveLow = "PercentAboveLow"
-        let SMA20Above50Days = "SMA20Above50Days"
+        let SMA20Above50Bars = "SMA20Above50Bars"
+        let SMA50Above200Bars = "SMA50Above200Bars"
         let PriceAbove20SMADays = "PriceAbove20SMADays"
         let CurrentPrice = "CurrentPrice"
         let PercentChangeAverage = "PercentChangeAverage"
@@ -61,7 +62,33 @@ module MultipleBarPriceAnalysis =
             ATRContainer(period, dataPoints)
                 
     module SMAAnalysis =
+            
+        let priceStreakDetection (sequenceA:decimal option array) (sequenceB:decimal option array) =
+            let sequence =
+                Array.zip sequenceA sequenceB
+                |> Array.filter (fun (a, b) -> a.IsSome && b.IsSome)
+                |> Array.map (fun (a, b) -> a.Value - b.Value)
+                |> Array.map (fun v -> v > 0m)
+                |> Array.rev
+                
+            let findIndexOrReturnLength func arr =
+                arr
+                |> Array.tryFindIndex func
+                |> Option.defaultWith (fun () -> arr.Length)
+                |> decimal
         
+            match sequence with
+            | [||] -> None
+            | _ ->
+                match sequence[0] with
+                | true ->
+                    OutcomeType.Positive,
+                    sequence |> findIndexOrReturnLength (fun v -> v = false)
+                | false ->
+                    OutcomeType.Negative,
+                    sequence |> findIndexOrReturnLength (fun v -> v = true) |> fun x -> x * -1m
+                |> Some    
+            
         let private generateSMAOutcomes (smaContainer: SMAContainer) =
             
             smaContainer.All
@@ -83,34 +110,13 @@ module MultipleBarPriceAnalysis =
             
         let private generatePriceAboveSMA20Outcome (bars:PriceBars) (container:SMAContainer) =
             
-            let closingPrices = bars.ClosingPrices()
+            let closingPrices = bars.ClosingPrices() |> Array.map (fun x -> x |> Some)
             
-            let priceAndSMA20 =
-                container.sma20.Values
-                |> Array.zip closingPrices
-                |> Array.filter (fun (_, sma20) -> sma20.IsSome)
-                |> Array.map (fun (price, sma20) -> (price, sma20.Value))
-                |> Array.map (fun (price, sma20) -> (price - sma20) > 0m)
-                |> Array.rev
-
-            let findIndexOrReturnLength func arr =
-                arr
-                |> Array.tryFindIndex func
-                |> Option.defaultWith (fun () -> arr.Length)
-                |> decimal
+            let outcomeTypeAndValueOption = priceStreakDetection closingPrices container.sma20.Values
                 
-            match priceAndSMA20 with
-            | [||] -> None
-            | _ ->
-                let outcomeType, value =
-                    match priceAndSMA20[0] with
-                    | true ->
-                        OutcomeType.Positive,
-                        priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = false)
-                    | false ->
-                        OutcomeType.Negative,
-                        priceAndSMA20 |> findIndexOrReturnLength (fun v -> v = true) |> fun x -> x * -1m
-                        
+            match outcomeTypeAndValueOption with
+            | None -> None
+            | Some (outcomeType, value) ->
                 AnalysisOutcome(
                     key = MultipleBarOutcomeKeys.PriceAbove20SMADays,
                     outcomeType = outcomeType,
@@ -121,51 +127,47 @@ module MultipleBarPriceAnalysis =
             
         let private generateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
             
-            let sma20Above50Sequence = 
-                smaContainer.sma50.Values
-                |> Array.zip smaContainer.sma20.Values 
-                |> Array.filter (fun (sma20, sma50) -> sma20.IsSome && sma50.IsSome)
-                |> Array.map (fun (sma20, sma50) -> (sma20.Value, sma50.Value))
-                |> Array.map (fun (sma20, sma50) -> (sma20 - sma50) > 0m)
-                |> Array.rev
-                
-            let findIndexOrReturnLength func arr =
-                arr
-                |> Array.tryFindIndex func
-                |> Option.defaultWith (fun () -> arr.Length)
-                |> decimal
-            
-            match sma20Above50Sequence with
-            | [||] -> None
-            | _ ->
-                let outcomeType, value =
-                    match sma20Above50Sequence[0] with
-                    | true ->
-                        OutcomeType.Positive,
-                        sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = false)
-                    | false ->
-                        OutcomeType.Negative,
-                        sma20Above50Sequence |> findIndexOrReturnLength (fun v -> v = true)
-                
+            let outcomeTypeAndValueOption = priceStreakDetection smaContainer.sma20.Values smaContainer.sma50.Values
+            match outcomeTypeAndValueOption with
+            | None -> None
+            | Some (outcomeType, value) ->
                 AnalysisOutcome(
-                    key = MultipleBarOutcomeKeys.SMA20Above50Days,
+                    key = MultipleBarOutcomeKeys.SMA20Above50Bars,
                     outcomeType = outcomeType,
                     value = value,
                     valueType = ValueFormat.Number,
-                    message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} days"
+                    message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} bars"
+                ) |> Some
+                
+        let private generateSMA50Above200DaysOutcome (smaContainer: SMAContainer) =
+                
+            let outcomeTypeAndvalueOption = priceStreakDetection smaContainer.sma50.Values smaContainer.sma200.Values
+            match outcomeTypeAndvalueOption with
+            | None -> None
+            | Some (outcomeType, value) ->
+                AnalysisOutcome(
+                    key = MultipleBarOutcomeKeys.SMA50Above200Bars,
+                    outcomeType = outcomeType,
+                    value = value,
+                    valueType = ValueFormat.Number,
+                    message = "SMA 50 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 200 for {value} bars"
                 ) |> Some
             
         let generate (prices: PriceBars) =
             
             let smaContainer =  prices |> SMAContainer.Generate
             
-            let sma20Over50Outcome = smaContainer |> generateSMA20Above50DaysOutcome
-            let priceOver20Outcome = smaContainer |> generatePriceAboveSMA20Outcome prices
+            let streakOutcomes =
+                [|
+                    smaContainer |> generatePriceAboveSMA20Outcome prices
+                    smaContainer |> generateSMA20Above50DaysOutcome
+                    smaContainer |> generateSMA50Above200DaysOutcome
+                |]
+                |> Array.choose id
             
             [
                 yield! smaContainer |> generateSMAOutcomes
-                if sma20Over50Outcome.IsSome then sma20Over50Outcome.Value
-                if priceOver20Outcome.IsSome then priceOver20Outcome.Value
+                yield! streakOutcomes
             ]
        
     module VolumeAnalysis =

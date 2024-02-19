@@ -76,3 +76,15 @@ let ``Average true range should be correct`` () =
 [<Fact>]
 let ``Green streak is positive`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.GreenStreak |> should equal 1
+    
+[<Fact>]
+let ``SMA20 above SMA50 is negative and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA20Above50Bars |> should equal -47m
+    
+[<Fact>]
+let ``Price above SMA20 bars is positive and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMADays |> should equal 1m
+
+[<Fact>]
+let ``SMA50 above SMA200 bars is positive and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars |> should equal -205m
