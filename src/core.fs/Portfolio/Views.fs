@@ -97,7 +97,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         
         let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
         let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.Vertical) |> Option.Some
-        let oneLineAnnotationHorizontal = ChartAnnotationLine(1, ChartAnnotationLineType.Horizontal) |> Option.Some
+        let twoLineAnnotationHorizontal = ChartAnnotationLine(2, ChartAnnotationLineType.Horizontal) |> Option.Some
         
         // go over each closed transaction and calculate number of wins for each window
         let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Line, zeroLineAnnotationHorizontal)
@@ -108,9 +108,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         let ev = ChartDataPointContainer<decimal>("EV", DataPointChartType.Line, ChartAnnotationLine(40, ChartAnnotationLineType.Horizontal) |> Option.Some)
         let avgWinAmount = ChartDataPointContainer<decimal>("Avg Win $", DataPointChartType.Line, ChartAnnotationLine(60, ChartAnnotationLineType.Horizontal) |> Option.Some)
         let avgLossAmount = ChartDataPointContainer<decimal>("Avg Loss $", DataPointChartType.Line, ChartAnnotationLine(-30, ChartAnnotationLineType.Horizontal) |> Option.Some)
-        let gainPctRatio = ChartDataPointContainer<decimal>("% Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal)
-        let profitRatio = ChartDataPointContainer<decimal>("$ Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal)
-        let rrRatio = ChartDataPointContainer<decimal>("RR Ratio", DataPointChartType.Line, oneLineAnnotationHorizontal)
+        let gainPctRatio = ChartDataPointContainer<decimal>("% Ratio", DataPointChartType.Line, twoLineAnnotationHorizontal)
+        let profitRatio = ChartDataPointContainer<decimal>("$ Ratio", DataPointChartType.Line, twoLineAnnotationHorizontal)
+        let rrRatio = ChartDataPointContainer<decimal>("RR Ratio", DataPointChartType.Line, twoLineAnnotationHorizontal)
         let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.Line)
         let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.Line)
         let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.Line)
