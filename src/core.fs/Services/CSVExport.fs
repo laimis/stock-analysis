@@ -88,6 +88,7 @@ module CSVExport =
             ReturnPct:string
             RR:string
             RiskedAmount:string
+            Strategy:string
             Grade:string
             GradeNote:string
         }
@@ -192,6 +193,7 @@ module CSVExport =
                     ReturnPct = t.GainPct.ToString(PERCENT_FORMAT, culture)
                     RR = t.RR.ToString(NUMBER_FORMAT, culture)
                     RiskedAmount = (if t.RiskedAmount.IsSome then t.RiskedAmount.Value.ToString(CURRENCY_FORMAT, culture) else "")
+                    Strategy= match t.TryGetLabelValue("strategy") with | true, v -> v | _ -> ""
                     Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
                     GradeNote = (if t.GradeNote.IsSome then t.GradeNote.Value else "")
                 }
