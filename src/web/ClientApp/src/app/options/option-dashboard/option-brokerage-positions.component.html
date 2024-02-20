@@ -34,7 +34,7 @@
             <td>{{option.marketValue | currency }}</td>
             <td>{{option.expirationDate | date}}</td>
             <td>
-              <input type="date" #purchaseDate class="form-control" />
+              <input type="date" #purchaseDate class="form-control" [valueAsDate]="getTodaysDate()" />
             </td>
             <td><button class="btn btn-primary" (click)="turnIntoPosition(option, purchaseDate.value)">Turn into Position</button></td>
           </tr>

@@ -19,9 +19,13 @@ export class OptionBrokeragePositionsComponent {
 
   @Output()
   positionsUpdated = new EventEmitter()
+    
+    getTodaysDate() {
+        return new Date()
+    }
 
   turnIntoPosition(position:BrokerageOptionPosition, purchased:string){
-      var opt = {
+      let opt = {
         ticker: position.ticker,
         strikePrice: position.strikePrice,
         optionType: position.optionType,
@@ -51,4 +55,6 @@ export class OptionBrokeragePositionsComponent {
         this.errors = GetErrors(err)
       })
     }
+
+    protected readonly Date = Date;
 }

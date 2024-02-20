@@ -25,7 +25,7 @@
   </div>
 }
 @if (loaded && isActive('open')) {
-  <app-option-open [openOptions]=optionsContainer.open (positionsUpdated)="refreshOptions()"></app-option-open>
+  <app-option-open [openOptions]=optionsContainer.open></app-option-open>
 }
 @if (loaded && isActive('brokerage')) {
   <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions" (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
