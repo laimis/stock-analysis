@@ -600,15 +600,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.CompletedPositionShares = completedPositionTransactions |> List.sumBy (_.NumberOfShares)
         
-    member this.LastBuyPrice =
-        match buys with
-        | [] -> 0m
-        | _ -> buys |> List.last |> _.Price
-        
-    member this.LastSellPrice =
-        match sells with
-        | [] -> 0m
-        | _ -> sells |> List.last |> _.Price
+    member this.ClosePrice =
+        match liquidationSlots with
+        | [] -> None
+        | _ -> liquidationSlots |> List.last |> Some
         
     member this.RR =
         match this.RiskedAmount with

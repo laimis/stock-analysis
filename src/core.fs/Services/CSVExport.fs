@@ -81,7 +81,8 @@ module CSVExport =
             Opened:string
             Closed:string
             DaysHeld:int
-            FirstBuyCost:string
+            AverageCostPerShare:string
+            LastSellCostPerShare:string
             Cost:string
             Profit:string
             ReturnPct:string
@@ -184,7 +185,8 @@ module CSVExport =
                     Opened = t.Opened.ToString(DATE_FORMAT, culture)
                     Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT, culture) else "")
                     DaysHeld = t.DaysHeld
-                    FirstBuyCost = t.CompletedPositionCostPerShare.ToString(CURRENCY_FORMAT, culture)
+                    AverageCostPerShare = t.CompletedPositionCostPerShare.ToString(CURRENCY_FORMAT, culture)
+                    LastSellCostPerShare = (if t.ClosePrice.IsSome then t.ClosePrice.Value.ToString(CURRENCY_FORMAT, culture) else "") 
                     Cost = t.Cost.ToString(CURRENCY_FORMAT, culture)
                     Profit = t.Profit.ToString(CURRENCY_FORMAT, culture)
                     ReturnPct = t.GainPct.ToString(PERCENT_FORMAT, culture)

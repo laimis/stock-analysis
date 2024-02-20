@@ -36,12 +36,8 @@ let shortPosition =
     |> StockPositionWithCalculations
     
 [<Fact>]
-let ``LastBuyPrice is accurate`` () =
-    position.LastBuyPrice |> should equal 35m
-
-[<Fact>]
-let ``LastSellPrice is accurate`` () =
-    position.LastSellPrice |> should equal 37m
+let ``ClosePrice is accurate`` () =
+    position.ClosePrice |> Option.get |> should equal 37m
 
 [<Fact>]
 let ``RR is accurate`` () =
@@ -69,12 +65,8 @@ let ``Risked amount is accurate`` () =
 
 // generate the same tests as above but for short position
 [<Fact>]
-let ``Short LastBuyPrice is accurate`` () =
-    shortPosition.LastBuyPrice |> should equal 30m
-    
-[<Fact>]
-let ``Short LastSellPrice is accurate`` () =
-    shortPosition.LastSellPrice |> should equal 37m
+let ``Short Close Price is accurate`` () =
+    shortPosition.ClosePrice |> Option.get |> should equal 30m
     
 [<Fact>]
 let ``Short GainPct is accurate`` () =
