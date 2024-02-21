@@ -89,10 +89,14 @@
               {{intrinsicValue(option) | currency}} / {{extrinsicValue(option) | currency}}
             </td>
             <td>
-              <div (click)="greeksDiv.style.display = 'block'"> <!-- this is from the API vs our own calculated intrinsic / extrinsic value, rendering for comparisons -->
+              <div #valueDiv> <!-- this is from the API vs our own calculated intrinsic / extrinsic value, rendering for comparisons -->
                 {{option.detail?.intrinsicValue | currency}} / {{option.detail?.timeValue | currency}}
+                  <span class="btn btn-link btn-sm float-end" (click)="toggleVisuallyHidden(greeksDiv); toggleVisuallyHidden(valueDiv)" role="button">Show Greeks</span>
               </div>
-              <div #greeksDiv style="display: none;" >greeks: delta {{option.detail?.delta}}, gamma {{option.detail?.gamma}}, theta {{option.detail?.theta}}, vega {{option.detail?.vega}}, rho {{option.detail?.rho}}</div>
+              <div #greeksDiv class="visually-hidden">
+                  <span class="small">greeks: delta {{option.detail?.delta}}, gamma {{option.detail?.gamma}}, theta {{option.detail?.theta}}, vega {{option.detail?.vega}}, rho {{option.detail?.rho}}</span>
+                  <span class="btn btn-link btn-sm float-end" (click)="toggleVisuallyHidden(greeksDiv); toggleVisuallyHidden(valueDiv)" role="button">Hide Greeks</span>
+              </div>
             </td>
           </tr>
         }

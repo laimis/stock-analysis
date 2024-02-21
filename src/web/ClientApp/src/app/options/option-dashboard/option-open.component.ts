@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { OwnedOption } from 'src/app/services/stocks.service';
+import {toggleVisuallyHidden} from "../../services/utils";
 
 @Component({
   selector: 'app-option-open',
@@ -65,4 +66,6 @@ export class OptionOpenComponent {
   extrinsicValue(option:OwnedOption) : number {
     return (option.detail?.ask + option.detail?.bid) / 2 - this.intrinsicValue(option)
   }
+
+    protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
 }
