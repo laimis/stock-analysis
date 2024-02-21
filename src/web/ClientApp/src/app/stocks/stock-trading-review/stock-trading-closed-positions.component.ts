@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { PositionInstance } from 'src/app/services/stocks.service';
 import {stockClosedPositionExportLink} from "../../services/links.service";
+import {GetStrategies} from "../../services/utils";
 
 
 @Component({
@@ -54,9 +55,17 @@ export class StockTradingClosedPositionsComponent {
         }
       )
       .filter((v, i, a) => v !== null && a.indexOf(v) === i) // unique
-      .sort()
       .forEach(s =>this.strategies.push(s))
-  }
+      
+        GetStrategies().forEach(
+            s => {
+                if (this.strategies.indexOf(s.key) === -1) {
+                    this.strategies.push(s.key)   
+                }
+            })
+      
+        this.strategies.sort()
+    }
 
   get positions(): PositionInstance[] {
     return this._positions
