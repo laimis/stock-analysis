@@ -43,6 +43,7 @@ export function toggleVisuallyHidden(element:HTMLElement) {
 export function GetStrategies(): { key: string, value: string }[] {
     return [
         { key: "10x", value: "10x" },
+        { key: "descendingchannelbreakthrough", value: "Descending Channel Breakthrough" },
         { key: "discretionary", value: "Discretionary" },
         { key: "channelbottom", value: "Channel Bottom" },
         { key: "leadingindustry", value: "Leading Industry" },
@@ -54,7 +55,6 @@ export function GetStrategies(): { key: string, value: string }[] {
         { key: "postearningsnewhigh", value: "Post Earnings New High" },
         { key: "recovery", value: "Recovery" },
         { key: "resistancebreakthrough", value: "Resistance Breakthrough" },
-        { key: "descendingchannelbreakthrough", value: "Descending Channel Breakthrough" },
         { key: "shortnewlow", value: "Short, New Low" },
         { key: "shortsuspectrunup", value: "Short, Suspect Runup" },
         { key: "shortweakindustry", value: "Short, Weak Industry" },
