@@ -29,10 +29,8 @@
     }
     </a>
     <a class="tab" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" (click)="activateTab('trade')">
-    Trade @if (options && options.length > 0) {
-    <span class="badge rounded-pill bg-info">{{ options.length }}</span>
-  }
-  </a>
+    Trade
+    </a>
   <a class="tab" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" (click)="activateTab('options')">
     Options @if (options && options.length > 0) {
     <span class="badge rounded-pill bg-info">{{ options.length }}</span>

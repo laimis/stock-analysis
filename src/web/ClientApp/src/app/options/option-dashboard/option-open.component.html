@@ -74,7 +74,10 @@
                 <span class="ml-1 badge bg-danger">expired</span>
               }
             </td>
-            <td>{{option.currentPrice | currency}}</td>
+            <td>
+                <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
+                {{option.currentPrice | currency}}
+            </td>
             <td class="text-start">
               <span class="badge bg-primary" [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{option.itmOtmLabel}}</span>
               {{option.strikePriceDiff | percent}}

@@ -185,15 +185,17 @@
             </div>
             }
         }
+        @if (_position.isOpen) {
         <div class="row mt-3">
             <div class="col">
                 @if (positionOrders.length > 0) {
                 <app-brokerage-orders [justOrders]="true" [orders]="positionOrders" [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId" (ordersChanged)="brokerageOrdersChanged.emit($event)"></app-brokerage-orders>
                 } @else {
-                    <span class="text-muted">No Orders</span>
+                    <span class="text-muted">No orders</span>
                 }
             </div>
         </div>
+        }
         <div class="row mt-3">
             <div class="col">
                 <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes
