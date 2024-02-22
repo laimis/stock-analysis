@@ -93,7 +93,8 @@ export class StockDetailsComponent implements OnInit {
   }
 
   brokerageOrderEntered(ticker:string) {
-    this.loadOrders()
+      this.loadStockOwnership()
+      this.loadOrders()
   }
 
   loadStockDetails() {
