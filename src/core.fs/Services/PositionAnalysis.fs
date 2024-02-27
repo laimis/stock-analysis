@@ -144,17 +144,6 @@ module PositionAnalysis =
             (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value < 14m)
         ]
         
-        let shortsAndStopAboveSMA20 = [
-            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value > 0.01m) // more than 1% above the 20SMA
-        ]
-        
-        let longsAndStopBelowSMA20 = [
-            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.StopDiffToSMA20Pct && o.Value < -0.01m) // more than 1% below the 20SMA
-        ]
-        
         let tickersAndTheirCosts =
             tickerOutcomes // we are only interested in this for positions that have stops set, and right now only longs
             |> TickerOutcomes.filter positionSizeUnbalancedFilter
@@ -223,18 +212,6 @@ module PositionAnalysis =
                     yield! positionSizeUnbalancedFilter
                     (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
                 ]
-            )
-            AnalysisOutcomeEvaluation(
-                "Shorts with stop above 20SMA",
-                OutcomeType.Negative,
-                PositionAnalysisKeys.StopDiffToSMA20Pct,
-                tickerOutcomes |> TickerOutcomes.filter shortsAndStopAboveSMA20
-            )
-            AnalysisOutcomeEvaluation(
-                "Longs with stop below 20SMA",
-                OutcomeType.Negative,
-                PositionAnalysisKeys.StopDiffToSMA20Pct,
-                tickerOutcomes |> TickerOutcomes.filter longsAndStopBelowSMA20
             )
         ]
 
