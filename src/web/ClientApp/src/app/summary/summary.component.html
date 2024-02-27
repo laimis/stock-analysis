@@ -57,22 +57,24 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Symbol</th>
-          <th># of Shares</th>
-          <th>Cost</th>
-          <th>Date</th>
+            <th style="width: 140px">Symbol</th>
+            <th style="width: 140px">Type</th>
+            <th style="width: 140px"># of Shares</th>
+            <th style="width: 140px">Cost</th>
+            <th>Date</th>
         </tr>
       </thead>
       <tbody>
         @for (p of result.openPositions; track p) {
           <tr>
-            <td style="width: 140px">
+            <td>
               <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
               <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
             </td>
-            <td style="width: 140px">{{p.completedPositionShares}}</td>
-            <td style="width: 140px">{{p.completedPositionCostPerShare * p.completedPositionShares  | number:'1.0-2'}}</td>
-            <td style="width: 140px">{{p.opened | date: 'MM/dd/yyyy'}}</td>
+              <td>{{p.isShort ? "SHORT" : "LONG"}}</td>
+            <td>{{p.completedPositionShares}}</td>
+            <td>{{p.completedPositionCostPerShare * p.completedPositionShares  | number:'1.0-2'}}</td>
+            <td>{{p.opened | date: 'MM/dd/yyyy'}}</td>
           </tr>
         }
         @if (result.openPositions.length === 0) {
@@ -88,20 +90,23 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Symbol</th>
-          <th>P/L</th>
-          <th>Date</th>
+            <th style="width: 140px">Symbol</th>
+            <th style="width: 140px">Number of Shares</th>
+            <th style="width: 140px">P/L</th>
+            <th style="width: 140px">Date</th>
+            <th style="width: 140px"></th>
         </tr>
       </thead>
       <tbody>
         @for (p of result.plStockTransactions; track p) {
           <tr>
-            <td style="width: 140px">
+            <td>
               <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
               <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
             </td>
-            <td style="width: 140px">{{p.profit  | currency}}</td>
-            <td style="width: 140px">{{p.date | date: 'MM/dd/yyyy'}}</td>
+              <td>{{p.numberOfShares}}</td>
+            <td>{{p.profit  | currency}}</td>
+            <td>{{p.date | date: 'MM/dd/yyyy'}}</td>
           </tr>
         }
         @if (result.plStockTransactions.length === 0) {
