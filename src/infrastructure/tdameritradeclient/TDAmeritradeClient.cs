@@ -28,7 +28,7 @@ public class TDAmeritradeClient : IBrokerage
     private readonly HttpClient _httpClient;
     
     private static readonly AsyncRetryPolicy _retryPolicy = Policy
-        .Handle<RateLimitRejectedException>()
+        .HandleInner<RateLimitRejectedException>()
         .WaitAndRetryAsync(
             retryCount: 3,
             sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
