@@ -26,11 +26,12 @@ public class TDAmeritradeClient : IBrokerage
     private const string AuthUrl = "https://auth.tdameritrade.com";
 
     private readonly HttpClient _httpClient;
+    
     private static readonly AsyncRetryPolicy _retryPolicy = Policy
         .Handle<RateLimitRejectedException>()
         .WaitAndRetryAsync(
             retryCount: 3,
-            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(retryAttempt * 2)
+            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
         );
 
     private static readonly AsyncRateLimitPolicy _rateLimit = Policy.RateLimitAsync(
@@ -43,7 +44,7 @@ public class TDAmeritradeClient : IBrokerage
     );
 
     private readonly AsyncPolicy _wrappedPolicy = Policy.WrapAsync(
-        _retryPolicy, _rateLimit, _timeoutPolicy
+        _rateLimit, _timeoutPolicy, _retryPolicy
     );
     
 
