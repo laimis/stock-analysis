@@ -34,6 +34,7 @@ module PositionAnalysis =
         let StrategyLabel = "StrategyLabel"
         let HasSellOrder = "HasSellOrder"
         let StopDiffToSMA20Pct = "StopDiffToSMA20Pct"
+        let StopDiffToCost = "StopDiffToCost"
         let SMA20Above50Bars = "SMA20Above50Bars"
         let SMA50Above200Bars = "SMA50Above200Bars"
         
@@ -94,6 +95,11 @@ module PositionAnalysis =
             | x when x = 0m -> 0.0m
             | _ -> (stopLoss - sma20) / sma20
             
+        let stopDiffToCost =
+            match position.StopPrice with
+            | None -> 0m
+            | Some stopLoss -> (stopLoss - position.AverageCostPerShare) / position.AverageCostPerShare
+            
         let sma20over50 = multipleBarOutcomes |> Seq.tryFind (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA20Above50Bars) |> Option.map _.Value |> Option.defaultValue 0m
         let sma50over200 = multipleBarOutcomes |> Seq.tryFind (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars) |> Option.map _.Value |> Option.defaultValue 0m
         
@@ -112,6 +118,7 @@ module PositionAnalysis =
             AnalysisOutcome(PositionAnalysisKeys.DaysSinceLastTransaction, OutcomeType.Neutral, position.DaysSinceLastTransaction, ValueFormat.Number, $"Last transaction was {position.DaysSinceLastTransaction} days ago")
             AnalysisOutcome(PositionAnalysisKeys.PositionSize, OutcomeType.Neutral, position.Cost, ValueFormat.Currency, $"Position size is {position.Cost}")
             AnalysisOutcome(PositionAnalysisKeys.StopDiffToSMA20Pct, OutcomeType.Neutral, stopDiffToSMA20Pct, ValueFormat.Percentage, $"Stop diff to SMA20 is {stopDiffToSMA20Pct:P}")
+            AnalysisOutcome(PositionAnalysisKeys.StopDiffToCost, OutcomeType.Neutral, stopDiffToCost, ValueFormat.Percentage, $"Stop diff to cost is {stopDiffToCost:P}")
             AnalysisOutcome(PositionAnalysisKeys.StrategyLabel, OutcomeType.Negative, (if position.ContainsLabel("strategy") then 1 else 0), ValueFormat.Boolean, $"Missing strategy label")
             AnalysisOutcome(PositionAnalysisKeys.HasSellOrder, OutcomeType.Neutral, (if hasSellOrderInOrders then 1 else 0), ValueFormat.Boolean, $"Has sell order")
             AnalysisOutcome(PositionAnalysisKeys.MaxGain, OutcomeType.Neutral, gain, ValueFormat.Percentage, $"Max gain is {gain:P}")
@@ -129,6 +136,7 @@ module PositionAnalysis =
         let percentToStopThreshold = -0.02m
         let recentlyOpenThreshold = TimeSpan.FromDays(5)
         let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
+        let gainPctThreshold = 0.07m
         
         let withRiskAmountFilters = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
@@ -245,6 +253,34 @@ module PositionAnalysis =
                 PositionAnalysisKeys.SMA20Above50Bars,
                 tickerOutcomes |> TickerOutcomes.filter [
                     yield! longsInDowntrendFilter
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Avoid Sells",
+                OutcomeType.Neutral,
+                PositionAnalysisKeys.DaysHeld,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value <= decimal recentlyOpenThreshold.TotalDays)
+                    (fun o -> o.Key = PositionAnalysisKeys.UnrealizedGain && o.Value > 0m)
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Recent but negative profit",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.UnrealizedProfit,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value <= decimal withinTwoWeeksThreshold.TotalDays)
+                    (fun o -> o.Key = PositionAnalysisKeys.UnrealizedProfit && o.Value < 0m)
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Consider moving stop to cost",
+                OutcomeType.Positive,
+                PositionAnalysisKeys.StopLoss,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
+                    (fun o -> o.Key = PositionAnalysisKeys.UnrealizedGain && o.Value > gainPctThreshold)
+                    (fun o -> o.Key = PositionAnalysisKeys.StopDiffToCost && o.Value < 0m)
                 ]
             )
         ]
