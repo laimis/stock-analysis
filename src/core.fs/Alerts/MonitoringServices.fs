@@ -71,6 +71,7 @@ let private _patternMonitorTimes = [
     TimeOnly.Parse("13:05")
     TimeOnly.Parse("14:35")
     TimeOnly.Parse("15:45")
+    TimeOnly.Parse("16:15")
 ]
 let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
     let easternTime = marketHours.ToMarketTime(referenceTimeUtc)
@@ -546,7 +547,7 @@ type AlertEmailService(accounts:IAccountStorage,
     let emailTimes =
         [
             TimeOnly.Parse("09:50")
-            TimeOnly.Parse("15:50")
+            TimeOnly.Parse("16:20")
         ]
 
     let sendAlerts recipient alerts =
