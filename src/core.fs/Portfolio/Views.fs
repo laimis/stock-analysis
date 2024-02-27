@@ -37,10 +37,7 @@ type StockViolationView =
 // TODO: this view class is very busy, doing all kinds of stuff. Maybe a service
 // should do this and this type would just contain data...
 type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculations array) =
-    
-    do
-        printfn "Creating TradingPerformanceContainerView"
-        
+     
     // feels a bit hacky, but the expectation is that the positions will always be sorted
     // from the most recent to the oldest. And for performance trends we want window by
     // date from oldest to most recent
@@ -289,7 +286,6 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
     let oneYear = closedPositions |> timeBasedSlice (DateTimeOffset.UtcNow.AddYears(-1)) DateTimeOffset.UtcNow
     
     let yearByYear =
-        printfn "Generating year by year"
         closedPositions
         |> Array.map (fun p -> p.Closed.Value.Year)
         |> Array.distinct
@@ -301,8 +297,6 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         )
             
     let trends =
-        let sw = System.Diagnostics.Stopwatch.StartNew()
-        printfn "Generating trends"
         let trends =
             [
                 generateTrends "Last 20" last20
@@ -314,13 +308,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 yield! yearByYear |> Array.map (fun (year, trades) -> generateTrends $"%d{year}" trades)
                 // generateTrends "All" closedPositions
             ]
-        sw.Stop()
-        printfn "Generating trends took %d ms" sw.ElapsedMilliseconds
         trends
         
     let performances =
-        let sw = System.Diagnostics.Stopwatch.StartNew()
-        printfn "Generating performances"
         let performances =
             [
                 last20 |> TradingPerformance.Create "Last 20"
@@ -332,8 +322,6 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 yield! yearByYear |> Array.map (fun (year, trades) -> trades |> TradingPerformance.Create $"%d{year}")
                 closedPositions |> TradingPerformance.Create "All"
             ]
-        sw.Stop()
-        printfn "Generating performances took %d ms" sw.ElapsedMilliseconds
         performances
         
     member _.Performances = performances    

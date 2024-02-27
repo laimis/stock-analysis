@@ -410,6 +410,11 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         |> List.choose id
         |> List.partition (fun x -> x.Type = Sell)
         
+    let riskAmounts =
+        stockPosition.Transactions
+        |> List.map (fun x -> match x with | Risk s -> Some s | _ -> None)
+        |> List.choose id
+        
     let buySlots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     
@@ -584,6 +589,8 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.PLTransactions = plTransactions
         
     member this.RiskedAmount = stockPosition.RiskAmount
+    
+    member this.InitialRiskedAmount = riskAmounts |> List.tryHead |> Option.map _.RiskAmount
     
     member this.FirstBuyPrice =
         match buys with
