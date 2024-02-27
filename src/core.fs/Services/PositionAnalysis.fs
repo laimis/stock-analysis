@@ -34,6 +34,9 @@ module PositionAnalysis =
         let StrategyLabel = "StrategyLabel"
         let HasSellOrder = "HasSellOrder"
         let StopDiffToSMA20Pct = "StopDiffToSMA20Pct"
+        let SMA20Above50Bars = "SMA20Above50Bars"
+        let SMA50Above200Bars = "SMA50Above200Bars"
+        
 
     let generate (position:StockPositionWithCalculations) (bars:PriceBars) orders =
         
@@ -90,6 +93,9 @@ module PositionAnalysis =
             match sma20 with
             | x when x = 0m -> 0.0m
             | _ -> (stopLoss - sma20) / sma20
+            
+        let sma20over50 = multipleBarOutcomes |> Seq.tryFind (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA20Above50Bars) |> Option.map _.Value |> Option.defaultValue 0m
+        let sma50over200 = multipleBarOutcomes |> Seq.tryFind (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars) |> Option.map _.Value |> Option.defaultValue 0m
         
         [
             AnalysisOutcome(PositionAnalysisKeys.Price, OutcomeType.Neutral, bars.Last.Close, ValueFormat.Currency, $"Price: {bars.Last.Close:C2}")
@@ -114,6 +120,8 @@ module PositionAnalysis =
             AnalysisOutcome(PositionAnalysisKeys.MaxGainLast10, OutcomeType.Neutral, last10Gain, ValueFormat.Percentage, $"Max gain in last 10 bars is {last10Gain:P}")
             AnalysisOutcome(PositionAnalysisKeys.MaxDrawdownLast10, OutcomeType.Neutral, last10Drawdown, ValueFormat.Percentage, $"Max drawdown in last 10 bars is {last10Drawdown:P}")
             AnalysisOutcome(PositionAnalysisKeys.GainDiffLast10, (if last10MaxGainDrawdownDiff >= 0.0m then OutcomeType.Positive else OutcomeType.Negative), last10MaxGainDrawdownDiff, ValueFormat.Percentage, $"Max gain drawdown diff in last 10 bars is {last10MaxGainDrawdownDiff:P}")
+            AnalysisOutcome(PositionAnalysisKeys.SMA20Above50Bars, OutcomeType.Neutral, sma20over50, ValueFormat.Number, $"SMA20 over 50 bars: {sma20over50}")
+            AnalysisOutcome(PositionAnalysisKeys.SMA50Above200Bars, OutcomeType.Neutral, sma50over200, ValueFormat.Number, $"SMA50 over 200 bars: {sma50over200}")
         ]
         
     let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
@@ -142,6 +150,16 @@ module PositionAnalysis =
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value < 14m)
+        ]
+        
+        let shortsInUptrendFilter = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.SMA20Above50Bars && o.Value > 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
+        ]
+        
+        let longsInDowntrendFilter = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.SMA20Above50Bars && o.Value < 0.0m)
+            (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
         ]
         
         let tickersAndTheirCosts =
@@ -211,6 +229,22 @@ module PositionAnalysis =
                 tickerOutcomes |> TickerOutcomes.filter [
                     yield! positionSizeUnbalancedFilter
                     (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Shorts in Uptrend",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.SMA20Above50Bars,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    yield! shortsInUptrendFilter
+                ]
+            )
+            AnalysisOutcomeEvaluation(
+                "Longs in Downtrend",
+                OutcomeType.Negative,
+                PositionAnalysisKeys.SMA20Above50Bars,
+                tickerOutcomes |> TickerOutcomes.filter [
+                    yield! longsInDowntrendFilter
                 ]
             )
         ]
