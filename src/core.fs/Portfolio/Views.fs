@@ -95,10 +95,12 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         let zeroLineAnnotationHorizontal = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
         let zeroLineAnnotationVertical = ChartAnnotationLine(0, ChartAnnotationLineType.Vertical) |> Option.Some
         let twoLineAnnotationHorizontal = ChartAnnotationLine(2, ChartAnnotationLineType.Horizontal) |> Option.Some
+        let tradeInterval = 10
         
         // go over each closed transaction and calculate number of wins for each window
         let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Line, zeroLineAnnotationHorizontal)
         let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.Line, zeroLineAnnotationHorizontal)
+        let profitsFixedNumberOfTrades = ChartDataPointContainer<decimal>($"Profits (last {tradeInterval} trades)", DataPointChartType.Line, zeroLineAnnotationHorizontal)
         let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.Line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.Horizontal) |> Option.Some)
         let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.Line, ChartAnnotationLine(0.12m, ChartAnnotationLineType.Horizontal) |> Option.Some)
         let avgLossPct = ChartDataPointContainer<decimal>("Avg Loss %", DataPointChartType.Line, ChartAnnotationLine(-0.07m, ChartAnnotationLineType.Horizontal) |> Option.Some)
@@ -111,7 +113,8 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         let maxWin = ChartDataPointContainer<decimal>("Max Win $", DataPointChartType.Line)
         let maxLoss = ChartDataPointContainer<decimal>("Max Loss $", DataPointChartType.Line)
         let rrSum = ChartDataPointContainer<decimal>("RR Sum", DataPointChartType.Line)
-        let rrAverage = ChartDataPointContainer<decimal>("RR Average", DataPointChartType.Line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.Horizontal) |> Option.Some)
+        let rrAverage = ChartDataPointContainer<decimal>("RR Average", DataPointChartType.Line, zeroLineAnnotationHorizontal)
+        let rrMovingAverage = ChartDataPointContainer<decimal>($"RR Moving Average ({tradeInterval} trades)", DataPointChartType.Line, zeroLineAnnotationHorizontal)
         let invested = ChartDataPointContainer<decimal>("Invested", DataPointChartType.Line)
         let tradeCount = ChartDataPointContainer<decimal>("Trade Count", DataPointChartType.Line)
         let positionsClosedByDateContainer = ChartDataPointContainer<decimal>("Positions Closed", DataPointChartType.Column)
@@ -164,6 +167,19 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (_.Profit))
             
             equityCurve.Add(start, equity)
+        )
+        
+        // moving average of RR using fixed number of trades instead of date
+        trades
+        |> Array.windowed tradeInterval
+        |> Array.iter (fun window ->
+            let date = window |> Array.last |> _.Closed.Value
+            
+            let avg = window |> Array.averageBy _.RR
+            rrMovingAverage.Add(date,avg)
+            
+            let profit = window |> Array.sumBy _.Profit
+            profitsFixedNumberOfTrades.Add(date, profit)
         )
         
         let aGrades, bGrades, cGrades =
@@ -228,8 +244,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         trades |> Seq.sortBy _.Profit |> Seq.iteri (fun i p -> profitByIndex.Add(i.ToString(), p.Profit))
         
         [
-            profits
             equityCurve
+            profits
+            profitsFixedNumberOfTrades
             gradeContainer
             gainDistribution
             gainPctDistribution
@@ -246,6 +263,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             rrRatio
             rrSum
             rrAverage
+            rrMovingAverage
             invested
             maxWin
             maxLoss
