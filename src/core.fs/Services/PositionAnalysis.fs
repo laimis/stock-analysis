@@ -261,7 +261,7 @@ module PositionAnalysis =
                 PositionAnalysisKeys.DaysHeld,
                 tickerOutcomes |> TickerOutcomes.filter [
                     (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value <= decimal recentlyOpenThreshold.TotalDays)
-                    (fun o -> o.Key = PositionAnalysisKeys.UnrealizedGain && o.Value > 0m)
+                    (fun o -> o.Key = PositionAnalysisKeys.UnrealizedProfit && o.Value > 0m)
                 ]
             )
             AnalysisOutcomeEvaluation(
