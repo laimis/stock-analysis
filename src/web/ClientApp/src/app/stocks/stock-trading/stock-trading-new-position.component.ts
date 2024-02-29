@@ -249,9 +249,13 @@ export class StockTradingNewPositionComponent {
       return
     }
 
-    let singleShareLoss = this.price - this.sizeStopPrice
-    this.numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
-
+    // right now we don't have a toggle for short or long, so we determine that
+      // based on sizeStopPrice, if it's above price, then it's a short
+    let singleShareLoss = this.sizeStopPrice > this.price ? this.sizeStopPrice - this.price : this.price - this.sizeStopPrice
+      let numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
+      
+    this.numberOfShares = this.sizeStopPrice > this.price ? -numberOfShares : numberOfShares
+      
     this.updateBuyingValues(singleShareLoss)
   }
 
