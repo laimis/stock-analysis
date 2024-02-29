@@ -1,6 +1,14 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import {ChartMarker, PositionChartInformation, PriceBar, SMA, StockTransaction} from 'src/app/services/stocks.service';
-import {IChartApi, PriceLineOptions, createChart, SeriesMarker, Time, PriceScaleMode} from 'lightweight-charts';
+import {
+    IChartApi,
+    PriceLineOptions,
+    createChart,
+    SeriesMarker,
+    Time,
+    PriceScaleMode,
+    CrosshairMode
+} from 'lightweight-charts';
 
 const numberOfVisibleBars = 60
 
@@ -94,6 +102,9 @@ export class CandlestickChartComponent implements OnDestroy {
           height: this.chartHeight,
           rightPriceScale: {
               mode: PriceScaleMode.Logarithmic
+          },
+          crosshair: {
+              mode: CrosshairMode.Normal
           }
       }
     );
