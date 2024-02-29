@@ -39,11 +39,11 @@
           </div>
         }
       </a>
-        <a class="tab float-end" [routerLink]="" (click)="toggleVisuallyHidden(filterDiv)">
-          Filter
+        <a class="tab float-end" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)">
+          Settings
         </a>
     </div>
-      <div class="row" #filterDiv>
+      <div class="row" #settingsDiv>
           <div class="col">
               <a class="btn btn-link me-1" [href]="getOpenPositionExportLink()">Export</a>
           </div>
@@ -74,7 +74,7 @@
       </div>
   }
   @if (isActive('positions') && positions) {
-    <app-stock-trading-positions [positions]=sortedPositions [metricFunc]="metricFunc" [orders]="brokerageAccount.orders" [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
+    <app-stock-trading-positions [positions]=sortedPositions [metricFunc]="metricFunc" [metricType]="metricType" [orders]="brokerageAccount.orders" [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
   }
   @if (isActive('openreview')) {
     <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=sortedPositions [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-review>

@@ -5,16 +5,27 @@ import {
     PositionInstance,
     StockQuote
 } from '../../services/stocks.service';
+import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 
 
 @Component({
     selector: 'app-stock-trading-positions',
     templateUrl: './stock-trading-positions.component.html',
-    styleUrls: ['./stock-trading-positions.component.css']
+    styleUrls: ['./stock-trading-positions.component.css'],
+    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
 })
 export class StockTradingPositionsComponent {
+    
+    constructor(
+        private percentPipe: PercentPipe,
+        private currencyPipe: CurrencyPipe,
+        private decimalPipe: DecimalPipe) {
+    }
     @Input()
     metricFunc: (p: PositionInstance) => any;
+    
+    @Input()
+    metricType: OutcomeValueTypeEnum;
 
     @Input()
     positions: PositionInstance[]
@@ -48,6 +59,22 @@ export class StockTradingPositionsComponent {
             return this.quotes[p.ticker]?.price
         }
         return 0
+    }
+
+    getMetricToRender(val:number) {
+        if (Number.isFinite(val)) {
+            val = Math.round(val * 100) / 100
+        }
+
+        if (this.metricType === OutcomeValueTypeEnum.Percentage) {
+            return this.percentPipe.transform(val, '1.0-2')
+        } else if (this.metricType === OutcomeValueTypeEnum.Currency) {
+            return this.currencyPipe.transform(val)
+        } else if (this.metricType === OutcomeValueTypeEnum.String) {
+            return val
+        } else {
+            return this.decimalPipe.transform(val)
+        }
     }
 }
 

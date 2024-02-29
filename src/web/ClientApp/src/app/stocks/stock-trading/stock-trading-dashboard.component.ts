@@ -15,8 +15,7 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 @Component({
     selector: 'app-stock-trading-dashboard',
     templateUrl: './stock-trading-dashboard.component.html',
-    styleUrls: ['./stock-trading-dashboard.component.css'],
-    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
+    styleUrls: ['./stock-trading-dashboard.component.css']
 })
 export class StockTradingDashboardComponent implements OnInit {
     positions: PositionInstance[]
@@ -63,10 +62,7 @@ export class StockTradingDashboardComponent implements OnInit {
     constructor(
         private stockService: StockPositionsService,
         private title: Title,
-        private route: ActivatedRoute,
-        private percentPipe: PercentPipe,
-        private currencyPipe: CurrencyPipe,
-        private decimalPipe: DecimalPipe
+        private route: ActivatedRoute
     ) {
     }
 
@@ -280,23 +276,6 @@ export class StockTradingDashboardComponent implements OnInit {
                 }
                 return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
             })
-    }
-    
-    getMetricToRender(p: PositionInstance) {
-        let val = this.metricFunc(p)
-        if (Number.isFinite(val)) {
-            val = Math.round(val * 100) / 100
-        }
-
-        if (this.metricType === OutcomeValueTypeEnum.Percentage) {
-            return this.percentPipe.transform(val, '1.0-2')
-        } else if (this.metricType === OutcomeValueTypeEnum.Currency) {
-            return this.currencyPipe.transform(val)
-        } else if (this.metricType === OutcomeValueTypeEnum.String) {
-            return val
-        } else {
-            return this.decimalPipe.transform(val)
-        }
     }
 
 
