@@ -39,13 +39,45 @@
           </div>
         }
       </a>
+        <a class="tab float-end" [routerLink]="" (click)="toggleVisuallyHidden(filterDiv)">
+          Filter
+        </a>
     </div>
+      <div class="row" #filterDiv>
+          <div class="col">
+              <a class="btn btn-link me-1" [href]="getOpenPositionExportLink()">Export</a>
+          </div>
+          <div class="col">
+              <div class="row">
+                  <label for="strategyToFilter" class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
+                  <div class="col-sm-10">
+                      <select class="form-select" name="strategyToFilter" id="strategyToFilter" (change)="strategyToFilterChanged($event.target)">
+                          @for (so of strategies; track so) {
+                              <option value="{{so.key}}" [selected]="so.key === strategyToFilter">{{so.value}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+          </div>
+          <div class="col">
+              <div class="row">
+                  <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
+                  <div class="col-sm-10">
+                      <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target['value'])">
+                          @for (so of sortOptions; track so.value) {
+                              <option value="{{so.value}}" [selected]="so.value === metricToRender">{{so.name}}</option>
+                          }
+                      </select>
+                  </div>
+              </div>
+          </div>
+      </div>
   }
   @if (isActive('positions') && positions) {
-    <app-stock-trading-positions [positions]=positions [orders]="brokerageAccount.orders" [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
+    <app-stock-trading-positions [positions]=sortedPositions [metricFunc]="metricFunc" [orders]="brokerageAccount.orders" [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
   }
   @if (isActive('openreview')) {
-    <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=positions [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-review>
+    <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=sortedPositions [quotes]="quotes" (brokerageOrdersChanged)="refresh()"></app-stock-trading-review>
   }
   @if (isActive('violations')) {
     <app-stock-violations

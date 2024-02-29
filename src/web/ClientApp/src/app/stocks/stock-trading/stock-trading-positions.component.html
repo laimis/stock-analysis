@@ -1,39 +1,6 @@
 <div>
-  <div class="row">
-    <div class="col">
-      <div class="row">
-        <div class="col"><a class="btn btn-link me-1" [href]="getOpenPositionExportLink()">Export</a></div>
-        <div class="col"><button class="btn btn-link me-1" (click)="toggleRenderStyle()">{{renderStyleName}}</button></div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="row">
-        <label for="strategyToFilter" class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
-        <div class="col-sm-10">
-          <select class="form-select" name="strategyToFilter" id="strategyToFilter" (change)="strategyToFilterChanged($event.target)">
-            @for (so of strategies; track so) {
-              <option value="{{so.key}}" [selected]="so.key === strategyToFilter">{{so.value}}</option>
-            }
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="row">
-        <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
-        <div class="col-sm-10">
-          <select class="form-select" name="metricToRender" id="metricToRender" (change)="metricChanged($event.target['value'])">
-            @for (so of sortOptions; track so.value) {
-              <option value="{{so.value}}" [selected]="so.value === metricToRender">{{so.name}}</option>
-            }
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-  @if (renderStyle === 'card') {
     <div>
-      @for (position of sortedPositions; track position.ticker) {
+      @for (position of positions; track position.ticker) {
         <div class="card border-info mt-4">
           <div class="card-body">
             <div class="card-title">
@@ -49,7 +16,7 @@
                   <div class="col text-center">
                   </div>
                   <div class="col">
-                    <span class="position-gain float-end">{{ getMetricToRender(position) }}</span>
+                    <span class="position-gain float-end"> {{metricFunc(position)}} </span>
                   </div>
                 </div>
               </div>
@@ -72,45 +39,5 @@
         </div>
       }
     </div>
-  }
-  @if (renderStyle === 'table') {
-    <div>
-      <table class="table table-hover striped">
-        <thead>
-          <tr>
-            <th>Ticker</th>
-            <th>Price</th>
-            <th>Cost/Share</th>
-            <th>Stop</th>
-            <th>Cost</th>
-            <th>Shares</th>
-            <th>P/L</th>
-            <th>Risked</th>
-            <th>R/R</th>
-            <th>Opened</th>
-            <th>Last tx Age</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (position of sortedPositions; track position) {
-            <tr>
-              <td>
-                <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
-              </td>
-              <td>{{getPrice(position) | currency}}</td>
-              <td>{{position.averageCostPerShare | currency}}</td>
-              <td>{{position.stopPrice | currency}}</td>
-              <td>{{position.cost | currency}}</td>
-              <td>{{position.numberOfShares}}</td>
-              <td>{{position.profit}}</td>
-              <td>{{position.riskedAmount | currency}}</td>
-              <td>{{position.rr | number}}</td>
-              <td>{{position.opened | date}}</td>
-              <td>{{position.daysSinceLastTransaction}}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+  
 </div>
