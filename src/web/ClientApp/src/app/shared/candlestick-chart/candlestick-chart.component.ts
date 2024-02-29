@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import {ChartMarker, PositionChartInformation, PriceBar, SMA, StockTransaction} from 'src/app/services/stocks.service';
-import {IChartApi, PriceLineOptions, createChart, SeriesMarker, Time} from 'lightweight-charts';
+import {IChartApi, PriceLineOptions, createChart, SeriesMarker, Time, PriceScaleMode} from 'lightweight-charts';
 
 const numberOfVisibleBars = 60
 
@@ -90,7 +90,12 @@ export class CandlestickChartComponent implements OnDestroy {
 
     this.chart = createChart(
       document.getElementById("chart"),
-      { height: this.chartHeight }
+      { 
+          height: this.chartHeight,
+          rightPriceScale: {
+              mode: PriceScaleMode.Logarithmic
+          }
+      }
     );
 
     const barSeries = this.chart.addCandlestickSeries();

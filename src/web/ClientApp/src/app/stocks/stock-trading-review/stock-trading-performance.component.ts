@@ -26,9 +26,9 @@ export class StockTradingPerformanceComponent {
 
   trends:DataPointContainer[]
 
-  performanceTradePeriod = "Last 20"
+  performanceTradePeriod = "1 Year"
   performanceSelection:StockTradingPerformance
-  performanceTitle = "Last 20"
+  performanceTitle = "1 Year"
   selectPerformanceToRenderBasedOnTradePeriodFilter() {
     let index = this.performance.performances.findIndex(p => p.name == this.performanceTradePeriod)
     this.performanceSelection = this.performance.performances[index]
