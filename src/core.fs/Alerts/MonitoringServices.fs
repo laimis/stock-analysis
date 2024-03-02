@@ -33,7 +33,7 @@ type private StopLossCheck = {
 }
 
 type private WeeklyUpsideCheckResult =
-    | Success of Ticker * Pattern option
+    | Success of Ticker * Pattern list
     | Failure of Ticker
 
 let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
@@ -425,7 +425,13 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
                 logger.LogError($"Weekly job could not get price history for {ticker}: {err.Message}")
                 WeeklyUpsideCheckResult.Failure ticker
             | Ok bars ->
-                WeeklyUpsideCheckResult.Success (ticker, PatternDetection.upsideReversal(bars))
+                let patterns =
+                    [
+                        PatternDetection.upsideReversal(bars)
+                        PatternDetection.downsideReversal(bars)
+                    ]
+                    |> List.choose id
+                (ticker, patterns) |> WeeklyUpsideCheckResult.Success
     }
 
     let runCheckForUser (logger:ILogger) (cancellationToken:CancellationToken) (user:UserState) (tickers: HashSet<Ticker>) = async {
@@ -443,10 +449,13 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
         let failed = work |> Seq.choose (function WeeklyUpsideCheckResult.Failure x -> Some x | _ -> None) |> Seq.toList
 
         logger.LogInformation($"Weekly upside reversal check for {user.Id} successfully checked {succeeded.Length} tickers, and failed for {failed.Length} tickers")
-
+        
         succeeded
-        |> Seq.filter (fun (_, p) -> p.IsSome)
-        |> Seq.map (fun (ticker, p) -> TriggeredAlert.PatternAlert p.Value ticker "Watchlist" DateTimeOffset.UtcNow (user.Id |> UserId))
+        |> List.map (fun (ticker, patterns) ->
+            patterns
+            |> List.map (fun p -> TriggeredAlert.PatternAlert p ticker "Watchlist" DateTimeOffset.UtcNow (user.Id |> UserId))
+        )
+        |> List.concat
         |> weeklyUpsidesDiscovered[user].AddRange
 
         let removed = succeeded |> Seq.map fst |> Seq.map tickers.Remove |> Seq.map (fun b -> if b then 1 else 0) |> Seq.sum
@@ -476,7 +485,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
 
                 do!
                     pair.Value
-                    |> generateEmailDataPayloadForAlertsWithGroupingFunction marketHours (fun _ -> "Weekly Upside Reversal")
+                    |> generateEmailDataPayloadForAlertsWithGroupingFunction marketHours (fun a -> "Weekly " + a.identifier)
                     |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
                     |> Async.AwaitTask
             })
