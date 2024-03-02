@@ -217,6 +217,8 @@ export class StockTradingDashboardComponent implements OnInit {
                 this.metricFunc = (p: PositionInstance) => p.rr
                 this.metricType = OutcomeValueTypeEnum.Number
         }
+        
+        this.updatePositions()
     }
 
 
