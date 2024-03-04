@@ -13,8 +13,7 @@ public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILog
 {
     // ReSharper disable once InconsistentNaming
     protected abstract DateTimeOffset GetNextRunDateTime(DateTimeOffset referenceTime);
-    protected core.fs.Adapters.Logging.ILogger baseLogger => logger;
-
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // warm up sleep duration, generate random seconds from 5 to 10 seconds
