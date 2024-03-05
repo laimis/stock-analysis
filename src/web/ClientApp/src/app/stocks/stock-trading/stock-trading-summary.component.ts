@@ -84,6 +84,36 @@ export class StockTradingSummaryComponent {
     this.positionGroups.sort(adjustedFunc)
   }
 
+    private brokerageSortColumn: string = 'ticker'
+    private brokerageSortDirection: string = 'asc'
+    sortBrokerageTable(column:string) {
+        if (this.brokerageSortColumn == column) {
+            this.brokerageSortDirection = this.brokerageSortDirection == 'asc' ? 'desc' : 'asc'
+        } else {
+            this.brokerageSortColumn = column
+            this.brokerageSortDirection = 'asc'
+        }
+
+        this.brokerageAccount.stockPositions.sort((a, b) => {
+            if (this.brokerageSortColumn === 'total') {
+                const aTotal = a.quantity * a.averageCost;
+                const bTotal = b.quantity * b.averageCost;
+
+                if (this.brokerageSortDirection == 'asc') {
+                    return aTotal > bTotal ? 1 : -1
+                } else {
+                    return aTotal < bTotal ? 1 : -1
+                }
+            } else {
+                if (this.brokerageSortDirection == 'asc') {
+                    return a[this.brokerageSortColumn] > b[this.brokerageSortColumn] ? 1 : -1
+                } else {
+                    return a[this.brokerageSortColumn] < b[this.brokerageSortColumn] ? 1 : -1
+                }
+            }
+        })
+    }
+
   breakdownByStrategy(positions:PositionInstance[]) : PositionGroup[] {
     console.log("breaking down positions")
 

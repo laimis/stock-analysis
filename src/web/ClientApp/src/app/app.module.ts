@@ -95,7 +95,6 @@ import {StockSearchComponent} from "./stocks/stock-search/stock-search.component
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
-import {BrokerageAccountComponent} from "./brokerage/brokerage-account.component";
 import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
 
 
@@ -223,7 +222,6 @@ let routes: Routes = [
 
     BrokerageOrdersComponent,
     BrokerageNewOrderComponent,
-    BrokerageAccountComponent,
 
     StockSearchComponent,
     TransactionsComponent,

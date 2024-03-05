@@ -10,7 +10,6 @@ import {
 import {GetErrors, GetStrategies, isLongTermStrategy, toggleVisuallyHidden} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {stockOpenPositionExportLink} from "../../services/links.service";
-import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 
 @Component({
     selector: 'app-stock-trading-dashboard',
