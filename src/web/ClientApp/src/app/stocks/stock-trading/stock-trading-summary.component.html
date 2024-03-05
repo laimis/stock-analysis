@@ -1,28 +1,28 @@
-@if (positions) {
+@if (positionGroups) {
   <div>
     <div class="row">
       <div class="col-md mb-4 mt-2 text-center">
         <div class="text-muted sort-header" >
-          Invested
+          Long Invested
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{ totalCost | currency }}
+          {{ totalLongCost | currency }}
         </div>
       </div>
       <div class="col-md mb-4 mt-2 text-center">
         <div class="text-muted">
-          Risked
+          Short Invested
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{ totalRiskedAmount | currency }}
+          {{ totalShortCost | currency }}
         </div>
       </div>
       <div class="col-md mb-4 mt-2 text-center">
         <div class="text-muted">
-          Positions
+          Positions Long / Short
         </div>
         <div class="fs-4 summary-card-main-info">
-          {{positions.length}}
+          {{longPositions.length}} / {{shortPositions.length}}
         </div>
       </div>
       <div class="col-md mb-4 mt-2 text-center">

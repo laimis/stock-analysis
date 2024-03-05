@@ -17,26 +17,28 @@ interface PositionGroup {
   styleUrls: ['./stock-trading-summary.component.css']
 })
 export class StockTradingSummaryComponent {
-  private _positions: PositionInstance[];
+  
+    positionGroups: PositionGroup[];
+    
+    sortProperty: string;
+    sortDirection: number;
+    longPositions: PositionInstance[];
+    shortPositions: PositionInstance[];
+    totalLongCost: number;
+    totalShortCost: number;
+    totalProfit: number;
 
-  positionGroups: PositionGroup[];
-  totalCost: number;
-  totalRiskedAmount: number;
-  totalProfit: number;
-  sortProperty: string;
-  sortDirection: number;
-
-  @Input()
-  set positions(value:PositionInstance[]) {
-    this._positions = value
-    this.totalCost = this.sum(value, (p:PositionInstance) => p.averageCostPerShare * p.numberOfShares)
-    this.totalRiskedAmount = this.sum(value, (p:PositionInstance) => p.costAtRiskBasedOnStopPrice)
-    this.totalProfit = this.sum(value, (p:PositionInstance) => this.getUnrealizedProfit(p))
-    this.positionGroups = this.breakdownByStrategy(value)
-  }
-  get positions():PositionInstance[] {
-    return this._positions
-  }
+    @Input()
+    set positions(value: PositionInstance[]) {
+        
+        this.longPositions = value.filter(p => p.isShort === false)
+        this.shortPositions = value.filter(p => p.isShort === true)
+        
+        this.totalLongCost = this.reduce(this.longPositions, (p: PositionInstance) => p.averageCostPerShare * p.numberOfShares)
+        this.totalShortCost = this.reduce(this.shortPositions, (p: PositionInstance) => p.averageCostPerShare * p.numberOfShares)
+        this.totalProfit = this.reduce(value, (p: PositionInstance) => this.getUnrealizedProfit(p))
+        this.positionGroups = this.breakdownByStrategy(value)
+    }
 
   @Input()
   quotes:Map<string, StockQuote>
@@ -112,9 +114,9 @@ export class StockTradingSummaryComponent {
         let group = {
           strategy : key,
           positions,
-          cost : this.sum(groupPositions, p => p.averageCostPerShare * p.numberOfShares),
-          risk : this.sum(groupPositions, p => p.costAtRiskBasedOnStopPrice),
-          profit : this.sum(groupPositions, p => this.getUnrealizedProfit(p)),
+          cost : this.reduce(groupPositions, (p:PositionInstance) => p.averageCostPerShare * p.numberOfShares),
+          risk : this.reduce(groupPositions, (p:PositionInstance) => p.costAtRiskBasedOnStopPrice),
+          profit : this.reduce(groupPositions, (p:PositionInstance) => this.getUnrealizedProfit(p)),
           length : groupPositions.length
         }
 
@@ -124,7 +126,7 @@ export class StockTradingSummaryComponent {
     return groupsArray
   }
 
-  private sum(positions, func) : number {
+  private reduce(positions:PositionInstance[], func: (p: PositionInstance) => number) : number {
     return positions.reduce((acc, cur) => acc + func(cur), 0)
   }
 }
