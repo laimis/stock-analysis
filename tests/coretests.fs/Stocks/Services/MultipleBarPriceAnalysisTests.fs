@@ -79,7 +79,7 @@ let ``Green streak is positive`` () =
     
 [<Fact>]
 let ``SMA20 above SMA50 is negative and matches`` () =
-    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA20Above50Bars |> should equal -47m
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EMA20AboveSMA50Bars |> should equal -48m
     
 [<Fact>]
 let ``Price above SMA20 bars is positive and matches`` () =

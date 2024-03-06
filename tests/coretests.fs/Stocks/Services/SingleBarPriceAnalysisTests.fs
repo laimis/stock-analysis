@@ -83,7 +83,7 @@ let ``NewHigh is correct`` () =
     
 [<Fact>]
 let ``SMA20Above50Bars is correct`` () =
-    SingleBarPriceAnalysis.SingleBarOutcomeKeys.SMA20Above50Bars |> firstOutcome |> should equal -47m
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.EMA20AboveSMA50Bars |> firstOutcome |> should equal -48m
     
 [<Fact>]
 let ``SMA50Above200Bars is correct`` () =
