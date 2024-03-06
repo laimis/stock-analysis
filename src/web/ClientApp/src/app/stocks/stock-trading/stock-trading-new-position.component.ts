@@ -193,7 +193,7 @@ export class StockTradingNewPositionComponent {
     }
 
     get20sma(): number {
-        return this.getLastSma(this.prices.sma.sma20)
+        return this.getLastValue(this.prices.movingAverages.sma20)
     }
 
     smaCheck20(): boolean {
@@ -201,7 +201,7 @@ export class StockTradingNewPositionComponent {
     }
 
     get50sma(): number {
-        return this.getLastSma(this.prices.sma.sma50)
+        return this.getLastValue(this.prices.movingAverages.sma50)
     }
 
     smaCheck50(): boolean {
@@ -209,11 +209,11 @@ export class StockTradingNewPositionComponent {
     }
 
     get150sma(): number {
-        return this.getLastSma(this.prices.sma.sma150)
+        return this.getLastValue(this.prices.movingAverages.sma150)
     }
 
     get200sma(): number {
-        return this.getLastSma(this.prices.sma.sma200)
+        return this.getLastValue(this.prices.movingAverages.sma200)
     }
 
     smaCheck150(): boolean {
@@ -224,7 +224,7 @@ export class StockTradingNewPositionComponent {
         return this.get200sma() < this.price && this.get200sma() < this.get150sma()
     }
 
-    getLastSma(sma: MovingAverages): number {
+    getLastValue(sma: MovingAverages): number {
         return sma.values.slice(-1)[0]
     }
 
