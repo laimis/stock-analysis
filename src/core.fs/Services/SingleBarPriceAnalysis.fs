@@ -28,9 +28,9 @@ module SingleBarPriceAnalysis =
         let SigmaRatio = "SigmaRatio"
         let TrueRange = "TrueRange"
     
-    let smaAnalysis (bars:PriceBars) =
+    let movingAveragesAnalysis (bars:PriceBars) =
         
-        let outcomes =  bars |> SMAAnalysis.generate
+        let outcomes =  bars |> MovingAveragesAnalysis.generate
         
         let sma20Above50Outcome =
             outcomes
@@ -42,7 +42,7 @@ module SingleBarPriceAnalysis =
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50Above200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
         let sma20outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 20)
             |> Option.filter (fun o -> o.Value = 0m |> not)
             |> Option.map (fun o ->
                 let currentBar = bars.Last        
@@ -50,7 +50,7 @@ module SingleBarPriceAnalysis =
                 AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
             )
         let sma200outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(200))
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 200)
             |> Option.filter (fun o -> o.Value = 0m |> not)
             |> Option.map (fun o ->
                 let currentBar = bars.Last        
@@ -228,7 +228,7 @@ module SingleBarPriceAnalysis =
         [
             yield! bars |> volumeAnalysis
             yield! bars |> priceAnalysis
-            yield! bars |> smaAnalysis
+            yield! bars |> movingAveragesAnalysis
         ]
         
 open SingleBarPriceAnalysis

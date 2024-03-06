@@ -7,7 +7,7 @@ import {
     PositionChartInformation,
     PriceFrequency,
     Prices,
-    SMA,
+    MovingAverages,
     StockGaps,
     StocksService
 } from 'src/app/services/stocks.service';
@@ -224,7 +224,7 @@ export class StockTradingNewPositionComponent {
         return this.get200sma() < this.price && this.get200sma() < this.get150sma()
     }
 
-    getLastSma(sma: SMA): number {
+    getLastSma(sma: MovingAverages): number {
         return sma.values.slice(-1)[0]
     }
 

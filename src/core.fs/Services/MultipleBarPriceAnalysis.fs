@@ -31,7 +31,12 @@ module MultipleBarPriceAnalysis =
         let GreenStreak = "GreenStreak"
         let GapPercentage = "GapPercentage"
         
-        let SMA interval = $"sma_%i{interval}"
+        let private MovingAverage interval exponential =
+            let ``type`` = match exponential with | true -> "EMA" | false -> "SMA"
+            $"{``type``}_{interval}"
+
+        let SimpleMovingAverage interval = MovingAverage interval false
+        let ExponentialMovingAverage interval = MovingAverage interval true
 
     module MultipleBarPriceAnalysisConstants =
         let NumberOfDaysForRecentAnalysis = 60
@@ -61,7 +66,7 @@ module MultipleBarPriceAnalysis =
                 
             ATRContainer(period, dataPoints)
                 
-    module SMAAnalysis =
+    module MovingAveragesAnalysis =
             
         let priceStreakDetection (sequenceA:decimal option array) (sequenceB:decimal option array) =
             let sequence =
@@ -89,26 +94,30 @@ module MultipleBarPriceAnalysis =
                     sequence |> findIndexOrReturnLength (fun v -> v = true) |> fun x -> x * -1m
                 |> Some    
             
-        let private generateSMAOutcomes (smaContainer: SMAContainer) =
+        let private generateSMAOutcomes (smaContainer: MovingAveragesContainer) =
             
             smaContainer.All
-            |> Array.map (fun sma ->
+            |> Array.map (fun ma ->
                 
                 let value =
-                    match sma.LastValue with
+                    match ma.LastValue with
                     | Some v -> v
                     | None -> 0m
                     
+                let key = match ma.Exponential with
+                          | true -> MultipleBarOutcomeKeys.ExponentialMovingAverage(ma.Interval)
+                          | false -> MultipleBarOutcomeKeys.SimpleMovingAverage(ma.Interval)
+                    
                 AnalysisOutcome(
-                    MultipleBarOutcomeKeys.SMA(sma.Interval),
+                    key,
                     OutcomeType.Neutral,
                     value,
                     ValueFormat.Currency,
-                    $"SMA {sma.Interval} is {value}"
+                    $"{key} is {value}"
                 )
             )   
             
-        let private generatePriceAboveSMA20Outcome (bars:PriceBars) (container:SMAContainer) =
+        let private generatePriceAboveSMA20Outcome (bars:PriceBars) (container:MovingAveragesContainer) =
             
             let closingPrices = bars.ClosingPrices() |> Array.map (fun x -> x |> Some)
             
@@ -125,7 +134,7 @@ module MultipleBarPriceAnalysis =
                     message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {abs value} days"
                 ) |> Some
             
-        let private generateSMA20Above50DaysOutcome (smaContainer: SMAContainer) =
+        let private generateSMA20Above50DaysOutcome (smaContainer: MovingAveragesContainer) =
             
             let outcomeTypeAndValueOption = priceStreakDetection smaContainer.sma20.Values smaContainer.sma50.Values
             match outcomeTypeAndValueOption with
@@ -139,7 +148,7 @@ module MultipleBarPriceAnalysis =
                     message = "SMA 20 has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 50 for {value} bars"
                 ) |> Some
                 
-        let private generateSMA50Above200DaysOutcome (smaContainer: SMAContainer) =
+        let private generateSMA50Above200DaysOutcome (smaContainer: MovingAveragesContainer) =
                 
             let outcomeTypeAndvalueOption = priceStreakDetection smaContainer.sma50.Values smaContainer.sma200.Values
             match outcomeTypeAndvalueOption with
@@ -155,7 +164,7 @@ module MultipleBarPriceAnalysis =
             
         let generate (prices: PriceBars) =
             
-            let smaContainer =  prices |> SMAContainer.Generate
+            let smaContainer =  prices |> MovingAveragesContainer.Generate
             
             let streakOutcomes =
                 [|
@@ -436,7 +445,7 @@ module MultipleBarPriceAnalysis =
         [
             yield! prices |> PriceAnalysis.generate
             yield! prices |> VolumeAnalysis.generate
-            yield! prices |> SMAAnalysis.generate    
+            yield! prices |> MovingAveragesAnalysis.generate    
         ]
             
     module MultipleBarAnalysisOutcomeEvaluation =

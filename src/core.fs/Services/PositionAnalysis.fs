@@ -89,7 +89,7 @@ module PositionAnalysis =
         let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
         
         let multipleBarOutcomes = MultipleBarPriceAnalysis.run bars
-        let sma20 = multipleBarOutcomes |> Seq.find (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA(20)) |> _.Value
+        let sma20 = multipleBarOutcomes |> Seq.find (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SimpleMovingAverage(20)) |> _.Value
         let stopDiffToSMA20Pct =
             match sma20 with
             | x when x = 0m -> 0.0m

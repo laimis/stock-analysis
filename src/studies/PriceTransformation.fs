@@ -71,7 +71,7 @@ let transform (brokerage:IGetPriceHistory) studiesDirectory signals = async {
         |> Array.choose (fun (ticker, prices) ->
             match prices with
             | Available prices ->
-                Some (ticker, (prices, prices |> SMAContainer.Generate))
+                Some (ticker, (prices, prices |> MovingAveragesContainer.Generate))
             | _ -> None
         )
         |> Map.ofArray

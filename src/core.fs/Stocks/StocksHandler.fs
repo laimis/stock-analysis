@@ -53,7 +53,7 @@ type PricesQuery =
         }
     
 type PricesView(prices:PriceBars) =
-    member _.SMA = prices |> SMAContainer.Generate
+    member _.SMA = prices |> MovingAveragesContainer.Generate
     member _.PercentChanges = prices |> PercentChangeAnalysis.calculateForPriceBars
     member _.Prices = prices.Bars
     member _.ATR =

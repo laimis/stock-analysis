@@ -72,11 +72,11 @@ type TickerPatterns =
         ticker:Ticker
     }
     
-type SMA(values,interval) =
+type MovingAverages(values,interval,exponential) =
     
     member this.Values = values
     member this.Interval = interval
-    member this.Description = $"SMA {interval}"
+    member this.Exponential = exponential
     member this.LastValue =
         match values |> Seq.isEmpty with
         | true -> None
@@ -97,22 +97,50 @@ type SMA(values,interval) =
                     
                 sma[i] <- Some (System.Math.Round(sum / decimal interval, 2))
         
-        SMA(sma, interval)
+        MovingAverages(sma, interval, false)
         
-type SMAContainer(all:SMA array) =
+    static member toEMA (prices:decimal array) interval =
+        
+        let ema =
+            match prices.Length <= interval with
+            | true -> Array.create prices.Length None
+            | false ->
+        
+            let alpha = 2m / (decimal (interval + 1))
+            let initialEMA = Array.averageBy id prices[..(interval - 1)]
+
+            prices
+            |> Array.skip interval
+            |> Array.scan
+                (fun prevEMA price ->
+                    let newEMA = alpha * price + (1m - alpha) * (prevEMA |> Option.get)
+                    newEMA |> Some)
+                (initialEMA |> Some)
+            |> Array.append (Array.create (interval-1) None) // need to subtract one because Array.scan includes the initial value
+            
+        MovingAverages(ema, interval, true)
+        
+type MovingAveragesContainer(all:MovingAverages array) =
     
     member this.All = all
     member this.Length = all.Length
-    member this.sma20 = all |> Array.find (fun x -> x.Interval = 20)
-    member this.sma50 = all |> Array.find (fun x -> x.Interval = 50)
-    member this.sma150 = all |> Array.find (fun x -> x.Interval = 150)
-    member this.sma200 = all |> Array.find (fun x -> x.Interval = 200)
+    
+    member this.ema20 = all |> Array.find (fun x -> x.Interval = 20 && x.Exponential = true)
+    member this.sma20 = all |> Array.find (fun x -> x.Interval = 20 && x.Exponential = false)
+    member this.sma50 = all |> Array.find (fun x -> x.Interval = 50 && x.Exponential = false)
+    member this.sma150 = all |> Array.find (fun x -> x.Interval = 150 && x.Exponential = false)
+    member this.sma200 = all |> Array.find (fun x -> x.Interval = 200 && x.Exponential = false)
     
     static member Generate (prices:decimal array) =
-        let generate = prices |> SMA.ToSMA
-        [|20;50;150;200|] |> Array.map generate |> SMAContainer
+        let generateSMA = prices |> MovingAverages.ToSMA
+        let generateEMA = prices |> MovingAverages.toEMA
         
-    static member Generate (prices:PriceBars) = prices.ClosingPrices() |> SMAContainer.Generate
+        let sma = [|20;50;150;200|] |> Array.map generateSMA
+        let ema = [|20;|] |> Array.map generateEMA
+        
+        MovingAveragesContainer(Array.append ema sma)
+        
+    static member Generate (prices:PriceBars) = prices.ClosingPrices() |> MovingAveragesContainer.Generate
     
 module AnalysisOutcomeEvaluationScoringHelper =
     
