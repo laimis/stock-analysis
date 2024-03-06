@@ -127,12 +127,14 @@ type PriceBarWithIndex = PriceBar * int
 
 type PriceBars(bars:PriceBar array) =
     let dateIndex = Dictionary<string, PriceBarWithIndex>()
+    let barsWithIndex = bars |> Array.indexed
+    
     do
-        bars
-        |> Array.indexed
+        barsWithIndex
         |> Array.iter (fun (index, bar) -> dateIndex.Add(bar.DateStr, (bar, index)))
             
     member this.Bars = bars
+    member this.BarsWithIndex = barsWithIndex
     member this.Length = bars.Length
     member this.First = bars[0]
     member this.Last = bars[this.Length - 1]
