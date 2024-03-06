@@ -676,10 +676,10 @@ export interface PriceBar {
   volume: number
 }
 
-export interface SMA {
+export interface MovingAverages {
   values: number[]
   interval: number
-  description: string
+    exponential: boolean
 }
 
 export interface DistributionStatistics {
@@ -695,7 +695,7 @@ export interface DistributionStatistics {
 
 export interface Prices {
   prices: PriceBar[]
-  sma: SMAContainer
+  movingAverages: MovingAveragesContainer
   atr: DataPointContainer
   percentChanges: DistributionStatistics
 }
@@ -715,13 +715,13 @@ export interface PositionChartInformation {
     markers: ChartMarker[]
 }
 
-export interface SMAContainer {
-  sma20: SMA
-  sma50: SMA
-  sma150: SMA
-  sma200: SMA
+export interface MovingAveragesContainer {
+    ema20: MovingAverages
+  sma20: MovingAverages
+  sma50: MovingAverages
+  sma150: MovingAverages
+  sma200: MovingAverages
 }
-
 
 export interface StockQuote {
   symbol: string

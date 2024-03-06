@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy } from '@angular/core';
-import {ChartMarker, PositionChartInformation, PriceBar, SMA, StockTransaction} from 'src/app/services/stocks.service';
+import {ChartMarker, PositionChartInformation, PriceBar, MovingAverages, StockTransaction} from 'src/app/services/stocks.service';
 import {
     IChartApi,
     PriceLineOptions,
@@ -18,9 +18,8 @@ export const red = '#ef5350'
 export const white = '#ffffff'
 export const lightblue = '#add8e6'
 
-function createLineData(sma:SMA, interval:number, priceBars) {
-  return sma.values
-    .filter(v => v != null)
+function createLineData(movingAverages:MovingAverages, interval:number, priceBars) {
+  return movingAverages.values.slice(interval)
     .map( (p, index) => ({ value: p, time: priceBars[index + interval].time }));
 }
 
@@ -33,9 +32,9 @@ function toVolumeBar (p:PriceBar) {
   return { time: p.dateStr, value: p.volume, color: color }
 }
 
-function addLineSeries (chart:IChartApi, sma:SMA, color:string, interval:number, priceBars) {
+function addLineSeries (chart:IChartApi, movingaAverages:MovingAverages, color:string, interval:number, priceBars) {
   const smaSeries = chart.addLineSeries({ color: color, lineWidth: 1, crosshairMarkerVisible: false });
-  let smaLineData = createLineData(sma, interval, priceBars)
+  let smaLineData = createLineData(movingaAverages, interval, priceBars)
   smaSeries.setData(smaLineData);
 }
 
@@ -125,10 +124,10 @@ export class CandlestickChartComponent implements OnDestroy {
       );
     }
 
-    addLineSeries(this.chart, info.prices.sma.sma20, red, info.prices.sma.sma20.interval, priceBars);
-    addLineSeries(this.chart, info.prices.sma.sma50, green, info.prices.sma.sma50.interval, priceBars);
-    addLineSeries(this.chart, info.prices.sma.sma150, lightblue, info.prices.sma.sma150.interval, priceBars);
-    addLineSeries(this.chart, info.prices.sma.sma200, blue, info.prices.sma.sma200.interval, priceBars);
+    addLineSeries(this.chart, info.prices.movingAverages.ema20, red, info.prices.movingAverages.ema20.interval, priceBars);
+    addLineSeries(this.chart, info.prices.movingAverages.sma50, green, info.prices.movingAverages.sma50.interval, priceBars);
+    addLineSeries(this.chart, info.prices.movingAverages.sma150, lightblue, info.prices.movingAverages.sma150.interval, priceBars);
+    addLineSeries(this.chart, info.prices.movingAverages.sma200, blue, info.prices.movingAverages.sma200.interval, priceBars);
 
     let markers = []
       

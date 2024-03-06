@@ -20,7 +20,7 @@ module SingleBarPriceAnalysis =
         let ClosingRange = "ClosingRange"
         let Open = "Open"
         let Close = "Close"
-        let SMA20Above50Bars = "SMA20Above50Bars"
+        let EMA20AboveSMA50Bars = "EMA20AboveSMA50Bars"
         let SMA50Above200Bars = "SMA50Above200Bars"
         let GapPercentage = "GapPercentage"
         let NewHigh = "NewHigh"
@@ -28,21 +28,21 @@ module SingleBarPriceAnalysis =
         let SigmaRatio = "SigmaRatio"
         let TrueRange = "TrueRange"
     
-    let smaAnalysis (bars:PriceBars) =
+    let movingAveragesAnalysis (bars:PriceBars) =
         
-        let outcomes =  bars |> SMAAnalysis.generate
+        let outcomes =  bars |> MovingAveragesAnalysis.generate
         
-        let sma20Above50Outcome =
+        let ema20Abovesma50Outcome =
             outcomes
-            |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA20Above50Bars)
-            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA20Above50Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+            |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.EMA20AboveSMA50Bars)
+            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.EMA20AboveSMA50Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
         let sma50Above200Outcome =
             outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA50Above200Bars)
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50Above200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
         let sma20outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(20))
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 20)
             |> Option.filter (fun o -> o.Value = 0m |> not)
             |> Option.map (fun o ->
                 let currentBar = bars.Last        
@@ -50,7 +50,7 @@ module SingleBarPriceAnalysis =
                 AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMA, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
             )
         let sma200outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA(200))
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 200)
             |> Option.filter (fun o -> o.Value = 0m |> not)
             |> Option.map (fun o ->
                 let currentBar = bars.Last        
@@ -63,7 +63,7 @@ module SingleBarPriceAnalysis =
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.PriceAbove20SMADays, o.OutcomeType, o.Value, o.ValueType, o.Message))
         
         [
-            sma20Above50Outcome
+            ema20Abovesma50Outcome
             sma50Above200Outcome
             sma20outcome
             sma200outcome
@@ -228,7 +228,7 @@ module SingleBarPriceAnalysis =
         [
             yield! bars |> volumeAnalysis
             yield! bars |> priceAnalysis
-            yield! bars |> smaAnalysis
+            yield! bars |> movingAveragesAnalysis
         ]
         
 open SingleBarPriceAnalysis
@@ -332,17 +332,17 @@ module SingleBarPriceAnalysisEvaluation =
             )
             
             AnalysisOutcomeEvaluation(
-                "SMA20 < SMA50 (short-term down)",
+                "EMA20 < SMA50 (short-term down)",
                 OutcomeType.Neutral,
-                SingleBarOutcomeKeys.SMA20Above50Bars,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Bars && o.Value < 0m) ]
+                SingleBarOutcomeKeys.EMA20AboveSMA50Bars,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.EMA20AboveSMA50Bars && o.Value < 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
-                "SMA20 > SMA50 (short-term up)",
+                "EMA20 > SMA50 (short-term up)",
                 OutcomeType.Neutral,
-                SingleBarOutcomeKeys.SMA20Above50Bars,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.SMA20Above50Bars && o.Value > 0m) ]
+                SingleBarOutcomeKeys.EMA20AboveSMA50Bars,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.EMA20AboveSMA50Bars && o.Value > 0m) ]
             )
             
             AnalysisOutcomeEvaluation(
