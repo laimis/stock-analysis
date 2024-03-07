@@ -12,24 +12,17 @@ let run() =
     | None -> failwith "User not found"
     | Some _ -> ()
 
-    let studiesDirectory =
-        match ServiceHelper.studiesDirectory() with
-        | None ->
-            ServiceHelper.logger.LogError("Studies directory not found")
-            exit -1
-        | Some d -> d
+    let studiesDirectory = ServiceHelper.getArgumentValue "-d"
         
-    let generateFilePathInStudiesDirectory filename = $"{studiesDirectory}\\{filename}"
-
     let actions = [
-        if ServiceHelper.importUrl().IsSome then fun () -> async {
-            let importUrl = ServiceHelper.importUrl() |> Option.get
+        if ServiceHelper.hasArgument "-i" then fun () -> async {
+            let importUrl = ServiceHelper.getArgumentValue "-i"
             let! response = Http.AsyncRequest(importUrl)
             let csv =
                 match response.Body with
                 | Text text -> text
                 | _ -> failwith "Unexpected response from screener"
-            let outputFilename = ServiceHelper.outputFilename()
+            let outputFilename = ServiceHelper.getArgumentValue "-o"
             do! csv |> saveCsv outputFilename
         }
         
@@ -44,35 +37,12 @@ let run() =
                 }
             
             let! transformed =
-                ServiceHelper.inputFilename()
+                ServiceHelper.getArgumentValue "-f"
                 |> Signal.Load |> _.Rows
                 |> PriceTransformation.transform pricesWrapper studiesDirectory
                 
-            let outputFilename = ServiceHelper.outputFilename()
+            let outputFilename = ServiceHelper.getArgumentValue "-o"
             do! transformed.SaveToString() |> appendCsv outputFilename
-        }
-        
-        if ServiceHelper.hasArgument "-trade" then fun () -> async {
-            let getPricesFromCsv = DataHelpers.getPricesFromCsv studiesDirectory    
-            let strategies = [
-                Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 5) None
-                Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 10) None
-                Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 30) None
-                Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 60) None
-                Trading.strategyWithStopLossPercent false core.fs.Stocks.Long (Some 90) None
-                Trading.strategyWithStopLossPercent false core.fs.Stocks.Long None None
-                Trading.strategyWithTrailingStop false core.fs.Stocks.Long 0.05m
-            ]
-            
-            let signals =
-                ServiceHelper.inputFilename()
-                |> generateFilePathInStudiesDirectory
-                |> SignalWithPriceProperties.Load
-                |> _.Rows
-            
-            let! outcomes = Trading.runTrades getPricesFromCsv signals strategies
-            let csv = new TradeOutcomeOutput(outcomes)
-            csv.Save($"{studiesDirectory}\\03_export_date_ticker_screenerid_gap_outcomes.csv")
         }
     ]
 

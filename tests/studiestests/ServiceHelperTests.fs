@@ -30,8 +30,10 @@ let ``Brokerage works`` () =
 [<Fact>]
 let ``Command line parsing works``() =
     
+    let tempPath = System.IO.Path.GetTempPath()
+    
     let args = [|
-        "-d"; System.IO.Path.GetTempPath()
+        "-d"; tempPath
         "-i"; "http://localhost:8080"
         "-o"; "outputFilename"
         "-f"; "inputFilename"
@@ -40,9 +42,9 @@ let ``Command line parsing works``() =
     
     initServiceHelper args
     
-    ServiceHelper.studiesDirectory() |> Option.isSome |> should equal true
-    ServiceHelper.importUrl() |> Option.get |> should equal "http://localhost:8080"
-    ServiceHelper.outputFilename() |> should equal "outputFilename"
+    ServiceHelper.getArgumentValue "-d" |> should equal tempPath
+    ServiceHelper.getArgumentValue "-i" |> should equal "http://localhost:8080"
+    ServiceHelper.getArgumentValue "-o" |> should equal "outputFilename"
     ServiceHelper.inputFilename() |> should equal "inputFilename"
     ServiceHelper.hasArgument "-d" |> should equal true
     
@@ -51,8 +53,7 @@ let ``Asking for input or output filenames when none have been provided should f
     
     initServiceHelper [||]
     
-    (fun () -> ServiceHelper.outputFilename() |> ignore) |> should (throwWithMessage "No output file specified, use -o <filename>") typeof<System.Exception>
-    (fun () -> ServiceHelper.inputFilename() |> ignore) |> should (throwWithMessage "No input file specified, use -f <filename>") typeof<System.Exception>
+    (fun () -> ServiceHelper.getArgumentValue "-o" |> ignore) |> should (throwWithMessage "No value specified for -o parameter") typeof<System.Exception>
     
     
 [<Fact>]
