@@ -4,11 +4,16 @@ open core.Shared
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
 
+type TrendDirection =
+    | Up
+    | Down
+    
 type Trend = {
     start: PriceBar
     startIndex: int
     end_: PriceBar
     endIndex: int
+    direction: TrendDirection
 }
     with
         member this.NumberOfDays = (this.end_.Date - this.start.Date).TotalDays |> int
@@ -36,7 +41,7 @@ let run() =
     // get the brokerage
     let brokerage = ServiceHelper.brokerage()
     
-    // get prices for SPY for the last 20 years
+    // get prices for ticker for the specified number of years
     let prices =
         brokerage.GetPriceHistory user.Value.State (ticker |> Ticker) PriceFrequency.Daily (System.DateTimeOffset.Now.AddYears(-years) |> Some) None
         |> Async.AwaitTask
@@ -65,7 +70,7 @@ let run() =
             |> Array.skip firstDownstreamTrend
             |> Array.findIndex (fun (i,ema20,sma50) -> i > firstDownstreamTrend && ema20 > sma50)
         
-        let createCycle foundLocation =
+        let createTrend foundLocation direction =
             let indexOfInterest, _, _ = indexedEma20AndSma50[foundLocation]
         
             {
@@ -73,46 +78,47 @@ let run() =
                 startIndex = prices.BarsWithIndex[indexOfInterest] |> fst
                 end_ = prices.BarsWithIndex[indexOfInterest] |> snd
                 endIndex = prices.BarsWithIndex[indexOfInterest] |> fst
+                direction = direction
             }
             
-        let initialCycle = createCycle (firstDownstreamTrend + firstUpstreamTrend)
+        let initialTrend = createTrend (firstDownstreamTrend + firstUpstreamTrend) Up
        
-        let cycleAndCycles =
+        let latestTrendAndTrends =
             indexedEma20AndSma50
             |> Array.skip (firstDownstreamTrend + firstUpstreamTrend)
-            |> Array.fold (fun (cycle, cycles) (i, ema20, sma50) ->
-                match cycle with
-                | Some cycle ->
-                    // checking if the cycle is ending
+            |> Array.fold (fun (trend, trends) (i, ema20, sma50) ->
+                match trend with
+                | Some trend ->
+                    // checking if the trend is ending
                     match ema20 < sma50 with
                     | true ->
-                        let newCycle = { cycle with end_ = prices.BarsWithIndex[i] |> snd; endIndex = prices.BarsWithIndex[i] |> fst }
-                        None, cycles @ [newCycle]
+                        let newTrend = { trend with end_ = prices.BarsWithIndex[i] |> snd; endIndex = prices.BarsWithIndex[i] |> fst }
+                        None, trends @ [newTrend]
                     | false ->
-                        Some cycle, cycles
+                        Some trend, trends
                 | None ->
                     match ema20 > sma50 with
                     | true ->
-                        let newCycle = { start = prices.BarsWithIndex[i] |> snd; startIndex = prices.BarsWithIndex[i] |> fst; end_ = prices.BarsWithIndex[i] |> snd; endIndex = prices.BarsWithIndex[i] |> fst }
-                        Some newCycle, cycles
+                        let newTrend = { start = prices.BarsWithIndex[i] |> snd; startIndex = prices.BarsWithIndex[i] |> fst; end_ = prices.BarsWithIndex[i] |> snd; endIndex = prices.BarsWithIndex[i] |> fst; direction = Up }
+                        Some newTrend, trends
                     | false ->
-                        None, cycles
-            ) (initialCycle |> Some, [])
+                        None, trends
+            ) (initialTrend |> Some, [])
             
-        let cycle, cycles = cycleAndCycles
+        let trend, trends = latestTrendAndTrends
         
-        let cycles =
-            match cycle with
-            | Some cycle ->
-                // the cycle is continuing, so we need to add it to the list
-                // use the latest bar as the end of the cycle
-                let newCycle = { cycle with end_ = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] |> snd; endIndex = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] |> fst }
-                cycles @ [newCycle]
-            | None -> cycles
+        let trends =
+            match trend with
+            | Some trend ->
+                // the trend is continuing, so we need to add it to the list
+                // use the latest bar as the end of the trend
+                let newTrend = { trend with end_ = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] |> snd; endIndex = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] |> fst }
+                trends @ [newTrend]
+            | None -> trends
         
-        System.Console.WriteLine("Discovered cycles:")
-        cycles
-        |> List.iter (fun cycle ->
-            let description = $"{cycle.start.DateStr} - {cycle.end_.DateStr} ({cycle.NumberOfDays} days, {cycle.NumberOfBars} bars)"
+        System.Console.WriteLine("Discovered trends:")
+        trends
+        |> List.iter (fun trend ->
+            let description = $"{trend.direction}: {trend.start.DateStr} - {trend.end_.DateStr} ({trend.NumberOfDays} days, {trend.NumberOfBars} bars)"
             System.Console.WriteLine(description)
         )
