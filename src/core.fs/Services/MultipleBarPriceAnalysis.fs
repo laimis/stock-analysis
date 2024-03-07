@@ -32,7 +32,7 @@ module MultipleBarPriceAnalysis =
         let GapPercentage = "GapPercentage"
         
         let private MovingAverage interval exponential =
-            let ``type`` = match exponential with | true -> "EMA" | false -> "SMA"
+            let ``type`` = match exponential with | true -> "ema" | false -> "sma"
             $"{``type``}_{interval}"
 
         let SimpleMovingAverage interval = MovingAverage interval false
