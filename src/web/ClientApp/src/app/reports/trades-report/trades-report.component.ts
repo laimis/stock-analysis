@@ -113,17 +113,33 @@ function topGainerShortWhenPriceBelowSMAAlign(report:OutcomesReport): TradeRecom
 // TOP GAINER END
 
 // TOP LOSER
-function topLoserBuyWhenPriceAbove20or200(report:OutcomesReport): TradeRecommendation {
+function topLoserBuyWhenPriceAbove20(report:OutcomesReport): TradeRecommendation {
     let matchingOutcomes = report.outcomes.filter(outcome => {
         let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
         let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
-        return currentPrice > sma200 || currentPrice > sma20
+        return currentPrice > sma20
     })
 
     // return trade recommendation instance
     return {
-        recommendation: 'Buy Top Loser when price is above sma20 OR sma200',
+        recommendation: 'Buy Top Loser when price is above sma20',
+        matchingOutcomes: matchingOutcomes,
+        notes: ['Stop Loss friendly in particularly in SPY LT UP cycle'],
+        cycles: ['All']
+    }
+}
+
+function topLoserBuyWhenPriceAbove200(report:OutcomesReport): TradeRecommendation {
+    let matchingOutcomes = report.outcomes.filter(outcome => {
+        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        return currentPrice > sma200 && currentPrice < sma20
+    })
+
+    // return trade recommendation instance
+    return {
+        recommendation: 'Buy Top Loser when price is above sma200 (but under 20sma)',
         matchingOutcomes: matchingOutcomes,
         notes: ['Stop Loss friendly in particularly in SPY LT UP cycle'],
         cycles: ['All']
@@ -291,7 +307,7 @@ function selectFunctionsToUse(screenerId:string) {
         case '29':
             return [topGainerBuyWhenPriceAbove200AndSpySTDown, topGainerShortWhenPriceBelowSMAAlign, topGainerShortWhenPriceBelow200]
         case '30':
-            return [topLoserBuyWhenPriceAbove20or200, topLoserBuyWhenPriceAboveSMAAlign, topLoserShortWhenPriceBelowSMAAlign, topLoserShortWhenPriceBelow200]
+            return [topLoserBuyWhenPriceAbove20, topLoserBuyWhenPriceAbove200, topLoserBuyWhenPriceAboveSMAAlign, topLoserShortWhenPriceBelowSMAAlign, topLoserShortWhenPriceBelow200]
         case '31':
             return [newLowBuyWhenPriceAbove20AND200, newLowBuyWhenPriceAbove200, newLowBuyWhenGapDown, newLowShortWhenPriceBelowSMAAlign, newLowShortWhenPriceBelow200]
         
