@@ -21,10 +21,13 @@ type Trend = {
     with
         member this.NumberOfDays = (this.end_.Date - this.start.Date).TotalDays |> int
         member this.NumberOfBars = this.endIndex - this.startIndex
+        member this.GainPercent = (this.end_.Close - this.start.Close) / this.start.Close
+        member this.StartValue = this.start.Close
+        member this.EndValue = this.end_.Close
         
         
 // csv type provider to export trend
-type TrendCsv = CsvProvider<Sample="Ticker,Direction,Start,End,Days,Bars", HasHeaders=true>
+type TrendCsv = CsvProvider<Sample="Ticker,Direction,Start,End,Bars,StartValue,EndValue,GainPercent", HasHeaders=true>
     
 let run() =
     
@@ -105,13 +108,24 @@ let run() =
         let trend, trends = latestTrendAndTrends
         
         // finish the last trend and add it to trends
-        let trend = { trend with end_ = prices.BarsWithIndex.[prices.BarsWithIndex.Length - 1] |> snd; endIndex = prices.BarsWithIndex.Length - 1 }
+        let trend = { trend with end_ = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] |> snd; endIndex = prices.BarsWithIndex.Length - 1 }
         let trends = trends @ [trend]
         
         // output to csv
         let rows =
             trends
-            |> List.map (fun t -> TrendCsv.Row(ticker=t.ticker.Value, direction=(match t.direction with | Up -> "Up" | Down -> "Down"), start=t.start.DateStr,``end``=t.end_.DateStr, days=t.NumberOfDays.ToString(), bars=t.NumberOfBars.ToString()))
+            |> List.map (fun t ->
+                TrendCsv.Row(
+                    ticker=t.ticker.Value,
+                    direction=(match t.direction with | Up -> "Up" | Down -> "Down"),
+                    start=t.start.DateStr,
+                    ``end``=t.end_.DateStr,
+                    bars=t.NumberOfBars.ToString(),
+                    startValue=t.StartValue.ToString(),
+                    endValue=t.EndValue.ToString(),
+                    gainPercent=t.GainPercent.ToString()
+                )
+            )
             
         let csv = new TrendCsv(rows)
         
