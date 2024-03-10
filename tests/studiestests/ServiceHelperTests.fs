@@ -53,7 +53,7 @@ let ``Asking for input or output filenames when none have been provided should f
     
     initServiceHelper [||]
     
-    (fun () -> ServiceHelper.getArgumentValue "-o" |> ignore) |> should (throwWithMessage "No value specified for -o parameter") typeof<System.Exception>
+    (fun () -> ServiceHelper.getArgumentValue "-o" |> ignore) |> should (throwWithMessage "No value specified for -o") typeof<System.Exception>
     
     
 [<Fact>]
