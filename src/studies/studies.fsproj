@@ -8,10 +8,7 @@
 
   <ItemGroup>
     <Compile Include="ServiceHelper.fs" />
-    <Compile Include="Types.fs" />
-    <Compile Include="Trading.fs" />
     <Compile Include="DataHelpers.fs" />
-    <Compile Include="PriceTransformation.fs" />
     <Compile Include="MarketTrendsStudy.fs" />
     <Compile Include="ScreenerStudy.fs" />
     <Compile Include="Program.fs" />

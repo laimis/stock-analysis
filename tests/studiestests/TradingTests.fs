@@ -5,15 +5,16 @@ open Xunit
 open FsUnit
 open core.fs.Stocks
 open studies
-open studies.Types
+open studies.ScreenerStudy
 open testutils
+
 
 let round (number:decimal) = Math.Round(number, 4)
 
 let runTradesSetupWithSignals signals strategies = async {
     let getPricesFunc = DataHelpersTests.setupGetPricesWithNoBrokerageAccess
     
-    let! transformed = PriceTransformation.transform getPricesFunc DataHelpersTests.testDataPath signals
+    let! transformed = transformSignals getPricesFunc DataHelpersTests.testDataPath signals
     
     let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv TestDataGenerator.TestDataPath) transformed.Rows strategies
     
@@ -266,7 +267,7 @@ let ``Specific test``() = async {
                 }
         }
         
-    let! transformed = PriceTransformation.transform mock "d:\\studies\\" signals
+    let! transformed = transformSignals mock "d:\\studies\\" signals
     
     let strategies = [Trading.strategyWithStopLossPercent false StockPositionType.Short None None]
     

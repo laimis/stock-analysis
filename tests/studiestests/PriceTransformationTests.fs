@@ -2,15 +2,14 @@ module studiestests.PriceTransformationTests
 
 open Xunit
 open FsUnit
-open studies
+open studies.ScreenerStudy
 open studies.DataHelpers
-open studies.Types
 open testutils
 
 let transform rows =
     let mock = DataHelpersTests.setupGetPricesWithNoBrokerageAccess
     rows
-    |> studies.PriceTransformation.transform mock DataHelpersTests.testDataPath
+    |> transformSignals mock DataHelpersTests.testDataPath
     
 [<Fact>]
 let ``Price transformation means adding price, gap, and SMA data``() = async {
@@ -83,7 +82,7 @@ let ``Transform retries fetching the prices until all the price feeds are availa
         
     let! transformed = 
         [Signal.Row(date = "2022-08-05", ticker = "ABRACADABRA", screenerid = 1)]
-        |> PriceTransformation.transform mock DataHelpersTests.testDataPath
+        |> transformSignals mock DataHelpersTests.testDataPath
         
     transformed.Rows |> Seq.length |> should equal 1
 }    
