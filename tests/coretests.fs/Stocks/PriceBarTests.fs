@@ -71,4 +71,4 @@ let ``Find by date returns none when not found``() =
 [<Fact>]
 let ``Find by date returns some when found``() =
     let result = bars.TryFindByDate(System.DateTimeOffset.Parse("2020-11-30"))
-    result |> should equal (Some(bar, 0))
+    result |> should equal (Some(0, bar))

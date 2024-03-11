@@ -12,18 +12,23 @@ type TrendDirection =
     
 type Trend = {
     ticker: Ticker
-    start: PriceBar
-    startIndex: int
-    end_: PriceBar
-    endIndex: int
+    start: PriceBarWithIndex
+    end_: PriceBarWithIndex
     direction: TrendDirection
 }
     with
-        member this.NumberOfDays = (this.end_.Date - this.start.Date).TotalDays |> int
-        member this.NumberOfBars = this.endIndex - this.startIndex
-        member this.GainPercent = (this.end_.Close - this.start.Close) / this.start.Close
-        member this.StartValue = this.start.Close
-        member this.EndValue = this.end_.Close
+        member this.NumberOfDays =
+            let end_ = this.end_ |> snd
+            let start = this.start |> snd
+            (end_.Date - start.Date).TotalDays |> int
+        member this.NumberOfBars =
+            let end_ = this.end_ |> fst
+            let start = this.start |> fst
+            end_ - start
+            
+        member this.StartValue = this.start |> snd |> _.Close
+        member this.EndValue = this.end_ |> snd |> _.Close
+        member this.GainPercent = (this.EndValue - this.StartValue) / this.StartValue
         
         
 // csv type provider to export trend
@@ -66,14 +71,12 @@ let run() =
             |> Array.map (fun (i,ema20,sma50) -> i, ema20.Value, sma50.Value)
             
         let createTrend foundLocation direction =
-            let index,bar = prices.BarsWithIndex[foundLocation]
+            let barWithIndex = prices.BarsWithIndex[foundLocation]
             
             {
                 ticker = ticker
-                start = bar
-                startIndex = index
-                end_ = bar
-                endIndex = index
+                start = barWithIndex
+                end_ = barWithIndex
                 direction = direction
             }
             
@@ -97,7 +100,7 @@ let run() =
                 
                 match direction = trend.direction with
                 | true ->
-                    let newTrend = { trend with end_ = prices.BarsWithIndex[i] |> snd; endIndex = prices.BarsWithIndex[i] |> fst }
+                    let newTrend = { trend with end_ = prices.BarsWithIndex[i] }
                     newTrend, trends
                 | false ->
                     let newTrends = trends @ [trend]
@@ -108,7 +111,7 @@ let run() =
         let trend, trends = latestTrendAndTrends
         
         // finish the last trend and add it to trends
-        let trend = { trend with end_ = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] |> snd; endIndex = prices.BarsWithIndex.Length - 1 }
+        let trend = { trend with end_ = prices.BarsWithIndex[prices.BarsWithIndex.Length - 1] }
         let trends = trends @ [trend]
         
         // output to csv
@@ -118,8 +121,8 @@ let run() =
                 TrendCsv.Row(
                     ticker=t.ticker.Value,
                     direction=(match t.direction with | Up -> "Up" | Down -> "Down"),
-                    start=t.start.DateStr,
-                    ``end``=t.end_.DateStr,
+                    start=(t.start |> snd |> _.DateStr),
+                    ``end``=(t.end_ |> snd |> _.DateStr),
                     bars=t.NumberOfBars.ToString(),
                     startValue=t.StartValue.ToString(),
                     endValue=t.EndValue.ToString(),

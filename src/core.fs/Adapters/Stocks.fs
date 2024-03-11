@@ -123,7 +123,7 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
         // a look at the constructor
         validBar && (this.Low > referenceBar.High || this.High < referenceBar.Low)
         
-type PriceBarWithIndex = PriceBar * int
+type PriceBarWithIndex = int * PriceBar
 
 type PriceBars(bars:PriceBar array) =
     let dateIndex = Dictionary<string, PriceBarWithIndex>()
@@ -131,7 +131,7 @@ type PriceBars(bars:PriceBar array) =
     
     do
         barsWithIndex
-        |> Array.iter (fun (index, bar) -> dateIndex.Add(bar.DateStr, (bar, index)))
+        |> Array.iter (fun indexWithBar -> dateIndex.Add(indexWithBar |> snd |> _.DateStr, indexWithBar))
             
     member this.Bars = bars
     member this.BarsWithIndex = barsWithIndex

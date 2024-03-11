@@ -285,7 +285,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
             | None ->
                 // failwith $"Could not find signal bar for {ticker} on {date}"
                 false
-            | Some (_, index) -> 
+            | Some (index, _) -> 
                 let nextDay = index + 1
                 let nextDayBar = prices.Bars |> Array.tryItem nextDay
                 match nextDayBar with
@@ -338,7 +338,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
         |> Seq.map (fun (r,g) ->
             let gapSize = match g with | None -> 0m | Some g -> g.GapSizePct
             let prices, container = prices[r.Ticker]
-            let _,index = prices.TryFindByDate r.Date |> Option.get
+            let index,_ = prices.TryFindByDate r.Date |> Option.get
             let sma20 = container.sma20.Values |> findSmaValue index
             let sma50 = container.sma50.Values |> findSmaValue index
             let sma150 = container.sma150.Values |> findSmaValue index
@@ -371,7 +371,7 @@ module Trading =
         match prices.TryFindByDate signal.Date with
         | None -> failwith $"Could not find the price bar for the {signal.Ticker} @ {signal.Date}, unexpected"
         | Some openBarWithIndex ->
-            let _, index = openBarWithIndex
+            let index,_ = openBarWithIndex
             let nextDayIndex = index + 1
             match nextDayIndex >= prices.Length with
             | true -> failwith $"No open day available for {signal.Ticker} @ {signal.Date}"
@@ -464,7 +464,7 @@ module Trading =
         let name = "Buy and use signal open as stop"
             
         let closeBar = prices.Last        
-        let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> fst |> fun (bar:PriceBar) -> bar.Open
+        let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> snd |> _.Open
         
         let stopLossFunc (index, bar:PriceBar) =
             let stopPriceReached = bar.Close < stopPrice
@@ -478,7 +478,7 @@ module Trading =
         let name = "Buy and use signal close as stop"
             
         let closeBar = prices.Last        
-        let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> fst |> fun (bar:PriceBar) -> bar.Close
+        let stopPrice = prices.TryFindByDate signal.Date |> Option.get |> snd |> _.Close
         
         let stopLossFunc (index, bar:PriceBar) =
             let stopPriceReached = bar.Close < stopPrice

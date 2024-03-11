@@ -57,7 +57,7 @@ module PositionAnalysis =
         let barAtOpen = bars.TryFindByDate position.Opened
         let barsFromOpen =
             match barAtOpen with
-            | Some (_,index) -> bars.Bars[index..]
+            | Some (index,_) -> bars.Bars[index..]
             | None ->
                 // position might be opened before the first bar in the dataset
                 match position.Opened with
