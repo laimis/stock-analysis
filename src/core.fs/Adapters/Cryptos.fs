@@ -49,7 +49,7 @@ type Datum =
         num_market_pairs: int
         date_added: DateTimeOffset
         tags: string list
-        max_supply: int64 option
+        max_supply: decimal option
         circulating_supply: double
         total_supply: double
         platform: Platform option
