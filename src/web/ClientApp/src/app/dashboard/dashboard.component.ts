@@ -21,7 +21,8 @@ export class DashboardComponent implements OnInit {
     { path: '/trading/simulations', label: 'Simulations' },
     { path: 'reports/recentsells', label: 'Recent Sells' },
     { path: '/transactions', label: 'Transactions' },
-    { path: '/reports/chain', label: 'Chain' }
+    { path: '/reports/chain', label: 'Chain' },
+      { path: '/reports/trends', label: 'Trends' },
   ];
 
 	constructor(

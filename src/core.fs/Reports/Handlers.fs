@@ -13,6 +13,7 @@ open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 open core.fs.Services.MultipleBarPriceAnalysis
+open core.fs.Services.Trends
 open core.fs.Stocks
 
 type ChainQuery =
@@ -188,6 +189,26 @@ type SellView =
         match this.CurrentPrice with
         | None -> 0m
         | Some value -> (value - this.Price) / this.Price
+        
+        
+type TrendsQuery =
+    {
+        UserId: UserId
+        Ticker: Ticker
+        TrendType: TrendType
+        Start: string option
+        End: string option
+    }
+    
+    member this.StartDate (marketHours:IMarketHours) =
+        match this.Start with
+        | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketStartOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow.AddYears(-10)
+        | None -> DateTimeOffset.UtcNow.AddYears(-10)
+        
+    member this.EndDate (marketHours:IMarketHours) =
+        match this.End with
+        | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketEndOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow
+        | None -> DateTimeOffset.UtcNow
     
 type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote>) =
     
@@ -484,4 +505,27 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 | Ok prices -> prices
                 
             return SellsView(stocks, prices) |> Ok
+    }
+
+
+    member _.Handle (query:TrendsQuery) = task {
+        let start = query.StartDate marketHours
+        let ``end`` = query.EndDate marketHours
+        
+        let! user = accounts.GetUser query.UserId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            let! priceResponse =
+                brokerage.GetPriceHistory
+                    user.State
+                    query.Ticker
+                    PriceFrequency.Daily
+                    (start |> Some)
+                    (``end`` |> Some)
+            
+            return priceResponse |> Result.map (fun prices ->
+                let trends = TrendCalculator.generate query.Ticker query.TrendType prices
+                trends
+            )
     }

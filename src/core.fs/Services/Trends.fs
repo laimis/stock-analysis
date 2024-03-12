@@ -9,15 +9,31 @@ type TrendDirection =
     | Up
     | Down
     
+    static member FromString s =
+        match s with
+        | nameof Up -> Up
+        | nameof Down -> Down
+        | _ -> failwith $"Invalid trend type {s}"
+        
+    override this.ToString() =
+        match this with
+        | Up -> nameof Up
+        | Down -> nameof Down
+        
 type TrendType =
     | Ema20OverSma50
     | Sma50OverSma200
     
-    static member parse s =
+    static member FromString s =
         match s with
         | nameof Ema20OverSma50 -> Ema20OverSma50
         | nameof Sma50OverSma200 -> Sma50OverSma200
         | _ -> failwith $"Invalid trend type {s}"
+        
+    override this.ToString() =
+        match this with
+        | Ema20OverSma50 -> nameof Ema20OverSma50
+        | Sma50OverSma200 -> nameof Sma50OverSma200
     
 type Trend = {
     ticker: Ticker
@@ -39,7 +55,9 @@ type Trend = {
             end_ - start
             
         member this.StartValue = this.start |> snd |> _.Close
+        member this.StartDateStr = this.start |> snd |> _.DateStr
         member this.EndValue = this.end_ |> snd |> _.Close
+        member this.EndDateStr = this.end_ |> snd |> _.DateStr
         member this.GainPercent = (this.EndValue - this.StartValue) / this.StartValue
         member this.MaxDate = this.max |> snd |> _.DateStr
         member this.MaxValue = this.max |> snd |> _.Close
@@ -83,6 +101,8 @@ type Trends(ticker, trendType, trends:Trend list) =
     
     member this.BarRank trend = determineRank compareByNumberOfBars trend
     member this.GainRank trend = determineRank compareByGain trend
+    member this.CurrentTrendRankByBars = this.BarRank this.CurrentTrend |> fst
+    member this.CurrentTrendRankByGain = this.GainRank this.CurrentTrend |> fst
     
 module TrendCalculator =
     

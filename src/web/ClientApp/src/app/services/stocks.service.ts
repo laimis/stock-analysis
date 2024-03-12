@@ -383,6 +383,21 @@ export class StocksService {
 
       return this.http.get<DailyOutcomeScoresReport>(endpoint)
   }
+  
+  reportTrends(
+      ticker:string,
+      trendType:TrendType,
+      start:string,
+      end:string=null): Observable<Trends> {
+        var endpoint = '/api/reports/trends/' + ticker + '?start=' + start
+        if (end) {
+          endpoint += '&end=' + end
+        }
+        endpoint += '&trendType=' + trendType
+        
+        return this.http.get<Trends>(endpoint)
+    }
+  
 }
 
 export interface StockListTicker {
@@ -1235,4 +1250,57 @@ export class brokerageordercommand {
   price: number
   type: string
   duration: string
+}
+
+export enum TrendDirection {
+    Up = 'Up',
+    Down = 'Down',
+}
+
+export enum TrendType {
+    Ema20OverSma50 = 'Ema20OverSma50',
+    Sma50OverSma200 = 'Sma50OverSma200',
+}
+
+export interface Trend {
+    ticker: string
+    start: PriceBar
+    end_: PriceBar
+    max: PriceBar
+    min: PriceBar
+    direction: TrendDirection
+    trendType: TrendType
+    numberOfDays: number
+    numberOfBars: number
+    startValue: number
+    startDateStr: string
+    endValue: number
+    endDateStr: string
+    gainPercent: number
+    maxDate: string
+    maxValue: number
+    maxAge: number
+    minDate: string
+    minValue: number
+    minAge: number
+}
+
+export class Trends {
+    ticker: string
+    trendType: TrendType
+    trends: Trend[]
+    upTrends: Trend[]
+    downTrends: Trend[]
+    currentTrend: Trend
+    length:number
+    barStatistics:DistributionStatistics
+    upBarStatistics:DistributionStatistics
+    downBarStatistics:DistributionStatistics
+    gainStatistics:DistributionStatistics
+    upGainStatistics:DistributionStatistics
+    downGainStatistics:DistributionStatistics
+    startDateStr:string
+    endDateStr:string
+    currentTrendRankByBars:number
+    currentTrendRankByGain:number
 }

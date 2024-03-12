@@ -68,3 +68,7 @@ let ``Current trend params are correct``() =
     // rank
     trends.BarRank trends.CurrentTrend |> fst |> should equal 3
     trends.GainRank trends.CurrentTrend |> fst |> should equal 4
+    
+    // rank obtained differently
+    trends.CurrentTrendRankByBars |> should equal 3
+    trends.CurrentTrendRankByGain |> should equal 4

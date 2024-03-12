@@ -94,7 +94,7 @@ let run() =
     let ticker = ServiceHelper.getArgumentValue "-t" |> Ticker
     let years = ServiceHelper.getArgumentValue "-y" |> int
     let outputFilename = ServiceHelper.getArgumentValue "-o"
-    let trendType = ServiceHelper.getArgumentValue "-tt" |> TrendType.parse
+    let trendType = ServiceHelper.getArgumentValue "-tt" |> TrendType.FromString
     
     // confirm the input
     Console.WriteLine($"Ticker: {ticker}, Years: {years}, Output: {outputFilename}")

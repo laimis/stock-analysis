@@ -76,5 +76,18 @@ namespace web.Controllers
                     )
                 )
             );
+        
+        [HttpGet("trends/{ticker}")]
+        public Task<ActionResult> Trends(string ticker, [FromQuery] string start, [FromQuery] string end, [FromQuery] string trendType) =>
+            this.OkOrError(
+                service.Handle(
+                    new TrendsQuery(
+                        User.Identifier(),
+                        new Ticker(ticker),
+                        core.fs.Services.Trends.TrendType.FromString(trendType),
+                        start, end
+                    )
+                )
+            );
     }
 }

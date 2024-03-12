@@ -176,3 +176,19 @@ public class SentimentTypeConverter : GenericConverterWithToString<SentimentType
         return SentimentType.FromString(reader.GetString());
     }
 }
+
+public class TrendDirectionConverter : GenericConverterWithToString<Trends.TrendDirection>
+{
+    public override Trends.TrendDirection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return Trends.TrendDirection.FromString(reader.GetString());
+    }
+}
+
+public class TrendTypeConverter : GenericConverterWithToString<Trends.TrendType>
+{
+    public override Trends.TrendType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return Trends.TrendType.FromString(reader.GetString());
+    }
+}
