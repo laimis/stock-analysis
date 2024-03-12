@@ -33,6 +33,7 @@
         <Compile Include="Services\PositionAnalysis.fs" />
         <Compile Include="Services\PatternDetection.fs" />
         <Compile Include="Services\CSVExport.fs" />
+        <Compile Include="Services\Trends.fs" />
         <Compile Include="Options\Views.fs"/>
         <Compile Include="Options\Handler.fs"/>
         <Compile Include="Options\Import.fs"/>
