@@ -94,7 +94,6 @@ import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
-import {LoadingComponent} from "./shared/loading/loading.component";
 import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
 import {TrendsReportComponent} from "./reports/trends-report/trends-report.component";
 
@@ -271,6 +270,7 @@ let routes: Routes = [
         BrowserModule,
         HttpClientModule,
         FormsModule,
+        StockSearchComponent,
         CanvasJSAngularChartsModule,
         RouterModule.forRoot(routes, {}),
         NgOptimizedImage
