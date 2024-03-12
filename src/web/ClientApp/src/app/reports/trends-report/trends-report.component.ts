@@ -4,6 +4,7 @@ import {DatePipe, NgClass, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {AppModule} from "../../app.module";
 import {LoadingComponent} from "../../shared/loading/loading.component";
+import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 
 @Component({
   selector: 'app-trends-report',
@@ -14,7 +15,8 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
         NgClass,
         FormsModule,
         NgIf,
-        LoadingComponent
+        LoadingComponent,
+        StockSearchComponent
     ],
   templateUrl: './trends-report.component.html',
   styleUrl: './trends-report.component.css'

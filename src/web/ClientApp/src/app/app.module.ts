@@ -225,7 +225,6 @@ let routes: Routes = [
         BrokerageOrdersComponent,
         BrokerageNewOrderComponent,
 
-        StockSearchComponent,
         TransactionsComponent,
         TermsComponent,
 

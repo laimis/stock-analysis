@@ -8,10 +8,13 @@
         <div class="card-body">
             <div class="row align-items-end">
                 <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="tickerInput" class="form-label">Ticker</label>
-                        <input type="text" class="form-control" id="tickerInput" [(ngModel)]="selectedTicker">
-                    </div>
+                    <app-stock-search
+                        [cssClass]="'d-flex ms-auto form-control'"
+                        [label]="'Ticker'"
+                        [placeholder]="'Search stocks'"
+                        (tickerSelected)="selectedTicker = $event"
+                        [justTickers]="true">
+                    </app-stock-search>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">

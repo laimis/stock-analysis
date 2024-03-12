@@ -3,11 +3,16 @@ import {Subject, Observable} from 'rxjs';
 import {debounceTime, switchMap} from 'rxjs/operators';
 import {StockSearchResult, StocksService} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
+import {FormsModule} from "@angular/forms";
 
 @Component({
-  selector: 'app-stock-search',
-  templateUrl: './stock-search.component.html',
-  styleUrls: ['./stock-search.component.css']
+    standalone: true,
+    selector: 'app-stock-search',
+    templateUrl: './stock-search.component.html',
+    imports: [
+        FormsModule
+    ],
+    styleUrls: ['./stock-search.component.css']
 })
 export class StockSearchComponent implements OnInit {
 
