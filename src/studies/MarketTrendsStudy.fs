@@ -77,19 +77,11 @@ let private outputToConsole (trends:Trends) =
     Console.WriteLine($"Min Value: {currentTrend.MinValue}")
     
     // let's rank the current trend in the context of all trends that match its direction
-    let matchingTrends = 
-        match currentTrend.direction with
-        | Up -> trends.UpTrends
-        | Down -> trends.DownTrends
-        
-    let compareByNumberOfBars = fun (t:Trend) -> t.NumberOfBars
-    let compareByGain = fun (t:Trend) -> t.GainPercent
+    let rankByNumberOfBars,trendTotal = trends.BarRank currentTrend
+    let rankByGain,_ = trends.GainRank currentTrend
     
-    let rankByNumberOfBars = matchingTrends |> List.sortByDescending compareByNumberOfBars |> List.findIndex (fun t -> t = currentTrend) |> fun x -> x + 1
-    let rankByGain = matchingTrends |> List.sortByDescending compareByGain |> List.findIndex (fun t -> t = currentTrend) |> fun x -> x + 1
-    
-    Console.WriteLine($"Rank by number of bars: {rankByNumberOfBars} out of {matchingTrends.Length}")
-    Console.WriteLine($"Rank by gain percent: {rankByGain} out of {matchingTrends.Length}")
+    Console.WriteLine($"Rank by number of bars: {rankByNumberOfBars} out of {trendTotal}")
+    Console.WriteLine($"Rank by gain percent: {rankByGain} out of {trendTotal}")
     
 let run() =
     
