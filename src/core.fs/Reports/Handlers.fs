@@ -499,10 +499,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     user.State
                     (stocks |> Seq.map (_.Ticker))
             
-            let prices =
-                match priceResult with
-                | Error _ -> Dictionary<Ticker,StockQuote>()
-                | Ok prices -> prices
+            let prices = priceResult |> Result.defaultValue (Dictionary<Ticker,StockQuote>())
                 
             return SellsView(stocks, prices) |> Ok
     }
