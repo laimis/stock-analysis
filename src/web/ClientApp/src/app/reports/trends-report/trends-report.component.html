@@ -155,57 +155,12 @@
             </div>
         </div>
     </div>
-    
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="upBarDistribution"></app-line-chart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="upGainDistribution"></app-line-chart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="upBarSorted"></app-line-chart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="upGainSorted"></app-line-chart>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="downBarDistribution"></app-line-chart>
+    @for (container of dataPointContainers; track container) {
+        <div class="row">
+            <div class="col mb-4">
+                <app-line-chart [dataContainer]="container"></app-line-chart>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="downGainDistribution"></app-line-chart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="downBarSorted"></app-line-chart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="downGainSorted"></app-line-chart>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="barsChronological"></app-line-chart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col mb-4">
-            <app-line-chart [dataContainer]="gainsChronological"></app-line-chart>
-        </div>
-    </div>
+    }
 </div>
