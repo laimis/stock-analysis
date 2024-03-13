@@ -265,7 +265,7 @@ let routes: Routes = [
         RoutineDashboardComponent,
         RoutineComponent,
         RoutinesActiveRoutineComponent,
-        LineChartComponent
+        
     ],
     imports: [
         BrowserModule,
@@ -273,6 +273,7 @@ let routes: Routes = [
         FormsModule,
         StockSearchComponent,
         LoadingComponent,
+        LineChartComponent,
         CanvasJSAngularChartsModule,
         RouterModule.forRoot(routes, {}),
         NgOptimizedImage

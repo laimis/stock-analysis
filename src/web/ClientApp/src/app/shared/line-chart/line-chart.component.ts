@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {ChartAnnotationLine, DataPoint, DataPointContainer} from "../../services/stocks.service";
 import {blue} from "../candlestick-chart/candlestick-chart.component";
+import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 
 function toChartJSPoint(p: DataPoint) {
   if (p.isDate) {
@@ -123,8 +124,12 @@ function toChart(containers:DataPointContainer[]) {
 }
 
 @Component({
-  selector: 'app-line-chart',
-  templateUrl: './line-chart.component.html'
+    selector: 'app-line-chart',
+    templateUrl: './line-chart.component.html',
+    standalone: true,
+    imports: [
+        CanvasJSAngularChartsModule
+    ]
 })
 export class LineChartComponent {
 

@@ -698,12 +698,13 @@ export interface MovingAverages {
 }
 
 export interface DistributionStatistics {
+    buckets : ValueWithFrequency[]
   count : number
   kurtosis : number
-  min : number
   max : number
   mean : number
   median : number
+  min : number
   skewness : number
   stdDev : number
 }
@@ -864,21 +865,10 @@ export interface LabelWithFrequency {
   label: string
   frequency: number
 }
-export interface StockPercentChangeDescriptor {
-  mean: number
-  median: number
-  min: number
-  max: number
-  stdDev: number
-  count: number
-  skewness: number
-  kurtosis: number
-  buckets: ValueWithFrequency[]
-}
 export interface StockPercentChangeResponse {
   ticker: string
-  recent: StockPercentChangeDescriptor
-  allTime: StockPercentChangeDescriptor
+  recent: DistributionStatistics
+  allTime: DistributionStatistics
 }
 
 export interface StockGap {
