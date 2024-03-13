@@ -96,6 +96,7 @@ import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
 import {TrendsReportComponent} from "./reports/trends-report/trends-report.component";
+import {LoadingComponent} from "./shared/loading/loading.component";
 
 
 let routes: Routes = [
@@ -271,6 +272,7 @@ let routes: Routes = [
         HttpClientModule,
         FormsModule,
         StockSearchComponent,
+        LoadingComponent,
         CanvasJSAngularChartsModule,
         RouterModule.forRoot(routes, {}),
         NgOptimizedImage
