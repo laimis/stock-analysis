@@ -6,6 +6,7 @@ open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
 open core.fs.Services.Trends
 open FSharp.Data
+open studies.ServiceHelper
 
       
 // csv type provider to export trend
@@ -83,24 +84,24 @@ let private outputToConsole (trends:Trends) =
     Console.WriteLine($"Rank by number of bars: {rankByNumberOfBars} out of {trendTotal}")
     Console.WriteLine($"Rank by gain percent: {rankByGain} out of {trendTotal}")
     
-let run() =
+let run (context:EnvironmentContext) =
     
     // get the user
-    let user = "laimis@gmail.com" |> ServiceHelper.storage().GetUserByEmail |> Async.AwaitTask |> Async.RunSynchronously
+    let user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask |> Async.RunSynchronously
     match user with
     | None -> failwith "User not found"
     | Some _ -> ()
     
-    let ticker = ServiceHelper.getArgumentValue "-t" |> Ticker
-    let years = ServiceHelper.getArgumentValue "-y" |> int
-    let outputFilename = ServiceHelper.getArgumentValue "-o"
-    let trendType = ServiceHelper.getArgumentValue "-tt" |> TrendType.FromString
+    let ticker = context.GetArgumentValue "-t" |> Ticker
+    let years = context.GetArgumentValue "-y" |> int
+    let outputFilename = context.GetArgumentValue "-o"
+    let trendType = context.GetArgumentValue "-tt" |> TrendType.FromString
     
     // confirm the input
     Console.WriteLine($"Ticker: {ticker}, Years: {years}, Output: {outputFilename}")
     
     // get the brokerage
-    let brokerage = ServiceHelper.brokerage()
+    let brokerage = context.Brokerage()
     
     // get prices for ticker for the specified number of years
     let prices =

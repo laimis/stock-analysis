@@ -9,6 +9,7 @@ open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 open studies.DataHelpers
 open Microsoft.Extensions.Logging
+open studies.ServiceHelper
 
 module Constants =
     [<Literal>]
@@ -593,30 +594,30 @@ module Trading =
         return allOutcomes
     }
 
-let run() =
+let run (context:EnvironmentContext) =
     
-    let user = "laimis@gmail.com" |> ServiceHelper.storage().GetUserByEmail |> Async.AwaitTask |> Async.RunSynchronously
+    let user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask |> Async.RunSynchronously
     match user with
     | None -> failwith "User not found"
     | Some _ -> ()
 
-    let studiesDirectory = ServiceHelper.getArgumentValue "-d"
+    let studiesDirectory = context.GetArgumentValue "-d"
         
     let actions = [
-        if ServiceHelper.hasArgument "-i" then fun () -> async {
-            let importUrl = ServiceHelper.getArgumentValue "-i"
+        if context.HasArgument "-i" then fun () -> async {
+            let importUrl = context.GetArgumentValue "-i"
             let! response = Http.AsyncRequest(importUrl)
             let csv =
                 match response.Body with
                 | Text text -> text
                 | _ -> failwith "Unexpected response from screener"
-            let outputFilename = ServiceHelper.getArgumentValue "-o"
+            let outputFilename = context.GetArgumentValue "-o"
             do! csv |> saveCsv outputFilename
         }
         
-        if ServiceHelper.hasArgument "-pt" then fun () -> async {
+        if context.HasArgument "-pt" then fun () -> async {
             
-            let brokerage = ServiceHelper.brokerage()    
+            let brokerage = context.Brokerage()    
             let pricesWrapper =
                 {
                     new IGetPriceHistory with 
@@ -625,11 +626,11 @@ let run() =
                 }
             
             let! transformed =
-                ServiceHelper.getArgumentValue "-f"
+                context.GetArgumentValue "-f"
                 |> Signal.Load |> _.Rows
                 |> transformSignals pricesWrapper studiesDirectory
                 
-            let outputFilename = ServiceHelper.getArgumentValue "-o"
+            let outputFilename = context.GetArgumentValue "-o"
             do! transformed.SaveToString() |> appendCsv outputFilename
         }
     ]

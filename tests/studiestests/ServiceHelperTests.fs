@@ -19,13 +19,11 @@ let initServiceHelper args =
     
 [<Fact>]
 let ``Storage works`` () =
-    initServiceHelper [||]
-    ServiceHelper.storage() |> ignore
+    initServiceHelper [||] |> _.Storage() |> ignore
     
 [<Fact>]
 let ``Brokerage works`` () =
-    initServiceHelper [||]
-    ServiceHelper.brokerage() |> ignore
+    initServiceHelper [||] |> _.Brokerage() |> ignore
     
 [<Fact>]
 let ``Command line parsing works``() =
@@ -40,22 +38,22 @@ let ``Command line parsing works``() =
         "-v"
     |]
     
-    initServiceHelper args
+    let context = initServiceHelper args
     
-    ServiceHelper.getArgumentValue "-d" |> should equal tempPath
-    ServiceHelper.getArgumentValue "-i" |> should equal "http://localhost:8080"
-    ServiceHelper.getArgumentValue "-o" |> should equal "outputFilename"
-    ServiceHelper.inputFilename() |> should equal "inputFilename"
-    ServiceHelper.hasArgument "-d" |> should equal true
+    context.GetArgumentValue "-d" |> should equal tempPath
+    context.GetArgumentValue "-i" |> should equal "http://localhost:8080"
+    context.GetArgumentValue "-o" |> should equal "outputFilename"
+    context.GetArgumentValue "-f" |> should equal "inputFilename"
+    context.HasArgument "-d" |> should equal true
     
 [<Fact>]
 let ``Asking for input or output filenames when none have been provided should fail``() =
     
-    initServiceHelper [||]
+    let context = initServiceHelper [||]
     
-    (fun () -> ServiceHelper.getArgumentValue "-o" |> ignore) |> should (throwWithMessage "No value specified for -o") typeof<System.Exception>
+    (fun () -> context.GetArgumentValue "-o" |> ignore) |> should (throwWithMessage "No value specified for -o") typeof<System.Exception>
     
     
 [<Fact>]
 let ``Not providing configuration, should fail``() =
-    (fun () -> ServiceHelper.init None [||]) |> should throw typeof<System.InvalidOperationException>
+    (fun () -> ServiceHelper.init None [||] |> ignore) |> should throw typeof<System.InvalidOperationException>

@@ -1,7 +1,7 @@
 ﻿open System
 open studies
 
-Environment.GetCommandLineArgs() |> ServiceHelper.init None
 
-// ScreenerStudy.run()
-MarketTrendsStudy.run()
+Environment.GetCommandLineArgs()
+|> ServiceHelper.init None
+|> MarketTrendsStudy.run

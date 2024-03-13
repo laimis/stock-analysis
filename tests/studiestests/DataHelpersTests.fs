@@ -84,7 +84,7 @@ let ``Get prices with brokerage should not go to brokerage if price exists on fi
 
 [<Fact>]
 let ``Get prices with brokerage should go to brokerage if price does not exists on the file system``() = async {
-    ServiceHelperTests.initServiceHelper [||]
+    ServiceHelperTests.initServiceHelper [||] |> ignore
     
     let mutable callCount = 0
         
@@ -177,7 +177,7 @@ let ``When prices are not available for perpetuity, brokerage is not pinged``() 
 
 [<Fact>]
 let ``If getting price data throws, it gets recorded``() = async {
-    ServiceHelperTests.initServiceHelper [||]
+    ServiceHelperTests.initServiceHelper [||] |> ignore
     let mock =
         {
             new DataHelpers.IGetPriceHistory with 
