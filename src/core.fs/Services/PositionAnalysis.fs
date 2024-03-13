@@ -307,7 +307,7 @@ module PositionAnalysis =
         for i in firstBar..lastBar do
             let bar = bars.Bars[i]
             
-            let currentPrice = bar.High
+            let currentPrice = bar.Close
             let currentGainPct = (currentPrice - costBasis) / costBasis * 100.0m
             let currentProfit = shares * (currentPrice - costBasis)
             
