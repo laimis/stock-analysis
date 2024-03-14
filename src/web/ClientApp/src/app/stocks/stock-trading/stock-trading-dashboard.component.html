@@ -36,8 +36,8 @@
           </div>
         }
       </a>
-        <a class="tab float-end" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)">
-          Settings
+        <a class="tab float-end" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)" *ngIf="isActive('positions') || isActive('openreview')">
+          Filters
         </a>
     </div>
       <div class="row visually-hidden" #settingsDiv>
