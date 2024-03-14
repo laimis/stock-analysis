@@ -231,7 +231,7 @@
         </div>
         <div class="row mt-3">
             <div class="col">
-                <button class="btn btn-sm btn-outline-secondary" (click)="closePosition()">Close</button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="closePosition()" *ngIf="_position.isOpen" >Close</button>
             </div>
             <div class="col">
                 <button class="btn btn-sm btn-outline-danger float-end" (click)="deletePosition()">Delete</button>
