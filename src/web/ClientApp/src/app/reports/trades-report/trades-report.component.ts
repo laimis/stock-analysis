@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {OutcomesReport, StockAnalysisOutcome, StocksService, TickerOutcomes} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
+import {Title} from "@angular/platform-browser";
 
 // this function will return tickers that match the new low trade candidates for buy side
 
@@ -336,7 +337,10 @@ export class TradesReportComponent implements OnInit {
     screenerId: string;
     tradeRecommendations: TradeRecommendation[] = []
     
-    constructor(private route: ActivatedRoute, private service: StocksService) {}
+    constructor(
+        private route: ActivatedRoute,
+        private service: StocksService,
+        private title: Title) {}
     
     ngOnInit() {
         // we must get screenerId parameter from the route, if it's not there, set the error informing the user
@@ -352,6 +356,10 @@ export class TradesReportComponent implements OnInit {
             this.errors = ['No tickers provided']
             return
         }
+        
+        const title = this.route.snapshot.queryParamMap.get('title') ?? this.screenerId
+        
+        this.title.setTitle("Trades Report: " + title)
         
         this.tickers = this.route.snapshot.queryParamMap.get('tickers').split(',')
         
