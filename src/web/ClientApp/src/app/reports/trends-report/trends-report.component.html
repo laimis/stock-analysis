@@ -1,10 +1,9 @@
 <div class="container">
     <h2>Trend Dashboard</h2>
 
+    <app-error-display *ngIf="errors"></app-error-display>
+    
     <div class="card mb-4">
-        <div class="card-header">
-            <h4>Select Trend</h4>
-        </div>
         <div class="card-body">
             <div class="row align-items-end">
                 <div class="col-md-4">
@@ -39,7 +38,7 @@
         </div>
     </div>
     
-    <app-loading *ngIf="!currentTrend"></app-loading>
+    <app-loading *ngIf="loading"></app-loading>
 
     <div class="card mb-5" *ngIf="currentTrend">
         <div class="card-header">

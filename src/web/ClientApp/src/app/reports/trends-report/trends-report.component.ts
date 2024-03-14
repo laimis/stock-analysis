@@ -15,6 +15,8 @@ import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
+import {GetErrors} from "../../services/utils";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
 @Component({
   selector: 'app-trends-report',
@@ -27,34 +29,33 @@ import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
         NgIf,
         LoadingComponent,
         StockSearchComponent,
-        LineChartComponent
+        LineChartComponent,
+        ErrorDisplayComponent
     ],
   templateUrl: './trends-report.component.html',
   styleUrl: './trends-report.component.css'
 })
-export class TrendsReportComponent implements OnInit {
+export class TrendsReportComponent {
     trends: Trends;
     currentTrend: Trend;
+    loading: boolean = false
     
     selectedTicker: string;
     selectedStartDate: string;
     selectedTrendType: TrendType;
     
     dataPointContainers: DataPointContainer[] = []
+    errors: string[];
     
     constructor(private stockService:StocksService) {
         // Set default values
-        this.selectedTicker = "SPY";
         this.selectedStartDate = "10";
         this.selectedTrendType = TrendType.Ema20OverSma50
     }
     
-    ngOnInit() {
-        this.loadTrends()
-    }
-    
     loadTrends() {
         
+        this.loading = true
         const date = new Date();
         date.setFullYear(date.getFullYear() - parseInt(this.selectedStartDate));
         const selectedStartDate = date.toISOString().substring(0,10);
@@ -84,7 +85,13 @@ export class TrendsReportComponent implements OnInit {
                 {label: "Bars Chronological", chartType: ChartType.Column, data: barsChronological},
                 {label: "Gains Chronological", chartType: ChartType.Column, data: gainsChronological}
             ]
-        });
+
+            this.loading = false
+        }, error => {
+            console.log("Error: " + error)
+            this.errors = GetErrors(error)
+            this.loading = false
+        })
     }
     
     tickerSelected(ticker: string) {
