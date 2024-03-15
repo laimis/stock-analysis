@@ -1,101 +1,105 @@
 <div>
-  @if (allBarsReport || positionsReport || singleBarReportDaily || singleBarReportWeekly) {
-  <div class="mb-3 mt-3">
-    <label for="tickerFilter" class="form-label">Ticker filter</label>
-    <select #tickerSelect id="tickerFilter" name="tickerFilter" class="form-select" aria-label="Ticker filter" (change)="onTickerChange(tickerSelect.value)">
-      <option value="all">All</option>
-      @for (t of tickers; track t) {
-        <option [value]="t">{{t}}</option>
-      }
-    </select>
-  </div>
-  }
+    @if (allBarsReport || positionsReport || singleBarReportDaily || singleBarReportWeekly) {
+        <div class="mb-3 mt-3">
+            <label for="tickerFilter" class="form-label">Ticker filter</label>
+            <select #tickerSelect id="tickerFilter" name="tickerFilter" class="form-select" aria-label="Ticker filter"
+                    (change)="onTickerChange(tickerSelect.value)">
+                <option value="all">All</option>
+                @for (t of tickers; track t) {
+                    <option [value]="t">{{ t }}</option>
+                }
+            </select>
+        </div>
+    }
 
-  @if (errors.allBars) {
-    <app-error-display [errors]="errors.allBars"></app-error-display>
-  }
-  @if (loading.allBars) {
-    <app-loading></app-loading>
-  }
-  @if (allBarsReport) {
-    <app-outcomes
-      [title]="'Mutliple bar outcomes'"
-      [tickerFilter]="tickerFilter"
-      [failures]="allBarsReport.failed"
-      [outcomes]="allBarsReport.outcomes">
-    </app-outcomes>
-  }
+    @if (errors.allBars) {
+        <app-error-display [errors]="errors.allBars"></app-error-display>
+    }
+    @if (loading.allBars) {
+        <app-loading></app-loading>
+    }
+    @if (allBarsReport) {
+        <app-outcomes
+            [title]="'Mutliple bar outcomes'"
+            [tickerFilter]="tickerFilter"
+            [failures]="allBarsReport.failed"
+            [outcomes]="allBarsReport.outcomes">
+        </app-outcomes>
+    }
 
-  @if (errors.positions) {
-    <app-error-display [errors]="errors.positions"></app-error-display>
-  }
-  @if (loading.positions) {
-    <app-loading></app-loading>
-  }
-  @if (positionsReport) {
-    <app-outcomes-analysis-report
-      [title]="'Position report'"
-      [report]="positionsReport"
-      [tickerFilter]="tickerFilter"
-      [showSummary]="false">
-    </app-outcomes-analysis-report>
-  }
-  @if (positionsReport) {
-    <app-outcomes
-      [title]="'Positions outcomes'"
-      [tickerFilter]="tickerFilter"
-      [failures]="positionsReport.failed"
-      [outcomes]="positionsReport.outcomes">
-    </app-outcomes>
-  }
+    @if (errors.positions) {
+        <app-error-display [errors]="errors.positions"></app-error-display>
+    }
+    @if (loading.positions) {
+        <app-loading></app-loading>
+    }
+    @if (positionsReport) {
+        <app-outcomes-analysis-report
+            [title]="'Position report'"
+            [report]="positionsReport"
+            [tickerFilter]="tickerFilter"
+            [showSummary]="false">
+        </app-outcomes-analysis-report>
+    }
+    @if (positionsReport) {
+        <app-outcomes
+            [title]="'Positions outcomes'"
+            [tickerFilter]="tickerFilter"
+            [failures]="positionsReport.failed"
+            [outcomes]="positionsReport.outcomes"
+            [isTableVisible]="false">
+        </app-outcomes>
+    }
 
-  @if (errors.daily) {
-    <app-error-display [errors]="errors.daily"></app-error-display>
-  }
-  @if (loading.daily) {
-    <app-loading></app-loading>
-  }
-  @if (singleBarReportDaily) {
-    <app-outcomes-analysis-report
-      [title]="'Daily report'"
-      [tickerFilter]="tickerFilter"
-      [report]="singleBarReportDaily"
-      [showSummary]="true">
-    </app-outcomes-analysis-report>
-  }
-  @if (singleBarReportDaily) {
-    <app-outcomes
-      [title]="'Daily outcomes'"
-      [tickerFilter]="tickerFilter"
-      [failures]="singleBarReportDaily.failed"
-      [outcomes]="singleBarReportDaily.outcomes">
-    </app-outcomes>
-  }
+    @if (errors.daily) {
+        <app-error-display [errors]="errors.daily"></app-error-display>
+    }
+    @if (loading.daily) {
+        <app-loading></app-loading>
+    }
+    @if (singleBarReportDaily) {
+        <app-outcomes-analysis-report
+            [title]="'Daily report'"
+            [tickerFilter]="tickerFilter"
+            [report]="singleBarReportDaily"
+            [showSummary]="true">
+        </app-outcomes-analysis-report>
+    }
+    @if (singleBarReportDaily) {
+        <app-outcomes
+            [title]="'Daily outcomes'"
+            [tickerFilter]="tickerFilter"
+            [failures]="singleBarReportDaily.failed"
+            [outcomes]="singleBarReportDaily.outcomes"
+            [isTableVisible]="false">
+        </app-outcomes>
+    }
 
-  @if (errors.weekly) {
-    <app-error-display [errors]="errors.weekly"></app-error-display>
-  }
-  @if (loading.weekly) {
-    <app-loading></app-loading>
-  }
-  @if (singleBarReportWeekly) {
-    <app-outcomes-analysis-report
-      [title]="'Weekly report'"
-      [report]="singleBarReportWeekly"
-      [tickerFilter]="tickerFilter"
-      [showSummary]="true">
-    </app-outcomes-analysis-report>
-  }
-  @if (singleBarReportWeekly) {
-    <app-outcomes
-      [title]="'Weekly outcomes'"
-      [tickerFilter]="tickerFilter"
-      [failures]="singleBarReportWeekly.failed"
-      [outcomes]="singleBarReportWeekly.outcomes">
-    </app-outcomes>
-  }
+    @if (errors.weekly) {
+        <app-error-display [errors]="errors.weekly"></app-error-display>
+    }
+    @if (loading.weekly) {
+        <app-loading></app-loading>
+    }
+    @if (singleBarReportWeekly) {
+        <app-outcomes-analysis-report
+            [title]="'Weekly report'"
+            [report]="singleBarReportWeekly"
+            [tickerFilter]="tickerFilter"
+            [showSummary]="true">
+        </app-outcomes-analysis-report>
+    }
+    @if (singleBarReportWeekly) {
+        <app-outcomes
+            [title]="'Weekly outcomes'"
+            [tickerFilter]="tickerFilter"
+            [failures]="singleBarReportWeekly.failed"
+            [outcomes]="singleBarReportWeekly.outcomes"
+            [isTableVisible]="false">
+        </app-outcomes>
+    }
 
-  @for (gap of gaps; track gap) {
-    <app-gaps [gaps]="gap"></app-gaps>
-  }
+    @for (gap of gaps; track gap) {
+        <app-gaps [gaps]="gap"></app-gaps>
+    }
 </div>

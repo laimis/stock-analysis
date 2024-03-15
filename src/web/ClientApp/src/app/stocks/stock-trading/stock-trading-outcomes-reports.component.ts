@@ -9,9 +9,6 @@ import { StocksService, OutcomesReport, PositionInstance, StockGaps } from '../.
 })
 export class StockPositionReportsComponent {
 
-
-  sortColumn: string
-  sortDirection: number = -1
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
   singleBarReportWeekly: OutcomesReport;

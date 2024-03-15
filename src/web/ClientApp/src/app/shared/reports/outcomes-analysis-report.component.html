@@ -92,9 +92,6 @@
                 @if (c.matchingTickers.length === 0) {
                   <span>No positions in this category</span>
                 }
-                @if (c.matchingTickers.length > 0) {
-                  <button class="btn btn-sm btn-outline-secondary mt-2" (click)="copyTickersToClipboard(c)">Copy tickers</button>
-                }
               </div>
             }
           </div>

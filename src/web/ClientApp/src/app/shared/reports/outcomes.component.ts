@@ -31,6 +31,9 @@ export class OutcomesComponent {
 
   @Input()
   tickerFilter: string
+    
+    @Input()
+    isTableVisible: boolean = true
 
   @Input()
   set category(value:AnalysisOutcomeEvaluation) {
@@ -58,6 +61,10 @@ export class OutcomesComponent {
       .filter(o => this.IsRenderableOutcome(o))
       .map(o => o.key)
   }
+  
+    toggleTableVisibility() {
+        this.isTableVisible = !this.isTableVisible;
+    }
 
   sort(column:string) {
 
