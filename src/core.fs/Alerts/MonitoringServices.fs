@@ -55,15 +55,17 @@ let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
 let private toEmailAlert marketHours alertGroup =
     {| identifier = alertGroup |> fst; alertCount = alertGroup |> snd |> Seq.length; alerts = alertGroup |> snd |> Seq.map (toEmailData marketHours)  |}
 
-let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours groupingFunc alerts=
+let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs groupingFunc alerts=
     let groups =
         alerts
         |> Seq.groupBy groupingFunc
         |> Seq.map (toEmailAlert marketHours)
+        
+    let diffs = alertDiffs |> Seq.map (fun (k,v) -> {| identifier = k; change = v |})
 
-    {| alertGroups = groups |};
+    {| alertGroups = groups; alertDiffs = diffsg |};
 
-let generateEmailDataPayloadForAlerts marketHours = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours _.identifier
+let generateEmailDataPayloadForAlerts marketHours alertDiffs = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs _.identifier
 
 let private _patternMonitorTimes = [
     TimeOnly.Parse("09:45")
@@ -485,7 +487,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
 
                 do!
                     pair.Value
-                    |> generateEmailDataPayloadForAlertsWithGroupingFunction marketHours (fun a -> "Weekly " + a.identifier)
+                    |> generateEmailDataPayloadForAlertsWithGroupingFunction marketHours [] (fun a -> "Weekly " + a.identifier)
                     |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
                     |> Async.AwaitTask
             })
@@ -547,7 +549,9 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
             marketHours.ToUniversalTime(nextSaturday)
 
 
-type AlertEmailService(accounts:IAccountStorage,
+type AlertEmailService(
+        accounts:IAccountStorage,
+        blobStorage:IBlobStorage,
         container:StockAlertContainer,
         emails:IEmailService,
         logger:ILogger,
@@ -559,14 +563,43 @@ type AlertEmailService(accounts:IAccountStorage,
             TimeOnly.Parse("16:20")
         ]
 
-    let processAlerts recipient alerts =
+    let processAlerts (user:User) alerts = async {
+        
+        let toAlertCountPairs (sequence:TriggeredAlert seq) =
+            sequence |> Seq.groupBy (_.identifier) |> Seq.map (fun (k,v) -> k, v |> Seq.length) |> Seq.toList
+                
+        // store alert breakdown in the database
+        let key = $"{user.State.Id}/" + DateTime.UtcNow.Date.ToString("yyyy-MM-dd") + "/alerts.json"
+        
+        let! fromStorage = blobStorage.Get<TriggeredAlert seq>(key) |> Async.AwaitTask
+        
+        let diffCount =
+            match fromStorage with
+            | null -> []
+            | _ ->
+                let previousCounts = fromStorage |> toAlertCountPairs
+                let currentCounts = alerts |> toAlertCountPairs
+                
+                currentCounts |> List.map (
+                    fun (k,v) ->
+                        let previousValue = previousCounts |> List.tryFind (fun (k2,_) -> k2 = k) |> Option.defaultValue (k,0) |> snd
+                        let diff = v - previousValue
+                        k, diff
+                )
+            
+        logger.LogWarning($"Overwriting existing alerts for {user.State.Id} on {DateTime.UtcNow.Date}")
+        
+        do! blobStorage.Save(key, alerts) |> Async.AwaitTask
+        
+        let recipient = Recipient(email=user.State.Email, name=user.State.Name)
+       
         logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
-        let sendTask =
+        do!
             alerts
-            |> generateEmailDataPayloadForAlerts marketHours
+            |> generateEmailDataPayloadForAlerts marketHours diffCount
             |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
-
-        sendTask |> Async.AwaitTask
+            |> Async.AwaitTask
+    }
 
     interface IApplicationService
 
@@ -582,11 +615,10 @@ type AlertEmailService(accounts:IAccountStorage,
                     match user with
                     | None -> logger.LogError $"User {emailIdPair.Id} not found"
                     | Some user ->
-                        let recipient = Recipient(email=user.State.Email, name=user.State.Name)
                         let alerts = container.GetAlerts emailIdPair.Id
                         match alerts |> Seq.isEmpty with
                         | true -> ()
-                        | false -> do! processAlerts recipient alerts;
+                        | false -> do! processAlerts user alerts;
                 })
                 |> Async.Sequential
                 |> Async.Ignore
