@@ -78,13 +78,13 @@ let ``Green streak is positive`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.GreenStreak |> should equal 1
     
 [<Fact>]
-let ``SMA20 above SMA50 is negative and matches`` () =
+let ``EMA20 above SMA50 is negative and matches`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EMA20AboveSMA50Bars |> should equal -48m
     
 [<Fact>]
-let ``Price above SMA20 bars is positive and matches`` () =
-    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMABars |> should equal 1m
+let ``Price above EMA20 bars is positive and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAboveEMA20Bars |> should equal 1m
 
 [<Fact>]
 let ``SMA50 above SMA200 bars is positive and matches`` () =
-    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars |> should equal -205m
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50AboveSMA200Bars |> should equal -205m

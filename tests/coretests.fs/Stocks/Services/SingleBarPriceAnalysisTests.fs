@@ -87,15 +87,15 @@ let ``SMA20Above50Bars is correct`` () =
     
 [<Fact>]
 let ``SMA50Above200Bars is correct`` () =
-    SingleBarPriceAnalysis.SingleBarOutcomeKeys.SMA50Above200Bars |> firstOutcome |> should equal -205m
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.SMA50AboveSMA200Bars |> firstOutcome |> should equal -205m
     
 [<Fact>]
 let ``PriceAbove20SMA is correct`` () =
-    SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove20SMA |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 4 |> should equal 0.0396m
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAboveSMA20 |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 4 |> should equal 0.0396m
     
 [<Fact>]
 let ``PriceAbove200SMA is correct`` () =
-    SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAbove200SMA |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 4 |> should equal -0.2918m
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.PriceAboveSMA200 |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 4 |> should equal -0.2918m
     
 [<Fact>]
 let ``TrueRange is correct`` () =

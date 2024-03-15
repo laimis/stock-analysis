@@ -45,14 +45,14 @@ let ``SMA20 above SMA50``()
     
 [<Fact>]
 let ``SMA50 above SMA200``()
-    = assertOutcomeExistsAndValueMatches MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50Above200Bars 60m
+    = assertOutcomeExistsAndValueMatches MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50AboveSMA200Bars 60m
 
 [<Fact>]
-let ``Price above 20SMA``()
-    = assertOutcomeExistsAndValueMatches MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAbove20SMABars 240m
+let ``Price above EMA20Bars``()
+    = assertOutcomeExistsAndValueMatches MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAboveEMA20Bars 241m
     
 [<Fact>]
-let ``SMA20 above SMA50 positive``()
+let ``EMA20 above SMA50 positive``()
     = outcomes
         |> Seq.find (fun o -> o.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EMA20AboveSMA50Bars)
         |> fun o -> o.OutcomeType |> should equal OutcomeType.Positive

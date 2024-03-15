@@ -63,6 +63,13 @@ if ($exitCode -ne 0) {
     Exit-With-Error "Tests failed"
 }
 
+#ensure database tests pass
+Invoke-Expression '.\test_database_secret.bat'
+$exitCode = $LASTEXITCODE
+if ($exitCode -ne 0) {
+    Exit-With-Error "Database tests failed"
+}
+
 # ensure that the web project lint is clean
 push-location "src/web/ClientApp"
 invoke-expression "ng lint"

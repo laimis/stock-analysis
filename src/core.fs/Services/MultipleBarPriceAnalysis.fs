@@ -20,8 +20,8 @@ module MultipleBarPriceAnalysis =
         let PercentBelowHigh = "PercentBelowHigh"
         let PercentAboveLow = "PercentAboveLow"
         let EMA20AboveSMA50Bars = "EMA20AboveSMA50Bars"
-        let SMA50Above200Bars = "SMA50Above200Bars"
-        let PriceAbove20SMABars = "PriceAbove20SMADays"
+        let SMA50AboveSMA200Bars = "SMA50AboveSMA200Bars"
+        let PriceAboveEMA20Bars = "PriceAboveEMA20Bars"
         let CurrentPrice = "CurrentPrice"
         let PercentChangeAverage = "PercentChangeAverage"
         let PercentChangeStandardDeviation = "PercentChangeStandardDeviation"
@@ -117,21 +117,21 @@ module MultipleBarPriceAnalysis =
                 )
             )   
             
-        let private generatePriceAboveSMA20Outcome (bars:PriceBars) (container:MovingAveragesContainer) =
+        let private generatePriceAboveEMA20Outcome (bars:PriceBars) (container:MovingAveragesContainer) =
             
             let closingPrices = bars.ClosingPrices() |> Array.map (fun x -> x |> Some)
             
-            let outcomeTypeAndValueOption = priceStreakDetection closingPrices container.sma20.Values
+            let outcomeTypeAndValueOption = priceStreakDetection closingPrices container.ema20.Values
                 
             match outcomeTypeAndValueOption with
             | None -> None
             | Some (outcomeType, value) ->
                 AnalysisOutcome(
-                    key = MultipleBarOutcomeKeys.PriceAbove20SMABars,
+                    key = MultipleBarOutcomeKeys.PriceAboveEMA20Bars,
                     outcomeType = outcomeType,
                     value = value,
                     valueType = ValueFormat.Number,
-                    message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" SMA 20 for {abs value} days"
+                    message = "Price has been " + (if outcomeType = OutcomeType.Negative then "below" else "above") + $" EMA 20 for {abs value} days"
                 ) |> Some
             
         let private generateSMA20Above50DaysOutcome (smaContainer: MovingAveragesContainer) =
@@ -155,7 +155,7 @@ module MultipleBarPriceAnalysis =
             | None -> None
             | Some (outcomeType, value) ->
                 AnalysisOutcome(
-                    key = MultipleBarOutcomeKeys.SMA50Above200Bars,
+                    key = MultipleBarOutcomeKeys.SMA50AboveSMA200Bars,
                     outcomeType = outcomeType,
                     value = value,
                     valueType = ValueFormat.Number,
@@ -168,10 +168,11 @@ module MultipleBarPriceAnalysis =
             
             let streakOutcomes =
                 [|
-                    smaContainer |> generatePriceAboveSMA20Outcome prices
-                    smaContainer |> generateSMA20Above50DaysOutcome
-                    smaContainer |> generateSMA50Above200DaysOutcome
+                    generatePriceAboveEMA20Outcome prices
+                    generateSMA20Above50DaysOutcome
+                    generateSMA50Above200DaysOutcome
                 |]
+                |> Array.map (fun func -> func smaContainer)
                 |> Array.choose id
             
             [
