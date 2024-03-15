@@ -1,212 +1,251 @@
 @if (workflowStarted === false) {
-  <section>
-    @if (positionEntered) {
-      <div class="alert alert-primary">Position has been successfully opened</div>
-    }
+    <section class="container">
+        @if (positionEntered) {
+            <div class="alert alert-primary">Position has been successfully opened</div>
+        }
 
-    @if (pendingPositionEntered) {
-      <div class="alert alert-primary">Pending position has been successfully created</div>
-    }
+        @if (pendingPositionEntered) {
+            <div class="alert alert-primary">Pending position has been successfully created</div>
+        }
 
-    <button class="btn btn-secondary" (click)="startNewPosition()">Start New Position</button>
-  </section>
+        <div>
+            <button class="btn btn-primary" (click)="startNewPosition()">Start New Position</button>
+        </div>
+    </section>
 } @else {
-  <section>
-    <h5>
-      Initiate Position
-      <span class="float-end fs-6">max loss: {{ maxLoss | currency }}</span>
-    </h5>
-    @if (!presetTicker) {
-      <div class="row">
-        <div class="col">
-          @if (isPendingPositionMode === true) {
-            <app-stock-search
-              label="Ticker"
-              placeholder="New position symbol"
-              (tickerSelected)="onBuyTickerSelected($event)"
-              cssClass="form-control">
-            </app-stock-search>
-          }
-          @if (isPendingPositionMode === false) {
-            <b>{{ ticker }}</b>
-          }
-        </div>
-      </div>
-    }
-    @if (ticker) {
-      <div class="row mt-3">
-        <div class="col">
-          <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }} x {{ this.ask | currency }}
-            )</label>
-          <input
-            type="number"
-            step="0.01"
-            id="costToBuy"
-            class="form-control"
-            [(ngModel)]="price"
-            (ngModelChange)="updateBuyingValuesWithCostToBuy()"
-          />
-        </div>
-        @if (isPendingPositionMode === true) {
-          <div class="col-md-3">
-            <label for="sizeStopPrice" class="form-label">Size Stop</label>
-            <input
-              type="number"
-              step="0.01"
-              id="sizeStopPrice"
-              class="form-control"
-              [(ngModel)]="sizeStopPrice"
-              (ngModelChange)="updateBuyingValuesSizeStopPrice()"
-            />
-          </div>
+    <section class="container">
+        <h3 class="mb-4">
+            Initiate Position
+            <span class="float-end fs-6">max loss: {{ maxLoss | currency }}</span>
+        </h3>
+        @if (!presetTicker) {
+            <div class="row mb-3">
+                <div class="col">
+                    @if (isPendingPositionMode === true) {
+                        <app-stock-search
+                            label="Ticker"
+                            placeholder="New position symbol"
+                            (tickerSelected)="onBuyTickerSelected($event)"
+                            cssClass="form-control form-control-lg">
+                        </app-stock-search>
+                    }
+                    @if (isPendingPositionMode === false) {
+                        <h4>{{ ticker }}</h4>
+                    }
+                </div>
+            </div>
         }
-        <div class="col-md-3">
-          <label for="stopPrice" class="form-label">Stop</label>
-          <input
-            type="number"
-            step="0.01"
-            id="stopPrice"
-            class="form-control"
-            [(ngModel)]="positionStopPrice"
-            (ngModelChange)="updateBuyingValuesPositionStopPrice()"
-          />
-        </div>
-        <div class="col-md-3">
-          <label for="stocksToBuy" class="form-label">Shares #</label>
-          <input
-            min="-10000"
-            max="10000"
-            type="number"
-            id="stocksToBuy"
-            class="form-control"
-            [(ngModel)]="numberOfShares"
-            (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
-          />
-        </div>
-        @if (isPendingPositionMode === false) {
-          <div class="col-md-3">
-            <label for="date" class="form-label">Purchase Date</label>
-            <input
-              type="date"
-              class="form-control"
-              id="date"
-              [(ngModel)]="date">
-          </div>
+        @if (ticker) {
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }} x {{ this.ask | currency }}
+                        )</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="costToBuy"
+                        class="form-control form-control-lg"
+                        [(ngModel)]="price"
+                        (ngModelChange)="updateBuyingValuesWithCostToBuy()"
+                    />
+                </div>
+                @if (isPendingPositionMode === true) {
+                    <div class="col-md-3">
+                        <label for="sizeStopPrice" class="form-label">Size Stop</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            id="sizeStopPrice"
+                            class="form-control form-control-lg"
+                            [(ngModel)]="sizeStopPrice"
+                            (ngModelChange)="updateBuyingValuesSizeStopPrice()"
+                        />
+                    </div>
+                }
+                <div class="col-md-3">
+                    <label for="stopPrice" class="form-label">Stop</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="stopPrice"
+                        class="form-control form-control-lg"
+                        [(ngModel)]="positionStopPrice"
+                        (ngModelChange)="updateBuyingValuesPositionStopPrice()"
+                    />
+                </div>
+                <div class="col-md-3">
+                    <label for="stocksToBuy" class="form-label">Shares #</label>
+                    <input
+                        min="-10000"
+                        max="10000"
+                        type="number"
+                        id="stocksToBuy"
+                        class="form-control form-control-lg"
+                        [(ngModel)]="numberOfShares"
+                        (ngModelChange)="updateBuyingValuesWithNumberOfShares()"
+                    />
+                </div>
+                @if (isPendingPositionMode === false) {
+                    <div class="col-md-3">
+                        <label for="date" class="form-label">Purchase Date</label>
+                        <input
+                            type="date"
+                            class="form-control form-control-lg"
+                            id="date"
+                            [(ngModel)]="date">
+                    </div>
+                }
+            </div>
         }
-      </div>
-    }
-    @if (prices) {
-      <div class="row mt-3">
-        <div class="col-md-6 fs-6">
-          <span class="me-2 visually-hidden" #sizeSpan
-                (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
-          <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
-          <span class="me-2 visually-hidden" #lossSpan
-                (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
-          <span class="me-2" #lossSpanAlt (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
-          <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
-          <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
-        </div>
-        <div class="col-md-6 text-end">
-          <app-stock-link class="me-2" [ticker]="ticker"></app-stock-link>
-          <app-trading-view-link class="me-2" [ticker]="ticker"></app-trading-view-link>
-          <span class="me-2 pointer"
-                (click)="assignSizeStopPrice(calculateAtrBasedStop())">ATR: <strong>{{ atr | currency }}</strong> </span>
-          <span class="me-2 pointer" (click)="assignSizeStopPrice(get20sma())">20: <strong
-            [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
-          <span class="me-2 pointer" (click)="assignSizeStopPrice(get50sma())">50: <strong
-            [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
-          <span class="me-2 pointer" (click)="assignSizeStopPrice(get150sma())">150: <strong
-            [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
-          <span class="me-2 pointer" (click)="assignSizeStopPrice(get200sma())">200: <strong
-            [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
-        </div>
-      </div>
-    }
-    @if (prices) {
-      <div class="row mt-3">
-        <div class="col">
-          <textarea class="form-control" rows="5" [(ngModel)]="notes" placeholder="Notes..."></textarea>
-        </div>
-      </div>
-    }
-    @if (prices) {
-      <div class="row mt-3">
-        <div class="col">
-          <select class="form-select" id="strategyInput" [(ngModel)]="strategy">
-            <option value="" selected>Select strategy...</option>
-            @for (s of strategies;track s) {
-              <option [value]="s.key">{{ s.value }}</option>
+        @if (prices) {
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Position Details</h5>
+                            <p class="card-text">
+                <span class="me-2 visually-hidden" #sizeSpan
+                      (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
+                                <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
+                                <span class="me-2 visually-hidden" #lossSpan
+                                      (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
+                                <span class="me-2" #lossSpanAlt (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
+                                <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
+                                <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Quick Actions</h5>
+                            <p class="card-text">
+                                <app-stock-link class="me-2" [ticker]="ticker"></app-stock-link>
+                                <app-trading-view-link class="me-2" [ticker]="ticker"></app-trading-view-link>
+                                <span class="me-2 pointer"
+                                      (click)="assignSizeStopPrice(calculateAtrBasedStop())">ATR: <strong>{{ atr | currency }}</strong> </span>
+                                <span class="me-2 pointer" (click)="assignSizeStopPrice(get20sma())">20: <strong
+                                    [ngClass]="{'text-success': smaCheck20()}">{{ get20sma() | currency }}</strong></span>
+                                <span class="me-2 pointer" (click)="assignSizeStopPrice(get50sma())">50: <strong
+                                    [ngClass]="{'text-success': smaCheck50()}">{{ get50sma() | currency }}</strong></span>
+                                <span class="me-2 pointer" (click)="assignSizeStopPrice(get150sma())">150: <strong
+                                    [ngClass]="{'text-success': smaCheck150()}">{{ get150sma() | currency }}</strong></span>
+                                <span class="me-2 pointer" (click)="assignSizeStopPrice(get200sma())">200: <strong
+                                    [ngClass]="{'text-success': smaCheck200()}">{{ get200sma() | currency }}</strong></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (prices) {
+            <div class="row mb-3">
+                <div class="col">
+                    <div>
+                        <textarea class="form-control" rows="5" id="notes" [(ngModel)]="notes" placeholder="Notes..."></textarea>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (prices) {
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="form-floating">
+                        <select class="form-select" id="strategyInput" [(ngModel)]="strategy">
+                            <option value="" selected>Select strategy...</option>
+                            @for (s of strategies;track s) {
+                                <option [value]="s.key">{{ s.value }}</option>
+                            }
+                        </select>
+                        <label for="strategyInput">Strategy</label>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (prices && isPendingPositionMode) {
+            <div class="row mb-3">
+                <div class="col">
+                    <button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position - LIMIT
+                    </button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending Position - MARKET
+                    </button>
+                </div>
+            </div>
+        }
+        @if (prices && !isPendingPositionMode) {
+            <div class="row mb-3">
+                <div class="col">
+                    <button class="btn btn-primary w-100" (click)="openPosition()" [disabled]="recordInProgress">Open Position
+                    </button>
+                </div>
+            </div>
+        }
+        @if (chartInfo && showChart) {
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (showAnalysis && resistanceContainer && supportContainer) {
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" id="priceFrequency" [(ngModel)]="priceFrequency"
+                                (ngModelChange)="priceFrequencyChanged()">
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                        </select>
+                        <label for="priceFrequency">Price Frequency</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select id="ageValueToUse" class="form-select" [(ngModel)]="ageValueToUse"
+                                (ngModelChange)="ageValueChanged()">
+                            <option [value]="twoMonths">2 months</option>
+                            <option [value]="sixMonths">6 months</option>
+                        </select>
+                        <label for="ageValueToUse">Support/Resistance Age</label>
+                    </div>
+                </div>
+            </div>
+            @if (resistanceContainer && supportContainer) {
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <app-line-chart [dataContainer]="supportContainer"></app-line-chart>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <app-line-chart [dataContainer]="resistanceContainer"></app-line-chart>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
-          </select>
-        </div>
-      </div>
-    }
-    @if (prices && isPendingPositionMode) {
-      <div class="row mt-3">
-        <div class="col">
-          <button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position - LIMIT
-          </button>
-        </div>
-        <div class="col">
-          <button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending Position - MARKET
-          </button>
-        </div>
-      </div>
-    }
-    @if (prices && !isPendingPositionMode) {
-      <div class="row mt-3">
-        <div class="col">
-          <button class="btn btn-primary w-100" (click)="openPosition()" [disabled]="recordInProgress">Open Position
-          </button>
-        </div>
-      </div>
-    }
-    @if (chartInfo && showChart) {
-      <div class="row mt-3">
-        <div class="col">
-          <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
-        </div>
-      </div>
-    }
-    @if (showAnalysis && resistanceContainer && supportContainer) {
-      <div>
-        <div class="row mt-3">
-          <div class="col">
-            <label class="form-label" for="priceFrequency">Price Frequency</label>
-            <select class="form-select" id="priceFrequency" [(ngModel)]="priceFrequency"
-                    (ngModelChange)="priceFrequencyChanged()">
-              <option value="Daily">Daily</option>
-              <option value="Weekly">Weekly</option>
-            </select>
-          </div>
-          <div class="col">
-            <label class="form-label" for="ageValueToUse">Support/Resistance Age</label>
-            <select id="ageValueToUse" class="form-select" [(ngModel)]="ageValueToUse"
-                    (ngModelChange)="ageValueChanged()">
-              <option [value]="twoMonths">2 months</option>
-              <option [value]="sixMonths">6 months</option>
-            </select>
-          </div>
-        </div>
-        @if (resistanceContainer && supportContainer) {
-          <div class="row mt-3">
-            <div class="col-md-6">
-              <app-line-chart [dataContainer]="supportContainer"></app-line-chart>
-            </div>
-            <div class="col-md-6">
-              <app-line-chart [dataContainer]="resistanceContainer"></app-line-chart>
-            </div>
-          </div>
+            @if (gaps) {
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <app-gaps [gaps]="gaps"></app-gaps>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         }
-        @if (gaps) {
-          <div class="row mt-3">
-            <div class="col">
-              <app-gaps [gaps]="gaps"></app-gaps>
-            </div>
-          </div>
-        }
-      </div>
-    }
-  </section>
+    </section>
 }
