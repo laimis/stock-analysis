@@ -40,14 +40,6 @@ module SingleBarPriceAnalysis =
             outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA50AboveSMA200Bars)
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50AboveSMA200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
-        let sma20outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 20)
-            |> Option.filter (fun o -> o.Value = 0m |> not)
-            |> Option.map (fun o ->
-                let currentBar = bars.Last        
-                let pctDiff = (currentBar.Close - o.Value) / o.Value
-                AnalysisOutcome (SingleBarOutcomeKeys.PriceAboveSMA20, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 20 day SMA")
-            )
         let sma200outcome =
             outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 200)
             |> Option.filter (fun o -> o.Value = 0m |> not)
@@ -64,7 +56,6 @@ module SingleBarPriceAnalysis =
         [
             ema20AboveSMA50Outcome
             sma50AboveSMA200Outcome
-            sma20outcome
             sma200outcome
             priceAboveEMA20BarsOutcome
         ] |> List.choose id
