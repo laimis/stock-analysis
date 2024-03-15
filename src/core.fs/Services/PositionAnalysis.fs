@@ -173,9 +173,19 @@ module PositionAnalysis =
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
         ]
         
+        let longsWentAboveEMA20Filter = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PriceAboveEMA20Bars && o.Value = 1m)
+            (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
+        ]
+        
         let longsWentUnderEMA20Filter = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PriceAboveEMA20Bars && o.Value = -1m)
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
+        ]
+        
+        let shortsWentBelowEMA20Filter = [
+            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PriceAboveEMA20Bars && o.Value = -1m)
+            (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
         ]
         
         let shortsWentAboveEMA20Filter = [
@@ -297,10 +307,22 @@ module PositionAnalysis =
                 ]
             )
             AnalysisOutcomeEvaluation(
+                "Longs went above EMA20",
+                OutcomeType.Positive,
+                PositionAnalysisKeys.PriceAboveEMA20Bars,
+                tickerOutcomes |> TickerOutcomes.filter longsWentAboveEMA20Filter
+            )
+            AnalysisOutcomeEvaluation(
                 "Longs went under EMA20",
                 OutcomeType.Negative,
                 PositionAnalysisKeys.PriceAboveEMA20Bars,
                 tickerOutcomes |> TickerOutcomes.filter longsWentUnderEMA20Filter
+            )
+            AnalysisOutcomeEvaluation(
+                "Shorts went below EMA20",
+                OutcomeType.Positive,
+                PositionAnalysisKeys.PriceAboveEMA20Bars,
+                tickerOutcomes |> TickerOutcomes.filter shortsWentBelowEMA20Filter
             )
             AnalysisOutcomeEvaluation(
                 "Shorts went above EMA20",
