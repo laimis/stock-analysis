@@ -1,64 +1,67 @@
+<div class="container">
+    @for (violation of violations; track violation) {
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="text-muted" role="button" (click)="toggleVisuallyHidden(sizeInfo)">Shares / Size <span>(click to show)</span></div>
+                        <div #sizeInfo class="visually-hidden">
+                            {{violation.numberOfShares}} / {{violation.numberOfShares * violation.pricePerShare | currency}}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted">Buy Price</div>
+                        <div>{{violation.pricePerShare | currency}}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted">Current Price</div>
+                        <div>{{violation.currentPrice | currency}}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted">% diff</div>
+                        <div>{{getDiffPrice(violation) | percent}}</div>
+                    </div>
+                </div>
 
-<!-- render violations on mobile as cards -->
-<div>
-  @for (violation of violations; track violation) {
-    <div class="card mb-3">
-      <div class="card-title">
-        <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
-      </div>
-      <div class="card-body">
-          <div class="row">
-              <div class="col-md-3">
-                  <div class="stat-label">Shares / Size</div>
-                  <div>{{violation.numberOfShares}} / {{violation.numberOfShares * violation.pricePerShare | currency}}</div>
-              </div>
-              <div class="col-md-3">
-                  <div class="stat-label">Buy Price</div>
-                  <div>{{violation.pricePerShare | currency}}</div>    
-              </div>
-              <div class="col-md-3">
-                  <div class="stat-label">Current Price</div>
-                  <div>{{violation.currentPrice | currency}}</div>
-              </div>
-              <div class="col-md-3">
-                  <div class="stat-label">% diff</div>
-                  <div>{{(violation.currentPrice - violation.pricePerShare) / violation.pricePerShare | percent}}</div>
-              </div>
-          </div>
-        
-          @if (!violation.localPosition) {
-          <div class="row" >
-            <div class="col">
-              <app-stock-trading-new-position
-                [presetTicker]="violation.ticker"
-                [showChart]="false"
-                [showAnalysis]="false"
-                [isPendingPositionMode]="false"
-                (positionOpened)="positionOpened($event)">
-              </app-stock-trading-new-position>
+                @if (!violation.localPosition) {
+                    <div class="mb-3">
+                        <app-stock-trading-new-position
+                            [presetTicker]="violation.ticker"
+                            [showChart]="false"
+                            [showAnalysis]="false"
+                            [isPendingPositionMode]="false"
+                            (positionOpened)="positionOpened($event)">
+                        </app-stock-trading-new-position>
+                    </div>
+                }
+
+                @if (tickerHasOrders(violation.ticker)) {
+                    <div class="mb-3">
+                        <app-brokerage-orders
+                            [positionId]="violation.localPosition?.positionId"
+                            [orders]="orders"
+                            [filteredTickers]="[violation.ticker]"
+                            [justOrders]="true"
+                            (ordersChanged)="refreshRequested.emit($event)">
+                        </app-brokerage-orders>
+                    </div>
+                }
             </div>
-          </div>
-            }
-            @if (tickerHasOrders(violation.ticker)) {
-            <div class="row">
-              <div class="col">
-                <app-brokerage-orders
-                  [positionId]="violation.localPosition?.positionId"
-                  [orders]="orders"
-                  [filteredTickers]="[violation.ticker]"
-                  [justOrders]="true"
-                  (ordersChanged)="refreshRequested.emit($event)"
-                ></app-brokerage-orders>
-              </div>
+
+            <div class="card-footer">
+                <p class="mb-0">{{violation.message}}</p>
             </div>
-            }
-      </div>
-        <div class="card-footer">
-            {{violation.message}}
         </div>
-    </div>
-  }
+    }
+
     @if (tickersInViolations.length > 0) {
-        <app-brokerage-new-order (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
+        <div class="mt-4">
+            <app-brokerage-new-order (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
+        </div>
     }
 </div>

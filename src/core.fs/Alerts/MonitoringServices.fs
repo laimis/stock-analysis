@@ -553,13 +553,13 @@ type AlertEmailService(accounts:IAccountStorage,
         logger:ILogger,
         marketHours:IMarketHours) =
 
-    let emailTimes =
+    let runTimes =
         [
             TimeOnly.Parse("09:50")
             TimeOnly.Parse("16:20")
         ]
 
-    let sendAlerts recipient alerts =
+    let processAlerts recipient alerts =
         logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
         let sendTask =
             alerts
@@ -586,7 +586,7 @@ type AlertEmailService(accounts:IAccountStorage,
                         let alerts = container.GetAlerts emailIdPair.Id
                         match alerts |> Seq.isEmpty with
                         | true -> ()
-                        | false -> do! sendAlerts recipient alerts;
+                        | false -> do! processAlerts recipient alerts;
                 })
                 |> Async.Sequential
                 |> Async.Ignore
@@ -599,7 +599,7 @@ type AlertEmailService(accounts:IAccountStorage,
         let eastern = marketHours.ToMarketTime(now);
 
         let nextTime =
-            emailTimes
+            runTimes
             |> Seq.map (fun t -> eastern.Date.Add(t.ToTimeSpan()) |> DateTimeOffset)
             |> Seq.filter (fun t -> t > eastern)
             |> Seq.map marketHours.ToUniversalTime
@@ -609,7 +609,7 @@ type AlertEmailService(accounts:IAccountStorage,
         | Some t ->
             t
         | None ->
-            let nextDay = eastern.Date.AddDays(1).Add(emailTimes[0].ToTimeSpan())
+            let nextDay = eastern.Date.AddDays(1).Add(runTimes[0].ToTimeSpan())
 
             match nextDay.DayOfWeek with
             | DayOfWeek.Saturday -> nextDay.AddDays(2)
