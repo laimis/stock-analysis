@@ -63,7 +63,7 @@ let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs
         
     let diffs = alertDiffs |> Seq.map (fun (k,v) -> {| identifier = k; change = v |})
 
-    {| alertGroups = groups; alertDiffs = diffsg |};
+    {| alertGroups = groups; alertDiffs = diffs |};
 
 let generateEmailDataPayloadForAlerts marketHours alertDiffs = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs _.identifier
 
@@ -568,7 +568,6 @@ type AlertEmailService(
         let toAlertCountPairs (sequence:TriggeredAlert seq) =
             sequence |> Seq.groupBy (_.identifier) |> Seq.map (fun (k,v) -> k, v |> Seq.length) |> Seq.toList
                 
-        // store alert breakdown in the database
         let key = $"{user.State.Id}/" + DateTime.UtcNow.Date.ToString("yyyy-MM-dd") + "/alerts.json"
         
         let! fromStorage = blobStorage.Get<TriggeredAlert seq>(key) |> Async.AwaitTask
@@ -587,10 +586,8 @@ type AlertEmailService(
                         k, diff
                 )
             
-        logger.LogWarning($"Overwriting existing alerts for {user.State.Id} on {DateTime.UtcNow.Date}")
-        
-        do! blobStorage.Save(key, alerts) |> Async.AwaitTask
-        
+        if fromStorage = null then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
+                
         let recipient = Recipient(email=user.State.Email, name=user.State.Name)
        
         logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")

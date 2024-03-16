@@ -43,5 +43,9 @@ namespace web.Controllers
 
         [HttpGet("monitors")]
         public IEnumerable<object> Monitors() => handler.Handle(new QueryAvailableMonitors());
+        
+        [HttpGet("emailJob")]
+        [Authorize("admin")]
+        public Task EmailJob() => handler.Handle(new RunEmailJob());
     }
 }

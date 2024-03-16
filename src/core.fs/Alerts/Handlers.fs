@@ -1,10 +1,13 @@
 namespace core.fs.Alerts
 
+    open System.Threading
     open core.Shared
     open core.Stocks
     open core.fs
     open core.fs.Accounts
+    open core.fs.Adapters.Logging
     open core.fs.Adapters.SMS
+    open core.fs.Alerts.MonitoringServices
 
     
     type QueryAlerts = {UserId:UserId}
@@ -14,8 +17,9 @@ namespace core.fs.Alerts
     type TurnSMSOn = struct end
     type TurnSMSOff = struct end
     type SMSStatus = struct end
+    type RunEmailJob = struct end
     
-    type Handler(container:StockAlertContainer,smsService:ISMSClient) =
+    type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger) =
     
         let deregisterStopPriceMonitoring userId ticker =
             container.Deregister ticker Constants.StopLossIdentifier userId
@@ -65,6 +69,11 @@ namespace core.fs.Alerts
         
         member this.Handle (_:SMSStatus) : System.Threading.Tasks.Task<Result<bool, ServiceError>> = task {
             return smsService.IsOn |> Ok
+        }
+        
+        member this.Handle (_:RunEmailJob) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
+            do! alertEmailService.Execute logger CancellationToken.None |> Async.AwaitTask
+            return Ok ()
         }
             
             
