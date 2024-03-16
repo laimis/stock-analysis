@@ -39,9 +39,9 @@ type private WeeklyUpsideCheckResult =
 let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
         let formattedValue format (value:decimal) =
             match format with
-            | ValueFormat.Currency -> value.ToString("C2")
-            | ValueFormat.Percentage -> value.ToString("P1")
-            | ValueFormat.Number -> value.ToString("N2")
+            | ValueFormat.Currency -> value.ToString("C2", CultureUtils.DefaultCulture)
+            | ValueFormat.Percentage -> value.ToString("P1", CultureUtils.DefaultCulture)
+            | ValueFormat.Number -> value.ToString("N2", CultureUtils.DefaultCulture)
             | ValueFormat.Boolean -> value.ToString()
 
         {|
