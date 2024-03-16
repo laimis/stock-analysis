@@ -5,7 +5,6 @@ using core.fs.Accounts;
 using core.Options;
 using core.Shared;
 using Moq;
-using OptionType = core.Options.OptionType;
 
 namespace coretests.Options
 {

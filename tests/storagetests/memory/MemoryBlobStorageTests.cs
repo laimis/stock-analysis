@@ -1,6 +1,5 @@
-﻿using core.fs.Adapters.Storage;
+﻿using core.Shared;
 using storage.memory;
-using storage.shared;
 
 namespace storagetests.memory
 {

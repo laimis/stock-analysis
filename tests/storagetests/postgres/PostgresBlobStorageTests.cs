@@ -1,5 +1,5 @@
-﻿using storage.postgres;
-using storage.shared;
+﻿using core.Shared;
+using storage.postgres;
 using testutils;
 using Xunit;
 
