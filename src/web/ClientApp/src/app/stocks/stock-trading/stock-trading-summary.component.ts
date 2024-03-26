@@ -118,24 +118,26 @@ export class StockTradingSummaryComponent {
     console.log("breaking down positions")
 
     if (!positions) return []
+      
+      let strategyGroups = {}
 
-    let strategyGroups = positions.reduce((acc, cur) => {
-      let strategyKey = this.getStrategy(cur)
+      // custom groups
+      strategyGroups["allbutlongterm"] = positions.filter(p => !isLongTermStrategy(this.getStrategy(p)))
+      strategyGroups["long"] = positions.filter((p:PositionInstance) => p.isShort === false && !isLongTermStrategy(this.getStrategy(p)))
+      strategyGroups["short"] = positions.filter((p:PositionInstance) => p.isShort === true && !isLongTermStrategy(this.getStrategy(p)))
 
-      if (!acc[strategyKey]) {
-        acc[strategyKey] = []
-      }
+      positions.reduce((acc, cur) => {
+          let strategyKey = this.getStrategy(cur)
 
-      acc[strategyKey].push(cur)
+          if (!acc[strategyKey]) {
+            acc[strategyKey] = []
+          }
+          
+          acc[strategyKey].push(cur)
 
-      return acc
-    }, {})
-
-    // custom groups
-    strategyGroups["allbutlongterm"] = positions.filter(p => !isLongTermStrategy(this.getStrategy(p)))
-    strategyGroups["long"] = positions.filter((p:PositionInstance) => p.isShort === false && !isLongTermStrategy(this.getStrategy(p)))
-    strategyGroups["short"] = positions.filter((p:PositionInstance) => p.isShort === true && !isLongTermStrategy(this.getStrategy(p)))
-
+          return acc
+      }, strategyGroups)
+    
     let groupsArray = []
 
     for (const key in strategyGroups) {

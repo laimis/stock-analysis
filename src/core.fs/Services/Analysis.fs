@@ -103,20 +103,20 @@ type MovingAverages(values,interval,exponential) =
         
         let ema =
             match prices.Length <= interval with
-            | true -> Array.create prices.Length None
+            | true ->
+                Array.create prices.Length None
             | false ->
-        
-            let alpha = 2m / (decimal (interval + 1))
-            let initialEMA = System.Math.Round(Array.averageBy id prices[..(interval - 1)], 2)
+                let alpha = 2m / (decimal (interval + 1))
+                let initialEMA = System.Math.Round(Array.averageBy id prices[..(interval - 1)], 2)
 
-            prices
-            |> Array.skip interval
-            |> Array.scan
-                (fun prevEMA price ->
-                    let newEMA = alpha * price + (1m - alpha) * (prevEMA |> Option.get)
-                    System.Math.Round(newEMA, 2) |> Some)
-                (initialEMA |> Some)
-            |> Array.append (Array.create (interval-1) None) // need to subtract one because Array.scan includes the initial value
+                prices
+                |> Array.skip interval
+                |> Array.scan
+                    (fun prevEMA price ->
+                        let newEMA = alpha * price + (1m - alpha) * (prevEMA |> Option.get)
+                        System.Math.Round(newEMA, 2) |> Some)
+                    (initialEMA |> Some)
+                |> Array.append (Array.create (interval-1) None) // need to subtract one because Array.scan includes the initial value
             
         MovingAverages(ema, interval, true)
         
