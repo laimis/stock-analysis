@@ -610,8 +610,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     
                 return 
                     [|
-                        ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
                         ProfitPoints.ProfitPointContainer($"{TradingStrategyConstants.AvgPercentGain}%% intervals", prices=percentBased)
+                        ProfitPoints.ProfitPointContainer("Stop based", prices=stopBased)
                     |] |> Ok
     }
     

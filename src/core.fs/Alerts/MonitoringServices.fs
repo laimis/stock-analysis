@@ -61,9 +61,7 @@ let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs
         |> Seq.groupBy groupingFunc
         |> Seq.map (toEmailAlert marketHours)
         
-    let diffs = alertDiffs |> Seq.map (fun (k,v) -> {| identifier = k; change = v |})
-
-    {| alertGroups = groups; alertDiffs = diffs |};
+    {| alertGroups = groups; alertDiffs = alertDiffs |};
 
 let generateEmailDataPayloadForAlerts marketHours alertDiffs = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs _.identifier
 
@@ -580,10 +578,9 @@ type AlertEmailService(
                 let currentCounts = alerts |> toAlertCountPairs
                 
                 currentCounts |> List.map (
-                    fun (k,v) ->
-                        let previousValue = previousCounts |> List.tryFind (fun (k2,_) -> k2 = k) |> Option.defaultValue (k,0) |> snd
-                        let diff = v - previousValue
-                        k, diff
+                    fun (identifier, count) ->
+                        let previousValue = previousCounts |> List.tryFind (fun (k2,_) -> k2 = identifier) |> Option.defaultValue (identifier,0) |> snd
+                        {| identifier = identifier; change = previousValue - count; previous = previousValue; current = count |}
                 )
             
         if fromStorage = null then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
