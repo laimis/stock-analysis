@@ -1,10 +1,18 @@
 <div>
-  <app-error-display [errors]="errors"></app-error-display>
+    <app-error-display [errors]="errors"></app-error-display>
 
-  <button class="btn btn-primary" (click)="run()">Kick off</button>
+    <button class="btn btn-primary" (click)="run()">Multiple API call demo</button>
 
-  {{status}}
+    {{ status }}
 
-  <app-brokerage-new-order [ticker]="testTicker" (brokerageOrderEntered)="brokerageOrderEntered($event)"></app-brokerage-new-order>
 
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Scatter plot demo</h5>
+
+            @if (scatterPlotOptions) {
+                <canvasjs-chart [options]="scatterPlotOptions"></canvasjs-chart>
+            }
+        </div>
+    </div>
 </div>

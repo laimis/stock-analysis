@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
-import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
+import { OutcomesReport, StocksService, TickerOutcomes } from '../../services/stocks.service';
 import {tap} from "rxjs/operators";
-import {concat, forkJoin} from "rxjs";
+import {concat} from "rxjs";
 
 @Component({
   selector: 'app-outcomes-report',
@@ -131,15 +131,7 @@ export class OutcomesReportComponent implements OnInit {
                 }
             ))
 
-      forkJoin([singleBarDailyReport, singleBarWeekly, allBarsReport]).subscribe(
-          (_) => {
-              console.log("All reports done")
-          },
-          (error) => {
-              console.error("Error fork join: " + error)
-              this.errors = GetErrors(error)
-          }
-      )
+      concat([singleBarDailyReport, singleBarWeekly, allBarsReport]).subscribe()
   }
 
   private reset() {

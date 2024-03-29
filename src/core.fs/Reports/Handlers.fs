@@ -136,7 +136,7 @@ type OutcomesReportView(evaluations,outcomes,gaps,patterns,failed) =
     member _.Outcomes: TickerOutcomes seq = outcomes
     member _.Gaps: GapReportView seq = gaps
     member _.Patterns: TickerPatterns seq = patterns
-    member _.Failed: Ticker seq = failed
+    member _.Failed: string seq = failed
     
     member _.TickerSummary: OutcomesReportViewTickerCountPair seq =
         evaluations
@@ -353,7 +353,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             |> Async.AwaitTask
                         
                         match priceResponse with
-                        | Error _ -> return Error t
+                        | Error e -> return Error (t,e.Message) 
                         | Ok prices ->
                             
                             let outcomes =
@@ -375,8 +375,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             
                             return (tickerOutcome, gapsView, tickerPatterns) |> Ok
                     with
-                    | _ ->
-                        return Error t
+                    | exn ->
+                        return Error (t, exn.Message)
                     }
                 )
                 |> Async.Sequential
@@ -395,7 +395,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let cleanedGaps = gaps |> Seq.choose id
             
-            let failed = tasks |> Seq.map (fun t -> match t with | Error e -> Some e | _ -> None) |> Seq.choose id
+            let failed = tasks |> Seq.map (fun t -> match t with | Error (t,e) -> Some $"{t}: {e}" | _ -> None) |> Seq.choose id
             
             let evaluations =
                 match query.Duration with
@@ -437,7 +437,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         |> Async.AwaitTask
                     
                     match priceResponse with
-                    | Error _ -> return Error position
+                    | Error error -> return Error (position, error.Message) 
                     | Ok prices ->
                         
                         let outcomes = PositionAnalysis.generate calculations prices orders
@@ -460,7 +460,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     (newOutcomes, newPatterns)
                 ) ([], [])
                 
-            let failed = tasks |> Seq.map (fun t -> match t with | Error e -> Some e | _ -> None) |> Seq.choose id |> Seq.map (fun p -> p.Ticker)
+            let failed = tasks |> Seq.map (fun t -> match t with | Error (position,message) -> Some $"{position.Ticker}: {message}" | _ -> None) |> Seq.choose id
                 
             let evaluations = PositionAnalysis.evaluate outcomes
             
