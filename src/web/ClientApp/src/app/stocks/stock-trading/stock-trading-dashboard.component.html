@@ -101,7 +101,7 @@
         ></app-stock-violations>
     }
     @if (isActive('charts')) {
-        <app-stock-trading-charts [positions]="positions" [quotes]="quotes"></app-stock-trading-charts>
+        <app-stock-trading-charts [positions]="sortedPositions" [quotes]="quotes"></app-stock-trading-charts>
     }
     @if (isActive('summary')) {
         <app-stock-trading-summary [quotes]="quotes" [positions]="positions"
