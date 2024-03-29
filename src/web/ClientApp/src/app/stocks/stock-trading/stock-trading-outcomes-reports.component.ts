@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {StocksService, OutcomesReport, PositionInstance, StockGaps} from '../../services/stocks.service';
+import {tap} from "rxjs/operators";
+import {forkJoin} from "rxjs";
 
 @Component({
     selector: 'app-stock-trading-outcomes-reports',
@@ -53,44 +55,55 @@ export class StockPositionReportsComponent {
 
     tickers: string[] = []
 
-    loadDailyData(positions: PositionInstance[]) {
+    loadPositionData(positions: PositionInstance[]) {
+        let positionReport = this.service.reportPositions().pipe(
+            tap(
+                report => {
+                    this.loading.positions = false
+                    this.positionsReport = report
+                }, error => {
+                    this.loading.positions = false
+                    this.handleApiError("Unable to load position reports", error, (e) => this.errors.positions = e)
+                }
+            )
+        )
+
         this.tickers = positions.map(p => p.ticker)
-        this.service.reportOutcomesSingleBarDaily(this.tickers).subscribe(
-            report => {
-                this.loading.daily = false
-                this.singleBarReportDaily = report
-                this.loadWeeklyData(positions)
+        let dailyReport = this.service.reportOutcomesSingleBarDaily(this.tickers).pipe(
+            tap(
+                report => {
+                    this.loading.daily = false
+                    this.singleBarReportDaily = report
+                },
+                error => {
+                    this.loading.daily = false
+                    this.handleApiError("Unable to load daily data", error, (e) => this.errors.daily = e)
+                }
+            )
+        )
+        
+        let weeklyReport = this.service.reportOutcomesSingleBarWeekly(this.tickers).pipe(
+            tap(
+                report => {
+                    this.loading.weekly = false
+                    this.singleBarReportWeekly = report
+                }, error => {
+                    this.loading.weekly = false
+                    this.handleApiError("Unable to load weekly data", error, (e) => this.errors.weekly = e)
+                }
+            )
+        )
+        
+        forkJoin([positionReport, dailyReport, weeklyReport]).subscribe(
+            (_) => {
+                console.log("Main Done")
             },
-            error => {
-                this.loading.daily = false
-                this.handleApiError("Unable to load daily data", error, (e) => this.errors.daily = e)
-                this.loadWeeklyData(positions)
+            (error) => {
+                console.error("Main Error")
+                console.error(error)
+                this.errors.positions = GetErrors(error)
             }
         )
-    }
-
-    loadWeeklyData(positions: PositionInstance[]) {
-        this.tickers = positions.map(p => p.ticker)
-        this.service.reportOutcomesSingleBarWeekly(this.tickers).subscribe(report => {
-            this.loading.weekly = false
-            this.singleBarReportWeekly = report
-        }, error => {
-            this.loading.weekly = false
-            this.handleApiError("Unable to load weekly data", error, (e) => this.errors.weekly = e)
-        })
-
-    }
-
-    loadPositionData(positions: PositionInstance[]) {
-        this.service.reportPositions().subscribe(report => {
-            this.loading.positions = false
-            this.positionsReport = report
-            this.loadDailyData(positions)
-        }, error => {
-            this.loading.positions = false
-            this.handleApiError("Unable to load position reports", error, (e) => this.errors.positions = e)
-            this.loadDailyData(positions)
-        })
     }
 
     private handleApiError(errorMessage: string, error: any, assignFunc: (error: any) => void) {
