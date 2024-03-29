@@ -162,10 +162,6 @@ export class StockTradingDashboardComponent implements OnInit {
         this.updatePositions()
     }
 
-    getQuote(p: PositionInstance) {
-        return this.quotes[p.ticker]
-    }
-
     getPrice(p: PositionInstance) {
         if (this.quotes) {
             return this.quotes[p.ticker]?.price
@@ -234,7 +230,7 @@ export class StockTradingDashboardComponent implements OnInit {
 
             let stratsWithCounts = GetStrategies().map(
                 (s) => {
-                    var count = this.positions.filter(i => this.matchesStrategyCheck(i, s.key)).length
+                    const count = this.positions.filter(i => this.matchesStrategyCheck(i, s.key)).length;
                     return {key: s.key, value: s.value + " - " + count}
                 }
             )

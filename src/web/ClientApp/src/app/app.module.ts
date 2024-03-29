@@ -104,6 +104,7 @@ import {InflectionPointsComponent} from "./playground/inflectionpoints.component
 import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
 import {TrendsReportComponent} from "./reports/trends-report/trends-report.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
+import {StockTradingChartsComponent} from "./stocks/stock-trading/stock-trading-charts.component";
 
 
 let routes: Routes = [
@@ -293,7 +294,8 @@ let routes: Routes = [
         ErrorDisplayComponent,
         CanvasJSAngularChartsModule,
         RouterModule.forRoot(routes, {}),
-        NgOptimizedImage
+        NgOptimizedImage,
+        StockTradingChartsComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

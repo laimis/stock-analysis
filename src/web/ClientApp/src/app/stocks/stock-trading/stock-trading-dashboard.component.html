@@ -27,6 +27,10 @@
                     <span class="badge rounded-pill bg-info">{{ violations.length }}</span>
                 }
             </a>
+            <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]=""
+               (click)="activateTab('charts')">
+                Charts
+            </a>
             <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]=""
                (click)="activateTab('summary')">
                 Summary
@@ -95,6 +99,9 @@
             [orders]="brokerageAccount.orders"
             (refreshRequested)="refresh()"
         ></app-stock-violations>
+    }
+    @if (isActive('charts')) {
+        <app-stock-trading-charts [positions]="positions" [quotes]="quotes"></app-stock-trading-charts>
     }
     @if (isActive('summary')) {
         <app-stock-trading-summary [quotes]="quotes" [positions]="positions"
