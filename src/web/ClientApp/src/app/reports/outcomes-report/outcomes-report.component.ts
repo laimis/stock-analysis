@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import { OutcomesReport, StockGaps, StocksService, TickerOutcomes } from '../../services/stocks.service';
 import {tap} from "rxjs/operators";
-import {concat} from "rxjs";
+import {concat, forkJoin} from "rxjs";
 
 @Component({
   selector: 'app-outcomes-report',
@@ -21,7 +21,6 @@ export class OutcomesReportComponent implements OnInit {
 
   activeTicker: string = null;
 
-  gaps: StockGaps[] = []
   allBarsReport: OutcomesReport;
   singleBarReportDaily: OutcomesReport;
   singleBarReportWeekly: OutcomesReport;
@@ -89,65 +88,66 @@ export class OutcomesReportComponent implements OnInit {
       return
     }
 
-    this.gaps = []
     this.allBarsReport = null
     this.singleBarReportDaily = null
     this.singleBarReportWeekly = null
     this.earningsOutcomes = null
 
     this.reset()
+      
+      let singleBarDailyReport = this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
+          .pipe(
+              tap(
+                  report => {
+                      this.singleBarReportDaily = report;
+                      if (this.earnings.length > 0) {
+                          this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
+                      }
+                  },
+                  error => {
+                      this.errors = GetErrors(error)
+                  }
+          ))
 
-    this.fetchSingleBarDailyReport()
+      let singleBarWeekly = this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
+          .pipe(
+              tap(
+                  report => {
+                      this.singleBarReportWeekly = report;
+                  },
+                  error => {
+                      this.errors = GetErrors(error)
+                  }
+          ))
+      
+        let allBarsReport = this.stocksService.reportOutcomesAllBars(this.tickers, this.startDate, this.endDate)
+            .pipe(
+                tap(
+                report => {
+                    this.allBarsReport = report;
+                },
+                error => {
+                    this.errors = GetErrors(error)
+                }
+            ))
+
+      forkJoin([singleBarDailyReport, singleBarWeekly, allBarsReport]).subscribe(
+          (_) => {
+              console.log("All reports done")
+          },
+          (error) => {
+              console.error("Error fork join: " + error)
+              this.errors = GetErrors(error)
+          }
+      )
   }
 
   private reset() {
     this.errors = null;
-    this.gaps = [];
     this.allBarsReport = null;
     this.singleBarReportDaily = null;
     this.singleBarReportWeekly = null;
     this.earningsOutcomes = [];
-  }
-
-  private fetchAllBarsReport() {
-    return this.stocksService.reportOutcomesAllBars(this.tickers, this.startDate, this.endDate)
-      .subscribe(
-          report => {
-            this.allBarsReport = report;
-          },
-          error => {
-            this.errors = GetErrors(error)
-          }
-      )
-  }
-
-  private fetchSingleBarWeeklyReport() {
-    this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
-      .subscribe(
-          report => {
-            this.singleBarReportWeekly = report;
-            this.fetchAllBarsReport()
-          },
-          error => {
-            this.errors = GetErrors(error)
-          }
-      )
-  }
-
-  private fetchSingleBarDailyReport() {
-    this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
-      .subscribe(
-          report => {
-            this.singleBarReportDaily = report;
-            if (this.earnings.length > 0) {
-              this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
-            }
-            this.fetchSingleBarWeeklyReport()
-          },
-          error => {
-            this.errors = GetErrors(error)
-          }
-        )
   }
 
   onTickerChange(activeTicker:string) {

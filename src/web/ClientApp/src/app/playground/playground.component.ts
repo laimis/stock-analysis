@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {StocksService} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
-import {concat} from "rxjs";
+import {forkJoin} from "rxjs";
 import {tap} from "rxjs/operators";
 
 @Component({
@@ -80,10 +80,10 @@ export class PlaygroundComponent implements OnInit {
 
     this.status = "Running..."
 
-    concat(positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily).subscribe(
+    forkJoin([positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily]).subscribe(
       (_) => {
         // this.status = "Done"
-        // console.log("Done")
+        console.log("Main Done")
       },
       (error) => {
         this.errors = GetErrors(error)
