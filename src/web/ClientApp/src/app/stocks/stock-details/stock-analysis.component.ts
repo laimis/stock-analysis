@@ -1,11 +1,10 @@
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
-    DataPointContainer,
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
-    PriceFrequency, Prices,
+    Prices,
     StockAnalysisOutcome,
     StockGaps,
     StockPercentChangeResponse,
@@ -14,31 +13,31 @@ import {
 } from 'src/app/services/stocks.service';
 
 @Component({
-  selector: 'app-stock-analysis',
-  templateUrl: './stock-analysis.component.html',
-  styleUrls: ['./stock-analysis.component.css'],
-  providers: [ PercentPipe, CurrencyPipe, DecimalPipe ]
+    selector: 'app-stock-analysis',
+    templateUrl: './stock-analysis.component.html',
+    styleUrls: ['./stock-analysis.component.css'],
+    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
 })
 export class StockAnalysisComponent {
-  multipleBarOutcomes: TickerOutcomes;
+    multipleBarOutcomes: TickerOutcomes;
 
-  dailyOutcomesReport : OutcomesReport;
-  dailyOutcomes: TickerOutcomes;
+    dailyOutcomesReport: OutcomesReport;
+    dailyOutcomes: TickerOutcomes;
 
-  gaps: StockGaps;
-  percentChangeDistribution: StockPercentChangeResponse;
-  chartInfo: PositionChartInformation
-  
-  constructor(
-    private stockService : StocksService,
-    private percentPipe: PercentPipe,
-    private currencyPipe: CurrencyPipe,
-    private decimalPipe: DecimalPipe
-  ) { }
+    gaps: StockGaps;
+    percentChangeDistribution: StockPercentChangeResponse;
+    chartInfo: PositionChartInformation
+    @Input()
+    ticker: string
 
-  @Input()
-  ticker : string
-    
+    constructor(
+        private stockService: StocksService,
+        private percentPipe: PercentPipe,
+        private currencyPipe: CurrencyPipe,
+        private decimalPipe: DecimalPipe
+    ) {
+    }
+
     @Input()
     set prices(prices: Prices) {
         this.chartInfo = {
@@ -52,49 +51,48 @@ export class StockAnalysisComponent {
         this.getOutcomesReportAllBars();
     }
 
-  getValue(o:StockAnalysisOutcome) {
-    if (o.valueType === OutcomeValueTypeEnum.Percentage) {
-      return this.percentPipe.transform(o.value)
-    } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
-      return this.currencyPipe.transform(o.value)
-    } else {
-      return this.decimalPipe.transform(o.value)
+    getValue(o: StockAnalysisOutcome) {
+        if (o.valueType === OutcomeValueTypeEnum.Percentage) {
+            return this.percentPipe.transform(o.value)
+        } else if (o.valueType === OutcomeValueTypeEnum.Currency) {
+            return this.currencyPipe.transform(o.value)
+        } else {
+            return this.decimalPipe.transform(o.value)
+        }
     }
-  }
 
-  private getOutcomesReportAllBars() {
-    this.stockService.reportOutcomesAllBars([this.ticker]).subscribe(report => {
-      this.gaps = report.gaps[0];
-      this.multipleBarOutcomes = report.outcomes[0]
+    positiveCount(outcomes: TickerOutcomes) {
+        return outcomes.outcomes.filter(r => r.outcomeType === 'Positive').length;
+    }
 
-      this.getOutcomesReportSingleBarDaily();
-    });
-  }
+    negativeCount(outcomes: TickerOutcomes) {
+        return outcomes.outcomes.filter(r => r.outcomeType === 'Negative').length;
+    }
 
-  private getOutcomesReportSingleBarDaily() {
+    private getOutcomesReportAllBars() {
+        this.stockService.reportOutcomesAllBars([this.ticker]).subscribe(report => {
+            this.gaps = report.gaps[0];
+            this.multipleBarOutcomes = report.outcomes[0]
 
-    this.stockService.reportOutcomesSingleBarDaily([this.ticker]).subscribe(report => {
-      this.dailyOutcomes = report.outcomes[0];
-      this.dailyOutcomesReport = report;
-      this.percentDistribution();
-    });
-  }
+            this.getOutcomesReportSingleBarDaily();
+        });
+    }
 
+    private getOutcomesReportSingleBarDaily() {
 
-  private percentDistribution() {
-    this.stockService.reportTickerPercentChangeDistribution(this.ticker).subscribe(
-      data => {
-        this.percentChangeDistribution = data;
-      }
-    );
-  }
+        this.stockService.reportOutcomesSingleBarDaily([this.ticker]).subscribe(report => {
+            this.dailyOutcomes = report.outcomes[0];
+            this.dailyOutcomesReport = report;
+            this.percentDistribution();
+        });
+    }
 
-  positiveCount(outcomes: TickerOutcomes) {
-    return outcomes.outcomes.filter(r => r.outcomeType === 'Positive').length;
-  }
-
-  negativeCount(outcomes: TickerOutcomes) {
-    return outcomes.outcomes.filter(r => r.outcomeType === 'Negative').length;
-  }
+    private percentDistribution() {
+        this.stockService.reportTickerPercentChangeDistribution(this.ticker).subscribe(
+            data => {
+                this.percentChangeDistribution = data;
+            }
+        );
+    }
 
 }

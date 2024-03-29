@@ -1,102 +1,118 @@
 <section>
-  <h5>Brokerage Order</h5>
-  @if (errorMessage) {
-    <div class="alert alert-danger">{{errorMessage}}</div>
-  }
-  <div>
-    @if (submittedOrder === false) {
-      <div class="row">
-        <div class="col-md">
-          <app-stock-search
-            [ticker]="selectedTicker"
-            label="Ticker"
-            placeholder="New position symbol"
-            (tickerSelected)="onTickerSelected($event)"
-            cssClass="form-control">
-          </app-stock-search>
-        </div>
-        <div class="col-md" >
-          <label for="brokerageOrderType" class="form-label">Order Type</label>
-          <select class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType" (ngModelChange)="brokerageOrderTypeChanged()">
-            <option value="Limit">Limit</option>
-            <option value="Market">Market</option>
-            <option value="StopMarket">StopMarket</option>
-          </select>
-        </div>
-        <div class="col-md" >
-          <label for="brokerageOrderDuration" class="form-label">Order Duration</label>
-          <select class="form-select" [(ngModel)]="brokerageOrderDuration" id="brokerageOrderDuration">
-            @for (duration of orderDurations; track duration) {
-              <option [value]="duration.key">{{duration.value}}</option>
-            }
-          </select>
-        </div>
-        <div class="col-md">
-          <label for="price" class="form-label">Price</label>
-          <input
-            type="number"
-            [ngClass]="{'form-control': true, 'disabled': brokerageOrderType === 'Market'}"
-            id="price"
-            step="0.01"
-            [disabled]="brokerageOrderType === 'Market'"
-            [readOnly]="brokerageOrderType === 'Market'"
-            [(ngModel)]="price">
-          </div>
-          <div class="col-md">
-            <label for="stocksToBuy" class="form-label"># of Shares</label>
-            <input
-              type="number"
-              class="form-control"
-              id="stocksToBuy"
-              [(ngModel)]="numberOfShares"
-              (ngModelChange)="numberOfSharesChanged()">
+    <h5>Brokerage Order</h5>
+    @if (errorMessage) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+    <div>
+        @if (submittedOrder === false) {
+            <div class="row">
+                <div class="col-md">
+                    <app-stock-search
+                        [ticker]="selectedTicker"
+                        label="Ticker"
+                        placeholder="New position symbol"
+                        (tickerSelected)="onTickerSelected($event)"
+                        cssClass="form-control">
+                    </app-stock-search>
+                </div>
+                <div class="col-md">
+                    <label for="brokerageOrderType" class="form-label">Order Type</label>
+                    <select class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType"
+                            (ngModelChange)="brokerageOrderTypeChanged()">
+                        <option value="Limit">Limit</option>
+                        <option value="Market">Market</option>
+                        <option value="StopMarket">StopMarket</option>
+                    </select>
+                </div>
+                <div class="col-md">
+                    <label for="brokerageOrderDuration" class="form-label">Order Duration</label>
+                    <select class="form-select" [(ngModel)]="brokerageOrderDuration" id="brokerageOrderDuration">
+                        @for (duration of orderDurations; track duration) {
+                            <option [value]="duration.key">{{ duration.value }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md">
+                    <label for="price" class="form-label">Price</label>
+                    <input
+                        type="number"
+                        [ngClass]="{'form-control': true, 'disabled': brokerageOrderType === 'Market'}"
+                        id="price"
+                        step="0.01"
+                        [disabled]="brokerageOrderType === 'Market'"
+                        [readOnly]="brokerageOrderType === 'Market'"
+                        [(ngModel)]="price">
+                </div>
+                <div class="col-md">
+                    <label for="stocksToBuy" class="form-label"># of Shares</label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="stocksToBuy"
+                        [(ngModel)]="numberOfShares"
+                        (ngModelChange)="numberOfSharesChanged()">
+                </div>
             </div>
-          </div>
         }
         @if (quote && submittedOrder === false) {
-          @if (quote) {
-            <div class="row">
-              <div class="col-md"><div class="stat-label">bid</div><div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div></div>
-              <div class="col-md"><div class="stat-label">ask</div><div>{{ quote.askPrice | currency }} x {{ quote.askSize }}</div></div>
-              <div class="col-md"><div class="stat-label">last</div><div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div></div>
-              <div class="col-md"><div class="stat-label">exchange</div><div>{{ quote.exchangeName }}</div></div>
-              <div class="col-md"><div class="stat-label">total</div><div>{{total | currency}}</div></div>
-            </div>
-          }
+            @if (quote) {
+                <div class="row">
+                    <div class="col-md">
+                        <div class="stat-label">bid</div>
+                        <div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div>
+                    </div>
+                    <div class="col-md">
+                        <div class="stat-label">ask</div>
+                        <div>{{ quote.askPrice | currency }} x {{ quote.askSize }}</div>
+                    </div>
+                    <div class="col-md">
+                        <div class="stat-label">last</div>
+                        <div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div>
+                    </div>
+                    <div class="col-md">
+                        <div class="stat-label">exchange</div>
+                        <div>{{ quote.exchangeName }}</div>
+                    </div>
+                    <div class="col-md">
+                        <div class="stat-label">total</div>
+                        <div>{{ total | currency }}</div>
+                    </div>
+                </div>
+            }
         }
         @if (submittedOrder === false && submittingOrder === false) {
-          @if (!submittedOrder) {
-            <div class="row mt-3">
-              <div class="col-md" >
-                <button class="btn btn-primary w-100" (click)="buy()">Buy</button>
-              </div>
-              <div class="col-md" >
-                <button class="btn btn-primary w-100" (click)="buyToCover()">Buy to Cover</button>
-              </div>
-              <div class="col-md" >
-                <button class="btn btn-primary w-100" (click)="sell()">Sell</button>
-              </div>
-              <div class="col-md" >
-                <button class="btn btn-primary w-100" (click)="sellShort()">Sell Short</button>
-              </div>
-            </div>
-          }
+            @if (!submittedOrder) {
+                <div class="row mt-3">
+                    <div class="col-md">
+                        <button class="btn btn-primary w-100" (click)="buy()">Buy</button>
+                    </div>
+                    <div class="col-md">
+                        <button class="btn btn-primary w-100" (click)="buyToCover()">Buy to Cover</button>
+                    </div>
+                    <div class="col-md">
+                        <button class="btn btn-primary w-100" (click)="sell()">Sell</button>
+                    </div>
+                    <div class="col-md">
+                        <button class="btn btn-primary w-100" (click)="sellShort()">Sell Short</button>
+                    </div>
+                </div>
+            }
         } @else if (submittingOrder) {
-          @if (submittingOrder) {
-            <div class="row mt-3">
-              <div class="col-md-12" >
-                <button class="btn btn-primary w-100 disabled" disabled>Submitting Order...</button>
-              </div>
-            </div>
-          }
+            @if (submittingOrder) {
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary w-100 disabled" disabled>Submitting Order...</button>
+                    </div>
+                </div>
+            }
         } @else {
-          @if (submittedOrder) {
-            <div class="row mt-3">
-              <div class="col-md-12" >
-                <button class="btn btn-primary w-100" (click)="submittedOrder = false">New Order</button>
-              </div>
-            </div>
-          }
+            @if (submittedOrder) {
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary w-100" (click)="submittedOrder = false">New Order</button>
+                    </div>
+                </div>
+            }
         }
-      </div>
-    </section>
+    </div>
+</section>

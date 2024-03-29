@@ -1,48 +1,48 @@
 <div class="search-container">
-  @if (label) {
-    <label for="ticker" class="form-label">{{label}}</label>
-  }
-  <div class="position-relative">
-    <input type="text"
-      class="{{cssClass}} pe-5"
-      id="ticker"
-      name="ticker"
-      [(ngModel)]="selectedValue"
-      (ngModelChange)="onModelChange($event)"
-      (blur)="loseFocus()"
-      (keydown)="onKeyDown($event)"
-      placeholder="{{placeholder}}"
-      autocomplete="off"/>
-      @if (loading) {
-        <span
-          class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto opacity-50"
-          role="status"
-        aria-hidden="true"></span>
-      }
+    @if (label) {
+        <label for="ticker" class="form-label">{{ label }}</label>
+    }
+    <div class="position-relative">
+        <input (blur)="loseFocus()"
+               (keydown)="onKeyDown($event)"
+               (ngModelChange)="onModelChange($event)"
+               [(ngModel)]="selectedValue"
+               autocomplete="off"
+               class="{{cssClass}} pe-5"
+               id="ticker"
+               name="ticker"
+               placeholder="{{placeholder}}"
+               type="text"/>
+        @if (loading) {
+            <span
+                class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto opacity-50"
+                role="status"
+                aria-hidden="true"></span>
+        }
     </div>
     @if (searchResultsSubscribedArray.length > 0) {
-      <div class="search-results shadow rounded" >
-        @for (r of searchResultsSubscribedArray; track r; let i = $index) {
-          <div class="row"
-            [class.highlighted]="i === highlightedIndex"
-            (click)="clicked(r.symbol)">
-            <div class="col ms-2 mb-2">{{r.symbol}}</div>
-            @if (justTickers === false) {
-              <div class="col-10">{{r.securityName}}</div>
+        <div class="search-results shadow rounded">
+            @for (r of searchResultsSubscribedArray; track r; let i = $index) {
+                <div class="row"
+                     [class.highlighted]="i === highlightedIndex"
+                     (click)="clicked(r.symbol)">
+                    <div class="col ms-2 mb-2">{{ r.symbol }}</div>
+                    @if (justTickers === false) {
+                        <div class="col-10">{{ r.securityName }}</div>
+                    }
+                </div>
             }
-          </div>
-        }
-      </div>
+        </div>
     }
     @if (errors.length > 0) {
-      <div class="search-results shadow rounded" >
-        @for (error of errors; track error; let i = $index) {
-          <div class="row"
-            >
-            <div class="col">{{error}}</div>
-          </div>
-        }
-      </div>
+        <div class="search-results shadow rounded">
+            @for (error of errors; track error; let i = $index) {
+                <div class="row"
+                >
+                    <div class="col">{{ error }}</div>
+                </div>
+            }
+        </div>
     }
-  </div>
+</div>
   

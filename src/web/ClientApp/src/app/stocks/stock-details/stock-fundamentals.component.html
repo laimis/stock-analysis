@@ -1,15 +1,14 @@
-
 @if (summary) {
-  <div>
-    <table class="table table-striped table-hover">
-      <tbody>
-        @for (fundamental of profile.fundamentals | keyvalue; track fundamental) {
-          <tr>
-            <td>{{fundamental.key}}</td>
-            <td>{{fundamental.value}}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+    <div>
+        <table class="table table-striped table-hover">
+            <tbody>
+                @for (fundamental of profile.fundamentals | keyvalue; track fundamental) {
+                    <tr>
+                        <td>{{ fundamental.key }}</td>
+                        <td>{{ fundamental.value }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

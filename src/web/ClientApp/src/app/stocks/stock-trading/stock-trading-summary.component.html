@@ -21,7 +21,7 @@
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Positions Long / Short</h5>
-                    <p class="card-text fs-4">{{longPositions.length}} / {{shortPositions.length}}</p>
+                    <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Profit</h5>
-                    <p class="card-text fs-4">{{ totalProfit | currency}}</p>
+                    <p class="card-text fs-4">{{ totalProfit | currency }}</p>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@
             <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Cash</h5>
-                    <p class="card-text fs-4">{{ brokerageAccount.cashBalance | currency}}</p>
+                    <p class="card-text fs-4">{{ brokerageAccount.cashBalance | currency }}</p>
                 </div>
             </div>
         </div>
@@ -67,7 +67,7 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title text-muted">Short Value</h5>
-                            <p class="card-text fs-4">{{brokerageAccount.shortMarketValue | currency}}</p>
+                            <p class="card-text fs-4">{{ brokerageAccount.shortMarketValue | currency }}</p>
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,8 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title text-muted">Cash</h5>
-                            <p class="card-text fs-4" *ngIf="brokerageAccount && brokerageAccount.connected">{{ brokerageAccount.cashBalance | currency}}</p>
+                            <p class="card-text fs-4"
+                               *ngIf="brokerageAccount && brokerageAccount.connected">{{ brokerageAccount.cashBalance | currency }}</p>
                             <p class="card-text fs-4" *ngIf="!brokerageAccount || !brokerageAccount.connected">N/A</p>
                         </div>
                     </div>
@@ -103,11 +104,11 @@
                 <tbody>
                     @for (positionGroup of positionGroups; track positionGroup) {
                         <tr>
-                            <td>{{positionGroup.strategy}}</td>
-                            <td>{{positionGroup.profit | currency}}</td>
+                            <td>{{ positionGroup.strategy }}</td>
+                            <td>{{ positionGroup.profit | currency }}</td>
                             <td>{{ positionGroup.cost | currency }}</td>
                             <td>{{ positionGroup.risk | currency }}</td>
-                            <td>{{positionGroup.length}}</td>
+                            <td>{{ positionGroup.length }}</td>
                             <td>{{ (positionGroup.profit / positionGroup.cost) | percent:'1.0-2' }}</td>
                         </tr>
                     }
@@ -117,23 +118,23 @@
                 @for (positionGroup of positionGroups; track positionGroup) {
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title">{{positionGroup.strategy}}</h5>
+                            <h5 class="card-title">{{ positionGroup.strategy }}</h5>
                             <div class="row">
                                 <div class="col-6 mb-3">
                                     <p class="mb-1 text-muted">Profit</p>
-                                    <p class="mb-0">{{ positionGroup.profit | currency}}</p>
+                                    <p class="mb-0">{{ positionGroup.profit | currency }}</p>
                                 </div>
                                 <div class="col-6 mb-3">
                                     <p class="mb-1 text-muted">Cost</p>
-                                    <p class="mb-0">{{ positionGroup.cost | currency}}</p>
+                                    <p class="mb-0">{{ positionGroup.cost | currency }}</p>
                                 </div>
                                 <div class="col-6">
                                     <p class="mb-1 text-muted">Risk</p>
-                                    <p class="mb-0">{{ positionGroup.risk | currency}}</p>
+                                    <p class="mb-0">{{ positionGroup.risk | currency }}</p>
                                 </div>
                                 <div class="col-6">
                                     <p class="mb-1 text-muted">Trades</p>
-                                    <p class="mb-0">{{ positionGroup.length}}</p>
+                                    <p class="mb-0">{{ positionGroup.length }}</p>
                                 </div>
                             </div>
                         </div>
@@ -143,5 +144,5 @@
         </div>
     }
 
-    
+
 </div>

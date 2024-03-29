@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {
     ChartType,
     DataPoint,
@@ -19,8 +19,8 @@ import {GetErrors} from "../../services/utils";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
 @Component({
-  selector: 'app-trends-report',
-  standalone: true,
+    selector: 'app-trends-report',
+    standalone: true,
     imports: [
         DatePipe,
         PercentPipe,
@@ -32,56 +32,63 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
         LineChartComponent,
         ErrorDisplayComponent
     ],
-  templateUrl: './trends-report.component.html',
-  styleUrl: './trends-report.component.css'
+    templateUrl: './trends-report.component.html',
+    styleUrl: './trends-report.component.css'
 })
 export class TrendsReportComponent {
     trends: Trends;
     currentTrend: Trend;
     loading: boolean = false
-    
+
     selectedTicker: string;
     selectedStartDate: string;
     selectedTrendType: TrendType;
-    
+
     dataPointContainers: DataPointContainer[] = []
     errors: string[];
-    
-    constructor(private stockService:StocksService) {
+    protected readonly TrendDirection = TrendDirection;
+
+    constructor(private stockService: StocksService) {
         // Set default values
         this.selectedStartDate = "10";
         this.selectedTrendType = TrendType.Ema20OverSma50
     }
-    
+
     loadTrends() {
-        
+
         this.loading = true
         const date = new Date();
         date.setFullYear(date.getFullYear() - parseInt(this.selectedStartDate));
-        const selectedStartDate = date.toISOString().substring(0,10);
-        
+        const selectedStartDate = date.toISOString().substring(0, 10);
+
         this.stockService.reportTrends(this.selectedTicker, this.selectedTrendType, selectedStartDate).subscribe(data => {
             this.trends = data
             this.currentTrend = data.currentTrend
 
             // chronological
-            let barsChronological: DataPoint[] = data.trends.map((t:Trend) => {
-                return {label:t.startDateStr, isDate: true, value: t.direction === TrendDirection.Up ? t.numberOfBars : -t.numberOfBars}
+            let barsChronological: DataPoint[] = data.trends.map((t: Trend) => {
+                return {
+                    label: t.startDateStr,
+                    isDate: true,
+                    value: t.direction === TrendDirection.Up ? t.numberOfBars : -t.numberOfBars
+                }
             })
-            let gainsChronological: DataPoint[] = data.trends.map((t:Trend) => {return {label:t.startDateStr, isDate: true, value: t.gainPercent}})
+            let gainsChronological: DataPoint[] = data.trends.map((t: Trend) => {
+                return {label: t.startDateStr, isDate: true, value: t.gainPercent}
+            })
 
             this.dataPointContainers = [
                 this.createContainer(data.upBarStatistics.buckets, "Up Bar Distribution"),
                 this.createContainer(data.downBarStatistics.buckets, "Down Bar Distribution"),
                 this.createContainer(data.upGainStatistics.buckets, "Up Gain Distribution"),
                 this.createContainer(data.downGainStatistics.buckets, "Down Gain Distribution"),
-                
+
                 // up bars sorted
-                this.sortAndCreateContainer(data.upTrends.map((t:Trend) => t.numberOfBars), "Up Bars Sorted"),
-                this.sortAndCreateContainer(data.downTrends.map((t:Trend) => t.numberOfBars), "Down Bars Sorted"),
-                this.sortAndCreateContainer(data.upTrends.map((t:Trend) => t.gainPercent), "Up Gain Sorted"),
-                this.sortAndCreateContainer(data.downTrends.map((t:Trend) => t.gainPercent), "Down Gain Sorted"),
-                
+                this.sortAndCreateContainer(data.upTrends.map((t: Trend) => t.numberOfBars), "Up Bars Sorted"),
+                this.sortAndCreateContainer(data.downTrends.map((t: Trend) => t.numberOfBars), "Down Bars Sorted"),
+                this.sortAndCreateContainer(data.upTrends.map((t: Trend) => t.gainPercent), "Up Gain Sorted"),
+                this.sortAndCreateContainer(data.downTrends.map((t: Trend) => t.gainPercent), "Down Gain Sorted"),
+
                 {label: "Bars Chronological", chartType: ChartType.Column, data: barsChronological},
                 {label: "Gains Chronological", chartType: ChartType.Column, data: gainsChronological}
             ]
@@ -93,29 +100,29 @@ export class TrendsReportComponent {
             this.loading = false
         })
     }
-    
+
     tickerSelected(ticker: string) {
         this.selectedTicker = ticker
         this.applyFilters()
     }
-    
+
     trendTypeSelected() {
         this.applyFilters()
     }
-    
+
     startDateSelected() {
         this.applyFilters()
     }
-    
+
     applyFilters() {
         this.currentTrend = null
         this.trends = null
         this.dataPointContainers = null
         this.loadTrends()
     }
-    
-    sortAndCreateContainer(numbers:number[], title:string) {
-        let sorted: DataPoint[] = numbers.sort((a,b) => a-b).map((value:number, index:number) => {
+
+    sortAndCreateContainer(numbers: number[], title: string) {
+        let sorted: DataPoint[] = numbers.sort((a, b) => a - b).map((value: number, index: number) => {
             return {label: (index + 1).toString(), isDate: false, value: value}
         })
         return {
@@ -124,23 +131,21 @@ export class TrendsReportComponent {
             data: sorted
         }
     }
-    
-    createContainer(data:ValueWithFrequency[], title:string) {
+
+    createContainer(data: ValueWithFrequency[], title: string) {
         let dataPoints: DataPoint[] = []
-        data.forEach((b:ValueWithFrequency) => {
+        data.forEach((b: ValueWithFrequency) => {
             dataPoints.push({
                 label: b.value.toString(),
                 isDate: false,
                 value: b.frequency
             })
         })
-        
+
         return {
             label: title,
             chartType: ChartType.Column,
             data: dataPoints
         }
     }
-
-    protected readonly TrendDirection = TrendDirection;
 }

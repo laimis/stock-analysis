@@ -1,22 +1,22 @@
 .invisible {
-	display: none
+    display: none
 }
 
 div.row {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 
 .search-results div:hover {
-  font-weight: bold;
-  cursor: pointer;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .profits-positive {
-  /* font-weight: bold; */
-  color: lightseagreen;
+    /* font-weight: bold; */
+    color: lightseagreen;
 }
 
 .profits-negative {
-  /* font-weight: bold; */
-  color: #f45531;
+    /* font-weight: bold; */
+    color: #f45531;
 }

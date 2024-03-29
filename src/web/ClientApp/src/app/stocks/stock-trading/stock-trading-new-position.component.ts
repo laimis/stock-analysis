@@ -1,13 +1,14 @@
 import {DatePipe} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-    DataPointContainer, openpositioncommand,
+    DataPointContainer,
+    MovingAverages,
+    openpositioncommand,
     OutcomeKeys,
     pendingstockpositioncommand,
     PositionChartInformation,
     PriceFrequency,
     Prices,
-    MovingAverages,
     StockGaps,
     StocksService
 } from 'src/app/services/stocks.service';
@@ -16,7 +17,8 @@ import {GlobalService} from "../../services/global.service";
 import {
     age,
     calculateInflectionPoints,
-    histogramToDataPointContainer, InfectionPointType,
+    histogramToDataPointContainer,
+    InfectionPointType,
     toHistogram
 } from "../../services/prices.service";
 import {StockPositionsService} from "../../services/stockpositions.service";
@@ -34,11 +36,49 @@ export class StockTradingNewPositionComponent {
     supportContainer: DataPointContainer
     prices: Prices;
     maxLoss = 60;
+    ageValueToUse: number;
+    priceFrequency: PriceFrequency = PriceFrequency.Daily;
+    @Input()
+    showChart: boolean = true
+    @Input()
+    showAnalysis: boolean = true
+    @Input()
+    recordPositions: boolean = true
+    @Input()
+    presetTicker: string
+    @Input()
+    price: number | null = null
+    @Input()
+    numberOfShares: number | null = null
+    @Input()
+    isPendingPositionMode: boolean = true
+    positionEntered = false
+    pendingPositionEntered = false
+    workflowStarted = false
+    recordInProgress: boolean = false
+    @Output()
+    positionOpened: EventEmitter<openpositioncommand> = new EventEmitter<openpositioncommand>()
+    @Output()
+    pendingPositionCreated: EventEmitter<pendingstockpositioncommand> = new EventEmitter<pendingstockpositioncommand>()
+    // variables for new positions
+    positionSizeCalculated: number = null
+    ask: number | null = null
+    bid: number | null = null
+    sizeStopPrice: number | null = null
+    positionStopPrice: number | null = null
+    oneR: number | null = null
+    potentialLoss: number | null = null
+    stopPct: number | null = null
+    date: string | null = null
+    ticker: string | null = null
+    notes: string | null = null
+    strategy: string = ""
+    chartStop: number = null;
+    gaps: StockGaps
+    atr: number
     protected readonly atrMultiplier = 2;
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
-    ageValueToUse: number;
-    priceFrequency: PriceFrequency = PriceFrequency.Daily;
 
     constructor(
         private stockService: StocksService,
@@ -53,32 +93,6 @@ export class StockTradingNewPositionComponent {
         })
     }
 
-    @Input()
-    showChart: boolean = true
-
-    @Input()
-    showAnalysis: boolean = true
-
-    @Input()
-    recordPositions: boolean = true
-
-    @Input()
-    presetTicker: string
-
-    @Input()
-    price: number | null = null
-
-    @Input()
-    numberOfShares: number | null = null
-
-    @Input()
-    isPendingPositionMode: boolean = true
-
-    positionEntered = false
-    pendingPositionEntered = false
-    workflowStarted = false
-    recordInProgress: boolean = false
-
     startNewPosition() {
         this.positionEntered = false
         this.workflowStarted = true
@@ -86,31 +100,6 @@ export class StockTradingNewPositionComponent {
             this.onBuyTickerSelected(this.presetTicker)
         }
     }
-
-    @Output()
-    positionOpened: EventEmitter<openpositioncommand> = new EventEmitter<openpositioncommand>()
-
-    @Output()
-    pendingPositionCreated: EventEmitter<pendingstockpositioncommand> = new EventEmitter<pendingstockpositioncommand>()
-
-    // variables for new positions
-    positionSizeCalculated: number = null
-    ask: number | null = null
-    bid: number | null = null
-    sizeStopPrice: number | null = null
-    positionStopPrice: number | null = null
-    oneR: number | null = null
-    potentialLoss: number | null = null
-    stopPct: number | null = null
-    date: string | null = null
-    ticker: string | null = null
-    notes: string | null = null
-    strategy: string = ""
-
-    chartStop: number = null;
-
-    gaps: StockGaps
-    atr: number
 
     onBuyTickerSelected(ticker: string) {
 
@@ -311,31 +300,6 @@ export class StockTradingNewPositionComponent {
         )
     }
 
-    private createPendingPositionCommand(useLimitOrder: boolean) {
-        let cmd = new pendingstockpositioncommand();
-        cmd.ticker = this.ticker;
-        cmd.numberOfShares = this.numberOfShares;
-        cmd.price = this.price;
-        cmd.stopPrice = this.positionStopPrice;
-        cmd.notes = this.notes;
-        cmd.date = this.date;
-        cmd.strategy = this.strategy;
-        cmd.useLimitOrder = useLimitOrder;
-        return cmd;
-    }
-
-    private createOpenPositionCommand(): openpositioncommand {
-        return {
-            numberOfShares: this.numberOfShares,
-            price: this.price,
-            stopPrice: this.positionStopPrice,
-            notes: this.notes,
-            date: this.date,
-            ticker: this.ticker,
-            strategy: this.strategy
-        }
-    }
-
     createPendingPositionLimit() {
         this.createPendingPosition(true)
     }
@@ -417,6 +381,31 @@ export class StockTradingNewPositionComponent {
 
     ageValueChanged() {
         this.fetchAndRenderPriceRelatedInformation(this.ticker)
+    }
+
+    private createPendingPositionCommand(useLimitOrder: boolean) {
+        let cmd = new pendingstockpositioncommand();
+        cmd.ticker = this.ticker;
+        cmd.numberOfShares = this.numberOfShares;
+        cmd.price = this.price;
+        cmd.stopPrice = this.positionStopPrice;
+        cmd.notes = this.notes;
+        cmd.date = this.date;
+        cmd.strategy = this.strategy;
+        cmd.useLimitOrder = useLimitOrder;
+        return cmd;
+    }
+
+    private createOpenPositionCommand(): openpositioncommand {
+        return {
+            numberOfShares: this.numberOfShares,
+            price: this.price,
+            stopPrice: this.positionStopPrice,
+            notes: this.notes,
+            date: this.date,
+            ticker: this.ticker,
+            strategy: this.strategy
+        }
     }
 }
 

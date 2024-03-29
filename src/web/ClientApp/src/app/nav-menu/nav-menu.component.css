@@ -1,23 +1,24 @@
 .navbar-color {
-  background-color: #004289 !important;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  border-radius: 2px;
+    background-color: #004289 !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 2px;
 }
 
 .nav-link {
-  /* color: #fff !important; */
-  color: #95a7c6 !important;
-  margin: 10px;
+    /* color: #fff !important; */
+    color: #95a7c6 !important;
+    margin: 10px;
 }
 
 .nav-item:hover {
-  background-color: #72a8e1 !important;
-  color: #fff !important;
-  border-radius: 2px;
+    background-color: #72a8e1 !important;
+    color: #fff !important;
+    border-radius: 2px;
 }
+
 .nav-item-active {
-  background-color: #72a8e1 !important;
-  color: #fff !important;
-  border-radius: 2px;
+    background-color: #72a8e1 !important;
+    color: #fff !important;
+    border-radius: 2px;
 }

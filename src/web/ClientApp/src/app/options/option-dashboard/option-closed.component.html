@@ -1,63 +1,64 @@
 @if (closedOptions) {
-  <table class="table mt-2">
-    <thead>
-      <tr>
-        <th>Option</th>
-        <th>Closed</th>
-        <th>P/L</th>
-        <th>P/L %</th>
-        <th>Premium/Day Held</th>
-        <th>Days Held</th>
-        <th>Days Held %</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (o of closedOptions; track o) {
+    <table class="table mt-2">
+        <thead>
         <tr>
-          <td width="100">
-            <div>
-              <app-stock-link [ticker]="o.ticker"></app-stock-link>
-            {{o.strikePrice |currency}}</div>
-            <div>
-              @if (o.boughtOrSold==='Sold') {
-                <span class="badge bg-info me-1">sell</span>
-              }
-              @if (o.boughtOrSold==='Bought') {
-                <span class="badge bg-secondary me-1">buy</span>
-              }
-              @if (o.optionType==='CALL') {
-                <span class="badge bg-success me-1">call</span>
-              }
-              @if (o.optionType==='PUT') {
-                <span class="badge bg-warning me-1">put</span>
-              }
-            </div>
-            @if (o.assigned) {
-              <div>
-                <span class="badge bg-warning me-1">assigned</span>
-              </div>
-            }
-          </td>
-          <td>{{o.closed | date:'MM/dd'}}</td>
-          <td>
-            <div>{{o.premiumReceived - o.premiumPaid | currency}}</div>
-            <div>
-              @if (o.premiumReceived - o.premiumPaid >= 0) {
-                <span class="badge bg-success me-1">win</span>
-              }
-              @if (o.premiumReceived - o.premiumPaid < 0) {
-                <span class="badge bg-warning me-1">loss</span>
-              }
-            </div>
-          </td>
-          <td>{{o.premiumCapture | percent}}</td>
-          <td>{{(o.premiumReceived - o.premiumPaid)/o.daysHeld | currency}}</td>
-          <td>{{o.daysHeld}} / {{o.days}}</td>
-          <td>{{o.daysHeld/o.days| percent}}</td>
-          <td><a [routerLink]="[ '/optiondetails', o.id ]">details</a></td>
+            <th>Option</th>
+            <th>Closed</th>
+            <th>P/L</th>
+            <th>P/L %</th>
+            <th>Premium/Day Held</th>
+            <th>Days Held</th>
+            <th>Days Held %</th>
+            <th></th>
         </tr>
-      }
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            @for (o of closedOptions; track o) {
+                <tr>
+                    <td width="100">
+                        <div>
+                            <app-stock-link [ticker]="o.ticker"></app-stock-link>
+                            {{ o.strikePrice |currency }}
+                        </div>
+                        <div>
+                            @if (o.boughtOrSold === 'Sold') {
+                                <span class="badge bg-info me-1">sell</span>
+                            }
+                            @if (o.boughtOrSold === 'Bought') {
+                                <span class="badge bg-secondary me-1">buy</span>
+                            }
+                            @if (o.optionType === 'CALL') {
+                                <span class="badge bg-success me-1">call</span>
+                            }
+                            @if (o.optionType === 'PUT') {
+                                <span class="badge bg-warning me-1">put</span>
+                            }
+                        </div>
+                        @if (o.assigned) {
+                            <div>
+                                <span class="badge bg-warning me-1">assigned</span>
+                            </div>
+                        }
+                    </td>
+                    <td>{{ o.closed | date:'MM/dd' }}</td>
+                    <td>
+                        <div>{{ o.premiumReceived - o.premiumPaid | currency }}</div>
+                        <div>
+                            @if (o.premiumReceived - o.premiumPaid >= 0) {
+                                <span class="badge bg-success me-1">win</span>
+                            }
+                            @if (o.premiumReceived - o.premiumPaid < 0) {
+                                <span class="badge bg-warning me-1">loss</span>
+                            }
+                        </div>
+                    </td>
+                    <td>{{ o.premiumCapture | percent }}</td>
+                    <td>{{ (o.premiumReceived - o.premiumPaid) / o.daysHeld | currency }}</td>
+                    <td>{{ o.daysHeld }} / {{ o.days }}</td>
+                    <td>{{ o.daysHeld / o.days| percent }}</td>
+                    <td><a [routerLink]="[ '/optiondetails', o.id ]">details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

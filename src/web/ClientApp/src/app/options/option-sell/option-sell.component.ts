@@ -1,92 +1,92 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../../services/stocks.service';
-import { DatePipe, Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { GetErrors } from 'src/app/services/utils';
+import {Component, OnInit} from '@angular/core';
+import {StocksService} from '../../services/stocks.service';
+import {DatePipe, Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {GetErrors} from 'src/app/services/utils';
 import {tick} from "@angular/core/testing";
 
 @Component({
-  selector: 'app-option-sell',
-  templateUrl: './option-sell.component.html',
-  providers: [DatePipe]
+    selector: 'app-option-sell',
+    templateUrl: './option-sell.component.html',
+    providers: [DatePipe]
 })
 export class OptionSellComponent implements OnInit {
 
-  errors : string[]
+    errors: string[]
 
-  success: boolean
+    success: boolean
 
-  ticker            : string
-  strikePrice       : number
-  optionType        : string
-  expirationDate    : string
-  positionType      : string
-  numberOfContracts : number
-  premium           : number
-  filled            : string
-  notes             : string
+    ticker: string
+    strikePrice: number
+    optionType: string
+    expirationDate: string
+    positionType: string
+    numberOfContracts: number
+    premium: number
+    filled: string
+    notes: string
+    protected readonly tick = tick;
 
-  constructor(
-    private service: StocksService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private datePipe: DatePipe,
-    private location: Location) { }
-
-  ngOnInit() {
-    var ticker = this.route.snapshot.paramMap.get('ticker');
-    if (ticker) {
-      this.ticker = ticker;
+    constructor(
+        private service: StocksService,
+        private route: ActivatedRoute,
+        private router: Router,
+        private datePipe: DatePipe,
+        private location: Location) {
     }
 
-    this.filled = Date()
-    this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
-    this.positionType = 'buy'
-  }
+    ngOnInit() {
+        var ticker = this.route.snapshot.paramMap.get('ticker');
+        if (ticker) {
+            this.ticker = ticker;
+        }
 
-  record() {
-    var opt = {
-      ticker: this.ticker,
-      strikePrice: this.strikePrice,
-      optionType: this.optionType,
-      expirationDate: this.expirationDate,
-      numberOfContracts: this.numberOfContracts,
-      premium: this.premium,
-      filled: this.filled,
-      notes: this.notes
+        this.filled = Date()
+        this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
+        this.positionType = 'buy'
     }
 
-    if (this.positionType == 'buy') this.recordBuy(opt)
-    if (this.positionType == 'sell') this.recordSell(opt)
-  }
+    record() {
+        var opt = {
+            ticker: this.ticker,
+            strikePrice: this.strikePrice,
+            optionType: this.optionType,
+            expirationDate: this.expirationDate,
+            numberOfContracts: this.numberOfContracts,
+            premium: this.premium,
+            filled: this.filled,
+            notes: this.notes
+        }
 
-  recordBuy(opt: object) {
-    this.service.buyOption(opt).subscribe( r => {
-      this.navigateToOption(r.id)
-    }, err => {
-      this.errors = GetErrors(err)
-    })
-  }
+        if (this.positionType == 'buy') this.recordBuy(opt)
+        if (this.positionType == 'sell') this.recordSell(opt)
+    }
 
-  recordSell(opt: object) {
-    this.service.sellOption(opt).subscribe( r => {
-      this.navigateToOption(r.id)
-    }, err => {
-      this.errors = GetErrors(err)
-    })
-  }
+    recordBuy(opt: object) {
+        this.service.buyOption(opt).subscribe(r => {
+            this.navigateToOption(r.id)
+        }, err => {
+            this.errors = GetErrors(err)
+        })
+    }
 
-  navigateToOption(id:string) {
-    this.router.navigate(['/optiondetails', id])
-  }
+    recordSell(opt: object) {
+        this.service.sellOption(opt).subscribe(r => {
+            this.navigateToOption(r.id)
+        }, err => {
+            this.errors = GetErrors(err)
+        })
+    }
 
-  back() {
-    this.location.back()
-  }
+    navigateToOption(id: string) {
+        this.router.navigate(['/optiondetails', id])
+    }
 
-  onTickerSelected(ticker:string) {
-    this.ticker = ticker;
-  }
+    back() {
+        this.location.back()
+    }
 
-  protected readonly tick = tick;
+    onTickerSelected(ticker: string) {
+        this.ticker = ticker;
+    }
 }

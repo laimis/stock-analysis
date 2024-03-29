@@ -2,8 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {
-    BrokerageAccount, OutcomeValueTypeEnum,
-    PositionInstance, StockQuote,
+    BrokerageAccount,
+    OutcomeValueTypeEnum,
+    PositionInstance,
+    StockQuote,
     StockTradingPositions,
     StockViolation
 } from '../../services/stocks.service';
@@ -30,18 +32,15 @@ export class StockTradingDashboardComponent implements OnInit {
     metricToRender: string
     metricFunc: (p: PositionInstance) => any;
     metricType: OutcomeValueTypeEnum;
-
-
+    invested: number = 0
+    readonly toggleVisuallyHidden = toggleVisuallyHidden;
     private NO_LONG_TERM_STRATEGY = "nolongterm"
+    strategyToFilter = this.NO_LONG_TERM_STRATEGY
     private NONE = ""
     private SHORTS = "shorts"
     private LONGS = "longs"
     private RR = "rr"
     private UnrealizedRR = "unrealizedRR"
-
-    strategyToFilter = this.NO_LONG_TERM_STRATEGY
-
-
     sortOptions: { name: string; value: string }[] = [
         {value: this.RR, name: "R/R"},
         {value: this.UnrealizedRR, name: "Unrealized R/R"},
@@ -99,63 +98,6 @@ export class StockTradingDashboardComponent implements OnInit {
     strategyToFilterChanged = (elem: EventTarget) => {
         this.strategyToFilter = (elem as HTMLInputElement).value
         this.updatePositions()
-    }
-
-    private loadEntries() {
-        this.loading = true
-        this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
-            this.positions = r.current
-            this.violations = r.violations
-            this.brokerageAccount = r.brokerageAccount
-            this.quotes = r.prices
-            this.loading = false
-            this.loaded = true
-
-            // create an array of strategies where value is the stratey name and count of positions that match
-
-            let stratsWithCounts = GetStrategies().map(
-                (s) => {
-                    var count = this.positions.filter(i => this.matchesStrategyCheck(i, s.key)).length
-                    return {key: s.key, value: s.value + " - " + count}
-                }
-            )
-            this.strategies.push({key: "all", value: "All - " + this.positions.length})
-
-            let longTermPositions = this.positions.filter(
-                (p) => {
-                    let strategy = p.labels.find(l => l.key == 'strategy')
-                    return strategy && isLongTermStrategy(strategy.value)
-                }
-            )
-
-            let shorts = this.positions.filter((p) => p.isShort)
-            let longs = this.positions.filter((p) => !p.isShort)
-
-            let noStrategy = this.positions.filter(i => this.matchesStrategyCheck(i, this.NONE))
-
-            this.strategies.push({
-                key: this.NO_LONG_TERM_STRATEGY,
-                value: "All minus long term - " + (this.positions.length - longTermPositions.length)
-            })
-            this.strategies.push({key: this.LONGS, value: "Longs - " + longs.length})
-            this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})
-            this.strategies.push({key: this.NONE, value: "None - " + noStrategy.length})
-            this.strategies = this.strategies.concat(
-                stratsWithCounts
-            )
-
-            this.metricToRender = this.UnrealizedRR
-            
-            this.metricChanged(this.metricToRender)
-            
-            this.updatePositions()
-
-        }, err => {
-            this.loading = false
-            this.loaded = true
-            console.log(err)
-            this.errors = GetErrors(err)
-        })
     }
 
     metricChanged(value: string) {
@@ -216,10 +158,9 @@ export class StockTradingDashboardComponent implements OnInit {
                 this.metricFunc = (p: PositionInstance) => p.rr
                 this.metricType = OutcomeValueTypeEnum.Number
         }
-        
+
         this.updatePositions()
     }
-
 
     getQuote(p: PositionInstance) {
         return this.quotes[p.ticker]
@@ -279,8 +220,61 @@ export class StockTradingDashboardComponent implements OnInit {
             })
     }
 
+    private loadEntries() {
+        this.loading = true
+        this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
+            this.positions = r.current
+            this.violations = r.violations
+            this.brokerageAccount = r.brokerageAccount
+            this.quotes = r.prices
+            this.loading = false
+            this.loaded = true
 
-    invested: number = 0
-    readonly toggleVisuallyHidden = toggleVisuallyHidden;
+            // create an array of strategies where value is the stratey name and count of positions that match
+
+            let stratsWithCounts = GetStrategies().map(
+                (s) => {
+                    var count = this.positions.filter(i => this.matchesStrategyCheck(i, s.key)).length
+                    return {key: s.key, value: s.value + " - " + count}
+                }
+            )
+            this.strategies.push({key: "all", value: "All - " + this.positions.length})
+
+            let longTermPositions = this.positions.filter(
+                (p) => {
+                    let strategy = p.labels.find(l => l.key == 'strategy')
+                    return strategy && isLongTermStrategy(strategy.value)
+                }
+            )
+
+            let shorts = this.positions.filter((p) => p.isShort)
+            let longs = this.positions.filter((p) => !p.isShort)
+
+            let noStrategy = this.positions.filter(i => this.matchesStrategyCheck(i, this.NONE))
+
+            this.strategies.push({
+                key: this.NO_LONG_TERM_STRATEGY,
+                value: "All minus long term - " + (this.positions.length - longTermPositions.length)
+            })
+            this.strategies.push({key: this.LONGS, value: "Longs - " + longs.length})
+            this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})
+            this.strategies.push({key: this.NONE, value: "None - " + noStrategy.length})
+            this.strategies = this.strategies.concat(
+                stratsWithCounts
+            )
+
+            this.metricToRender = this.UnrealizedRR
+
+            this.metricChanged(this.metricToRender)
+
+            this.updatePositions()
+
+        }, err => {
+            this.loading = false
+            this.loaded = true
+            console.log(err)
+            this.errors = GetErrors(err)
+        })
+    }
 }
 

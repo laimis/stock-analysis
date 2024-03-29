@@ -1,60 +1,62 @@
 <div>
-  <app-error-display [errors]="errors"></app-error-display>
-  @for (ticker of tickers; track ticker) {
-    <span class="badge bg-success m-1">{{ticker}}</span>
-  }
-  <div class="row">
-    <div class="col">
-      <label class="form-label" for="priceFrequency">Price Frequency</label>
-      <select class="form-select" id="priceFrequency" [(ngModel)]="priceFrequency" (ngModelChange)="priceFrequencyChanged()">
-        <option value="Daily">Daily</option>
-        <option value="Weekly">Weekly</option>
-      </select>
+    <app-error-display [errors]="errors"></app-error-display>
+    @for (ticker of tickers; track ticker) {
+        <span class="badge bg-success m-1">{{ ticker }}</span>
+    }
+    <div class="row">
+        <div class="col">
+            <label class="form-label" for="priceFrequency">Price Frequency</label>
+            <select (ngModelChange)="priceFrequencyChanged()" [(ngModel)]="priceFrequency" class="form-select"
+                    id="priceFrequency">
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+            </select>
+        </div>
+        <div class="col">
+            <label class="form-label" for="ageValueToUse">Support/Resistance Age</label>
+            <select (ngModelChange)="ageValueChanged()" [(ngModel)]="ageValueToUse" class="form-select"
+                    id="ageValueToUse">
+                <option [value]="twoMonths">2 months</option>
+                <option [value]="sixMonths">6 months</option>
+            </select>
+        </div>
     </div>
-    <div class="col">
-      <label class="form-label" for="ageValueToUse">Support/Resistance Age</label>
-      <select id="ageValueToUse" class="form-select" [(ngModel)]="ageValueToUse" (ngModelChange)="ageValueChanged()">
-        <option [value]="twoMonths">2 months</option>
-        <option [value]="sixMonths">6 months</option>
-      </select>
-    </div>
-  </div>
-  <app-candlestick-chart [chartInformation]="chartInfo" >
-  </app-candlestick-chart>
-  @for (container of lineContainers; track container) {
+    <app-candlestick-chart [chartInformation]="chartInfo">
+    </app-candlestick-chart>
+    @for (container of lineContainers; track container) {
+        <section>
+            <!--    <h3>{{container.label}}</h3>-->
+            <app-line-chart [dataContainer]="container"></app-line-chart>
+        </section>
+    }
     <section>
-      <!--    <h3>{{container.label}}</h3>-->
-      <app-line-chart [dataContainer]="container"></app-line-chart>
+        <h3>Peaks & Valleys</h3>
+        <app-line-chart [dataContainers]="peaksAndValleys"></app-line-chart>
     </section>
-  }
-  <section>
-    <h3>Peaks & Valleys</h3>
-    <app-line-chart [dataContainers]="peaksAndValleys"></app-line-chart>
-  </section>
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>From</th>
-        <th></th>
-        <th>To</th>
-        <th></th>
-        <th>Days</th>
-        <th>Change</th>
-        <th>% Change</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (entry of log; track entry) {
+    <table class="table table-hover">
+        <thead>
         <tr>
-          <td>{{entry.from.gradient.bar.close}}</td>
-          <td>{{entry.from.gradient.bar.dateStr}}</td>
-          <td>{{entry.to.gradient.bar.close}}</td>
-          <td>{{entry.to.gradient.bar.dateStr}}</td>
-          <td>{{entry.days}}</td>
-          <td>{{entry.change | currency}}</td>
-          <td>{{entry.percentChange | percent}}</td>
+            <th>From</th>
+            <th></th>
+            <th>To</th>
+            <th></th>
+            <th>Days</th>
+            <th>Change</th>
+            <th>% Change</th>
         </tr>
-      }
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            @for (entry of log; track entry) {
+                <tr>
+                    <td>{{ entry.from.gradient.bar.close }}</td>
+                    <td>{{ entry.from.gradient.bar.dateStr }}</td>
+                    <td>{{ entry.to.gradient.bar.close }}</td>
+                    <td>{{ entry.to.gradient.bar.dateStr }}</td>
+                    <td>{{ entry.days }}</td>
+                    <td>{{ entry.change | currency }}</td>
+                    <td>{{ entry.percentChange | percent }}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

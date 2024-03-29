@@ -6,23 +6,23 @@
         }{{ tickers.length }} tickers</h3>
 
         <div #dateFilter>
-            <span role="button" #spanButton
-                  (click)="toggleVisibility(dateForm, spanButton)">Date Selections {{ startDate }} {{ endDate }}</span>
-            <form class="visually-hidden" #dateForm>
+            <span #spanButton (click)="toggleVisibility(dateForm, spanButton)"
+                  role="button">Date Selections {{ startDate }} {{ endDate }}</span>
+            <form #dateForm class="visually-hidden">
                 <div class="row">
                     <div class="col-md-4">
                         <label class="form-label" for="startDate">Start Date</label>
-                        <input #startDateControl type="date" class="form-control form-control-sm"
-                               [(ngModel)]="startDate" id="startDate" name="startDate"/>
+                        <input #startDateControl [(ngModel)]="startDate" class="form-control form-control-sm"
+                               id="startDate" name="startDate" type="date"/>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label" for="endDate">End Date</label>
-                        <input #endDateControl type="date" class="form-control form-control-sm" [(ngModel)]="endDate"
-                               id="endDate" name="endDate"/>
+                        <input #endDateControl [(ngModel)]="endDate" class="form-control form-control-sm" id="endDate"
+                               name="endDate" type="date"/>
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
-                        <button class="btn btn-primary btn-sm"
-                                (click)="toggleVisibility(dateForm,spanButton); runReports(startDateControl.value, endDateControl.value)">
+                        <button (click)="toggleVisibility(dateForm,spanButton); runReports(startDateControl.value, endDateControl.value)"
+                                class="btn btn-primary btn-sm">
                             Apply
                         </button>
                     </div>
@@ -38,14 +38,14 @@
         </div>
         <!-- drop down with all the tickers -->
         <div class="mb-3 mt-3">
-            <label for="tickerFilter" class="form-label">Ticker highlighter</label>
+            <label class="form-label" for="tickerFilter">Ticker highlighter</label>
             @if (earnings.length > 0) {
                 <button class="btn btn-link float-end"
                         (click)="toggleExcludeEarnings()">{{ excludeEarningsTitle }}
                 </button>
             }
-            <select #tickerSelect id="tickerFilter" class="form-select" aria-label="Ticker filter"
-                    (change)="onTickerChange(tickerSelect.value)">
+            <select #tickerSelect (change)="onTickerChange(tickerSelect.value)" aria-label="Ticker filter" class="form-select"
+                    id="tickerFilter">
                 <option value="all">All</option>
                 @for (t of tickers; track t) {
                     <option [value]="t">{{ t }}</option>

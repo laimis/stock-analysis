@@ -38,7 +38,8 @@
         @if (ticker) {
             <div class="row mb-3">
                 <div class="col">
-                    <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }} x {{ this.ask | currency }}
+                    <label for="costToBuy" class="form-label">Price ( {{ this.bid | currency }}
+                        x {{ this.ask | currency }}
                         )</label>
                     <input
                         type="number"
@@ -106,12 +107,15 @@
                             <p class="card-text">
                 <span class="me-2 visually-hidden" #sizeSpan
                       (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
-                                <span class="me-2" #sizeSpanAlt (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
+                                <span class="me-2" #sizeSpanAlt
+                                      (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
                                 <span class="me-2 visually-hidden" #lossSpan
                                       (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
-                                <span class="me-2" #lossSpanAlt (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
+                                <span class="me-2" #lossSpanAlt
+                                      (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
                                 <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
-                                <span class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
+                                <span
+                                    class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
                             </p>
                         </div>
                     </div>
@@ -143,7 +147,8 @@
             <div class="row mb-3">
                 <div class="col">
                     <div>
-                        <textarea class="form-control" rows="5" id="notes" [(ngModel)]="notes" placeholder="Notes..."></textarea>
+                        <textarea class="form-control" rows="5" id="notes" [(ngModel)]="notes"
+                                  placeholder="Notes..."></textarea>
                     </div>
                 </div>
             </div>
@@ -154,7 +159,7 @@
                     <div class="form-floating">
                         <select class="form-select" id="strategyInput" [(ngModel)]="strategy">
                             <option value="" selected>Select strategy...</option>
-                            @for (s of strategies;track s) {
+                            @for (s of strategies; track s) {
                                 <option [value]="s.key">{{ s.value }}</option>
                             }
                         </select>
@@ -166,11 +171,13 @@
         @if (prices && isPendingPositionMode) {
             <div class="row mb-3">
                 <div class="col">
-                    <button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position - LIMIT
+                    <button class="btn btn-primary w-100" (click)="createPendingPositionLimit()">Create Pending Position
+                        - LIMIT
                     </button>
                 </div>
                 <div class="col">
-                    <button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending Position - MARKET
+                    <button class="btn btn-primary w-100" (click)="createPendingPositionMarket()">Create Pending
+                        Position - MARKET
                     </button>
                 </div>
             </div>
@@ -178,7 +185,8 @@
         @if (prices && !isPendingPositionMode) {
             <div class="row mb-3">
                 <div class="col">
-                    <button class="btn btn-primary w-100" (click)="openPosition()" [disabled]="recordInProgress">Open Position
+                    <button class="btn btn-primary w-100" (click)="openPosition()" [disabled]="recordInProgress">Open
+                        Position
                     </button>
                 </div>
             </div>

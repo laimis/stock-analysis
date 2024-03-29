@@ -1,32 +1,34 @@
 <div>
 
-  <h4>
-    {{activeRoutine.name}}
-    <button class="btn btn-primary btn-sm float-end" (click)="deactivate()">Deactivate</button>
-  </h4>
+    <h4>
+        {{ activeRoutine.name }}
+        <button (click)="deactivate()" class="btn btn-primary btn-sm float-end">Deactivate</button>
+    </h4>
 
-  <div class="wrapper text-center">
-    <div class="step-container">
-      <div class="step">
-        <a
-          target="_blank"
-          [href]="activeStep.url">{{activeStep.label}}
-        </a>
-      </div>
-      <div class="step-url">
-        <a
-          target="_blank"
-          [href]="activeStep.url">{{activeStep.url}}
-        </a>
-      </div>
-      <div class="step-url">
-        {{currentStepIndex + 1}} / {{activeRoutine.steps.length}}
-      </div>
+    <div class="wrapper text-center">
+        <div class="step-container">
+            <div class="step">
+                <a
+                    [href]="activeStep.url"
+                    target="_blank">{{ activeStep.label }}
+                </a>
+            </div>
+            <div class="step-url">
+                <a
+                    [href]="activeStep.url"
+                    target="_blank">{{ activeStep.url }}
+                </a>
+            </div>
+            <div class="step-url">
+                {{ currentStepIndex + 1 }} / {{ activeRoutine.steps.length }}
+            </div>
+        </div>
+
     </div>
 
-  </div>
-
-  <button class="btn btn-primary btn-sm" (click)="prevStep()" [disabled]="currentStepIndex === 0">Prev</button>
-  <button class="btn btn-primary btn-sm float-end" (click)="nextStep()" [disabled]="currentStepIndex >= activeRoutine.steps.length - 1">Next</button>
+    <button (click)="prevStep()" [disabled]="currentStepIndex === 0" class="btn btn-primary btn-sm">Prev</button>
+    <button (click)="nextStep()" [disabled]="currentStepIndex >= activeRoutine.steps.length - 1"
+            class="btn btn-primary btn-sm float-end">Next
+    </button>
 
 </div>

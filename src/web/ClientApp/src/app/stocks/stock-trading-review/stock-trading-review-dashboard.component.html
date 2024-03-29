@@ -1,34 +1,37 @@
 <div>
-  <div class="tab-container mt-2">
-    <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
-      Positions
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]="" (click)="activateTab('performance')">
-      Performance
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('strategies')}" [routerLink]="" (click)="activateTab('strategies')">
-      Strategies
-    </a>
-    <a class="tab" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" (click)="activateTab('review')">
-      Review
-    </a>
-    <a class="tab float-end" [routerLink]="" (click)="refresh()">
-      Refresh
-    </a>
-  </div>
-  @if (loading.positions || loading.performance) {
-    <app-loading></app-loading>
-  }
-  @if (isActive('positions') && past) {
-    <app-stock-trading-closed-positions [positions]=past></app-stock-trading-closed-positions>
-  }
-  @if (isActive('performance') && performance) {
-    <app-stock-trading-performance [performance]=performance></app-stock-trading-performance>
-  }
-  @if (isActive('strategies') && strategies) {
-    <app-stock-trading-strategies [results]=strategies></app-stock-trading-strategies>
-  }
-  @if (isActive('review') && past) {
-    <app-stock-trading-review [positions]="past"></app-stock-trading-review>
-  }
+    <div class="tab-container mt-2">
+        <a (click)="activateTab('positions')" [ngClass]="{'is-active': isActive('positions')}" [routerLink]=""
+           class="tab">
+            Positions
+        </a>
+        <a (click)="activateTab('performance')" [ngClass]="{'is-active': isActive('performance')}" [routerLink]=""
+           class="tab">
+            Performance
+        </a>
+        <a (click)="activateTab('strategies')" [ngClass]="{'is-active': isActive('strategies')}" [routerLink]=""
+           class="tab">
+            Strategies
+        </a>
+        <a (click)="activateTab('review')" [ngClass]="{'is-active': isActive('review')}" [routerLink]="" class="tab">
+            Review
+        </a>
+        <a (click)="refresh()" [routerLink]="" class="tab float-end">
+            Refresh
+        </a>
+    </div>
+    @if (loading.positions || loading.performance) {
+        <app-loading></app-loading>
+    }
+    @if (isActive('positions') && past) {
+        <app-stock-trading-closed-positions [positions]=past></app-stock-trading-closed-positions>
+    }
+    @if (isActive('performance') && performance) {
+        <app-stock-trading-performance [performance]=performance></app-stock-trading-performance>
+    }
+    @if (isActive('strategies') && strategies) {
+        <app-stock-trading-strategies [results]=strategies></app-stock-trading-strategies>
+    }
+    @if (isActive('review') && past) {
+        <app-stock-trading-review [positions]="past"></app-stock-trading-review>
+    }
 </div>

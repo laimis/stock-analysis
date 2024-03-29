@@ -1,12 +1,12 @@
 <div>
-  @if (error) {
-    <div>
-      <div class="alert alert-danger" role="alert">
-        <p>{{error}}</p>
-      </div>
-    </div>
-  }
-  @if (gaps) {
-    <app-gaps [gaps]="gaps"></app-gaps>
-  }
+    @if (error) {
+        <div>
+            <div class="alert alert-danger" role="alert">
+                <p>{{ error }}</p>
+            </div>
+        </div>
+    }
+    @if (gaps) {
+        <app-gaps [gaps]="gaps"></app-gaps>
+    }
 </div>

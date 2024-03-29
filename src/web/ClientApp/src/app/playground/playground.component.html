@@ -1,7 +1,7 @@
 <div>
     <app-error-display [errors]="errors"></app-error-display>
 
-    <button class="btn btn-primary" (click)="run()">Multiple API call demo</button>
+    <button (click)="run()" class="btn btn-primary">Multiple API call demo</button>
 
     {{ status }}
 
@@ -10,8 +10,8 @@
         <div class="card-body">
             <h5 class="card-title">Scatter plot demo</h5>
 
-            @if (scatterPlotOptions) {
-                <canvasjs-chart [options]="scatterPlotOptions"></canvasjs-chart>
+            @for (option of chartOptions; track option) {
+                <canvasjs-chart [options]="option"></canvasjs-chart>
             }
         </div>
     </div>

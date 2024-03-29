@@ -1,24 +1,24 @@
 <div>
-  @if (saved) {
-    <div class="alert alert-success">Thank you for your message</div>
-  }
-  @if (errors) {
-    <app-error-display [errors]="errors"></app-error-display>
-  }
-  @if (!saved) {
-    <form>
-      <div>
-        <label for="title">Your email</label>
-        <input autofocus type="email" class="form-control" id="email" name="email" [(ngModel)]="email">
-      </div>
-      <div>
-        <label for="description">Message</label>
-        <textarea class="form-control" id="message" name="message" [(ngModel)]="message" rows="10">
+    @if (saved) {
+        <div class="alert alert-success">Thank you for your message</div>
+    }
+    @if (errors) {
+        <app-error-display [errors]="errors"></app-error-display>
+    }
+    @if (!saved) {
+        <form>
+            <div>
+                <label for="title">Your email</label>
+                <input autofocus type="email" class="form-control" id="email" name="email" [(ngModel)]="email">
+            </div>
+            <div>
+                <label for="description">Message</label>
+                <textarea class="form-control" id="message" name="message" [(ngModel)]="message" rows="10">
         </textarea>
-      </div>
-      <div>
-        <button class="btn btn-primary me-1" (click)="sendMessage()">Submit</button>
-      </div>
-    </form>
-  }
+            </div>
+            <div>
+                <button class="btn btn-primary me-1" (click)="sendMessage()">Submit</button>
+            </div>
+        </form>
+    }
 </div>

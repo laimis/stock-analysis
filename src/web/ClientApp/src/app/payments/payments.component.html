@@ -1,8 +1,8 @@
 @if (success) {
-  <div class="alert alert-success">Thank you for your subscription!</div>
+    <div class="alert alert-success">Thank you for your subscription!</div>
 }
 @if (errors) {
-  <app-error-display [errors]="errors"></app-error-display>
+    <app-error-display [errors]="errors"></app-error-display>
 }
-<button type="button" class="btn btn-primary me-3" (click)="payStarter()">Subscribe - Starter</button>
-<button type="button" class="btn btn-primary" (click)="payFull()">Subscribe - Full</button>
+<button (click)="payStarter()" class="btn btn-primary me-3" type="button">Subscribe - Starter</button>
+<button (click)="payFull()" class="btn btn-primary" type="button">Subscribe - Full</button>

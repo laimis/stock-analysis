@@ -1,40 +1,39 @@
-
 @if (sells && sells.length > 0) {
-  <div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <th>Date</th>
-          <th>Number of Shares</th>
-          <th>Price&#64;Sale</th>
-          <th>Current Price</th>
-          <th>% Diff</th>
-          <th>Older Than 30 Days</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (s of sells; track s) {
-          <tr ngClass="{{s.diff > 0 ? 'bg-warning' : 'bg-info'}}">
-            <td>
-              <app-stock-link class="text-white" [ticker]="s.ticker"></app-stock-link>
-            </td>
-            <td>{{s.date | date}}</td>
-            <td>{{s.numberOfShares}}</td>
-            <td>{{s.price}}</td>
-            <td>{{s.currentPrice}}</td>
-            <td>{{s.diff | percent:'1.2'}}</td>
-            <td>@if (s.olderThan30Days) {
-              <span class="badge bg-success">yes</span>
-            }</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Date</th>
+                <th>Number of Shares</th>
+                <th>Price&#64;Sale</th>
+                <th>Current Price</th>
+                <th>% Diff</th>
+                <th>Older Than 30 Days</th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (s of sells; track s) {
+                    <tr ngClass="{{s.diff > 0 ? 'bg-warning' : 'bg-info'}}">
+                        <td>
+                            <app-stock-link class="text-white" [ticker]="s.ticker"></app-stock-link>
+                        </td>
+                        <td>{{ s.date | date }}</td>
+                        <td>{{ s.numberOfShares }}</td>
+                        <td>{{ s.price }}</td>
+                        <td>{{ s.currentPrice }}</td>
+                        <td>{{ s.diff | percent:'1.2' }}</td>
+                        <td>@if (s.olderThan30Days) {
+                            <span class="badge bg-success">yes</span>
+                        }</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 @if (sells && sells.length === 0) {
-  <div>
-    No sells found
-  </div>
+    <div>
+        No sells found
+    </div>
 }

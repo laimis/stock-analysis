@@ -1,18 +1,18 @@
 @media (max-width: 767px) {
-  /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-  .body-content {
-    padding-top: 50px;
-  }
+    /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
+    .body-content {
+        padding-top: 50px;
+    }
 }
 
 
 #bodyContainer {
-  min-height: 600px;
+    min-height: 600px;
 }
 
 #sticky {
-  width:100%;
-  height: 100px;
-  color:white;
-  text-align:center;
+    width: 100%;
+    height: 100px;
+    color: white;
+    text-align: center;
 }

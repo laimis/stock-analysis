@@ -1,36 +1,47 @@
 .bg-level-4-success {
-  background-color: #0e700e;
+    background-color: #0e700e;
 }
+
 .bg-level-4-success {
-  background-color: #17a217;
+    background-color: #17a217;
 }
+
 .bg-level-3-success {
     background-color: #34b234;
 }
+
 .bg-level-2-success {
-  background-color: #75d495;
+    background-color: #75d495;
 }
+
 .bg-level-1-success {
-  background-color: #AFE1AF;
+    background-color: #AFE1AF;
 }
+
 .bg-level-0-success {
     background-color: #DFF8DF;
 }
+
 .bg-level-0-failure {
-  background-color: #FFDFDF;
+    background-color: #FFDFDF;
 }
+
 .bg-level-1-failure {
-  background-color: #FAA0A0;
+    background-color: #FAA0A0;
 }
+
 .bg-level-2-failure {
-  background-color: #e36e6e;
+    background-color: #e36e6e;
 }
+
 .bg-level-3-failure {
-  background-color: #bb4c4c;
+    background-color: #bb4c4c;
 }
+
 .bg-level-4-failure {
-  background-color: #9b2020;
+    background-color: #9b2020;
 }
+
 .bg-level-5-failure {
-  background-color: #6e0808;
+    background-color: #6e0808;
 }

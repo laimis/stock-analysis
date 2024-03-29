@@ -1,73 +1,79 @@
 <div class="mt-2">
-  @if (errors) {
-    <app-error-display [errors]="errors"></app-error-display>
-  }
-  @if (success) {
-    <div class="alert alert-success" role="alert">
-      Contract sale has been successfully recorded
+    @if (errors) {
+        <app-error-display [errors]="errors"></app-error-display>
+    }
+    @if (success) {
+        <div class="alert alert-success" role="alert">
+            Contract sale has been successfully recorded
+        </div>
+    }
+    <h3>Record your option transaction</h3>
+    <div class="option-purchase-c-container">
+        <form>
+            <div class="row">
+                <div class="col">
+                    <app-stock-search
+                        (tickerSelected)="onTickerSelected($event)"
+                        [ticker]="ticker"
+                        cssClass="form-control"
+                        label="Ticker">
+                    </app-stock-search>
+                </div>
+                <div class="col">
+                    <label for="strikePrice">Strike Price</label>
+                    <input [(ngModel)]="strikePrice" class="form-control" id="strikePrice" name="strikePrice" step="0.01"
+                           type="number">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <label for="expirationDate">Expiration</label>
+                    <input [(ngModel)]="expirationDate" class="form-control" id="expirationDate" name="expirationDate"
+                           type="date">
+                </div>
+                <div class="col">
+                    <label for="optionType">Option Type &nbsp;&nbsp; </label>
+                    <select [(ngModel)]="optionType" class="form-control btn border rounded" id="optionType"
+                            name="optionType">
+                        <option>CALL</option>
+                        <option>PUT</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <label for="numberOfContracts">Number of Contracts</label>
+                    <input [(ngModel)]="numberOfContracts" class="form-control" id="numberOfContracts" name="numberOfContracts"
+                           type="number">
+                </div>
+                <div class="col">
+                    <label for="premium">Premium per Contract</label>
+                    <input [(ngModel)]="premium" class="form-control" id="premium" name="premium" step="0.01"
+                           type="number">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
+                    <select [(ngModel)]="positionType" class="form-control btn border rounded" id="positionType"
+                            name="positionType">
+                        <option value="buy">Bought</option>
+                        <option value="sell">Sold</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="filled">Filled Date</label>
+                    <input [(ngModel)]="filled" class="form-control" id="filled" name="filled" type="date">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <label for="notes">Notes and your thoughts around this transaction</label>
+                <textarea [(ngModel)]="notes" class="form-control" id="notes" name="notes" rows="5"></textarea>
+            </div>
+            <div class="mt-2">
+                <button (click)="record()" class="btn btn-primary mb-2 me-2" type="submit">Record</button>
+                <button (click)="back()" class="btn btn-secondary mb-2" type="button">Back</button>
+            </div>
+        </form>
     </div>
-  }
-  <h3>Record your option transaction</h3>
-  <div class="option-purchase-c-container">
-    <form>
-      <div class="row">
-        <div class="col">
-          <app-stock-search
-            label="Ticker"
-            (tickerSelected)="onTickerSelected($event)"
-            cssClass="form-control"
-            [ticker]="ticker">
-          </app-stock-search>
-        </div>
-        <div class="col">
-          <label for="strikePrice">Strike Price</label>
-          <input type="number" step="0.01" class="form-control" id="strikePrice" name="strikePrice" [(ngModel)]="strikePrice">
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col">
-          <label for="expirationDate">Expiration</label>
-          <input type="date" class="form-control" id="expirationDate" name="expirationDate" [(ngModel)]="expirationDate">
-        </div>
-        <div class="col">
-          <label for="optionType">Option Type &nbsp;&nbsp; </label>
-          <select class="form-control btn border rounded" id="optionType" name="optionType" [(ngModel)]="optionType">
-            <option>CALL</option>
-            <option>PUT</option>
-          </select>
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col">
-          <label for="numberOfContracts">Number of Contracts</label>
-          <input type="number" class="form-control" id="numberOfContracts" name="numberOfContracts" [(ngModel)]="numberOfContracts">
-        </div>
-        <div class="col">
-          <label for="premium">Premium per Contract</label>
-          <input type="number" step="0.01" class="form-control" id="premium" name="premium" [(ngModel)]="premium">
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col">
-          <label for="positionType">Did you buy or sell? &nbsp;&nbsp; </label>
-          <select class="form-control btn border rounded" id="positionType" name="positionType" [(ngModel)]="positionType">
-            <option value="buy">Bought</option>
-            <option value="sell">Sold</option>
-          </select>
-        </div>
-        <div class="col">
-          <label for="filled">Filled Date</label>
-          <input type="date" class="form-control" id="filled" name="filled" [(ngModel)]="filled">
-        </div>
-      </div>
-      <div class="row mt-2">
-        <label for="notes">Notes and your thoughts around this transaction</label>
-        <textarea class="form-control" id="notes" name="notes" [(ngModel)]="notes" rows="5"></textarea>
-      </div>
-      <div class="mt-2">
-        <button type="submit" class="btn btn-primary mb-2 me-2" (click)="record()">Record</button>
-        <button type="button" class="btn btn-secondary mb-2" (click)="back()">Back</button>
-      </div>
-    </form>
-  </div>
 </div>

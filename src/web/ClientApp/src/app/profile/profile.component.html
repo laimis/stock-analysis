@@ -1,133 +1,139 @@
 <div>
-  @if (errors) {
-    <app-error-display [errors]="errors"></app-error-display>
-  }
-  @if (profile) {
-    <div class="card mb-3">
-      <div class="card-header">
-        Profile
-        <span class="text-muted float-end">Member since {{profile.created | date}}</span>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <div class="card-title">{{profile.firstname}} {{profile.lastname}}, {{profile.subscriptionLevel}} Plan</div>
-          </div>
-          <div class="col text-end">
-            <span class="text-muted">{{profile.email}}</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col mb-1">
-            <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
-          </div>
-          <div class="col text-end"></div>
-        </div>
-      </div>
-    </div>
-  }
-  <!-- settings section -->
-  @if (profile) {
-    <div class="card mb-3">
-      <div class="card-header">
-        Settings
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            <label for="maxLoss" class="form-label">Max Loss</label>
-            <input type="number" #maxLoss class="form-control" name="maxLoss" id="maxLoss" [value]="profile.maxLoss">
-          </div>
-        </div>
-        <div class="row mt-2">
-          <div class="col">
-            <button class="btn btn-primary" (click)="updateMaxLoss(maxLoss.value)">Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-  <!-- Integrations section -->
-  @if (profile) {
-    <div class="card mb-3">
-      <div class="card-header">
-        Integrations
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col">
-            @if (profile.connectedToBrokerage) {
-              <div class="card-title">
-                @if (profile.connectedToBrokerage) {
-                  <a href="/api/account/integrations/tdameritrade/disconnect" class="btn btn-primary card-link">Disconnect TDAmeritrade</a>
-                }
-                <div>
-                  Refresh expires: {{profile.brokerageRefreshTokenExpirationDate | date}}
+    @if (errors) {
+        <app-error-display [errors]="errors"></app-error-display>
+    }
+    @if (profile) {
+        <div class="card mb-3">
+            <div class="card-header">
+                Profile
+                <span class="text-muted float-end">Member since {{ profile.created | date }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="card-title">{{ profile.firstname }} {{ profile.lastname }}
+                            , {{ profile.subscriptionLevel }} Plan
+                        </div>
+                    </div>
+                    <div class="col text-end">
+                        <span class="text-muted">{{ profile.email }}</span>
+                    </div>
                 </div>
-              </div>
+                <div class="row">
+                    <div class="col mb-1">
+                        <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
+                    </div>
+                    <div class="col text-end"></div>
+                </div>
+            </div>
+        </div>
+    }
+    <!-- settings section -->
+    @if (profile) {
+        <div class="card mb-3">
+            <div class="card-header">
+                Settings
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <label for="maxLoss" class="form-label">Max Loss</label>
+                        <input type="number" #maxLoss class="form-control" name="maxLoss" id="maxLoss"
+                               [value]="profile.maxLoss">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <button class="btn btn-primary" (click)="updateMaxLoss(maxLoss.value)">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <!-- Integrations section -->
+    @if (profile) {
+        <div class="card mb-3">
+            <div class="card-header">
+                Integrations
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        @if (profile.connectedToBrokerage) {
+                            <div class="card-title">
+                                @if (profile.connectedToBrokerage) {
+                                    <a href="/api/account/integrations/tdameritrade/disconnect"
+                                       class="btn btn-primary card-link">Disconnect TDAmeritrade</a>
+                                }
+                                <div>
+                                    Refresh expires: {{ profile.brokerageRefreshTokenExpirationDate | date }}
+                                </div>
+                            </div>
+                        }
+                        @if (!profile.connectedToBrokerage) {
+                            <div class="card-title">
+                                @if (!profile.connectedToBrokerage) {
+                                    <a href="/api/account/integrations/tdameritrade/connect"
+                                       class="btn btn-primary card-link">TDAmeritrade</a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="card mb-3">
+        <div class="card-header">Imports</div>
+        <div class="card-body">
+            @if (importErrors) {
+                <app-error-display [errors]="importErrors"></app-error-display>
             }
-            @if (!profile.connectedToBrokerage) {
-              <div class="card-title">
-                @if (!profile.connectedToBrokerage) {
-                  <a href="/api/account/integrations/tdameritrade/connect" class="btn btn-primary card-link">TDAmeritrade</a>
-                }
-              </div>
+            @if (importSuccess) {
+                <div class="alert alert-success" role="alert">
+                    {{ importSuccess }}
+                </div>
             }
-          </div>
+            @if (importProgress) {
+                <div class="alert alert-info" role="alert">
+                    {{ importProgress }}
+                </div>
+            }
+            <input #shareInput (change)="importShares($event)" hidden id="shareInput" type="file">
+            <button (click)="shareInput.click()" class="btn btn-secondary me-2 mb-1">Shares</button>
+            <input #cryptoInput (change)="importCrypto($event)" hidden id="cryptoInput" type="file">
+            <button (click)="cryptoInput.click()" class="btn btn-secondary me-2 mb-1">Crypto</button>
+            <input #optionInput (change)="importOptions($event)" hidden id="optionsInput" type="file">
+            <button (click)="optionInput.click()" class="btn btn-secondary me-2 mb-1">Options</button>
+            <input #transactionInput (change)="importTransactions($event)" hidden id="transactionsInput" type="file">
+            <button (click)="transactionInput.click()" class="btn btn-secondary me-2 mb-1">Transactions</button>
         </div>
-      </div>
     </div>
-  }
-  <div class="card mb-3">
-    <div class="card-header">Imports</div>
-    <div class="card-body">
-      @if (importErrors) {
-        <app-error-display [errors]="importErrors"></app-error-display>
-      }
-      @if (importSuccess) {
-        <div class="alert alert-success" role="alert">
-          {{importSuccess}}
+    <div class="card mb-3">
+        <div class="card-header">Exports</div>
+        <div class="card-body">
+            <a class="btn btn-secondary me-2 mb-1" href="/api/portfolio/stockpositions/export/transactions">Shares</a>
+            <a class="btn btn-secondary me-2 mb-1" href="/api/options/export">Options</a>
+            <a class="btn btn-secondary me-2 mb-1" href="/api/cryptos/export">Crypto</a>
         </div>
-      }
-      @if (importProgress) {
-        <div class="alert alert-info" role="alert">
-          {{importProgress}}
+    </div>
+    <div class="card mb-5">
+        <div class="card-header">Close Account</div>
+        <div class="card-body">
+            <button (click)="deleteInitial()" class="btn btn-danger me-2">delete account</button>
+            <button (click)="clearData()" class="btn btn-warning">clear data</button>
+            @if (showDelete) {
+                <div class="mt-1">
+                    <form>
+                        <label for="deleteFeedback">Any feedback you would like to pass along?</label>
+                        <textarea class="form-control mb-2" name="deleteFeedback" id="deleteFeedback" autofocus
+                                  [(ngModel)]="deleteFeedback"></textarea>
+                        <button class="btn btn-danger me-2" (click)="deleteFinal()">confirm delete</button>
+                        <button class="btn btn-primary" (click)="undoDelete()">nevermind</button>
+                    </form>
+                </div>
+            }
         </div>
-      }
-      <input hidden (change)="importShares($event)"  #shareInput type="file" id="shareInput">
-      <button class="btn btn-secondary me-2 mb-1" (click)="shareInput.click()">Shares</button>
-      <input hidden (change)="importCrypto($event)"  #cryptoInput type="file" id="cryptoInput">
-      <button class="btn btn-secondary me-2 mb-1" (click)="cryptoInput.click()">Crypto</button>
-      <input hidden (change)="importOptions($event)"  #optionInput type="file" id="optionsInput">
-      <button class="btn btn-secondary me-2 mb-1" (click)="optionInput.click()">Options</button>
-      <input hidden (change)="importTransactions($event)"  #transactionInput type="file" id="transactionsInput">
-      <button class="btn btn-secondary me-2 mb-1" (click)="transactionInput.click()">Transactions</button>
     </div>
-  </div>
-  <div class="card mb-3">
-    <div class="card-header">Exports</div>
-    <div class="card-body">
-      <a href="/api/portfolio/stockpositions/export/transactions" class="btn btn-secondary me-2 mb-1">Shares</a>
-      <a href="/api/options/export" class="btn btn-secondary me-2 mb-1">Options</a>
-      <a href="/api/cryptos/export" class="btn btn-secondary me-2 mb-1">Crypto</a>
-    </div>
-  </div>
-  <div class="card mb-5">
-    <div class="card-header">Close Account</div>
-    <div class="card-body">
-      <button class="btn btn-danger me-2" (click)="deleteInitial()">delete account</button>
-      <button class="btn btn-warning" (click)="clearData()">clear data</button>
-      @if (showDelete) {
-        <div class="mt-1">
-          <form>
-            <label for="deleteFeedback">Any feedback you would like to pass along?</label>
-            <textarea class="form-control mb-2" name="deleteFeedback" id="deleteFeedback" autofocus [(ngModel)]="deleteFeedback"></textarea>
-            <button class="btn btn-danger me-2" (click)="deleteFinal()">confirm delete</button>
-            <button class="btn btn-primary" (click)="undoDelete()">nevermind</button>
-          </form>
-        </div>
-      }
-    </div>
-  </div>
-  <div class="w50"></div>
+    <div class="w50"></div>
 </div>

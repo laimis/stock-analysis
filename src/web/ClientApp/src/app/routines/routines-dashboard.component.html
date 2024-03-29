@@ -1,46 +1,54 @@
 <div>
-  @if (errors) {
-    <app-error-display [errors]="errors"></app-error-display>
-  }
-  <section #addNewRoutineSection class="visually-hidden">
-    <h5>Add new routine</h5>
-    <form>
-      <div class="form-group">
-        <label for="newName">Name</label>
-        <input class="form-control" type="text" id="newName" name="newName" #newName>
-      </div>
-      <div class="form-group">
-        <label for="newDescription">Description</label>
-        <textarea class="form-control" id="newDescription" name="newDescription" rows="5" #newDescription></textarea>
-      </div>
-      <button type="button" class="btn btn-primary btn-small me-2" (click)="create(newName.value, newDescription.value)">Create</button>
-      <button type="button" class="btn btn-secondary btn-small" (click)="toggleVisibility(addNewRoutineSection)">Cancel</button>
-    </form>
-  </section>
-  @if (!activeRoutine) {
-    <table class="table table-borderless">
-      <thead>
-        <tr>
-          <th colspan="2" class="text-end">
-            <button type="submit" class="btn btn-secondary me-2 mb-2 float-end" (click)="toggleVisibility(addNewRoutineSection)">Create new routine</button>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (routine of routines; track routine) {
-          <tr>
-            <td>
-              <button class="fs-4 btn btn-link" (click)="activate(routine)">{{routine.name}}</button>
-            </td>
-            <td class="text-end">
-              <a class="btn btn-primary" [routerLink]="['/routines', routine.name, 'edit']">Edit</a>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  }
-  @if (activeRoutine) {
-    <app-routines-active-routine [routine]="activeRoutine" (routineDeactivated)="deactivate()"></app-routines-active-routine>
-  }
+    @if (errors) {
+        <app-error-display [errors]="errors"></app-error-display>
+    }
+    <section #addNewRoutineSection class="visually-hidden">
+        <h5>Add new routine</h5>
+        <form>
+            <div class="form-group">
+                <label for="newName">Name</label>
+                <input #newName class="form-control" id="newName" name="newName" type="text">
+            </div>
+            <div class="form-group">
+                <label for="newDescription">Description</label>
+                <textarea #newDescription class="form-control" id="newDescription" name="newDescription"
+                          rows="5"></textarea>
+            </div>
+            <button (click)="create(newName.value, newDescription.value)" class="btn btn-primary btn-small me-2"
+                    type="button">Create
+            </button>
+            <button (click)="toggleVisibility(addNewRoutineSection)" class="btn btn-secondary btn-small" type="button">
+                Cancel
+            </button>
+        </form>
+    </section>
+    @if (!activeRoutine) {
+        <table class="table table-borderless">
+            <thead>
+            <tr>
+                <th colspan="2" class="text-end">
+                    <button type="submit" class="btn btn-secondary me-2 mb-2 float-end"
+                            (click)="toggleVisibility(addNewRoutineSection)">Create new routine
+                    </button>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (routine of routines; track routine) {
+                    <tr>
+                        <td>
+                            <button class="fs-4 btn btn-link" (click)="activate(routine)">{{ routine.name }}</button>
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-primary" [routerLink]="['/routines', routine.name, 'edit']">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    @if (activeRoutine) {
+        <app-routines-active-routine [routine]="activeRoutine"
+                                     (routineDeactivated)="deactivate()"></app-routines-active-routine>
+    }
 </div>

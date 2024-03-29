@@ -1,9 +1,46 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {StocksService} from '../services/stocks.service';
+import {PositionInstance, StockQuote, StocksService, StockTradingPositions} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
-import {concat, forkJoin} from "rxjs";
+import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
+import {StockPositionsService} from "../services/stockpositions.service";
+
+
+function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
+    return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
+}
+
+function createProfitScatter(entries: PositionInstance[], quotes: Map<string, StockQuote>) {
+    const mapped = entries.map(p => {
+        return {x: p.daysHeld, y: unrealizedProfit(p, quotes[p.ticker]), label: p.ticker}
+    })
+
+    return {
+        exportEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Position Profit / Days Held",
+        },
+        axisX: {
+            title: "Days Held",
+            // valueFormatString: "YYYY-MM-DD",
+            gridThickness: 0.1,
+        },
+        axisY: {
+            title: "Profit",
+            gridThickness: 0.1,
+        },
+        data: [
+            {
+                type: "scatter",
+                showInLegend: true,
+                name: "Position",
+                dataPoints: mapped
+            }
+        ]
+    }
+}
 
 @Component({
     selector: 'app-playground',
@@ -12,21 +49,36 @@ import {tap} from "rxjs/operators";
 })
 export class PlaygroundComponent implements OnInit {
     tickers: string[];
-
-    constructor(
-        private stocks: StocksService,
-        private route: ActivatedRoute) {
-    }
-
     errors: string[];
     status: string;
     testTicker: string;
+    chartOptions: any[] = []
 
+    constructor(
+        private stocks: StocksService,
+        private stockPositions: StockPositionsService,
+        private route: ActivatedRoute) {
+    }
 
     ngOnInit() {
         const tickerParam = this.route.snapshot.queryParamMap.get('tickers')
         this.tickers = tickerParam ? tickerParam.split(',') : ['AMD']
         this.testTicker = this.tickers[0]
+
+        this.stockPositions.getTradingEntries().subscribe((data) => {
+            this.createChartOptions(data)
+        }, (error) => {
+            this.errors = GetErrors(error)
+        })
+    }
+
+    createChartOptions(positions: StockTradingPositions) {
+        const entries = positions.current
+        const quotes = positions.prices
+
+        const profitScatter = createProfitScatter(entries, quotes)
+
+        this.chartOptions.push(profitScatter)
     }
 
     run() {
@@ -82,9 +134,5 @@ export class PlaygroundComponent implements OnInit {
         this.status = "Running..."
 
         concat([positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily]).subscribe()
-    }
-
-    brokerageOrderEntered($event) {
-        this.status = "Brokerage order entered: " + $event
     }
 }

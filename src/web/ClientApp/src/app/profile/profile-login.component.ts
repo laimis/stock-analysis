@@ -1,86 +1,87 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService } from '../services/stocks.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Location } from '@angular/common';
-import { GetErrors } from '../services/utils';
-import { GlobalService } from '../services/global.service';
+import {Component, OnInit} from '@angular/core';
+import {StocksService} from '../services/stocks.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Location} from '@angular/common';
+import {GetErrors} from '../services/utils';
+import {GlobalService} from '../services/global.service';
 
 @Component({
-  selector: 'app-profile-login',
-  templateUrl: './profile-login.component.html',
-  styleUrls: ['./profile-login.component.css']
+    selector: 'app-profile-login',
+    templateUrl: './profile-login.component.html',
+    styleUrls: ['./profile-login.component.css']
 })
 export class ProfileLoginComponent implements OnInit {
 
-  public email      :string
-  public password   :string
+    public email: string
+    public password: string
 
-  public errors     :string[]
+    public errors: string[]
 
-  inProgress : boolean
+    inProgress: boolean
 
-  public resetPasswordRequest : boolean
-  public passwordRequestSuccess : boolean
-  returnUrl: string;
+    public resetPasswordRequest: boolean
+    public passwordRequestSuccess: boolean
+    returnUrl: string;
 
-  constructor(
-    private stockService  : StocksService,
-    private route         : ActivatedRoute,
-    private router        : Router,
-    private location      : Location,
-    private globalService : GlobalService) { }
-
-  ngOnInit() {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-  }
-
-  login() {
-
-    this.errors = null
-    this.inProgress = true
-
-    var obj = {
-      email: this.email,
-      password: this.password
+    constructor(
+        private stockService: StocksService,
+        private route: ActivatedRoute,
+        private router: Router,
+        private location: Location,
+        private globalService: GlobalService) {
     }
 
-    this.stockService.loginAccount(obj).subscribe(status => {
-      console.log("logged in setting global variable")
-      this.globalService.markLoggedIn(status)
-      this.router.navigateByUrl(this.returnUrl)
-    }, err => {
-      this.inProgress = false
-      this.errors = GetErrors(err)
-    })
-  }
-
-  requestReset() {
-
-    this.errors = null
-    this.passwordRequestSuccess = false
-
-    let obj = {
-      email: this.email
+    ngOnInit() {
+        this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     }
 
-    this.stockService.requestPasswordReset(obj).subscribe(_ => {
-      this.email = null
-      this.passwordRequestSuccess = true
-    }, err => {
-      this.errors = GetErrors(err)
-    })
-  }
+    login() {
 
-  forgotPassword() : boolean {
-    this.resetPasswordRequest = true
-    return false
-  }
+        this.errors = null
+        this.inProgress = true
 
-  cancelReset() {
-    this.resetPasswordRequest = false
-  }
+        var obj = {
+            email: this.email,
+            password: this.password
+        }
 
-  back() {
-    this.location.back()
-  }
+        this.stockService.loginAccount(obj).subscribe(status => {
+            console.log("logged in setting global variable")
+            this.globalService.markLoggedIn(status)
+            this.router.navigateByUrl(this.returnUrl)
+        }, err => {
+            this.inProgress = false
+            this.errors = GetErrors(err)
+        })
+    }
+
+    requestReset() {
+
+        this.errors = null
+        this.passwordRequestSuccess = false
+
+        let obj = {
+            email: this.email
+        }
+
+        this.stockService.requestPasswordReset(obj).subscribe(_ => {
+            this.email = null
+            this.passwordRequestSuccess = true
+        }, err => {
+            this.errors = GetErrors(err)
+        })
+    }
+
+    forgotPassword(): boolean {
+        this.resetPasswordRequest = true
+        return false
+    }
+
+    cancelReset() {
+        this.resetPasswordRequest = false
+    }
+
+    back() {
+        this.location.back()
+    }
 }

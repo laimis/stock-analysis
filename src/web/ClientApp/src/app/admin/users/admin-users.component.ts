@@ -1,25 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { StocksService } from 'src/app/services/stocks.service';
+import {Component, OnInit} from '@angular/core';
+import {StocksService} from 'src/app/services/stocks.service';
 
 
 @Component({
-  selector: 'app-admin-users',
-  templateUrl: './admin-users.component.html',
-  styleUrls: ['./admin-users.component.css']
+    selector: 'app-admin-users',
+    templateUrl: './admin-users.component.html',
+    styleUrls: ['./admin-users.component.css']
 })
 export class AdminUsersComponent implements OnInit {
 
-	public users : any
+    public users: any
 
-  constructor(private stocks : StocksService)
-	{ }
+    constructor(private stocks: StocksService) {
+    }
 
-	ngOnInit() {
+    ngOnInit() {
 
-		this.stocks.getUsers().subscribe(result => {
-      this.users = result;
-		}, error => {
-			console.log(error);
-    })
-  }
+        this.stocks.getUsers().subscribe(result => {
+            this.users = result;
+        }, error => {
+            console.log(error);
+        })
+    }
 }

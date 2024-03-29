@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
-import {StocksService, OutcomesReport, PositionInstance, StockGaps} from '../../services/stocks.service';
+import {OutcomesReport, PositionInstance, StockGaps, StocksService} from '../../services/stocks.service';
 import {catchError, finalize, map} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
 
@@ -31,6 +31,7 @@ export class StockPositionReportsComponent {
         allBars: null,
         positions: null
     }
+    tickers: string[] = []
 
     constructor(private service: StocksService) {
     }
@@ -50,15 +51,15 @@ export class StockPositionReportsComponent {
         }
     }
 
-    tickers: string[] = []
-
     loadPositionData(positions: PositionInstance[]) {
         this.loading.daily = true
         this.loading.weekly = true
         this.loading.positions = true
 
         const positionReport$ = this.service.reportPositions().pipe(
-            map(report => {this.positionsReport = report}),
+            map(report => {
+                this.positionsReport = report
+            }),
             catchError(
                 error => {
                     this.handleApiError("Unable to load position reports", error, (e) => this.errors.positions = e)
@@ -79,9 +80,11 @@ export class StockPositionReportsComponent {
             ),
             finalize(() => this.loading.daily = false)
         )
-        
+
         const weeklyReport$ = this.service.reportOutcomesSingleBarWeekly(this.tickers).pipe(
-            map(report => {this.singleBarReportWeekly = report}), 
+            map(report => {
+                this.singleBarReportWeekly = report
+            }),
             catchError(
                 error => {
                     this.handleApiError("Unable to load weekly data", error, (e) => this.errors.weekly = e)
@@ -90,15 +93,8 @@ export class StockPositionReportsComponent {
             ),
             finalize(() => this.loading.weekly = false)
         )
-        
-        concat(positionReport$, dailyReport$, weeklyReport$).subscribe()
-    }
 
-    private handleApiError(errorMessage: string, error: any, assignFunc: (error: any) => void) {
-        const extractedErrors = GetErrors(error);
-        extractedErrors.forEach(e => console.log(e))
-        const fullError = errorMessage + ": " + extractedErrors.join(", ")
-        assignFunc([fullError])
+        concat(positionReport$, dailyReport$, weeklyReport$).subscribe()
     }
 
     loadAllTimeData(positions: PositionInstance[]) {
@@ -115,5 +111,12 @@ export class StockPositionReportsComponent {
 
     onTickerChange(ticker: string) {
         this.tickerFilter = ticker
+    }
+
+    private handleApiError(errorMessage: string, error: any, assignFunc: (error: any) => void) {
+        const extractedErrors = GetErrors(error);
+        extractedErrors.forEach(e => console.log(e))
+        const fullError = errorMessage + ": " + extractedErrors.join(", ")
+        assignFunc([fullError])
     }
 }

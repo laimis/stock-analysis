@@ -1,163 +1,178 @@
 <div>
-  <h2>Position simulator</h2>
-  @if (showExisting) {
-    <div class="row">
-      <label for="tickerFilter" class="form-label">Ticker filter</label>
-      <input type="text" class="form-control" placeholder="Ticker filter" [(ngModel)]="positionFilter" (ngModelChange)="filterPositions()" id="tickerFilter">
-      <ul class="overflow-auto" style="max-height: 600px">
-        @for (position of filteredPositions; track position) {
-          <li>
-            <a [routerLink]="" (click)="loadPosition(position)">{{position.ticker}} {{position.opened | date }} - P/L {{ position.profit | currency }}</a>
-          </li>
-        }
-      </ul>
-    </div>
-  }
-  @if (!showExisting) {
-    <div class="row">
-      @if (!ticker) {
-        <div class="col-md-8">
-          <app-stock-trading-new-position
-            (positionOpened)="initialPosition(ticker, $event)"
-            [recordPositions]="false"
-            [isPendingPositionMode]="false">
-          </app-stock-trading-new-position>
+    <h2>Position simulator</h2>
+    @if (showExisting) {
+        <div class="row">
+            <label for="tickerFilter" class="form-label">Ticker filter</label>
+            <input type="text" class="form-control" placeholder="Ticker filter" [(ngModel)]="positionFilter"
+                   (ngModelChange)="filterPositions()" id="tickerFilter">
+            <ul class="overflow-auto" style="max-height: 600px">
+                @for (position of filteredPositions; track position) {
+                    <li>
+                        <a [routerLink]=""
+                           (click)="loadPosition(position)">{{ position.ticker }} {{ position.opened | date }} -
+                            P/L {{ position.profit | currency }}</a>
+                    </li>
+                }
+            </ul>
         </div>
-      }
-      @if (ticker) {
-        <div class="col-md-8">
-          <div class="row">
-            <div class="col">
-              <label for="ticker" class="form-label">Ticker</label>
-              <input type="text" class="form-control text-uppercase" id="ticker" [(ngModel)]="ticker" placeholder="Ticker">
-            </div>
-            <div class="col">
-              <label for="price" class="form-label">Price</label>
-              <input type="number" step="0.01" class="form-control" id="price" [(ngModel)]="price" placeholder="Price">
-            </div>
-            <div class="col">
-              <label for="quantity" class="form-label">Quantity</label>
-              <input type="number" class="form-control" id="quantity" [(ngModel)]="quantity" placeholder="Quantity">
-            </div>
-            <div class="col">
-              <label for="date" class="form-label">Date</label>
-              <input type="date" class="form-control" id="date" [(ngModel)]="date">
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col">
-              <button class="btn btn-primary" (click)="buy()">Buy</button>
-            </div>
-            <div class="col text-end">
-              @if (numberOfShares > 0) {
-                <button class="btn btn-primary" (click)="sell()">Sell</button>
-              }
-            </div>
-          </div>
-          @if (transactions.length > 0) {
-            <div class="row mt-3">
-              <h3>Purchases</h3>
-              @for (p of transactions; track p; let i = $index) {
-                <div class="row">
-                  <div class="col">{{p.date | date:'shortDate'}}</div>
-                  <div class="col">{{p.type}}</div>
-                  <div class="col">{{p.price | currency}}</div>
-                  <div class="col">{{p.numberOfShares | number }}</div>
-                  <div class="col">{{p.numberOfShares * p.price | currency}}</div>
-                  <div class="col text-end">
-                    <a [routerLink]="" (click)="removeTransaction(i)">
-                      <i class="bi bi-trash"></i>
-                    </a>
-                  </div>
+    }
+    @if (!showExisting) {
+        <div class="row">
+            @if (!ticker) {
+                <div class="col-md-8">
+                    <app-stock-trading-new-position
+                        (positionOpened)="initialPosition(ticker, $event)"
+                        [recordPositions]="false"
+                        [isPendingPositionMode]="false">
+                    </app-stock-trading-new-position>
                 </div>
-              }
+            }
+            @if (ticker) {
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col">
+                            <label for="ticker" class="form-label">Ticker</label>
+                            <input type="text" class="form-control text-uppercase" id="ticker" [(ngModel)]="ticker"
+                                   placeholder="Ticker">
+                        </div>
+                        <div class="col">
+                            <label for="price" class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" id="price" [(ngModel)]="price"
+                                   placeholder="Price">
+                        </div>
+                        <div class="col">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" [(ngModel)]="quantity"
+                                   placeholder="Quantity">
+                        </div>
+                        <div class="col">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="date" [(ngModel)]="date">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <button class="btn btn-primary" (click)="buy()">Buy</button>
+                        </div>
+                        <div class="col text-end">
+                            @if (numberOfShares > 0) {
+                                <button class="btn btn-primary" (click)="sell()">Sell</button>
+                            }
+                        </div>
+                    </div>
+                    @if (transactions.length > 0) {
+                        <div class="row mt-3">
+                            <h3>Purchases</h3>
+                            @for (p of transactions; track p; let i = $index) {
+                                <div class="row">
+                                    <div class="col">{{ p.date | date:'shortDate' }}</div>
+                                    <div class="col">{{ p.type }}</div>
+                                    <div class="col">{{ p.price | currency }}</div>
+                                    <div class="col">{{ p.numberOfShares | number }}</div>
+                                    <div class="col">{{ p.numberOfShares * p.price | currency }}</div>
+                                    <div class="col text-end">
+                                        <a [routerLink]="" (click)="removeTransaction(i)">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            <div class="col-md-4">
+                @if (transactions.length > 0) {
+                    <div>
+                        <label for="currentCost" class="form-label">Current Cost</label>
+                        <input type="number" step="0.01" id="currentCost" [(ngModel)]="currentCost"
+                               (ngModelChange)="update()" class="form-control">
+                        <label for="stopPrice" class="form-label">Stop</label>
+                        <input type="number" step="0.01" id="stopPrice" [(ngModel)]="stopPrice"
+                               (ngModelChange)="update()" class="form-control">
+                        <label for="riskedAmount" class="form-label">Risked Amount (<a (click)="calculateRiskedAmount()"
+                                                                                       class="link-primary">calculate
+                            based on stop</a>)</label>
+                        <input type="number" step="0.01" id="riskedAmount" [(ngModel)]="riskedAmount"
+                               (ngModelChange)="update()" class="form-control">
+                        <label class="form-label me-3">{{ r1 | currency }}</label>
+                        <label class="form-label me-3">{{ r2 | currency }}</label>
+                        <label class="form-label me-3">{{ r4 | currency }}</label>
+                        <select>
+                            @for (r of rrs; track r) {
+                                <option>{{ r }}</option>
+                            }
+                        </select>
+                        <h3 class="mt-3">Summary</h3>
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <td>Unrealized Profit</td>
+                                <td class="value">{{ unrealizedProfit | currency }}</td>
+                            </tr>
+                            <tr>
+                                <td>Unrealized Gain</td>
+                                <td class="value">{{ unrealizedGain | percent:'1.0-2' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Unrealize R/R</td>
+                                <td class="value">{{ unrealizedRR | number }}</td>
+                            </tr>
+                            <tr class="table-success">
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Cost</td>
+                                <td class="value">{{ cost | currency }}</td>
+                            </tr>
+                            <tr>
+                                <td>Cost/Share</td>
+                                <td class="value">{{ averageCostPerShare | currency }}</td>
+                            </tr>
+                            <tr>
+                                <td>Stop</td>
+                                <td class="value">{{ stopPrice | currency }}
+                                    ( {{ (stopPrice - averageCostPerShare) / averageCostPerShare | percent:'1.0-2' }})
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Number of Shares</td>
+                                <td class="value">{{ numberOfShares | number }}</td>
+                            </tr>
+                            <tr class="table-success">
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Profit</td>
+                                <td class="value">{{ profit | currency }}</td>
+                            </tr>
+                            <tr>
+                                <td>Risked</td>
+                                <td class="value">{{ riskedAmount | currency }}</td>
+                            </tr>
+                            <tr>
+                                <td>R/R</td>
+                                <td class="value">{{ profit / riskedAmount | number }}</td>
+                            </tr>
+                            <tr>
+                                <td>Avg Buy Cost/Share</td>
+                                <td class="value">{{ averageBuyCostPerShare | currency }}</td>
+                            </tr>
+                            <tr>
+                                <td>Avg Sale Cost/Share</td>
+                                <td class="value">{{ averageSaleCostPerShare | currency }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
             </div>
-          }
         </div>
-      }
-      <div class="col-md-4">
-        @if (transactions.length > 0) {
-          <div>
-            <label for="currentCost" class="form-label">Current Cost</label>
-            <input type="number" step="0.01" id="currentCost" [(ngModel)]="currentCost" (ngModelChange)="update()" class="form-control">
-            <label for="stopPrice" class="form-label">Stop</label>
-            <input type="number" step="0.01" id="stopPrice" [(ngModel)]="stopPrice" (ngModelChange)="update()" class="form-control">
-            <label for="riskedAmount" class="form-label">Risked Amount (<a (click)="calculateRiskedAmount()" class="link-primary">calculate based on stop</a>)</label>
-            <input type="number" step="0.01" id="riskedAmount" [(ngModel)]="riskedAmount" (ngModelChange)="update()" class="form-control">
-            <label class="form-label me-3">{{ r1 | currency }}</label>
-            <label class="form-label me-3">{{ r2 | currency }}</label>
-            <label class="form-label me-3">{{ r4 | currency }}</label>
-            <select>
-              @for (r of rrs; track r) {
-                <option>{{r}}</option>
-              }
-            </select>
-            <h3 class="mt-3">Summary</h3>
-            <table class="table">
-              <tbody>
-                <tr>
-                  <td>Unrealized Profit</td>
-                  <td class="value">{{unrealizedProfit | currency}}</td>
-                </tr>
-                <tr>
-                  <td>Unrealized Gain</td>
-                  <td class="value">{{unrealizedGain | percent:'1.0-2'}}</td>
-                </tr>
-                <tr>
-                  <td>Unrealize R/R</td>
-                  <td class="value">{{unrealizedRR | number}}</td>
-                </tr>
-                <tr class="table-success">
-                  <td></td><td></td>
-                </tr>
-                <tr>
-                  <td>Cost</td>
-                  <td class="value">{{cost | currency}}</td>
-                </tr>
-                <tr>
-                  <td>Cost/Share</td>
-                  <td class="value">{{averageCostPerShare | currency}}</td>
-                </tr>
-                <tr>
-                  <td>Stop</td>
-                  <td class="value">{{stopPrice | currency}} ( {{ (stopPrice - averageCostPerShare)/averageCostPerShare | percent:'1.0-2' }}) </td>
-                </tr>
-                <tr>
-                  <td>Number of Shares</td>
-                  <td class="value">{{numberOfShares | number}}</td>
-                </tr>
-                <tr class="table-success">
-                  <td></td><td></td>
-                </tr>
-                <tr>
-                  <td>Profit</td>
-                  <td class="value">{{profit | currency}}</td>
-                </tr>
-                <tr>
-                  <td>Risked</td>
-                  <td class="value">{{riskedAmount | currency}}</td>
-                </tr>
-                <tr>
-                  <td>R/R</td>
-                  <td class="value">{{profit / riskedAmount | number}}</td>
-                </tr>
-                <tr>
-                  <td>Avg Buy Cost/Share</td>
-                  <td class="value">{{averageBuyCostPerShare | currency}}</td>
-                </tr>
-                <tr>
-                  <td>Avg Sale Cost/Share</td>
-                  <td class="value">{{averageSaleCostPerShare | currency}}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        }
-      </div>
+    }
+    <div>
+        <button (click)="showExistingPositions()" class="btn btn-primary me-3">Load</button>
+        <button (click)="reset()" class="btn btn-primary me-3">Reset</button>
     </div>
-  }
-  <div>
-    <button class="btn btn-primary me-3" (click)="showExistingPositions()">Load</button>
-    <button class="btn btn-primary me-3" (click)="reset()">Reset</button>
-  </div>
 </div>

@@ -1,194 +1,212 @@
 <div>
-  <section>
-    <form>
-      <div class="row">
-        <div class="form-group col">
-          <label class="form-label" for="filterByTicker">Ticker</label>
-          <select #filterByTicker class="form-select" id="filterByTicker" (change)="filterByTickerChanged(filterByTicker.value)">
-            <option value="all">Show all tickers</option>
-            @for (t of tickers; track t) {
-              <option [value]="t">{{t}}</option>
-            }
-          </select>
-        </div>
-        <div class="form-group col">
-          <label class="form-label" for="filterByGrade">Grade</label>
-          <select #filterByGrade class="form-select" id="filterByGrade" (change)="filterByGradeChanged(filterByGrade.value)">
-            <option value="all">Show all grades</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-          </select>
-        </div>
-        <div class="form-group col">
-          <label class="form-label" for="filterByOutcome">Outcome</label>
-          <select #filterByOutcome class="form-select" id="filterByOutcome" (change)="filterByOutcomeChanged(filterByOutcome.value)">
-            <option value="all">Show all outcomes</option>
-            <option value="win">Wins</option>
-            <option value="loss">Losses</option>
-          </select>
-        </div>
-        <div class="form-group col">
-          <label class="form-label" for="filterByPL">Filter by P/L</label>
-          <select #filterByPL class="form-select" id="filterByPL" (change)="filterByPLChanged(filterByPL.value)">
-            <option value="all">Show all</option>
-            <option value="plus150">+150</option>
-            <option value="plus100">+100</option>
-            <option value="minus50">-50</option>
-            <option value="minus100">-100</option>
-          </select>
-        </div>
-        <div class="form-group col">
-          <label class="form-label" for="filterByStrategy">Filter by Strategy</label>
-          <select #filterByStrategy class="form-select" id="filterByStrategy" (change)="filterByStrategyChanged(filterByStrategy.value)">
-            <option value="all">Show all</option>
-            @for (so of strategies; track so) {
-              <option value="{{so}}">{{so}}</option>
-            }
-          </select>
-        </div>
-      </div>
-    </form>
-  </section>
-  <div>
     <section>
-      <form>
-        <div class="row">
-          <div class="col">
-            <a [href]="getClosedPositionExportLink()" class="btn btn-link">Export trades</a>
-          </div>
-          <div class="col">
-            <div class="form-check form-switch float-end">
-              <input class="form-check-input" type="checkbox" id="cardLayoutSwitch" (click)="toggleLayout()">
-              <label class="form-check-label" for="cardLayoutSwitch">Split Layout</label>
+        <form>
+            <div class="row">
+                <div class="form-group col">
+                    <label class="form-label" for="filterByTicker">Ticker</label>
+                    <select #filterByTicker (change)="filterByTickerChanged(filterByTicker.value)" class="form-select"
+                            id="filterByTicker">
+                        <option value="all">Show all tickers</option>
+                        @for (t of tickers; track t) {
+                            <option [value]="t">{{ t }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group col">
+                    <label class="form-label" for="filterByGrade">Grade</label>
+                    <select #filterByGrade (change)="filterByGradeChanged(filterByGrade.value)" class="form-select"
+                            id="filterByGrade">
+                        <option value="all">Show all grades</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </div>
+                <div class="form-group col">
+                    <label class="form-label" for="filterByOutcome">Outcome</label>
+                    <select #filterByOutcome (change)="filterByOutcomeChanged(filterByOutcome.value)" class="form-select"
+                            id="filterByOutcome">
+                        <option value="all">Show all outcomes</option>
+                        <option value="win">Wins</option>
+                        <option value="loss">Losses</option>
+                    </select>
+                </div>
+                <div class="form-group col">
+                    <label class="form-label" for="filterByPL">Filter by P/L</label>
+                    <select #filterByPL (change)="filterByPLChanged(filterByPL.value)" class="form-select"
+                            id="filterByPL">
+                        <option value="all">Show all</option>
+                        <option value="plus150">+150</option>
+                        <option value="plus100">+100</option>
+                        <option value="minus50">-50</option>
+                        <option value="minus100">-100</option>
+                    </select>
+                </div>
+                <div class="form-group col">
+                    <label class="form-label" for="filterByStrategy">Filter by Strategy</label>
+                    <select #filterByStrategy (change)="filterByStrategyChanged(filterByStrategy.value)" class="form-select"
+                            id="filterByStrategy">
+                        <option value="all">Show all</option>
+                        @for (so of strategies; track so) {
+                            <option value="{{so}}">{{ so }}</option>
+                        }
+                    </select>
+                </div>
             </div>
-          </div>
-        </div>
-      </form>
+        </form>
     </section>
-  </div>
-  <ng-template #splitOutcomeTemplate let-positions="positions" let-label="label">
-    <div class="col">
-      <h5>
-        {{label}}: {{positions.length}}
-        <span class="float-end">{{ getProfitSum(positions) | currency }}</span>
-      </h5>
-      @for (position of positions; track position) {
-        @if (matchesFilter(position)) {
-          <div class="row" [ngClass]="{
+    <div>
+        <section>
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <a [href]="getClosedPositionExportLink()" class="btn btn-link">Export trades</a>
+                    </div>
+                    <div class="col">
+                        <div class="form-check form-switch float-end">
+                            <input (click)="toggleLayout()" class="form-check-input" id="cardLayoutSwitch"
+                                   type="checkbox">
+                            <label class="form-check-label" for="cardLayoutSwitch">Split Layout</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+    <ng-template #splitOutcomeTemplate let-label="label" let-positions="positions">
+        <div class="col">
+            <h5>
+                {{ label }}: {{ positions.length }}
+                <span class="float-end">{{ getProfitSum(positions) | currency }}</span>
+            </h5>
+            @for (position of positions; track position) {
+                @if (matchesFilter(position)) {
+                    <div class="row" [ngClass]="{
             'bg-success':position.grade === 'A',
             'bg-warning':position.grade === 'C',
             }">
-            <div class="col">
-              <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
-              <app-stock-link [ticker]="position.ticker"></app-stock-link>
-            </div>
-            <div class="col">{{position.opened | date:'shortDate'}}</div>
-            <div class="col">{{position.closed | date:'shortDate'}}</div>
-            <div class="col">{{position.rr | number:'1.0-2' }}</div>
-            <div class="col">{{position.profit | currency}}</div>
-            <div class="col">{{position.grade}}</div>
-          </div>
-        }
-      }
-    </div>
-  </ng-template>
-  @if (layout === LAYOUT_OPTION_SPLIT_OUTCOME) {
-    <div>
-      @for (group of groupedByMonth; track group) {
-        <div class="card mt-3 mb-3">
-          <div class="card-body">
-            <h4 class="card-title">
-              {{group.month}}
-              <span class="float-end">Total: <strong>{{getProfitSum(group.positions) | currency}}</strong></span>
-            </h4>
-            <div class="row mt-2">
-              <ng-template *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.wins, label: 'Wins'}"></ng-template>
-              <ng-template *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.losses, label: 'Losses'}"></ng-template>
-            </div>
-          </div>
+                        <div class="col">
+                            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+                            <app-stock-link [ticker]="position.ticker"></app-stock-link>
+                        </div>
+                        <div class="col">{{ position.opened | date:'shortDate' }}</div>
+                        <div class="col">{{ position.closed | date:'shortDate' }}</div>
+                        <div class="col">{{ position.rr | number:'1.0-2' }}</div>
+                        <div class="col">{{ position.profit | currency }}</div>
+                        <div class="col">{{ position.grade }}</div>
+                    </div>
+                }
+            }
         </div>
-      }
-    </div>
-  }
-  @if (layout === LAYOUT_OPTION_TABLE) {
-    <div>
-      @if (positions) {
-        <table class="table table-hover mt-3">
-          <thead>
-            <tr>
-              <th style="width: 50px"></th>
-              <th class="sort-header" (click)="sort('ticker')">Stock</th>
-              <th class="sort-header" (click)="sort('opened')">Opened</th>
-              <th class="sort-header" (click)="sort('closed')">Closed</th>
-              <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
-              <th class="sort-header" (click)="sort('rr')">R:R</th>
-              <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
-              <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
-              <th class="sort-header" (click)="sort('grade')">Grade</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (p of positions; track p; let i = $index) {
-              <!-- add separator row if p closed date month is different from previous position -->
-              @if (i === 0 || getPropertyForSeperatorGrouping(p) !== getPropertyForSeperatorGrouping(positions[i - 1])) {
-                <tr>
-                  <td colspan="3" class="text-center fw-bold pt-3">
-                    {{getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy'}}
-                  </td>
-                  <td class="pt-3 pb-3">R:R Sum <span class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
-                  <td class="pt-3">Profit/Loss <span class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
-                  <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }} A trades</span></td>
-                  <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'B') }}</span> B trades</td>
-                  <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span> C trades</td>
-                  <td class="pt-3"><span class="fw-bold">{{ getTradeCountForMonth(p) }}</span> Total</td>
-                </tr>
-              }
-              @if (matchesFilter(p)) {
-                <tr
-                  [ngClass]="{
+    </ng-template>
+    @if (layout === LAYOUT_OPTION_SPLIT_OUTCOME) {
+        <div>
+            @for (group of groupedByMonth; track group) {
+                <div class="card mt-3 mb-3">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            {{ group.month }}
+                            <span
+                                class="float-end">Total: <strong>{{ getProfitSum(group.positions) | currency }}</strong></span>
+                        </h4>
+                        <div class="row mt-2">
+                            <ng-template
+                                *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.wins, label: 'Wins'}"></ng-template>
+                            <ng-template
+                                *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.losses, label: 'Losses'}"></ng-template>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if (layout === LAYOUT_OPTION_TABLE) {
+        <div>
+            @if (positions) {
+                <table class="table table-hover mt-3">
+                    <thead>
+                    <tr>
+                        <th style="width: 50px"></th>
+                        <th class="sort-header" (click)="sort('ticker')">Stock</th>
+                        <th class="sort-header" (click)="sort('opened')">Opened</th>
+                        <th class="sort-header" (click)="sort('closed')">Closed</th>
+                        <th class="sort-header" (click)="sort('daysHeld')">Days Held</th>
+                        <th class="sort-header" (click)="sort('rr')">R:R</th>
+                        <th class="sort-header" (click)="sort('profit')">Profit/Loss</th>
+                        <th class="sort-header" (click)="sort('gainPct')">Profit/Loss %</th>
+                        <th class="sort-header" (click)="sort('grade')">Grade</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @for (p of positions; track p; let i = $index) {
+                            <!-- add separator row if p closed date month is different from previous position -->
+                            @if (i === 0 || getPropertyForSeperatorGrouping(p) !== getPropertyForSeperatorGrouping(positions[i - 1])) {
+                                <tr>
+                                    <td colspan="3" class="text-center fw-bold pt-3">
+                                        {{ getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy' }}
+                                    </td>
+                                    <td class="pt-3 pb-3">R:R Sum <span
+                                        class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
+                                    <td class="pt-3">Profit/Loss <span
+                                        class="fw-bold">{{ getProfitSumForMonth(p) | currency }}</span></td>
+                                    <td class="pt-3"><span class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'A') }} A trades</span>
+                                    </td>
+                                    <td class="pt-3"><span
+                                        class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'B') }}</span> B trades
+                                    </td>
+                                    <td class="pt-3"><span
+                                        class="fw-bold">{{ getTradeCountByGradeForMonth(p, 'C') }}</span> C trades
+                                    </td>
+                                    <td class="pt-3"><span class="fw-bold">{{ getTradeCountForMonth(p) }}</span> Total
+                                    </td>
+                                </tr>
+                            }
+                            @if (matchesFilter(p)) {
+                                <tr
+                                    [ngClass]="{
                   'table-success':p.grade === 'A',
                   'table-warning':p.grade === 'C',
                   }">
-                  <td style="cursor: pointer"
-                  (click)="toggleShowNotes(i)">{{i + 1}}</td>
-                  <td>
-                    <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
-                    <app-stock-link [ticker]="p.ticker"></app-stock-link>
-                  </td>
-                  <td>{{p.opened | date}}</td>
-                  <td>{{p.closed | date}}</td>
-                  <td>{{p.daysHeld}}</td>
-                  <td>{{p.rr | number:'1.0-2' }}</td>
-                  <td>{{p.profit | currency}}</td>
-                  <td>
-                    @if (p.profit >= 0) {
-                      <span class="badge bg-success me-1">win</span>
-                    }
-                    @if (p.profit < 0) {
-                      <span class="badge bg-warning me-1">loss</span>
-                    }
-                    {{p.gainPct | percent:'1.0-2' }}
-                  </td>
-                  <td>{{p.grade}}</td>
-                </tr>
-              }
-              @if (showNotes === i) {
-                <tr>
-                  <td colspan="9">
-                    @for (n of p.notes; track n) {
-                      <div class="mb-2">
-                        <!-- <span class="badge bg-secondary me-1"></span> -->
-                        {{n}}
-                      </div>
-                    }
-                  </td>
-                </tr>
-              }
+                                    <td style="cursor: pointer"
+                                        (click)="toggleShowNotes(i)">{{ i + 1 }}
+                                    </td>
+                                    <td>
+                                        <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
+                                        <app-stock-link [ticker]="p.ticker"></app-stock-link>
+                                    </td>
+                                    <td>{{ p.opened | date }}</td>
+                                    <td>{{ p.closed | date }}</td>
+                                    <td>{{ p.daysHeld }}</td>
+                                    <td>{{ p.rr | number:'1.0-2' }}</td>
+                                    <td>{{ p.profit | currency }}</td>
+                                    <td>
+                                        @if (p.profit >= 0) {
+                                            <span class="badge bg-success me-1">win</span>
+                                        }
+                                        @if (p.profit < 0) {
+                                            <span class="badge bg-warning me-1">loss</span>
+                                        }
+                                        {{ p.gainPct | percent:'1.0-2' }}
+                                    </td>
+                                    <td>{{ p.grade }}</td>
+                                </tr>
+                            }
+                            @if (showNotes === i) {
+                                <tr>
+                                    <td colspan="9">
+                                        @for (n of p.notes; track n) {
+                                            <div class="mb-2">
+                                                <!-- <span class="badge bg-secondary me-1"></span> -->
+                                                {{ n }}
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             }
-          </tbody>
-        </table>
-      }
-    </div>
-  }
+        </div>
+    }
 </div>

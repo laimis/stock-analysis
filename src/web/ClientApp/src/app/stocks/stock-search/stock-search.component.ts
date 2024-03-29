@@ -1,5 +1,5 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {Subject, Observable} from 'rxjs';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
 import {debounceTime, switchMap} from 'rxjs/operators';
 import {StockSearchResult, StocksService} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
@@ -16,102 +16,98 @@ import {FormsModule} from "@angular/forms";
 })
 export class StockSearchComponent implements OnInit {
 
-  @Input() label : string = "Search for securities using ticker or name"
-  @Input() cssClass : string = "form-control"
+    @Input() label: string = "Search for securities using ticker or name"
+    @Input() cssClass: string = "form-control"
 
-  errors: string[] = [];
+    errors: string[] = [];
+    @Input() placeholder: string
+    @Input() justTickers: boolean = false
+    @Output() tickerSelected = new EventEmitter<string>();
+    selectedValue: string = null
+    loading: boolean = false
+    public searchResults: Observable<StockSearchResult[]>;
+    searchResultsSubscribedArray: StockSearchResult[] = []
+    highlightedIndex = -1;
+    private searchTerms = new Subject<string>();
 
-  @Input()
-  set ticker(value: string) {
-    this.selectedValue = value
-  }
+    constructor(
+        private stocks: StocksService
+    ) {
+    }
 
-  @Input() placeholder : string
-  @Input() justTickers : boolean = false
+    @Input()
+    set ticker(value: string) {
+        this.selectedValue = value
+    }
 
-  @Output() tickerSelected = new EventEmitter<string>();
+    ngOnInit() {
 
-  selectedValue: string = null
-  loading:boolean = false
-  public searchResults: Observable<StockSearchResult[]>;
-  private searchTerms = new Subject<string>();
-  searchResultsSubscribedArray: StockSearchResult[] = []
-  highlightedIndex = -1;
+        this.searchResults = this.searchTerms.pipe(
+            // wait 300ms after each keystroke before considering the term
+            debounceTime(300),
 
-  constructor(
-    private stocks: StocksService
-  ) {
-  }
+            // ignore new term if same as previous term -- commented this one out because
+            // if a user went back and used delete to go back to their previous query, this
+            // filter would consider it duplicate and not pass it on
+            // distinctUntilChanged(),
 
-  ngOnInit() {
+            // switch to new search observable each time the term changes
+            switchMap((term: string) => {
+                this.loading = true
+                this.errors = []
+                return this.stocks.search(term)
+            }),
+        );
 
-    this.searchResults = this.searchTerms.pipe(
-      // wait 300ms after each keystroke before considering the term
-      debounceTime(300),
+        this.searchResults.subscribe(value => {
+            this.loading = false
+            console.log("searchResults.subscribe: " + value.length)
+            this.searchResultsSubscribedArray = value
+        }, error => {
+            this.loading = false
+            this.searchResultsSubscribedArray = []
+            this.errors = GetErrors(error)
+            console.log("searchResults.subscribe error: " + this.errors)
+        })
+    }
 
-      // ignore new term if same as previous term -- commented this one out because
-      // if a user went back and used delete to go back to their previous query, this
-      // filter would consider it duplicate and not pass it on
-      // distinctUntilChanged(),
-
-      // switch to new search observable each time the term changes
-      switchMap((term: string) => {
-        this.loading = true
+    loseFocus() {
+        this.searchTerms.next('')
+        this.loading = false
         this.errors = []
-        return this.stocks.search(term)
-      }),
-    );
-
-    this.searchResults.subscribe(value => {
-      this.loading = false
-      console.log("searchResults.subscribe: " + value.length)
-      this.searchResultsSubscribedArray = value
-    }, error => {
-      this.loading = false
-      this.searchResultsSubscribedArray = []
-      this.errors = GetErrors(error)
-      console.log("searchResults.subscribe error: " + this.errors)
-    })
-  }
-
-  loseFocus() {
-    this.searchTerms.next('')
-    this.loading = false
-    this.errors = []
-    if (!this.selectedValue) {
-    }
-  }
-
-  clicked(ticker: string) {
-    console.log("clicked: " + ticker)
-    this.selectedValue = ticker
-    this.tickerSelected.emit(ticker)
-  }
-
-  onModelChange($event: string)
-  {
-    console.log("onModelChange: " + $event)
-    this.searchTerms.next($event)
-  }
-
-  onKeyDown($event: KeyboardEvent) {
-
-    if (this.searchResultsSubscribedArray.length == 0) {
-      return
+        if (!this.selectedValue) {
+        }
     }
 
-    if ($event.key === 'ArrowUp' && this.highlightedIndex > 0) {
-      this.highlightedIndex--;
+    clicked(ticker: string) {
+        console.log("clicked: " + ticker)
+        this.selectedValue = ticker
+        this.tickerSelected.emit(ticker)
     }
 
-    if ($event.key === 'ArrowDown' && this.highlightedIndex < this.searchResultsSubscribedArray.length - 1) {
-      this.highlightedIndex++;
+    onModelChange($event: string) {
+        console.log("onModelChange: " + $event)
+        this.searchTerms.next($event)
     }
 
-    if ($event.key === 'Enter' && this.highlightedIndex >= 0) {
-      let ticker = this.searchResultsSubscribedArray[this.highlightedIndex].symbol
-      this.loseFocus()
-      this.clicked(ticker)
+    onKeyDown($event: KeyboardEvent) {
+
+        if (this.searchResultsSubscribedArray.length == 0) {
+            return
+        }
+
+        if ($event.key === 'ArrowUp' && this.highlightedIndex > 0) {
+            this.highlightedIndex--;
+        }
+
+        if ($event.key === 'ArrowDown' && this.highlightedIndex < this.searchResultsSubscribedArray.length - 1) {
+            this.highlightedIndex++;
+        }
+
+        if ($event.key === 'Enter' && this.highlightedIndex >= 0) {
+            let ticker = this.searchResultsSubscribedArray[this.highlightedIndex].symbol
+            this.loseFocus()
+            this.clicked(ticker)
+        }
     }
-  }
 }

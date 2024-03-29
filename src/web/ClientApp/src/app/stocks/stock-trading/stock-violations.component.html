@@ -3,28 +3,31 @@
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <app-stock-link-and-tradingview-link [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
+                    <app-stock-link-and-tradingview-link
+                        [ticker]="violation.ticker"></app-stock-link-and-tradingview-link>
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-3">
-                        <div class="text-muted" role="button" (click)="toggleVisuallyHidden(sizeInfo)">Shares / Size <span>(click to show)</span></div>
+                        <div class="text-muted" role="button" (click)="toggleVisuallyHidden(sizeInfo)">Shares / Size
+                            <span>(click to show)</span></div>
                         <div #sizeInfo class="visually-hidden">
-                            {{violation.numberOfShares}} / {{violation.numberOfShares * violation.pricePerShare | currency}}
+                            {{ violation.numberOfShares }}
+                            / {{ violation.numberOfShares * violation.pricePerShare | currency }}
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-muted">Buy Price</div>
-                        <div>{{violation.pricePerShare | currency}}</div>
+                        <div>{{ violation.pricePerShare | currency }}</div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-muted">Current Price</div>
-                        <div>{{violation.currentPrice | currency}}</div>
+                        <div>{{ violation.currentPrice | currency }}</div>
                     </div>
                     <div class="col-md-3">
                         <div class="text-muted">% diff</div>
-                        <div>{{getDiffPrice(violation) | percent}}</div>
+                        <div>{{ getDiffPrice(violation) | percent }}</div>
                     </div>
                 </div>
 
@@ -54,7 +57,7 @@
             </div>
 
             <div class="card-footer">
-                <p class="mb-0">{{violation.message}}</p>
+                <p class="mb-0">{{ violation.message }}</p>
             </div>
         </div>
     }

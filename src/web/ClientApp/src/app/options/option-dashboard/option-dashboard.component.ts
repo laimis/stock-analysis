@@ -1,46 +1,47 @@
-import { Component, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { BrokerageOptionPosition, OptionsContainer, StocksService } from '../../services/stocks.service';
+import {Component, OnInit} from '@angular/core';
+import {Title} from '@angular/platform-browser';
+import {OptionsContainer, StocksService} from '../../services/stocks.service';
 
 @Component({
-  selector: 'app-options',
-  templateUrl: './option-dashboard.component.html',
-  styleUrls: ['./option-dashboard.component.css']
+    selector: 'app-options',
+    templateUrl: './option-dashboard.component.html',
+    styleUrls: ['./option-dashboard.component.css']
 })
 export class OptionsComponent implements OnInit {
 
-  optionsContainer: OptionsContainer
-  
-  loaded: boolean = false;
+    optionsContainer: OptionsContainer
 
-  activeTab: string = 'open'
+    loaded: boolean = false;
 
-  constructor(
-    private service: StocksService,
-    private title: Title
-  ) { }
+    activeTab: string = 'open'
 
-  ngOnInit() {
-    this.title.setTitle("Options - Nightingale Trading")
-    this.getOptions()
-  }
+    constructor(
+        private service: StocksService,
+        private title: Title
+    ) {
+    }
 
-  getOptions(){
-    this.service.getOptions().subscribe( result => {
-      this.optionsContainer = result
-      this.loaded = true
-    })
-  }
+    ngOnInit() {
+        this.title.setTitle("Options - Nightingale Trading")
+        this.getOptions()
+    }
 
-  isActive(tabName:string) {
-    return tabName == this.activeTab
-  }
+    getOptions() {
+        this.service.getOptions().subscribe(result => {
+            this.optionsContainer = result
+            this.loaded = true
+        })
+    }
 
-  activateTab(tabName:string) {
-    this.activeTab = tabName
-  }
+    isActive(tabName: string) {
+        return tabName == this.activeTab
+    }
 
-  refreshOptions() {
-    this.getOptions()
-  }
+    activateTab(tabName: string) {
+        this.activeTab = tabName
+    }
+
+    refreshOptions() {
+        this.getOptions()
+    }
 }

@@ -1,55 +1,56 @@
-import { Component, Input } from '@angular/core';
-import { TradingStrategyPerformance } from 'src/app/services/stocks.service';
+import {Component, Input} from '@angular/core';
+import {TradingStrategyPerformance} from 'src/app/services/stocks.service';
 
 @Component({
-  selector: 'app-stock-trading-strategies',
-  templateUrl: './stock-trading-strategies.component.html',
-  styleUrls: ['./stock-trading-strategies.component.css']
+    selector: 'app-stock-trading-strategies',
+    templateUrl: './stock-trading-strategies.component.html',
+    styleUrls: ['./stock-trading-strategies.component.css']
 })
 export class StockTradingStrategiesComponent {
 
-  @Input()
-  set results(value : TradingStrategyPerformance[]) {
-    this._results = value
-    this.sortedResults = value
-  }
+    sortedResults: TradingStrategyPerformance[]
+    private _sortDirection = 1
+    private _sortProperty = "strategyName"
 
-  sort(propertyName) {
-    if (this._sortProperty == propertyName) {
-      this._sortDirection *= -1
-    } else {
-      this._sortDirection = 1
+    private _results: TradingStrategyPerformance[]
+
+    @Input()
+    set results(value: TradingStrategyPerformance[]) {
+        this._results = value
+        this.sortedResults = value
     }
 
-    this._sortProperty = propertyName
+    sort(propertyName) {
+        if (this._sortProperty == propertyName) {
+            this._sortDirection *= -1
+        } else {
+            this._sortDirection = 1
+        }
 
-    this.doSort()
-  }
+        this._sortProperty = propertyName
 
-  doSort() {
-    this.sortedResults = this._results.sort((a, b) => {
-      let aVal = a[this._sortProperty]
-      if (!aVal) {
-        aVal = a.performance[this._sortProperty]
-      }
-      let bVal = b[this._sortProperty]
-      if (!bVal) {
-        bVal = b.performance[this._sortProperty]
-      }
-      
-      if (aVal < bVal) {
-        return -1 * this._sortDirection
-      }
-      if (aVal > bVal) {
-        return 1 * this._sortDirection
-      }
-      return 0
-    })
-  }
+        this.doSort()
+    }
 
-  private _results:TradingStrategyPerformance[]
-  sortedResults:TradingStrategyPerformance[]
-  private _sortDirection = 1
-  private _sortProperty = "strategyName"
-  
+    doSort() {
+        this.sortedResults = this._results.sort((a, b) => {
+            let aVal = a[this._sortProperty]
+            if (!aVal) {
+                aVal = a.performance[this._sortProperty]
+            }
+            let bVal = b[this._sortProperty]
+            if (!bVal) {
+                bVal = b.performance[this._sortProperty]
+            }
+
+            if (aVal < bVal) {
+                return -1 * this._sortDirection
+            }
+            if (aVal > bVal) {
+                return 1 * this._sortDirection
+            }
+            return 0
+        })
+    }
+
 }

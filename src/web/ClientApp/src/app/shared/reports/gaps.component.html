@@ -1,52 +1,52 @@
 @if (gaps) {
-  <div>
-    <h5>{{gaps.ticker}} Gaps</h5>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Gap Size</th>
-          <th>% Change</th>
-          <th>Open</th>
-          <th>Close</th>
-          <th>Vol</th>
-          <th>RelV</th>
-          <th>Closing Range</th>
-          <th><!-- close quickly icon --></th>
-          <th><!-- open --></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (g of gaps.gaps; track g) {
-          <tr>
-            <td>
-              <i
-                [ngClass]="{'bg-success': g.type === 'Up', 'bg-secondary': g.type === 'Down', 'text-white': true, 'bi': true, 'bi-arrow-up-circle': g.type === 'Up', 'bi-arrow-down-circle': g.type === 'Down'}"
-                class="ps-2 pe-2">
-              </i>
-              {{g.bar.dateStr | date}}
-            </td>
-            <td>{{g.gapSizePct | percent}}</td>
-            <td>{{g.percentChange | percent}}</td>
-            <td>{{g.bar.open | currency}}</td>
-            <td>{{g.bar.close | currency}}</td>
-            <td>{{g.bar.volume | number }}</td>
-            <td>{{g.relativeVolume | number}}</td>
-            <td>{{g.closingRange | percent}}</td>
-            <td>
-              @if (g.closedQuickly) {
-                <i class="bi bi-stop-circle-fill"></i>
-              }
-            </td>
-            <td>
-              @if (g.open) {
-                <i class="bi bi-door-open"
-                [ngClass]="{'text-success': g.type === 'Up', 'text-danger': g.type === 'Down'}"></i>
-              }
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+    <div>
+        <h5>{{ gaps.ticker }} Gaps</h5>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Gap Size</th>
+                <th>% Change</th>
+                <th>Open</th>
+                <th>Close</th>
+                <th>Vol</th>
+                <th>RelV</th>
+                <th>Closing Range</th>
+                <th><!-- close quickly icon --></th>
+                <th><!-- open --></th>
+            </tr>
+            </thead>
+            <tbody>
+                @for (g of gaps.gaps; track g) {
+                    <tr>
+                        <td>
+                            <i
+                                [ngClass]="{'bg-success': g.type === 'Up', 'bg-secondary': g.type === 'Down', 'text-white': true, 'bi': true, 'bi-arrow-up-circle': g.type === 'Up', 'bi-arrow-down-circle': g.type === 'Down'}"
+                                class="ps-2 pe-2">
+                            </i>
+                            {{ g.bar.dateStr | date }}
+                        </td>
+                        <td>{{ g.gapSizePct | percent }}</td>
+                        <td>{{ g.percentChange | percent }}</td>
+                        <td>{{ g.bar.open | currency }}</td>
+                        <td>{{ g.bar.close | currency }}</td>
+                        <td>{{ g.bar.volume | number }}</td>
+                        <td>{{ g.relativeVolume | number }}</td>
+                        <td>{{ g.closingRange | percent }}</td>
+                        <td>
+                            @if (g.closedQuickly) {
+                                <i class="bi bi-stop-circle-fill"></i>
+                            }
+                        </td>
+                        <td>
+                            @if (g.open) {
+                                <i class="bi bi-door-open"
+                                   [ngClass]="{'text-success': g.type === 'Up', 'text-danger': g.type === 'Down'}"></i>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }

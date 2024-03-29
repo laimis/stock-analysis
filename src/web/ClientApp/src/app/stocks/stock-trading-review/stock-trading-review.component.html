@@ -1,32 +1,36 @@
 <div>
-  @if (currentPosition) {
-    <div class="container">
-      <div class="row">
-        <div class="col"><button (click)="previous()" class="btn btn-primary">Previous</button></div>
-        <div class="col text-center">
-          <select class="form-select" (change)="dropdownClick($event.target)">
-            @for (position of positions; track position; let i = $index) {
-              <option
-                [value]="i"
-                [selected]="position.positionId === currentPosition.positionId">
-                {{position.ticker}}
-              </option>
-            }
-          </select>
+    @if (currentPosition) {
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <button (click)="previous()" class="btn btn-primary">Previous</button>
+                </div>
+                <div class="col text-center">
+                    <select class="form-select" (change)="dropdownClick($event.target)">
+                        @for (position of positions; track position; let i = $index) {
+                            <option
+                                [value]="i"
+                                [selected]="position.positionId === currentPosition.positionId">
+                                {{ position.ticker }}
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col">
+                    <span class="text-muted">Price: </span>{{ getPrice(currentPosition) | currency }}
+                </div>
+                <div class="col">
+                    <span class="text-muted">Stop: </span>{{ currentPosition.stopPrice | currency }}
+                </div>
+                <div class="col">
+                    <span class="text-muted">Cost/Share: </span>{{ currentPosition.averageBuyCostPerShare | currency }}
+                </div>
+                <div class="col">
+                    <button (click)="next()" class="btn btn-primary float-end">Next</button>
+                </div>
+            </div>
         </div>
-        <div class="col">
-          <span class="text-muted">Price: </span>{{getPrice(currentPosition) | currency}}
-        </div>
-        <div class="col">
-          <span class="text-muted">Stop: </span>{{currentPosition.stopPrice | currency}}
-        </div>
-        <div class="col">
-          <span class="text-muted">Cost/Share: </span>{{currentPosition.averageBuyCostPerShare | currency}}
-        </div>
-        <div class="col"><button (click)="next()" class="btn btn-primary float-end">Next</button></div>
-      </div>
-    </div>
-  }
+    }
     <section>
         <h5>Stock chart</h5>
         @if (pricesErrors) {
@@ -39,106 +43,107 @@
             <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
         }
     </section>
-    
-    @if(currentPosition && currentPosition.isClosed) {
-      <section>
-        <h5>Actual vs Trading Strategies</h5>
-        @if (simulationErrors) {
-          <app-error-display [errors]="simulationErrors"></app-error-display>
-        }
-        @if (!simulationResults && !simulationErrors) {
-          <app-loading></app-loading>
-        }
-        @if (simulationResults) {
-          <app-trading-actual-vs-simulated
-            [simulations]="simulationResults"
-            [simulationErrors]="simulationErrors">
-          </app-trading-actual-vs-simulated>
-        }
-      </section>
+
+    @if (currentPosition && currentPosition.isClosed) {
+        <section>
+            <h5>Actual vs Trading Strategies</h5>
+            @if (simulationErrors) {
+                <app-error-display [errors]="simulationErrors"></app-error-display>
+            }
+            @if (!simulationResults && !simulationErrors) {
+                <app-loading></app-loading>
+            }
+            @if (simulationResults) {
+                <app-trading-actual-vs-simulated
+                    [simulations]="simulationResults"
+                    [simulationErrors]="simulationErrors">
+                </app-trading-actual-vs-simulated>
+            }
+        </section>
     }
-  @if (currentPosition && currentPosition.isClosed) {
-    <section>
-      <h5>Grade</h5>
-      @if (gradingError) {
-        <div class="alert alert-danger" role="alert">
-          {{gradingError }}
-        </div>
-      }
-      @if (gradingSuccess) {
-        <div class="alert alert-success" role="alert">
-          {{gradingSuccess }}
-        </div>
-      }
-      <div class="mb-3">
-        <div class="form-check form-check-inline">
-          <input
-            [checked]="this.assignedGrade === 'A'"
-            value="A"
-            (click)="this.assignedGrade = 'A'"
-            class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1">
-            <label class="form-check-label" for="inlineRadio1">A</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              [checked]="this.assignedGrade === 'B'"
-              value="B"
-              (click)="this.assignedGrade = 'B'"
-              class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2">
-              <label class="form-check-label" for="inlineRadio2">B</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input
-                [checked]="this.assignedGrade === 'C'"
-                value="C"
-                (click)="this.assignedGrade = 'C'"
-                class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3">
-                <label class="form-check-label" for="inlineRadio3">C</label>
-              </div>
+    @if (currentPosition && currentPosition.isClosed) {
+        <section>
+            <h5>Grade</h5>
+            @if (gradingError) {
+                <div class="alert alert-danger" role="alert">
+                    {{ gradingError }}
+                </div>
+            }
+            @if (gradingSuccess) {
+                <div class="alert alert-success" role="alert">
+                    {{ gradingSuccess }}
+                </div>
+            }
+            <div class="mb-3">
+                <div class="form-check form-check-inline">
+                    <input
+                        [checked]="this.assignedGrade === 'A'"
+                        value="A"
+                        (click)="this.assignedGrade = 'A'"
+                        class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1">
+                    <label class="form-check-label" for="inlineRadio1">A</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input
+                        [checked]="this.assignedGrade === 'B'"
+                        value="B"
+                        (click)="this.assignedGrade = 'B'"
+                        class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2">
+                    <label class="form-check-label" for="inlineRadio2">B</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input
+                        [checked]="this.assignedGrade === 'C'"
+                        value="C"
+                        (click)="this.assignedGrade = 'C'"
+                        class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3">
+                    <label class="form-check-label" for="inlineRadio3">C</label>
+                </div>
             </div>
             <div class="mb-3">
-              <label for="notesInput" class="form-label">Notes</label>
-              <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
+                <label for="notesInput" class="form-label">Notes</label>
+                <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
             </div>
             <div>
-              <button (click)="assignGrade(gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
+                <button (click)="assignGrade(gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
             </div>
-          </section>
-        }
-        <section>
-          <h5>Daily Gain Breakdown</h5>
-          <div class="row">
-            <div class="col">
-              @if (scoresErrors) {
-                <app-error-display [errors]="scoresErrors"></app-error-display>
-              }
-              @if (!dailyPositionReport && !scoresErrors) {
-                <app-loading></app-loading>
-              }
-              @if (dailyPositionReport) {
-                <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyGainPct">
-                </app-daily-outcome-scores>
-              }
-            </div>
-            <div class="col">
-              @if (scoresErrors) {
-                <app-error-display [errors]="scoresErrors"></app-error-display>
-              }
-              @if (!dailyPositionReport && !scoresErrors) {
-                <app-loading></app-loading>
-              }
-              @if (dailyPositionReport) {
-                <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyProfit">
-                </app-daily-outcome-scores>
-              }
-            </div>
-          </div>
-
         </section>
+    }
+    <section>
+        <h5>Daily Gain Breakdown</h5>
+        <div class="row">
+            <div class="col">
+                @if (scoresErrors) {
+                    <app-error-display [errors]="scoresErrors"></app-error-display>
+                }
+                @if (!dailyPositionReport && !scoresErrors) {
+                    <app-loading></app-loading>
+                }
+                @if (dailyPositionReport) {
+                    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyGainPct">
+                    </app-daily-outcome-scores>
+                }
+            </div>
+            <div class="col">
+                @if (scoresErrors) {
+                    <app-error-display [errors]="scoresErrors"></app-error-display>
+                }
+                @if (!dailyPositionReport && !scoresErrors) {
+                    <app-loading></app-loading>
+                }
+                @if (dailyPositionReport) {
+                    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyProfit">
+                    </app-daily-outcome-scores>
+                }
+            </div>
+        </div>
 
-        <section>
-          <h5>Position Information</h5>
-          <app-stock-trading-position [position]="currentPosition" [orders]="orders" [quote]="getQuote(currentPosition)" (brokerageOrdersChanged)="brokerageOrdersChanged.emit($event)"></app-stock-trading-position>
-        </section>
-        
-      </div>
+    </section>
+
+    <section>
+        <h5>Position Information</h5>
+        <app-stock-trading-position (brokerageOrdersChanged)="brokerageOrdersChanged.emit($event)" [orders]="orders" [position]="currentPosition"
+                                    [quote]="getQuote(currentPosition)"></app-stock-trading-position>
+    </section>
+
+</div>

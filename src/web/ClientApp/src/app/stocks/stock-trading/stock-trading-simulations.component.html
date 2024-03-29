@@ -1,44 +1,47 @@
 <div>
-  <h3>Simulating trades</h3>
-  <h5><span class="text-muted">Parameters: </span>{{numberOfTrades}} trades {{closePositions ? ", closing positions at end of simulations" : ""}}</h5>
-  @if (!results) {
-    <section>
-      <!-- show loading indicator -->
-      <div class="spinner-border" role="status">
-        <span class="sr-only">Loading...</span>
-      </div>
-    </section>
-  }
-  @if (results) {
-    <section>
-      <h3>Results</h3>
-      <div class="row mb-3">
-        <div class="col-10">
-          <div>
-            <span class="text-muted">Earliest date:</span> {{results[0].performance.earliestDate | date }},
-            <span class="text-muted">latest date:</span> {{results[0].performance.latestDate | date }}
-          </div>
-          @if (spyPrices) {
-            <div>
-              <span class="text-muted">SPY during that time advanced from </span>
-              {{spyPrices[0].close| currency}} to {{spyPrices[spyPrices.length - 1].close | currency}}
-              <span class="text-muted">for gain of </span>{{(spyPrices[spyPrices.length - 1].close - spyPrices[0].close) / spyPrices[0].close | percent}}
+    <h3>Simulating trades</h3>
+    <h5><span class="text-muted">Parameters: </span>{{ numberOfTrades }}
+        trades {{ closePositions ? ", closing positions at end of simulations" : "" }}</h5>
+    @if (!results) {
+        <section>
+            <!-- show loading indicator -->
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
             </div>
-          }
-          @if (qqqPrices) {
-            <div>
-              <span class="text-muted">QQQ during that time advanced from </span>
-              {{qqqPrices[0].close| currency}} to {{qqqPrices[qqqPrices.length - 1].close | currency}}
-              <span class="text-muted">for gain of </span>{{(qqqPrices[qqqPrices.length - 1].close - qqqPrices[0].close) / qqqPrices[0].close | percent}}
+        </section>
+    }
+    @if (results) {
+        <section>
+            <h3>Results</h3>
+            <div class="row mb-3">
+                <div class="col-10">
+                    <div>
+                        <span class="text-muted">Earliest date:</span> {{ results[0].performance.earliestDate | date }},
+                        <span class="text-muted">latest date:</span> {{ results[0].performance.latestDate | date }}
+                    </div>
+                    @if (spyPrices) {
+                        <div>
+                            <span class="text-muted">SPY during that time advanced from </span>
+                            {{ spyPrices[0].close| currency }} to {{ spyPrices[spyPrices.length - 1].close | currency }}
+                            <span
+                                class="text-muted">for gain of </span>{{ (spyPrices[spyPrices.length - 1].close - spyPrices[0].close) / spyPrices[0].close | percent }}
+                        </div>
+                    }
+                    @if (qqqPrices) {
+                        <div>
+                            <span class="text-muted">QQQ during that time advanced from </span>
+                            {{ qqqPrices[0].close| currency }} to {{ qqqPrices[qqqPrices.length - 1].close | currency }}
+                            <span
+                                class="text-muted">for gain of </span>{{ (qqqPrices[qqqPrices.length - 1].close - qqqPrices[0].close) / qqqPrices[0].close | percent }}
+                        </div>
+                    }
+                </div>
+                <div class="col-2">
+                    <a [href]="getExportUrl()" class="btn btn-primary btn-sm float-end">Export</a>
+                </div>
             </div>
-          }
-        </div>
-        <div class="col-2">
-          <a [href]="getExportUrl()" class="btn btn-primary btn-sm float-end">Export</a>
-        </div>
-      </div>
-      <app-error-display [errors]="errors"></app-error-display>
-      <app-stock-trading-strategies [results]=results></app-stock-trading-strategies>
-    </section>
-  }
+            <app-error-display [errors]="errors"></app-error-display>
+            <app-stock-trading-strategies [results]=results></app-stock-trading-strategies>
+        </section>
+    }
 </div>

@@ -3,27 +3,28 @@
     <!-- option buttons to show all, success, or failure links -->
     <div class="d-flex justify-content-center">
         <button
-            class="btn btn-primary me-2"
-            (click)="showAllLinks()">
+            (click)="showAllLinks()"
+            class="btn btn-primary me-2">
             Show All
         </button>
         <button
-            class="btn btn-success me-2"
-            (click)="showSuccessLinks()">
+            (click)="showSuccessLinks()"
+            class="btn btn-success me-2">
             Show Success
         </button>
         <button
-            class="btn btn-danger"
-            (click)="showFailureLinks()">
+            (click)="showFailureLinks()"
+            class="btn btn-danger">
             Show Failure
         </button>
     </div>
     <div class="mt-5">
         <ul>
-        @for (link of chain.links; track link) {
-          <span title="{{link.ticker}} level {{ link.level }} profit: {{ link.profit | currency }} on {{ link.date | date: 'shortDate' }}"
-            class="badge me-2 text-white"
-            [ngClass]="{
+            @for (link of chain.links; track link) {
+                <span
+                    title="{{link.ticker}} level {{ link.level }} profit: {{ link.profit | currency }} on {{ link.date | date: 'shortDate' }}"
+                    class="badge me-2 text-white"
+                    [ngClass]="{
             'bg-level-5-success': link.success && link.level === 5 && (render === 'all' || render === 'success'),
             'bg-level-5-failure': !link.success && link.level === 5 && (render === 'all' || render === 'failure'),
             'bg-level-4-success': link.success && link.level === 4 && (render === 'all' || render === 'success'),
@@ -39,9 +40,9 @@
             }">
             {{ link.profit | currency }}
           </span>
-        } @empty {
-            Generate some trades to see links
-        }
+            } @empty {
+                Generate some trades to see links
+            }
         </ul>
     </div>
 </div>

@@ -1,74 +1,80 @@
 @if (loaded) {
-  <div class="mt-2 mb-4">
-    <div>
-      <div>
-        <h3>{{crypto.token}}: {{crypto.name}}
-          <a class="float-end ms-3" href="https://coinmarketcap.com/currencies/{{crypto.name}}/" target="_blank">
-            <img src="/assets/images/cml.png" height="35px" />
-          </a>
-        </h3>
-      </div>
-      <div>
-        <div id="crypto-description">
-          <a [routerLink]="[ '/cryptos' ]" class="h6">Back to cryptos</a>
-        </div>
-      </div>
-    </div>
-    <div class="tab-container mt-2">
-      <div class="mt-4">
-        <div class="row">
-          @if (ownership && ownership.quantity > 0) {
-            <div class="col">
-              Ownership: <b>{{ownership.quantity}}</b> &#64; <b>{{ownership.averageCost | currency}}</b> ({{(crypto.price.amount - ownership.averageCost) / crypto.price.amount | percent}})
-            </div>
-          }
-          @if (crypto.price) {
-            <div class="col">
-              Current price: <b>{{crypto.price.amount | currency}}</b>
-            </div>
-          }
-        </div>
-      </div>
-      @if (ownership && ownership.transactions.length > 0) {
+    <div class="mt-2 mb-4">
         <div>
-          <div class="mt-4">
-            <div class="text-muted">Past Transactions</div>
-            <table class="table table-striped border">
-              <thead class="thead-light">
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (t of ownership.transactions; track t) {
-                  <tr
-                    [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount === 0}"
-                    >
-                    <td>{{ t.date | date:'shortDate'}}</td>
-                    <td>{{ t.description }}</td>
-                    <td>{{ t.amount | currency }}</td>
-                    <td><i class="fa fa-trash delete" aria-hidden="true" (click)="deleteTransaction(t.eventId)"></i></td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-          <div class="mb-3">
-            <label>Delete this crypto from your portfolio</label>
             <div>
-              <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">Delete</button>
+                <h3>{{ crypto.token }}: {{ crypto.name }}
+                    <a class="float-end ms-3" href="https://coinmarketcap.com/currencies/{{crypto.name}}/"
+                       target="_blank">
+                        <img src="/assets/images/cml.png" height="35px"/>
+                    </a>
+                </h3>
             </div>
-          </div>
+            <div>
+                <div id="crypto-description">
+                    <a [routerLink]="[ '/cryptos' ]" class="h6">Back to cryptos</a>
+                </div>
+            </div>
         </div>
-      }
+        <div class="tab-container mt-2">
+            <div class="mt-4">
+                <div class="row">
+                    @if (ownership && ownership.quantity > 0) {
+                        <div class="col">
+                            Ownership: <b>{{ ownership.quantity }}</b> &#64;
+                            <b>{{ ownership.averageCost | currency }}</b>
+                            ({{ (crypto.price.amount - ownership.averageCost) / crypto.price.amount | percent }})
+                        </div>
+                    }
+                    @if (crypto.price) {
+                        <div class="col">
+                            Current price: <b>{{ crypto.price.amount | currency }}</b>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (ownership && ownership.transactions.length > 0) {
+                <div>
+                    <div class="mt-4">
+                        <div class="text-muted">Past Transactions</div>
+                        <table class="table table-striped border">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (t of ownership.transactions; track t) {
+                                    <tr
+                                        [ngClass]="{'table-success': t.amount> 0, 'table-warning': t.amount < 0, 'table-light': t.amount === 0}"
+                                    >
+                                        <td>{{ t.date | date:'shortDate' }}</td>
+                                        <td>{{ t.description }}</td>
+                                        <td>{{ t.amount | currency }}</td>
+                                        <td><i class="fa fa-trash delete" aria-hidden="true"
+                                               (click)="deleteTransaction(t.eventId)"></i></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mb-3">
+                        <label>Delete this crypto from your portfolio</label>
+                        <div>
+                            <button type="button float-end" class="btn btn-secondary mb-1 me-2" (click)="delete()">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-  </div>
 }
 @if (!loaded) {
-  <div>
-    Fetching crypto information...
-  </div>
+    <div>
+        Fetching crypto information...
+    </div>
 }

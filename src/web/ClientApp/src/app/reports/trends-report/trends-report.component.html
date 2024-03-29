@@ -2,24 +2,25 @@
     <h2>Trend Dashboard</h2>
 
     <app-error-display *ngIf="errors"></app-error-display>
-    
+
     <div class="card mb-4">
         <div class="card-body">
             <div class="row align-items-end">
                 <div class="col-md-4">
                     <app-stock-search
-                        [cssClass]="'d-flex ms-auto form-control'"
-                        [label]="'Ticker'"
-                        [ticker]="selectedTicker"
-                        [placeholder]="'Search stocks'"
                         (tickerSelected)="tickerSelected($event)"
-                        [justTickers]="true">
+                        [cssClass]="'d-flex ms-auto form-control'"
+                        [justTickers]="true"
+                        [label]="'Ticker'"
+                        [placeholder]="'Search stocks'"
+                        [ticker]="selectedTicker">
                     </app-stock-search>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="trendTypeSelect" class="form-label">Trend Type</label>
-                        <select class="form-control form-select" id="trendTypeSelect" [(ngModel)]="selectedTrendType" (ngModelChange)="trendTypeSelected()">
+                        <label class="form-label" for="trendTypeSelect">Trend Type</label>
+                        <select (ngModelChange)="trendTypeSelected()" [(ngModel)]="selectedTrendType" class="form-control form-select"
+                                id="trendTypeSelect">
                             <option value="Ema20OverSma50">EMA 20 Over SMA 50</option>
                             <option value="Sma50OverSma200">SMA 50 Over SMA 200</option>
                         </select>
@@ -27,8 +28,9 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="startDateSelect" class="form-label">Start Date</label>
-                        <select class="form-control form-select" id="startDateSelect" [(ngModel)]="selectedStartDate" (ngModelChange)="startDateSelected()">
+                        <label class="form-label" for="startDateSelect">Start Date</label>
+                        <select (ngModelChange)="startDateSelected()" [(ngModel)]="selectedStartDate" class="form-control form-select"
+                                id="startDateSelect">
                             <option value="10">10 years</option>
                             <option value="20">20 years</option>
                         </select>
@@ -37,10 +39,10 @@
             </div>
         </div>
     </div>
-    
+
     <app-loading *ngIf="loading"></app-loading>
 
-    <div class="card mb-5" *ngIf="currentTrend">
+    <div *ngIf="currentTrend" class="card mb-5">
         <div class="card-header">
             <h4>Current Trend</h4>
         </div>
@@ -53,7 +55,8 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Direction:</span>
-                        <strong [ngClass]="{'text-success': currentTrend.direction === 'Up', 'text-primary': currentTrend.direction === 'Down'}">{{ currentTrend.direction }}</strong>
+                        <strong
+                            [ngClass]="{'text-success': currentTrend.direction === 'Up', 'text-primary': currentTrend.direction === 'Down'}">{{ currentTrend.direction }}</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Trend Type:</span>
@@ -83,18 +86,20 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Rank by Bars:</span>
-                        <span>{{ trends.currentTrendRankByBars }} / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
+                        <span>{{ trends.currentTrendRankByBars }}
+                            / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Rank by Gain Percentage:</span>
-                        <span>{{ trends.currentTrendRankByGain }} / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
+                        <span>{{ trends.currentTrendRankByGain }}
+                            / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row" *ngIf="trends">
+    <div *ngIf="trends" class="row">
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header">

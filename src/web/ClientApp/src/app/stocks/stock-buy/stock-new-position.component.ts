@@ -4,41 +4,42 @@ import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
 
 @Component({
-  selector: 'app-stock-new-position',
-  templateUrl: './stock-new-position.component.html',
-  styleUrls: ['./stock-new-position.component.css']
+    selector: 'app-stock-new-position',
+    templateUrl: './stock-new-position.component.html',
+    styleUrls: ['./stock-new-position.component.css']
 })
 export class StockNewPositionComponent implements OnInit {
-  feedbackMessage: string;
-  orders: BrokerageOrder[];
+    feedbackMessage: string;
+    orders: BrokerageOrder[];
 
-  constructor(private brokerage : BrokerageService) {}
+    constructor(private brokerage: BrokerageService) {
+    }
 
-  ngOnInit(): void {
-    this.getOrders()
-  }
+    ngOnInit(): void {
+        this.getOrders()
+    }
 
-  brokerageOrderEntered() {
-    this.feedbackMessage = "Brokerage order entered";
-  }
+    brokerageOrderEntered() {
+        this.feedbackMessage = "Brokerage order entered";
+    }
 
-  getOrders() {
-    this.brokerage.brokerageAccount().subscribe(account => {
-      this.orders = account.orders
-    }, error => {
-      this.feedbackMessage = GetErrors(error)[0]
-    })
-  }
+    getOrders() {
+        this.brokerage.brokerageAccount().subscribe(account => {
+            this.orders = account.orders
+        }, error => {
+            this.feedbackMessage = GetErrors(error)[0]
+        })
+    }
 
-  positionOpened() {
-    this.feedbackMessage = "Position opened";
-  }
+    positionOpened() {
+        this.feedbackMessage = "Position opened";
+    }
 
-  pendingPositionCreated() {
-    this.feedbackMessage = "Pending position created";
-  }
+    pendingPositionCreated() {
+        this.feedbackMessage = "Pending position created";
+    }
 
-  pendingPositionClosed() {
-    this.feedbackMessage = "Pending position closed";
-  }
+    pendingPositionClosed() {
+        this.feedbackMessage = "Pending position closed";
+    }
 }

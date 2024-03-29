@@ -37,9 +37,9 @@
                 </div>
                 <div>{{ candidateStopPrice | currency }}</div>
                 @if (!_position.isClosed) {
-                <div>
-                    <span class="text-muted"> {{ _position.percentToStopFromCost | percent }} from avg cost</span>
-                </div>
+                    <div>
+                        <span class="text-muted"> {{ _position.percentToStopFromCost | percent }} from avg cost</span>
+                    </div>
                 }
             </div>
             <div class="col-md-3 visually-hidden" #stopPriceEditDiv>
@@ -153,8 +153,11 @@
                 <div class="col-md-3">
                     <label class="form-label stat-label" for="candidateRiskAmount"></label>
                     <div>
-                        <button class="btn btn-outline-secondary btn-sm" (click)="fetchProfitPoints()">Profit Points</button>
-                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showOrderForm = !showOrderForm">Order Form</button>
+                        <button class="btn btn-outline-secondary btn-sm" (click)="fetchProfitPoints()">Profit Points
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showOrderForm = !showOrderForm">
+                            Order Form
+                        </button>
                     </div>
                 </div>
             </div>
@@ -176,25 +179,28 @@
                     </div>
                 }
             </div>
-            
+
             @if (showOrderForm) {
-            <div class="row mt-3">
-                <div class="col">
-                    <app-brokerage-new-order [ticker]="_position.ticker" (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
+                <div class="row mt-3">
+                    <div class="col">
+                        <app-brokerage-new-order [ticker]="_position.ticker"
+                                                 (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
+                    </div>
                 </div>
-            </div>
             }
         }
         @if (_position.isOpen) {
-        <div class="row mt-3">
-            <div class="col">
-                @if (positionOrders.length > 0) {
-                <app-brokerage-orders [justOrders]="true" [orders]="positionOrders" [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId" (ordersChanged)="brokerageOrdersChanged.emit($event)"></app-brokerage-orders>
-                } @else {
-                    <span class="text-muted">No orders</span>
-                }
+            <div class="row mt-3">
+                <div class="col">
+                    @if (positionOrders.length > 0) {
+                        <app-brokerage-orders [justOrders]="true" [orders]="positionOrders"
+                                              [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId"
+                                              (ordersChanged)="brokerageOrdersChanged.emit($event)"></app-brokerage-orders>
+                    } @else {
+                        <span class="text-muted">No orders</span>
+                    }
+                </div>
             </div>
-        </div>
         }
         <div class="row mt-3">
             <div class="col">
@@ -231,7 +237,9 @@
         </div>
         <div class="row mt-3">
             <div class="col">
-                <button class="btn btn-sm btn-outline-secondary" (click)="closePosition()" *ngIf="_position.isOpen" >Close</button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="closePosition()" *ngIf="_position.isOpen">
+                    Close
+                </button>
             </div>
             <div class="col">
                 <button class="btn btn-sm btn-outline-danger float-end" (click)="deletePosition()">Delete</button>

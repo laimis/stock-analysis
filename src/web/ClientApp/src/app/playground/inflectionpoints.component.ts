@@ -1,106 +1,108 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-  DataPointContainer,
-  PositionChartInformation,
-  PriceFrequency,
-  Prices,
-  StocksService
+    DataPointContainer,
+    PositionChartInformation,
+    PriceFrequency,
+    Prices,
+    StocksService
 } from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 import {
-  age,
-  calculateInflectionPoints, histogramToDataPointContainer, humanFriendlyTime,
-  InfectionPointType,
-  InflectionPointLog, logToDataPointContainer,
-  toChartMarker, toDailyBreakdownDataPointCointainer, toHistogram, toInflectionPointLog
+    age,
+    calculateInflectionPoints,
+    histogramToDataPointContainer,
+    humanFriendlyTime,
+    InfectionPointType,
+    InflectionPointLog,
+    logToDataPointContainer,
+    toChartMarker,
+    toDailyBreakdownDataPointCointainer,
+    toHistogram,
+    toInflectionPointLog
 } from "../services/prices.service";
 
 @Component({
-  selector: 'app-inflection-points',
-  templateUrl: './inflectionpoints.component.html'
+    selector: 'app-inflection-points',
+    templateUrl: './inflectionpoints.component.html'
 })
 export class InflectionPointsComponent implements OnInit {
-  tickers: string[];
-  options: any;
-  prices: Prices;
-  chartInfo: PositionChartInformation;
+    tickers: string[];
+    options: any;
+    prices: Prices;
+    chartInfo: PositionChartInformation;
+    priceFrequency: PriceFrequency = PriceFrequency.Daily;
+    ageValueToUse: number;
+    lineContainers: DataPointContainer[];
+    peaksAndValleys: DataPointContainer[];
+    log: InflectionPointLog[];
+    errors: string[];
+    protected readonly twoMonths = 365 / 6;
+    protected readonly sixMonths = 365 / 2;
 
+    constructor(
+        private stocks: StocksService,
+        private route: ActivatedRoute) {
+    }
 
-  protected readonly twoMonths = 365 / 6;
-  protected readonly sixMonths = 365 / 2;
-  priceFrequency: PriceFrequency = PriceFrequency.Daily;
-  ageValueToUse:number;
+    ngOnInit() {
+        this.ageValueToUse = this.twoMonths
+        const tickerParam = this.route.snapshot.queryParamMap.get('tickers');
+        this.tickers = tickerParam ? tickerParam.split(',') : ['AMD'];
+        this.renderPrices(this.tickers)
+    }
 
-  lineContainers: DataPointContainer[];
-  peaksAndValleys: DataPointContainer[];
-  log: InflectionPointLog[];
+    renderPrices(tickers: string[]) {
+        this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
+            result => {
+                this.prices = result
 
-  constructor(
-    private stocks: StocksService,
-    private route: ActivatedRoute) {
-  }
+                const inflectionPoints = calculateInflectionPoints(result.prices);
+                const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
+                const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
 
-  errors: string[];
+                this.chartInfo = {
+                    ticker: this.tickers[0],
+                    prices: result,
+                    markers: inflectionPoints.map(toChartMarker),
+                    transactions: [],
+                    averageBuyPrice: null,
+                    stopPrice: null
+                }
 
-  ngOnInit() {
-    this.ageValueToUse = this.twoMonths
-    const tickerParam = this.route.snapshot.queryParamMap.get('tickers');
-    this.tickers = tickerParam ? tickerParam.split(',') : ['AMD'];
-    this.renderPrices(this.tickers)
-  }
+                const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
+                const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
+                const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
+                const smoothedValleys = toDailyBreakdownDataPointCointainer('smoothed valleys', valleys, (p: number) => Math.round(p))
 
-  renderPrices(tickers: string[]) {
-    this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
-      result => {
-        this.prices = result
+                this.log = toInflectionPointLog(inflectionPoints).reverse()
 
-        const inflectionPoints = calculateInflectionPoints(result.prices);
-        const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
-        const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
+                const humanFriendlyTimeDuration = humanFriendlyTime(this.ageValueToUse)
+                const resistanceHistogram = toHistogram(peaks.filter(p => age(p) < this.ageValueToUse))
+                const resistanceHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' resistance histogram', resistanceHistogram)
 
-        this.chartInfo = {
-          ticker: this.tickers[0],
-          prices: result,
-          markers: inflectionPoints.map(toChartMarker),
-            transactions: [],
-          averageBuyPrice: null,
-          stopPrice: null
-        }
+                const supportHistogram = toHistogram(valleys.filter(p => age(p) < this.ageValueToUse))
+                const supportHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' support histogram', supportHistogram)
 
-        const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
-        const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
-        const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
-        const smoothedValleys = toDailyBreakdownDataPointCointainer('smoothed valleys', valleys, (p: number) => Math.round(p))
+                const logChart = logToDataPointContainer("Log", this.log)
 
-        this.log = toInflectionPointLog(inflectionPoints).reverse()
+                this.lineContainers = [
+                    resistanceHistogramPointContainer, supportHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys, logChart
+                ]
 
-        const humanFriendlyTimeDuration = humanFriendlyTime(this.ageValueToUse)
-        const resistanceHistogram = toHistogram(peaks.filter(p => age(p) < this.ageValueToUse))
-        const resistanceHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' resistance histogram', resistanceHistogram)
+                this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
+            },
+            error => this.errors = GetErrors(error)
+        );
+    }
 
-        const supportHistogram = toHistogram(valleys.filter(p => age(p) < this.ageValueToUse))
-        const supportHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' support histogram', supportHistogram)
+    priceFrequencyChanged() {
+        this.chartInfo = null
+        this.renderPrices(this.tickers);
+    }
 
-        const logChart = logToDataPointContainer("Log", this.log)
-
-        this.lineContainers = [
-          resistanceHistogramPointContainer, supportHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys, logChart
-        ]
-
-        this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
-      },
-      error => this.errors = GetErrors(error)
-    );
-  }
-
-  priceFrequencyChanged() {
-    this.chartInfo = null
-    this.renderPrices(this.tickers);
-  }
-
-  ageValueChanged() {
-    this.chartInfo = null
-    this.renderPrices(this.tickers);
-  }
+    ageValueChanged() {
+        this.chartInfo = null
+        this.renderPrices(this.tickers);
+    }
 }

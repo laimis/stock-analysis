@@ -1,38 +1,38 @@
 <table class="table table-hover table-striped">
-  <thead>
+    <thead>
     <tr>
-      <th class="sort-header" (click)="sort('strategyName')">Strategy</th>
-      <th class="sort-header" (click)="sort('profit')">P/L</th>
-      <th class="sort-header" (click)="sort('rrSum')">R/R Sum</th>
-      <th class="sort-header" (click)="sort('winPct')">Win %</th>
-      <th class="sort-header" (click)="sort('winAvgReturnPct')">Avg Win %</th>
-      <th class="sort-header" (click)="sort('lossAvgReturnPct')">Avg Loss %</th>
-      <th class="sort-header" (click)="sort('maxWinAmount')">Max Win</th>
-      <th class="sort-header" (click)="sort('maxLossAmount')">Max Loss</th>
-      <th class="sort-header" (click)="sort('ev')">E/V</th>
-      <th class="sort-header" (click)="sort('profitRatio')">Profit Ratio</th>
-      <th class="sort-header" (click)="sort('returnPctRatio')">Pct Ratio</th>
-      <th class="sort-header" (click)="sort('rrRatio')">R/R Ratio</th>
-      <th class="sort-header" (click)="sort('numberOfTrades')">Trades</th>
+        <th (click)="sort('strategyName')" class="sort-header">Strategy</th>
+        <th (click)="sort('profit')" class="sort-header">P/L</th>
+        <th (click)="sort('rrSum')" class="sort-header">R/R Sum</th>
+        <th (click)="sort('winPct')" class="sort-header">Win %</th>
+        <th (click)="sort('winAvgReturnPct')" class="sort-header">Avg Win %</th>
+        <th (click)="sort('lossAvgReturnPct')" class="sort-header">Avg Loss %</th>
+        <th (click)="sort('maxWinAmount')" class="sort-header">Max Win</th>
+        <th (click)="sort('maxLossAmount')" class="sort-header">Max Loss</th>
+        <th (click)="sort('ev')" class="sort-header">E/V</th>
+        <th (click)="sort('profitRatio')" class="sort-header">Profit Ratio</th>
+        <th (click)="sort('returnPctRatio')" class="sort-header">Pct Ratio</th>
+        <th (click)="sort('rrRatio')" class="sort-header">R/R Ratio</th>
+        <th (click)="sort('numberOfTrades')" class="sort-header">Trades</th>
     </tr>
-  </thead>
-  <tbody>
-    @for (r of sortedResults; track r) {
-      <tr>
-        <td>{{r.strategyName}}</td>
-        <td>{{r.performance.profit | currency}}</td>
-        <td>{{r.performance.rrSum | number:'1.0-2'}}</td>
-        <td>{{r.performance.winPct | percent}}</td>
-        <td>{{r.performance.winAvgReturnPct | percent}}</td>
-        <td>{{r.performance.lossAvgReturnPct | percent}}</td>
-        <td>{{r.performance.maxWinAmount | currency}}</td>
-        <td>{{r.performance.maxLossAmount | currency}}</td>
-        <td>{{r.performance.ev | currency}}</td>
-        <td>{{r.performance.profitRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.returnPctRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.rrRatio | number:'1.0-2'}}</td>
-        <td>{{r.performance.numberOfTrades }}</td>
-      </tr>
-    }
-  </tbody>
+    </thead>
+    <tbody>
+        @for (r of sortedResults; track r) {
+            <tr>
+                <td>{{ r.strategyName }}</td>
+                <td>{{ r.performance.profit | currency }}</td>
+                <td>{{ r.performance.rrSum | number:'1.0-2' }}</td>
+                <td>{{ r.performance.winPct | percent }}</td>
+                <td>{{ r.performance.winAvgReturnPct | percent }}</td>
+                <td>{{ r.performance.lossAvgReturnPct | percent }}</td>
+                <td>{{ r.performance.maxWinAmount | currency }}</td>
+                <td>{{ r.performance.maxLossAmount | currency }}</td>
+                <td>{{ r.performance.ev | currency }}</td>
+                <td>{{ r.performance.profitRatio | number:'1.0-2' }}</td>
+                <td>{{ r.performance.returnPctRatio | number:'1.0-2' }}</td>
+                <td>{{ r.performance.rrRatio | number:'1.0-2' }}</td>
+                <td>{{ r.performance.numberOfTrades }}</td>
+            </tr>
+        }
+    </tbody>
 </table>

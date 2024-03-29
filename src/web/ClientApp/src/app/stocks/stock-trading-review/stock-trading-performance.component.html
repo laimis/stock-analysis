@@ -1,34 +1,36 @@
 <div>
-  <div>
-    <form>
-      <div class="row">
-        <div class="form-group col">
-          <label class="form-label" for="performanceTradePeriod">Trade Period</label>
-          <select #performanceTradePeriodDropdown class="form-select" id="performanceTradePeriod" (change)="performanceTradePeriodChanged(performanceTradePeriodDropdown.value)">
-            @for (p of performance.performances; track p) {
-              <option [value]="p.name" [selected]="performanceTitle === p.name" >{{p.name}}</option>
-            }
-          </select>
-        </div>
-      </div>
-    </form>
-  </div>
-  <section>
-    <h5>Summary</h5>
-    @if (performanceSelection) {
-      <app-trading-performance-summary [performance]="performanceSelection" [title]="performanceTitle"></app-trading-performance-summary>
-    }
-  </section>
-  <section>
-    <h5>Charts</h5>
-    @for (t of trends; track t) {
-      <div class="p-5 m-2 border">
-        <app-line-chart [dataContainer]="t"></app-line-chart>
-      </div>
-    } @empty {
-      <div class="p-5 m-2 border">
-        <p>No data available</p>
-      </div>
-    }
-  </section>
+    <div>
+        <form>
+            <div class="row">
+                <div class="form-group col">
+                    <label class="form-label" for="performanceTradePeriod">Trade Period</label>
+                    <select #performanceTradePeriodDropdown (change)="performanceTradePeriodChanged(performanceTradePeriodDropdown.value)" class="form-select"
+                            id="performanceTradePeriod">
+                        @for (p of performance.performances; track p) {
+                            <option [value]="p.name" [selected]="performanceTitle === p.name">{{ p.name }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <section>
+        <h5>Summary</h5>
+        @if (performanceSelection) {
+            <app-trading-performance-summary [performance]="performanceSelection"
+                                             [title]="performanceTitle"></app-trading-performance-summary>
+        }
+    </section>
+    <section>
+        <h5>Charts</h5>
+        @for (t of trends; track t) {
+            <div class="p-5 m-2 border">
+                <app-line-chart [dataContainer]="t"></app-line-chart>
+            </div>
+        } @empty {
+            <div class="p-5 m-2 border">
+                <p>No data available</p>
+            </div>
+        }
+    </section>
 </div>

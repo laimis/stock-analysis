@@ -1,46 +1,48 @@
 <div class="text-start">
-  @if (errors) {
-    <app-error-display [errors]="errors"></app-error-display>
-  }
-  <form>
-    <div class="h5 mb-3">
+    @if (errors) {
+        <app-error-display [errors]="errors"></app-error-display>
+    }
+    <form>
+        <div class="h5 mb-3">
       <span
-        class="badge bg-pill p-2"
-        [ngClass]="{'bg-warning': isPremium, 'bg-secondary': !isPremium}">
-        {{planName}} plan
+          [ngClass]="{'bg-warning': isPremium, 'bg-secondary': !isPremium}"
+          class="badge bg-pill p-2">
+        {{ planName }} plan
       </span>
-    </div>
-    <div class="row">
-      <div class="col">
-        <label for="firstname">First name</label>
-        <input class="form-control" type="text" id="firstname" name="firstname" [(ngModel)]="firstname" />
-      </div>
-      <div class="col">
-        <label for="lastname">Last name</label>
-        <input class="form-control" type="text" id="lastname" name="lastname" [(ngModel)]="lastname" />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <label for="email">Email</label>
-        <input class="form-control" type="email" id="email" name="email" [(ngModel)]="email" />
-      </div>
-      <div class="col">
-        <label for="password">Password</label>
-        <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <input type="checkbox" class="form-control" class="mt-2" id="terms" name="terms" [(ngModel)]="terms" />
-        <label for="terms">&nbsp; Agree to Terms & Conditions</label>
-      </div>
-    </div>
-    <div class="row mt-2">
-      <div class="col">
-        <button class="btn btn-primary me-2" [disabled]="disableButton" (click)="validate()">Create {{payLabel}}</button>
-        <button class="btn btn-secondary" (click)="back()">Back</button>
-      </div>
-    </div>
-  </form>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="firstname">First name</label>
+                <input [(ngModel)]="firstname" class="form-control" id="firstname" name="firstname" type="text"/>
+            </div>
+            <div class="col">
+                <label for="lastname">Last name</label>
+                <input [(ngModel)]="lastname" class="form-control" id="lastname" name="lastname" type="text"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="email">Email</label>
+                <input [(ngModel)]="email" class="form-control" id="email" name="email" type="email"/>
+            </div>
+            <div class="col">
+                <label for="password">Password</label>
+                <input [(ngModel)]="password" class="form-control" id="password" name="password" type="password"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <input [(ngModel)]="terms" class="mt-2" class="form-control" id="terms" name="terms" type="checkbox"/>
+                <label for="terms">&nbsp; Agree to Terms & Conditions</label>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col">
+                <button (click)="validate()" [disabled]="disableButton" class="btn btn-primary me-2">
+                    Create {{ payLabel }}
+                </button>
+                <button (click)="back()" class="btn btn-secondary">Back</button>
+            </div>
+        </div>
+    </form>
 </div>

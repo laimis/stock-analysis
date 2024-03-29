@@ -1,13 +1,13 @@
 label {
-	font-weight: bold;
-	margin-top: 10px;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
 #company-description {
-  font-size: smaller;
+    font-size: smaller;
 }
 
 #ticker-logo {
-  max-height: 50px;
-  margin-right: 5px;
+    max-height: 50px;
+    margin-right: 5px;
 }

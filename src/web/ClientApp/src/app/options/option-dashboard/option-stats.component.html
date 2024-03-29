@@ -1,18 +1,54 @@
 <div class="row mb-2">
-  <div class="col"><div class="stat-label">Trades</div><div>{{stats.count}}</div></div>
-  <div class="col"><div class="stat-label">Winning</div><div>{{stats.wins / stats.count | percent:'1.2'}}</div></div>
-  <div class="col"><div class="stat-label">Assigned</div><div>{{stats.assigned / stats.count | percent:'1.2'}}</div></div>
-  <div class="col"><div class="stat-label">Avg Profit %</div><div>{{stats.averagePremiumCapture | percent:'1.2'}}</div></div>
+    <div class="col">
+        <div class="stat-label">Trades</div>
+        <div>{{ stats.count }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Winning</div>
+        <div>{{ stats.wins / stats.count | percent:'1.2' }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Assigned</div>
+        <div>{{ stats.assigned / stats.count | percent:'1.2' }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Avg Profit %</div>
+        <div>{{ stats.averagePremiumCapture | percent:'1.2' }}</div>
+    </div>
 </div>
 <div class="row mb-2">
-  <div class="col"><div class="stat-label">Avg Win</div><div>{{stats.avgWinAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Avg Loss</div><div>{{stats.averageLossAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Max Win</div><div>{{stats.maxWinAmount | currency}}</div></div>
-  <div class="col"><div class="stat-label">Max Loss</div><div>{{stats.maxLossAmount | currency}}</div></div>
+    <div class="col">
+        <div class="stat-label">Avg Win</div>
+        <div>{{ stats.avgWinAmount | currency }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Avg Loss</div>
+        <div>{{ stats.averageLossAmount | currency }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Max Win</div>
+        <div>{{ stats.maxWinAmount | currency }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Max Loss</div>
+        <div>{{ stats.maxLossAmount | currency }}</div>
+    </div>
 </div>
 <div class="row mb-2">
-  <div class="col"><div class="stat-label">Expected Value</div><div>{{stats.ev | number}}</div></div>
-  <div class="col"><div class="stat-label">Avg Profit/Day</div><div>{{stats.averageProfitPerDay | currency}}</div></div>
-  <div class="col"><div class="stat-label">Avg DTE</div><div>{{stats.averageDays | number}}</div></div>
-  <div class="col"><div class="stat-label">Avg Days Held</div><div>{{stats.averageDaysHeld | number}}</div></div>
+    <div class="col">
+        <div class="stat-label">Expected Value</div>
+        <div>{{ stats.ev | number }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Avg Profit/Day</div>
+        <div>{{ stats.averageProfitPerDay | currency }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Avg DTE</div>
+        <div>{{ stats.averageDays | number }}</div>
+    </div>
+    <div class="col">
+        <div class="stat-label">Avg Days Held</div>
+        <div>{{ stats.averageDaysHeld | number }}</div>
+    </div>
 </div>

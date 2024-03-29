@@ -1,10 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {toggleVisuallyHidden} from 'src/app/services/utils';
-import {
-    BrokerageOrder, OutcomeValueTypeEnum,
-    PositionInstance,
-    StockQuote
-} from '../../services/stocks.service';
+import {BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 
 
@@ -15,36 +11,34 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
     providers: [PercentPipe, CurrencyPipe, DecimalPipe]
 })
 export class StockTradingPositionsComponent {
-    
+
+    @Input()
+    metricFunc: (p: PositionInstance) => any;
+    @Input()
+    metricType: OutcomeValueTypeEnum;
+    @Input()
+    positions: PositionInstance[]
+    @Input()
+    orders: BrokerageOrder[];
+    @Output()
+    brokerageOrdersChanged = new EventEmitter<string>()
+
     constructor(
         private percentPipe: PercentPipe,
         private currencyPipe: CurrencyPipe,
         private decimalPipe: DecimalPipe) {
     }
-    @Input()
-    metricFunc: (p: PositionInstance) => any;
-    
-    @Input()
-    metricType: OutcomeValueTypeEnum;
-
-    @Input()
-    positions: PositionInstance[]
-
-    @Input()
-    orders: BrokerageOrder[];
 
     private _quotes: Map<string, StockQuote>;
-    @Input()
-    set quotes(val: Map<string, StockQuote>) {
-        this._quotes = val
-    }
 
     get quotes() {
         return this._quotes
     }
 
-    @Output()
-    brokerageOrdersChanged = new EventEmitter<string>()
+    @Input()
+    set quotes(val: Map<string, StockQuote>) {
+        this._quotes = val
+    }
 
     toggleVisibility(elem: HTMLElement) {
         toggleVisuallyHidden(elem)
@@ -61,7 +55,7 @@ export class StockTradingPositionsComponent {
         return 0
     }
 
-    getMetricToRender(val:number) {
+    getMetricToRender(val: number) {
         if (Number.isFinite(val)) {
             val = Math.round(val * 100) / 100
         }

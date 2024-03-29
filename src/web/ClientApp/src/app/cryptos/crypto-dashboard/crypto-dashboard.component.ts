@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {StocksService, OwnedCrypto} from '../../services/stocks.service';
+import {OwnedCrypto, StocksService} from '../../services/stocks.service';
 
 
 @Component({
@@ -20,6 +20,8 @@ export class CryptoDashboardComponent implements OnInit {
     profits: number;
 
     activeTab: string = 'owned'
+    sortColumn: string
+    sortDirection: number = -1
 
     constructor(private stocks: StocksService, private router: Router) {
     }
@@ -68,9 +70,6 @@ export class CryptoDashboardComponent implements OnInit {
             this.profits = made / this.moneySpentOnTokens
         }
     }
-
-    sortColumn: string
-    sortDirection: number = -1
 
     sort(column: string) {
 

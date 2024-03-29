@@ -1,15 +1,15 @@
 .positive {
-  background-color: green;
-  color: white;
-  font-weight: bolder;
+    background-color: green;
+    color: white;
+    font-weight: bolder;
 }
 
 .evaluation {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .evaluation-count {
-  font-weight: bold;
+    font-weight: bold;
 }

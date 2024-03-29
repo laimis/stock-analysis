@@ -1,99 +1,104 @@
 /* You can add global styles to this file, and also import other style files */
 a {
-  color: #004289;
+    color: #004289;
 }
 
 .bg-info {
-  background-color: #004289;
+    background-color: #004289;
 }
 
 .ngtd-border-info {
-  border-color: #004289;
+    border-color: #004289;
 }
 
 .btn-primary {
-  background-color: #004289;
-  border-color: #004289;
+    background-color: #004289;
+    border-color: #004289;
 }
 
 .sort-header {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .stat-label {
-  font-weight: lighter;
+    font-weight: lighter;
 }
 
 .tab-container {
-  border-bottom: 1px solid #767676;
-  display: block;
-  margin-bottom: 10px;
-  width: 100%;
+    border-bottom: 1px solid #767676;
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 .tab {
-  border-bottom: 3px solid transparent;
-  color: #767676;
-  cursor: pointer;
-  display: inline-block;
-  list-style-type: none;
-  margin-right: 2px;
-  padding: 10px 15px;
-  text-decoration: none;
-  transition: all .25s;
+    border-bottom: 3px solid transparent;
+    color: #767676;
+    cursor: pointer;
+    display: inline-block;
+    list-style-type: none;
+    margin-right: 2px;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: all .25s;
 }
 
 .tab:hover {
-	border-color: #ccc;
+    border-color: #ccc;
 }
 
 .tab.is-active {
-  border-bottom-color: #535353;
-  color: #353535;
+    border-bottom-color: #535353;
+    color: #353535;
 }
 
 
 section {
-  margin-top: 20px;
-  padding-right: 10px;
+    margin-top: 20px;
+    padding-right: 10px;
 }
 
 section h5 {
-  margin-top:0;
-  padding:0;
-  border-bottom:1px solid #858484;
+    margin-top: 0;
+    padding: 0;
+    border-bottom: 1px solid #858484;
 }
 
 section h3 {
-  margin-top:0;
-  padding:0;
-  border-bottom:1px solid #858484;
+    margin-top: 0;
+    padding: 0;
+    border-bottom: 1px solid #858484;
 }
 
 .bg-negative {
-  background-color: #FFB6C1 !important;    
+    background-color: #FFB6C1 !important;
 }
+
 .bg-positive {
-  background-color: #698f3f !important;
+    background-color: #698f3f !important;
 }
 
 .event {
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  /* font-size: 0.75rem; */
-  font-weight: 600;
-  text-transform: uppercase;
-  margin: 0.5rem 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    /* font-size: 0.75rem; */
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0.5rem 0.5rem;
 }
+
 .event-buy {
-  background-color: #a7c687;
+    background-color: #a7c687;
 }
+
 .event-sell {
-  background-color: #ea7676;
+    background-color: #ea7676;
 }
+
 .event-stop {
-  background-color: #e2dad9;
+    background-color: #e2dad9;
 }
+
 .event-risk {
-  background-color: #fbfaf8;
+    background-color: #fbfaf8;
 }

@@ -1,35 +1,34 @@
-
 @for (s of spreads; track s) {
-  <table class="table table-striped mt-3">
-    <tbody>
-      <tr class="table-info">
-        <td colspan="2">{{s.name}}</td>
-        <td colspan="2">
-          @if (s.premiumPaid) {
-            <span>You will pay {{s.premiumPaid | currency}}.</span>
-          }
-          @if (s.premiumReceived) {
-            <span>You will receive {{s.premiumReceived | currency}}.</span>
-          }
-        </td>
-        <td colspan="2">
-          max gain: {{s.maxGain | currency}}
-        </td>
-        <td>
-          Max risk is {{s.risk | currency}}
-        </td>
-      </tr>
-      @for (leg of s.legs; track leg) {
-        <tr>
-          <td>{{leg.action}}</td>
-          <td>{{leg.option.strikePrice | currency}} {{leg.option.optionType}}</td>
-          <td>{{leg.option.expirationDate}}</td>
-          <td>{{leg.option.bid | currency}}</td>
-          <td>{{leg.option.ask | currency}}</td>
-          <td>{{leg.option.openInterest}}</td>
-          <td>{{leg.option.volume}}</td>
+    <table class="table table-striped mt-3">
+        <tbody>
+        <tr class="table-info">
+            <td colspan="2">{{ s.name }}</td>
+            <td colspan="2">
+                @if (s.premiumPaid) {
+                    <span>You will pay {{ s.premiumPaid | currency }}.</span>
+                }
+                @if (s.premiumReceived) {
+                    <span>You will receive {{ s.premiumReceived | currency }}.</span>
+                }
+            </td>
+            <td colspan="2">
+                max gain: {{ s.maxGain | currency }}
+            </td>
+            <td>
+                Max risk is {{ s.risk | currency }}
+            </td>
         </tr>
-      }
-    </tbody>
-  </table>
+            @for (leg of s.legs; track leg) {
+                <tr>
+                    <td>{{ leg.action }}</td>
+                    <td>{{ leg.option.strikePrice | currency }} {{ leg.option.optionType }}</td>
+                    <td>{{ leg.option.expirationDate }}</td>
+                    <td>{{ leg.option.bid | currency }}</td>
+                    <td>{{ leg.option.ask | currency }}</td>
+                    <td>{{ leg.option.openInterest }}</td>
+                    <td>{{ leg.option.volume }}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
