@@ -79,7 +79,7 @@ function createUnrealizedRRChart(entries: PositionInstance[], quotes: Map<string
 }
 
 function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
-    // Create data for the chart
+    
     const chartData = positions.map(position => {
         const unrealizedGainPercent = unrealizedGainPercentage(position, quotes[position.ticker]);
         return {
@@ -90,7 +90,6 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
         };
     });
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -119,10 +118,9 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
 
 
 function createPositionsOpenedChart(positions: PositionInstance[]) {
-    // Create a map to store the count of positions opened for each date
+    
     const positionsOpenedMap = new Map<string, number>();
 
-    // Iterate over each position
     positions.forEach(position => {
         const openedDate = position.opened.slice(0, 10); // Extract the date portion of the opened timestamp
 
@@ -144,7 +142,6 @@ function createPositionsOpenedChart(positions: PositionInstance[]) {
     // Sort the data points by date in ascending order
     dataPoints.sort((a, b) => a.x.getTime() - b.x.getTime());
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -188,7 +185,6 @@ function createProfitDistributionChart(positions: PositionInstance[], quotes: Ma
         histogramData.push({ x: lowerBound, y: count });
     }
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -218,13 +214,12 @@ function createProfitDistributionChart(positions: PositionInstance[], quotes: Ma
 }
 
 function createPositionSizeDistributionChart(positions: PositionInstance[]) {
-    // Create pie chart data
+    
     const pieChartData = positions.map(position => ({
         y: position.cost,
         label: position.ticker
     }));
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -260,7 +255,6 @@ function createDaysHeldDistributionChart(positions: PositionInstance[]) {
         histogramData.push({ x: lowerBound, y: count });
     }
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -310,7 +304,6 @@ function createUnrealizedGainPercentageDistributionChart(positions: PositionInst
         histogramData.push({ x: lowerBound, y: count });
     }
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -358,7 +351,6 @@ function createUnrealizedRRDistributionChart(positions: PositionInstance[], quot
         histogramData.push({ x: lowerBound, y: count });
     }
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -400,7 +392,6 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         label: position.ticker
     }));
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -439,13 +430,11 @@ function createPositionLabelsPieChart(positions: PositionInstance[]) {
         });
     });
 
-    // Create pie chart data
     const pieChartData = Array.from(labelCounts.entries()).map(([label, count]) => ({
         label: label,
         y: count
     }));
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -466,7 +455,6 @@ function createPositionLabelsPieChart(positions: PositionInstance[]) {
 }
 
 function createRealizedVsUnrealizedProfitChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
-    // Create data for realized and unrealized profit for each position
     const chartData = positions.map(position => {
         const realizedProfit = position.profit;
         const unrealizedProfitAmt = unrealizedProfit(position, quotes[position.ticker]);
@@ -477,7 +465,6 @@ function createRealizedVsUnrealizedProfitChart(positions: PositionInstance[], qu
         };
     }).sort((a, b) => (a.realized + a.unrealized) - (b.realized + b.unrealized));
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -515,13 +502,11 @@ function createPositionsByCostChart(positions: PositionInstance[]) {
     // Sort positions from smallest to largest based on cost
     const sortedPositions = [...positions].sort((a, b) => a.cost - b.cost);
 
-    // Create data for the chart
     const chartData = sortedPositions.map(position => ({
         label: position.ticker,
         y: position.cost
     }));
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -557,13 +542,11 @@ function createPositionsByGainsChart(positions: PositionInstance[], quotes: Map<
     }));
     const sortedPositions = [...positionsWithGains].sort((a, b) => a.unrealizedGain - b.unrealizedGain);
 
-    // Create data for the chart
     const chartData = sortedPositions.map(position => ({
         label: position.ticker,
         y: position.unrealizedGain
     }));
 
-    // Create the chart options
     return {
         exportEnabled: true,
         zoomEnabled: true,
