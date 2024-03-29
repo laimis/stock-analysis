@@ -580,7 +580,7 @@ type AlertEmailService(
                 currentCounts |> List.map (
                     fun (identifier, count) ->
                         let previousValue = previousCounts |> List.tryFind (fun (k2,_) -> k2 = identifier) |> Option.defaultValue (identifier,0) |> snd
-                        {| identifier = identifier; change = previousValue - count; previous = previousValue; current = count |}
+                        {| identifier = identifier; change = count - previousValue; previous = previousValue; current = count |}
                 )
             
         if fromStorage = null then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
