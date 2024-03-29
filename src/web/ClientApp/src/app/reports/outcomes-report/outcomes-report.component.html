@@ -75,6 +75,8 @@
             title="Single Bar Outcome (daily)"
             [isTableVisible]="false">
         </app-outcomes>
+    } @else {
+        <app-loading></app-loading>
     }
     @if (singleBarReportWeekly) {
         <app-outcomes-analysis-report
@@ -90,6 +92,8 @@
             title="Single Bar Outcome (weekly)"
             [isTableVisible]="false">
         </app-outcomes>
+    } @else {
+        <app-loading></app-loading>
     }
     @if (allBarsReport) {
         <app-outcomes
@@ -98,5 +102,7 @@
             [failures]="allBarsReport.failed"
             title="All Bar Outcomes (daily)">
         </app-outcomes>
+    } @else {
+        <app-loading></app-loading>
     }
 </div>
