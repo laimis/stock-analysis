@@ -3,6 +3,8 @@ import {PositionInstance, StockQuote} from 'src/app/services/stocks.service';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
 
+const scatterPointMarkerSize = 12;
+
 function generateHistogramData(data: number[], numIntervals: number) {
     const histogramData = [];
     const minPercentage = Math.min(...data);
@@ -50,7 +52,7 @@ function createUnrealizedProfitChart(entries: PositionInstance[], quotes: Map<st
         data: [
             {
                 type: "scatter",
-                markerSize: 15,
+                markerSize: scatterPointMarkerSize,
                 color: blue,
                 name: "Position",
                 dataPoints: mapped
@@ -95,7 +97,7 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
         data: [
             {
                 type: "scatter",
-                markerSize: 15,
+                markerSize: scatterPointMarkerSize,
                 color: blue,
                 dataPoints: chartData
             }
@@ -193,7 +195,7 @@ function createPositionSizePieChart(positions: PositionInstance[]) {
     const pieChartData = positions.map(position => ({
         y: position.cost,
         label: position.ticker
-    }));
+    })).sort((a, b) => b.y - a.y);
 
     return {
         exportEnabled: true,
@@ -354,7 +356,7 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         data: [
             {
                 type: "scatter",
-                markerSize: 15,
+                markerSize: scatterPointMarkerSize,
                 color: blue,
                 dataPoints: scatterData
             }
