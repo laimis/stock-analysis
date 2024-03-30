@@ -1,5 +1,5 @@
 import {ChartMarker, ChartType, DataPoint, DataPointContainer, PriceBar} from "./stocks.service";
-import {green, red} from "../shared/candlestick-chart/candlestick-chart.component";
+import {green, red} from "./charts.service";
 
 export enum InfectionPointType { Peak = "Peak", Valley = "Valley" }
 

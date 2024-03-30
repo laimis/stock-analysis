@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {PositionInstance, StockQuote} from 'src/app/services/stocks.service';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
+import {blue} from "../../services/charts.service";
 
 function generateHistogramData(data: number[], numIntervals: number) {
     const histogramData = [];
@@ -35,7 +36,7 @@ function createUnrealizedProfitChart(entries: PositionInstance[], quotes: Map<st
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Unrealized Profit and Days Held",
+            text: "Unrealized Profit vs Days Held",
         },
         axisX: {
             title: "Days Held",
@@ -49,7 +50,8 @@ function createUnrealizedProfitChart(entries: PositionInstance[], quotes: Map<st
         data: [
             {
                 type: "scatter",
-                // showInLegend: true,
+                markerSize: 15,
+                color: blue,
                 name: "Position",
                 dataPoints: mapped
             }
@@ -74,7 +76,7 @@ function createUnrealizedRRChart(entries: PositionInstance[], quotes: Map<string
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Unrealized RR and Days Held",
+            text: "Unrealized RR vs Days Held",
         },
         axisX: {
             title: "Days Held",
@@ -87,6 +89,8 @@ function createUnrealizedRRChart(entries: PositionInstance[], quotes: Map<string
         data: [
             {
                 type: "scatter",
+                markerSize: 15,
+                color: blue,
                 name: "Position",
                 dataPoints: mapped
             }
@@ -110,14 +114,14 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Days Held vs. Unrealized Gain Percentage",
+            text: "Days Held vs. Unrealized Gain %",
         },
         axisX: {
             title: "Days Held",
             gridThickness: 0.1
         },
         axisY: {
-            title: "Unrealized Gain Percentage",
+            title: "Unrealized Gain %",
             gridThickness: 0.1,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
@@ -126,6 +130,8 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
         data: [
             {
                 type: "scatter",
+                markerSize: 15,
+                color: blue,
                 dataPoints: chartData
             }
         ]
@@ -176,6 +182,7 @@ function createPositionsOpenedChart(positions: PositionInstance[]) {
         data: [
             {
                 type: "column",
+                color: blue,
                 dataPoints: dataPoints
             }
         ]
@@ -209,6 +216,7 @@ function createProfitDistributionChart(positions: PositionInstance[], quotes: Ma
         data: [
             {
                 type: "column",
+                color: blue,
                 dataPoints: histogramData
             }
         ]
@@ -226,7 +234,7 @@ function createPositionSizePieChart(positions: PositionInstance[]) {
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Position Size Distribution by Cost",
+            text: "Position Sizes",
         },
         data: [
             {
@@ -234,6 +242,7 @@ function createPositionSizePieChart(positions: PositionInstance[]) {
                 showInLegend: true,
                 legendText: "{label}",
                 indexLabel: "{label}: {y}",
+                indexLabelFontColor: "white",
                 indexLabelPlacement: "inside",
                 dataPoints: pieChartData
             }
@@ -264,6 +273,7 @@ function createDaysHeldDistributionChart(positions: PositionInstance[]) {
         data: [
             {
                 type: "column",
+                color: blue,
                 dataPoints: histogramData
             }
         ]
@@ -303,6 +313,7 @@ function createUnrealizedGainPercentageDistributionChart(positions: PositionInst
         data: [
             {
                 type: "column",
+                color: blue,
                 dataPoints: histogramData
             }
         ]
@@ -319,7 +330,7 @@ function createUnrealizedRRDistributionChart(positions: PositionInstance[], quot
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Unrealized Risk-Reward Ratio (RR) Distribution",
+            text: "Unrealized RR Distribution",
         },
         axisX: {
             title: "Risk-Reward Ratio",
@@ -337,6 +348,7 @@ function createUnrealizedRRDistributionChart(positions: PositionInstance[], quot
         data: [
             {
                 type: "column",
+                color: blue,
                 dataPoints: histogramData
             }
         ]
@@ -378,6 +390,8 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         data: [
             {
                 type: "scatter",
+                markerSize: 15,
+                color: blue,
                 dataPoints: scatterData
             }
         ]

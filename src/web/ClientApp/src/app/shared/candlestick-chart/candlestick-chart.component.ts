@@ -15,14 +15,9 @@ import {
     SeriesMarker,
     Time
 } from 'lightweight-charts';
+import {blue, green, lightblue, red, white} from "../../services/charts.service";
 
 const numberOfVisibleBars = 60
-
-export const blue = '#2196f3'
-export const green = '#26a69a'
-export const red = '#ef5350'
-export const white = '#ffffff'
-export const lightblue = '#add8e6'
 
 function createLineData(movingAverages: MovingAverages, interval: number, priceBars) {
     return movingAverages.values.slice(interval)

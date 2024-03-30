@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {ChartAnnotationLine, DataPoint, DataPointContainer} from "../../services/stocks.service";
-import {blue} from "../candlestick-chart/candlestick-chart.component";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
+import {blue} from "../../services/charts.service";
 
 function toChartJSPoint(p: DataPoint) {
     if (p.isDate) {
