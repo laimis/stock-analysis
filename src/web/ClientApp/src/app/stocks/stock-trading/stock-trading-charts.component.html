@@ -1,3 +1,14 @@
-@for(option of chartOptions; track option) {
-    <canvasjs-chart [options]="option"></canvasjs-chart>
-}
+<div class="container">
+
+    @for (option of chartOptions; track option) {
+        <div class="row">
+            <div class="col mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <canvasjs-chart [options]="option"></canvasjs-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
