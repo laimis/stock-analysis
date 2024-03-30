@@ -63,41 +63,6 @@ function unrealizedRR(p: PositionInstance, quote: StockQuote) {
     return (p.profit + p.numberOfShares * (quote.price - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
 }
 
-function createUnrealizedRRChart(entries: PositionInstance[], quotes: Map<string, StockQuote>) {
-    const mapped = entries.map(p => {
-        return {
-            x: p.daysHeld,
-            y: unrealizedRR(p, quotes[p.ticker]),
-            label: p.ticker,
-            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: ${unrealizedRR(p, quotes[p.ticker]).toFixed(2)}`}
-    })
-
-    return {
-        exportEnabled: true,
-        zoomEnabled: true,
-        title: {
-            text: "Unrealized RR vs Days Held",
-        },
-        axisX: {
-            title: "Days Held",
-            gridThickness: 0.1,
-        },
-        axisY: {
-            title: "RR",
-            gridThickness: 0.1,
-        },
-        data: [
-            {
-                type: "scatter",
-                markerSize: 15,
-                color: blue,
-                name: "Position",
-                dataPoints: mapped
-            }
-        ]
-    }
-}
-
 function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
     
     const chartData = positions.map(position => {
@@ -281,8 +246,7 @@ function createDaysHeldDistributionChart(positions: PositionInstance[]) {
 }
 
 function unrealizedGainPercentage(position: PositionInstance, quote: StockQuote) {
-    const profit = unrealizedProfit(position, quote);
-    return (profit / position.cost) * 100;
+    return (quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100;
 }
 
 function createUnrealizedGainPercentageDistributionChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
@@ -583,7 +547,6 @@ export class StockTradingChartsComponent {
         if (this._positions && this._quotes) {
             this.chartOptions = [
                 createUnrealizedProfitChart(this._positions, this._quotes),
-                createUnrealizedRRChart(this._positions, this._quotes),
                 createDaysHeldVsGainPercentChart(this._positions, this._quotes),
                 createPositionsOpenedChart(this._positions),
                 createProfitDistributionChart(this._positions, this._quotes),
