@@ -21,7 +21,7 @@ function Exit-With-Error ($message) {
 # check if there are any git changes, and if there are, report them and exit
 $gitStatus = git status --porcelain
 if ($null -ne $gitStatus) {
-    
+
     # store message as multiline string
     $message = "
 There are uncommitted changes in git, please make sure everything is committed before doing a release.
