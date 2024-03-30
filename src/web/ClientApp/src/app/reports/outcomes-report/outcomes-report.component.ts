@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import {OutcomesReport, StocksService, TickerOutcomes} from '../../services/stocks.service';
-import {tap} from "rxjs/operators";
+import {catchError, map, tap} from "rxjs/operators";
 import {concat} from "rxjs";
 
 @Component({
@@ -96,43 +96,32 @@ export class OutcomesReportComponent implements OnInit {
 
         this.reset()
 
-        let singleBarDailyReport = this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
+        const singleBarDailyReport = this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
             .pipe(
-                tap(
+                map(
                     report => {
                         this.singleBarReportDaily = report;
                         if (this.earnings.length > 0) {
                             this.earningsOutcomes = report.outcomes.filter(o => this.earnings.indexOf(o.ticker) >= 0);
                         }
-                    },
-                    error => {
-                        this.errors = GetErrors(error)
                     }
-                ))
+                ),
+                catchError(errors => this.errors = GetErrors(errors))
+            )
 
-        let singleBarWeekly = this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
+        const singleBarWeekly = this.stocksService.reportOutcomesSingleBarWeekly(this.tickers, this.endDate)
             .pipe(
-                tap(
-                    report => {
-                        this.singleBarReportWeekly = report;
-                    },
-                    error => {
-                        this.errors = GetErrors(error)
-                    }
-                ))
+                map(report => this.singleBarReportWeekly = report),
+                catchError(errors => this.errors = GetErrors(errors))
+            )
 
-        let allBarsReport = this.stocksService.reportOutcomesAllBars(this.tickers, this.startDate, this.endDate)
+        const allBarsReport = this.stocksService.reportOutcomesAllBars(this.tickers, this.startDate, this.endDate)
             .pipe(
-                tap(
-                    report => {
-                        this.allBarsReport = report;
-                    },
-                    error => {
-                        this.errors = GetErrors(error)
-                    }
-                ))
+                map(report => this.allBarsReport = report),
+                catchError(errors => this.errors = GetErrors(errors))
+            )
 
-        concat([singleBarDailyReport, singleBarWeekly, allBarsReport]).subscribe()
+        concat(singleBarDailyReport, singleBarWeekly, allBarsReport).subscribe()
     }
 
     onTickerChange(activeTicker: string) {
