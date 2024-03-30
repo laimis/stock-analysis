@@ -2,6 +2,22 @@ import {Component, Input} from '@angular/core';
 import {PositionInstance, StockQuote} from 'src/app/services/stocks.service';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 
+function generateHistogramData(data: number[], numIntervals: number) {
+    const histogramData = [];
+    const minPercentage = Math.min(...data);
+    const maxPercentage = Math.max(...data);
+    const range = maxPercentage - minPercentage;
+    const intervalSize = range / numIntervals;
+
+    for (let i = 0; i < numIntervals; i++) {
+        const lowerBound = minPercentage + i * intervalSize;
+        let upperBound = i === numIntervals - 1 ? maxPercentage + 1 : lowerBound + intervalSize;
+        const count = data.filter(percentage => percentage >= lowerBound && percentage < upperBound).length;
+        histogramData.push({ x: lowerBound, y: count });
+    }
+    return [histogramData, minPercentage, maxPercentage, intervalSize];
+}
+
 function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
 }
@@ -167,23 +183,9 @@ function createPositionsOpenedChart(positions: PositionInstance[]) {
 }
 
 function createProfitDistributionChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
-    // Calculate unrealized profit for each position
     const profitData = positions.map(position => unrealizedProfit(position, quotes[position.ticker]));
 
-    // Create histogram data
-    const histogramData = [];
-    const min = Math.min(...profitData);
-    const max = Math.max(...profitData);
-    const range = max - min;
-    const numIntervals = 10;
-    const intervalSize = range / numIntervals;
-
-    for (let i = 0; i < numIntervals; i++) {
-        const lowerBound = min + i * intervalSize;
-        const upperBound = lowerBound + intervalSize;
-        const count = profitData.filter(profit => profit >= lowerBound && profit < upperBound).length;
-        histogramData.push({ x: lowerBound, y: count });
-    }
+    const [histogramData, min, max, interval] = generateHistogramData(profitData, 10)
 
     return {
         exportEnabled: true,
@@ -195,7 +197,7 @@ function createProfitDistributionChart(positions: PositionInstance[], quotes: Ma
             title: "Profit",
             minimum: min,
             maximum: max,
-            interval: intervalSize,
+            interval: interval,
             labelFormatter: function(e: any) {
                 return "$" + e.value.toFixed(2);
             }
@@ -213,7 +215,7 @@ function createProfitDistributionChart(positions: PositionInstance[], quotes: Ma
     };
 }
 
-function createPositionSizeDistributionChart(positions: PositionInstance[]) {
+function createPositionSizePieChart(positions: PositionInstance[]) {
     
     const pieChartData = positions.map(position => ({
         y: position.cost,
@@ -240,20 +242,8 @@ function createPositionSizeDistributionChart(positions: PositionInstance[]) {
 }
 
 function createDaysHeldDistributionChart(positions: PositionInstance[]) {
-    // Create histogram data
-    const histogramData = [];
-    const minDays = Math.min(...positions.map(position => position.daysHeld));
-    const maxDays = Math.max(...positions.map(position => position.daysHeld));
-    const range = maxDays - minDays;
-    const numIntervals = 10;
-    const intervalSize = Math.ceil(range / numIntervals);
-
-    for (let i = 0; i < numIntervals; i++) {
-        const lowerBound = minDays + i * intervalSize;
-        const upperBound = lowerBound + intervalSize;
-        const count = positions.filter(position => position.daysHeld >= lowerBound && position.daysHeld < upperBound).length;
-        histogramData.push({ x: lowerBound, y: count });
-    }
+    const data = positions.map(position => position.daysHeld);
+    const [histogramData, min, max, interval] = generateHistogramData(data, 10)
 
     return {
         exportEnabled: true,
@@ -263,9 +253,9 @@ function createDaysHeldDistributionChart(positions: PositionInstance[]) {
         },
         axisX: {
             title: "Days Held",
-            minimum: minDays,
-            maximum: maxDays,
-            interval: intervalSize
+            minimum: min,
+            maximum: max,
+            interval: interval
         },
         axisY: {
             title: "Number of Positions",
@@ -289,21 +279,8 @@ function createUnrealizedGainPercentageDistributionChart(positions: PositionInst
     // Calculate unrealized gain percentage for each position
     const gainPercentageData = positions.map(position => unrealizedGainPercentage(position, quotes[position.ticker]));
 
-    // Create histogram data
-    const histogramData = [];
-    const minPercentage = Math.min(...gainPercentageData);
-    const maxPercentage = Math.max(...gainPercentageData);
-    const range = maxPercentage - minPercentage;
-    const numIntervals = 10;
-    const intervalSize = range / numIntervals;
-
-    for (let i = 0; i < numIntervals; i++) {
-        const lowerBound = minPercentage + i * intervalSize;
-        let upperBound = i === numIntervals - 1 ? maxPercentage + 1 : lowerBound + intervalSize;
-        const count = gainPercentageData.filter(percentage => percentage >= lowerBound && percentage < upperBound).length;
-        histogramData.push({ x: lowerBound, y: count });
-    }
-
+    const [histogramData, min, max, interval] = generateHistogramData(gainPercentageData, 10)
+    
     return {
         exportEnabled: true,
         zoomEnabled: true,
@@ -312,9 +289,9 @@ function createUnrealizedGainPercentageDistributionChart(positions: PositionInst
         },
         axisX: {
             title: "Gain Percentage",
-            minimum: minPercentage,
-            maximum: maxPercentage,
-            interval: intervalSize,
+            minimum: min,
+            maximum: max,
+            interval: interval,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
@@ -336,20 +313,7 @@ function createUnrealizedRRDistributionChart(positions: PositionInstance[], quot
     // Calculate unrealized RR for each position
     const rrData = positions.map(position => unrealizedRR(position, quotes[position.ticker]));
 
-    // Create histogram data
-    const histogramData = [];
-    const minRR = Math.min(...rrData);
-    const maxRR = Math.max(...rrData);
-    const range = maxRR - minRR;
-    const numIntervals = 10;
-    const intervalSize = range / numIntervals;
-
-    for (let i = 0; i < numIntervals; i++) {
-        const lowerBound = minRR + i * intervalSize;
-        const upperBound = lowerBound + intervalSize;
-        const count = rrData.filter(rr => rr >= lowerBound && rr < upperBound).length;
-        histogramData.push({ x: lowerBound, y: count });
-    }
+    const [histogramData, min, max, interval] = generateHistogramData(rrData, 10)
 
     return {
         exportEnabled: true,
@@ -359,9 +323,9 @@ function createUnrealizedRRDistributionChart(positions: PositionInstance[], quot
         },
         axisX: {
             title: "Risk-Reward Ratio",
-            minimum: minRR,
-            maximum: maxRR,
-            interval: intervalSize,
+            minimum: min,
+            maximum: max,
+            interval: interval,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2);
             }
@@ -387,7 +351,7 @@ function stopPriceDistance(position: PositionInstance, quote: StockQuote) {
 function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
     // Calculate stop price distance and position cost for each position
     const scatterData = positions.map(position => ({
-        x: position.cost,
+        x: unrealizedProfit(position, quotes[position.ticker]),
         y: stopPriceDistance(position, quotes[position.ticker]),
         label: position.ticker
     }));
@@ -396,10 +360,10 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Stop Price Distance vs. Position Cost",
+            text: "Stop Price Distance vs. Position Profit",
         },
         axisX: {
-            title: "Position Cost",
+            title: "Position Profit",
             labelFormatter: function(e: any) {
                 return "$" + e.value.toFixed(2);
             }
@@ -439,7 +403,7 @@ function createPositionLabelsPieChart(positions: PositionInstance[]) {
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Position Labels Distribution",
+            text: "Position Labels",
         },
         data: [
             {
@@ -609,7 +573,7 @@ export class StockTradingChartsComponent {
                 createDaysHeldVsGainPercentChart(this._positions, this._quotes),
                 createPositionsOpenedChart(this._positions),
                 createProfitDistributionChart(this._positions, this._quotes),
-                createPositionSizeDistributionChart(this._positions),
+                createPositionSizePieChart(this._positions),
                 createDaysHeldDistributionChart(this._positions),
                 createUnrealizedGainPercentageDistributionChart(this._positions, this._quotes),
                 createUnrealizedRRDistributionChart(this._positions, this._quotes),
