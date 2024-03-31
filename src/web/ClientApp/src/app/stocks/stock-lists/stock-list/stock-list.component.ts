@@ -26,14 +26,14 @@ export class StockListComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
-            const name = params['id']
-            this.loadList(name);
+            const id = params['id']
+            this.loadList(id);
             this.loadMonitors()
         })
     }
 
     remove(ticker: StockListTicker) {
-        this.stockService.removeFromStockList(this.list.name, ticker.ticker).subscribe(list => {
+        this.stockService.removeFromStockList(this.list.id, ticker.ticker).subscribe(list => {
                 this.list = list
             }, e => {
                 console.error(e);
@@ -75,16 +75,16 @@ export class StockListComponent implements OnInit {
             return
         }
 
-        this.stockService.clearStockList(this.list.name).subscribe(_ => {
-            this.loadList(this.list.name)
+        this.stockService.clearStockList(this.list.id).subscribe(_ => {
+            this.loadList(this.list.id)
         }, e => {
             console.error(e);
         });
     }
 
     assignTag(tag: string) {
-        this.stockService.assignTagToStockList(this.list.name, tag).subscribe(_ => {
-            this.loadList(this.list.name)
+        this.stockService.assignTagToStockList(this.list.id, tag).subscribe(_ => {
+            this.loadList(this.list.id)
         }, e => {
             console.error(e);
         });
@@ -95,23 +95,23 @@ export class StockListComponent implements OnInit {
     }
 
     removeTag(tag: string) {
-        this.stockService.removeTagFromStockList(this.list.name, tag).subscribe(_ => {
-            this.loadList(this.list.name)
+        this.stockService.removeTagFromStockList(this.list.id, tag).subscribe(_ => {
+            this.loadList(this.list.id)
         }, e => {
             console.error(e);
         });
     }
 
     update(name, description) {
-        this.stockService.updateStockList(this.list.name, name, description).subscribe(_ => {
-            this.loadList(name)
+        this.stockService.updateStockList(this.list.id, name, description).subscribe(_ => {
+            this.loadList(this.list.id)
         }, e => {
             console.error(e);
         });
     }
 
-    private loadList(name: string) {
-        this.stockService.getStockList(name).subscribe(list => {
+    private loadList(id: string) {
+        this.stockService.getStockList(id).subscribe(list => {
             this.list = list;
             this.analysisLink = this.getAnalysisLink(list)
             this.exportLink = this.getExportLink(list, false)
@@ -131,7 +131,7 @@ export class StockListComponent implements OnInit {
 
     private addTickersToList(tickerArray: string[]) {
         if (tickerArray.length == 0) {
-            this.loadList(this.list.name)
+            this.loadList(this.list.id)
             this.addInProgress = false
             if (this.controlToHide) {
                 toggleVisuallyHidden(this.controlToHide)
@@ -147,7 +147,7 @@ export class StockListComponent implements OnInit {
         }
 
         if (ticker) {
-            this.stockService.addToStockList(this.list.name, ticker).subscribe(
+            this.stockService.addToStockList(this.list.id, ticker).subscribe(
                 _ => {
                     this.addTickersToList(tickerArray.slice(1))
                 },

@@ -128,10 +128,10 @@ export class StocksService {
         return this.http.delete<StockList>('/api/stocks/lists/' + name + '/tags/' + tag)
     }
 
-    updateStockList(oldName: string, newName: string, description: string): Observable<StockList> {
-        return this.http.post<StockList>('/api/stocks/lists/' + oldName, {
-            name: oldName,
-            newName: newName,
+    updateStockList(id: string, newName: string, description: string): Observable<StockList> {
+        return this.http.post<StockList>('/api/stocks/lists/' + id, {
+            id: id,
+            name: newName,
             description: description
         })
     }

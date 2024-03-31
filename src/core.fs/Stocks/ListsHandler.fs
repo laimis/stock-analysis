@@ -1,5 +1,6 @@
 namespace core.fs.Stocks.Lists
 
+open System
 open System.ComponentModel.DataAnnotations
 open core.Shared
 open core.Stocks
@@ -8,7 +9,6 @@ open core.fs.Accounts
 open core.fs.Adapters.CSV
 open core.fs.Adapters.Storage
 open core.fs.Services
-open core.fs.Adapters.Storage
 
 
 type GetLists =
@@ -18,13 +18,13 @@ type GetLists =
 
 type GetList =
     {
-        Name: string
+        Id: Guid
         UserId: UserId
     }
     
 type ExportList =
     {
-        Name: string
+        Id: Guid
         UserId: UserId
         JustTickers: bool
     }
@@ -32,7 +32,7 @@ type ExportList =
 type AddStockToList =
     {
         [<Required>]
-        Name: string
+        Id: Guid
         [<Required>]
         Ticker: Ticker
     }
@@ -40,7 +40,7 @@ type AddStockToList =
 type RemoveStockFromList =
     {
         [<Required>]
-        Name: string
+        Id: Guid
         UserId: UserId
         [<Required>]
         Ticker: Ticker
@@ -49,11 +49,12 @@ type RemoveStockFromList =
 type AddTagToList =
     {
         [<Required>]
+        Id: Guid
+        UserId: UserId
+        [<Required>]
         [<MinLength(1)>]
         [<MaxLength(50)>]
         Tag: string
-        [<Required>]
-        Name: string
     }
     
 type RemoveTagFromList =
@@ -61,7 +62,7 @@ type RemoveTagFromList =
         [<Required>]
         Tag: string
         [<Required>]
-        Name: string
+        Id: Guid
         UserId: UserId
     }
     
@@ -73,19 +74,22 @@ type Create =
     
 type Update =
     {
+        [<Required>]
+        Id: Guid
+        [<Required>]
         Name: string
         Description: string
     }
     
 type Delete =
     {
-        Name: string
+        Id: Guid
         UserId: UserId
     }
     
 type Clear =
     {
-        Name: string
+        Id: Guid
         UserId: UserId
     }
     
@@ -109,7 +113,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found"  |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Id command.UserId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ -> return list.State |> Ok
@@ -121,11 +125,11 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Id command.UserId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
-                let filename = CSVExport.generateFilename($"Stocks_{command.Name}");
+                let filename = CSVExport.generateFilename($"Stocks_{list.State.Name}");
                 let response = ExportResponse(filename, CSVExport.stockList csvWriter list.State command.JustTickers)
                 return response |> Ok
     }
@@ -136,7 +140,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name userId
+            let! list = portfolio.GetStockList command.Id userId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
@@ -151,7 +155,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Id command.UserId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
@@ -166,7 +170,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name userId
+            let! list = portfolio.GetStockList command.Id userId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
@@ -181,7 +185,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Id command.UserId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
@@ -196,26 +200,31 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name userId
-            match list with
-            | null ->
+            let! lists = portfolio.GetStockLists userId
+            let exists = lists |> Seq.exists (fun x -> x.State.Name = command.Name)
+            match exists with
+            | false ->
                 let newList = StockList(name=command.Name, description=command.Description, userId=(userId |> IdentifierHelper.getUserId))
                 do! portfolio.SaveStockList newList userId
                 return newList.State |> Ok
-            | _ ->
+            | true ->
                 return "List already exists" |> ServiceError |> Error
     }
     
-    member _.HandleUpdate userId (command: Update) = task {
+    member _.HandleUpdate (command: Update) userId = task {
+        System.Console.WriteLine("Handling update")
         let! user = accounts.GetUser userId
         
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name userId
+            let! list = portfolio.GetStockList command.Id userId
             match list with
-            | null -> return "List not found" |> ServiceError |> Error
+            | null ->
+                System.Console.WriteLine("List not found")
+                return "List not found" |> ServiceError |> Error
             | _ ->
+                System.Console.WriteLine("Updating list")
                 list.Update(name=command.Name, description=command.Description)
                 do! portfolio.SaveStockList list userId
                 return list.State |> Ok
@@ -227,7 +236,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList command.Name command.UserId
+            let! list = portfolio.GetStockList command.Id command.UserId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
@@ -241,7 +250,7 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! list = portfolio.GetStockList clear.Name clear.UserId
+            let! list = portfolio.GetStockList clear.Id clear.UserId
             match list with
             | null -> return "List not found" |> ServiceError |> Error
             | _ ->
