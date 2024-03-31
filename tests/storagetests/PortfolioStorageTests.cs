@@ -231,7 +231,7 @@ namespace storagetests
 
             Assert.NotEmpty(existing);
 
-            var loaded = await storage.GetRoutine(routine.State.Name, _userId);
+            var loaded = await storage.GetRoutine(routine.State.Id, _userId);
 
             Assert.Equal(routine.State.Name, loaded.State.Name);
 
