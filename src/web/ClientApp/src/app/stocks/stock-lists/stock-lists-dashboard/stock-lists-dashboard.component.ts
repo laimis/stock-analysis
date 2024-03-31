@@ -43,7 +43,7 @@ export class StockListsDashboardComponent implements OnInit {
 
     deleteList(list: StockList) {
         if (confirm(`Are you sure you want to delete ${list.name}?`)) {
-            this.stockService.deleteStockList(list.name).subscribe(
+            this.stockService.deleteStockList(list.id).subscribe(
                 _ => {
                     this.loadLists()
                 },

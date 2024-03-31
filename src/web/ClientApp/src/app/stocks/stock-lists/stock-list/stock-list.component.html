@@ -1,5 +1,6 @@
-@if (list) {
-    <div class="container">
+<div class="container">
+    <app-error-display [errors]="errors"></app-error-display>
+    @if (list) {
         <div class="row mb-4">
             <div class="col-12">
                 <h2>{{ list.name }}</h2>
@@ -133,5 +134,5 @@
                 </div>
             </div>
         </section>
-    </div>
-}
+    }
+</div>

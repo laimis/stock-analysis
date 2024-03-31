@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {Monitor, StockList, StockListTicker, StocksService} from 'src/app/services/stocks.service';
-import {toggleVisuallyHidden} from 'src/app/services/utils';
+import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 
 @Component({
     selector: 'app-stock-list',
@@ -17,6 +17,7 @@ export class StockListComponent implements OnInit {
     exportLinkJustTickers: string;
     addInProgress: boolean = false;
     controlToHide: HTMLElement;
+    errors: string[];
 
     constructor(
         private stockService: StocksService,
@@ -125,7 +126,7 @@ export class StockListComponent implements OnInit {
         this.stockService.getAvailableMonitors().subscribe(monitors => {
             this.monitors = monitors;
         }, e => {
-            console.error(e);
+            this.errors = GetErrors(e);
         });
     }
 

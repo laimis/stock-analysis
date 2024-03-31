@@ -116,16 +116,16 @@ export class StocksService {
         return this.http.post<StockList>('/api/stocks/lists', input)
     }
 
-    deleteStockList(name: string): Observable<StockList> {
-        return this.http.delete<StockList>('/api/stocks/lists/' + name)
+    deleteStockList(id: string): Observable<StockList> {
+        return this.http.delete<StockList>('/api/stocks/lists/' + id)
     }
 
-    assignTagToStockList(name: string, tag: string): Observable<StockList> {
-        return this.http.put<StockList>('/api/stocks/lists/' + name + '/tags', {name: name, tag: tag})
+    assignTagToStockList(id: string, tag: string): Observable<StockList> {
+        return this.http.put<StockList>('/api/stocks/lists/' + id + '/tags', {id: id, tag: tag})
     }
 
-    removeTagFromStockList(name: string, tag: string): Observable<StockList> {
-        return this.http.delete<StockList>('/api/stocks/lists/' + name + '/tags/' + tag)
+    removeTagFromStockList(id: string, tag: string): Observable<StockList> {
+        return this.http.delete<StockList>('/api/stocks/lists/' + id + '/tags/' + tag)
     }
 
     updateStockList(id: string, newName: string, description: string): Observable<StockList> {
@@ -136,8 +136,8 @@ export class StocksService {
         })
     }
 
-    clearStockList(name: string): Observable<StockList> {
-        return this.http.post<StockList>('/api/stocks/lists/' + name + '/clear', {})
+    clearStockList(id: string): Observable<StockList> {
+        return this.http.post<StockList>('/api/stocks/lists/' + id + '/clear', {})
     }
 
     // ----------------- pending positions ---------------------
