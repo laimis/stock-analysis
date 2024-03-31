@@ -16,7 +16,6 @@ export class RoutineComponent implements OnInit {
     routine: Routine;
     activeRoutine: Routine = null;
     mode: string;
-    private routineName: string;
 
     // accept route service where I can extract current routine name from :name parameter
     constructor(
@@ -25,9 +24,9 @@ export class RoutineComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.routineName = this.route.snapshot.paramMap.get('name');
+        const id = this.route.snapshot.paramMap.get('id');
         this.mode = this.route.snapshot.paramMap.get('mode');
-        this.fetchRoutines();
+        this.fetchRoutines(id);
     }
 
     activate(routine: Routine) {
@@ -39,14 +38,16 @@ export class RoutineComponent implements OnInit {
         this.mode = null;
     }
 
-    toggleVisibility(element: HTMLElement) {
-        toggleVisuallyHidden(element)
+    toggleVisibility(elements: HTMLElement[]) {
+        elements.forEach(element => {
+            toggleVisuallyHidden(element)
+        })
     }
 
     create(name: string, description: string) {
         this.service.createRoutine(name, description).subscribe(
-            _ => {
-                this.fetchRoutines();
+            result => {
+                this.fetchRoutines(result.id);
             },
             error => {
                 this.errors = GetErrors(error)
@@ -65,9 +66,9 @@ export class RoutineComponent implements OnInit {
     }
 
     addStep(routine: Routine, label: string, url: string) {
-        this.service.addRoutineStep(routine.name, label, url).subscribe(
+        this.service.addRoutineStep(routine.id, label, url).subscribe(
             _ => {
-                this.fetchRoutines();
+                this.fetchRoutines(routine.id);
             },
             error => {
                 this.errors = GetErrors(error)
@@ -76,9 +77,9 @@ export class RoutineComponent implements OnInit {
     }
 
     deleteStep(routine: Routine, stepIndex: number) {
-        this.service.deleteRoutineStep(routine.name, stepIndex).subscribe(
+        this.service.deleteRoutineStep(routine.id, stepIndex).subscribe(
             _ => {
-                this.fetchRoutines();
+                this.fetchRoutines(routine.id);
             },
             error => {
                 this.errors = GetErrors(error)
@@ -87,9 +88,9 @@ export class RoutineComponent implements OnInit {
     }
 
     updateStep(routine: Routine, stepIndex: number, label: string, url: string) {
-        this.service.updateRoutineStep(routine.name, stepIndex, label, url).subscribe(
+        this.service.updateRoutineStep(routine.id, stepIndex, label, url).subscribe(
             _ => {
-                this.fetchRoutines();
+                this.fetchRoutines(routine.id);
             },
             error => {
                 this.errors = GetErrors(error)
@@ -97,10 +98,10 @@ export class RoutineComponent implements OnInit {
         )
     }
 
-    updateRoutine(routine: Routine, newName: string) {
-        this.service.updateRoutine(routine.name, newName).subscribe(
+    updateRoutine(routine: Routine, name: string) {
+        this.service.updateRoutine(routine.id, name).subscribe(
             _ => {
-                this.fetchRoutines();
+                this.fetchRoutines(routine.id);
             },
             error => {
                 this.errors = GetErrors(error)
@@ -108,10 +109,10 @@ export class RoutineComponent implements OnInit {
         )
     }
 
-    private fetchRoutines() {
+    private fetchRoutines(id:String) {
         this.service.getRoutines().subscribe(
             data => {
-                this.routine = data.filter(routine => routine.name === this.routineName)[0];
+                this.routine = data.filter(routine => routine.id === id)[0];
                 if (this.mode === 'activate') {
                     this.activate(this.routine);
                 }
@@ -120,9 +121,9 @@ export class RoutineComponent implements OnInit {
     }
 
     private moveStep(routine: Routine, stepIndex: number, direction: number) {
-        this.service.moveRoutineStep(routine.name, stepIndex, direction).subscribe(
+        this.service.moveRoutineStep(routine.id, stepIndex, direction).subscribe(
             _ => {
-                this.fetchRoutines();
+                this.fetchRoutines(routine.id);
             },
             error => {
                 this.errors = GetErrors(error);

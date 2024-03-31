@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using core.fs.Routines;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,7 @@ public class RoutinesController(Handler handler) : ControllerBase
             )
         );
 
-    [HttpPut("{routineName}")]
+    [HttpPut("{id}")]
     public Task UpdateRoutine([FromBody]Update command) =>
         this.OkOrError(
             handler.HandleUpdate(
@@ -33,15 +34,15 @@ public class RoutinesController(Handler handler) : ControllerBase
             )
         );
 
-    [HttpDelete("{routineName}")]
-    public Task DeleteRoutine([FromRoute]string routineName) =>
+    [HttpDelete("{id}")]
+    public Task DeleteRoutine([FromRoute]Guid id) =>
         this.OkOrError(
             handler.Handle(
-                new Delete(User.Identifier(), routineName)
+                new Delete(User.Identifier(), id)
             )
         );
 
-    [HttpPut("{routineName}/steps")]
+    [HttpPut("{id}/steps")]
     public Task<ActionResult> AddRoutineStep([FromBody]AddStep command) =>
         this.OkOrError(
             handler.HandleAddStep(
@@ -49,7 +50,7 @@ public class RoutinesController(Handler handler) : ControllerBase
             )
         );
     
-    [HttpPost("{routineName}/steps/{stepIndex}")]
+    [HttpPost("{id}/steps/{stepIndex}")]
     public Task<ActionResult> UpdateRoutineStep([FromBody]UpdateStep command) =>
         this.OkOrError(
             handler.HandleUpdateStep(
@@ -58,15 +59,15 @@ public class RoutinesController(Handler handler) : ControllerBase
         );
 
 
-    [HttpDelete("{routineName}/steps/{stepIndex}")]
-    public Task<ActionResult> RemoveRoutineStep([FromRoute] string routineName, [FromRoute] int stepIndex) =>
+    [HttpDelete("{id}/steps/{stepIndex}")]
+    public Task<ActionResult> RemoveRoutineStep([FromRoute] Guid id, [FromRoute] int stepIndex) =>
         this.OkOrError(
             handler.Handle(
-                new RemoveStep(routineName, stepIndex, User.Identifier())
+                new RemoveStep(id, stepIndex, User.Identifier())
             )
         );
 
-    [HttpPost("{routineName}/steps/{stepIndex}/position")]
+    [HttpPost("{id}/steps/{stepIndex}/position")]
     public Task<ActionResult> MoveRoutineStep([FromBody] MoveStep cmd) =>
         this.OkOrError(
             handler.HandleMoveStep(

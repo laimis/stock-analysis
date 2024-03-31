@@ -62,35 +62,35 @@ export class StocksService {
         return this.http.get<Routine[]>('/api/routines')
     }
 
-    createRoutine(name, description): Observable<Routine> {
+    createRoutine(name:string, description:string): Observable<Routine> {
         return this.http.post<Routine>('/api/routines', {name, description})
     }
 
-    updateRoutine(name, newName): Observable<Routine> {
-        return this.http.put<Routine>('/api/routines/' + name, {name, newName})
+    updateRoutine(id:string, name:string): Observable<Routine> {
+        return this.http.put<Routine>('/api/routines/' + id, {name})
     }
 
-    addRoutineStep(routineName, label, url): Observable<Routine> {
-        return this.http.put<Routine>('/api/routines/' + routineName + "/steps", {label, url, routineName})
+    addRoutineStep(id:string, label:string, url:string): Observable<Routine> {
+        return this.http.put<Routine>('/api/routines/' + id + "/steps", {label, url, id})
     }
 
-    updateRoutineStep(routineName, stepIndex: number, label, url): Observable<Routine> {
-        return this.http.post<Routine>('/api/routines/' + routineName + '/steps/' + stepIndex, {
+    updateRoutineStep(id:string, stepIndex: number, label:string, url:string) : Observable<Routine> {
+        return this.http.post<Routine>('/api/routines/' + id + '/steps/' + stepIndex, {
             label,
             url,
-            routineName,
+            id,
             stepIndex
         })
     }
 
-    deleteRoutineStep(routineName, stepIndex: number): Observable<Routine> {
-        return this.http.delete<Routine>('/api/routines/' + routineName + '/steps/' + stepIndex)
+    deleteRoutineStep(id:string, stepIndex: number): Observable<Routine> {
+        return this.http.delete<Routine>('/api/routines/' + id + '/steps/' + stepIndex)
     }
 
-    moveRoutineStep(routineName, stepIndex: number, direction: number) {
-        return this.http.post<Routine>('/api/routines/' + routineName + '/steps/' + stepIndex + '/position', {
+    moveRoutineStep(id:string, stepIndex: number, direction: number) {
+        return this.http.post<Routine>('/api/routines/' + id + '/steps/' + stepIndex + '/position', {
             direction,
-            routineName,
+            id,
             stepIndex
         })
     }
@@ -446,6 +446,7 @@ export interface RoutineStep {
 }
 
 export interface Routine {
+    id: string
     name: string
     description?: string
     steps: RoutineStep[]

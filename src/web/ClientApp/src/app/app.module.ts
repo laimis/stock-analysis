@@ -175,8 +175,8 @@ let routes: Routes = [
     {path: 'reports/trends', component: TrendsReportComponent, canActivate: [AuthGuard], title: 'Trends Report'},
 
     {path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard], title: 'Routines'},
-    {path: 'routines/:name/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
-    {path: 'routines/:name', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
+    {path: 'routines/:id/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
+    {path: 'routines/:id', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
 
     {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
     {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
