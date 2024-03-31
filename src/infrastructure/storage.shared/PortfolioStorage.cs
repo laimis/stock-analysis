@@ -183,11 +183,11 @@ namespace storage.shared
         public Task SaveRoutine(Routine routine, UserId userId) =>
             Save(routine, _routine_entity, userId);
 
-        public async Task<Routine> GetRoutine(string name, UserId userId)
+        public async Task<Routine> GetRoutine(Guid id, UserId userId)
         {
             var list = await GetRoutines(userId);
             
-            return list.SingleOrDefault(s => s.State.Name == name);
+            return list.SingleOrDefault(s => s.State.Id == id);
         }
 
         public Task DeleteRoutine(Routine routine, UserId userId) =>

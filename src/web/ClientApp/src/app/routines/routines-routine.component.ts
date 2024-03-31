@@ -38,8 +38,10 @@ export class RoutineComponent implements OnInit {
         this.mode = null;
     }
 
-    toggleVisibility(element: HTMLElement) {
-        toggleVisuallyHidden(element)
+    toggleVisibility(elements: HTMLElement[]) {
+        elements.forEach(element => {
+            toggleVisuallyHidden(element)
+        })
     }
 
     create(name: string, description: string) {

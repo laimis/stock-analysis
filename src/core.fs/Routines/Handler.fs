@@ -82,13 +82,15 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some _ ->
-            let! routine = storage.GetRoutine create.Name userId
-            match routine with
-            | null ->
+            let! routine = storage.GetRoutines userId
+            let exists = routine |> Seq.exists (fun r -> r.State.Name.ToLower() = create.Name.ToLower())
+            
+            match exists with
+            | false ->
                 let routine = Routine(name=create.Name,description=create.Description,userId=(userId |> IdentifierHelper.getUserId))
                 do! storage.SaveRoutine routine userId
                 return routine.State |> Ok
-            | _ -> return "Routine already exists" |> ServiceError |> Error
+            | true -> return "Routine already exists" |> ServiceError |> Error
     }
     
     member _.HandleUpdate userId (update:Update) = task {
