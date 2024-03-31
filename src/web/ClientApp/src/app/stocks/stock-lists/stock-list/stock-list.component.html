@@ -1,128 +1,137 @@
 @if (list) {
-    <div>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/stocks/lists">Lists</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ list.name }}</li>
-            </ol>
-        </nav>
-        <h3>
-            {{ list.name }}
-            ({{ list.tickers.length }})
-            <button class="btn btn-link" (click)="toggleVisibility(editSection)"><i class="bi bi-pencil"></i></button>
-        </h3>
-        <section #editSection class="visually-hidden">
-            <h5>Edit</h5>
-            <form>
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input class="form-control" id="name" #name placeholder="Name" value="{{list.name}}">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2>{{ list.name }}</h2>
+                <p class="lead">{{ list.description }}</p>
+                <div class="d-flex align-items-center">
+                    <a class="btn btn-link me-2" href="/stocks/lists"><i class="bi bi-arrow-left"></i> Back to Lists</a>
+                    <button class="btn btn-link" (click)="toggleVisibility(editSection)"><i class="bi bi-pencil"></i> Edit</button>
                 </div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea class="form-control" id="description" #description placeholder="Description"
-                              rows="5">{{ list.description }}</textarea>
-                </div>
-                <button type="submit" class="btn btn-primary"
-                        (click)="update(name.value, description.value); toggleVisibility(editSection)">Update
-                </button>
-            </form>
-        </section>
-        <p>{{ list.description }}</p>
-        <section>
-            <h5>Tools</h5>
-            <form>
-                <div class="row">
-                    <div class="col-6">
-                        <button type="submit" class="btn btn-secondary me-1" (click)="toggleVisibility(addNewSection)">
-                            Batch add
-                        </button>
-                        <button type="submit" class="btn btn-secondary me-1"
-                                (click)="toggleVisibility(monitoringSection)">Monitoring
-                        </button>
-                        <a href="{{analysisLink}}" type="submit" class="btn btn-secondary me-1">Analysis</a>
-                        <a href="{{exportLink}}" type="submit" class="btn btn-secondary me-1">Export</a>
-                        <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-secondary me-1">Export (just
-                            tickers)</a>
-                        <button type="submit" class="btn btn-danger" (click)="clear()">Clear list</button>
+            </div>
+        </div>
+        <section #editSection class="row mb-4 visually-hidden">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Edit List</h5>
+                        <form>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input class="form-control" id="name" #name placeholder="Name" value="{{list.name}}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" #description placeholder="Description" rows="5">{{ list.description }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" (click)="update(name.value, description.value); toggleVisibility(editSection)">Update</button>
+                        </form>
                     </div>
-                    <div class="col-6">
-                        <div class="row">
-                            <div class="col-2">
-                                <label class="col-form-label" for="quickAdd">Quick add</label>
+                </div>
+            </div>
+        </section>
+        <section class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tools</h5>
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex flex-wrap">
+                                    <button type="submit" class="btn btn-outline-secondary me-2 mb-2" (click)="toggleVisibility(addNewSection)">Batch add</button>
+                                    <button type="submit" class="btn btn-outline-secondary me-2 mb-2" (click)="toggleVisibility(monitoringSection)">Monitoring</button>
+                                    <a href="{{analysisLink}}" type="submit" class="btn btn-outline-secondary me-2 mb-2">Analysis</a>
+                                    <a href="{{exportLink}}" type="submit" class="btn btn-outline-secondary me-2 mb-2">Export</a>
+                                    <a href="{{exportLinkJustTickers}}" type="submit" class="btn btn-outline-secondary me-2 mb-2">Export (just tickers)</a>
+                                    <button type="submit" class="btn btn-danger mb-2" (click)="clear()">Clear list</button>
+                                </div>
                             </div>
-                            <div class="col-8">
-                                <input class="form-control" id="quickAdd" #quickAdd placeholder="Tickers" type="text">
-                            </div>
-                            <div class="col-2">
-                                <button *ngIf="addInProgress === false" type="submit" class="btn btn-primary"
-                                        (click)="add(quickAdd.value, undefined)">Add
-                                </button>
-                                <button *ngIf="addInProgress === true" type="submit" class="btn btn-primary" disabled>
-                                    Adding...
-                                </button>
+                            <div class="col-md-4">
+                                <form class="d-flex justify-content-end">
+                                    <div class="input-group">
+                                        <input class="form-control" id="quickAdd" #quickAdd placeholder="Tickers" type="text">
+                                        <button *ngIf="addInProgress === false" type="submit" class="btn btn-primary" (click)="add(quickAdd.value, undefined)">Add</button>
+                                        <button *ngIf="addInProgress === true" type="submit" class="btn btn-primary" disabled>Adding...</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </section>
-        <section #monitoringSection class="visually-hidden">
-            <h5>Monitors</h5>
-            @for (monitor of monitors; track monitor) {
-                @if (!containsTag(monitor.tag)) {
-                    <button (click)="assignTag(monitor.tag)" class="btn btn-primary me-2">Enable {{ monitor.name }}
-                    </button>
-                }
-                @if (containsTag(monitor.tag)) {
-                    <button (click)="removeTag(monitor.tag)" class="btn btn-danger me-2">Disable {{ monitor.name }}
-                    </button>
-                }
-            }
-        </section>
-        <section #addNewSection class="visually-hidden">
-            <h5>Add new</h5>
-            <form>
-                <div class="form-group">
-                    <label for="tickers">Tickers</label>
-                    <textarea class="form-control" id="tickers" #ticker placeholder="Tickers" rows="5"></textarea>
+        <section #monitoringSection class="row mb-4 visually-hidden">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Monitors</h5>
+                        <div class="d-flex flex-wrap">
+                            @for (monitor of monitors; track monitor) {
+                                @if (!containsTag(monitor.tag)) {
+                                    <button (click)="assignTag(monitor.tag)" class="btn btn-outline-primary me-2 mb-2">Enable {{ monitor.name }}</button>
+                                }
+                                @if (containsTag(monitor.tag)) {
+                                    <button (click)="removeTag(monitor.tag)" class="btn btn-outline-danger me-2 mb-2">Disable {{ monitor.name }}</button>
+                                }
+                            }
+                        </div>
+                    </div>
                 </div>
-                <button *ngIf="addInProgress === false" type="submit" class="btn btn-primary"
-                        (click)="add(ticker.value, addNewSection)">Add
-                </button>
-                <button *ngIf="addInProgress === true" type="submit" class="btn btn-primary" disabled>Adding...</button>
-                <button type="button" class="btn btn-secondary float-end" (click)="toggleVisibility(addNewSection)">
-                    Close
-                </button>
-            </form>
+            </div>
         </section>
-        <section>
-            @if (list.tickers.length > 0) {
-                <h5>Tickers</h5>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @for (t of sortedTickers(list); track t) {
-                            <tr>
-                                <td>
-                                    <app-trading-view-link [ticker]="t.ticker"></app-trading-view-link>
-                                    <a [routerLink]="['/stocks', t.ticker]">{{ t.ticker }}</a>
-                                </td>
-                                <td class="text-end">
-                                    <button class="btn btn-danger" (click)="remove(t)">Remove</button>
-                                </td>
-                            </tr>
+        <section #addNewSection class="row mb-4 visually-hidden">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Add Tickers</h5>
+                        <form>
+                            <div class="mb-3">
+                                <label for="tickers" class="form-label">Tickers</label>
+                                <textarea class="form-control" id="tickers" #ticker placeholder="Tickers" rows="5"></textarea>
+                            </div>
+                            <button *ngIf="addInProgress === false" type="submit" class="btn btn-primary" (click)="add(ticker.value, addNewSection)">Add</button>
+                            <button *ngIf="addInProgress === true" type="submit" class="btn btn-primary" disabled>Adding...</button>
+                            <button type="button" class="btn btn-link float-end" (click)="toggleVisibility(addNewSection)">Close</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tickers ({{ list.tickers.length }})</h5>
+                        @if (list.tickers.length > 0) {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (t of sortedTickers(list); track t) {
+                                            <tr>
+                                                <td>
+                                                    <app-trading-view-link [ticker]="t.ticker"></app-trading-view-link>
+                                                    <a [routerLink]="['/stocks', t.ticker]">{{ t.ticker }}</a>
+                                                </td>
+                                                <td class="text-end">
+                                                    <button class="btn btn-sm btn-outline-danger" (click)="remove(t)">Remove</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        } @else {
+                            <p>No tickers found in this list.</p>
                         }
-                    </tbody>
-                </table>
-            } @else {
-                <p>No tickers</p>
-            }
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 }

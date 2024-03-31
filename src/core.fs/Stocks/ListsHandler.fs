@@ -212,7 +212,6 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
     }
     
     member _.HandleUpdate (command: Update) userId = task {
-        System.Console.WriteLine("Handling update")
         let! user = accounts.GetUser userId
         
         match user with
@@ -221,10 +220,8 @@ type Handler(accounts:IAccountStorage, portfolio:IPortfolioStorage, csvWriter:IC
             let! list = portfolio.GetStockList command.Id userId
             match list with
             | null ->
-                System.Console.WriteLine("List not found")
                 return "List not found" |> ServiceError |> Error
             | _ ->
-                System.Console.WriteLine("Updating list")
                 list.Update(name=command.Name, description=command.Description)
                 do! portfolio.SaveStockList list userId
                 return list.State |> Ok
