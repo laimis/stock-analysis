@@ -1,84 +1,81 @@
-<div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li aria-current="page" class="breadcrumb-item active">Lists</li>
-        </ol>
-    </nav>
-    <section>
-        <form>
-            <div class="row">
-                <div class="col-2">
-                    <button (click)="toggleVisibility(addNewListSection)" class="btn btn-secondary me-2" type="submit">
-                        Create new list
-                    </button>
-                </div>
-                <div class="col-2">
-                    <label class="float-end" for="tickerFilter">Filter by ticker</label>
-                </div>
-                <div class="col-8">
-                    <input #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)" class="form-control" id="tickerFilter" name="tickerFilter"
-                           type="text">
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Stock Lists</h2>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)" class="form-control" id="tickerFilter" name="tickerFilter" type="text" placeholder="Filter by ticker">
+                <button class="btn btn-outline-secondary" type="button" (click)="toggleVisibility(addNewListSection)">Create New List</button>
+            </div>
+        </div>
+    </div>
+    <section #addNewListSection class="row mb-4 visually-hidden">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Add New List</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="newName" class="form-label">Name</label>
+                            <input [(ngModel)]="newName" class="form-control" id="newName" name="newName" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDescription" class="form-label">Description</label>
+                            <textarea [(ngModel)]="newDescription" class="form-control" id="newDescription" name="newDescription" rows="5"></textarea>
+                        </div>
+                        <button (click)="createList()" class="btn btn-primary" type="button">Create</button>
+                    </form>
                 </div>
             </div>
-        </form>
+        </div>
     </section>
-    <section #addNewListSection class="visually-hidden">
-        <h5>Add new list</h5>
-        <form>
-            <div class="form-group">
-                <label for="newName">Name</label>
-                <input [(ngModel)]="newName" class="form-control" id="newName" name="newName" type="text">
-            </div>
-            <div class="form-group">
-                <label for="newDescription">Description</label>
-                <textarea [(ngModel)]="newDescription" class="form-control" id="newDescription" name="newDescription"
-                          rows="5"></textarea>
-            </div>
-            <button (click)="createList()" class="btn btn-primary btn-small" type="button">Create</button>
-        </form>
-    </section>
-    <section>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th width="800">Description</th>
-                <th class="text-end">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (l of filteredLists; track l) {
-                    <tr>
-                        <td>
-                            <a class="fw-bolder" [routerLink]="['/stocks', 'lists', l.name]">{{ l.name }}</a>
-                        </td>
-                        <td>
-                            @if (l.description) {
-                                <div class="ms-1 mb-4">{{ l.description }}</div>
-                            }
-                            <div>
-                                @for (t of l.tags; track t) {
-                                    <span class="badge bg-secondary m-1">{{ t }}</span>
+    <section class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (l of filteredLists; track l) {
+                                    <tr>
+                                        <td>
+                                            <a class="fw-bold" [routerLink]="['/stocks', 'lists', l.id]">{{ l.name }}</a>
+                                        </td>
+                                        <td>
+                                            @if (l.description) {
+                                                <div class="mb-2">{{ l.description }}</div>
+                                            }
+                                            <div class="mb-2">
+                                                @for (t of l.tags; track t) {
+                                                    <span class="badge bg-secondary me-1">{{ t }}</span>
+                                                }
+                                            </div>
+                                            <div class="text-muted">{{ l.tickers.length }} ticker(s)</div>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group" role="group">
+                                                <a class="btn btn-sm btn-outline-secondary" href="{{getAnalysisLink(l)}}" rel="noopener noreferrer" target="_blank">Analysis</a>
+                                                <a class="btn btn-sm btn-outline-secondary" href="{{getExportLink(l)}}">Export</a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteList(l)">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 }
-                            </div>
-                            <div>
-                                {{ l.tickers.length }} ticker(s)
-                            </div>
-                        </td>
-                        <!-- <td>
-                        {{l.tickers.length}}
-                      </td> -->
-                        <td class="text-end">
-                            <a class="btn btn-sm btn-secondary m-1" href="{{getAnalysisLink(l)}}"
-                               rel="noopener noreferrer" target="_blank">Analysis</a>
-                            <a class="btn btn-sm btn-secondary m-1" href="{{getExportLink(l)}}">Export</a>
-                            <button type="button" class="btn btn-sm btn-outline-danger m-1" (click)="deleteList(l)">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 </div>

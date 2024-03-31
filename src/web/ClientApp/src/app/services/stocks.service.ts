@@ -100,8 +100,8 @@ export class StocksService {
         return this.http.get<StockList[]>('/api/stocks/lists')
     }
 
-    getStockList(name: string): Observable<StockList> {
-        return this.http.get<StockList>('/api/stocks/lists/' + name)
+    getStockList(id: string): Observable<StockList> {
+        return this.http.get<StockList>('/api/stocks/lists/' + id)
     }
 
     addToStockList(name: string, ticker: string): Observable<StockList> {
@@ -128,10 +128,10 @@ export class StocksService {
         return this.http.delete<StockList>('/api/stocks/lists/' + name + '/tags/' + tag)
     }
 
-    updateStockList(oldName: string, newName: string, description: string): Observable<StockList> {
-        return this.http.post<StockList>('/api/stocks/lists/' + oldName, {
-            name: oldName,
-            newName: newName,
+    updateStockList(id: string, newName: string, description: string): Observable<StockList> {
+        return this.http.post<StockList>('/api/stocks/lists/' + id, {
+            id: id,
+            name: newName,
             description: description
         })
     }
@@ -452,6 +452,7 @@ export interface Routine {
 }
 
 export interface StockList {
+    id: string
     name: string
     description: string
     tickers: StockListTicker[]

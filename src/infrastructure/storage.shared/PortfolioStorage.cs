@@ -201,11 +201,11 @@ namespace storage.shared
                 .Select(g => new StockList(g));
         }
 
-        public async Task<StockList> GetStockList(string name, UserId userId)
+        public async Task<StockList> GetStockList(Guid id, UserId userId)
         {
             var list = await GetStockLists(userId);
             
-            return list.SingleOrDefault(s => s.State.Name == name);
+            return list.SingleOrDefault(s => s.State.Id == id);
         }
 
         public Task SaveStockList(StockList list, UserId userId) =>
