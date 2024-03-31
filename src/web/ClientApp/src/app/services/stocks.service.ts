@@ -100,8 +100,8 @@ export class StocksService {
         return this.http.get<StockList[]>('/api/stocks/lists')
     }
 
-    getStockList(name: string): Observable<StockList> {
-        return this.http.get<StockList>('/api/stocks/lists/' + name)
+    getStockList(id: string): Observable<StockList> {
+        return this.http.get<StockList>('/api/stocks/lists/' + id)
     }
 
     addToStockList(name: string, ticker: string): Observable<StockList> {
@@ -452,6 +452,7 @@ export interface Routine {
 }
 
 export interface StockList {
+    id: string
     name: string
     description: string
     tickers: StockListTicker[]

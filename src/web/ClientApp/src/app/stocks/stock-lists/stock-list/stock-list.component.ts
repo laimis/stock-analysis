@@ -26,7 +26,7 @@ export class StockListComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
-            const name = params['name']
+            const name = params['id']
             this.loadList(name);
             this.loadMonitors()
         })
