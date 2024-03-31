@@ -22,22 +22,22 @@ type Create =
 type Update =
     {
         [<Required>]
-        Name:string
+        Id:Guid
         [<Required>]
-        NewName:string
+        Name:string
         Description:string
     }
     
 type Delete =
     {
         UserId:UserId
-        Name:string
+        Id:Guid
     }
     
 type AddStep =
     {
         [<Required>]
-        RoutineName:string
+        Id:Guid
         [<Required>]
         Label:string
         Url:string
@@ -46,7 +46,7 @@ type AddStep =
 type MoveStep =
     {
         [<Required>]
-        RoutineName: string
+        Id: Guid
         [<Required>]
         StepIndex:Nullable<int>
         [<Required>]
@@ -55,7 +55,7 @@ type MoveStep =
 type RemoveStep =
     {
         [<Required>]
-        RoutineName: string
+        Id: Guid
         [<Required>]
         StepIndex:Nullable<int>
         UserId:UserId
@@ -64,7 +64,7 @@ type RemoveStep =
 type UpdateStep =
     {
         [<Required>]
-        RoutineName:string
+        Id:Guid
         [<Required>]
         StepIndex:Nullable<int>
         [<Required>]
@@ -97,11 +97,11 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine update.Name userId
+            let! routine = storage.GetRoutine update.Id userId
             match routine with
             | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
-                routine.Update(name=update.NewName,description=update.Description)
+                routine.Update(name=update.Name,description=update.Description)
                 do! storage.SaveRoutine routine userId
                 return routine.State |> Ok
     }
@@ -112,7 +112,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine delete.Name delete.UserId
+            let! routine = storage.GetRoutine delete.Id delete.UserId
             match routine with
             | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
@@ -141,7 +141,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine add.RoutineName userId
+            let! routine = storage.GetRoutine add.Id userId
             match routine with
             | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
@@ -156,7 +156,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine move.RoutineName userId
+            let! routine = storage.GetRoutine move.Id userId
             match routine with
             | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
@@ -171,7 +171,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine remove.RoutineName remove.UserId
+            let! routine = storage.GetRoutine remove.Id remove.UserId
             match routine with
             | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->
@@ -186,7 +186,7 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine update.RoutineName userId
+            let! routine = storage.GetRoutine update.Id userId
             match routine with
             | null -> return "Routine not found" |> ServiceError |> Error
             | _ ->

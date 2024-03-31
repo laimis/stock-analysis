@@ -1,54 +1,74 @@
-<div>
-    @if (errors) {
-        <app-error-display [errors]="errors"></app-error-display>
-    }
-    <section #addNewRoutineSection class="visually-hidden">
-        <h5>Add new routine</h5>
-        <form>
-            <div class="form-group">
-                <label for="newName">Name</label>
-                <input #newName class="form-control" id="newName" name="newName" type="text">
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Routines</h2>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search routines" aria-label="Search routines">
+                <button class="btn btn-outline-secondary" type="button" (click)="toggleVisibility(addNewRoutineSection)">Create New Routine</button>
             </div>
-            <div class="form-group">
-                <label for="newDescription">Description</label>
-                <textarea #newDescription class="form-control" id="newDescription" name="newDescription"
-                          rows="5"></textarea>
+        </div>
+    </div>
+    <section #addNewRoutineSection class="row mb-4 visually-hidden">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Add New Routine</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="newName" class="form-label">Name</label>
+                            <input #newName class="form-control" id="newName" name="newName" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDescription" class="form-label">Description</label>
+                            <textarea #newDescription class="form-control" id="newDescription" name="newDescription" rows="5"></textarea>
+                        </div>
+                        <button (click)="create(newName.value, newDescription.value)" class="btn btn-primary me-2" type="button">Create</button>
+                        <button (click)="toggleVisibility(addNewRoutineSection)" class="btn btn-secondary" type="button">Cancel</button>
+                    </form>
+                </div>
             </div>
-            <button (click)="create(newName.value, newDescription.value)" class="btn btn-primary btn-small me-2"
-                    type="button">Create
-            </button>
-            <button (click)="toggleVisibility(addNewRoutineSection)" class="btn btn-secondary btn-small" type="button">
-                Cancel
-            </button>
-        </form>
+        </div>
     </section>
-    @if (!activeRoutine) {
-        <table class="table table-borderless">
-            <thead>
-            <tr>
-                <th colspan="2" class="text-end">
-                    <button type="submit" class="btn btn-secondary me-2 mb-2 float-end"
-                            (click)="toggleVisibility(addNewRoutineSection)">Create new routine
-                    </button>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (routine of routines; track routine) {
-                    <tr>
-                        <td>
-                            <button class="fs-4 btn btn-link" (click)="activate(routine)">{{ routine.name }}</button>
-                        </td>
-                        <td class="text-end">
-                            <a class="btn btn-primary" [routerLink]="['/routines', routine.name, 'edit']">Edit</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    @if (activeRoutine) {
-        <app-routines-active-routine [routine]="activeRoutine"
-                                     (routineDeactivated)="deactivate()"></app-routines-active-routine>
-    }
+    <section class="row">
+        <div class="col-12">
+            @if (errors) {
+                <app-error-display [errors]="errors"></app-error-display>
+            }
+            <div class="card">
+                <div class="card-body">
+                    @if (!activeRoutine) {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    @for (routine of routines; track routine) {
+                                        <tr>
+                                            <td>
+                                                <button class="btn btn-link fs-5" (click)="activate(routine)">{{ routine.name }}</button>
+                                            </td>
+                                            <td class="text-end">
+                                                <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/routines', routine.id, 'edit']">Edit</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    @if (activeRoutine) {
+                        <app-routines-active-routine [routine]="activeRoutine" (routineDeactivated)="deactivate()"></app-routines-active-routine>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
