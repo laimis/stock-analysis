@@ -5,6 +5,7 @@ open Microsoft.FSharp.Collections
 open core.Shared
 open core.fs
 open core.fs.Adapters.Brokerage
+open core.fs.Services.Analysis
 open core.fs.Services.Trading
 
 open core.fs.Stocks
@@ -45,50 +46,12 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
     
     let rounded (value:decimal) = Math.Round(value, 4)
     
-    let generateOutcomeHistogram (label:string) transactions valueFunc (buckets:int) symmetric annotation =
+    let generateHistogramDataContainer (label:string) trades valueFunc (buckets:int) symmetric annotation =
         
-        let gains = ChartDataPointContainer<decimal>(label, DataPointChartType.Column, annotation)
-      
-        let min, max =
-            transactions
-            |> Seq.fold (fun (min,max) transaction ->
-                let value = valueFunc transaction
-                let min = if value < min then value else min
-                let max = if value > max then value else max
-                (min,max)
-            ) (Decimal.MaxValue, Decimal.MinValue)
-        ()
-    
-        let min = Math.Floor(min)
-        let max = Math.Ceiling(max)
-        
-        let min,max =
-            match symmetric with
-            | true ->
-                let absMax = Math.Max(Math.Abs(min), Math.Abs(max))
-                (-absMax, absMax)
-            | false -> (min,max)
-    
-        let step = (max - min) / (buckets |> decimal)
-        let step =
-            match step with
-            | x when x < 1.0m -> Math.Round(step, 4)
-            | _ -> Math.Round(step, 0)
-            
-        [0..buckets]
-        |> Seq.iter (fun i ->
-            let lower = min + (step * decimal i)
-            let upper = min + (step * (decimal i + 1.0m))
-            let count =
-                transactions
-                |> Seq.filter (fun t ->
-                    let value = valueFunc t
-                    value >= lower && value < upper
-                )
-                |> Seq.length
-            gains.Add(lower.ToString(), decimal count)
-        )
-        gains
+        trades
+        |> Seq.map valueFunc
+        |> Histogram.calculateFromSequence symmetric buckets
+        |> Seq.fold (fun (container:ChartDataPointContainer<decimal>) i -> container.Add(i.value.ToString(), i.frequency)) (ChartDataPointContainer<decimal>(label, DataPointChartType.Column, annotation))
         
     let generateTrends name (trades:StockPositionWithCalculations array) =
         
@@ -182,6 +145,13 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             profitsFixedNumberOfTrades.Add(date, profit)
         )
         
+        let profitVsDaysHeld =
+            trades
+            |> Seq.sortBy _.DaysHeld
+            |> Seq.fold (fun (container:ChartDataPointContainer<decimal>) trade ->
+                container.Add(trade.DaysHeld.ToString(), trade.Profit)
+            ) (ChartDataPointContainer<decimal>("Profit vs Days Held", DataPointChartType.Scatter, zeroLineAnnotationHorizontal))
+        
         let aGrades, bGrades, cGrades =
             trades
             |> Seq.fold ( fun (a, b, c) position ->
@@ -197,19 +167,19 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 ) (0, 0, 0)
         
         let gradeContainer = ChartDataPointContainer<decimal>("Grade", DataPointChartType.Column)
-        gradeContainer.Add("A", aGrades)
-        gradeContainer.Add("B", bGrades)
-        gradeContainer.Add("C", cGrades)
+        gradeContainer.Add("A", aGrades) |> ignore
+        gradeContainer.Add("B", bGrades) |> ignore
+        gradeContainer.Add("C", cGrades) |> ignore
         
         let gainDistribution =
             let label = "Gain Distribution"
             match trades.Length with
             | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.Column)
             | _ ->
-                generateOutcomeHistogram
+                generateHistogramDataContainer
                     label
                     trades
-                    (fun x -> x.Profit)
+                    (_.Profit)
                     20
                     true
                     zeroLineAnnotationVertical
@@ -219,10 +189,10 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             match trades.Length with
             | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.Column)
             | _ ->
-                generateOutcomeHistogram
+                generateHistogramDataContainer
                     label
                     trades
-                    (fun p -> p.RR)
+                    (_.RR)
                     10
                     true
                     zeroLineAnnotationVertical
@@ -232,19 +202,20 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             match trades.Length with
             | 0 -> ChartDataPointContainer<decimal>(label, DataPointChartType.Column)
             | _ ->
-                generateOutcomeHistogram
+                generateHistogramDataContainer
                     label
                     trades
-                    (fun p -> p.GainPct)
+                    (_.GainPct)
                     40
                     true
                     zeroLineAnnotationVertical
                     
         let profitByIndex = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Column)
-        trades |> Seq.sortBy _.Profit |> Seq.iteri (fun i p -> profitByIndex.Add(i.ToString(), p.Profit))
+        trades |> Seq.sortBy _.Profit |> Seq.iteri (fun i p -> profitByIndex.Add(i.ToString(), p.Profit) |> ignore)
         
         [
             equityCurve
+            profitVsDaysHeld
             profits
             profitsFixedNumberOfTrades
             gradeContainer

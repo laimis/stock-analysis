@@ -180,8 +180,11 @@ module AnalysisOutcomeEvaluationScoringHelper =
         counts
 
 module Histogram =
+    let private rounded (value:decimal) = System.Math.Round(value, 4)
+    let private floored (value:decimal) = System.Math.Floor(value)
+    
     // by default number of buckets should be 21
-    let calculate (numbers:decimal seq) (min:decimal) max numberOfBuckets : array<ValueWithFrequency> =
+    let calculate (min:decimal) max numberOfBuckets (numbers:decimal seq) : array<ValueWithFrequency> =
         
         let bucketSize = (max - min) / decimal(numberOfBuckets)
         
@@ -189,15 +192,15 @@ module Histogram =
         // otherwise use 0 decimal places
         let bucketSize = 
             if bucketSize < 1m then
-                System.Math.Round(bucketSize, 4)
+                bucketSize |> rounded
             else
-                System.Math.Floor(bucketSize)
+                bucketSize |> floored
         
         let min = 
             if bucketSize < 1m then
-                System.Math.Round(min, 4)
+                min |> rounded
             else
-                System.Math.Floor(min)
+                min |> floored
         
         let result =
             List<ValueWithFrequency>(
@@ -214,6 +217,28 @@ module Histogram =
         )
         
         result.ToArray()
+        
+    let calculateFromSequence symmetric numberOfBuckets (numbers:decimal seq) =
+        let min, max =
+            numbers
+            |> Seq.fold (fun (min,max) value ->
+                let min = if value < min then value else min
+                let max = if value > max then value else max
+                (min,max)
+            ) (System.Decimal.MaxValue, System.Decimal.MinValue)
+        ()
+    
+        let min = System.Math.Floor(min)
+        let max = System.Math.Ceiling(max)
+        
+        let min,max =
+            match symmetric with
+            | true ->
+                let absMax = System.Math.Max(System.Math.Abs(min), System.Math.Abs(max))
+                (-absMax, absMax)
+            | false -> (min,max)
+        
+        calculate min max numberOfBuckets numbers
     
 type DistributionStatistics =
     {
@@ -302,7 +327,7 @@ module DistributionStatistics =
                 | x when System.Double.IsNaN(x) -> 0m
                 | _ -> decimal kurtosisDouble
                 
-            let buckets = Histogram.calculate numbers min max 21
+            let buckets = numbers |> Histogram.calculate min max 21
             
             {
                 count = count

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ChartAnnotationLine, DataPoint, DataPointContainer} from "../../services/stocks.service";
+import {ChartAnnotationLine, ChartType, DataPoint, DataPointContainer} from "../../services/stocks.service";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
 
@@ -63,16 +63,20 @@ function emptyChart(containers: DataPointContainer[]) {
 
 function toChartData(container: DataPointContainer) {
     let chartType = "line"
-    if (container.chartType === "Column") {
+    if (container.chartType === ChartType.Column) {
         chartType = "column"
-    } else if (container.chartType === "Line") {
+    } else if (container.chartType === ChartType.Line) {
         chartType = "line"
+    } else if (container.chartType === ChartType.Scatter) {
+        chartType = "scatter"
     }
+    
+    const markerSize = chartType === "scatter" ? 10 : 1
 
     let chartJSDataPoints = container.data.map(p => toChartJSPoint(p))
     let data: any = [{
         type: chartType,
-        markerSize: 1,
+        markerSize: markerSize,
         color: blue,
         dataPoints: chartJSDataPoints
     }]

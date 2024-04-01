@@ -105,6 +105,7 @@ type ChartAnnotationLineType =
 type DataPointChartType =
     | Line
     | Column
+    | Scatter
     
     with 
     
@@ -112,11 +113,13 @@ type DataPointChartType =
             match this with
             | Line -> nameof Line
             | Column -> nameof Column
+            | Scatter -> nameof Scatter
             
         static member FromString (value: string) =
             match value with
             | nameof Line -> Line
             | nameof Column -> Column
+            | nameof Scatter -> Scatter
             | _ -> failwithf $"Unknown data point chart type: %s{value}"
             
 type ChartAnnotationLine(value:decimal,chartAnnotationLineType:ChartAnnotationLineType) =
@@ -149,6 +152,7 @@ type ChartDataPointContainer<'a>(label:string,chartType:DataPointChartType,annot
     
     member this.Add(label:string,value:'a) =
         data.Add(DataPoint(label,value,isDate = false))
+        this
         
     member this.Add(timestamp:DateTimeOffset,value:'a) =
         data.Add(DataPoint(timestamp,value))

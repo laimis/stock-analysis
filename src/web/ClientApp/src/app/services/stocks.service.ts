@@ -502,7 +502,8 @@ export enum OutcomeValueTypeEnum {
 
 export enum ChartType {
     Column = "Column",
-    Line = "Line"
+    Line = "Line",
+    Scatter = "Scatter"
 }
 
 export enum OutcomeTypeEnum {
