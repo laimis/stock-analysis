@@ -331,7 +331,8 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
     const scatterData = positions.map(position => ({
         x: unrealizedProfit(position, quotes[position.ticker]),
         y: stopPriceDistance(position, quotes[position.ticker]),
-        label: position.ticker
+        label: position.ticker,
+        toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker])}<br/>Unrealized Gain: ${unrealizedProfit(position, quotes[position.ticker]).toFixed(2)}%`
     }));
 
     return {

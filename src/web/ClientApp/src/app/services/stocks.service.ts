@@ -104,12 +104,12 @@ export class StocksService {
         return this.http.get<StockList>('/api/stocks/lists/' + id)
     }
 
-    addToStockList(name: string, ticker: string): Observable<StockList> {
-        return this.http.put<StockList>('/api/stocks/lists/' + name, {name: name, ticker: ticker})
+    addToStockList(id: string, ticker: string): Observable<StockList> {
+        return this.http.put<StockList>('/api/stocks/lists/' + id, {id: id, ticker: ticker})
     }
 
-    removeFromStockList(name: string, ticker: string): Observable<StockList> {
-        return this.http.delete<StockList>('/api/stocks/lists/' + name + '/' + ticker)
+    removeFromStockList(id: string, ticker: string): Observable<StockList> {
+        return this.http.delete<StockList>('/api/stocks/lists/' + id + '/' + ticker)
     }
 
     createStockList(input): Observable<StockList> {
