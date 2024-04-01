@@ -143,6 +143,19 @@
             </div>
         </div>
     }
+    
+    @if(chartOptionsArray) {
+        <div class="mb-4">
+            <h3>Daily Balances</h3>
+            @for(chartOptions of chartOptionsArray; track chartOptions) {
+                <div class="card">
+                    <div class="card-body">
+                        <canvasjs-chart [options]="chartOptions"></canvasjs-chart>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 
 
 </div>

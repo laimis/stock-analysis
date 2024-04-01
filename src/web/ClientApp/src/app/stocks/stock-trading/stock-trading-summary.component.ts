@@ -1,5 +1,10 @@
 import {Component, Input} from '@angular/core';
-import {BrokerageAccount, PositionInstance, StockQuote} from 'src/app/services/stocks.service';
+import {
+    BrokerageAccount,
+    BrokerageAccountSnapshot,
+    PositionInstance,
+    StockQuote
+} from 'src/app/services/stocks.service';
 import {isLongTermStrategy} from 'src/app/services/utils';
 
 interface PositionGroup {
@@ -31,8 +36,7 @@ export class StockTradingSummaryComponent {
     quotes: Map<string, StockQuote>
     @Input()
     brokerageAccount: BrokerageAccount
-    private brokerageSortColumn: string = 'ticker'
-    private brokerageSortDirection: string = 'asc'
+    chartOptionsArray: any[];
 
     @Input()
     set positions(value: PositionInstance[]) {
@@ -44,6 +48,11 @@ export class StockTradingSummaryComponent {
         this.totalShortCost = this.reduce(this.shortPositions, (p: PositionInstance) => p.averageCostPerShare * p.numberOfShares)
         this.totalProfit = this.reduce(value, (p: PositionInstance) => this.getUnrealizedProfit(p))
         this.positionGroups = this.breakdownByStrategy(value)
+    }
+    
+    @Input()
+    set balances(value:BrokerageAccountSnapshot[]) {
+        this.updateChartOptions(value);
     }
 
     getStrategy(position: PositionInstance): string {
@@ -81,34 +90,6 @@ export class StockTradingSummaryComponent {
         const adjustedFunc = (a: PositionGroup, b: PositionGroup) => this.sortDirection * sortFunc(a, b)
 
         this.positionGroups.sort(adjustedFunc)
-    }
-
-    sortBrokerageTable(column: string) {
-        if (this.brokerageSortColumn == column) {
-            this.brokerageSortDirection = this.brokerageSortDirection == 'asc' ? 'desc' : 'asc'
-        } else {
-            this.brokerageSortColumn = column
-            this.brokerageSortDirection = 'asc'
-        }
-
-        this.brokerageAccount.stockPositions.sort((a, b) => {
-            if (this.brokerageSortColumn === 'total') {
-                const aTotal = a.quantity * a.averageCost;
-                const bTotal = b.quantity * b.averageCost;
-
-                if (this.brokerageSortDirection == 'asc') {
-                    return aTotal > bTotal ? 1 : -1
-                } else {
-                    return aTotal < bTotal ? 1 : -1
-                }
-            } else {
-                if (this.brokerageSortDirection == 'asc') {
-                    return a[this.brokerageSortColumn] > b[this.brokerageSortColumn] ? 1 : -1
-                } else {
-                    return a[this.brokerageSortColumn] < b[this.brokerageSortColumn] ? 1 : -1
-                }
-            }
-        })
     }
 
     breakdownByStrategy(positions: PositionInstance[]): PositionGroup[] {
@@ -157,5 +138,41 @@ export class StockTradingSummaryComponent {
 
     private reduce(positions: PositionInstance[], func: (p: PositionInstance) => number): number {
         return positions.reduce((acc, cur) => acc + func(cur), 0)
+    }
+
+    private updateChartOptions(value: BrokerageAccountSnapshot[]) {
+        const cashData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.cash }));
+        const equityData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.equity }));
+        const longValueData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.longValue }));
+        const shortValueData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.shortValue }));
+
+        const axisY = {
+            includeZero: true,
+                gridThickness: 1,
+                gridColor: 'rgba(0, 0, 0, 0.1)'
+        }
+        
+        this.chartOptionsArray = [
+            {
+                title: { text: 'Cash Balance' },
+                data: [{ type: 'line', dataPoints: cashData, markerSize: 1 }],
+                axisY: axisY
+            },
+            {
+                title: { text: 'Equity Balance' },
+                data: [{ type: 'line', dataPoints: equityData, markerSize: 1 }],
+                axisY: axisY
+            },
+            {
+                title: { text: 'Long Value' },
+                data: [{ type: 'line', dataPoints: longValueData, markerSize: 1 }],
+                axisY: axisY
+            },
+            {
+                title: { text: 'Short Value' },
+                data: [{ type: 'line', dataPoints: shortValueData, markerSize: 1 }],
+                axisY: axisY
+            }
+        ];
     }
 }

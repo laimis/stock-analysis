@@ -12,7 +12,7 @@ type IAccountStorage =
     abstract member Save: u:User -> Task
     abstract member Delete: u:User -> Task
     abstract member SaveUserAssociation: r:ProcessIdToUserAssociation -> Task
-    abstract member GetLatestAccountBalancesSnapshot: userId:UserId -> Task<AccountBalancesSnapshot option>
+    abstract member GetAccountBalancesSnapshots: start:DateTimeOffset -> ``end``:DateTimeOffset -> userId:UserId -> Task<AccountBalancesSnapshot seq>
     abstract member SaveAccountBalancesSnapshot: userId:UserId -> balances:AccountBalancesSnapshot -> Task
     abstract member GetUserAssociation: guid:Guid -> Task<ProcessIdToUserAssociation option>
     abstract member GetUserEmailIdPairs: unit -> Task<IEnumerable<EmailIdPair>>

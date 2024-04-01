@@ -4,6 +4,7 @@ open System
 open Microsoft.FSharp.Collections
 open core.Shared
 open core.fs
+open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Services.Analysis
 open core.fs.Services.Trading
@@ -330,6 +331,7 @@ type TradingEntriesView =
         violations: StockViolationView array
         brokerageAccount: BrokerageAccount
         prices: Map<string, StockQuote>
+        dailyBalances: AccountBalancesSnapshot seq
     }
     
 type PastTradingEntriesView =

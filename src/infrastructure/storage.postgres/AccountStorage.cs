@@ -77,15 +77,22 @@ namespace storage.postgres
             await db.ExecuteAsync(query, new {r.Id, userId = r.UserId.Item, timestamp = r.Timestamp});
         }
 
-        public async Task<FSharpOption<AccountBalancesSnapshot>> GetLatestAccountBalancesSnapshot(UserId userId)
+        public async Task<IEnumerable<AccountBalancesSnapshot>> GetAccountBalancesSnapshots(DateTimeOffset start, DateTimeOffset end, UserId userId)
         {
             using var db = GetConnection();
 
-            var query = @"SELECT cash,equity,longValue,shortValue,date,userId FROM accountbalancessnapshots WHERE userId = :userId ORDER BY date DESC LIMIT 1";
+            var query = @"SELECT cash,equity,longValue,shortValue,date,userId FROM accountbalancessnapshots WHERE userId = :userId AND date BETWEEN :start AND :end ORDER BY date DESC";
             
-            var result = await db.QuerySingleOrDefaultAsync<AccountBalancesSnapshot>(query, new {userId = userId.Item});
+            var result = await db.QueryAsync<AccountBalancesSnapshot>(
+                query, 
+                new
+                {
+                    userId = userId.Item,
+                    start = start.ToString("yyyy-MM-dd"),
+                    end = end.ToString("yyyy-MM-dd")
+                });
             
-            return result == null ? FSharpOption<AccountBalancesSnapshot>.None : new FSharpOption<AccountBalancesSnapshot>(result);
+            return result;
         }
 
         public async Task SaveAccountBalancesSnapshot(UserId userId, AccountBalancesSnapshot balances)

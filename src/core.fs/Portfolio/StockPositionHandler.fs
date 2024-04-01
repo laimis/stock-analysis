@@ -773,6 +773,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 | Ok acc -> acc
                 | Error _ -> BrokerageAccount.Empty
                 
+            let! balances = accounts.GetAccountBalancesSnapshots (DateTimeOffset.UtcNow.AddYears(-1)) DateTimeOffset.UtcNow query.UserId
+                
             let tickers =
                 positions
                 |> Seq.map (_.Ticker)
@@ -789,7 +791,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let current = positions |> Array.sortByDescending _.RR
             
-            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray;
+            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray
             
             let (tradingEntries:TradingEntriesView) =
                 {
@@ -797,6 +799,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     violations=violations
                     brokerageAccount=account
                     prices=pricesWithStringAsKey
+                    dailyBalances=balances
                 }
             return tradingEntries |> Ok
     }

@@ -1020,11 +1020,20 @@ export interface BrokerageAccount {
     connected: boolean
 }
 
+export interface BrokerageAccountSnapshot {
+    cash: number
+    equity: number
+    longValue: number
+    shortValue: number
+    date: string
+}
+
 export interface StockTradingPositions {
     current: PositionInstance[]
     violations: StockViolation[]
     brokerageAccount: BrokerageAccount
     prices: Map<string, StockQuote>
+    dailyBalances: BrokerageAccountSnapshot[]
 }
 
 export interface PastStockTradingPositions {

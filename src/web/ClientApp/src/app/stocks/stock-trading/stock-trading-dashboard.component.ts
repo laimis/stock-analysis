@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {
-    BrokerageAccount,
+    BrokerageAccount, BrokerageAccountSnapshot,
     OutcomeValueTypeEnum,
     PositionInstance,
     StockQuote,
@@ -19,6 +19,7 @@ import {stockOpenPositionExportLink} from "../../services/links.service";
     styleUrls: ['./stock-trading-dashboard.component.css']
 })
 export class StockTradingDashboardComponent implements OnInit {
+    balances: BrokerageAccountSnapshot[]
     positions: PositionInstance[]
     sortedPositions: PositionInstance[]
     loaded: boolean = false
@@ -223,6 +224,7 @@ export class StockTradingDashboardComponent implements OnInit {
             this.violations = r.violations
             this.brokerageAccount = r.brokerageAccount
             this.quotes = r.prices
+            this.balances = r.dailyBalances
             this.loading = false
             this.loaded = true
 

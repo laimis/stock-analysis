@@ -8,7 +8,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 {
     private static readonly Dictionary<UserId, User?> _users = new();
     private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new();
-    private static readonly Dictionary<UserId, AccountBalancesSnapshot> _snapshots = new();
+    private static readonly Dictionary<UserId, List<AccountBalancesSnapshot>> _snapshots = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
@@ -30,14 +30,21 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task SaveAccountBalancesSnapshot(UserId userId, AccountBalancesSnapshot balances)
     {
-        _snapshots[userId] = balances;
+        // check if we have a snapshot for this user
+        if (_snapshots.ContainsKey(userId) == false)
+        {
+            _snapshots[userId] = [];
+        }
+        
+        _snapshots[userId].Add(balances);
         return Task.CompletedTask;
     }
     
-    public Task<FSharpOption<AccountBalancesSnapshot>> GetLatestAccountBalancesSnapshot(UserId userId)
+    public Task<IEnumerable<AccountBalancesSnapshot>> GetAccountBalancesSnapshots(DateTimeOffset start, DateTimeOffset end, UserId userId)
     {
-        var response = _snapshots.TryGetValue(userId, out var snapshot) ? new FSharpOption<AccountBalancesSnapshot>(snapshot!) : FSharpOption<AccountBalancesSnapshot>.None;
-        return Task.FromResult(response);
+        return Task.FromResult<IEnumerable<AccountBalancesSnapshot>>(
+            _snapshots.GetValueOrDefault(userId, [])
+        );
     }
 
     public Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid guid) =>

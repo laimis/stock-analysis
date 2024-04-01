@@ -95,19 +95,21 @@ namespace storagetests
 
             var userId = UserId.NewUserId(Guid.NewGuid());
 
-            var date = DateTime.UtcNow.ToString("yyyy-MM-dd");
+            var date = DateTimeOffset.UtcNow;
             
-            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, date, userId.Item);
+            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, date.ToString("yyyy-MM-dd"), userId.Item);
 
             await storage.SaveAccountBalancesSnapshot(userId, balances);
             
-            var fromDb = await storage.GetLatestAccountBalancesSnapshot(userId);
+            var fromDb = await storage.GetAccountBalancesSnapshots(date, date, userId);
+            
+            Assert.Single(fromDb);
 
-            Assert.Equal(balances.UserId, fromDb.Value.UserId);
-            Assert.Equal(balances.Cash, fromDb.Value.Cash);
-            Assert.Equal(balances.LongValue, fromDb.Value.LongValue);
-            Assert.Equal(balances.ShortValue, fromDb.Value.ShortValue);
-            Assert.Equal(balances.Date, fromDb.Value.Date);
+            Assert.Equal(balances.UserId, fromDb.First().UserId);
+            Assert.Equal(balances.Cash, fromDb.First().Cash);
+            Assert.Equal(balances.LongValue, fromDb.First().LongValue);
+            Assert.Equal(balances.ShortValue, fromDb.First().ShortValue);
+            Assert.Equal(balances.Date, fromDb.First().Date);
             
             // saving the same snapshot should not blow up but just do update
             await storage.SaveAccountBalancesSnapshot(userId, balances);
