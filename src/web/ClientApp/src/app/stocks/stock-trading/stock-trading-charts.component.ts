@@ -327,24 +327,24 @@ function stopPriceDistance(position: PositionInstance, quote: StockQuote) {
 }
 
 function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
-    // Calculate stop price distance and position cost for each position
+    // Calculate stop price distance and unrealized gain percentage for each position
     const scatterData = positions.map(position => ({
-        x: unrealizedProfit(position, quotes[position.ticker]),
+        x: unrealizedGainPercentage(position, quotes[position.ticker]),
         y: stopPriceDistance(position, quotes[position.ticker]),
         label: position.ticker,
-        toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker])}<br/>Unrealized Gain: ${unrealizedProfit(position, quotes[position.ticker]).toFixed(2)}%`
+        toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker]).toFixed(2)}%<br/>Unrealized Gain %: ${unrealizedGainPercentage(position, quotes[position.ticker]).toFixed(2)}%`
     }));
 
     return {
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Stop Price Distance vs. Position Profit",
+            text: "Stop Price Distance vs. Unrealized Gain %",
         },
         axisX: {
-            title: "Position Profit",
+            title: "Unrealized Gain %",
             labelFormatter: function(e: any) {
-                return "$" + e.value.toFixed(2);
+                return e.value.toFixed(2) + "%";
             }
         },
         axisY: {
