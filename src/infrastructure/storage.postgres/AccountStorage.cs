@@ -81,7 +81,7 @@ namespace storage.postgres
         {
             using var db = GetConnection();
 
-            var query = @"SELECT cash,equity,longValue,shortValue,date,userId FROM accountbalancessnapshots WHERE userId = :userId AND date BETWEEN :start AND :end ORDER BY date DESC";
+            var query = @"SELECT cash,equity,longValue,shortValue,date FROM accountbalancessnapshots WHERE userId = :userId AND date BETWEEN :start AND :end ORDER BY date DESC";
             
             var result = await db.QueryAsync<AccountBalancesSnapshot>(
                 query, 

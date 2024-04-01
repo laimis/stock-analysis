@@ -18,13 +18,12 @@ type EmailIdPair(email:string, id:string) =
     member _.Email = email
     member _.Id = id |> Guid |> UserId
     
-type AccountBalancesSnapshot(cash:decimal,equity:decimal,longValue:decimal,shortValue:decimal,date:string,userId:Guid) =
+type AccountBalancesSnapshot(cash:decimal,equity:decimal,longValue:decimal,shortValue:decimal,date:string) =
     member _.Cash = cash
     member _.Equity = equity
     member _.LongValue = longValue
     member _.ShortValue = shortValue
     member _.Date = date
-    member _.UserId = userId |> UserId
     
 type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset) =
     

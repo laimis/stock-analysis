@@ -97,7 +97,7 @@ namespace storagetests
 
             var date = DateTimeOffset.UtcNow;
             
-            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, date.ToString("yyyy-MM-dd"), userId.Item);
+            var balances = new AccountBalancesSnapshot(100, 200, 300, 400, date.ToString("yyyy-MM-dd"));
 
             await storage.SaveAccountBalancesSnapshot(userId, balances);
             
@@ -105,7 +105,6 @@ namespace storagetests
             
             Assert.Single(fromDb);
 
-            Assert.Equal(balances.UserId, fromDb.First().UserId);
             Assert.Equal(balances.Cash, fromDb.First().Cash);
             Assert.Equal(balances.LongValue, fromDb.First().LongValue);
             Assert.Equal(balances.ShortValue, fromDb.First().ShortValue);
