@@ -248,7 +248,8 @@ function createDaysHeldDistributionChart(positions: PositionInstance[]) {
 }
 
 function unrealizedGainPercentage(position: PositionInstance, quote: StockQuote) {
-    return (quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100;
+    // need abs for short positions
+    return Math.abs ((quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100);
 }
 
 function createUnrealizedGainPercentageDistributionChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
@@ -323,7 +324,8 @@ function createUnrealizedRRDistributionChart(positions: PositionInstance[], quot
 
 function stopPriceDistance(position: PositionInstance, quote: StockQuote) {
     let referencePrice = position.stopPrice ? position.stopPrice : position.averageCostPerShare;
-    return ((quote.price - referencePrice) / quote.price) * 100;
+    // need abs for short positions
+    return Math.abs( ((quote.price - referencePrice) / quote.price) * 100 );
 }
 
 function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
