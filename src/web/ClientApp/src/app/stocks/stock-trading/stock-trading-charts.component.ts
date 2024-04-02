@@ -447,11 +447,11 @@ function createRealizedVsUnrealizedProfitChart(positions: PositionInstance[], qu
 
 function createPositionsByCostChart(positions: PositionInstance[]) {
     // Sort positions from smallest to largest based on cost
-    const sortedPositions = [...positions].sort((a, b) => a.cost - b.cost);
+    const sortedPositions = [...positions].sort((a, b) => Math.abs(a.cost) - Math.abs(b.cost));
 
     const chartData = sortedPositions.map(position => ({
         label: position.ticker,
-        y: position.cost
+        y: Math.abs(position.cost)
     }));
 
     return {
