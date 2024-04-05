@@ -42,6 +42,10 @@
                             (newPositionWorkflowStarted)="showElement(sizeInfo)">
                         </app-stock-trading-new-position>
                     </div>
+                } @else {
+                    <div class="mb-3">
+                        Mismatch: {{violation.message}}
+                    </div>
                 }
 
                 @if (tickerHasOrders(violation.ticker)) {
