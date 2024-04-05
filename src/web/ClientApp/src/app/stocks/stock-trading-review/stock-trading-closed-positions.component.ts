@@ -107,17 +107,11 @@ export class StockTradingClosedPositionsComponent {
         }
 
         if (this.plFilter != 'all') {
-            if (this.plFilter === 'plus150') {
-                return position.profit >= 150
-            } else if (this.plFilter === 'plus100') {
-                return position.profit >= 100
-            } else if (this.plFilter === 'minus50') {
-                return position.profit < -50
-            } else if (this.plFilter === 'minus100') {
-                return position.profit < -100
+            let value = parseFloat(this.plFilter)
+            if (value > 0) {
+                return position.profit >= value
             } else {
-                console.log("unrecognized pl filter " + this.plFilter)
-                return false
+                return position.profit < value
             }
         }
 
