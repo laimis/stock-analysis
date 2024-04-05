@@ -45,8 +45,9 @@
         @for (g of alertGroups; track g) {
             <section>
                 <div class="alert-group-summary" (click)="toggleGroup(g)" role="button">
-                    <h5 style="border-bottom: none;">{{ g.identifier }} ({{ g.alerts.length }})
-                    <i class="fas" [ngClass]="{'fa-chevron-down': !g.expanded, 'fa-chevron-up': g.expanded}"></i>
+                    <h5 style="border-bottom: none;">
+                        <i class="fas" [ngClass]="{'fa-chevron-down': !g.expanded, 'fa-chevron-up': g.expanded}"></i>
+                        {{ g.identifier }} ({{ g.alerts.length }})
                     </h5>
                 </div>
                 <div class="alert-group-details" [ngClass]="{'d-none': !g.expanded}">
@@ -128,8 +129,8 @@
             <section>
                 <div class="recent-triggers-summary" (click)="recentlyTriggeredExpanded = !recentlyTriggeredExpanded" role="button">
                     <h5>
-                        Recent Triggers
                         <i class="fas" [ngClass]="{'fa-chevron-down': !recentlyTriggeredExpanded, 'fa-chevron-up': recentlyTriggeredExpanded}"></i>
+                        Recent Triggers
                     </h5>
                 </div>
                 <div class="recent-triggers-details" [ngClass]="{'d-none': !recentlyTriggeredExpanded}">
