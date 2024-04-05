@@ -4,16 +4,20 @@ import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
 
 function toChartJSPoint(p: DataPoint) {
+    let toolTipContent = p.ticker ? p.ticker + ": {y}" : undefined
+    
     if (p.isDate) {
         return {
             x: new Date(Date.parse(p.label)),
             y: p.value,
-            format: "MMM DD, YYYY"
+            format: "MMM DD, YYYY",
+            toolTipContent: toolTipContent
         }
     } else {
         return {
             label: p.label,
-            y: p.value
+            y: p.value,
+            toolTipContent: toolTipContent
         }
     }
 }

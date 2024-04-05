@@ -967,6 +967,7 @@ export interface DataPoint {
     value: number
     label: string
     isDate: boolean
+    ticker?: string
 }
 
 export interface ChartAnnotationLine {

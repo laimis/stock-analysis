@@ -126,16 +126,20 @@ type ChartAnnotationLine(value:decimal,chartAnnotationLineType:ChartAnnotationLi
     member this.Value = value
     member this.ChartAnnotationLineType = chartAnnotationLineType
 
-type DataPoint<'a>(label:string,value:'a,isDate:bool) =
+type DataPoint<'a>(label:string,value:'a,isDate:bool,ticker:string option) =
     
     new(label:string,value:'a) =
-        DataPoint(label,value,isDate = false)
+        DataPoint(label,value,isDate = false,ticker = None)
+    
+    new(label:string,value:'a,ticker:string) =
+        DataPoint(label,value,isDate = false,ticker = Some ticker)
         
     new(timestamp:DateTimeOffset,value:'a) =
-        DataPoint(timestamp.ToString("yyyy-MM-dd"),value,isDate = true)
+        DataPoint(timestamp.ToString("yyyy-MM-dd"),value,isDate = true,ticker = None)
         
     member this.Label = label
     member this.Value = value
+    member this.Ticker = ticker
     member this.IsDate = isDate
     
 type ChartDataPointContainer<'a>(label:string,chartType:DataPointChartType,annotationLine:ChartAnnotationLine option) =
@@ -151,7 +155,11 @@ type ChartDataPointContainer<'a>(label:string,chartType:DataPointChartType,annot
     member this.AnnotationLine = annotationLine
     
     member this.Add(label:string,value:'a) =
-        data.Add(DataPoint(label,value,isDate = false))
+        data.Add(DataPoint(label,value))
+        this
+        
+    member this.Add(label:string,value:'a,ticker:string) =
+        data.Add(DataPoint(label,value,ticker))
         this
         
     member this.Add(timestamp:DateTimeOffset,value:'a) =

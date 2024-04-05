@@ -150,7 +150,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             trades
             |> Seq.sortBy _.DaysHeld
             |> Seq.fold (fun (container:ChartDataPointContainer<decimal>) trade ->
-                container.Add(trade.DaysHeld.ToString(), trade.Profit)
+                container.Add(trade.DaysHeld.ToString(), trade.Profit, trade.Ticker.Value)
             ) (ChartDataPointContainer<decimal>("Profit vs Days Held", DataPointChartType.Scatter, zeroLineAnnotationHorizontal))
         
         let aGrades, bGrades, cGrades =
