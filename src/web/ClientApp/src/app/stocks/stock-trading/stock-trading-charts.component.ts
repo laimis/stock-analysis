@@ -553,17 +553,17 @@ export class StockTradingChartsComponent {
             this.chartOptions = [
                 createUnrealizedProfitChart(this._positions, this._quotes),
                 createDaysHeldVsGainPercentChart(this._positions, this._quotes),
-                createPositionsOpenedChart(this._positions),
-                createProfitDistributionChart(this._positions, this._quotes),
-                createPositionSizePieChart(this._positions),
-                createDaysHeldDistributionChart(this._positions),
-                createUnrealizedGainPercentageDistributionChart(this._positions, this._quotes),
-                createUnrealizedRRDistributionChart(this._positions, this._quotes),
                 createStopPriceDistanceChart(this._positions, this._quotes),
+                createPositionSizePieChart(this._positions),
+                createPositionsByCostChart(this._positions),
+                createPositionsByGainsChart(this._positions, this._quotes),
                 createPositionLabelsPieChart(this._positions),
                 createRealizedVsUnrealizedProfitChart(this._positions, this._quotes),
-                createPositionsByCostChart(this._positions),
-                createPositionsByGainsChart(this._positions, this._quotes)
+                createUnrealizedGainPercentageDistributionChart(this._positions, this._quotes),
+                createUnrealizedRRDistributionChart(this._positions, this._quotes),
+                createProfitDistributionChart(this._positions, this._quotes),
+                createDaysHeldDistributionChart(this._positions),
+                createPositionsOpenedChart(this._positions),
             ]
         }
     }
