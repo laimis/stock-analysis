@@ -344,14 +344,14 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
             text: "Unrealized Gain % vs Stop Price Distance %",
         },
         axisX: {
-            title: "Unrealized Gain %",
+            title: "Stop Price Distance (%)",
+            gridThickness: 0.1,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
         },
         axisY: {
-            title: "Stop Price Distance (%)",
-            gridThickness: 0.1,
+            title: "Unrealized Gain %",
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
