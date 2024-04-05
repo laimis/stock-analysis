@@ -38,7 +38,8 @@
                             [showChart]="false"
                             [showAnalysis]="false"
                             [isPendingPositionMode]="false"
-                            (positionOpened)="positionOpened($event)">
+                            (positionOpened)="positionOpened($event)"
+                            (newPositionWorkflowStarted)="showElement(sizeInfo)">
                         </app-stock-trading-new-position>
                     </div>
                 }

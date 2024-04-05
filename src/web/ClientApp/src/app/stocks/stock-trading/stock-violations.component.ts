@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {BrokerageOrder, openpositioncommand, StockViolation} from 'src/app/services/stocks.service';
-import {toggleVisuallyHidden} from "../../services/utils";
+import {showElement, toggleVisuallyHidden} from "../../services/utils";
 
 @Component({
     selector: 'app-stock-violations',
@@ -50,4 +50,6 @@ export class StockViolationsComponent {
             return (v.pricePerShare - v.currentPrice) / v.currentPrice
         }
     }
+
+    protected readonly showElement = showElement;
 }

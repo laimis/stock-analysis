@@ -44,6 +44,13 @@ export function hideElement(element: HTMLElement) {
     }
 }
 
+export function showElement(element: HTMLElement) {
+    const className = 'visually-hidden';
+    if (element.classList.contains(className)) {
+        element.classList.remove(className);
+    }
+}
+
 // export an array of key value pairs representing strategies
 export function GetStrategies(): { key: string, value: string }[] {
     return [

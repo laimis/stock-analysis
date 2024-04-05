@@ -60,6 +60,9 @@ export class StockTradingNewPositionComponent {
     positionOpened: EventEmitter<openpositioncommand> = new EventEmitter<openpositioncommand>()
     @Output()
     pendingPositionCreated: EventEmitter<pendingstockpositioncommand> = new EventEmitter<pendingstockpositioncommand>()
+    @Output()
+    newPositionWorkflowStarted: EventEmitter<void> = new EventEmitter<void>()
+    
     // variables for new positions
     positionSizeCalculated: number = null
     ask: number | null = null
@@ -96,6 +99,7 @@ export class StockTradingNewPositionComponent {
     startNewPosition() {
         this.positionEntered = false
         this.workflowStarted = true
+        this.newPositionWorkflowStarted.emit()
         if (this.presetTicker) {
             this.onBuyTickerSelected(this.presetTicker)
         }
