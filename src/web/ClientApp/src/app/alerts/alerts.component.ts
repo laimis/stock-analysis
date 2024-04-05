@@ -3,28 +3,36 @@ import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core'
 import {AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService} from 'src/app/services/stocks.service';
 import {toggleVisuallyHidden} from '../services/utils';
 
+
+type StockAlertGroup = {
+    identifier: string
+    alerts: StockAlert[]
+    expanded: boolean
+}
+
 @Component({
     selector: 'app-alerts',
     templateUrl: './alerts.component.html',
     styleUrls: ['./alerts.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe]
 })
-
 export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     container: AlertsContainer;
-    alertGroups: StockAlert[][];
+    alertGroups: StockAlertGroup[];
     intervalId: any;
     lastRefreshed: string;
+    scheduled: boolean = false
+    sortColumn = 'description'
+    sortDirection = 'asc'
+    recentlyTriggeredExpanded = false;
+
     @Input()
     hideRecentTriggered: boolean = false;
     @Input()
     hideMessages: boolean = false;
     @Input()
     hideScheduling: boolean = false;
-    scheduled: boolean = false
-    sortColumn = 'description'
-    sortDirection = 'asc'
-
+    
     constructor(
         private stockService: StocksService,
         private percentPipe: PercentPipe,
@@ -53,15 +61,20 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.stockService.getAlerts().subscribe(container => {
             this.container = container;
 
-            var compareTickers = (a: StockAlert, b: StockAlert) => a.ticker.localeCompare(b.ticker)
+            const compareTickers = (a: StockAlert, b: StockAlert) => a.ticker.localeCompare(b.ticker);
 
-            var sorted = container.alerts.sort(compareTickers);
+            const sorted = container.alerts.sort(compareTickers);
 
-            var identifiers = new Set(sorted.map(m => m.identifier));
+            const identifiers = new Set(sorted.map(m => m.identifier));
 
-            var groups = []
+            const groups = [];
             identifiers.forEach(identifier => {
-                var group = sorted.filter(m => m.identifier === identifier).sort(compareTickers);
+                const alerts = sorted.filter(m => m.identifier === identifier).sort(compareTickers);
+                const group = {
+                    identifier: identifier,
+                    alerts: alerts,
+                    expanded: false
+                }
                 groups.push(group);
             })
 
@@ -73,7 +86,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
 
-    toggleVisibility(elem) {
+    toggleVisibility(elem:HTMLElement) {
         toggleVisuallyHidden(elem);
     }
 
@@ -96,7 +109,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    sort(column: string, alertGroups: StockAlert[][] | null = null) {
+    sort(column: string, alertGroups: StockAlertGroup[] | null = null) {
         if (this.sortColumn === column) {
             this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc'
         } else {
@@ -111,18 +124,21 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.applySort(alertGroups)
     }
 
-    applySort(alertGroups: StockAlert[][]) {
-        var column = this.sortColumn
+    applySort(alertGroups: StockAlertGroup[]) {
         var compare = (a: StockAlert, b: StockAlert) => {
             if (this.sortDirection === 'asc') {
-                return a[column] > b[column] ? 1 : -1
+                return a[this.sortColumn] > b[this.sortColumn] ? 1 : -1
             } else {
-                return a[column] < b[column] ? 1 : -1
+                return a[this.sortColumn] < b[this.sortColumn] ? 1 : -1
             }
         }
 
         alertGroups.forEach(group => {
-            group.sort(compare)
+            group.alerts.sort(compare)
         })
+    }
+    
+    toggleGroup(group: StockAlertGroup) {
+        group.expanded = !group.expanded
     }
 }

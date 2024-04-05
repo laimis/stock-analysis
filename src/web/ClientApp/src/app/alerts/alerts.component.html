@@ -44,72 +44,78 @@
         }
         @for (g of alertGroups; track g) {
             <section>
-                <h5>{{ g[0].identifier }} ({{ g.length }})</h5>
-                <table class="table table-hover d-none d-md-table">
-                    <thead>
-                    <tr>
-                        <th class="sort-header" (click)="sort('ticker')">Ticker</th>
-                        <th class="sort-header" (click)="sort('description')">Description</th>
-                        <th class="sort-header" (click)="sort('watchedValue')">Watched Value</th>
-                        <th class="sort-header" (click)="sort('triggeredValue')">Triggered Value</th>
-                        <th class="sort-header" (click)="sort('when')"></th>
-                        <th class="sort-header" (click)="sort('sourceList')">Source</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @for (alert of g; track alert) {
-                            <tr
-                                [ngClass]="{
-                  'table-warning': alert.alertType === 'Negative',
-                  'table-success': alert.alertType === 'Positive',
-                  'text-white': alert.alertType === 'Positive'
-                  }">
-                                <td>
-                                    <app-stock-link-and-tradingview-link
-                                        [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
-                                </td>
-                                <td>
-                                    {{ alert.description }}
-                                </td>
-                                <td>{{ getValue(alert.watchedValue, alert.valueFormat) }}</td>
-                                <td>{{ getValue(alert.triggeredValue, alert.valueFormat) }}</td>
-                                <td>Triggered on {{ alert.when | date:'short' }}</td>
-                                <td>
-                                    <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{ alert.sourceList }}</a>
-                                </td>
-                            </tr>
-                        }
-                </table>
-                <div class="d-md-none">
-                    @for (alert of g; track alert) {
-                        <div
-                            class="card mb-3"
-                            [ngClass]="{
-                  'bg-warning': alert.alertType === 'Negative',
-                  'bg-success': alert.alertType === 'Positive',
-                  'text-white': alert.alertType === 'Positive'
-                  }">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-6">
+                <div class="alert-group-summary" (click)="toggleGroup(g)" role="button">
+                    <h5 style="border-bottom: none;">{{ g.identifier }} ({{ g.alerts.length }})
+                    <i class="fas" [ngClass]="{'fa-chevron-down': !g.expanded, 'fa-chevron-up': g.expanded}"></i>
+                    </h5>
+                </div>
+                <div class="alert-group-details" [ngClass]="{'d-none': !g.expanded}">
+                    <table class="table table-hover d-none d-md-table">
+                        <thead>
+                        <tr>
+                            <th class="sort-header" (click)="sort('ticker')">Ticker</th>
+                            <th class="sort-header" (click)="sort('description')">Description</th>
+                            <th class="sort-header" (click)="sort('watchedValue')">Watched Value</th>
+                            <th class="sort-header" (click)="sort('triggeredValue')">Triggered Value</th>
+                            <th class="sort-header" (click)="sort('when')"></th>
+                            <th class="sort-header" (click)="sort('sourceList')">Source</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @for (alert of g.alerts; track alert) {
+                                <tr
+                                    [ngClass]="{
+'table-warning': alert.alertType === 'Negative',
+'table-success': alert.alertType === 'Positive',
+'text-white': alert.alertType === 'Positive'
+}">
+                                    <td>
                                         <app-stock-link-and-tradingview-link
                                             [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
+                                    </td>
+                                    <td>
+                                        {{ alert.description }}
+                                    </td>
+                                    <td>{{ getValue(alert.watchedValue, alert.valueFormat) }}</td>
+                                    <td>{{ getValue(alert.triggeredValue, alert.valueFormat) }}</td>
+                                    <td>Triggered on {{ alert.when | date:'short' }}</td>
+                                    <td>
+                                        <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{ alert.sourceList }}</a>
+                                    </td>
+                                </tr>
+                            }
+                    </table>
+                    <div class="d-md-none">
+                        @for (alert of g.alerts; track alert) {
+                            <div
+                                class="card mb-3"
+                                [ngClass]="{
+'bg-warning': alert.alertType === 'Negative',
+'bg-success': alert.alertType === 'Positive',
+'text-white': alert.alertType === 'Positive'
+}">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <app-stock-link-and-tradingview-link
+                                                [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="float-end">
+                                                <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{ alert.sourceList }}</a>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="float-end">
-                                            <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{ alert.sourceList }}</a>
+                                    <div class="row">
+                                        <div class="col">
+<span
+    class="stat-label">Triggered value of</span> {{ getValue(alert.triggeredValue, alert.valueFormat) }}
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <span
-                                            class="stat-label">Triggered value of</span> {{ getValue(alert.triggeredValue, alert.valueFormat) }}
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             </section>
         }
@@ -120,29 +126,36 @@
         }
         @if (!hideRecentTriggered) {
             <section>
-                <h5>Recent Triggers</h5>
-                @if (container.recentlyTriggered && !hideRecentTriggered) {
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>ticker</th>
-                            <th>description</th>
-                            <th>date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @for (alert of container.recentlyTriggered; track alert) {
-                                <tr [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
-                                    <td>
-                                        <app-stock-link-and-tradingview-link
-                                            [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
-                                    </td>
-                                    <td>{{ alert.description }}</td>
-                                    <td>{{ alert.when | date:'short' }}</td>
-                                </tr>
-                            }
-                    </table>
-                }
+                <div class="recent-triggers-summary" (click)="recentlyTriggeredExpanded = !recentlyTriggeredExpanded" role="button">
+                    <h5>
+                        Recent Triggers
+                        <i class="fas" [ngClass]="{'fa-chevron-down': !recentlyTriggeredExpanded, 'fa-chevron-up': recentlyTriggeredExpanded}"></i>
+                    </h5>
+                </div>
+                <div class="recent-triggers-details" [ngClass]="{'d-none': !recentlyTriggeredExpanded}">
+                    @if (container.recentlyTriggered && !hideRecentTriggered) {
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>ticker</th>
+                                <th>description</th>
+                                <th>date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (alert of container.recentlyTriggered; track alert) {
+                                    <tr [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
+                                        <td>
+                                            <app-stock-link-and-tradingview-link
+                                                [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
+                                        </td>
+                                        <td>{{ alert.description }}</td>
+                                        <td>{{ alert.when | date:'short' }}</td>
+                                    </tr>
+                                }
+                        </table>
+                    }
+                </div>
             </section>
         }
         @if (!container.recentlyTriggered) {
@@ -152,4 +165,3 @@
         }
     </div>
 }
-      
