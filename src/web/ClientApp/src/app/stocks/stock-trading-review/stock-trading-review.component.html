@@ -1,32 +1,30 @@
 <div>
     @if (currentPosition) {
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <button (click)="previous()" class="btn btn-primary">Previous</button>
-                </div>
-                <div class="col text-center">
-                    <select class="form-select" (change)="dropdownClick($event.target)">
-                        @for (position of positions; track position; let i = $index) {
-                            <option
-                                [value]="i"
-                                [selected]="position.positionId === currentPosition.positionId">
-                                {{ position.ticker }}
+        <div class="container my-4">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                    <div class="input-group">
+                        <button (click)="previous()" class="btn btn-outline-secondary" type="button"><i
+                            class="fas fa-chevron-left"></i></button>
+                        <select class="form-select"
+                                (change)="dropdownClick($event.target)"> @for (position of positions; track position; let i = $index) {
+                            <option [value]="i"
+                                    [selected]="position.positionId === currentPosition.positionId"> {{ position.ticker }}
                             </option>
-                        }
-                    </select>
+                        } </select>
+                        <button (click)="next()" class="btn btn-outline-secondary" type="button"><i
+                            class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
-                <div class="col">
-                    <span class="text-muted">Price: </span>{{ getPrice(currentPosition) | currency }}
-                </div>
-                <div class="col">
-                    <span class="text-muted">Stop: </span>{{ currentPosition.stopPrice | currency }}
-                </div>
-                <div class="col">
-                    <span class="text-muted">Cost/Share: </span>{{ currentPosition.averageBuyCostPerShare | currency }}
-                </div>
-                <div class="col">
-                    <button (click)="next()" class="btn btn-primary float-end">Next</button>
+                <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between">
+                        <div><span class="text-muted">Price:</span> <span
+                            class="ms-2">{{ getPrice(currentPosition) | currency }}</span></div>
+                        <div><span class="text-muted">Stop:</span> <span
+                            class="ms-2">{{ currentPosition.stopPrice | currency }}</span></div>
+                        <div><span class="text-muted">Cost/Share:</span> <span
+                            class="ms-2">{{ currentPosition.averageBuyCostPerShare | currency }}</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -103,11 +101,17 @@
             <div class="mb-3">
                 <label for="notesInput" class="form-label">Notes</label>
                 <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
-                <div #gradeLabel class="visually-hidden">{{gradeNotes.value}}</div>
+                <div #gradeLabel class="visually-hidden">{{ gradeNotes.value }}</div>
             </div>
             <div>
-                <button (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
-                <button (click)="gradeNotes.readOnly = false; toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary visually-hidden" #editGradeButton>Edit Grade</button>
+                <button
+                    (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)"
+                    class="btn btn-primary" #submitGradeButton>Submit Grade
+                </button>
+                <button
+                    (click)="gradeNotes.readOnly = false; toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)"
+                    class="btn btn-primary visually-hidden" #editGradeButton>Edit Grade
+                </button>
             </div>
         </section>
     }
@@ -144,7 +148,8 @@
 
     <section>
         <h5>Position Information</h5>
-        <app-stock-trading-position (brokerageOrdersChanged)="brokerageOrdersChanged.emit($event)" [orders]="orders" [position]="currentPosition"
+        <app-stock-trading-position (brokerageOrdersChanged)="brokerageOrdersChanged.emit($event)" [orders]="orders"
+                                    [position]="currentPosition"
                                     [quote]="getQuote(currentPosition)"></app-stock-trading-position>
     </section>
 
