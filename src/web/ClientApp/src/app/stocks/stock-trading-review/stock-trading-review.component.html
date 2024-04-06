@@ -103,9 +103,11 @@
             <div class="mb-3">
                 <label for="notesInput" class="form-label">Notes</label>
                 <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
+                <div #gradeLabel class="visually-hidden">{{gradeNotes.value}}</div>
             </div>
             <div>
-                <button (click)="assignGrade(gradeNotes.value)" class="btn btn-primary">Submit Grade</button>
+                <button (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
+                <button (click)="gradeNotes.readOnly = false; toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary visually-hidden" #editGradeButton>Edit Grade</button>
             </div>
         </section>
     }

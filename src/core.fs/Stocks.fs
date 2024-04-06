@@ -287,8 +287,8 @@ module StockPosition =
     let assignGrade grade (gradeNote:string option) date (stockPosition:StockPositionState) =
         match stockPosition with
         | x when x.Closed.IsNone -> failwith "Cannot assign grade to open position"
-        | x when x.Grade.IsSome && x.Grade.Value = grade -> stockPosition
         | _ when gradeNote.IsNone || String.IsNullOrWhiteSpace(gradeNote.Value) -> failwith "Grade notes cannot be empty"
+        | x when x.Grade.IsSome && x.Grade.Value = grade && x.GradeNote.Value = gradeNote.Value -> stockPosition
         | _ ->
             let e = StockPositionGradeAssigned(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, grade.Value, gradeNote.Value)
             apply e stockPosition

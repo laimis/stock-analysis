@@ -282,8 +282,14 @@ let ``Assign grade to graded position, updates grade and note`` () =
         |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
         |> StockPosition.sell 1m 2m DateTimeOffset.UtcNow
         |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow
-        |> StockPosition.assignGrade (TradeGrade("B")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
+        |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
         
+    position.Grade |> should equal (Some (TradeGrade("A")))
+    position.Notes |> should contain "this trade went perfectly! (updated)"
+    position.GradeNote.Value |> should be (equal "this trade went perfectly! (updated)")
+    
+    let position = position |> StockPosition.assignGrade (TradeGrade("B")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
+    
     position.Grade |> should equal (Some (TradeGrade("B")))
     position.Notes |> should contain "this trade went perfectly! (updated)"
     position.GradeNote.Value |> should be (equal "this trade went perfectly! (updated)")

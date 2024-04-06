@@ -11,7 +11,7 @@ import {
     StocksService,
     TradingStrategyResults
 } from 'src/app/services/stocks.service';
-import {GetErrors} from 'src/app/services/utils';
+import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 
 
@@ -192,4 +192,5 @@ export class StockTradingReviewComponent {
         );
     }
 
+    protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
 }
