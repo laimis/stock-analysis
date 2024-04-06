@@ -88,12 +88,12 @@
             </div>
             <div class="mb-3">
                 <label for="notesInput" class="form-label">Notes</label>
-                <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
-                <div #gradeLabel class="visually-hidden">{{gradeNotes.value}}</div>
+                <textarea #gradeNotes [ngClass]="assignedNote ? 'visually-hidden' : ''" class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
+                <div #gradeLabel [ngClass]="assignedNote ? '' : 'visually-hidden'">{{gradeNotes.value}}</div>
                 </div>
                 <div class="d-grid gap-2">
-                    <button (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
-                    <button (click)="toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-secondary visually-hidden" #editGradeButton>Edit Grade</button>
+                    <button [ngClass]="assignedNote ? 'visually-hidden' : ''" (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
+                    <button [ngClass]="assignedNote ? '' : 'visually-hidden'" (click)="toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-secondary" #editGradeButton>Edit Grade</button>
                 </div>
             </div>
         </div>
