@@ -60,60 +60,44 @@
         </section>
     }
     @if (currentPosition && currentPosition.isClosed) {
-        <section>
-            <h5>Grade</h5>
-            @if (gradingError) {
-                <div class="alert alert-danger" role="alert">
-                    {{ gradingError }}
-                </div>
-            }
-            @if (gradingSuccess) {
-                <div class="alert alert-success" role="alert">
-                    {{ gradingSuccess }}
-                </div>
-            }
+    <section class="my-4">
+        <h5>Grade</h5>
+        @if (gradingError) {
+    <div class="alert alert-danger" role="alert">
+        {{ gradingError }}
+    </div>
+    }
+    @if (gradingSuccess) {
+    <div class="alert alert-success" role="alert">
+        {{ gradingSuccess }}
+    </div>
+    }
+    <div class="card">
+        <div class="card-body">
             <div class="mb-3">
-                <div class="form-check form-check-inline">
-                    <input
-                        [checked]="this.assignedGrade === 'A'"
-                        value="A"
-                        (click)="this.assignedGrade = 'A'"
-                        class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1">
-                    <label class="form-check-label" for="inlineRadio1">A</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input
-                        [checked]="this.assignedGrade === 'B'"
-                        value="B"
-                        (click)="this.assignedGrade = 'B'"
-                        class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2">
-                    <label class="form-check-label" for="inlineRadio2">B</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input
-                        [checked]="this.assignedGrade === 'C'"
-                        value="C"
-                        (click)="this.assignedGrade = 'C'"
-                        class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3">
-                    <label class="form-check-label" for="inlineRadio3">C</label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="gradeOptions" id="gradeA" autocomplete="off" [checked]="this.assignedGrade === 'A'" (click)="this.assignedGrade = 'A'">
+                    <label class="btn btn-outline-primary" for="gradeA">A</label>
+
+                    <input type="radio" class="btn-check" name="gradeOptions" id="gradeB" autocomplete="off" [checked]="this.assignedGrade === 'B'" (click)="this.assignedGrade = 'B'">
+                    <label class="btn btn-outline-primary" for="gradeB">B</label>
+
+                    <input type="radio" class="btn-check" name="gradeOptions" id="gradeC" autocomplete="off" [checked]="this.assignedGrade === 'C'" (click)="this.assignedGrade = 'C'">
+                    <label class="btn btn-outline-primary" for="gradeC">C</label>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="notesInput" class="form-label">Notes</label>
                 <textarea #gradeNotes class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
-                <div #gradeLabel class="visually-hidden">{{ gradeNotes.value }}</div>
+                <div #gradeLabel class="visually-hidden">{{gradeNotes.value}}</div>
+                </div>
+                <div class="d-grid gap-2">
+                    <button (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
+                    <button (click)="toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-secondary visually-hidden" #editGradeButton>Edit Grade</button>
+                </div>
             </div>
-            <div>
-                <button
-                    (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)"
-                    class="btn btn-primary" #submitGradeButton>Submit Grade
-                </button>
-                <button
-                    (click)="gradeNotes.readOnly = false; toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)"
-                    class="btn btn-primary visually-hidden" #editGradeButton>Edit Grade
-                </button>
-            </div>
-        </section>
+        </div>
+    </section>
     }
     <section>
         <h5>Daily Gain Breakdown</h5>
