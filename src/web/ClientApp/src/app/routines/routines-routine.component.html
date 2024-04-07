@@ -4,19 +4,26 @@
             <div class="col-12">
                 <h2>
                     <span #routineReadonlySection>{{ routine.name }}</span>
-                    <button class="btn btn-link" (click)="toggleVisibility([routineEditSection, routineReadonlySection])">
+                    <button class="btn btn-link"
+                            (click)="toggleVisibility([routineEditSection, routineReadonlySection])">
                         <i class="bi bi-pencil"></i>
                     </button>
                 </h2>
                 <div #routineEditSection class="visually-hidden">
                     <div class="input-group mb-3">
                         <input class="form-control" type="text" #routineName value="{{routine.name}}">
-                        <button class="btn btn-outline-primary" (click)="toggleVisibility([routineEditSection,routineReadonlySection]); updateRoutine(routine, routineName.value);">Save</button>
-                        <button class="btn btn-outline-secondary" (click)="toggleVisibility([routineEditSection, routineReadonlySection]);">Cancel</button>
+                        <button class="btn btn-outline-primary"
+                                (click)="toggleVisibility([routineEditSection,routineReadonlySection]); updateRoutine(routine, routineName.value);">
+                            Save
+                        </button>
+                        <button class="btn btn-outline-secondary"
+                                (click)="toggleVisibility([routineEditSection, routineReadonlySection]);">Cancel
+                        </button>
                     </div>
                 </div>
                 <div class="d-flex align-items-center mb-3">
-                    <a class="btn btn-link me-2" [routerLink]="['/routines']"><i class="bi bi-arrow-left"></i> Back to Routines</a>
+                    <a class="btn btn-link me-2" [routerLink]="['/routines']"><i class="bi bi-arrow-left"></i> Back to
+                        Routines</a>
                 </div>
             </div>
         </div>
@@ -30,7 +37,8 @@
         <div class="row mb-4">
             <div class="col-12">
                 <button class="btn btn-primary me-2" (click)="activate(routine)">Activate</button>
-                <button class="btn btn-outline-secondary" (click)="toggleVisibility([addNewStepSection])">Add Step</button>
+                <button class="btn btn-outline-secondary" (click)="toggleVisibility([addNewStepSection])">Add Step
+                </button>
             </div>
         </div>
         <div class="row mb-4 visually-hidden" #addNewStepSection>
@@ -47,8 +55,13 @@
                                 <label for="stepUrl" class="form-label">URL</label>
                                 <input class="form-control" type="text" id="stepUrl" name="stepUrl" #stepUrl>
                             </div>
-                            <button type="button" class="btn btn-primary" (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility([addNewStepSection])">Add</button>
-                            <button type="button" class="btn btn-link" (click)="toggleVisibility([addNewStepSection])">Cancel</button>
+                            <button type="button" class="btn btn-primary"
+                                    (click)="addStep(routine, stepLabel.value, stepUrl.value); toggleVisibility([addNewStepSection])">
+                                Add
+                            </button>
+                            <button type="button" class="btn btn-link" (click)="toggleVisibility([addNewStepSection])">
+                                Cancel
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -77,7 +90,8 @@
                                                         {{ step.label }}
                                                     </div>
                                                     <div class="visually-hidden" #editLabel>
-                                                        <input type="text" class="form-control" #stepLabel value="{{step.label}}">
+                                                        <input type="text" class="form-control" #stepLabel
+                                                               value="{{step.label}}">
                                                     </div>
                                                 </td>
                                                 <td>
@@ -85,23 +99,43 @@
                                                         <a target="_blank" [href]="step.url">{{ step.url }}</a>
                                                     </div>
                                                     <div class="visually-hidden" #editUrl>
-                                                        <input type="text" class="form-control" #stepUrl value="{{step.url}}">
+                                                        <input type="text" class="form-control" #stepUrl
+                                                               value="{{step.url}}">
                                                     </div>
                                                 </td>
                                                 <td class="text-end">
                                                     <div #readOnlySection>
-                                                        <button class="btn btn-sm btn-outline-secondary me-2" (click)="toggleVisibility([readOnlySection, readOnlyUrl, readOnlyLabel, editSection, editLabel, editUrl])">Edit</button>
-                                                        <button [ngClass]="{'disabled': stepIndex === 0}" class="btn btn-sm btn-outline-secondary me-2" (click)="moveUp(routine, stepIndex)">
-                                                            <i class="bi bi-arrow-up"></i>
+                                                        <button class="btn btn-sm btn-outline-secondary"
+                                                                (click)="toggleVisibility([readOnlySection, readOnlyUrl, readOnlyLabel, editSection, editLabel, editUrl])">
+                                                            <i class="fas fa-pencil-alt"></i>
                                                         </button>
-                                                        <button [ngClass]="{'disabled': stepIndex === routine.steps.length - 1}" class="btn btn-sm btn-outline-secondary me-2" (click)="moveDown(routine, stepIndex)">
-                                                            <i class="bi bi-arrow-down"></i>
+                                                        <div class="btn-group ms-2 mt-2 mb-2">
+                                                            <button [ngClass]="{'disabled': stepIndex === 0}"
+                                                                    class="btn btn-sm btn-outline-secondary"
+                                                                    (click)="moveUp(routine, stepIndex)">
+                                                                <i class="bi bi-arrow-up"></i>
+                                                            </button>
+                                                            <button
+                                                                [ngClass]="{'disabled': stepIndex === routine.steps.length - 1}"
+                                                                class="btn btn-sm btn-outline-secondary"
+                                                                (click)="moveDown(routine, stepIndex)">
+                                                                <i class="bi bi-arrow-down"></i>
+                                                            </button>
+                                                        </div>
+                                                        <button class="btn btn-sm btn-outline-danger ms-2"
+                                                                (click)="deleteStep(routine, stepIndex)">
+                                                            <i class="fas fa-trash-alt"></i>
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-danger" (click)="deleteStep(routine, stepIndex)">Delete</button>
                                                     </div>
                                                     <div class="visually-hidden" #editSection>
-                                                        <button class="btn btn-sm btn-primary me-2" (click)="toggleVisibility([readOnlySection, readOnlyUrl, readOnlyLabel, editSection, editLabel, editUrl]); updateStep(routine, stepIndex, stepLabel.value, stepUrl.value); ">Save</button>
-                                                        <button class="btn btn-sm btn-link" (click)="toggleVisibility([readOnlySection, readOnlyUrl, readOnlyLabel, editSection, editLabel, editUrl])">Cancel</button>
+                                                        <button class="btn btn-sm btn-primary me-2"
+                                                                (click)="toggleVisibility([readOnlySection, readOnlyUrl, readOnlyLabel, editSection, editLabel, editUrl]); updateStep(routine, stepIndex, stepLabel.value, stepUrl.value); ">
+                                                            Save
+                                                        </button>
+                                                        <button class="btn btn-sm btn-link"
+                                                                (click)="toggleVisibility([readOnlySection, readOnlyUrl, readOnlyLabel, editSection, editLabel, editUrl])">
+                                                            Cancel
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -118,6 +152,7 @@
         </div>
     </div>
 }
-@if (activeRoutine) {
-    <app-routines-active-routine [routine]="activeRoutine" (routineDeactivated)="deactivate()"></app-routines-active-routine>
-}
+    @if (activeRoutine) {
+        <app-routines-active-routine [routine]="activeRoutine"
+                                     (routineDeactivated)="deactivate()"></app-routines-active-routine>
+    }
