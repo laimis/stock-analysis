@@ -19,7 +19,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label" for="trendTypeSelect">Trend Type</label>
-                        <select (ngModelChange)="trendTypeSelected()" [(ngModel)]="selectedTrendType" class="form-control form-select"
+                        <select (ngModelChange)="trendTypeSelected($event)" [(ngModel)]="selectedTrendType" class="form-control form-select"
                                 id="trendTypeSelect">
                             <option value="Ema20OverSma50">EMA 20 Over SMA 50</option>
                             <option value="Sma50OverSma200">SMA 50 Over SMA 200</option>
@@ -29,7 +29,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label" for="startDateSelect">Start Date</label>
-                        <select (ngModelChange)="startDateSelected()" [(ngModel)]="selectedStartDate" class="form-control form-select"
+                        <select (ngModelChange)="startDateSelected($event)" [(ngModel)]="selectedStartDate" class="form-control form-select"
                                 id="startDateSelect">
                             <option value="10">10 years</option>
                             <option value="20">20 years</option>

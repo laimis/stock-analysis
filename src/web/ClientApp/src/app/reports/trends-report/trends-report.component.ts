@@ -55,6 +55,10 @@ export class TrendsReportComponent {
     }
 
     loadTrends() {
+        
+        if (!this.selectedTicker) {
+            return
+        }
 
         this.loading = true
         const date = new Date();
@@ -106,11 +110,13 @@ export class TrendsReportComponent {
         this.applyFilters()
     }
 
-    trendTypeSelected() {
+    trendTypeSelected(newTrendType: TrendType) {
+        this.selectedTrendType = newTrendType
         this.applyFilters()
     }
 
-    startDateSelected() {
+    startDateSelected(newDate: string) {
+        this.selectedStartDate = newDate
         this.applyFilters()
     }
 
