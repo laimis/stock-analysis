@@ -15,7 +15,7 @@ namespace web.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class StockPositionsController(StockPositionHandler stockPositionHandler) : ControllerBase
+public class PortfolioController(StockPositionHandler stockPositionHandler) : ControllerBase
 {
     [HttpGet]
     public Task<ActionResult> Index() =>
