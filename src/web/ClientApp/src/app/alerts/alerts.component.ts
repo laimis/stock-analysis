@@ -42,9 +42,20 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
+        this.turnOnRefresh();
+    }
+
+    private turnOnRefresh() {
         this.intervalId = setInterval(() => {
             this.fetchData()
         }, 5000);
+    }
+    
+    private turnOffRefresh() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
     }
 
     ngOnInit(): void {
@@ -52,9 +63,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-        }
+        this.turnOffRefresh();
     }
 
     fetchData() {
@@ -125,20 +134,25 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     applySort(alertGroups: StockAlertGroup[]) {
-        var compare = (a: StockAlert, b: StockAlert) => {
+        const compare = (a: StockAlert, b: StockAlert) => {
             if (this.sortDirection === 'asc') {
                 return a[this.sortColumn] > b[this.sortColumn] ? 1 : -1
             } else {
                 return a[this.sortColumn] < b[this.sortColumn] ? 1 : -1
             }
-        }
+        };
 
         alertGroups.forEach(group => {
             group.alerts.sort(compare)
         })
     }
     
-    toggleGroup(group: StockAlertGroup) {
+    toggleGroupExpansion(group: StockAlertGroup) {
         group.expanded = !group.expanded
+        if (group.expanded) {
+            this.turnOffRefresh()
+        } else {
+            this.turnOnRefresh()
+        }
     }
 }

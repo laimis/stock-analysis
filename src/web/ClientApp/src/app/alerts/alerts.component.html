@@ -44,7 +44,7 @@
         }
         @for (g of alertGroups; track g) {
             <section>
-                <div class="alert-group-summary" (click)="toggleGroup(g)" role="button">
+                <div class="alert-group-summary" (click)="toggleGroupExpansion(g)" role="button">
                     <h5 style="border-bottom: none;">
                         <i class="fas" [ngClass]="{'fa-chevron-down': !g.expanded, 'fa-chevron-up': g.expanded}"></i>
                         {{ g.identifier }} ({{ g.alerts.length }})
