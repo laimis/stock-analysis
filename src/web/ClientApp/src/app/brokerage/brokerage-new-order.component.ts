@@ -17,10 +17,11 @@ export class BrokerageNewOrderComponent {
     brokerageOrderType: string
     numberOfShares: number | null = null
     price: number | null = null
+    notes: string | null = null
     selectedTicker: string
     quote: StockQuote
     total: number | null = null
-    errorMessage: string | null = null;
+    errors: string[] | null = null;
 
     submittedOrder = false
     submittingOrder = false
@@ -51,6 +52,9 @@ export class BrokerageNewOrderComponent {
     set ticker(value: string) {
         this.selectTicker(value)
     }
+    
+    @Input()
+    positionId: string
 
     numberOfSharesChanged() {
         if (this.numberOfShares && this.price) {
@@ -72,7 +76,7 @@ export class BrokerageNewOrderComponent {
 
     reset() {
         this.numberOfShares = null
-        this.errorMessage = null
+        this.errors = null
     }
 
     onTickerSelected(ticker: string) {
@@ -115,14 +119,16 @@ export class BrokerageNewOrderComponent {
     }
 
     execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
-        this.errorMessage = null
+        this.errors = null
         this.submittingOrder = true
         const cmd: brokerageordercommand = {
             ticker: this.selectedTicker,
             numberOfShares: this.numberOfShares,
             price: this.price,
             type: this.brokerageOrderType,
-            duration: this.brokerageOrderDuration
+            duration: this.brokerageOrderDuration,
+            positionId: this.positionId,
+            notes: this.notes
         }
 
         fn(cmd).subscribe(
@@ -135,7 +141,7 @@ export class BrokerageNewOrderComponent {
             err => {
                 this.submittingOrder = false
                 this.submittedOrder = true
-                this.errorMessage = GetErrors(err)[0]
+                this.errors = GetErrors(err)
                 console.error(err)
             }
         )

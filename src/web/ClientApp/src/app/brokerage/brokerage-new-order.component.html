@@ -1,62 +1,64 @@
-<section>
-    <h5>Brokerage Order</h5>
-    @if (errorMessage) {
-        <div class="alert alert-danger">{{ errorMessage }}</div>
-    }
-    <div>
-        @if (submittedOrder === false) {
-            <div class="row">
-                <div class="col-md">
-                    <app-stock-search
-                        [ticker]="selectedTicker"
-                        label="Ticker"
-                        placeholder="New position symbol"
-                        (tickerSelected)="onTickerSelected($event)"
-                        cssClass="form-control">
-                    </app-stock-search>
-                </div>
-                <div class="col-md">
-                    <label for="brokerageOrderType" class="form-label">Order Type</label>
-                    <select class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType"
-                            (ngModelChange)="brokerageOrderTypeChanged()">
-                        <option value="Limit">Limit</option>
-                        <option value="Market">Market</option>
-                        <option value="StopMarket">StopMarket</option>
-                    </select>
-                </div>
-                <div class="col-md">
-                    <label for="brokerageOrderDuration" class="form-label">Order Duration</label>
-                    <select class="form-select" [(ngModel)]="brokerageOrderDuration" id="brokerageOrderDuration">
-                        @for (duration of orderDurations; track duration) {
-                            <option [value]="duration.key">{{ duration.value }}</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md">
-                    <label for="price" class="form-label">Price</label>
-                    <input
-                        type="number"
-                        [ngClass]="{'form-control': true, 'disabled': brokerageOrderType === 'Market'}"
-                        id="price"
-                        step="0.01"
-                        [disabled]="brokerageOrderType === 'Market'"
-                        [readOnly]="brokerageOrderType === 'Market'"
-                        [(ngModel)]="price">
-                </div>
-                <div class="col-md">
-                    <label for="stocksToBuy" class="form-label"># of Shares</label>
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="stocksToBuy"
-                        [(ngModel)]="numberOfShares"
-                        (ngModelChange)="numberOfSharesChanged()">
-                </div>
+<section><h5>Brokerage Order</h5>
+    <app-error-display [errors]="errors"></app-error-display>
+    <div> @if (submittedOrder === false) {
+        <div class="row">
+            <div class="col-md">
+                <app-stock-search [ticker]="selectedTicker" label="Ticker" placeholder="New position symbol"
+                                  (tickerSelected)="onTickerSelected($event)"
+                                  cssClass="form-control"></app-stock-search>
             </div>
-        }
+            <div class="col-md">
+                <label for="brokerageOrderType" class="form-label">Order Type</label>
+                <select
+                    class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType"
+                    (ngModelChange)="brokerageOrderTypeChanged()">
+                    <option value="Limit">Limit</option>
+                    <option value="Market">Market</option>
+                    <option value="StopMarket">StopMarket</option>
+                </select>
+            </div>
+            <div class="col-md">
+                <label for="brokerageOrderDuration" class="form-label">Order Duration</label>
+                <select
+                    class="form-select" [(ngModel)]="brokerageOrderDuration"
+                    id="brokerageOrderDuration">
+                    @for (duration of orderDurations; track duration) {
+                        <option [value]="duration.key">{{ duration.value }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md">
+                <label for="price" class="form-label">Price</label>
+                <input type="number"
+                       [ngClass]="{'form-control': true, 'disabled': brokerageOrderType === 'Market'}"
+                       id="price" step="0.01"
+                       [disabled]="brokerageOrderType === 'Market'"
+                       [readOnly]="brokerageOrderType === 'Market'"
+                       [(ngModel)]="price">
+            </div>
+            <div class="col-md">
+                <label for="stocksToBuy" class="form-label"># of Shares</label>
+                <input type="number"
+                       class="form-control"
+                       id="stocksToBuy"
+                       [(ngModel)]="numberOfShares"
+                       (ngModelChange)="numberOfSharesChanged()">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control"
+                          id="notes" rows="3"
+                          [(ngModel)]="notes"></textarea>
+            </div>
+        </div>
+    }
         @if (quote && submittedOrder === false) {
             @if (quote) {
-                <div class="row">
+                <div class="row mt-3">
                     <div class="col-md">
                         <div class="stat-label">bid</div>
                         <div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div>
@@ -68,10 +70,6 @@
                     <div class="col-md">
                         <div class="stat-label">last</div>
                         <div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div>
-                    </div>
-                    <div class="col-md">
-                        <div class="stat-label">exchange</div>
-                        <div>{{ quote.exchangeName }}</div>
                     </div>
                     <div class="col-md">
                         <div class="stat-label">total</div>
@@ -113,6 +111,5 @@
                     </div>
                 </div>
             }
-        }
-    </div>
+        } </div>
 </section>

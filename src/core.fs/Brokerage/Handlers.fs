@@ -1,11 +1,13 @@
 namespace core.fs.Brokerage
 
+open System
 open System.ComponentModel.DataAnnotations
 open core.Shared
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Storage
+open core.fs.Stocks
 
 type BuyOrSellData =
     {
@@ -19,6 +21,8 @@ type BuyOrSellData =
         Duration:BrokerageOrderDuration
         [<Required>]
         Ticker:Ticker
+        PositionId:System.Guid option
+        Notes:string option
     }
     
 type BrokerageTransaction =
@@ -38,7 +42,7 @@ type QueryAccount =
         UserId:UserId
     }
     
-type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage) =
+type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage, portfolio:IPortfolioStorage) =
     
     let buy (data:BuyOrSellData) user = 
         brokerage.BuyOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
@@ -66,8 +70,21 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage) =
         | None ->
             return "User not found" |> ServiceError |> Error 
         | Some user ->
-            let! _ = user.State |> func data
-            return Ok ()
+            let! result = user.State |> func data
+            match result with
+            | Error error -> return Error error
+            | Ok _ ->
+                match data.PositionId, data.Notes with
+                | Some positionId, Some _ -> 
+                    let! positionOption = portfolio.GetStockPosition (positionId |> StockPositionId) userId
+                    match positionOption with
+                    | None -> return "Position not found" |> ServiceError |> Error
+                    | Some position -> 
+                        let positionWithNote = StockPosition.addNotes data.Notes DateTimeOffset.UtcNow position
+                        do! portfolio.SaveStockPosition userId positionOption positionWithNote
+                        return Ok ()
+                | _ -> 
+                    return Ok ()
     }
     
     member _.Handle (command:CancelOrder) = task {

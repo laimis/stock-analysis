@@ -184,6 +184,7 @@
                 <div class="row mt-3">
                     <div class="col">
                         <app-brokerage-new-order [ticker]="_position.ticker"
+                                                 [positionId]="_position.positionId"
                                                  (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
                     </div>
                 </div>
@@ -237,7 +238,7 @@
         </div>
         <div class="row mt-3">
             <div class="col">
-                <button class="btn btn-sm btn-outline-secondary" (click)="closePosition()" *ngIf="_position.isOpen">
+                <button class="btn btn-sm btn-outline-secondary" (click)="openCloseModal()" *ngIf="_position.isOpen">
                     Close
                 </button>
             </div>
@@ -245,5 +246,32 @@
                 <button class="btn btn-sm btn-outline-danger float-end" (click)="deletePosition()">Delete</button>
             </div>
         </div>
+        
+        <!-- Add the modal HTML -->
+        <div class="modal" tabindex="-1" role="dialog" [style.display]="showCloseModal ? 'block' : 'none'">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="border-bottom: none">Confirm Position Close</h5>
+                        <button type="button" class="btn-close" (click)="closeCloseModal()">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to close this position?</p>
+                        <div class="mb-3">
+                            <label for="closeReasonInput" class="form-label">Reason for Closing:</label>
+                            <textarea class="form-control" id="closeReasonInput" rows="3" [(ngModel)]="closeReason"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
+                        <button type="button" class="btn btn-primary" (click)="confirmClosePosition()">Close Position</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add the modal backdrop -->
+        <div class="modal-backdrop fade show" [style.display]="showCloseModal ? 'block' : 'none'"></div>
+        
     </div>
 }

@@ -24,6 +24,7 @@ export class StockTradingPositionComponent {
     allOrders: BrokerageOrder[] = [];
     strategies: { key: string; value: string; }[];
     showOrderForm: boolean = false;
+    
     @Input()
     quote: StockQuote
     @Output()
@@ -154,20 +155,37 @@ export class StockTradingPositionComponent {
         }
     }
 
-    closePosition() {
-        if (confirm("Are you sure you want to close this position?")) {
-            this.stockService.closePosition(this._position.positionId)
-                .subscribe(
-                    (_) => {
-                        this.brokerageOrdersChanged.emit()
-                    },
-                    err => {
-                        let errors = GetErrors(err)
-                        alert("Error closing position: " + errors.join(", "))
-                    })
-        }
+    closePosition(closeReason:string) {
+        this.stockService.closePosition(this._position.positionId, closeReason)
+            .subscribe(
+                (_) => {
+                    this.brokerageOrdersChanged.emit()
+                },
+                err => {
+                    let errors = GetErrors(err)
+                    alert("Error closing position: " + errors.join(", "))
+                })
     }
 
+    showCloseModal: boolean = false;
+    closeReason: string = '';
+
+    openCloseModal() {
+        this.showCloseModal = true;
+    }
+
+    closeCloseModal() {
+        this.showCloseModal = false;
+        this.closeReason = '';
+    }
+
+    confirmClosePosition() {
+        // Call the existing closePosition() method
+        this.closePosition(this.closeReason);
+
+        // Close the modal
+        this.closeCloseModal();
+    }
 
     deleteTransaction(transactionId: string) {
         if (confirm("are you sure you want to delete the transaction?")) {

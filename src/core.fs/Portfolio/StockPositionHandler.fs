@@ -99,8 +99,10 @@ type OpenStockPosition = {
 
 type ClosePosition =
     {
+        [<Required>]
         PositionId: StockPositionId
-        UserId: UserId
+        [<Required>]
+        CloseReason: string option
     }
  
 type DeletePosition =
@@ -455,22 +457,32 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 return Ok ()
     }
     
-    member this.Handle (command:ClosePosition) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member this.Handle (userId:UserId, command:ClosePosition) = task {
+        let! user = accounts.GetUser(userId)
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let! position = storage.GetStockPosition command.PositionId command.UserId
+            let! position = storage.GetStockPosition command.PositionId userId
             match position with
-            | None -> return "Stock position not found" |> ServiceError |> Error
+            | None ->
+                return "Stock position not found" |> ServiceError |> Error
+                
             | Some position ->
                 
                 // if short, we need to buy to cover
                 // if long, we need to sell
-                return!
+                let! orderResult =
                     match position.StockPositionType with
                     | Short -> brokerage.BuyToCoverOrder user.State position.Ticker (position.NumberOfShares |> abs) 0m BrokerageOrderType.Market BrokerageOrderDuration.Day
                     | Long -> brokerage.SellOrder user.State position.Ticker position.NumberOfShares 0m BrokerageOrderType.Market BrokerageOrderDuration.Day
+                    
+                match orderResult with
+                | Error _ -> ()
+                | Ok _ ->
+                    // add a note
+                    do! position |> StockPosition.addNotes command.CloseReason DateTimeOffset.UtcNow |> storage.SaveStockPosition userId (Some position)
+                    
+                return orderResult
     }
     
     member _.Handle (userId:UserId, command:DeleteStop) = task {

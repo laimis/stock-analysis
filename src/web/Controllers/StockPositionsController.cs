@@ -15,7 +15,7 @@ namespace web.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class PortfolioController(StockPositionHandler stockPositionHandler) : ControllerBase
+public class StockPositionsController(StockPositionHandler stockPositionHandler) : ControllerBase
 {
     [HttpGet]
     public Task<ActionResult> Index() =>
@@ -221,8 +221,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
 
     [HttpDelete("stockpositions/{positionId}")]
     public Task<ActionResult> DeletePosition(
-        [FromRoute] string positionId,
-        [FromServices] StockPositionHandler stockPositionHandler) =>
+        [FromRoute] string positionId) =>
         this.OkOrError(
             stockPositionHandler.Handle(
                 new DeletePosition(
@@ -233,20 +232,11 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
         );
     
     [HttpPost("stockpositions/{positionId}/close")]
-    public Task<ActionResult> ClosePosition(
-        [FromRoute] string positionId,
-        [FromServices] StockPositionHandler stockPositionHandler) =>
-        this.OkOrError(
-            stockPositionHandler.Handle(
-                new ClosePosition(
-                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
-                    userId: User.Identifier()
-                )
-            )
-        );
+    public Task<ActionResult> ClosePosition([FromBody] ClosePosition command) =>
+        this.OkOrError(stockPositionHandler.Handle(User.Identifier(), command));
 
     [HttpPost("stockpositions/{positionId}/labels")]
-    public Task SetLabel([FromBody]AddLabel command, [FromServices] StockPositionHandler stockPositionHandler) =>
+    public Task SetLabel([FromBody]AddLabel command) =>
         this.OkOrError(
             stockPositionHandler.HandleAddLabel(
                 User.Identifier(), command
@@ -260,8 +250,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
     [HttpDelete("stockpositions/{positionId}/labels/{label}")]
     public Task RemoveLabel(
         [FromRoute] string positionId,
-        [FromRoute] string label,
-        [FromServices] StockPositionHandler stockPositionHandler) => 
+        [FromRoute] string label) => 
         this.OkOrError(
             stockPositionHandler.Handle(
                 new RemoveLabel(

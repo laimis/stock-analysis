@@ -1294,6 +1294,8 @@ export class brokerageordercommand {
     price: number
     type: string
     duration: string
+    positionId: string
+    notes: string
 }
 
 export enum TrendDirection {
