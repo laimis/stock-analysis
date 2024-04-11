@@ -31,7 +31,11 @@ function createUnrealizedProfitChart(entries: PositionInstance[], quotes: Map<st
             x: p.daysHeld,
             y: unrealizedProfit(p, quotes[p.ticker]),
             label: p.ticker,
-            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${unrealizedProfit(p, quotes[p.ticker]).toFixed(2)}`}
+            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${unrealizedProfit(p, quotes[p.ticker]).toFixed(2)}`,
+            indexLabel: '{label}', // Add the ticker symbol as the index label
+            // indexLabelFontSize: 12, // Adjust the font size of the index label
+            // indexLabelFontColor: "black" // Adjust the font color of the index label
+        }
     })
 
     return {
@@ -73,6 +77,7 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
             x: position.daysHeld,
             y: unrealizedGainPercent,
             label: position.ticker,
+            indexLabel: '{label}', // Add the ticker symbol as the index label
             toolTipContent: `<strong>${position.ticker}</strong><br/>Days Held: ${position.daysHeld}<br/>Unrealized Gain: ${unrealizedGainPercent.toFixed(2)}%`
         };
     });
@@ -100,57 +105,6 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
                 markerSize: scatterPointMarkerSize,
                 color: blue,
                 dataPoints: chartData
-            }
-        ]
-    };
-}
-
-
-function createPositionsOpenedChart(positions: PositionInstance[]) {
-    
-    const positionsOpenedMap = new Map<string, number>();
-
-    positions.forEach(position => {
-        const openedDate = position.opened.slice(0, 10); // Extract the date portion of the opened timestamp
-
-        // If the date already exists in the map, increment the count
-        if (positionsOpenedMap.has(openedDate)) {
-            positionsOpenedMap.set(openedDate, positionsOpenedMap.get(openedDate)! + 1);
-        } else {
-            // If the date doesn't exist in the map, initialize the count to 1
-            positionsOpenedMap.set(openedDate, 1);
-        }
-    });
-
-    // Convert the map entries to an array of data points
-    const dataPoints = Array.from(positionsOpenedMap.entries()).map(([date, count]) => ({
-        x: new Date(date),
-        y: count
-    }));
-
-    // Sort the data points by date in ascending order
-    dataPoints.sort((a, b) => a.x.getTime() - b.x.getTime());
-
-    return {
-        exportEnabled: true,
-        zoomEnabled: true,
-        title: {
-            text: "Positions Opened by Date",
-        },
-        axisX: {
-            title: "Date",
-            valueFormatString: "YYYY-MM-DD",
-            labelAngle: -45
-        },
-        axisY: {
-            title: "Number of Positions Opened",
-            gridThickness: 0.1,
-        },
-        data: [
-            {
-                type: "column",
-                color: blue,
-                dataPoints: dataPoints
             }
         ]
     };
@@ -334,6 +288,7 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         x: stopPriceDistance(position, quotes[position.ticker]),
         y: unrealizedGainPercentage(position, quotes[position.ticker]),
         label: position.ticker,
+        indexLabel: '{label}', // Add the ticker symbol as the index label
         toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker]).toFixed(2)}%<br/>Unrealized Gain %: ${unrealizedGainPercentage(position, quotes[position.ticker]).toFixed(2)}%`
     }));
 
@@ -563,7 +518,6 @@ export class StockTradingChartsComponent {
                 createUnrealizedRRDistributionChart(this._positions, this._quotes),
                 createProfitDistributionChart(this._positions, this._quotes),
                 createDaysHeldDistributionChart(this._positions),
-                createPositionsOpenedChart(this._positions),
             ]
         }
     }
