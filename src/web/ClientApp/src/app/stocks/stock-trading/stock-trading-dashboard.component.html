@@ -35,18 +35,19 @@
                (click)="activateTab('summary')">
                 Summary
             </a>
-            <a class="tab float-end" [routerLink]="" (click)="refresh()">
-                Refresh
+            <a class="tab" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)"
+               *ngIf="isActive('positions') || isActive('openreview') || isActive('charts')">
+                <i class="fas fa-filter"></i>
+            </a>
+            <a class="tab" [routerLink]="" (click)="refresh()">
                 @if (loading) {
                     <div class="spinner-border text-info spinner-border-sm" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
+                } @else {
+                    <i class="fas fa-sync-alt"></i>
                 }
-            </a>
-            <a class="tab float-end" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)"
-               *ngIf="isActive('positions') || isActive('openreview') || isActive('charts')">
-                Filters
-            </a>
+            g</a>
         </div>
         <div class="row visually-hidden" #settingsDiv>
             <div class="col">
