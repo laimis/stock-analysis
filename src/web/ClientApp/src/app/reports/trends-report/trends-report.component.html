@@ -78,7 +78,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Gain Percentage:</span>
-                        <span>{{ currentTrend.gainPercent | percent }}</span>
+                        <span>{{ currentTrend.gainPercent | percent:'1.2-2' }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Max Age:</span>
@@ -112,7 +112,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Average Gain Percentage:</span>
-                        <span>{{ trends.upGainStatistics.mean | percent }}</span>
+                        <span>{{ trends.upGainStatistics.mean | percent:'1.2-2' }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Average Bars:</span>
@@ -120,7 +120,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Max Gain Percentage:</span>
-                        <span>{{ trends.upGainStatistics.max | percent }}</span>
+                        <span>{{ trends.upGainStatistics.max | percent:'1.2-2' }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Max Bars:</span>
@@ -141,7 +141,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Average Gain Percentage:</span>
-                        <span>{{ trends.downGainStatistics.mean | percent }}</span>
+                        <span>{{ trends.downGainStatistics.mean | percent:'1.2-2' }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Average Bars:</span>
@@ -149,7 +149,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Max Loss Percentage:</span>
-                        <span>{{ trends.downGainStatistics.min | percent }}</span>
+                        <span>{{ trends.downGainStatistics.min | percent:'1.2-2' }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Max Bars:</span>

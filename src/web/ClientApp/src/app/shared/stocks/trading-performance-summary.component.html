@@ -11,7 +11,7 @@
         </div>
         <div class="col">
             <div class="stat-label">Win %</div>
-            <div>{{ performance.winPct | percent:'1.2' }}</div>
+            <div>{{ performance.winPct | percent:'1.2-2' }}</div>
         </div>
         <div class="col">
             <div class="stat-label">R/R</div>
@@ -29,7 +29,7 @@
         </div>
         <div class="col">
             <div class="stat-label">Avg % Wins</div>
-            <div>{{ performance.winAvgReturnPct | percent:'1.0-2' }}</div>
+            <div>{{ performance.winAvgReturnPct | percent:'1.2-2' }}</div>
         </div>
         <div class="col">
             <div class="stat-label">Avg RR Wins</div>
@@ -37,7 +37,7 @@
         </div>
         <div class="col">
             <div class="stat-label">Max Wins</div>
-            <div>{{ performance.maxWinAmount | currency }} / {{ performance.winMaxReturnPct | percent:'1.0-2' }}</div>
+            <div>{{ performance.maxWinAmount | currency }} / {{ performance.winMaxReturnPct | percent:'1.2-2' }}</div>
         </div>
         <div class="col">
             <div class="stat-label">Avg Win Days Held</div>
@@ -51,7 +51,7 @@
         </div>
         <div class="col">
             <div class="stat-label">Avg % Losses</div>
-            <div>{{ performance.lossAvgReturnPct | percent:'1.0-0' }}</div>
+            <div>{{ performance.lossAvgReturnPct | percent:'1.2-2' }}</div>
         </div>
         <div class="col">
             <div class="stat-label">Avg RR Losses</div>
@@ -59,7 +59,7 @@
         </div>
         <div class="col">
             <div class="stat-label">Max Losses</div>
-            <div>{{ performance.maxLossAmount | currency }} / {{ performance.lossMaxReturnPct | percent:'1.0-0' }}</div>
+            <div>{{ performance.maxLossAmount | currency }} / {{ performance.lossMaxReturnPct | percent:'1.2-2' }}</div>
         </div>
         <div class="col">
             <div class="stat-label">Avg Loss Days Held</div>
@@ -85,7 +85,7 @@
         </div>
         <div class="col">
             <div class="stat-label">Avg Return</div>
-            <div>{{ performance.avgReturnPct | percent:'1.0-0' }}</div>
+            <div>{{ performance.avgReturnPct | percent:'1.2-2' }}</div>
         </div>
     </div>
     <div class="row mb-2">

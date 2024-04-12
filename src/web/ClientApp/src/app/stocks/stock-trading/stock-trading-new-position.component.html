@@ -113,9 +113,9 @@
                                       (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
                                 <span class="me-2" #lossSpanAlt
                                       (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
-                                <span class="me-2">Stop %: <strong>{{ stopPct | percent }}</strong></span>
+                                <span class="me-2">Stop %: <strong>{{ stopPct | percent:'1.2-2' }}</strong></span>
                                 <span
-                                    class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent }}</strong> </span>
+                                    class="me-2">std: <strong>{{ prices.percentChanges.stdDev / 100 | percent:'1.2-2' }}</strong> </span>
                             </p>
                         </div>
                     </div>

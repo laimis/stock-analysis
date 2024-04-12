@@ -22,9 +22,9 @@
                 <td>{{ r.strategyName }}</td>
                 <td>{{ r.performance.profit | currency }}</td>
                 <td>{{ r.performance.rrSum | number:'1.0-2' }}</td>
-                <td>{{ r.performance.winPct | percent }}</td>
-                <td>{{ r.performance.winAvgReturnPct | percent }}</td>
-                <td>{{ r.performance.lossAvgReturnPct | percent }}</td>
+                <td>{{ r.performance.winPct | percent:'1.2-2' }}</td>
+                <td>{{ r.performance.winAvgReturnPct | percent:'1.2-2' }}</td>
+                <td>{{ r.performance.lossAvgReturnPct | percent:'1.2-2' }}</td>
                 <td>{{ r.performance.maxWinAmount | currency }}</td>
                 <td>{{ r.performance.maxLossAmount | currency }}</td>
                 <td>{{ r.performance.ev | currency }}</td>

@@ -26,8 +26,8 @@
                             </i>
                             {{ g.bar.dateStr | date }}
                         </td>
-                        <td>{{ g.gapSizePct | percent }}</td>
-                        <td>{{ g.percentChange | percent }}</td>
+                        <td>{{ g.gapSizePct | percent:'1.2-2' }}</td>
+                        <td>{{ g.percentChange | percent:'1.2-2' }}</td>
                         <td>{{ g.bar.open | currency }}</td>
                         <td>{{ g.bar.close | currency }}</td>
                         <td>{{ g.bar.volume | number }}</td>

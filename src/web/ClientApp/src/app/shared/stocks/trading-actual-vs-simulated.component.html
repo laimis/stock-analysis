@@ -22,11 +22,11 @@
                         <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{ r.position.profit | currency }}</td>
                         <td>{{ r.position.stopPrice | currency }}</td>
                         <td>{{ r.position.rr | number }}</td>
-                        <td>{{ r.position.gainPct | percent }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxGainPct | percent:'1.0-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxDrawdownPct | percent:'1.0-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{ r.maxGainPctRecent | percent:'1.0-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{ r.maxDrawdownPctRecent | percent:'1.0-2' }}</td>
+                        <td>{{ r.position.gainPct | percent:'1.2-2' }}</td>
+                        <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxGainPct | percent:'1.2-2' }}</td>
+                        <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxDrawdownPct | percent:'1.2-2' }}</td>
+                        <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{ r.maxGainPctRecent | percent:'1.2-2' }}</td>
+                        <td [ngClass]="{'bg-negative': r.maxGainPctRecent < r.maxDrawdownPctRecent * -1}">{{ r.maxDrawdownPctRecent | percent:'1.2-2' }}</td>
                         <td>
                             @if (r.position.isClosed) {
                                 <span class="badge bg-secondary rounded-pill">closed</span>
