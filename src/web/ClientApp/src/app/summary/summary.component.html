@@ -17,9 +17,9 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h4 class="card-title">Profit Summary</h4>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="display-4 mb-0">{{ result.stockProfit + result.optionProfit | currency }}</h1>
+                <div class="d-flex justify-content-between align-items-center flex-column flex-md-row">
+                    <div class="mb-3 mb-md-0">
+                        <h4 class="display-6 mb-0">{{ result.stockProfit + result.optionProfit | currency }}</h4>
                         <p class="text-muted mb-0">Total Profit</p>
                     </div>
                     <div class="d-flex">
@@ -127,7 +127,7 @@
                                     <app-stock-link [ticker]="p.ticker" [openInNewTab]="true"></app-stock-link>
                                 </td>
                                 <td>{{ p.numberOfShares }}</td>
-                                <td>{{ p.profit | currency }}</td>
+                                <td [ngClass]="{'negative': p.profit < 0}">{{ p.profit | currency }}</td>
                                 <td>{{ p.date | date: 'MM/dd/yyyy' }}</td>
                             </tr>
                         }
