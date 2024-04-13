@@ -4,6 +4,7 @@ import {brokerageordercommand, KeyValuePair, StockQuote, StocksService} from 'sr
 import {GetErrors} from '../services/utils';
 import {BrokerageOrderDuration, BrokerageOrderType, BrokerageService} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
+import {FormControl, Validators} from "@angular/forms";
 
 
 @Component({
@@ -17,7 +18,6 @@ export class BrokerageNewOrderComponent {
     brokerageOrderType: string
     numberOfShares: number | null = null
     price: number | null = null
-    notes: string | null = null
     selectedTicker: string
     quote: StockQuote
     total: number | null = null
@@ -39,6 +39,8 @@ export class BrokerageNewOrderComponent {
         {key: BrokerageOrderDuration.GtcPlus, value: 'GTC+AH'}
     ]
 
+    notesControl = new FormControl('')
+
     constructor(
         private brokerage: BrokerageService,
         private stockService: StocksService,
@@ -53,8 +55,20 @@ export class BrokerageNewOrderComponent {
         this.selectTicker(value)
     }
     
+    private _positionId: string = null
     @Input()
-    positionId: string
+    set positionId(value:string) {
+        this._positionId = value
+        if (value) {
+            this.notesControl.setValidators(Validators.required)
+        } else {
+            this.notesControl.clearValidators()
+        }
+        this.notesControl.updateValueAndValidity()
+    }
+    get positionId() {
+        return this._positionId
+    }
 
     numberOfSharesChanged() {
         if (this.numberOfShares && this.price) {
@@ -120,6 +134,16 @@ export class BrokerageNewOrderComponent {
 
     execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
         this.errors = null
+        
+        if (this.notesControl.invalid) {
+            if (this.notesControl.errors.required) {
+                this.errors = ['Notes field is required.'];    
+            } else {
+                this.errors = ['Notes field is invalid.'];
+            }
+            return;
+        }
+        
         this.submittingOrder = true
         const cmd: brokerageordercommand = {
             ticker: this.selectedTicker,
@@ -128,7 +152,7 @@ export class BrokerageNewOrderComponent {
             type: this.brokerageOrderType,
             duration: this.brokerageOrderDuration,
             positionId: this.positionId,
-            notes: this.notes
+            notes: this.notesControl.value
         }
 
         fn(cmd).subscribe(

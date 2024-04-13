@@ -49,10 +49,13 @@
         </div>
         <div class="row mt-3">
             <div class="col-md">
-                <label for="notes" class="form-label">Notes</label>
+                <label for="notes" class="form-label">Notes
+                    <span *ngIf="notesControl.invalid" class="text-danger">*</span>
+                </label>
                 <textarea class="form-control"
                           id="notes" rows="3"
-                          [(ngModel)]="notes"></textarea>
+                          [formControl]="notesControl"
+                            [required]="positionId !== null"></textarea>
             </div>
         </div>
     }

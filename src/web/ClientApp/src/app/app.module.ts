@@ -4,7 +4,7 @@ import {BrowserModule, Title} from '@angular/platform-browser';
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {ErrorDisplayComponent} from './shared/error-display/error-display.component';
 import {EventsComponent} from './events/events.component';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import {LandingComponent} from './landing/landing.component';
 import {NavMenuComponent} from './nav-menu/nav-menu.component';
@@ -295,7 +295,8 @@ let routes: Routes = [
         CanvasJSAngularChartsModule,
         RouterModule.forRoot(routes, {}),
         NgOptimizedImage,
-        StockTradingChartsComponent
+        StockTradingChartsComponent,
+        ReactiveFormsModule
     ],
     providers: [
         {provide: "windowObject", useValue: window},
