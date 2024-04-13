@@ -2,8 +2,8 @@
     <app-loading></app-loading>
 }
 @if (loaded) {
-    <div class="container">
-        <div class="row justify-content-between align-items-center mb-4">
+    <section class="container">
+        <header class="row justify-content-between align-items-center mb-4">
             <div class="col-auto">
                 <h2>Week of {{ result.start | date }} Review</h2>
             </div>
@@ -13,7 +13,7 @@
                     <option value="last7days">Last 7 days</option>
                 </select>
             </div>
-        </div>
+        </header>
         <div class="card mb-4">
             <div class="card-body">
                 <h4 class="card-title">Profit Summary</h4>
@@ -189,5 +189,5 @@
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 }
