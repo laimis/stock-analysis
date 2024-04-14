@@ -126,6 +126,9 @@ export class StockTradingReviewComponent {
             note).subscribe(
             (_: any) => {
                 this.gradingSuccess = "Grade assigned successfully"
+                setTimeout(() => {
+                    this.gradingSuccess = null
+                }, 5000)
             },
             (error) => {
                 let errors = GetErrors(error)

@@ -11,7 +11,7 @@ import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 export class RoutineDashboardComponent implements OnInit {
 
 
-    routines: Routine[] = []
+    routines: Routine[] = null
     activeRoutine: Routine = null
     errors: string[] = null
 

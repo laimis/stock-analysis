@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
     ChartType,
     DataPoint,
@@ -10,13 +10,14 @@ import {
     TrendType,
     ValueWithFrequency
 } from "../../services/stocks.service";
-import {DatePipe, NgClass, NgIf, PercentPipe} from "@angular/common";
+import {DatePipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
 import {GetErrors} from "../../services/utils";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
     selector: 'app-trends-report',
@@ -30,12 +31,13 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
         LoadingComponent,
         StockSearchComponent,
         LineChartComponent,
-        ErrorDisplayComponent
+        ErrorDisplayComponent,
+        NgForOf
     ],
     templateUrl: './trends-report.component.html',
     styleUrl: './trends-report.component.css'
 })
-export class TrendsReportComponent {
+export class TrendsReportComponent implements OnInit {
     trends: Trends;
     currentTrend: Trend;
     loading: boolean = false
@@ -47,8 +49,9 @@ export class TrendsReportComponent {
     dataPointContainers: DataPointContainer[] = []
     errors: string[];
     protected readonly TrendDirection = TrendDirection;
+    
 
-    constructor(private stockService: StocksService) {
+    constructor(private stockService: StocksService, private route: ActivatedRoute) {
         // Set default values
         this.selectedStartDate = "10";
         this.selectedTrendType = TrendType.Ema20OverSma50
@@ -154,4 +157,36 @@ export class TrendsReportComponent {
             data: dataPoints
         }
     }
+
+    ngOnInit(): void {
+        this.route.queryParams.subscribe(params => {
+            if (params['tickers']) {
+                let tickers = params['tickers'].split(',');
+                this.loadSummary(tickers)
+            }
+        });
+    }
+    
+    trendSummary = {}
+    
+    loadSummary(tickers: string[]) {
+        
+        tickers.forEach(ticker => this.trendSummary[ticker] = null)
+        
+        tickers.forEach(
+            ticker => {
+                this.stockService.reportTrends(ticker, this.selectedTrendType, this.selectedStartDate)
+                    .subscribe(
+                        data => {
+                            this.trendSummary[ticker] = data
+                        },
+                        error => {
+                            console.log("Error: " + error)
+                            this.errors = GetErrors(error)
+                        }
+                    )
+            })
+    }
+
+    protected readonly Object = Object;
 }

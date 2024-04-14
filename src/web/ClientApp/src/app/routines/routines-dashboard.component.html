@@ -30,7 +30,8 @@
             @if (errors) {
                 <app-error-display [errors]="errors"></app-error-display>
             }
-            <div class="card">
+            <app-loading *ngIf="!routines"></app-loading>
+            <div class="card" *ngIf="routines">
                 <div class="card-body">
                     @if (!activeRoutine) {
                         <div class="table-responsive">
@@ -56,7 +57,7 @@
                             </table>
                         </div>
                     }
-                    @if (activeRoutine) {
+                    @else {
                         <app-routines-active-routine [routine]="activeRoutine" (routineDeactivated)="deactivate()"></app-routines-active-routine>
                     }
                 </div>

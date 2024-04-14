@@ -3,6 +3,18 @@
 
     <app-error-display *ngIf="errors"></app-error-display>
 
+    <div *ngIf="trendSummary" class="row">
+        <div *ngFor="let ticker of Object.keys(trendSummary)" class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
+                <span (click)="tickerSelected(ticker)" style="cursor: pointer;">{{ ticker }}</span>
+                <span [ngClass]="{'text-success': trendSummary[ticker].currentTrend.direction === 'Up', 'text-danger': trendSummary[ticker].currentTrend.direction === 'Down'}">
+                    {{ trendSummary[ticker].currentTrend.direction }}
+                </span>
+                <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>
+            </div>
+        </div>
+    </div>
+
     <div class="card mb-4">
         <div class="card-body">
             <div class="row align-items-end">
