@@ -60,7 +60,7 @@ let private reversal (isReversal: PriceBar -> PriceBar -> bool) (sentimentType: 
             {
                 date = current.Date
                 name = name
-                description = $"{name}"
+                description = $"{name}{volumeInfo}"
                 value = current.Close
                 valueFormat = ValueFormat.Currency
                 sentimentType = sentimentType
