@@ -55,15 +55,15 @@ let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
 let private toEmailAlert marketHours alertGroup =
     {| identifier = alertGroup |> fst; alertCount = alertGroup |> snd |> Seq.length; alerts = alertGroup |> snd |> Seq.map (toEmailData marketHours)  |}
 
-let generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs groupingFunc alerts=
+let generateEmailDataPayloadForAlertsWithGroupingFunction title marketHours alertDiffs groupingFunc alerts=
     let groups =
         alerts
         |> Seq.groupBy groupingFunc
         |> Seq.map (toEmailAlert marketHours)
         
-    {| alertGroups = groups; alertDiffs = alertDiffs |};
+    {| alertGroups = groups; alertDiffs = alertDiffs; title = title |};
 
-let generateEmailDataPayloadForAlerts marketHours alertDiffs = generateEmailDataPayloadForAlertsWithGroupingFunction marketHours alertDiffs _.identifier
+let generateEmailDataPayloadForAlerts title marketHours alertDiffs = generateEmailDataPayloadForAlertsWithGroupingFunction title marketHours alertDiffs _.identifier
 
 let private _patternMonitorTimes = [
     TimeOnly.Parse("09:45")
@@ -485,7 +485,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
 
                 do!
                     pair.Value
-                    |> generateEmailDataPayloadForAlertsWithGroupingFunction marketHours [] (fun a -> "Weekly " + a.identifier)
+                    |> generateEmailDataPayloadForAlertsWithGroupingFunction "NGTD: Weekly Alerts" marketHours [] (fun a -> "Weekly " + a.identifier)
                     |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
                     |> Async.AwaitTask
             })
@@ -590,7 +590,7 @@ type AlertEmailService(
         logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
         do!
             alerts
-            |> generateEmailDataPayloadForAlerts marketHours diffCount
+            |> generateEmailDataPayloadForAlerts "NGTD: Alerts" marketHours diffCount
             |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
             |> Async.AwaitTask
     }
