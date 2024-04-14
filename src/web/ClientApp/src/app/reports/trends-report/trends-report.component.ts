@@ -173,19 +173,31 @@ export class TrendsReportComponent implements OnInit {
         
         tickers.forEach(ticker => this.trendSummary[ticker] = null)
         
-        tickers.forEach(
-            ticker => {
-                this.stockService.reportTrends(ticker, this.selectedTrendType, this.selectedStartDate)
-                    .subscribe(
-                        data => {
-                            this.trendSummary[ticker] = data
-                        },
-                        error => {
-                            console.log("Error: " + error)
-                            this.errors = GetErrors(error)
-                        }
-                    )
-            })
+        this.loadSummaryIncremental(tickers)
+    }
+    
+    loadSummaryIncremental(tickers: string[]) {
+        // if there are no tickers, do nothing
+        if (tickers.length == 0) {
+            return
+        }
+        
+        // take the first ticker
+        let ticker = tickers[0]
+
+        this.stockService.reportTrends(ticker, this.selectedTrendType, this.selectedStartDate)
+            .subscribe(
+                data => {
+                    this.trendSummary[ticker] = data
+                    // call the function recursively with the rest of the tickers
+                    this.loadSummaryIncremental(tickers.slice(1))
+                },
+                error => {
+                    console.log("Error: " + error)
+                    this.errors = GetErrors(error)
+                    this.loadSummaryIncremental(tickers.slice(1))
+                }
+            )
     }
 
     protected readonly Object = Object;
