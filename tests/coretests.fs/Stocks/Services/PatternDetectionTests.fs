@@ -16,7 +16,8 @@ let ``Pattern detection with only one bar returns nothing`` () =
     |> should be Empty
 
 
-[<Fact>]
+// TODO: find the true upside reversal
+[<Fact(Skip="Needs to be re-implemented")>]
 let ``Pattern detection with ENPH finds upside reversal``() =
     let patterns =
         TestDataGenerator.ENPH

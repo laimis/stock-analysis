@@ -22,106 +22,62 @@ let private relativeVolume (current:PriceBar) (bars:PriceBars) =
         decimal(current.Volume) / stats.median |> Some
     | false -> None
         
-let gapDownName = "Gap Down"
-let gapDown (bars: PriceBars) =
+let gap (gapType: GapType) (name: string) (sentimentType: SentimentType) (bars: PriceBars) =
     match bars.Length with
     | 0 | 1 -> None
     | _ ->
         let gaps = bars |> detectGaps 2
         match gaps with
-        | [|gap|] when gap.Type = GapType.Down ->
+        | [|gap|] when gap.Type = gapType ->
             let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString
             let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
             {
                 date = bars.Last.Date
-                name = gapDownName
-                description = $"%s{gapDownName} {gapPercentFormatted}%%{relativeVolume}"
+                name = name
+                description = $"%s{name} {gapPercentFormatted}%%{relativeVolume}"
                 value = gap.GapSizePct
                 valueFormat = ValueFormat.Percentage
-                sentimentType = SentimentType.Negative 
+                sentimentType = sentimentType
             } |> Some
         | _ -> None
 
 let gapUpName = "Gap Up"
-let gapUp (bars: PriceBars) =
-    
-    match bars.Length with
-    | 0 | 1 -> None
-    | _ ->
-        let gaps = bars |> detectGaps 2
-        match gaps with
-        | [|gap|] when gap.Type = GapType.Up ->
-            let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString
-            let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
-            {
-                date = bars.Last.Date
-                name = gapUpName
-                description = $"%s{gapUpName} {gapPercentFormatted}%%{relativeVolume}"
-                value = gap.GapSizePct
-                valueFormat = ValueFormat.Percentage
-                sentimentType = SentimentType.Positive 
-            } |> Some
-        | _ -> None
+let gapDownName = "Gap Down"
+let gapDown = gap GapType.Down gapDownName SentimentType.Negative
+let gapUp = gap GapType.Up gapUpName SentimentType.Positive
 
-let downsideReversalName = "Downside Reversal"
-let downsideReversal (bars: PriceBars) =
+let private reversal (isReversal: PriceBar -> PriceBar -> bool) (sentimentType: SentimentType) (name: string) (bars: PriceBars) =
     match bars.Length with
     | 0 | 1 -> None
     | _ ->
         let current = bars.Last
         let previous = bars.Bars[bars.Length - 2]
-        
-        // downside reversal pattern detection
-        if current.Close < System.Math.Min(previous.Open, previous.Close) && current.High > previous.High then
-            let completeReversal = current.Close < previous.Low
+
+        // reversal pattern detection
+        if isReversal current previous then
             let volumeInfo = relativeVolume current bars |> toVolumeMultiplierString
-                    
-            let additionalInfo =
-                match completeReversal with
-                | true -> " (complete) " + volumeInfo
-                | false -> volumeInfo
-                
+
             {
                 date = current.Date
-                name = downsideReversalName
-                description = $"{downsideReversalName}{additionalInfo}"
+                name = name
+                description = $"{name}"
                 value = current.Close
                 valueFormat = ValueFormat.Currency
-                sentimentType = SentimentType.Negative 
+                sentimentType = sentimentType
             } |> Some
         else
             None
 
 let upsideReversalName = "Upside Reversal"
-let upsideReversal (bars: PriceBars) =
-    match bars.Length with
-    | 0 | 1 -> None
-    | _ ->
-        let current = bars.Last
-        let previous = bars.Bars[bars.Length - 2]
-        
-        // upside reversal pattern detection
-        if current.Close > System.Math.Max(previous.Open, previous.Close) && current.Low < previous.Low then
-            let completeReversal = current.Close < previous.Low
-            let volumeInfo = relativeVolume current bars |> toVolumeMultiplierString
-            
-            let additionalInfo =
-                match completeReversal with
-                | true -> " (complete) " + volumeInfo
-                | false -> volumeInfo
-                
-            {
-                date = current.Date
-                name = upsideReversalName
-                description = $"{upsideReversalName}{additionalInfo}"
-                value = current.Close
-                valueFormat = ValueFormat.Currency
-                sentimentType = SentimentType.Positive 
-            } |> Some
-        else
-            None
+let upsideReversal =
+    let isUpsideReversal (current:PriceBar) (previous:PriceBar) = current.Close > previous.High && current.Low < previous.Low
+    reversal isUpsideReversal SentimentType.Positive upsideReversalName
 
-
+let downsideReversalName = "Downside Reversal"
+let downsideReversal =
+    let isDownsideReversal (current:PriceBar) (previous:PriceBar) = current.Close < previous.Low && current.High > previous.High
+    reversal isDownsideReversal SentimentType.Negative downsideReversalName
+    
 let highest1YearVolumeName = "Highest 1 year volume"
 
 let highest1YearVolume (bars: PriceBars) =
