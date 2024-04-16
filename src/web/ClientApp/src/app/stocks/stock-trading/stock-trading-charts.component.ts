@@ -147,7 +147,7 @@ function createProfitDistributionChart(positions: PositionInstance[], quotes: Ma
 function createPositionSizePieChart(positions: PositionInstance[]) {
     
     const pieChartData = positions.map(position => ({
-        y: position.cost,
+        y: Math.abs(position.cost),
         label: position.ticker
     })).sort((a, b) => b.y - a.y);
 
