@@ -155,7 +155,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
             
             let! positions = portfolio.GetPendingStockPositions(command.UserId)
             
-            let data = positions |> Seq.sortByDescending(fun x -> x.State.Date);
+            let data = positions |> Seq.sortByDescending _.State.Opened;
                 
             let filename = CSVExport.generateFilename("pendingpositions");
 
@@ -177,7 +177,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 positions
                 |> Seq.map _.State
                 |> Seq.filter (fun x -> x.IsClosed |> not)
-                |> Seq.sortByDescending _.Date
+                |> Seq.sortByDescending _.Opened
             
             let tickers = data |> Seq.map(fun x -> x.Ticker)
             let! priceResponse = brokerage.GetQuotes user.State tickers

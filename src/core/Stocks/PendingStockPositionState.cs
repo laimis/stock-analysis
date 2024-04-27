@@ -16,7 +16,7 @@ namespace core.Stocks
         public decimal? StopPrice { get; private set; }
         public string Notes { get; private set; }
         public string Strategy { get; private set; }
-        public DateTimeOffset Date { get; private set; }
+        public DateTimeOffset Opened { get; private set; }
         public DateTimeOffset? Closed { get; private set; }
         public bool IsClosed => Closed.HasValue;
         public bool Purchased { get; private set; }
@@ -52,7 +52,7 @@ namespace core.Stocks
 
         private void ApplyInternal(PendingStockPositionCreatedWithStrategy created)
         {
-            Date = created.When;
+            Opened = created.When;
             Id = created.AggregateId;
             Notes = created.Notes;
             NumberOfShares = created.NumberOfShares;

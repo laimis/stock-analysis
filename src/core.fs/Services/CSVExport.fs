@@ -21,9 +21,9 @@ module CSVExport =
             Ticker:string
             Bid:decimal
             NumberOfShares:decimal
-            StopPrice:decimal option
-            Date:string
-            Closed:string option
+            StopPrice:string
+            Opened:string
+            Closed:string
             Purchased:bool
             Strategy:string
             Notes:string
@@ -157,9 +157,9 @@ module CSVExport =
                     Ticker = p.State.Ticker.Value
                     Bid = p.State.Bid
                     NumberOfShares = p.State.NumberOfShares
-                    StopPrice = (if p.State.StopPrice.HasValue then Some(p.State.StopPrice.Value) else None)
-                    Date = p.State.Date.ToString(DATE_FORMAT)
-                    Closed = (if p.State.Closed.HasValue then Some (p.State.Closed.Value.ToString(DATE_FORMAT)) else None)
+                    StopPrice = (if p.State.StopPrice.HasValue then p.State.StopPrice.Value.ToString(CURRENCY_FORMAT) else "")
+                    Opened = p.State.Opened.ToString(DATE_FORMAT)
+                    Closed = (if p.State.Closed.HasValue then p.State.Closed.Value.ToString(DATE_FORMAT) else "")
                     Purchased = p.State.Purchased
                     Strategy = p.State.Strategy
                     Notes = p.State.Notes
