@@ -7,7 +7,11 @@
         <div *ngFor="let ticker of Object.keys(trendSummary)" class="col-md-4">
             @if (trendSummary[ticker] && trendSummary[ticker].currentTrend) {
             <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
-                <span (click)="tickerSelected(ticker)" role="button">{{ ticker }}</span>
+                <span (click)="tickerSelected(ticker)" role="button">
+                    <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
+                    {{ ticker }}
+                    
+                </span>
                 <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Up'" class="fas fa-arrow-up text-success"></i>
                 <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Down'" class="fas fa-arrow-down text-danger"></i>
                 <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>

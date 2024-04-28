@@ -272,7 +272,6 @@ let routes: Routes = [
         StockSECFilingsComponent,
         StockTradingAnalysisDashboardComponent,
         StockTradingStrategiesComponent,
-        TradingViewLinkComponent,
         StockLinkComponent,
         StockLinkAndTradingviewLinkComponent,
 
@@ -296,7 +295,8 @@ let routes: Routes = [
         RouterModule.forRoot(routes, {}),
         NgOptimizedImage,
         StockTradingChartsComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        TradingViewLinkComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

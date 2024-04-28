@@ -10,7 +10,7 @@ import {
     TrendType,
     ValueWithFrequency
 } from "../../services/stocks.service";
-import {DatePipe, NgClass, NgForOf, NgIf, PercentPipe, NgTemplateOutlet} from "@angular/common";
+import {DatePipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
@@ -20,6 +20,7 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
 import {ActivatedRoute} from "@angular/router";
 import {catchError, tap} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
+import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 
 @Component({
     selector: 'app-trends-report',
@@ -34,7 +35,8 @@ import {concat, EMPTY} from "rxjs";
         StockSearchComponent,
         LineChartComponent,
         ErrorDisplayComponent,
-        NgForOf
+        NgForOf,
+        TradingViewLinkComponent
     ],
     templateUrl: './trends-report.component.html',
     styleUrl: './trends-report.component.css'
