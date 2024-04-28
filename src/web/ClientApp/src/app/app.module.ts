@@ -1,5 +1,5 @@
 import {AppComponent} from './app.component';
-import {AuthGuard, AuthGuardAdminOnly, AuthGuardUnverifiedAllowed} from './auth/auth.guard';
+import {AuthGuard, AuthGuardAdminOnly, AuthGuardUnverifiedAllowed, WithLoginStatus} from './auth/auth.guard';
 import {BrowserModule, Title} from '@angular/platform-browser';
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {ErrorDisplayComponent} from './shared/error-display/error-display.component';
@@ -181,7 +181,7 @@ let routes: Routes = [
     {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
     {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
 
-    {path: '**', pathMatch: 'full', component: PageNotFoundComponent},
+    {path: '**', pathMatch: 'full', component: PageNotFoundComponent, canActivate: [WithLoginStatus]},
 ];
 
 @NgModule({

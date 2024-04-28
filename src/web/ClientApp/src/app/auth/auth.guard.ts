@@ -4,6 +4,22 @@ import {AccountStatus, StocksService} from '../services/stocks.service';
 import {GlobalService} from '../services/global.service';
 
 @Injectable({providedIn: 'root'})
+export class WithLoginStatus {
+
+    constructor(
+        private globalService: GlobalService,
+        private stocks: StocksService) {
+    }
+
+    async canActivate(): Promise<boolean> {
+        //get user data
+        const result = await this.stocks.getProfile().toPromise<AccountStatus>();
+        this.globalService.markLoggedIn(result)
+        return true;
+    }
+}
+
+@Injectable({providedIn: 'root'})
 export class AuthGuard {
 
     constructor(

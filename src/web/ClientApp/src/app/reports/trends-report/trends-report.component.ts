@@ -10,7 +10,7 @@ import {
     TrendType,
     ValueWithFrequency
 } from "../../services/stocks.service";
-import {DatePipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
+import {DatePipe, NgClass, NgForOf, NgIf, PercentPipe, NgTemplateOutlet} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
@@ -18,6 +18,8 @@ import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
 import {GetErrors} from "../../services/utils";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {ActivatedRoute} from "@angular/router";
+import {catchError, tap} from "rxjs/operators";
+import {concat, EMPTY} from "rxjs";
 
 @Component({
     selector: 'app-trends-report',
@@ -85,19 +87,22 @@ export class TrendsReportComponent implements OnInit {
             })
 
             this.dataPointContainers = [
+
+                {label: "Gains Chronological", chartType: ChartType.Column, data: gainsChronological},
+                {label: "Bars Chronological", chartType: ChartType.Column, data: barsChronological},
+
+                this.sortAndCreateContainer(data.upTrends.map((t: Trend) => t.numberOfBars), "Up Bars Sorted"),
+                this.sortAndCreateContainer(data.upTrends.map((t: Trend) => t.gainPercent), "Up Gain Sorted"),
+                
+                this.sortAndCreateContainer(data.downTrends.map((t: Trend) => t.numberOfBars), "Down Bars Sorted"),
+                this.sortAndCreateContainer(data.downTrends.map((t: Trend) => t.gainPercent), "Down Gain Sorted"),
+                
                 this.createContainer(data.upBarStatistics.buckets, "Up Bar Distribution"),
-                this.createContainer(data.downBarStatistics.buckets, "Down Bar Distribution"),
                 this.createContainer(data.upGainStatistics.buckets, "Up Gain Distribution"),
+                
+                this.createContainer(data.downBarStatistics.buckets, "Down Bar Distribution"),
                 this.createContainer(data.downGainStatistics.buckets, "Down Gain Distribution"),
 
-                // up bars sorted
-                this.sortAndCreateContainer(data.upTrends.map((t: Trend) => t.numberOfBars), "Up Bars Sorted"),
-                this.sortAndCreateContainer(data.downTrends.map((t: Trend) => t.numberOfBars), "Down Bars Sorted"),
-                this.sortAndCreateContainer(data.upTrends.map((t: Trend) => t.gainPercent), "Up Gain Sorted"),
-                this.sortAndCreateContainer(data.downTrends.map((t: Trend) => t.gainPercent), "Down Gain Sorted"),
-
-                {label: "Bars Chronological", chartType: ChartType.Column, data: barsChronological},
-                {label: "Gains Chronological", chartType: ChartType.Column, data: gainsChronological}
             ]
 
             this.loading = false
@@ -167,16 +172,43 @@ export class TrendsReportComponent implements OnInit {
         });
     }
     
-    trendSummary = {}
+    shortTermTrendSummary = {}
+    longTermTrendSummary = {}
     
     loadSummary(tickers: string[]) {
         
-        tickers.forEach(ticker => this.trendSummary[ticker] = null)
+        // for each ticker in the list, setup an observable that will make reportTrends call
+        // when the observable is subscribed to
+        let shortTermObservables = tickers.map(ticker => {
+            return this.stockService.reportTrends(ticker, TrendType.Ema20OverSma50, "10")
+                .pipe(
+                    tap(data => this.shortTermTrendSummary[ticker] = data),
+                    catchError(error => {
+                        console.log("Error: " + error)
+                        this.errors = GetErrors(error)
+                        return EMPTY
+                    })
+                )
+        })
         
-        this.loadSummaryIncremental(tickers)
+        let longTermObservables = tickers.map(ticker => {
+            return this.stockService.reportTrends(ticker, TrendType.Sma50OverSma200, "10")
+                .pipe(
+                    tap(data => this.longTermTrendSummary[ticker] = data),
+                    catchError(error => {
+                        console.log("Error: " + error)
+                        this.errors = GetErrors(error)
+                        return EMPTY
+                    })
+                )
+        })
+        
+        let allObservables = shortTermObservables.concat(longTermObservables)
+        
+        concat(...allObservables).subscribe()
     }
     
-    loadSummaryIncremental(tickers: string[]) {
+    loadSummaryIncremental(tickers: string[], trendSummaryContainer: {}) {
         // if there are no tickers, do nothing
         if (tickers.length == 0) {
             return
@@ -185,17 +217,17 @@ export class TrendsReportComponent implements OnInit {
         // take the first ticker
         let ticker = tickers[0]
 
-        this.stockService.reportTrends(ticker, this.selectedTrendType, this.selectedStartDate)
+        this.stockService.reportTrends(ticker, TrendType.Ema20OverSma50, "10")
             .subscribe(
                 data => {
-                    this.trendSummary[ticker] = data
+                    trendSummaryContainer[ticker] = data
                     // call the function recursively with the rest of the tickers
-                    this.loadSummaryIncremental(tickers.slice(1))
+                    this.loadSummaryIncremental(tickers.slice(1), trendSummaryContainer)
                 },
                 error => {
                     console.log("Error: " + error)
                     this.errors = GetErrors(error)
-                    this.loadSummaryIncremental(tickers.slice(1))
+                    this.loadSummaryIncremental(tickers.slice(1), trendSummaryContainer)
                 }
             )
     }
