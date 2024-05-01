@@ -73,7 +73,8 @@ module Helpers =
                             NumberOfShares = localPosition.NumberOfShares
                             PricePerShare = localPosition.AverageCostPerShare
                             Ticker = localPosition.Ticker
-                            LocalPosition = localPosition |> Some 
+                            LocalPosition = localPosition |> Some
+                            PendingPosition = None 
                         }
                     Some violation
                     
@@ -89,6 +90,7 @@ module Helpers =
                                 PricePerShare = localPosition.AverageCostPerShare
                                 Ticker = localPosition.Ticker
                                 LocalPosition = localPosition |> Some
+                                PendingPosition = None 
                             }
                         Some violation
             )
