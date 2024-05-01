@@ -60,6 +60,16 @@
                     </div>
                 }
             </div>
+            @if(violation.pendingPosition) {
+            <div class="card-footer">
+                <div class="text-muted">
+                    Pending Position stop at {{ violation.pendingPosition.stopPrice | currency }}
+                </div>
+            </div>
+            }
+            <div>
+                
+            </div>
         </div>
     }
 

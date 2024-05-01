@@ -570,6 +570,7 @@ export class StockViolation {
     ticker: string
     currentPrice: number
     localPosition: PositionInstance
+    pendingPosition: PendingStockPosition
 }
 
 export interface TransactionsView {

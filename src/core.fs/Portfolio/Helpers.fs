@@ -2,12 +2,13 @@ namespace core.fs.Portfolio
 
 open System.Collections.Generic
 open core.Shared
+open core.Stocks
 open core.fs.Adapters.Brokerage
 open core.fs.Stocks
 
 module Helpers =
 
-    let getViolations brokeragePositions localPositions (prices:Dictionary<Ticker,StockQuote>) =
+    let getViolations brokeragePositions localPositions (pendingPositions:PendingStockPosition seq) (prices:Dictionary<Ticker,StockQuote>) =
         
         let brokerageSideViolations =
             brokeragePositions
@@ -19,6 +20,10 @@ module Helpers =
                     | false, _ -> 0m
                     
                 let localPositionOption = localPositions |> Seq.tryFind (fun (x:StockPositionWithCalculations) -> x.Ticker = brokeragePosition.Ticker)
+                let localPendingPositionOption =
+                    pendingPositions
+                    |> Seq.tryFind (fun (x:PendingStockPosition) -> x.State.Ticker = brokeragePosition.Ticker)
+                    |> Option.map _.State
                 
                 match localPositionOption with
                 | None ->
@@ -28,7 +33,8 @@ module Helpers =
                             NumberOfShares = brokeragePosition.Quantity
                             PricePerShare = brokeragePosition.AverageCost
                             Ticker = brokeragePosition.Ticker
-                            LocalPosition = None 
+                            LocalPosition = None
+                            PendingPosition = localPendingPositionOption
                         }
                     Some violation
                     
@@ -42,7 +48,8 @@ module Helpers =
                                 NumberOfShares = brokeragePosition.Quantity
                                 PricePerShare = brokeragePosition.AverageCost
                                 Ticker = brokeragePosition.Ticker
-                                LocalPosition = localPositionOption 
+                                LocalPosition = localPositionOption
+                                PendingPosition = localPendingPositionOption
                             }
                         Some violation
                 )

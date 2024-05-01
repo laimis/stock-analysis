@@ -779,6 +779,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.map (fun s -> s |> StockPositionWithCalculations)
                 |> Seq.toArray
                 
+            let! pendingPositions = storage.GetPendingStockPositions query.UserId
+                
             let! accountResponse = brokerage.GetAccount(user.State)
             let account =
                 match accountResponse with
@@ -803,7 +805,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let current = positions |> Array.sortByDescending _.RR
             
-            let violations = Helpers.getViolations account.StockPositions positions prices |> Seq.toArray
+            let violations = Helpers.getViolations account.StockPositions positions pendingPositions prices |> Seq.toArray
             
             let (tradingEntries:TradingEntriesView) =
                 {

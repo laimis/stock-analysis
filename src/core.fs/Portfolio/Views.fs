@@ -3,6 +3,7 @@ namespace core.fs.Portfolio
 open System
 open Microsoft.FSharp.Collections
 open core.Shared
+open core.Stocks
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
@@ -22,6 +23,7 @@ type StockViolationView =
         PricePerShare: decimal
         Ticker: Ticker
         LocalPosition: StockPositionWithCalculations option
+        PendingPosition: PendingStockPositionState option
     }
     
     override this.Equals(other) =
