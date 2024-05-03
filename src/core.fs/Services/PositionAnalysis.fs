@@ -146,17 +146,6 @@ module PositionAnalysis =
             (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
         ]
         
-        let tickersAndTheirRiskAmounts = 
-            tickerOutcomes
-            |> TickerOutcomes.filter withRiskAmountFilters
-            |> Seq.map (fun o -> (o.ticker, o.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.RiskAmount)))
-            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value))
-        
-        let riskAmountAnalysis =
-            tickersAndTheirRiskAmounts
-            |> Seq.map snd
-            |> DistributionStatistics.calculate
-            
         let positionSizeUnbalancedFilter = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
@@ -245,12 +234,13 @@ module PositionAnalysis =
                 ]
             )
             AnalysisOutcomeEvaluation(
-                "Unbalanced Risk Amount",
+                "Risk Amount too Small or too Big",
                 OutcomeType.Negative,
                 PositionAnalysisKeys.RiskAmount,
                 tickerOutcomes |> TickerOutcomes.filter [
                     yield! withRiskAmountFilters
-                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (riskAmountAnalysis.mean / o.Value < 0.9m || riskAmountAnalysis.mean / o.Value > 1.1m))
+                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (o.Value < 40m || o.Value > 60m))
+                    // actual risk limits should come from user configuration
                 ]
             )
             AnalysisOutcomeEvaluation(
