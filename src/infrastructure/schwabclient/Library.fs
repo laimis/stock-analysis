@@ -289,7 +289,7 @@ type NanConverter() =
     override this.Write(writer: Utf8JsonWriter, value: decimal, _) =
         writer.WriteNumberValue(value)
 
-type TDAmeritradeClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: string, logger: ILogger<TDAmeritradeClient> option) =
+type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: string, logger: ILogger<SchwabClient> option) =
 
     let _logger = logger
     let _callbackUrl = callbackUrl
