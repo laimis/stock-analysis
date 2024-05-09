@@ -528,8 +528,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
     }
 
     // run this Saturday morning then all the data has settled
-    // Friday evenings often brokerage data is under some sort of maintenance with
-    // TD Ameritrade at least
+    // Friday evenings often brokerage data is under some sort of maintenance
     member _.NextRunTime (now:DateTimeOffset) =
         match tickersToCheckCount() with
         | x when x > 0 -> now.Add(TimeSpan.FromMinutes(1.0))
