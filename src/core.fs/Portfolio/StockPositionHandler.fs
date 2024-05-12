@@ -805,7 +805,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let current = positions |> Array.sortByDescending _.RR
             
-            let violations = Helpers.getViolations account.StockPositions positions pendingPositions prices |> Seq.toArray
+            let violations = Helpers.getViolations account positions pendingPositions prices |> Seq.toArray
             
             let (tradingEntries:TradingEntriesView) =
                 {
