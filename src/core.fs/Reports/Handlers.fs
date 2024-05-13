@@ -210,7 +210,7 @@ type TrendsQuery =
         | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketEndOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow
         | None -> DateTimeOffset.UtcNow
     
-type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote>) =
+type SellsView(stocks:StockPositionState seq,prices:IDictionary<Ticker,StockQuote>) =
     
     member _.Sells: SellView seq =
         stocks

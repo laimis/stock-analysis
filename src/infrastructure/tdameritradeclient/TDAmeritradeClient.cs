@@ -465,11 +465,11 @@ public class TDAmeritradeClient : IBrokerage
         return ToFSharpResult(quote);
     }
 
-    public async Task<FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
+    public async Task<FSharpResult<IDictionary<Ticker, StockQuote>, ServiceError>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
     {
         if (user.ConnectedToBrokerage == false)
         {
-            return NotConnectedToBrokerageError<Dictionary<Ticker, StockQuote>>();
+            return NotConnectedToBrokerageError<IDictionary<Ticker, StockQuote>>();
         }
         
         var function = $"marketdata/quotes?symbol={string.Join(",", tickers.Select(t => t.Value))}";
@@ -481,9 +481,9 @@ public class TDAmeritradeClient : IBrokerage
         // but that did not work, seems like you had to add dictionary converter and it got ugly pretty quickly
         return result.IsOk switch
         {
-            false => ToFSharpError<Dictionary<Ticker, StockQuote>>(result.ErrorValue),
+            false => ToFSharpError<IDictionary<Ticker, StockQuote>>(result.ErrorValue),
             true => ToFSharpResult(
-                result.ResultValue.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value)
+                result.ResultValue.ToDictionary(keySelector: pair => new Ticker(pair.Key), pair => pair.Value) as IDictionary<Ticker, StockQuote>
             )
         };
     }

@@ -8,7 +8,7 @@ open core.fs.Stocks
 
 module Helpers =
 
-    let getViolations (account:BrokerageAccount) localPositions (pendingPositions:PendingStockPosition seq) (prices:Dictionary<Ticker,StockQuote>) =
+    let getViolations (account:BrokerageAccount) localPositions (pendingPositions:PendingStockPosition seq) (prices:IDictionary<Ticker,StockQuote>) =
         
         match account.Connected with
         | false -> Seq.empty

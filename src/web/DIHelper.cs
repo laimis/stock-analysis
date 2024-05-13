@@ -69,7 +69,6 @@ namespace web
                     services.AddSingleton(type);
                 }
             }
-
             
             services.AddSingleton<ISubscriptions>(s => 
                 new stripe.Subscriptions(
@@ -104,8 +103,6 @@ namespace web
                         configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
                         s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
                     ));
-                
-                services.AddSingleton(s => s.GetService<IBrokerage>() as IStockInfoProvider);
             }
             else if (schwabCallbackUrl != null)
             {
@@ -117,18 +114,16 @@ namespace web
                         configuration.GetValue<string>("SCHWAB_CLIENT_SECRET"),
                         new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
                     ));
-                
-                services.AddSingleton(s => s.GetService<IBrokerage>() as IStockInfoProvider);
             }
             else
             {
                 logger.LogWarning("Dummy brokerage client registered, no brokerage callback url provided");
-                // dummy brokerage client
-                services.AddSingleton<IBrokerage>(s => new DummyBrokerageClient());
-                services.AddSingleton<IStockInfoProvider>(s => new DummyPriceInfoProvider());
+                services.AddSingleton<IBrokerage>(s => new DummyImplementation());
             }
             
             StorageRegistrations(configuration, services, logger);
+            
+            services.AddSingleton<IStockInfoProvider>(s => s.GetService<dbstockinfoprovider.DbStockInfoProvider>());
             
             var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
             if (backendJobsSwitch != "off")
@@ -195,6 +190,7 @@ namespace web
             services.AddSingleton<IAccountStorage>(s => new storage.postgres.AccountStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IBlobStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IAggregateStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
+            services.AddSingleton(s => new dbstockinfoprovider.DbStockInfoProvider(s.GetService<IBrokerage>(), cnn));
         }
     }
 }

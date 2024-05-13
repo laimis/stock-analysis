@@ -11,8 +11,26 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Options
 open core.fs.Adapters.Stocks
 
-type StockService(connectionString: string) =
+type DbStockInfoProvider(brokerage:IBrokerage, connectionString: string) =
     
+    let stockQuoteMapper (reader:RowReader) =
+        {
+            symbol = reader.string "ticker"
+            exchange = ""
+            mark = 0m
+            volatility = 0m
+            askPrice = reader.decimal "lastprice"
+            askSize = 0m
+            bidPrice = reader.decimal "lastprice"
+            bidSize = 0m
+            closePrice = reader.decimal "lastprice"
+            exchangeName = ""
+            lastPrice = reader.decimal "lastprice"
+            lastSize = 0m
+            regularMarketLastPrice = reader.decimal "lastprice"
+            regularMarketLastSize = 0m 
+        }
+        
     member this.WriteHistoricalData(ticker: string, date: DateTimeOffset, open': decimal, high: decimal, low: decimal, close: decimal, volume: int64) =
         let query = @"INSERT INTO historical_prices (ticker, date, open, high, low, close, volume) VALUES (@ticker, @date, @open, @high, @low, @close, @volume)
                       ON CONFLICT (ticker, date) DO UPDATE SET open = @open, high = @high, low = @low, close = @close, volume = @volume"
@@ -29,7 +47,7 @@ type StockService(connectionString: string) =
             "@close", close |> Sql.decimal;
             "@volume", volume |> Sql.int64;
         ]
-        |> Sql.executeNonQuery
+        |> Sql.executeNonQueryAsync
 
     member this.WriteQuoteData(ticker: string, lastPrice: decimal, lastUpdate: DateTimeOffset) =
         let query = "INSERT INTO quotes (ticker, lastprice, lastupdate) VALUES (@ticker, @lastprice, @lastupdate) ON CONFLICT (ticker) DO UPDATE SET lastprice = @lastprice, lastupdate = @lastupdate"
@@ -42,11 +60,28 @@ type StockService(connectionString: string) =
             "@lastprice", lastPrice |> Sql.decimal;
             "@lastupdate", lastUpdate |> Sql.timestamptz;
         ]
-        |> Sql.executeNonQuery
+        |> Sql.executeNonQueryAsync
+        
+    member this.GetQuoteRequests() : Task<Result<string[], ServiceError>> = task {
+        let query = "SELECT ticker FROM quoterequests"
+        
+        let! requests =
+            connectionString
+            |> Sql.connect
+            |> Sql.query query
+            |> Sql.executeAsync (fun reader -> reader.string "ticker")
+            
+        let tickers = requests |> List.toArray
+        
+        return Ok tickers
+    }
         
 
     interface IStockInfoProvider with
         member this.GetQuote(state: UserState) (ticker: Ticker) : Task<Result<StockQuote, ServiceError>> = task {
+            match state.ConnectedToBrokerage with
+            | true -> return! brokerage.GetQuote state ticker
+            | false ->
             let query = "SELECT ticker,lastprice, lastupdate FROM quotes WHERE ticker = @ticker"
             
             let! quote =
@@ -54,30 +89,22 @@ type StockService(connectionString: string) =
                 |> Sql.connect
                 |> Sql.query query
                 |> Sql.parameters ["@ticker", ticker.Value |> Sql.string]
-                |> Sql.executeRowAsync (fun reader ->
-                    {
-                        symbol = reader.string "ticker"
-                        exchange = ""
-                        mark = 0m
-                        volatility = 0m
-                        askPrice = reader.decimal "lastprice"
-                        askSize = 0m
-                        bidPrice = reader.decimal "lastprice"
-                        bidSize = 0m
-                        closePrice = reader.decimal "lastprice"
-                        exchangeName = ""
-                        lastPrice = reader.decimal "lastprice"
-                        lastSize = 0m
-                        regularMarketLastPrice = reader.decimal "lastprice"
-                        regularMarketLastSize = 0m 
-                    }
-                )
+                |> Sql.executeAsync stockQuoteMapper
                 
-            return Ok quote
+            match quote with
+            | [] ->
+                // let's write to quoterequest table that we need this quote
+                let query = "INSERT INTO quoterequests (ticker) VALUES (@ticker) ON CONFLICT (ticker) DO NOTHING"
+                connectionString |> Sql.connect |> Sql.query query |> Sql.parameters ["@ticker", ticker.Value |> Sql.string] |> Sql.executeNonQuery |> ignore
+                return Error (ServiceError("No quote data available"))
+            | [x] -> return Ok x
+            | _ -> return Error (ServiceError("Multiple quotes found"))
         }
                 
         member this.GetQuotes(state: UserState) (tickers: Ticker seq) : Task<Result<IDictionary<Ticker, StockQuote>, ServiceError>> = task {
-            
+            match state.ConnectedToBrokerage with
+            | true -> return! brokerage.GetQuotes state tickers
+            | false ->
             let query = "SELECT ticker, lastprice, lastupdate FROM quotes WHERE ticker = ANY(@tickers)"
             
             let! quotes =
@@ -85,27 +112,7 @@ type StockService(connectionString: string) =
                 |> Sql.connect
                 |> Sql.query query
                 |> Sql.parameters ["@tickers", tickers |> Seq.map (_.Value) |> Seq.toArray |> Sql.stringArray]
-                |> Sql.executeAsync (fun reader ->
-                    let ticker = reader.string "ticker"
-                    let quote =
-                        {
-                            symbol = ticker
-                            exchange = ""
-                            mark = 0m
-                            volatility = 0m
-                            askPrice = reader.decimal "lastprice"
-                            askSize = 0m
-                            bidPrice = reader.decimal "lastprice"
-                            bidSize = 0m
-                            closePrice = reader.decimal "lastprice"
-                            exchangeName = ""
-                            lastPrice = reader.decimal "lastprice"
-                            lastSize = 0m
-                            regularMarketLastPrice = reader.decimal "lastprice"
-                            regularMarketLastSize = 0m 
-                        }
-                    quote
-                )
+                |> Sql.executeAsync stockQuoteMapper
                 
             let mapped = quotes |> List.map (fun q -> q.symbol |> Ticker, q) |> dict 
                 
@@ -113,7 +120,9 @@ type StockService(connectionString: string) =
         }
 
         member this.Search(state: UserState) (search: string) (limit: int) : Task<Result<SearchResult[], ServiceError>> = task {
-            
+            match state.ConnectedToBrokerage with
+            | true -> return! brokerage.Search state search limit
+            | false ->
             let query = "SELECT ticker FROM quotes WHERE ticker ILIKE @query LIMIT @limit"
             
             let! results =
@@ -138,14 +147,21 @@ type StockService(connectionString: string) =
         }
             
         member this.GetOptions(state: UserState) (ticker: Ticker) (expirationDate: DateTimeOffset option) (strikePrice: decimal option) (contractType: string option) : Task<Result<OptionChain, ServiceError>> = task {
-            return Error (ServiceError("No option data available"))
+            match state.ConnectedToBrokerage with
+            | true -> return! brokerage.GetOptions state ticker expirationDate strikePrice contractType
+            | false -> return Error (ServiceError("No option data available"))
         }
 
         member this.GetStockProfile(state: UserState) (ticker: Ticker) : Task<Result<StockProfile, ServiceError>> = task {
-            return Error (ServiceError("No stock profile data available"))
+            match state.ConnectedToBrokerage with
+            | true -> return! brokerage.GetStockProfile state ticker
+            | false -> return Error (ServiceError("No stock profile data available"))
         }
         member this.GetPriceHistory(state: UserState) (ticker: Ticker) (frequency: PriceFrequency) (start: DateTimeOffset option) (``end``: DateTimeOffset option) : Task<Result<PriceBars, ServiceError>> =
             task {
+                match state.ConnectedToBrokerage with
+                | true -> return! brokerage.GetPriceHistory state ticker frequency start ``end``
+                | false ->
                 let query = "SELECT date, open, high, low, close, volume FROM historical_prices WHERE ticker = @ticker AND date >= @start AND date <= @end ORDER BY date"
                 
                 let! bars =

@@ -127,3 +127,5 @@ CREATE TABLE quotes (
                         PRIMARY KEY (ticker)
 );
 ALTER TABLE quotes OWNER TO stocks;
+
+CREATE TABLE quoterequests ( ticker TEXT, PRIMARY KEY (ticker) );

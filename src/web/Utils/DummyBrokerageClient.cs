@@ -11,7 +11,7 @@ using OptionChain = core.fs.Adapters.Options.OptionChain;
 
 namespace web.Utils;
 
-public class DummyPriceInfoProvider : IStockInfoProvider
+public class DummyImplementation : IBrokerage
 {
     public Task<FSharpResult<StockProfile,ServiceError>> GetStockProfile(UserState state, Ticker ticker)
     {
@@ -28,7 +28,7 @@ public class DummyPriceInfoProvider : IStockInfoProvider
         throw new NotImplementedException();
     }
 
-    public Task<FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
+    public Task<FSharpResult<IDictionary<Ticker, StockQuote>, ServiceError>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
     {
         throw new NotImplementedException();
     }
@@ -47,10 +47,7 @@ public class DummyPriceInfoProvider : IStockInfoProvider
     {
         throw new NotImplementedException();
     }
-}
 
-public class DummyBrokerageClient : IBrokerage
-{
     public Task<OAuthResponse> ConnectCallback(string code)
     {
         throw new NotImplementedException();

@@ -6,12 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="DbStockInfoProvider.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="Npgsql.FSharp" Version="5.7.0" />
+    <PackageReference Update="FSharp.Core" Version="8.0.200" />
   </ItemGroup>
 
   <ItemGroup>

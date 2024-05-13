@@ -899,7 +899,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     match result with
                     | Error error -> Error error
                     | Ok result ->
-                        Ok (result |> Seq.map (fun (KeyValue(k, v)) -> KeyValuePair(Ticker k, v)) |> Dictionary)
+                        Ok (result |> Seq.map (fun (KeyValue(k, v)) -> (Ticker k, v)) |> dict)
             }
             
             return! execIfConnectedToBrokerage user func

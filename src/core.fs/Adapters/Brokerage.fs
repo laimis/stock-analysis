@@ -215,6 +215,7 @@ type IStockInfoProvider =
     abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset option -> ``end``:DateTimeOffset option -> Task<Result<PriceBars,ServiceError>>
     
 type IBrokerage =
+    inherit IStockInfoProvider
     abstract member GetOAuthUrl : unit -> Task<string>
     abstract member ConnectCallback : code:string -> Task<OAuthResponse>
     abstract member GetAccessToken : state:UserState -> Task<OAuthResponse>
