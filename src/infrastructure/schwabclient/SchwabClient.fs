@@ -164,6 +164,12 @@ type AccountsResponse = {
     securitiesAccount: SecuritiesAccount option
 }
 
+[<CLIMutable>]
+type AccountNumber = {
+    accountNumber: string
+    hashValue: string
+}
+
 type SearchItem = {
     cusip: string option
     symbol: string option
@@ -289,16 +295,21 @@ type NanConverter() =
     override this.Write(writer: Utf8JsonWriter, value: decimal, _) =
         writer.WriteNumberValue(value)
 
-type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: string, logger: ILogger<SchwabClient> option) =
-
-    let _logger = logger
-    let _callbackUrl = callbackUrl
-    let _clientId = clientId
+type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: string, clientSecret:string, logger: ILogger<SchwabClient> option) =
+    
+    do
+        // make sure callback url, client id, and client secret are set
+        if String.IsNullOrWhiteSpace(callbackUrl) then
+            raise (ArgumentNullException("callbackUrl"))
+        if String.IsNullOrWhiteSpace(clientId) then
+            raise (ArgumentNullException("clientId"))
+        if String.IsNullOrWhiteSpace(clientSecret) then
+            raise (ArgumentNullException("clientSecret"))
+    
     let _httpClient = new HttpClient()
     let _asyncLock = AsyncLock()
 
     let ApiUrl = "https://api.schwabapi.com/v1"
-    let AuthUrl = "https://api.schwabapi.com/v1/oauth"
 
     static let _retryPolicy =
         Policy
@@ -328,12 +339,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     let generateApiUrl(function': string) = $"{ApiUrl}/{function'}"
     
     let logDebug message ([<ParamArray>]args: obj array) =
-        match _logger with
+        match logger with
         | Some logger -> logger.LogDebug(message, args)
         | None -> ()
     
     let logError message ([<ParamArray>]args: obj array) =
-        match _logger with
+        match logger with
         | Some logger -> logger.LogError(message, args)
         | None -> ()
     
@@ -357,15 +368,19 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             dict [
                 "grant_type", "refresh_token"
                 "refresh_token", user.BrokerageRefreshToken
-                "client_id", _clientId
+                "client_id", clientId
             ]
 
         if fullRefresh then
             postData.Add("access_type", "offline")
 
         let content = new FormUrlEncodedContent(postData)
+        
+        let base64Encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"))
+        
+        content.Headers.Add("Authorization", $"Basic {base64Encoded}")
 
-        let! response = _httpClient.PostAsync(generateApiUrl "/oauth2/token", content)
+        let! response = _httpClient.PostAsync(generateApiUrl "/oauth/token", content)
 
         do! logIfFailed response "refresh access token"
 
@@ -429,7 +444,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 match token with
                 | t when t.IsExpired = false -> return token
                 | _ ->
-                    match _logger with
+                    match logger with
                     | Some logger -> logger.LogInformation("Refreshing access token")
                     | None -> ()
                     
@@ -438,12 +453,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
                     match t.IsError with
                     | true ->
-                        match _logger with
+                        match logger with
                         | Some logger -> logger.LogError("Could not refresh access token: {error}", t.error)
                         | None -> ()
                         return raise (Exception("Could not refresh access token: " + t.error))
                     | false ->
-                        match _logger with
+                        match logger with
                         | Some logger -> logger.LogInformation("Saving access token to storage")
                         | None -> ()
                     
@@ -497,12 +512,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     
     member this.EnterOrder(user: UserState) (postData: obj) = task {
         let enterOrderExecution user = task {
-            let! response = this.CallApi<AccountsResponse []>(user, "/accounts", HttpMethod.Get)
+            let! response = this.CallApi<AccountNumber []>(user, "/accounts/accountNumbers", HttpMethod.Get)
             
             match response with
             | Error error -> return Error error
             | Ok accounts ->
-                let accountId = accounts[0].securitiesAccount.Value.accountId.Value
+                let accountId = accounts[0].hashValue
 
                 let url = $"/accounts/{accountId}/orders"
 
@@ -530,13 +545,17 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     "grant_type", "authorization_code"
                     "code", code
                     "access_type", "offline"
-                    "redirect_uri", _callbackUrl
-                    "client_id", _clientId
+                    "redirect_uri", callbackUrl
+                    "client_id", clientId
                 ]
 
             let content = new FormUrlEncodedContent(postData)
+            
+            let base64Encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"))
+            
+            content.Headers.Add("Authorization", $"Basic {base64Encoded}")
 
-            let! response = _httpClient.PostAsync(generateApiUrl "/oauth2/token", content)
+            let! response = _httpClient.PostAsync(generateApiUrl "/oauth/token", content)
 
             do! logIfFailed response "connect callback"
 
@@ -548,9 +567,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         }
 
         member _.GetOAuthUrl() = task {
-            let encodedClientId = Uri.EscapeDataString(_clientId)
-            let encodedCallbackUrl = Uri.EscapeDataString(_callbackUrl)
-            let url = $"{AuthUrl}/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}&scope=readonly"
+            let encodedClientId = Uri.EscapeDataString(clientId)
+            let encodedCallbackUrl = Uri.EscapeDataString(callbackUrl)
+            let url = $"{ApiUrl}/oauth/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}"
             return url
         }
 
@@ -719,12 +738,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.CancelOrder (user: UserState) (orderId: string) = task {
             let cancelExecution user = task {
                 // get account first
-                let! response = this.CallApi<AccountsResponse []>(user, "/accounts", HttpMethod.Get)
+                let! response = this.CallApi<AccountNumber []>(user, "/accounts/accountNumbers", HttpMethod.Get)
 
                 match response with
                 | Error error -> return Error error
                 | Ok accounts ->
-                    let accountId = accounts[0].securitiesAccount.Value.accountId
+                    let accountId = accounts[0].hashValue
 
                     let url = $"/accounts/{accountId}/orders/{orderId}"
 

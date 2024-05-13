@@ -92,21 +92,31 @@ namespace web
                     s.GetService<ILogger<twilioclient.TwilioClientWrapper>>(),
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
-            // services.AddSingleton<IBrokerage>(s =>
-            //     new tdameritradeclient.TDAmeritradeClient(
-            //         s.GetService<IBlobStorage>(),
-            //         configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL"),
-            //         configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
-            //         s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
-            //     ));
-            services.AddSingleton<IBrokerage>(s =>
-                new SchwabClient.SchwabClient(
-                    s.GetService<IBlobStorage>(),
-                    configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL"),
-                    configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
-                    new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
-                ));
-
+            var tdAmeritradeCallbackUrl = configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL");
+            if (tdAmeritradeCallbackUrl != null)
+            {
+                services.AddSingleton<IBrokerage>(s =>
+                    new tdameritradeclient.TDAmeritradeClient(
+                        s.GetService<IBlobStorage>(),
+                        tdAmeritradeCallbackUrl,
+                        configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
+                        s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
+                    ));
+            }
+            
+            var schwabCallbackUrl = configuration.GetValue<string>("SCHWAB_CALLBACK_URL");
+            if (schwabCallbackUrl != null)
+            {
+                services.AddSingleton<IBrokerage>(s =>
+                    new SchwabClient.SchwabClient(
+                        s.GetService<IBlobStorage>(),
+                        schwabCallbackUrl,
+                        configuration.GetValue<string>("SCHWAB_CLIENT_ID"),
+                        configuration.GetValue<string>("SCHWAB_CLIENT_SECRET"),
+                        new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
+                    ));
+            }
+            
             StorageRegistrations(configuration, services, logger);
             
             var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
