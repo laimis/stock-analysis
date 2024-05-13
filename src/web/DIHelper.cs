@@ -104,6 +104,8 @@ namespace web
                         configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
                         s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
                     ));
+                
+                services.AddSingleton(s => s.GetService<IBrokerage>() as IStockInfoProvider);
             }
             else if (schwabCallbackUrl != null)
             {
@@ -115,12 +117,15 @@ namespace web
                         configuration.GetValue<string>("SCHWAB_CLIENT_SECRET"),
                         new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
                     ));
+                
+                services.AddSingleton(s => s.GetService<IBrokerage>() as IStockInfoProvider);
             }
             else
             {
                 logger.LogWarning("Dummy brokerage client registered, no brokerage callback url provided");
                 // dummy brokerage client
                 services.AddSingleton<IBrokerage>(s => new DummyBrokerageClient());
+                services.AddSingleton<IStockInfoProvider>(s => new DummyPriceInfoProvider());
             }
             
             StorageRegistrations(configuration, services, logger);
