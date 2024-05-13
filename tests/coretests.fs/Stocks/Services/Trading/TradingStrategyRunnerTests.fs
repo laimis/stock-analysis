@@ -35,9 +35,15 @@ let createRunner numberOfBars priceFunction =
 
     let mock =
         {
-            new IBrokerageGetPriceHistory with 
+            new IStockInfoProvider with 
                 member this.GetPriceHistory userState ticker priceFrequency start ``end`` =
                     prices |> Ok |> Task.FromResult
+
+                override this.GetOptions state ticker expirationDate strikePrice contractType = failwith "todo"
+                override this.GetQuote state ticker = failwith "todo"
+                override this.GetQuotes state tickers = failwith "todo"
+                override this.GetStockProfile state ticker = failwith "todo"
+                override this.Search state query limit = failwith "todo"
         }
     
     TradingStrategyRunner(mock, MarketHoursAlwaysOn()), prices

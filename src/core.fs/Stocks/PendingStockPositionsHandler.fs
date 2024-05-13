@@ -51,7 +51,12 @@ type Query =
         UserId: UserId
     }
 
-type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,portfolio:IPortfolioStorage,csvWriter:ICSVWriter) =
+type PendingStockPositionsHandler(
+    accounts:IAccountStorage,
+    brokerage:IBrokerage,
+    csvWriter:ICSVWriter,
+    portfolio:IPortfolioStorage,
+    stockInfoProvider:IStockInfoProvider) =
     
     interface IApplicationService
     
@@ -179,8 +184,8 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 |> Seq.filter (fun x -> x.IsClosed |> not)
                 |> Seq.sortByDescending _.Opened
             
-            let tickers = data |> Seq.map(fun x -> x.Ticker)
-            let! priceResponse = brokerage.GetQuotes user.State tickers
+            let tickers = data |> Seq.map(_.Ticker)
+            let! priceResponse = stockInfoProvider.GetQuotes user.State tickers
             let prices = priceResponse |> Result.defaultValue (Dictionary<Ticker, StockQuote>())
                 
             let dataWithPrices =

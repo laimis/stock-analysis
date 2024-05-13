@@ -617,12 +617,12 @@ let run (context:EnvironmentContext) =
         
         if context.HasArgument "-pt" then fun () -> async {
             
-            let brokerage = context.Brokerage()    
+            let priceProvider = context.PriceInfoProvider()    
             let pricesWrapper =
                 {
                     new IGetPriceHistory with 
                         member this.GetPriceHistory start ``end`` ticker =
-                            brokerage.GetPriceHistory user.Value.State ticker PriceFrequency.Daily start ``end``
+                            priceProvider.GetPriceHistory user.Value.State ticker PriceFrequency.Daily start ``end``
                 }
             
             let! transformed =

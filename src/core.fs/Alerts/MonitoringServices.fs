@@ -99,7 +99,7 @@ let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
 
         marketHours.ToUniversalTime(nextDay);
 
-type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, portfolio:IPortfolioStorage, marketHours:IMarketHours) =
+type StopLossMonitoringService(accounts:IAccountStorage, stockInfoProvider:IStockInfoProvider, container:StockAlertContainer, portfolio:IPortfolioStorage, marketHours:IMarketHours) =
 
     // need to decide how I will log these
     let marketStartTime = TimeOnly(9, 30, 0)
@@ -107,7 +107,7 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
     let checks = List<StopLossCheck>()
 
     let runStopLossCheck (logger:ILogger) (check:StopLossCheck) = async {
-        let! priceResponse = brokerage.GetQuote check.user check.ticker |> Async.AwaitTask
+        let! priceResponse = stockInfoProvider.GetQuote check.user check.ticker |> Async.AwaitTask
 
         match priceResponse with
         | Error err ->
@@ -213,7 +213,7 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
 
             marketHours.ToUniversalTime(adjustedScanTime)
 
-type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,container:StockAlertContainer,marketHours:IMarketHours,portfolio:IPortfolioStorage) =
+type PatternMonitoringService(accounts:IAccountStorage,stockInfoProvider:IStockInfoProvider,container:StockAlertContainer,marketHours:IMarketHours,portfolio:IPortfolioStorage) =
 
     let mutable nextPatternMonitoringRunDateTime = DateTimeOffset.MinValue
     let listOfChecks = List<PatternCheck>()
@@ -294,7 +294,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365)) |> Some
             let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow) |> Some
 
-            let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
+            let! prices = stockInfoProvider.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
 
             match prices with
             | Error err ->
@@ -381,7 +381,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         now.Add(monitoringFrequency)
 
 
-type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage) =
+type WeeklyUpsideMonitoringService(accounts:IAccountStorage, stockInfoProvider:IStockInfoProvider, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage) =
 
     let tickersToCheck = Dictionary<UserState, HashSet<Ticker>>()
     let weeklyUpsidesDiscovered = Dictionary<UserState, List<TriggeredAlert>>()
@@ -417,7 +417,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
     }
 
     let runCheckForUserTicker (logger:ILogger) (_:CancellationToken) user ticker = async {
-        let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Weekly None None |> Async.AwaitTask
+        let! prices = stockInfoProvider.GetPriceHistory user ticker PriceFrequency.Weekly None None |> Async.AwaitTask
 
         return
             match prices with

@@ -233,7 +233,7 @@ type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote
         })
         
     
-type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHours,storage:IPortfolioStorage) =
+type Handler(accounts:IAccountStorage,priceInfoProvider:IStockInfoProvider,marketHours:IMarketHours,storage:IPortfolioStorage) =
     
     let getLevel (position:StockPositionWithCalculations) =
         match position.Profit |> abs with
@@ -289,7 +289,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | None -> None
                 
                 let! pricesResponse =
-                    brokerage.GetPriceHistory
+                    priceInfoProvider.GetPriceHistory
                         user.State
                         request.Ticker
                         PriceFrequency.Daily
@@ -315,7 +315,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | Some user ->
             
             let! priceResponse =
-                brokerage.GetPriceHistory
+                priceInfoProvider.GetPriceHistory
                     user.State
                     query.Ticker
                     query.Frequency
@@ -344,7 +344,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     try
                         
                         let! priceResponse =
-                            brokerage.GetPriceHistory
+                            priceInfoProvider.GetPriceHistory
                                 user.State
                                 t
                                 query.Frequency
@@ -414,12 +414,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let! stocks = query.UserId |> storage.GetStockPositions
             
             let positions = stocks |> Seq.filter (fun stock -> stock.IsClosed |> not)
-            
-            let! account = brokerage.GetAccount user.State
-            let orders =
-                match account with
-                | Error _ -> Array.Empty<Order>()
-                | Ok account -> account.Orders
                 
             let! tasks =
                 positions
@@ -428,7 +422,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     let calculations = position |> StockPositionWithCalculations
                     
                     let! priceResponse =
-                        brokerage.GetPriceHistory
+                        priceInfoProvider.GetPriceHistory
                             user.State
                             position.Ticker
                             PriceFrequency.Daily
@@ -440,7 +434,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | Error error -> return Error (position, error.Message) 
                     | Ok prices ->
                         
-                        let outcomes = PositionAnalysis.generate calculations prices orders
+                        let outcomes = PositionAnalysis.generate calculations prices [||]
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
                         let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
                         
@@ -473,7 +467,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! pricesResponse =
-                brokerage.GetPriceHistory
+                priceInfoProvider.GetPriceHistory
                     user.State
                     query.Ticker
                     query.Frequency
@@ -495,7 +489,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let! stocks = storage.GetStockPositions query.UserId
             
             let! priceResult =
-                brokerage.GetQuotes
+                priceInfoProvider.GetQuotes
                     user.State
                     (stocks |> Seq.map (_.Ticker))
             
@@ -514,7 +508,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! priceResponse =
-                brokerage.GetPriceHistory
+                priceInfoProvider.GetPriceHistory
                     user.State
                     query.Ticker
                     PriceFrequency.Daily

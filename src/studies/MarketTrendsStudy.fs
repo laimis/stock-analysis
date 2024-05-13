@@ -101,7 +101,7 @@ let run (context:EnvironmentContext) =
     Console.WriteLine($"Ticker: {ticker}, Years: {years}, Output: {outputFilename}")
     
     // get the brokerage
-    let brokerage = context.Brokerage()
+    let brokerage = context.PriceInfoProvider()
     
     // get prices for ticker for the specified number of years
     let prices =

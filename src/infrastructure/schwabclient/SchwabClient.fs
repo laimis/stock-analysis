@@ -572,89 +572,6 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             return $"{ApiUrl}/oauth/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}"
         }
 
-        member this.GetStockProfile (state: UserState) (ticker: Ticker) = task {
-            let execution state = task {
-                let function' = $"instruments?symbol={ticker.Value}&projection=fundamental"
-                
-                let! results = this.CallApi<Dictionary<string, SearchItemWithFundamental>>(
-                    state, function', HttpMethod.Get
-                )
-                
-                return
-                    results
-                    |> Result.map(fun results ->
-                        let fundamentals =
-                            match results[ticker.Value].fundamental with
-                            | Some f ->
-                                let keyValuePairs =
-                                    f
-                                    |> Seq.map (fun kvp -> KeyValuePair<string,string>(kvp.Key, kvp.Value.ToString()))
-                                Dictionary<string, string>(keyValuePairs)
-                            | None -> Dictionary<string, string>()
-                        let data = results[ticker.Value]
-
-                        let mapped : StockProfile = {
-                            Symbol = data.symbol |> Option.defaultValue ""
-                            Description = data.description |> Option.defaultValue ""
-                            SecurityName = data.description |> Option.defaultValue ""
-                            Exchange = data.exchange |> Option.defaultValue ""
-                            Cusip = data.cusip |> Option.defaultValue ""
-                            IssueType = data.assetType |> Option.defaultValue ""
-                            Fundamentals = fundamentals
-                        }
-                        
-                        mapped
-                    )
-            }
-            
-            return! execIfConnectedToBrokerage state execution
-        }
-
-        member this.Search (state: UserState) (query: string) (limit: int) = task {
-            
-            let connectedStateFunc state = task {
-                let function' = $"instruments?symbol={query}.*&projection=symbol-regex"
-
-                let! results = this.CallApi<Dictionary<string, SearchItem>>(state, function', HttpMethod.Get)
-                
-                return
-                    results
-                    |> Result.map(fun results ->
-                        results.Values
-                        |> Seq.map (fun i ->
-                            {
-                                Region = ""
-                                Symbol = i.symbol |> Option.defaultValue ""
-                                SecurityName = i.description |> Option.defaultValue ""
-                                Exchange = i.exchange |> Option.defaultValue ""
-                                SecurityType = i.assetType |> Option.defaultValue ""
-                            }
-                        )
-                        |> Seq.sortBy (fun r ->
-                            match r.Exchange with
-                            | "Pink Sheet" -> 1
-                            | _ -> 0
-                        )
-                        |> Seq.sortBy (fun r ->
-                            match r.SecurityType with
-                            | "EQUITY" -> 0
-                            | "OPTION" -> 1
-                            | "MUTUAL_FUND" -> 2
-                            | "ETF" -> 3
-                            | "INDEX" -> 4
-                            | "CASH_EQUIVALENT" -> 5
-                            | "FIXED_INCOME" -> 6
-                            | "CURRENCY" -> 7
-                            | _ -> 8
-                        )
-                        |> Seq.truncate limit
-                        |> Seq.toArray
-                    )
-            }
-            
-            return! execIfConnectedToBrokerage state connectedStateFunc
-        }
-
         member this.GetAccount(user: UserState) = task {
             
             let accountFunc state = task {
@@ -840,6 +757,116 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
             this.EnterOrder user postData
 
+        
+
+        member this.RefreshAccessToken(user: UserState) = refreshAccessTokenInternal user true
+        member this.GetMarketHours(state: UserState) (date: DateTimeOffset) = task {
+            let execFunc state = task {
+                let dateStr = date.ToString("yyyy-MM-dd")
+                let function' = $"marketdata/EQUITY/hours?date={dateStr}"
+
+                let! wrapper = this.CallApi<MarketHoursWrapper>(state, function', HttpMethod.Get)
+
+                return
+                    match wrapper with
+                    | Error error -> Error error
+                    | Ok wrapper ->
+                        match wrapper.equity with
+                        | None -> ServiceError "Could not find market hours for date" |> Error
+                        | Some equity ->
+                            match equity.EQ with
+                            | None -> ServiceError "Could not find market hours for date (EQ)" |> Error
+                            | Some hours -> hours |> Ok
+            }
+            
+            return! execIfConnectedToBrokerage state execFunc
+        }
+
+    interface IStockInfoProvider with
+    
+        member this.GetStockProfile (state: UserState) (ticker: Ticker) = task {
+            let execution state = task {
+                let function' = $"instruments?symbol={ticker.Value}&projection=fundamental"
+                
+                let! results = this.CallApi<Dictionary<string, SearchItemWithFundamental>>(
+                    state, function', HttpMethod.Get
+                )
+                
+                return
+                    results
+                    |> Result.map(fun results ->
+                        let fundamentals =
+                            match results[ticker.Value].fundamental with
+                            | Some f ->
+                                let keyValuePairs =
+                                    f
+                                    |> Seq.map (fun kvp -> KeyValuePair<string,string>(kvp.Key, kvp.Value.ToString()))
+                                Dictionary<string, string>(keyValuePairs)
+                            | None -> Dictionary<string, string>()
+                        let data = results[ticker.Value]
+
+                        let mapped : StockProfile = {
+                            Symbol = data.symbol |> Option.defaultValue ""
+                            Description = data.description |> Option.defaultValue ""
+                            SecurityName = data.description |> Option.defaultValue ""
+                            Exchange = data.exchange |> Option.defaultValue ""
+                            Cusip = data.cusip |> Option.defaultValue ""
+                            IssueType = data.assetType |> Option.defaultValue ""
+                            Fundamentals = fundamentals
+                        }
+                        
+                        mapped
+                    )
+            }
+            
+            return! execIfConnectedToBrokerage state execution
+        }
+
+        member this.Search (state: UserState) (query: string) (limit: int) = task {
+            
+            let connectedStateFunc state = task {
+                let function' = $"instruments?symbol={query}.*&projection=symbol-regex"
+
+                let! results = this.CallApi<Dictionary<string, SearchItem>>(state, function', HttpMethod.Get)
+                
+                return
+                    results
+                    |> Result.map(fun results ->
+                        results.Values
+                        |> Seq.map (fun i ->
+                            {
+                                Region = ""
+                                Symbol = i.symbol |> Option.defaultValue ""
+                                SecurityName = i.description |> Option.defaultValue ""
+                                Exchange = i.exchange |> Option.defaultValue ""
+                                SecurityType = i.assetType |> Option.defaultValue ""
+                            }
+                        )
+                        |> Seq.sortBy (fun r ->
+                            match r.Exchange with
+                            | "Pink Sheet" -> 1
+                            | _ -> 0
+                        )
+                        |> Seq.sortBy (fun r ->
+                            match r.SecurityType with
+                            | "EQUITY" -> 0
+                            | "OPTION" -> 1
+                            | "MUTUAL_FUND" -> 2
+                            | "ETF" -> 3
+                            | "INDEX" -> 4
+                            | "CASH_EQUIVALENT" -> 5
+                            | "FIXED_INCOME" -> 6
+                            | "CURRENCY" -> 7
+                            | _ -> 8
+                        )
+                        |> Seq.truncate limit
+                        |> Seq.toArray
+                    )
+            }
+            
+            return! execIfConnectedToBrokerage state connectedStateFunc
+        }
+
         member this.GetQuote (user: UserState) (ticker: Ticker) = task {
             let execFunc user = task {
                 let function' = $"marketdata/{ticker.Value}/quotes"
@@ -940,28 +967,6 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             return! execIfConnectedToBrokerage state execFunc
         }
 
-        member this.GetMarketHours(state: UserState) (date: DateTimeOffset) = task {
-            let execFunc state = task {
-                let dateStr = date.ToString("yyyy-MM-dd")
-                let function' = $"marketdata/EQUITY/hours?date={dateStr}"
-
-                let! wrapper = this.CallApi<MarketHoursWrapper>(state, function', HttpMethod.Get)
-
-                return
-                    match wrapper with
-                    | Error error -> Error error
-                    | Ok wrapper ->
-                        match wrapper.equity with
-                        | None -> ServiceError "Could not find market hours for date" |> Error
-                        | Some equity ->
-                            match equity.EQ with
-                            | None -> ServiceError "Could not find market hours for date (EQ)" |> Error
-                            | Some hours -> hours |> Ok
-            }
-            
-            return! execIfConnectedToBrokerage state execFunc
-        }
-
         member this.GetPriceHistory (state: UserState) (ticker: Ticker) (frequency: PriceFrequency) (startDate: DateTimeOffset option) (endDate: DateTimeOffset option) = task {
             let execFunc state = task {
                 let fromOption (option:DateTimeOffset option) (defaultValue:DateTimeOffset) =
@@ -1005,5 +1010,3 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             
             return! execIfConnectedToBrokerage state execFunc
         }
-
-        member this.RefreshAccessToken(user: UserState) = refreshAccessTokenInternal user true

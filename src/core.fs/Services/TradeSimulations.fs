@@ -266,7 +266,7 @@ module TradingStrategyFactory =
             createCloseAfterFixedNumberOfDays 30
         ]
     
-type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours) =
+type TradingStrategyRunner(priceInfoProvider:IStockInfoProvider, hours:IMarketHours) =
     
     let setRiskAmountFromActualTradeIfSet actualTrade date stockPosition =
         match actualTrade with
@@ -292,7 +292,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             let convertedWhen = hours.GetMarketEndOfDayTimeInUtc(``when``)
             
             let! prices =
-                brokerage.GetPriceHistory
+                priceInfoProvider.GetPriceHistory
                     user
                     ticker
                     PriceFrequency.Daily

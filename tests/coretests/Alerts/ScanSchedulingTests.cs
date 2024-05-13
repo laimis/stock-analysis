@@ -49,7 +49,7 @@ namespace coretests.Alerts
         private static MonitoringServices.StopLossMonitoringService CreateStopLossMonitoringService()
         {
             var stopLossService = new MonitoringServices.StopLossMonitoringService(
-                Mock.Of<IAccountStorage>(), Mock.Of<IBrokerage>(), new StockAlertContainer(),
+                Mock.Of<IAccountStorage>(), Mock.Of<IStockInfoProvider>(), new StockAlertContainer(),
                 Mock.Of<IPortfolioStorage>(), _marketHours);
             return stopLossService;
         }

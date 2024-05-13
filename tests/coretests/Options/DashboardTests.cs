@@ -40,25 +40,26 @@ namespace coretests.Options
                     )
                 );
 
-            var brokerage = new Mock<IBrokerage>();
-            brokerage.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<Ticker>>()))
+            var stockInfoProvider = new Mock<IStockInfoProvider>();
+            stockInfoProvider.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<Ticker>>()))
                 .Returns(Task.FromResult(
                     FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>.NewOk(
                         new Dictionary<Ticker, StockQuote>()
                     )
                 ));
 
+            var brokerage = new Mock<IBrokerage>();
             brokerage.Setup(x => x.GetAccount(It.IsAny<UserState>()))
                 .Returns(Task.FromResult(
                     FSharpResult<BrokerageAccount,ServiceError>.NewOk(
                         new BrokerageAccount {
-                            OptionPositions = Array.Empty<OptionPosition>(),
-                            StockPositions = Array.Empty<StockPosition>(),
+                            OptionPositions = [],
+                            StockPositions = [],
                         }
                     )
                 ));
             
-            var handler = new Handler(accounts.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>());
+            var handler = new Handler(accounts.Object, brokerage.Object, stockInfoProvider.Object, storage, Mock.Of<ICSVWriter>());
 
             var result = await handler.Handle(query);
 

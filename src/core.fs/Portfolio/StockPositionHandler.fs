@@ -250,7 +250,14 @@ type TransactionSummary =
             
             (monday, sunday)
     
-type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser) =
+type StockPositionHandler(
+    accounts:IAccountStorage,
+    brokerage:IBrokerage,
+    csvWriter:ICSVWriter,
+    stockInfoProvider:IStockInfoProvider,
+    storage:IPortfolioStorage,
+    marketHours:IMarketHours,
+    csvParser:ICSVParser) =
     
     interface IApplicationService
     
@@ -654,7 +661,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             match stock with
             | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
-                let runner = TradingStrategyRunner(brokerage, marketHours)
+                let runner = TradingStrategyRunner(stockInfoProvider, marketHours)
                 let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=false)
                 return simulation |> Ok
     }
@@ -664,7 +671,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let runner = TradingStrategyRunner(brokerage, marketHours)
+            let runner = TradingStrategyRunner(stockInfoProvider, marketHours)
                 
             let! results = runner.Run(
                     user.State,
@@ -733,7 +740,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.truncate command.NumberOfTrades
                 |> Seq.toList
                 
-            let runner = TradingStrategyRunner(brokerage, marketHours)
+            let runner = TradingStrategyRunner(stockInfoProvider, marketHours)
             
             let! simulations =
                 positions
@@ -795,7 +802,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.append (account.StockPositions |> Seq.map (_.Ticker))
                 |> Seq.distinct
                 
-            let! pricesResponse = brokerage.GetQuotes user.State tickers
+            let! pricesResponse = stockInfoProvider.GetQuotes user.State tickers
             let prices =
                 match pricesResponse with
                 | Ok prices -> prices

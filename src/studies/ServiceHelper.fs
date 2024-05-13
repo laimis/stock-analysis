@@ -22,6 +22,7 @@ type EnvironmentContext(host:IHost, logger, commandLine) =
     
     member this.Storage() = host.Services.GetService(typeof<IAccountStorage>) :?> IAccountStorage
     member this.Brokerage() = host.Services.GetService(typeof<IBrokerage>) :?> IBrokerage
+    member this.PriceInfoProvider() = host.Services.GetService(typeof<IStockInfoProvider>) :?> IStockInfoProvider
 
 let mutable logger : ILogger = null
     

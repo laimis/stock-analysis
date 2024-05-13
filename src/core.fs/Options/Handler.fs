@@ -78,7 +78,12 @@ type DetailsQuery = { OptionId: Guid; UserId: UserId }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
 type OwnershipQuery = { UserId: UserId; Ticker: Ticker }
 
-type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter) =
+type Handler(
+    accounts: IAccountStorage,
+    brokerage: IBrokerage,
+    stockInfo: IStockInfoProvider,
+    storage: IPortfolioStorage,
+    csvWriter: ICSVWriter) =
 
     interface IApplicationService
 
@@ -105,7 +110,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     |> Seq.sortBy (fun o -> o.Ticker.Value, o.Expiration)
                     |> Seq.map (fun o ->
                         task {
-                            let! chain = brokerage.GetOptions user.State o.Ticker (Some o.Expiration) None None
+                            let! chain = stockInfo.GetOptions user.State o.Ticker (Some o.Expiration) None None
 
                             let detail =
                                 match chain with
@@ -260,7 +265,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | Some user ->
 
                 let! option = storage.GetOwnedOption query.OptionId query.UserId
-                let! chain = brokerage.GetOptions user.State option.State.Ticker None None None
+                let! chain = stockInfo.GetOptions user.State option.State.Ticker None None None
                 
                 return
                     chain |> Result.map (fun c ->
@@ -281,14 +286,14 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
 
-                let! priceResult = brokerage.GetQuote user.State query.Ticker
+                let! priceResult = stockInfo.GetQuote user.State query.Ticker
 
                 let price =
                     match priceResult with
                     | Ok price -> Some price.Price
                     | Error _ -> None
 
-                let! details = brokerage.GetOptions user.State query.Ticker None None None
+                let! details = stockInfo.GetOptions user.State query.Ticker None None None
                 
                 return details |> Result.map (fun d -> OptionDetailsViewModel(price, d))
         }

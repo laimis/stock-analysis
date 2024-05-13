@@ -83,7 +83,7 @@ type CompanyFilingsQuery =
         UserId:UserId
     }
             
-type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISECFilings) =
+type StocksHandler(accounts:IAccountStorage,priceInfoProvider:IStockInfoProvider,secFilings:ISECFilings) =
     
     interface IApplicationService
     
@@ -92,8 +92,8 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let! profileResponse = brokerage.GetStockProfile user.State query.Ticker
-            let! quoteResponse = brokerage.GetQuote user.State query.Ticker
+            let! profileResponse = priceInfoProvider.GetStockProfile user.State query.Ticker
+            let! quoteResponse = priceInfoProvider.GetQuote user.State query.Ticker
                 
             let view = {
                 Ticker = query.Ticker.Value
@@ -110,7 +110,7 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let! priceResponse = brokerage.GetQuote user.State query.Ticker
+            let! priceResponse = priceInfoProvider.GetQuote user.State query.Ticker
             return priceResponse |> Result.map (_.Price)
     }
     
@@ -120,7 +120,7 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker query.Frequency query.Start query.End
+            let! priceResponse = priceInfoProvider.GetPriceHistory user.State query.Ticker query.Frequency query.Start query.End
             return priceResponse |> Result.map PricesView
     }
     
@@ -129,14 +129,14 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
         
         match user with
         | None -> return "User not found" |> ServiceError |> Error
-        | Some user -> return! brokerage.GetQuote user.State query.Ticker
+        | Some user -> return! priceInfoProvider.GetQuote user.State query.Ticker
     }
     
     member _.Handle (query:SearchQuery) = task {
         let! user = accounts.GetUser(query.UserId)
         match user with
         | None -> return "User not found" |> ServiceError |> Error
-        | Some user -> return! brokerage.Search user.State query.Term 10
+        | Some user -> return! priceInfoProvider.Search user.State query.Term 10
     }
     
     member _.Handle (query:CompanyFilingsQuery) = task {

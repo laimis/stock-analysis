@@ -33,7 +33,7 @@ namespace coretests.Options
 
             var account = _fixture.CreateAccountStorageWithUserAsync();
 
-            var handler = new Handler(account, Mock.Of<IBrokerage>(), mock.Object, Mock.Of<ICSVWriter>());
+            var handler = new Handler(account, Mock.Of<IBrokerage>(), Mock.Of<IStockInfoProvider>(), mock.Object, Mock.Of<ICSVWriter>());
 
             await handler.Handle(
                 OptionsTestsFixture.CreateSellCommand());
