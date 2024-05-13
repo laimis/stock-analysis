@@ -208,7 +208,7 @@ type IMarketHours =
 
 type IStockInfoProvider =
     abstract member GetQuote : state:UserState -> ticker:Ticker -> Task<Result<StockQuote,ServiceError>>
-    abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<Result<Dictionary<Ticker, StockQuote>,ServiceError>>
+    abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<Result<IDictionary<Ticker, StockQuote>,ServiceError>>
     abstract member Search : state:UserState -> query:string -> limit:int -> Task<Result<SearchResult[],ServiceError>>
     abstract member GetOptions : state:UserState -> ticker:Ticker -> expirationDate:DateTimeOffset option -> strikePrice:decimal option -> contractType:string option -> Task<Result<OptionChain,ServiceError>>
     abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<Result<StockProfile,ServiceError>>

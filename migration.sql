@@ -107,3 +107,23 @@ CREATE TABLE accountbalancessnapshots (
     PRIMARY KEY (userid,date) 
 );
 ALTER TABLE accountbalancessnapshots OWNER TO stocks;
+
+CREATE TABLE historical_prices (
+                                   ticker TEXT,
+                                   date DATE,
+                                   open DECIMAL,
+                                   high DECIMAL,
+                                   low DECIMAL,
+                                   close DECIMAL,
+                                   volume BIGINT,
+                                   PRIMARY KEY (ticker, date)
+);
+ALTER TABLE historical_prices OWNER TO stocks;
+
+CREATE TABLE quotes (
+                        ticker TEXT,
+                        lastprice DECIMAL,
+                        lastupdate TIMESTAMP,
+                        PRIMARY KEY (ticker)
+);
+ALTER TABLE quotes OWNER TO stocks;
