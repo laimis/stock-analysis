@@ -87,18 +87,18 @@ namespace web.Controllers
         [Authorize]
         public ActionResult Login() => Redirect("~/");
 
-        [HttpGet("integrations/tdameritrade/connect")]
+        [HttpGet("integrations/brokerage/connect")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritrade()
+        public async Task<ActionResult> Brokerage()
         {
             var url = await handler.Handle(new Connect());
 
             return Redirect(url);
         }
 
-        [HttpGet("integrations/tdameritrade")]
+        [HttpGet("integrations/brokerage")]
         [Authorize]
-        public Task<ActionResult> TdAmeritradeInfo() =>
+        public Task<ActionResult> BrokerageInfo() =>
             this.OkOrError(
                 handler.HandleInfo(
                     new BrokerageInfo(User.Identifier()
@@ -116,9 +116,9 @@ namespace web.Controllers
             return Redirect("~/profile");
         }
 
-        [HttpGet("integrations/tdameritrade/disconnect")]
+        [HttpGet("integrations/brokerage/disconnect")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeDisconnect()
+        public async Task<ActionResult> BrokerageDisconnect()
         {
             var result = await handler.HandleDisconnect(
                 new BrokerageDisconnect(User.Identifier())
@@ -126,9 +126,9 @@ namespace web.Controllers
             return RedirectOrError(result);
         }
 
-        [HttpGet("integrations/tdameritrade/callback")]
+        [HttpGet("integrations/brokerage/callback")]
         [Authorize]
-        public async Task<ActionResult> TdAmeritradeCallback([FromQuery]string code)
+        public async Task<ActionResult> BrokerageCallback([FromQuery]string code)
         {
             var result = await handler.HandleConnectCallback(
                 new ConnectCallback(code, User.Identifier()));

@@ -15,6 +15,7 @@ using csvparser;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.FSharp.Core;
 using secedgar;
 using securityutils;
 using storage.shared;
@@ -91,12 +92,19 @@ namespace web
                     s.GetService<ILogger<twilioclient.TwilioClientWrapper>>(),
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
+            // services.AddSingleton<IBrokerage>(s =>
+            //     new tdameritradeclient.TDAmeritradeClient(
+            //         s.GetService<IBlobStorage>(),
+            //         configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL"),
+            //         configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
+            //         s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
+            //     ));
             services.AddSingleton<IBrokerage>(s =>
-                new tdameritradeclient.TDAmeritradeClient(
+                new SchwabClient.SchwabClient(
                     s.GetService<IBlobStorage>(),
                     configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL"),
                     configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
-                    s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
+                    new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
                 ));
 
             StorageRegistrations(configuration, services, logger);
