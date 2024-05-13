@@ -43,7 +43,7 @@ namespace coretests.Options
             var stockInfoProvider = new Mock<IStockInfoProvider>();
             stockInfoProvider.Setup(x => x.GetQuotes(It.IsAny<UserState>(), It.IsAny<List<Ticker>>()))
                 .Returns(Task.FromResult(
-                    FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>.NewOk(
+                    FSharpResult<IDictionary<Ticker, StockQuote>, ServiceError>.NewOk(
                         new Dictionary<Ticker, StockQuote>()
                     )
                 ));
