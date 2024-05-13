@@ -128,8 +128,13 @@ export class StockTradingNewPositionComponent {
         this.stockService.reportOutcomesAllBars([ticker])
             .subscribe(data => {
                     this.gaps = data.gaps[0]
-                    this.gaps.gaps.sort((a, b) => b.bar.dateStr.localeCompare(a.bar.dateStr)) // we want reverse order than what backend provides
-                    this.atr = data.outcomes[0].outcomes.filter(o => o.key === OutcomeKeys.AverageTrueRange)[0].value
+                    if (this.gaps) {
+                        this.gaps.gaps.sort((a, b) => b.bar.dateStr.localeCompare(a.bar.dateStr)) // we want reverse order than what backend provides
+                    }
+                    if (data.outcomes[0]) {
+                        this.atr = data.outcomes[0].outcomes.filter(o => o.key === OutcomeKeys.AverageTrueRange)[0].value    
+                    }
+                    
                 }, error => {
                     console.error(error)
                 }

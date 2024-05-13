@@ -82,6 +82,10 @@ export class StockTradingPositionComponent {
     }
 
     profitPointReached(price: number) {
+        if (!this.quote) {
+            return false
+        }
+        
         if (this._position.isShort) {
             return price >= this.quote.price
         }
