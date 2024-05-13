@@ -569,8 +569,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member _.GetOAuthUrl() = task {
             let encodedClientId = Uri.EscapeDataString(clientId)
             let encodedCallbackUrl = Uri.EscapeDataString(callbackUrl)
-            let url = $"{ApiUrl}/oauth/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}"
-            return url
+            return $"{ApiUrl}/oauth/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}"
         }
 
         member this.GetStockProfile (state: UserState) (ticker: Ticker) = task {

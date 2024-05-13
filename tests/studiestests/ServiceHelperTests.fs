@@ -9,7 +9,7 @@ open studies
 let initServiceHelper args =
     let myConfiguration = Dictionary<string, string>()
     myConfiguration.Add("storage", "memory")
-
+    
     let configuration =
         ConfigurationBuilder()
             .AddInMemoryCollection(myConfiguration)

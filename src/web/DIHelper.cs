@@ -93,6 +93,8 @@ namespace web
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
             var tdAmeritradeCallbackUrl = configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL");
+            var schwabCallbackUrl = configuration.GetValue<string>("SCHWAB_CALLBACK_URL");
+            
             if (tdAmeritradeCallbackUrl != null)
             {
                 services.AddSingleton<IBrokerage>(s =>
@@ -103,9 +105,7 @@ namespace web
                         s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
                     ));
             }
-            
-            var schwabCallbackUrl = configuration.GetValue<string>("SCHWAB_CALLBACK_URL");
-            if (schwabCallbackUrl != null)
+            else if (schwabCallbackUrl != null)
             {
                 services.AddSingleton<IBrokerage>(s =>
                     new SchwabClient.SchwabClient(
@@ -115,6 +115,12 @@ namespace web
                         configuration.GetValue<string>("SCHWAB_CLIENT_SECRET"),
                         new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
                     ));
+            }
+            else
+            {
+                logger.LogWarning("Dummy brokerage client registered, no brokerage callback url provided");
+                // dummy brokerage client
+                services.AddSingleton<IBrokerage>(s => new DummyBrokerageClient());
             }
             
             StorageRegistrations(configuration, services, logger);
