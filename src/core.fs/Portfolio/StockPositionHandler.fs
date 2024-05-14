@@ -394,10 +394,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     | Some _ -> cmd.StopPrice
                     | None ->
                         match pendingPositionOption with
-                        | Some pendingPosition ->
-                            match pendingPosition.State.StopPrice.HasValue with
-                            | true -> Some pendingPosition.State.StopPrice.Value
-                            | false -> None
+                        | Some pendingPosition -> pendingPosition.State.StopPrice
                         | None -> None
                         
                 let notes =

@@ -159,7 +159,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 
             let filename = CSVExport.generateFilename("pendingpositions");
 
-            let response = ExportResponse(filename, CSVExport.pendingPositions csvWriter data);
+            let response = ExportResponse(filename, CSVExport.pendingPositions CultureUtils.DefaultCulture csvWriter data);
             
             return Ok response
     }

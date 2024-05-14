@@ -1,5 +1,6 @@
 namespace core.fs.Services
 
+open System
 open core.Cryptos
 open core.Options
 open core.Shared
@@ -11,10 +12,21 @@ open core.fs.Stocks
 
 module CSVExport =
     
+    [<Literal>]
     let private DATE_FORMAT = "yyyy-MM-dd"
+    [<Literal>]
     let private CURRENCY_FORMAT = "C"
+    [<Literal>]
     let private PERCENT_FORMAT = "P"
+    [<Literal>]
     let private NUMBER_FORMAT = "G2"
+    
+    let private number culture (value:decimal) = value.ToString(NUMBER_FORMAT, culture)
+    let private currency culture (value:decimal) = value.ToString(CURRENCY_FORMAT, culture)
+    let private percent culture (value:decimal) = value.ToString(PERCENT_FORMAT, culture)
+    let private currencyOption culture (opt:decimal option) = opt |> Option.map (currency culture) |> Option.defaultValue ""
+    let private date (value:System.DateTimeOffset) = value.ToString(DATE_FORMAT)
+    let private dateOption (opt:System.DateTimeOffset option) = opt |> Option.map date |> Option.defaultValue ""
     
     type PendingPositionRecord =
         {
@@ -89,7 +101,7 @@ module CSVExport =
             ReturnPct:string
             RR:string
             InitialRiskedAmount:string
-            RiskedAmount:string
+            RiskAmount:string
             Strategy:string
             Grade:string
             GradeNote:string
@@ -133,15 +145,15 @@ module CSVExport =
                     {
                         StrategyName = strategy.strategyName
                         Ticker = r.Ticker.Value
-                        Profit = System.Math.Round(r.Profit, 2)
-                        RR = System.Math.Round(r.RR, 2)
-                        ReturnPct = System.Math.Round(r.GainPct, 2) * 100m
+                        Profit = Math.Round(r.Profit, 2)
+                        RR = Math.Round(r.RR, 2)
+                        ReturnPct = Math.Round(r.GainPct, 2) * 100m
                         NumberOfShares = r.CompletedPositionShares
                         Cost = r.CompletedPositionShares * r.CompletedPositionCostPerShare
                         AverageBuyCostPerShare = r.CompletedPositionCostPerShare
                         AverageSaleCostPerShare = r.AverageSaleCostPerShare
-                        Opened = r.Opened.ToString(DATE_FORMAT)
-                        Closed = r.Closed.Value.ToString(DATE_FORMAT)
+                        Opened = r.Opened |> date
+                        Closed = r.Closed |> dateOption
                         DaysHeld = r.DaysHeld
                     }
                 )
@@ -149,7 +161,7 @@ module CSVExport =
             
         writer.Generate(rows)
     
-    let pendingPositions (writer:ICSVWriter) (pending:seq<PendingStockPosition>) =
+    let pendingPositions (culture:IFormatProvider) (writer:ICSVWriter) (pending:seq<PendingStockPosition>) =
         
         let rows =
             pending
@@ -158,9 +170,9 @@ module CSVExport =
                     Ticker = p.State.Ticker.Value
                     Bid = p.State.Bid
                     NumberOfShares = p.State.NumberOfShares
-                    StopPrice = (if p.State.StopPrice.HasValue then p.State.StopPrice.Value.ToString(CURRENCY_FORMAT) else "")
-                    Opened = p.State.Opened.ToString(DATE_FORMAT)
-                    Closed = (if p.State.Closed.HasValue then p.State.Closed.Value.ToString(DATE_FORMAT) else "")
+                    StopPrice = p.State.StopPrice |> currencyOption culture
+                    Opened = p.State.Opened |> date
+                    Closed = p.State.Closed |> dateOption
                     Purchased = p.State.Purchased
                     Strategy = p.State.Strategy
                     Notes = p.State.Notes
@@ -173,7 +185,7 @@ module CSVExport =
         
         match justTickers with
         | true -> writer.Generate(list.Tickers |> Seq.map (fun s -> { Ticker = s.Ticker.Value }))
-        | false -> writer.Generate(list.Tickers |> Seq.map (fun s -> { Ticker = s.Ticker.Value; Created = s.When.ToString(DATE_FORMAT); Notes = s.Note }))
+        | false -> writer.Generate(list.Tickers |> Seq.map (fun s -> { Ticker = s.Ticker.Value; Created = s.When |> date; Notes = s.Note }))
         
     
     let trades culture (writer:ICSVWriter) (trades:seq<StockPositionWithCalculations>) =
@@ -184,19 +196,19 @@ module CSVExport =
                 {
                     Symbol = t.Ticker.Value
                     PositionType = t.StockPositionType
-                    NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> _.ToString(NUMBER_FORMAT, culture)
-                    Opened = t.Opened.ToString(DATE_FORMAT, culture)
-                    Closed = (if t.Closed.IsSome then t.Closed.Value.ToString(DATE_FORMAT, culture) else "")
+                    NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> number culture
+                    Opened = t.Opened |> date
+                    Closed = t.Closed |> dateOption
                     DaysHeld = t.DaysHeld
-                    AverageCostPerShare = t.CompletedPositionCostPerShare.ToString(CURRENCY_FORMAT, culture)
-                    LastSellCostPerShare = (if t.ClosePrice.IsSome then t.ClosePrice.Value.ToString(CURRENCY_FORMAT, culture) else "")
-                    StopPrice = (if t.StopPrice.IsSome then t.StopPrice.Value.ToString(CURRENCY_FORMAT, culture) else "") 
-                    Cost = t.Cost.ToString(CURRENCY_FORMAT, culture)
-                    Profit = t.Profit.ToString(CURRENCY_FORMAT, culture)
-                    ReturnPct = t.GainPct.ToString(PERCENT_FORMAT, culture)
-                    RR = t.RR.ToString(NUMBER_FORMAT, culture)
-                    InitialRiskedAmount = (if t.InitialRiskedAmount.IsSome then t.InitialRiskedAmount.Value.ToString(CURRENCY_FORMAT, culture) else "")
-                    RiskedAmount = (if t.RiskedAmount.IsSome then t.RiskedAmount.Value.ToString(CURRENCY_FORMAT, culture) else "")
+                    AverageCostPerShare = t.CompletedPositionCostPerShare |> currency culture
+                    LastSellCostPerShare = t.ClosePrice |> currencyOption culture
+                    StopPrice = t.StopPrice  |> currencyOption culture
+                    Cost = t.Cost |> currency culture
+                    Profit = t.Profit |> currency culture
+                    ReturnPct = t.GainPct |> percent culture
+                    RR = t.RR |> number culture
+                    InitialRiskedAmount = t.InitialRiskedAmount |> currencyOption culture
+                    RiskAmount = t.RiskedAmount |> currencyOption culture
                     Strategy= match t.TryGetLabelValue("strategy") with | true, v -> v | _ -> ""
                     Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
                     GradeNote = (if t.GradeNote.IsSome then t.GradeNote.Value else "")
@@ -233,7 +245,7 @@ module CSVExport =
                         Type = "buy"
                         Amount = cp.Quantity
                         Price = cp.DollarAmount
-                        Date = cp.When.ToString(DATE_FORMAT)
+                        Date = cp.When |> date
                     }
                 | :? CryptoSold as cs ->
                     {
@@ -241,7 +253,7 @@ module CSVExport =
                         Type = "sell"
                         Amount = cs.Quantity
                         Price = cs.DollarAmount
-                        Date = cs.When.ToString(DATE_FORMAT)
+                        Date = cs.When |> date
                     }
                 | _ -> { Symbol = ""; Type = ""; Amount = 0m; Price = 0m; Date = "" }
             )
@@ -263,7 +275,7 @@ module CSVExport =
                         Type = "buy"
                         Amount = e.NumberOfShares
                         Price = e.Price
-                        Date = e.Date.ToString(DATE_FORMAT)
+                        Date = e.Date |> date
                     }
                 | Sell ->
                     {
@@ -271,7 +283,7 @@ module CSVExport =
                         Type = "sell"
                         Amount = e.NumberOfShares
                         Price = e.Price
-                        Date = e.Date.ToString(DATE_FORMAT)
+                        Date = e.Date |> date
                     }
             )
             |> Seq.filter (fun r -> r.Ticker <> "")
@@ -299,10 +311,10 @@ module CSVExport =
                         Type = "sell"
                         Strike = o.State.StrikePrice
                         OptionType = o.State.OptionType.ToString()
-                        Expiration = o.State.Expiration.ToString(DATE_FORMAT)
+                        Expiration = o.State.Expiration |> date
                         Amount = os.NumberOfContracts |> decimal
                         Premium = os.Premium
-                        Filled = os.When.ToString(DATE_FORMAT)
+                        Filled = os.When |> date
                     }
                 | :? OptionPurchased as op ->
                     {
@@ -310,10 +322,10 @@ module CSVExport =
                         Type = "buy"
                         Strike = o.State.StrikePrice
                         OptionType = o.State.OptionType.ToString()
-                        Expiration = o.State.Expiration.ToString(DATE_FORMAT)
+                        Expiration = o.State.Expiration |> date
                         Amount = op.NumberOfContracts |> decimal
                         Premium = op.Premium
-                        Filled = op.When.ToString(DATE_FORMAT)
+                        Filled = op.When |> date
                     }
                 | :? OptionExpired as oe ->
                     {
@@ -321,10 +333,10 @@ module CSVExport =
                         Type = (if oe.Assigned then "assigned" else "expired")
                         Strike = o.State.StrikePrice
                         OptionType = o.State.OptionType.ToString()
-                        Expiration = o.State.Expiration.ToString(DATE_FORMAT)
+                        Expiration = o.State.Expiration |> date
                         Amount = 0m
                         Premium = 0m
-                        Filled = oe.When.ToString(DATE_FORMAT)
+                        Filled = oe.When |> date
                     }
                 | _ -> { Ticker = ""; Type = ""; Strike = 0m; OptionType = ""; Expiration = ""; Amount = 0m; Premium = 0m; Filled = "" }
             )

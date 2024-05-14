@@ -1,6 +1,7 @@
 using System;
 using core.Shared;
 using core.Stocks;
+using Microsoft.FSharp.Core;
 
 namespace core.Stocks
 {
@@ -13,12 +14,12 @@ namespace core.Stocks
         public decimal? Price { get; private set;}
         public decimal? PercentDiffBetweenBidAndPrice { get; private set; }
         public decimal NumberOfShares { get; private set; }
-        public decimal? StopPrice { get; private set; }
+        public FSharpOption<decimal> StopPrice { get; private set; }
         public string Notes { get; private set; }
         public string Strategy { get; private set; }
         public DateTimeOffset Opened { get; private set; }
-        public DateTimeOffset? Closed { get; private set; }
-        public bool IsClosed => Closed.HasValue;
+        public FSharpOption<DateTimeOffset> Closed { get; private set; }
+        public bool IsClosed => FSharpOption<DateTimeOffset>.get_IsSome(Closed);
         public bool Purchased { get; private set; }
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
