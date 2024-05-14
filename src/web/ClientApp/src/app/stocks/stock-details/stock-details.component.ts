@@ -15,6 +15,8 @@ import {Title} from '@angular/platform-browser';
 import {GetErrors} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {BrokerageService} from "../../services/brokerage.service";
+import {catchError, tap} from "rxjs/operators";
+import {concat} from "rxjs";
 
 @Component({
     selector: 'app-stock-details',
@@ -123,34 +125,44 @@ export class StockDetailsComponent implements OnInit {
     }
 
     loadStockOwnership() {
-        this.stocks.getStockPrices(this.ticker, 365, PriceFrequency.Daily)
-            .subscribe(
-                result => {
-                    this.prices = result
-                    this.stockPositions.getStockOwnership(this.ticker).subscribe(result => {
+        let pricesPromise = 
+            this.stocks.getStockPrices(this.ticker, 365, PriceFrequency.Daily)
+                .pipe(
+                    tap(result => this.prices = result),
+                    catchError(error => {
+                        this.errors.stock = GetErrors(error)
+                        return []
+                    })
+                )
+        
+        let ownershipPromise =
+            this.stockPositions.getStockOwnership(this.ticker)
+                .pipe(
+                    tap(result => {
                         this.stockOwnership = result
                         this.currentPosition = result.positions.filter(p => p.isOpen)[0]
-                        if (this.currentPosition) {
-                            this.currentPositionChartInfo = {
-                                averageBuyPrice: this.currentPosition.averageCostPerShare,
-                                stopPrice: this.currentPosition.stopPrice,
-                                transactions: this.currentPosition.transactions,
-                                markers: [],
-                                prices: this.prices,
-                                ticker: this.currentPosition.ticker
-                            }
-                        }
                         this.loading.ownership = false;
-                    }, err => {
+                    }),
+                    catchError(err => {
                         this.loading.ownership = false;
                         this.errors.ownership = GetErrors(err)
+                        return []
                     })
-                },
-                error => {
-                    this.errors.stock = GetErrors(error)
-                    this.loading.stock = false;
+                )
+        
+        concat(pricesPromise, ownershipPromise).subscribe(() => {
+                if (this.currentPosition && this.prices) {
+                    this.currentPositionChartInfo = {
+                        averageBuyPrice: this.currentPosition.averageCostPerShare,
+                        stopPrice: this.currentPosition.stopPrice,
+                        transactions: this.currentPosition.transactions,
+                        markers: [],
+                        prices: this.prices,
+                        ticker: this.currentPosition.ticker
+                    }
                 }
-            );
+            }
+        )
     }
 
     isActive(tabName: string) {
