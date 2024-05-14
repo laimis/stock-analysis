@@ -92,22 +92,26 @@ export class StockSearchComponent implements OnInit {
 
     onKeyDown($event: KeyboardEvent) {
 
-        if (this.searchResultsSubscribedArray.length == 0) {
-            return
-        }
+        if (this.searchResultsSubscribedArray.length > 0) {
+            if ($event.key === 'ArrowUp' && this.highlightedIndex > 0) {
+                this.highlightedIndex--;
+            }
 
-        if ($event.key === 'ArrowUp' && this.highlightedIndex > 0) {
-            this.highlightedIndex--;
-        }
+            if ($event.key === 'ArrowDown' && this.highlightedIndex < this.searchResultsSubscribedArray.length - 1) {
+                this.highlightedIndex++;
+            }
 
-        if ($event.key === 'ArrowDown' && this.highlightedIndex < this.searchResultsSubscribedArray.length - 1) {
-            this.highlightedIndex++;
-        }
-
-        if ($event.key === 'Enter' && this.highlightedIndex >= 0) {
-            let ticker = this.searchResultsSubscribedArray[this.highlightedIndex].symbol
-            this.loseFocus()
-            this.clicked(ticker)
+            if ($event.key === 'Enter' && this.highlightedIndex >= 0) {
+                let ticker = this.searchResultsSubscribedArray[this.highlightedIndex].symbol
+                this.loseFocus()
+                this.clicked(ticker)
+            }
+        } else {
+            // no results, but perhaps the user wants to select what they just typed in
+            if ($event.key === 'Enter') {
+                this.loseFocus()
+                this.clicked(this.selectedValue)
+            }
         }
     }
 }

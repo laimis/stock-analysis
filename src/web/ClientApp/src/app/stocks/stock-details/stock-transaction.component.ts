@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {PositionInstance, stocktransactioncommand} from '../../services/stocks.service';
+import {openpositioncommand, PositionInstance, stocktransactioncommand} from '../../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
@@ -55,14 +55,35 @@ export class StockTransactionComponent implements OnInit {
 
 
     record() {
-        let op = new stocktransactioncommand()
-        op.positionId = this.position.positionId
-        op.numberOfShares = this.numberOfShares
-        op.price = this.pricePerShare
-        op.date = this.filled
+        // if position is set, then we are updating an existing position, otherwise we will be opening short/long position
+        if (this.position) {
+            let op = new stocktransactioncommand()
+            op.positionId = this.position.positionId
+            op.numberOfShares = this.numberOfShares
+            op.price = this.pricePerShare
+            op.date = this.filled
 
-        if (this.positionType == 'buy') this.recordBuy(op)
-        if (this.positionType == 'sell') this.recordSell(op)
+            if (this.positionType == 'buy') this.recordBuy(op)
+            if (this.positionType == 'sell') this.recordSell(op)
+        } else {
+            let command = new openpositioncommand()
+            command.ticker = this.ticker
+            command.numberOfShares = this.numberOfShares
+            command.price = this.pricePerShare
+            command.date = this.filled
+            command.notes = this.notes
+            
+            if (this.positionType == 'sell') {
+                command.numberOfShares = -1 * command.numberOfShares
+            }
+            
+            this.service.openPosition(command).subscribe(_ => {
+                this.transactionRecorded.emit("open")
+                this.clearFields()
+            }, err => {
+                this.transactionFailed.emit(GetErrors(err))
+            })
+        }
     }
 
     recordBuy(stock: stocktransactioncommand) {
