@@ -25,7 +25,7 @@ type AccountBalancesSnapshot(cash:decimal,equity:decimal,longValue:decimal,short
     member _.ShortValue = shortValue
     member _.Date = date
     
-type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset) =
+type ProcessIdToUserAssociation(Id:Guid, UserIdent:UserId, Timestamp:DateTimeOffset) =
     
     new(userId, timestamp:DateTimeOffset) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, timestamp)
     new(userId, timestamp:string) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, DateTimeOffset.Parse(timestamp))
@@ -33,7 +33,7 @@ type ProcessIdToUserAssociation(Id:Guid, UserId:UserId, Timestamp:DateTimeOffset
     
     member _.IsOlderThan(duration:TimeSpan) = DateTimeOffset.UtcNow.Subtract(Timestamp) > duration
     member _.Id = Id
-    member _.UserId = UserId
+    member _.UserId = UserIdent
     member _.Timestamp = Timestamp
     
     
