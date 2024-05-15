@@ -38,20 +38,10 @@ type SearchResult =
     {
         Symbol:string
         SecurityName:string
-        SecurityType:string
+        AssetType:string
         Region:string
         Exchange:string
-    }
-    
-    with
-        member this.IsSupportedType =
-            match this.SecurityType with
-            | "SHARE" -> true
-            | "cs" -> true
-            | "et" -> true
-            | "ad" -> true
-            | _ -> false
-            
+    }       
 
 [<CLIMutable>]
 type StockQueryResult =

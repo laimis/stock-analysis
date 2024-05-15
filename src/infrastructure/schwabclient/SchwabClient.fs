@@ -20,7 +20,7 @@ open Nito.AsyncEx
 open Polly
 open Polly.RateLimit
 open core.fs.Adapters.Stocks
-
+    
 type ErrorResponse = {
     message: string option
 }
@@ -46,11 +46,12 @@ type PriceHistoryResponse = {
     candles: Candle [] option
 }
 
+[<CLIMutable>]
 type Instrument = {
-    assetType: string option
-    cusip: string option
-    symbol: string option
-    description: string option
+    assetType: string
+    cusip: string
+    symbol: string
+    description: string
 }
 
 type OrderLeg = {
@@ -337,6 +338,13 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     let _httpClient = new HttpClient()
     let _asyncLock = AsyncLock()
 
+    let isStockType assetType =
+        match assetType with
+        | "EQUITY" -> true
+        | "ETF" -> true
+        | "COLLECTIVE_INVESTMENT" -> true
+        | _ -> false
+    
     static let _retryPolicy =
         Policy
             .HandleInner<RateLimitRejectedException>()
@@ -682,13 +690,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     results
                     |> Result.map(fun results ->
                         results.instruments
+                        |> Seq.filter (fun i -> i.assetType.IsSome && i.assetType.Value |> isStockType)
                         |> Seq.map (fun i ->
                             {
                                 Region = ""
                                 Symbol = i.symbol |> Option.defaultValue ""
                                 SecurityName = i.description |> Option.defaultValue ""
                                 Exchange = i.exchange |> Option.defaultValue ""
-                                SecurityType = i.assetType |> Option.defaultValue ""
+                                AssetType = i.assetType |> Option.defaultValue ""
                             }
                         )
                         |> Seq.sortBy (fun r ->
@@ -697,9 +706,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             | _ -> 0
                         )
                         |> Seq.sortBy (fun r ->
-                            match r.SecurityType with
+                            match r.AssetType with
                             | "EQUITY" -> 0
-                            | "OPTION" -> 1
                             | "MUTUAL_FUND" -> 2
                             | "ETF" -> 3
                             | "INDEX" -> 4
@@ -749,10 +757,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                     order.Quantity <- int l.quantity
                                     order.Price <- o.ResolvePrice()
                                     order.Cancelable <- o.cancelable
-                                    order.Ticker <- Ticker (l.instrument.Value.symbol |> Option.defaultValue "") |> Some
-                                    order.Description <- l.instrument.Value.description |> Option.defaultValue ""
+                                    order.Ticker <- Ticker l.instrument.Value.symbol |> Some
+                                    order.Description <- l.instrument.Value.description
                                     order.Type <- l.instruction |> Option.defaultValue ""
-                                    order.AssetType <- l.instrument.Value.assetType |> Option.defaultValue ""
+                                    order.AssetType <- l.instrument.Value.assetType
                                     order
                                 )
 
@@ -766,17 +774,17 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                 
                                 let stockPositions =
                                     tdPositions
-                                    |> Array.filter (fun p -> p.instrument.Value.assetType = Some "EQUITY" || p.instrument.Value.assetType = Some "ETF")
+                                    |> Array.filter (fun p -> p.instrument.Value.assetType |> isStockType)
                                     |> Array.map (fun p ->
                                         let qty = if p.longQuantity > 0m then p.longQuantity else -p.shortQuantity
-                                        StockPosition(Ticker p.instrument.Value.symbol.Value, p.averagePrice, qty)
+                                        StockPosition(Ticker p.instrument.Value.symbol, p.averagePrice, qty)
                                     )
 
                                 let optionPositions =
                                     tdPositions
-                                    |> Array.filter (fun p -> p.instrument.Value.assetType = Some "OPTION")
+                                    |> Array.filter (fun p -> p.instrument.Value.assetType = "OPTION")
                                     |> Array.map (fun p ->
-                                        let description = p.instrument.Value.description.Value
+                                        let description = p.instrument.Value.description
                                         // description looks like this: AGI Jul 21 2023 13.0 Call
                                         // AGI is ticker, Jul 21 2023 is expiration date, 13.0 is strike price
                                         // and Call is CALL type, parse all of these values from the description

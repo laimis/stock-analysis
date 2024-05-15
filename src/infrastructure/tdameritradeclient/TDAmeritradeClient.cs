@@ -167,7 +167,7 @@ public class TDAmeritradeClient : IBrokerage
                 Symbol = i.symbol,
                 SecurityName = i.description,
                 Exchange = i.exchange,
-                SecurityType = i.assetType
+                AssetType = i.assetType
             }
             ).OrderBy(r =>
                 r.Exchange switch {
@@ -176,7 +176,7 @@ public class TDAmeritradeClient : IBrokerage
                 }
             )
             .ThenBy(r =>
-                r.SecurityType switch {
+                r.AssetType switch {
                     "EQUITY" => 0,
                     "OPTION" => 1,
                     "MUTUAL_FUND" => 2,
