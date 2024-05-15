@@ -516,7 +516,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     
     member private this.CallApiWithoutSerialization(user: UserState) (resource: SchwabResourceEndpoint) (method: HttpMethod) (jsonData: string option) = task {
         let! oauth = getAccessToken user
-
+        
         let makeCallAndGetResponse (ct:CancellationToken) = task {
             let request = new HttpRequestMessage(method, resource |> generateUrl)
             request.Headers.Authorization <- AuthenticationHeaderValue("Bearer", oauth.access_token)
@@ -674,8 +674,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.Search (state: UserState) (query: string) (limit: int) = task {
             
             let connectedStateFunc state = task {
-                let resource = $"/instruments?symbols={query}.*&projection=symbol-regex" |> MarketDataUrl
-
+                let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
+                
                 let! results = this.CallApi<InstrumentsResponse> state resource HttpMethod.Get None None
                 
                 return
@@ -766,7 +766,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                 
                                 let stockPositions =
                                     tdPositions
-                                    |> Array.filter (fun p -> p.instrument.Value.assetType = Some "EQUITY")
+                                    |> Array.filter (fun p -> p.instrument.Value.assetType = Some "EQUITY" || p.instrument.Value.assetType = Some "ETF")
                                     |> Array.map (fun p ->
                                         let qty = if p.longQuantity > 0m then p.longQuantity else -p.shortQuantity
                                         StockPosition(Ticker p.instrument.Value.symbol.Value, p.averagePrice, qty)

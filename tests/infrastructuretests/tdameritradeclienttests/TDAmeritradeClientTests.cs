@@ -42,12 +42,13 @@ namespace tdameritradeclienttests
         //         new FSharpOption<ILogger<SchwabClient.SchwabClient>>(Mock.Of<ILogger<SchwabClient.SchwabClient>>())
         //     ) as IBrokerage;
         //     
-        //     var quote = await schwab.GetAccount(user.State);
+        //     var quote = await schwab.Search(user.State, "NET", 15);
         //
         //     var errorMessage = quote.IsError ? quote.ErrorValue.Message : null;
         //     Assert.Null(errorMessage);
         //     
-        //     Assert.NotEmpty(quote.ResultValue.Orders);
+        //     Assert.NotEmpty(quote.ResultValue);
+        //     Assert.True(quote.ResultValue.Length > 1);
         // }
     }
 
