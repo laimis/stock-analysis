@@ -374,13 +374,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         if fullRefresh then
             postData.Add("access_type", "offline")
 
-        let content = new FormUrlEncodedContent(postData)
+        let request = new HttpRequestMessage(HttpMethod.Post, generateApiUrl "/oauth/token")
+        request.Headers.Authorization <- AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")))
+        request.Content <- new FormUrlEncodedContent(postData)
         
-        let base64Encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"))
-        
-        content.Headers.Add("Authorization", $"Basic {base64Encoded}")
-
-        let! response = _httpClient.PostAsync(generateApiUrl "/oauth/token", content)
+        let! response = _httpClient.SendAsync(request)
 
         do! logIfFailed response "refresh access token"
 
@@ -548,14 +546,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     "redirect_uri", callbackUrl
                     "client_id", clientId
                 ]
-
-            let content = new FormUrlEncodedContent(postData)
+                
+            let request = new HttpRequestMessage(HttpMethod.Post, generateApiUrl "/oauth/token")
             
-            let base64Encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"))
+            request.Content <- new FormUrlEncodedContent(postData)
             
-            content.Headers.Add("Authorization", $"Basic {base64Encoded}")
+            request.Headers.Authorization <- AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")))
 
-            let! response = _httpClient.PostAsync(generateApiUrl "/oauth/token", content)
+            let! response = _httpClient.SendAsync(request)
 
             do! logIfFailed response "connect callback"
 
