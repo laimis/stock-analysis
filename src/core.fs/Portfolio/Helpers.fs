@@ -66,7 +66,7 @@ module Helpers =
                     | true, price -> price.Price
                     | false, _ -> 0m
                     
-                let brokeragePositionOption = account.OptionPositions |> Seq.tryFind (fun x -> x.Ticker.Value = localPosition.Ticker)
+                let brokeragePositionOption = account.StockPositions |> Seq.tryFind (fun x -> x.Ticker = localPosition.Ticker)
                 
                 match brokeragePositionOption with
                 | None -> 
