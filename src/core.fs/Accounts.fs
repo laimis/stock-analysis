@@ -68,8 +68,8 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
         let event = UserDeleted(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, feedback)
         this.Apply(event)
         
-    member this.ConnectToBrokerage accessToken refreshToken tokenType expiresInSeconds scope refreshTokenExpiresInSeconds =
-        let event = UserConnectedToBrokerage(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, refreshTokenExpiresInSeconds)
+    member this.ConnectToBrokerage accessToken refreshToken tokenType expiresInSeconds scope =
+        let event = UserConnectedToBrokerage(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, 0)
         this.Apply(event)
         
     member this.DisconnectFromBrokerage() =

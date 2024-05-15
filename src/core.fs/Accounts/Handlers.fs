@@ -422,7 +422,7 @@ namespace core.fs.Accounts
             match user with
             None -> return "User not found" |> ServiceError |> Error
             | Some user ->
-                user.ConnectToBrokerage r.access_token r.refresh_token r.token_type r.expires_in r.scope r.refresh_token_expires_in
+                user.ConnectToBrokerage r.access_token r.refresh_token r.token_type r.expires_in r.scope
                 do! storage.Save(user)
                 return Ok ()
         }

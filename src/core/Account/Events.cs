@@ -103,7 +103,6 @@ namespace core.Account
             TokenType = tokenType;
             ExpiresInSeconds = expiresInSeconds;
             Scope = scope;
-            RefreshTokenExpiresInSeconds = refreshTokenExpiresInSeconds;
         }
 
         public string AccessToken { get; }
@@ -111,6 +110,7 @@ namespace core.Account
         public string TokenType { get; }
         public long ExpiresInSeconds { get; }
         public string Scope { get; }
+        [Obsolete("this will not have a valid value and ish here to preserve the event structure")]
         public long RefreshTokenExpiresInSeconds { get; }
     }
 
