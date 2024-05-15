@@ -22,7 +22,7 @@ open Polly.RateLimit
 open core.fs.Adapters.Stocks
 
 type ErrorResponse = {
-    error: string option
+    message: string option
 }
 
 type MarketHoursEquity = {
@@ -516,7 +516,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     
     member private this.CallApiWithoutSerialization(user: UserState) (resource: SchwabResourceEndpoint) (method: HttpMethod) (jsonData: string option) = task {
         let! oauth = getAccessToken user
-        
+
         let makeCallAndGetResponse (ct:CancellationToken) = task {
             let request = new HttpRequestMessage(method, resource |> generateUrl)
             request.Headers.Authorization <- AuthenticationHeaderValue("Bearer", oauth.access_token)
@@ -545,7 +545,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 
             if not response.IsSuccessStatusCode then
                 let error = JsonSerializer.Deserialize<ErrorResponse>(content)
-                match error.error with
+                match error.message with
                 | Some error -> return error |> ServiceError |> Error
                 | None -> return content |> ServiceError |> Error
             else
@@ -719,75 +719,92 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.GetAccount(user: UserState) = task {
             
             let accountFunc state = task {
-                let resource = "/accounts?fields=positions" |> TraderApiUrl
                 
-                let! response = this.CallApi<AccountsResponse []> state resource HttpMethod.Get None None
-                
-                return
-                    response
-                    |> Result.map(fun accounts ->
-                        let tdPositions = if accounts[0].securitiesAccount.IsSome then accounts[0].securitiesAccount.Value.positions |> Option.defaultValue [||] else [||]
-                        // let strategies = if accounts[0].securitiesAccount.IsSome then accounts[0].securitiesAccount.Value.orderStrategies |> Option.defaultValue [||] else [||]
-                        //
-                        // let orders =
-                        //     strategies
-                        //     |> Array.collect (fun o -> defaultArg o.orderLegCollection [||] |> Array.map (fun l -> o, l))
-                        //     |> Array.map (fun (o, l) ->
-                        //         let order = Order()
-                        //         order.Date <- o.closeTime |> Option.map DateTimeOffset.Parse
-                        //         order.Status <- o.status |> Option.defaultValue ""
-                        //         order.OrderId <- o.orderId.ToString()
-                        //         order.Quantity <- int l.quantity
-                        //         order.Price <- o.ResolvePrice()
-                        //         order.Cancelable <- o.cancelable
-                        //         order.Ticker <- Ticker (l.instrument.Value.symbol |> Option.defaultValue "") |> Some
-                        //         order.Description <- l.instrument.Value.description |> Option.defaultValue ""
-                        //         order.Type <- l.instruction |> Option.defaultValue ""
-                        //         order.AssetType <- l.instrument.Value.assetType |> Option.defaultValue ""
-                        //         order
-                        //     )
+                let accountNumbersResource = "/accounts/accountNumbers" |> TraderApiUrl
+                let! accountNumbers = this.CallApi<AccountNumber []> state accountNumbersResource HttpMethod.Get None None
+                match accountNumbers with
+                | Error error -> return Error error
+                | Ok accountNumbers ->
+                    let accountId = accountNumbers[0].hashValue
+                    
+                    // ISO-8601 format
+                    let format = "yyyy-MM-dd'T'HH:mm:ss.000Z"
+                    let fromEnteredTime = DateTimeOffset.UtcNow.AddMonths(-6).ToString(format)
+                    let toEnteredTime = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
+                    
+                    let ordersResource = $"/accounts/{accountId}/orders?fromEnteredTime={fromEnteredTime}&toEnteredTime={toEnteredTime}" |> TraderApiUrl
+                    let! orders = this.CallApi<OrderStrategy []> state ordersResource HttpMethod.Get None None
+                    match orders with
+                    | Error error -> return Error error
+                    | Ok orders ->
+                        
+                        let brokerageOrders =
+                            orders
+                            |> Array.collect(fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.map(fun l -> o, l))
+                            |> Array.map(fun (o, l) ->
+                                    let order = Order()
+                                    order.Date <- o.closeTime |> Option.map DateTimeOffset.Parse
+                                    order.Status <- o.status |> Option.defaultValue ""
+                                    order.OrderId <- o.orderId.ToString()
+                                    order.Quantity <- int l.quantity
+                                    order.Price <- o.ResolvePrice()
+                                    order.Cancelable <- o.cancelable
+                                    order.Ticker <- Ticker (l.instrument.Value.symbol |> Option.defaultValue "") |> Some
+                                    order.Description <- l.instrument.Value.description |> Option.defaultValue ""
+                                    order.Type <- l.instruction |> Option.defaultValue ""
+                                    order.AssetType <- l.instrument.Value.assetType |> Option.defaultValue ""
+                                    order
+                                )
 
-                        let stockPositions =
-                            tdPositions
-                            |> Array.filter (fun p -> p.instrument.Value.assetType = Some "EQUITY")
-                            |> Array.map (fun p ->
-                                let qty = if p.longQuantity > 0m then p.longQuantity else -p.shortQuantity
-                                StockPosition(Ticker p.instrument.Value.symbol.Value, p.averagePrice, qty)
+                        let resource = $"/accounts/{accountId}?fields=positions" |> TraderApiUrl
+                        let! response = this.CallApi<AccountsResponse> state resource HttpMethod.Get None None
+                        
+                        return
+                            response
+                            |> Result.map(fun accounts ->
+                                let tdPositions = if accounts.securitiesAccount.IsSome then accounts.securitiesAccount.Value.positions |> Option.defaultValue [||] else [||]
+                                
+                                let stockPositions =
+                                    tdPositions
+                                    |> Array.filter (fun p -> p.instrument.Value.assetType = Some "EQUITY")
+                                    |> Array.map (fun p ->
+                                        let qty = if p.longQuantity > 0m then p.longQuantity else -p.shortQuantity
+                                        StockPosition(Ticker p.instrument.Value.symbol.Value, p.averagePrice, qty)
+                                    )
+
+                                let optionPositions =
+                                    tdPositions
+                                    |> Array.filter (fun p -> p.instrument.Value.assetType = Some "OPTION")
+                                    |> Array.map (fun p ->
+                                        let description = p.instrument.Value.description.Value
+                                        // description looks like this: AGI Jul 21 2023 13.0 Call
+                                        // AGI is ticker, Jul 21 2023 is expiration date, 13.0 is strike price
+                                        // and Call is CALL type, parse all of these values from the description
+
+                                        match description.Split(" ") with
+                                        | [| ticker; expMonth; expDay; expYear; strike; optionType |] ->
+                                            let optionPosition = OptionPosition()
+                                            optionPosition.Ticker <- Some(Ticker ticker)
+                                            optionPosition.Quantity <- if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
+                                            optionPosition.AverageCost <- p.averagePrice
+                                            optionPosition.StrikePrice <- decimal strike
+                                            optionPosition.ExpirationDate <- $"{expMonth} {expDay} {expYear}"
+                                            optionPosition.MarketValue <- p.marketValue
+                                            optionPosition.OptionType <- optionType.ToUpperInvariant()
+                                            optionPosition
+                                        | _ -> failwith $"Could not parse option description: {description}"
+                                    )
+
+                                let account = BrokerageAccount()
+                                account.Orders <- brokerageOrders
+                                account.StockPositions <- stockPositions
+                                account.OptionPositions <- optionPositions
+                                account.CashBalance <- Some accounts.securitiesAccount.Value.currentBalances.Value.cashBalance
+                                account.Equity <- Some accounts.securitiesAccount.Value.currentBalances.Value.equity
+                                account.LongMarketValue <- Some accounts.securitiesAccount.Value.currentBalances.Value.longMarketValue
+                                account.ShortMarketValue <- Some accounts.securitiesAccount.Value.currentBalances.Value.shortMarketValue
+                                account
                             )
-
-                        let optionPositions =
-                            tdPositions
-                            |> Array.filter (fun p -> p.instrument.Value.assetType = Some "OPTION")
-                            |> Array.map (fun p ->
-                                let description = p.instrument.Value.description.Value
-                                // description looks like this: AGI Jul 21 2023 13.0 Call
-                                // AGI is ticker, Jul 21 2023 is expiration date, 13.0 is strike price
-                                // and Call is CALL type, parse all of these values from the description
-
-                                match description.Split(" ") with
-                                | [| ticker; expMonth; expDay; expYear; strike; optionType |] ->
-                                    let optionPosition = OptionPosition()
-                                    optionPosition.Ticker <- Some(Ticker ticker)
-                                    optionPosition.Quantity <- if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
-                                    optionPosition.AverageCost <- p.averagePrice
-                                    optionPosition.StrikePrice <- decimal strike
-                                    optionPosition.ExpirationDate <- $"{expMonth} {expDay} {expYear}"
-                                    optionPosition.MarketValue <- p.marketValue
-                                    optionPosition.OptionType <- optionType.ToUpperInvariant()
-                                    optionPosition
-                                | _ -> failwith $"Could not parse option description: {description}"
-                            )
-
-                        let account = BrokerageAccount()
-                        account.Orders <- [||] // TODO: we need to obtain orders with a separate call
-                        account.StockPositions <- stockPositions
-                        account.OptionPositions <- optionPositions
-                        account.CashBalance <- Some accounts[0].securitiesAccount.Value.currentBalances.Value.cashBalance
-                        account.Equity <- Some accounts[0].securitiesAccount.Value.currentBalances.Value.equity
-                        account.LongMarketValue <- Some accounts[0].securitiesAccount.Value.currentBalances.Value.longMarketValue
-                        account.ShortMarketValue <- Some accounts[0].securitiesAccount.Value.currentBalances.Value.shortMarketValue
-                        account
-                    )
             }
             
             return! execIfConnectedToBrokerage user accountFunc    
@@ -796,9 +813,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.CancelOrder (user: UserState) (orderId: string) = task {
             let cancelExecution user = task {
                 let resource = "/accounts/accountNumbers" |> TraderApiUrl
-                
                 let! response = this.CallApi<AccountNumber []> user resource HttpMethod.Get None None
-
                 match response with
                 | Error error -> return Error error
                 | Ok accounts ->

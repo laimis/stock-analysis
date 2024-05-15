@@ -42,12 +42,12 @@ namespace tdameritradeclienttests
         //         new FSharpOption<ILogger<SchwabClient.SchwabClient>>(Mock.Of<ILogger<SchwabClient.SchwabClient>>())
         //     ) as IBrokerage;
         //     
-        //     var quote = await schwab.GetStockProfile(user.State, new Ticker("AAPL"));
+        //     var quote = await schwab.GetAccount(user.State);
+        //
+        //     var errorMessage = quote.IsError ? quote.ErrorValue.Message : null;
+        //     Assert.Null(errorMessage);
         //     
-        //     Assert.True(quote.IsOk);
-        //     Assert.Equal("AAPL", quote.ResultValue!.Symbol);
-        //     Assert.Equal("Apple Inc", quote.ResultValue!.Description);
-        //     Assert.NotNull(quote.ResultValue.Fundamentals);
+        //     Assert.NotEmpty(quote.ResultValue.Orders);
         // }
     }
 
