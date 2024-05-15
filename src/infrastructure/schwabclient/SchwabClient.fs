@@ -35,7 +35,7 @@ type MarketHoursWrapper = {
 
 type Candle = {
     datetime: int64
-    open': decimal
+    ``open``: decimal
     high: decimal
     low: decimal
     close: decimal
@@ -234,6 +234,30 @@ type Fundamental = {
     vol3MonthAvg: float
 }
 
+type RegularMarketQuote = {
+    regularMarketLastPrice: decimal
+}
+
+[<CLIMutable>]
+type SchwabStockQuote = {
+    bidPrice : decimal
+    bidSize : decimal
+    askPrice : decimal
+    askSize : decimal
+    lastPrice : decimal
+    closePrice : decimal
+    lastSize : decimal
+    mark : decimal
+    exchange : string
+    exchangeName : string
+    volatility : decimal
+}
+
+type SchwabStockQuoteResponse = {
+    quote: SchwabStockQuote
+    regular: RegularMarketQuote
+}
+
 type OptionDescriptor = {
     putCall: string option
     symbol: string option
@@ -329,7 +353,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
     static let _timeoutPolicy =
         Policy.TimeoutAsync(
-            seconds = int (TimeSpan.FromSeconds(15.0).TotalSeconds)
+            seconds = int (TimeSpan.FromSeconds(255.0).TotalSeconds)
         )
 
     let _wrappedPolicy =
@@ -428,6 +452,24 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | DayPlus -> "SEAMLESS"
         | GtcPlus -> "SEAMLESS"
         
+    let mapSchwabQuoteResponseToStockResponse symbol (schwabResponse:SchwabStockQuoteResponse) : StockQuote =
+        {
+            symbol = symbol
+            bidPrice = schwabResponse.quote.bidPrice
+            exchange = schwabResponse.quote.exchange
+            mark =  schwabResponse.quote.mark
+            volatility = schwabResponse.quote.volatility
+            askPrice = schwabResponse.quote.askPrice
+            askSize = schwabResponse.quote.askSize
+            bidSize = schwabResponse.quote.bidSize
+            closePrice = schwabResponse.quote.closePrice
+            exchangeName = schwabResponse.quote.exchangeName
+            lastPrice = schwabResponse.quote.lastPrice
+            lastSize = schwabResponse.quote.lastSize
+            regularMarketLastPrice = schwabResponse.regular.regularMarketLastPrice
+        }
+        
+        
     let getAccessToken (user:UserState) = task {
         if not user.ConnectedToBrokerage then
             return raise (Exception("User is not connected to brokerage"))
@@ -513,6 +555,22 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | :? TimeoutRejectedException as e ->
             logError "Timeout function {function} with exception: {exception}" [|resource; e.Message|]
             return e.Message |> ServiceError |> Error
+    }
+    
+    member private this.GetQuote (tickers:Ticker seq) (state:UserState) = task {
+        let commaSeparated = String.concat "," (tickers |> Seq.map _.Value)
+        let resource = $"/quotes?symbols={commaSeparated}" |> MarketDataUrl
+
+        let! result = this.CallApi<Dictionary<string, SchwabStockQuoteResponse>> state resource HttpMethod.Get None None
+
+        // doing this conversion as I can't seem to find a way for system.text.json to support dictionary deserialization where
+        // the key is something other than string. If I put Ticker in there, I get a runtime error. Tried to use converters
+        // but that did not work, seems like you had to add dictionary converter and it got ugly pretty quickly
+        return
+            match result with
+            | Error error -> Error error
+            | Ok result ->
+                Ok (result |> Seq.map (fun (KeyValue(k, v)) -> KeyValuePair(Ticker k, (v |> mapSchwabQuoteResponseToStockResponse k))) |> Dictionary)
     }
     
     member this.EnterOrder(user: UserState) (postData: obj) = task {
@@ -841,42 +899,18 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
             this.EnterOrder user postData
 
+        member this.GetQuotes (user: UserState) (tickers: Ticker seq) = execIfConnectedToBrokerage user (this.GetQuote tickers)
+        
         member this.GetQuote (user: UserState) (ticker: Ticker) = task {
-            let execFunc user = task {
-                let resource = $"/{ticker.Value}/quotes" |> MarketDataUrl
-
-                let! response = this.CallApi<Dictionary<string, StockQuote>> user resource HttpMethod.Get None (Some true)
-
+            let! response = this.GetQuote [ticker] user
+            
+            return
                 match response with
-                | Error error -> return Error error
-                | Ok response ->
-                    match response.TryGetValue(ticker.Value) with
-                    | true, quote -> return Ok quote
-                    | false, _ -> return "Could not find quote for ticker" |> ServiceError |> Error
-            }
-            
-            return! execIfConnectedToBrokerage user execFunc
-        }
-
-        member this.GetQuotes (user: UserState) (tickers: Ticker seq) = task {
-            
-            let func state = task {
-                let commaSeparated = String.concat "," (tickers |> Seq.map _.Value)
-                let resource = $"/quotes?symbols={commaSeparated}" |> MarketDataUrl
-
-                let! result = this.CallApi<Dictionary<string, StockQuote>> state resource HttpMethod.Get None None
-
-                // doing this conversion as I can't seem to find a way for system.text.json to support dictionary deserialization where
-                // the key is something other than string. If I put Ticker in there, I get a runtime error. Tried to use converters
-                // but that did not work, seems like you had to add dictionary converter and it got ugly pretty quickly
-                return
-                    match result with
-                    | Error error -> Error error
-                    | Ok result ->
-                        Ok (result |> Seq.map (fun (KeyValue(k, v)) -> KeyValuePair(Ticker k, v)) |> Dictionary)
-            }
-            
-            return! execIfConnectedToBrokerage user func
+                | Error error -> Error error
+                | Ok quotes ->
+                    match quotes.TryGetValue ticker with
+                    | true, quote -> Ok quote
+                    | _ -> ServiceError "Could not find quote for ticker" |> Error
         }
 
         member this.GetOptions (state: UserState) (ticker: Ticker) (expirationDate: DateTimeOffset option) (strikePrice: decimal option) (contractType: string option) = task {
@@ -991,7 +1025,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     let payload =
                         candles
                         |> Array.map (
-                            fun c -> PriceBar(DateTimeOffset.FromUnixTimeMilliseconds(c.datetime), c.open', c.high, c.low, c.close,c.volume)
+                            fun c -> PriceBar(DateTimeOffset.FromUnixTimeMilliseconds(c.datetime), c.``open``, c.high, c.low, c.close,c.volume)
                         )
 
                     if Array.isEmpty payload then

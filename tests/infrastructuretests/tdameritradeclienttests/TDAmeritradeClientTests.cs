@@ -27,6 +27,26 @@ namespace tdameritradeclienttests
             
             Assert.Equal(1.0m, deserializedWithoutNan!.volatility);
         }
+
+        // [Fact]
+        // public async Task Schwab()
+        // {
+        //     var user = User.Create("test", "test", "test");
+        //     user.ConnectToBrokerage("access", "refresh", "type", 1000000, "name");
+        //     
+        //     var schwab = new SchwabClient.SchwabClient(
+        //         Mock.Of<IBlobStorage>(),
+        //         "client",
+        //         "secret",
+        //         "redirect",
+        //         new FSharpOption<ILogger<SchwabClient.SchwabClient>>(Mock.Of<ILogger<SchwabClient.SchwabClient>>())
+        //     ) as IBrokerage;
+        //     
+        //     var quote = await schwab.GetQuote(user.State, new Ticker("AAPL"));
+        //     
+        //     Assert.True(quote.IsOk);
+        //     Assert.True(quote.ResultValue.Price > 0);
+        // }
     }
 
     // [Trait("Category", "Integration")]

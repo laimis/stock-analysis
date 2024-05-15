@@ -84,7 +84,6 @@ type StockQuote =
         exchangeName : string
         volatility : decimal
         regularMarketLastPrice : decimal
-        regularMarketLastSize : decimal
     }
     member this.Price : decimal = this.regularMarketLastPrice
 
