@@ -850,6 +850,11 @@ public class TDAmeritradeClient : IBrokerage
     
     public async Task<OAuthResponse> GetAccessToken(UserState user)
     {
+        bool NotExpired(FSharpOption<OAuthResponse> t)
+        {
+            return FSharpOption<OAuthResponse>.get_IsSome(t) && t.Value is { IsExpired: false } ;
+        }
+        
         if (!user.ConnectedToBrokerage)
         {
             throw new Exception("User is not connected to brokerage");
@@ -858,35 +863,34 @@ public class TDAmeritradeClient : IBrokerage
         // go to the storage to check for access token there
         var storageKey = "access-token:" + user.Id;
         var token = await _blogStorage.Get<OAuthResponse>(storageKey);
-        
-        if (token is { IsExpired: false })
+        if (NotExpired(token))
         {
-            return token;
+            return token.Value;
         }
 
         using (await _asyncLock.LockAsync())
         {
             // check again, in case another thread has already refreshed the token
             token = await _blogStorage.Get<OAuthResponse>(storageKey);
-            if (token is { IsExpired: false })
+            if (NotExpired(token))
             {
-                return token;
+                return token.Value;
             }
             
             _logger?.LogInformation("Refreshing access token");
             
-            token = await RefreshAccessTokenInternal(user, fullRefresh: false);
-            token.created = FSharpOption<DateTimeOffset>.Some(DateTimeOffset.UtcNow);
-            if (token.IsError)
+            var refreshedToken = await RefreshAccessTokenInternal(user, fullRefresh: false);
+            refreshedToken.created = FSharpOption<DateTimeOffset>.Some(DateTimeOffset.UtcNow);
+            if (refreshedToken.IsError)
             {
-                _logger?.LogError("Could not refresh access token: {error}", token.error);
-                throw new Exception("Could not refresh access token: " + token.error);
+                _logger?.LogError("Could not refresh access token: {error}", refreshedToken.error);
+                throw new Exception("Could not refresh access token: " + refreshedToken.error);
             }
 
             _logger?.LogInformation("Saving access token to storage");
         
-            await _blogStorage.Save(storageKey, token);
-            return token;
+            await _blogStorage.Save(storageKey, refreshedToken);
+            return refreshedToken;
         }
     }
 

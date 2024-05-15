@@ -73,7 +73,7 @@ namespace core.Account
             ConnectedToBrokerage = true;
             BrokerageAccessToken = accessToken;
             BrokerageRefreshToken = refreshToken;
-            BrokerageAccessTokenExpires = eventTimestamp.AddSeconds(1800);
+            BrokerageAccessTokenExpires = eventTimestamp.AddSeconds(1800); // these durations should come from somewhere else
             BrokerageRefreshTokenExpires = eventTimestamp.AddDays(7);
         }
 

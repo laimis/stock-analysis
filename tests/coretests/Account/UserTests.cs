@@ -114,14 +114,13 @@ namespace coretests.Account
         {
             var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
             
-            u.RefreshBrokerageConnection("access", "refresh", "token", 3600, "Accounts",
-                (int)TimeSpan.FromDays(90).TotalSeconds);
+            u.RefreshBrokerageConnection("access", "refresh", "token", 3600, "Accounts");
             
             Assert.True(u.State.ConnectedToBrokerage);
             Assert.Equal("access", u.State.BrokerageAccessToken);
             Assert.Equal("refresh", u.State.BrokerageRefreshToken);
             Assert.Equal(DateTimeOffset.UtcNow.AddSeconds(1800), u.State.BrokerageAccessTokenExpires, TimeSpan.FromSeconds(1));
-            Assert.Equal(DateTimeOffset.UtcNow.AddDays(90), u.State.BrokerageRefreshTokenExpires,
+            Assert.Equal(DateTimeOffset.UtcNow.AddDays(7), u.State.BrokerageRefreshTokenExpires,
                 TimeSpan.FromSeconds(1));
         }
     }

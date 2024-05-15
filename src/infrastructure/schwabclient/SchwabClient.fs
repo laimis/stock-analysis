@@ -427,10 +427,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         else
             // go to the storage to check for access token there
             let storageKey = "access-token-schwab:" + user.Id.ToString()
-            let! token = blobStorage.Get<OAuthResponse>(storageKey)
+            let! firstCheck = blobStorage.Get<OAuthResponse>(storageKey)
             
-            match token with
-            | Some t when t.IsExpired = false -> return token
+            match firstCheck with
+            | Some t when t.IsExpired = false -> return t
             | _ ->
                 
                 // TODO: this looks suspect
@@ -438,9 +438,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 use _ = lock
                 
                 // check again, in case another thread has already refreshed the token
-                let! token = blobStorage.Get<OAuthResponse>(storageKey)
-                match token with
-                | Some t when t.IsExpired = false -> return token
+                let! secondCheck = blobStorage.Get<OAuthResponse>(storageKey)
+                match secondCheck with
+                | Some t when t.IsExpired = false -> return t
                 | _ ->
                     match logger with
                     | Some logger -> logger.LogInformation("Refreshing access token")
@@ -460,8 +460,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         | Some logger -> logger.LogInformation("Saving access token to storage")
                         | None -> ()
                     
-                        do! blobStorage.Save(storageKey, token)
-                        return token
+                        do! blobStorage.Save(storageKey, t)
+                        return t
     }
     
     member private this.CallApiWithoutSerialization(user: UserState, function': string, method: HttpMethod, ?jsonData: string) = task {

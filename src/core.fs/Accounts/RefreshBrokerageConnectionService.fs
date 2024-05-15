@@ -31,7 +31,7 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
                     | true ->
                         logger.LogError $"Brokerage connection for user {userId} could not be refreshed. Error: {refreshedToken.error}"
                     | false ->
-                        user.RefreshBrokerageConnection refreshedToken.access_token refreshedToken.refresh_token refreshedToken.token_type refreshedToken.expires_in refreshedToken.scope refreshedToken.refresh_token_expires_in
+                        user.RefreshBrokerageConnection refreshedToken.access_token refreshedToken.refresh_token refreshedToken.token_type refreshedToken.expires_in refreshedToken.scope
                         do! accounts.Save user
                         logger.LogInformation $"Brokerage connection for user {userId} was refreshed."
                 | false ->

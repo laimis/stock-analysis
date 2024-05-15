@@ -76,8 +76,8 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
         let event = UserDisconnectedFromBrokerage(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow)
         this.Apply(event)
         
-    member this.RefreshBrokerageConnection accessToken refreshToken tokenType expiresInSeconds scope refreshTokenExpiresInSeconds =
-        let event = UserRefreshedBrokerageConnection(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, refreshTokenExpiresInSeconds)
+    member this.RefreshBrokerageConnection accessToken refreshToken tokenType expiresInSeconds scope =
+        let event = UserRefreshedBrokerageConnection(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, accessToken, refreshToken, tokenType, expiresInSeconds, scope, 0)
         this.Apply(event)
         
     member this.PasswordHashMatches passwordHash =
