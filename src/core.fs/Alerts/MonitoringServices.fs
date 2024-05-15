@@ -571,8 +571,8 @@ type AlertEmailService(
         
         let diffCount =
             match fromStorage with
-            | null -> []
-            | _ ->
+            | None -> []
+            | Some fromStorage ->
                 let previousCounts = fromStorage |> toAlertCountPairs
                 let currentCounts = alerts |> toAlertCountPairs
                 
@@ -582,7 +582,7 @@ type AlertEmailService(
                         {| identifier = identifier; change = count - previousValue; previous = previousValue; current = count |}
                 )
             
-        if fromStorage = null then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
+        if fromStorage = None then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
                 
         let recipient = Recipient(email=user.State.Email, name=user.State.Name)
        

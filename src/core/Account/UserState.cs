@@ -74,7 +74,7 @@ namespace core.Account
             BrokerageAccessToken = accessToken;
             BrokerageRefreshToken = refreshToken;
             BrokerageAccessTokenExpires = eventTimestamp.AddSeconds(1800);
-            BrokerageRefreshTokenExpires = eventTimestamp.AddDays(90);
+            BrokerageRefreshTokenExpires = eventTimestamp.AddDays(7);
         }
 
         internal void ApplyInternal(UserConnectedToBrokerage e) =>
