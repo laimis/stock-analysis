@@ -154,7 +154,6 @@ type BrokeragePosition = {
 type SecuritiesAccount = {
     type': string option
     accountId: string option
-    orderStrategies: OrderStrategy [] option
     positions: BrokeragePosition [] option
     currentBalances: BrokerageBalances option
 }
@@ -294,6 +293,11 @@ type NanConverter() =
     override this.Write(writer: Utf8JsonWriter, value: decimal, _) =
         writer.WriteNumberValue(value)
 
+type SchwabResourceEndpoint =
+    | AuthAUrl of string
+    | TraderApiUrl of string
+    | MarketDataUrl of string
+
 type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: string, clientSecret:string, logger: ILogger<SchwabClient> option) =
     
     do
@@ -307,9 +311,6 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     
     let _httpClient = new HttpClient()
     let _asyncLock = AsyncLock()
-
-    let AuthUrl = "https://api.schwabapi.com/v1"
-    let TraderApiUrl = "https://api.schwabapi.com/trader/v1"
 
     static let _retryPolicy =
         Policy
@@ -336,8 +337,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             _rateLimit, _timeoutPolicy, _retryPolicy
         )
         
-    let generateApiUrl(function': string) = $"{TraderApiUrl}{function'}"
-    let generateAuthUrl(function': string) = $"{AuthUrl}{function'}"
+    let generateUrl (url: SchwabResourceEndpoint) =
+        match url with
+        | AuthAUrl path -> $"https://api.schwabapi.com/v1{path}"
+        | TraderApiUrl path -> $"https://api.schwabapi.com/trader/v1{path}"
+        | MarketDataUrl path -> $"https://api.schwabapi.com/marketdata/v1{path}"
     
     let logDebug message ([<ParamArray>]args: obj array) =
         match logger with
@@ -374,8 +378,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
         if fullRefresh then
             postData.Add("access_type", "offline")
+            
+        let url = "/oauth/token" |> AuthAUrl |> generateUrl
 
-        let request = new HttpRequestMessage(HttpMethod.Post, generateAuthUrl "/oauth/token")
+        let request = new HttpRequestMessage(HttpMethod.Post, url)
         request.Headers.Authorization <- AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")))
         request.Content <- new FormUrlEncodedContent(postData)
         
@@ -465,11 +471,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         return t
     }
     
-    member private this.CallApiWithoutSerialization(user: UserState) (function': string) (method: HttpMethod) (jsonData: string option) = task {
+    member private this.CallApiWithoutSerialization(user: UserState) (resource: SchwabResourceEndpoint) (method: HttpMethod) (jsonData: string option) = task {
         let! oauth = getAccessToken user
         
         let makeCallAndGetResponse (ct:CancellationToken) = task {
-            let request = new HttpRequestMessage(method, generateApiUrl function')
+            let request = new HttpRequestMessage(method, resource |> generateUrl)
             request.Headers.Authorization <- AuthenticationHeaderValue("Bearer", oauth.access_token)
             if jsonData.IsSome then
                 request.Content <- new StringContent(jsonData.Value, Encoding.UTF8, "application/json")
@@ -485,12 +491,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         return tuple
     }
     
-    member private this.CallApi<'T> (user: UserState) (function': string) (method: HttpMethod) (jsonData: string option) (debug: bool option) = task {
+    member private this.CallApi<'T> (user: UserState) (resource: SchwabResourceEndpoint) (method: HttpMethod) (jsonData: string option) (debug: bool option) = task {
         try
-            let! response, content = this.CallApiWithoutSerialization user function' method jsonData
+            let! response, content = this.CallApiWithoutSerialization user resource method jsonData
 
             if debug.IsSome && debug.Value then
-                logError "debug function: {function}" [|function'|]
+                logError "debug function: {function}" [|resource|]
                 logError "debug response code: {statusCode}" [|response.StatusCode|]
                 logError "debug response output: {content}" [|content|]
                 
@@ -505,24 +511,24 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
         with
         | :? TimeoutRejectedException as e ->
-            logError "Timeout function {function} with exception: {exception}" [|function'; e.Message|]
+            logError "Timeout function {function} with exception: {exception}" [|resource; e.Message|]
             return e.Message |> ServiceError |> Error
     }
     
     member this.EnterOrder(user: UserState) (postData: obj) = task {
         let enterOrderExecution user = task {
-            let! response = this.CallApi<AccountNumber []> user "/accounts/accountNumbers" HttpMethod.Get None None
+            let! response = this.CallApi<AccountNumber []> user ("/accounts/accountNumbers" |> TraderApiUrl) HttpMethod.Get None None
             
             match response with
             | Error error -> return Error error
             | Ok accounts ->
                 let accountId = accounts[0].hashValue
 
-                let url = $"/accounts/{accountId}/orders"
+                let resource = $"/accounts/{accountId}/orders" |> TraderApiUrl
 
                 let data = JsonSerializer.Serialize(postData)
 
-                let! enterResponse, content = this.CallApiWithoutSerialization user url HttpMethod.Post (Some data)
+                let! enterResponse, content = this.CallApiWithoutSerialization user resource HttpMethod.Post (Some data)
 
                 return
                     match enterResponse.IsSuccessStatusCode with
@@ -547,7 +553,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     "client_id", clientId
                 ]
                 
-            let request = new HttpRequestMessage(HttpMethod.Post, generateAuthUrl "/oauth/token")
+            let request = new HttpRequestMessage(HttpMethod.Post, "/oauth/token" |> AuthAUrl |> generateUrl)
             
             request.Content <- new FormUrlEncodedContent(postData)
             
@@ -567,14 +573,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member _.GetOAuthUrl() = task {
             let encodedClientId = Uri.EscapeDataString(clientId)
             let encodedCallbackUrl = Uri.EscapeDataString(callbackUrl)
-            return $"{AuthUrl}/oauth/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}"
+            return $"/oauth/authorize?response_type=code&redirect_uri={encodedCallbackUrl}&client_id={encodedClientId}" |> AuthAUrl |> generateUrl
         }
 
         member this.GetStockProfile (state: UserState) (ticker: Ticker) = task {
             let execution state = task {
-                let function' = $"/instruments?symbol={ticker.Value}&projection=fundamental"
+                let resource = $"/instruments?symbol={ticker.Value}&projection=fundamental" |> MarketDataUrl
                 
-                let! results = this.CallApi<Dictionary<string, SearchItemWithFundamental>> state function' HttpMethod.Get None None
+                let! results = this.CallApi<Dictionary<string, SearchItemWithFundamental>> state resource HttpMethod.Get None None
                 
                 return
                     results
@@ -609,9 +615,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.Search (state: UserState) (query: string) (limit: int) = task {
             
             let connectedStateFunc state = task {
-                let function' = $"/instruments?symbol={query}.*&projection=symbol-regex"
+                let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
 
-                let! results = this.CallApi<Dictionary<string, SearchItem>> state function' HttpMethod.Get None None
+                let! results = this.CallApi<Dictionary<string, SearchItem>> state resource HttpMethod.Get None None
                 
                 return
                     results
@@ -654,31 +660,33 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.GetAccount(user: UserState) = task {
             
             let accountFunc state = task {
-                let! response = this.CallApi<AccountsResponse []> state "/accounts?fields=positions" HttpMethod.Get None None
+                let resource = "/accounts?fields=positions" |> TraderApiUrl
+                
+                let! response = this.CallApi<AccountsResponse []> state resource HttpMethod.Get None None
                 
                 return
                     response
                     |> Result.map(fun accounts ->
                         let tdPositions = if accounts[0].securitiesAccount.IsSome then accounts[0].securitiesAccount.Value.positions |> Option.defaultValue [||] else [||]
-                        let strategies = if accounts[0].securitiesAccount.IsSome then accounts[0].securitiesAccount.Value.orderStrategies |> Option.defaultValue [||] else [||]
-
-                        let orders =
-                            strategies
-                            |> Array.collect (fun o -> defaultArg o.orderLegCollection [||] |> Array.map (fun l -> o, l))
-                            |> Array.map (fun (o, l) ->
-                                let order = Order()
-                                order.Date <- o.closeTime |> Option.map DateTimeOffset.Parse
-                                order.Status <- o.status |> Option.defaultValue ""
-                                order.OrderId <- o.orderId.ToString()
-                                order.Quantity <- int l.quantity
-                                order.Price <- o.ResolvePrice()
-                                order.Cancelable <- o.cancelable
-                                order.Ticker <- Ticker (l.instrument.Value.symbol |> Option.defaultValue "") |> Some
-                                order.Description <- l.instrument.Value.description |> Option.defaultValue ""
-                                order.Type <- l.instruction |> Option.defaultValue ""
-                                order.AssetType <- l.instrument.Value.assetType |> Option.defaultValue ""
-                                order
-                            )
+                        // let strategies = if accounts[0].securitiesAccount.IsSome then accounts[0].securitiesAccount.Value.orderStrategies |> Option.defaultValue [||] else [||]
+                        //
+                        // let orders =
+                        //     strategies
+                        //     |> Array.collect (fun o -> defaultArg o.orderLegCollection [||] |> Array.map (fun l -> o, l))
+                        //     |> Array.map (fun (o, l) ->
+                        //         let order = Order()
+                        //         order.Date <- o.closeTime |> Option.map DateTimeOffset.Parse
+                        //         order.Status <- o.status |> Option.defaultValue ""
+                        //         order.OrderId <- o.orderId.ToString()
+                        //         order.Quantity <- int l.quantity
+                        //         order.Price <- o.ResolvePrice()
+                        //         order.Cancelable <- o.cancelable
+                        //         order.Ticker <- Ticker (l.instrument.Value.symbol |> Option.defaultValue "") |> Some
+                        //         order.Description <- l.instrument.Value.description |> Option.defaultValue ""
+                        //         order.Type <- l.instruction |> Option.defaultValue ""
+                        //         order.AssetType <- l.instrument.Value.assetType |> Option.defaultValue ""
+                        //         order
+                        //     )
 
                         let stockPositions =
                             tdPositions
@@ -712,7 +720,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             )
 
                         let account = BrokerageAccount()
-                        account.Orders <- orders
+                        // account.Orders <- orders // TODO: we need to obtain orders with a separate call
                         account.StockPositions <- stockPositions
                         account.OptionPositions <- optionPositions
                         account.CashBalance <- Some accounts[0].securitiesAccount.Value.currentBalances.Value.cashBalance
@@ -728,17 +736,18 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
         member this.CancelOrder (user: UserState) (orderId: string) = task {
             let cancelExecution user = task {
-                // get account first
-                let! response = this.CallApi<AccountNumber []> user "/accounts/accountNumbers" HttpMethod.Get None None
+                let resource = "/accounts/accountNumbers" |> TraderApiUrl
+                
+                let! response = this.CallApi<AccountNumber []> user resource HttpMethod.Get None None
 
                 match response with
                 | Error error -> return Error error
                 | Ok accounts ->
                     let accountId = accounts[0].hashValue
 
-                    let url = $"/accounts/{accountId}/orders/{orderId}"
+                    let orderResource = $"/accounts/{accountId}/orders/{orderId}" |> TraderApiUrl
 
-                    let! cancelResponse, content = this.CallApiWithoutSerialization user url HttpMethod.Delete None
+                    let! cancelResponse, content = this.CallApiWithoutSerialization user orderResource HttpMethod.Delete None
 
                     return
                         match cancelResponse.IsSuccessStatusCode with
@@ -834,9 +843,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
         member this.GetQuote (user: UserState) (ticker: Ticker) = task {
             let execFunc user = task {
-                let function' = $"/marketdata/{ticker.Value}/quotes"
+                let resource = $"/{ticker.Value}/quotes" |> MarketDataUrl
 
-                let! response = this.CallApi<Dictionary<string, StockQuote>> user function' HttpMethod.Get None None
+                let! response = this.CallApi<Dictionary<string, StockQuote>> user resource HttpMethod.Get None (Some true)
 
                 match response with
                 | Error error -> return Error error
@@ -853,9 +862,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             
             let func state = task {
                 let commaSeparated = String.concat "," (tickers |> Seq.map _.Value)
-                let function' = $"/marketdata/quotes?symbol={commaSeparated}"
+                let resource = $"/quotes?symbols={commaSeparated}" |> MarketDataUrl
 
-                let! result = this.CallApi<Dictionary<string, StockQuote>> state function' HttpMethod.Get None None
+                let! result = this.CallApi<Dictionary<string, StockQuote>> state resource HttpMethod.Get None None
 
                 // doing this conversion as I can't seem to find a way for system.text.json to support dictionary deserialization where
                 // the key is something other than string. If I put Ticker in there, I get a runtime error. Tried to use converters
@@ -884,9 +893,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     |> List.choose id
                     |> String.concat "&"
 
-                let function' = $"/marketdata/chains?{parameters}"
+                let resource = $"/chains?{parameters}" |> MarketDataUrl
                 
-                let! chainResponse = this.CallApi<OptionChain> state function' HttpMethod.Get None None
+                let! chainResponse = this.CallApi<OptionChain> state resource HttpMethod.Get None None
                 
                 return chainResponse
                 |> Result.map (fun chain ->
@@ -935,9 +944,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.GetMarketHours(state: UserState) (date: DateTimeOffset) = task {
             let execFunc state = task {
                 let dateStr = date.ToString("yyyy-MM-dd")
-                let function' = $"/marketdata/EQUITY/hours?date={dateStr}"
+                let resource = $"/markets?date={dateStr}&markets=equity" |> MarketDataUrl
 
-                let! wrapper = this.CallApi<MarketHoursWrapper> state function' HttpMethod.Get None None
+                let! wrapper = this.CallApi<MarketHoursWrapper> state resource HttpMethod.Get None None
 
                 return
                     match wrapper with
@@ -970,9 +979,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     | PriceFrequency.Weekly -> "weekly"
                     | PriceFrequency.Monthly -> "monthly"
                 
-                let function' = $"/marketdata/{ticker.Value}/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}"
+                let resource = $"/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}&symbol={ticker.Value}" |> MarketDataUrl
 
-                let! response = this.CallApi<PriceHistoryResponse> state function' HttpMethod.Get None None
+                let! response = this.CallApi<PriceHistoryResponse> state resource HttpMethod.Get None None
 
                 match response with
                 | Error error -> return Error error

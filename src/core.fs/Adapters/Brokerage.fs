@@ -144,7 +144,6 @@ type BrokerageAccount() =
     
     member val StockPositions : StockPosition [] = [||] with get, set
     member val OptionPositions : OptionPosition [] = [||] with get, set
-    member val Orders : Order [] = [||] with get, set
     member val CashBalance : decimal option = None with get, set
     member val Equity : decimal option = None with get, set
     member val LongMarketValue : decimal option = None with get, set
