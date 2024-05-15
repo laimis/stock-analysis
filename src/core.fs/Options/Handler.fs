@@ -128,7 +128,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                                 o.Ticker.Value = p.Ticker.Value.Value
                                 && o.StrikePrice = p.StrikePrice
                                 && o.OptionType = p.OptionType)
-                            |> not), a.Orders)
+                            |> not), [||])
                     |> Result.defaultValue (Seq.empty, Array.empty)
 
                 return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok

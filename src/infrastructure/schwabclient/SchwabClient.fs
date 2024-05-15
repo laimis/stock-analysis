@@ -720,7 +720,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             )
 
                         let account = BrokerageAccount()
-                        // account.Orders <- orders // TODO: we need to obtain orders with a separate call
+                        account.Orders <- [||] // TODO: we need to obtain orders with a separate call
                         account.StockPositions <- stockPositions
                         account.OptionPositions <- optionPositions
                         account.CashBalance <- Some accounts[0].securitiesAccount.Value.currentBalances.Value.cashBalance
