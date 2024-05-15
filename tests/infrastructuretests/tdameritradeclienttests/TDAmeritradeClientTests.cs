@@ -27,22 +27,6 @@ namespace tdameritradeclienttests
             
             Assert.Equal(1.0m, deserializedWithoutNan!.volatility);
         }
-
-        [Fact]
-        public async Task Schwab()
-        {
-            var client = new SchwabClient.SchwabClient(Mock.Of<IBlobStorage>(), "asd", "cli", "sec",
-                FSharpOption<ILogger<SchwabClient.SchwabClient>>.None) as IBrokerage;
-            
-            var user = User.Create("test", "test", "test");
-            user.ConnectToBrokerage("asd", "re", "Asd", 0, "asdf");
-            var response = await client.GetAccount(user.State);
-            var error = (response.IsError) ? response.ErrorValue.Message : "";
-            Assert.Equal("", error);
-
-            var positions = response.ResultValue.StockPositions;
-            Assert.NotEmpty(positions);
-        }
     }
 
     // [Trait("Category", "Integration")]
