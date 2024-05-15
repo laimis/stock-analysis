@@ -430,7 +430,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             let! token = blobStorage.Get<OAuthResponse>(storageKey)
             
             match token with
-            | t when t.IsExpired = false -> return token
+            | Some t when t.IsExpired = false -> return token
             | _ ->
                 
                 // TODO: this looks suspect
@@ -440,7 +440,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 // check again, in case another thread has already refreshed the token
                 let! token = blobStorage.Get<OAuthResponse>(storageKey)
                 match token with
-                | t when t.IsExpired = false -> return token
+                | Some t when t.IsExpired = false -> return token
                 | _ ->
                     match logger with
                     | Some logger -> logger.LogInformation("Refreshing access token")

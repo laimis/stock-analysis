@@ -1,6 +1,7 @@
 using System.Data;
 using core.fs.Accounts;
 using core.Shared;
+using Microsoft.FSharp.Core;
 using storage.shared;
 
 namespace storage.memory;
@@ -103,13 +104,14 @@ public class MemoryAggregateStorage(IOutbox outbox) : IAggregateStorage, IBlobSt
         return SaveEventsInternal(newAgg, oldAgg?.Version ?? 0, entity, userId);
     }
 
-    public Task<T?> Get<T>(string key)
+    public Task<FSharpOption<T>> Get<T>(string key)
     {
-        if (!_blobs.ContainsKey(key))
+        var result = _blobs.ContainsKey(key) switch
         {
-            return Task.FromResult(default(T));
-        }
-        return Task.FromResult((T?)_blobs[key]);
+            true => FSharpOption<T>.Some((T)_blobs[key]),
+            false => FSharpOption<T>.None
+        };
+        return Task.FromResult(result);
     }
 
     public Task Save<T>(string key, T t)

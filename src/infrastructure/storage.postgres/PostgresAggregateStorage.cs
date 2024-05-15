@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.Shared;
 using Dapper;
+using Microsoft.FSharp.Core;
 using Newtonsoft.Json;
 using Npgsql;
 using storage.shared;
@@ -138,7 +139,7 @@ namespace storage.postgres
             return list;
         }
 
-        public async Task<T?> Get<T>(string key)
+        public async Task<FSharpOption<T>> Get<T>(string key)
         {
             using var db = GetConnection();
 
@@ -147,10 +148,9 @@ namespace storage.postgres
                 new { key }
             );
 
-            if (string.IsNullOrEmpty(blob))
-                return default;
-
-            return JsonConvert.DeserializeObject<T>(blob);
+            return string.IsNullOrEmpty(blob) ? 
+                FSharpOption<T>.None :
+                FSharpOption<T>.Some(JsonConvert.DeserializeObject<T>(blob)!);
         }
 
         public async Task Save<T>(string key, T t)
