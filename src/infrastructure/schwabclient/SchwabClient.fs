@@ -51,9 +51,6 @@ type Instrument = {
     cusip: string option
     symbol: string option
     description: string option
-    type': string option
-    putCall: string option
-    underlyingSymbol: string option
 }
 
 type OrderLeg = {
@@ -114,7 +111,7 @@ type OrderStrategy = {
                     activities
                     |> Array.choose (fun o ->
                         match o.executionLegs with
-                        | Some legs -> Some(legs |> Array.map(fun l -> l.price))
+                        | Some legs -> Some(legs |> Array.map(_.price))
                         | None -> None
                     )
                     |> Array.concat
@@ -183,6 +180,10 @@ type SearchItemWithFundamental = {
     exchange: string option
     assetType: string option
     fundamental: Dictionary<string, obj> option
+}
+
+type InstrumentsResponse = {
+    instruments: SearchItemWithFundamental []
 }
 
 type Fundamental = {
@@ -638,20 +639,20 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             let execution state = task {
                 let resource = $"/instruments?symbol={ticker.Value}&projection=fundamental" |> MarketDataUrl
                 
-                let! results = this.CallApi<Dictionary<string, SearchItemWithFundamental>> state resource HttpMethod.Get None None
+                let! results = this.CallApi<InstrumentsResponse> state resource HttpMethod.Get None None
                 
                 return
                     results
                     |> Result.map(fun results ->
                         let fundamentals =
-                            match results[ticker.Value].fundamental with
+                            match results.instruments[0].fundamental with
                             | Some f ->
                                 let keyValuePairs =
                                     f
                                     |> Seq.map (fun kvp -> KeyValuePair<string,string>(kvp.Key, kvp.Value.ToString()))
                                 Dictionary<string, string>(keyValuePairs)
                             | None -> Dictionary<string, string>()
-                        let data = results[ticker.Value]
+                        let data = results.instruments[0]
 
                         let mapped : StockProfile = {
                             Symbol = data.symbol |> Option.defaultValue ""
@@ -673,14 +674,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.Search (state: UserState) (query: string) (limit: int) = task {
             
             let connectedStateFunc state = task {
-                let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
+                let resource = $"/instruments?symbols={query}.*&projection=symbol-regex" |> MarketDataUrl
 
-                let! results = this.CallApi<Dictionary<string, SearchItem>> state resource HttpMethod.Get None None
+                let! results = this.CallApi<InstrumentsResponse> state resource HttpMethod.Get None None
                 
                 return
                     results
                     |> Result.map(fun results ->
-                        results.Values
+                        results.instruments
                         |> Seq.map (fun i ->
                             {
                                 Region = ""
