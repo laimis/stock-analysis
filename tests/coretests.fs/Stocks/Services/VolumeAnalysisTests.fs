@@ -3,6 +3,7 @@ module coretests.fs.Stocks.Services.VolumeAnalysisTests
 open Xunit
 open core.fs.Services
 open FsUnit
+open core.fs.Services.Analysis
 open testutils
 
 let outcomes = TestDataGenerator.IncreasingPriceBars(300)
