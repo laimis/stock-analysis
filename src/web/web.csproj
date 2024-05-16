@@ -8,7 +8,7 @@
         <SpaRoot>ClientApp\</SpaRoot>
         <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
         <BuildServerSideRenderer>false</BuildServerSideRenderer>
-        <SpaProxyServerUrl>https://app.localhost.com:44406</SpaProxyServerUrl>
+        <SpaProxyServerUrl>https://localhost:44406</SpaProxyServerUrl>
         <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
         <LangVersion>Latest</LangVersion>
         <InvariantGlobalization>false</InvariantGlobalization>
