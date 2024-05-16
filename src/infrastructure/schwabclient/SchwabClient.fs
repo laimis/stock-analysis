@@ -906,7 +906,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.SellOrder (user: UserState) (ticker: Ticker) (numberOfShares: decimal) (price: decimal) (brokerageOrderType: BrokerageOrderType) (brokerageOrderDuration: BrokerageOrderDuration) =
             let legCollection =
                 {|
-                    instruction = "Sell"
+                    instruction = "SELL"
                     quantity = numberOfShares
                     instrument = {| symbol = ticker.Value; assetType = "EQUITY" |}
                 |}

@@ -47,7 +47,7 @@
                        (ngModelChange)="numberOfSharesChanged()">
             </div>
         </div>
-        <div class="row mt-3">
+        <div class="row mt-3" *ngIf="positionId">
             <div class="col-md">
                 <label for="notes" class="form-label">Notes
                     <span *ngIf="notesControl.invalid" class="text-danger">*</span>
@@ -55,7 +55,7 @@
                 <textarea class="form-control"
                           id="notes" rows="3"
                           [formControl]="notesControl"
-                            [required]="positionId !== null"></textarea>
+                            [required]="true"></textarea>
             </div>
         </div>
     }
