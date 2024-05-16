@@ -465,7 +465,7 @@ export interface StockAlert {
     ticker: string
     description: string
     identifier: string
-    sourceList: string
+    sourceLists: string[]
     triggeredValue: number
     watchedValue: number
     alertType: string

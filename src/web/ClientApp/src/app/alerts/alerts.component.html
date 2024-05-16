@@ -14,6 +14,14 @@
             <div class="float-end text-muted" role="status">
                 last refresh: {{ lastRefreshed | date:'medium' }}
             </div>
+            <div class="float-end me-2">
+                <select class="form-select-sm form-control" (change)="sourceListSelection($event)">
+                    <option value="All">All</option>
+                    @for(sourceList of sourceLists; track sourceList) {
+                        <option value="{{ sourceList }}">{{ sourceList }}</option>
+                    }
+                </select>
+            </div>
             @if (scheduled) {
                 <div class="alert alert-success mt-3" role="alert">
                     Scheduled!
@@ -81,7 +89,9 @@
                                     <td>{{ getValue(alert.triggeredValue, alert.valueFormat) }}</td>
                                     <td>Triggered on {{ alert.when | date:'short' }}</td>
                                     <td>
-                                        <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{ alert.sourceList }}</a>
+                                        @for (source of alert.sourceLists; track source) {
+                                            <div><a [routerLink]="[ '/stocks/lists', source ]">{{ source }}</a></div>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -102,9 +112,11 @@
                                                 [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
                                         </div>
                                         <div class="col-6">
-                                            <div class="float-end">
-                                                <a [routerLink]="[ '/stocks/lists', alert.sourceList ]">{{ alert.sourceList }}</a>
-                                            </div>
+                                            @for(source of alert.sourceLists; track source) {
+                                                <div class="float-end">
+                                                    <a [routerLink]="[ '/stocks/lists', source ]">{{ source }}</a>    
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                     <div class="row">

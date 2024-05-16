@@ -20,7 +20,7 @@ open core.fs.Stocks
 [<Struct>]
 type private PatternCheck = {
     ticker: Ticker
-    listName: string
+    listNames: string list
     user: UserState
 }
 
@@ -45,10 +45,11 @@ let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
             | ValueFormat.Boolean -> value.ToString()
 
         {|
-            ticker = alert.ticker.Value;
-            value = alert.triggeredValue |> formattedValue alert.valueFormat;
-            description = alert.description;
-            sourceList = alert.sourceList;
+            ticker = alert.ticker.Value
+            value = alert.triggeredValue |> formattedValue alert.valueFormat
+            description = alert.description
+            sourceLists = alert.sourceLists
+            sourceList = alert.sourceLists.Head
             time = alert.``when`` |> marketHours.ToMarketTime |> fun x -> x.ToString("HH:mm") + " ET"
         |}
 
@@ -231,20 +232,20 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
                 ownedStocks
                 |> Seq.filter (_.IsOpen)
                 |> Seq.map (_.Ticker)
-                |> Seq.map (fun t -> {ticker=t; listName=Constants.PortfolioIdentifier; user=user.State})
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PortfolioIdentifier]; user=user.State})
 
             let! pendingPositions = emailIdPair.Id |> portfolio.GetPendingStockPositions |> Async.AwaitTask
             let pendingList =
                 pendingPositions
                 |> Seq.filter (fun p -> p.State.IsClosed |> not)
                 |> Seq.map (_.State.Ticker)
-                |> Seq.map (fun t -> {ticker=t; listName=Constants.PendingIdentifier; user=user.State})
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PendingIdentifier]; user=user.State})
 
             let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
             let stockList =
                 lists
                 |> Seq.filter (_.State.ContainsTag(Constants.MonitorTagPattern))
-                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listName=l.State.Name; user=user.State}))
+                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=user.State}))
                 |> Seq.concat
 
             // create a map of all the tickers we are checking so we can remove duplicates, and we want to prefer portfolio list entries
@@ -253,7 +254,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
 
             let addTicker (ticker: Ticker) (check:PatternCheck) =
                 match tickerMap.TryGetValue(ticker) with
-                | true, _ -> ()
+                | true, _ -> tickerMap[ticker] <- {check with listNames = check.listNames @ tickerMap[ticker].listNames}
                 | _ -> tickerMap.Add(ticker, check)
 
             portfolioList |> Seq.iter (fun check -> addTicker check.ticker check)
@@ -323,7 +324,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             let patterns = PatternDetection.generate prices
 
             patterns |> List.iter (fun p ->
-                let alert = TriggeredAlert.PatternAlert p alertCheck.ticker alertCheck.listName DateTimeOffset.UtcNow userId
+                let alert = TriggeredAlert.PatternAlert p alertCheck.ticker alertCheck.listNames DateTimeOffset.UtcNow userId
                 container.Register alert
             )
 
@@ -453,7 +454,7 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
         succeeded
         |> List.map (fun (ticker, patterns) ->
             patterns
-            |> List.map (fun p -> TriggeredAlert.PatternAlert p ticker "Watchlist" DateTimeOffset.UtcNow (user.Id |> UserId))
+            |> List.map (fun p -> TriggeredAlert.PatternAlert p ticker ["Watchlist"] DateTimeOffset.UtcNow (user.Id |> UserId))
         )
         |> List.concat
         |> weeklyUpsidesDiscovered[user].AddRange

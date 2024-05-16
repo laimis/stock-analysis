@@ -36,7 +36,7 @@ namespace core.fs.Alerts
             ``when``:DateTimeOffset
             ticker:Ticker
             description:string
-            sourceList:string
+            sourceLists:string list
             userId:UserId
             alertType:SentimentType
             valueFormat:ValueFormat
@@ -52,13 +52,13 @@ namespace core.fs.Alerts
                 ``when`` = ``when``
                 ticker = ticker
                 description = "Stop price"
-                sourceList = "Stop price"
+                sourceLists = ["Stop price"]
                 userId = userId
                 alertType = SentimentType.Negative
                 valueFormat = ValueFormat.Currency
             }
             
-        static member PatternAlert (pattern:Pattern) ticker sourceList ``when`` userId =
+        static member PatternAlert (pattern:Pattern) ticker sourceLists ``when`` userId =
             {
                 identifier = pattern.name
                 triggeredValue = pattern.value
@@ -66,7 +66,7 @@ namespace core.fs.Alerts
                 ``when`` = ``when``
                 ticker = ticker
                 description = pattern.description
-                sourceList = sourceList
+                sourceLists = sourceLists
                 userId = userId
                 alertType = pattern.sentimentType
                 valueFormat = pattern.valueFormat
@@ -124,7 +124,7 @@ namespace core.fs.Alerts
         member _.GetAlerts userId =
             alerts.Values
             |> Seq.filter (fun alert -> alert.userId = userId)
-            |> Seq.sortBy (fun x -> x.sourceList,x.ticker.Value)
+            |> Seq.sortBy (fun x -> x.sourceLists.Head,x.ticker.Value)
             
         member _.AddNotice message =
             if notices.Count = 10 then

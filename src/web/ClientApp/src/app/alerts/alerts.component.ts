@@ -24,7 +24,9 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     scheduled: boolean = false
     sortColumn = 'description'
     sortDirection = 'asc'
+    selectedSourceList = 'All'
     recentlyTriggeredExpanded = false;
+    sourceLists: string[] = []
 
     @Input()
     hideRecentTriggered: boolean = false;
@@ -68,31 +70,43 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     fetchData() {
         this.stockService.getAlerts().subscribe(container => {
-            this.container = container;
-
-            const compareTickers = (a: StockAlert, b: StockAlert) => a.ticker.localeCompare(b.ticker);
-
-            const sorted = container.alerts.sort(compareTickers);
-
-            const identifiers = new Set(sorted.map(m => m.identifier));
-
-            const groups = [];
-            identifiers.forEach(identifier => {
-                const alerts = sorted.filter(m => m.identifier === identifier).sort(compareTickers);
-                const group = {
-                    identifier: identifier,
-                    alerts: alerts,
-                    expanded: false
-                }
-                groups.push(group);
-            })
-
-            this.applySort(groups)
-
-            this.alertGroups = groups
-            this.lastRefreshed = new Date().toLocaleString();
-            this.scheduled = false
+            this.container = container; 
+            const uniqueSourceLists = new Set<string>() //[].concat(container.alerts.map(a => a.sourceLists)))
+            container.alerts.forEach(a => a.sourceLists.forEach(s => uniqueSourceLists.add(s)))
+            this.sourceLists = Array.from(uniqueSourceLists)
+            this.createGroups();
         });
+    }
+    
+    createGroups() {
+        const compareTickers = (a: StockAlert, b: StockAlert) => a.ticker.localeCompare(b.ticker);
+
+        // filter out alerts based on source list selection, alert
+        // should be included if selection is All or if the alert
+        // sourceLists property contains the selection
+        
+        const alertsOfInterest =
+            this.container.alerts.filter(a => this.selectedSourceList === 'All' || a.sourceLists.includes(this.selectedSourceList))
+                .sort(compareTickers);
+
+        const identifiers = new Set(alertsOfInterest.map(m => m.identifier));
+
+        const groups = [];
+        identifiers.forEach(identifier => {
+            const alerts = alertsOfInterest.filter(m => m.identifier === identifier).sort(compareTickers);
+            const group = {
+                identifier: identifier,
+                alerts: alerts,
+                expanded: false
+            }
+            groups.push(group);
+        })
+
+        this.applySort(groups)
+
+        this.alertGroups = groups
+        this.lastRefreshed = new Date().toLocaleString();
+        this.scheduled = false
     }
 
     toggleVisibility(elem:HTMLElement) {
@@ -154,5 +168,10 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             this.turnOnRefresh()
         }
+    }
+    
+    sourceListSelection(event:any) {
+        this.selectedSourceList = event.target.value
+        this.createGroups()
     }
 }
