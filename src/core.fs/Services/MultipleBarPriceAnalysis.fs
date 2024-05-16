@@ -1,8 +1,7 @@
-namespace core.fs.Services
+namespace core.fs.Services.Analysis
 
 open core.fs
 open core.fs.Adapters.Stocks
-open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 
 
@@ -449,5 +448,4 @@ module MultipleBarPriceAnalysis =
             yield! prices |> MovingAveragesAnalysis.generate    
         ]
             
-    module MultipleBarAnalysisOutcomeEvaluation =
-        let evaluate _ = []
+    let evaluate _ = []

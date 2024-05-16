@@ -4,7 +4,6 @@ open System
 open core.fs
 open core.fs.Adapters.Stocks
 open core.fs.Services
-open core.fs.Services.MultipleBarPriceAnalysis
 
 module SingleBarPriceAnalysis =
     
@@ -29,19 +28,19 @@ module SingleBarPriceAnalysis =
     
     let movingAveragesAnalysis (bars:PriceBars) =
         
-        let outcomes =  bars |> MovingAveragesAnalysis.generate
+        let outcomes =  bars |> MultipleBarPriceAnalysis.MovingAveragesAnalysis.generate
         
         let ema20AboveSMA50Outcome =
             outcomes
-            |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.EMA20AboveSMA50Bars)
+            |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EMA20AboveSMA50Bars)
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.EMA20AboveSMA50Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
         let sma50AboveSMA200Outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SMA50AboveSMA200Bars)
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50AboveSMA200Bars)
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50AboveSMA200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
         let sma200outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.SimpleMovingAverage 200)
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SimpleMovingAverage 200)
             |> Option.filter (fun o -> o.Value = 0m |> not)
             |> Option.map (fun o ->
                 let currentBar = bars.Last        
@@ -50,7 +49,7 @@ module SingleBarPriceAnalysis =
             )
             
         let priceAboveEMA20BarsOutcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarOutcomeKeys.PriceAboveEMA20Bars)
+            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAboveEMA20Bars)
             |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.PriceAboveEMA20Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
         
         [
@@ -182,7 +181,7 @@ module SingleBarPriceAnalysis =
                 let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
                 yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
                 
-            yield PriceAnalysis.generateGreenStreakOutcome bars
+            yield MultipleBarPriceAnalysis.PriceAnalysis.generateGreenStreakOutcome bars
         ]
         
     let volumeAnalysis (bars:PriceBars) =

@@ -9,10 +9,10 @@ open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
+open core.fs.Portfolio
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
-open core.fs.Services.MultipleBarPriceAnalysis
 open core.fs.Services.Trends
 open core.fs.Stocks
 
@@ -400,7 +400,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let evaluations =
                 match query.Duration with
                 | OutcomesReportDuration.SingleBar -> SingleBarPriceAnalysisEvaluation.evaluate outcomes
-                | OutcomesReportDuration.AllBars -> MultipleBarAnalysisOutcomeEvaluation.evaluate outcomes
+                | OutcomesReportDuration.AllBars ->  MultipleBarPriceAnalysis.evaluate outcomes
             
             return OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns, failed) |> Ok
     }
@@ -412,17 +412,43 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             let! stocks = query.UserId |> storage.GetStockPositions
-            
             let positions = stocks |> Seq.filter (fun stock -> stock.IsClosed |> not)
             
             let! account = brokerage.GetAccount user.State
-            let orders =
+            let brokerageAccount =
                 match account with
-                | Error _ -> Array.Empty<Order>()
-                | Ok account -> account.Orders
+                | Error _ -> BrokerageAccount.Empty
+                | Ok account -> account
+                
+            // we also want to generate temporary positions from positions that are
+            // in brokerage and have a matching pending position that's open,
+            // it means the position is baking and I am evaluating if to keep it
+            let! pendingStockPositions = storage.GetPendingStockPositions query.UserId
+            let pendingStockPositions = pendingStockPositions |> Seq.filter (fun p -> p.State.IsClosed |> not)
+            
+            let brokerageStockPositions =
+                brokerageAccount.StockPositions
+                |> Array.filter (fun p -> positions |> Seq.tryFind (fun s -> s.Ticker = p.Ticker) |> Option.isNone)
+                |> Array.map (fun p ->
+                    match pendingStockPositions |> Seq.tryFind (fun s -> s.State.Ticker = p.Ticker) with
+                    | Some pending -> Some (p, pending.State)
+                    | None -> None
+                )
+                |> Array.choose id
+                |> Array.map (fun (brokeragePosition, pendingPosition) ->
+                    
+                    // let's open the position with the pending position
+                    let position =
+                        StockPosition.``open`` pendingPosition.Ticker pendingPosition.NumberOfShares brokeragePosition.AverageCost DateTimeOffset.UtcNow
+                        |> StockPosition.setStop pendingPosition.StopPrice DateTimeOffset.UtcNow
+                        |> StockPosition.setLabel "strategy" pendingPosition.Strategy DateTimeOffset.UtcNow
+                        
+                    position
+                )
                 
             let! tasks =
                 positions
+                |> Seq.append brokerageStockPositions
                 |> Seq.map (fun position -> async {
                     
                     let calculations = position |> StockPositionWithCalculations
@@ -440,7 +466,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | Error error -> return Error (position, error.Message) 
                     | Ok prices ->
                         
-                        let outcomes = PositionAnalysis.generate calculations prices orders
+                        let outcomes = PositionAnalysis.generate calculations prices brokerageAccount.Orders
                         let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
                         let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
                         
