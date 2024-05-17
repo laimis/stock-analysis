@@ -21,7 +21,20 @@ let createTestData() =
         |> StockPosition.buy 10m 100m (bars.First.Date)
         |> StockPosition.setStop (Some 90m) (bars.First.Date)
         
-    let orders = [| Order(Ticker = Some(ticker), Price = 100m, Type = "SELL") |]
+    let orders : Order array = [|
+        {
+            Ticker = ticker
+            Price = 100m
+            Instruction = OrderInstruction.Buy
+            Quantity = 1
+            Status = OrderStatus.Working
+            Type = OrderType.Market
+            AssetType = "equity"
+            ExecutionTime = None
+            OrderId = "orderId"
+            CanBeCancelled = true 
+        }
+    |]
     
     (position, bars, orders)
     
