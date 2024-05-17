@@ -163,74 +163,18 @@ type AccountNumber = {
     hashValue: string
 }
 
+[<CLIMutable>]
 type SearchItem = {
-    cusip: string option
-    symbol: string option
-    description: string option
-    exchange: string option
-    assetType: string option
-}
-
-type SearchItemWithFundamental = {
-    cusip: string option
-    symbol: string option
-    description: string option
-    exchange: string option
-    assetType: string option
+    cusip: string
+    symbol: string
+    description: string
+    exchange: string
+    assetType: string
     fundamental: Dictionary<string, obj> option
 }
 
 type InstrumentsResponse = {
-    instruments: SearchItemWithFundamental []
-}
-
-type Fundamental = {
-    symbol: string option
-    high52: float
-    low52: float
-    dividendAmount: float
-    dividendYield: float
-    dividendDate: string option
-    peRatio: float
-    pegRatio: float
-    pbRatio: float
-    prRatio: float
-    pcfRatio: float
-    grossMarginTtm: float
-    grossMarginMrq: float
-    netProfitMarginTtm: float
-    netProfitMarginMrq: float
-    operatingMarginTtm: float
-    operatingMarginMrq: float
-    returnOnEquity: float
-    returnOnAssets: float
-    returnOnInvestment: float
-    quickRatio: float
-    currentRatio: float
-    interestCoverage: float
-    totalDebtToCapital: float
-    ltDebtToEquity: float
-    totalDebtToEquity: float
-    epsTtm: float
-    epsChangePercentTtm: float
-    epsChangeYear: float
-    epsChange: float
-    revChangeYear: float
-    revChangeTtm: float
-    revChangeIn: float
-    sharesOutstanding: float
-    marketCapFloat: float
-    marketCap: float
-    bookValuePerShare: float
-    shortIntToFloat: float
-    shortIntDayToCover: float
-    divGrowthRate3Year: float
-    dividendPayAmount: float
-    dividendPayDate: string option
-    beta: float
-    vol1DayAvg: float
-    vol10DayAvg: float
-    vol3MonthAvg: float
+    instruments: SearchItem [] option
 }
 
 type RegularMarketQuote = {
@@ -483,9 +427,16 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "BUY_TO_COVER" -> OrderInstruction.BuyToCover
         | _ -> failwith $"Unknown order instruction: {instruction}"
         
+    let parseAssetType assetType =
+        match assetType with
+        | "EQUITY" -> AssetType.Equity
+        | "OPTION" -> AssetType.Option
+        | "ETF" -> AssetType.ETF
+        | _ -> failwith $"Unknown asset type: {assetType}"
+        
     let mapSchwabQuoteResponseToStockResponse symbol (schwabResponse:SchwabStockQuoteResponse) : StockQuote =
         {
-            symbol = symbol
+            symbol = symbol |> Ticker
             bidPrice = schwabResponse.quote.bidPrice
             exchange = schwabResponse.quote.exchange
             mark =  schwabResponse.quote.mark
@@ -564,9 +515,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         return tuple
     }
     
-    member private this.CallApi<'T> (user: UserState) (resource: SchwabResourceEndpoint) (method: HttpMethod) (jsonData: string option) (debug: bool option) = task {
+    member private this.CallApi<'T> (user: UserState) (resource: SchwabResourceEndpoint) (debug: bool option) = task {
         try
-            let! response, content = this.CallApiWithoutSerialization user resource method jsonData
+            let! response, content = this.CallApiWithoutSerialization user resource HttpMethod.Get None
 
             if debug.IsSome && debug.Value then
                 logError "debug function: {function}" [|resource|]
@@ -592,7 +543,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         let commaSeparated = String.concat "," (tickers |> Seq.map _.Value)
         let resource = $"/quotes?symbols={commaSeparated}" |> MarketDataUrl
 
-        let! result = this.CallApi<Dictionary<string, SchwabStockQuoteResponse>> state resource HttpMethod.Get None None
+        let! result = this.CallApi<Dictionary<string, SchwabStockQuoteResponse>> state resource None
 
         // doing this conversion as I can't seem to find a way for system.text.json to support dictionary deserialization where
         // the key is something other than string. If I put Ticker in there, I get a runtime error. Tried to use converters
@@ -606,7 +557,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     
     member this.EnterOrder(user: UserState) (postData: obj) = task {
         let enterOrderExecution user = task {
-            let! response = this.CallApi<AccountNumber []> user ("/accounts/accountNumbers" |> TraderApiUrl) HttpMethod.Get None None
+            let! response = this.CallApi<AccountNumber []> user ("/accounts/accountNumbers" |> TraderApiUrl) None
             
             match response with
             | Error error -> return Error error
@@ -669,28 +620,32 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             let execution state = task {
                 let resource = $"/instruments?symbol={ticker.Value}&projection=fundamental" |> MarketDataUrl
                 
-                let! results = this.CallApi<InstrumentsResponse> state resource HttpMethod.Get None None
+                let! results = this.CallApi<InstrumentsResponse> state resource None
                 
                 return
                     results
                     |> Result.map(fun results ->
+                        match results.instruments with
+                        | Some instruments -> instruments
+                        | None -> [||])
+                    |> Result.map(fun instruments ->
                         let fundamentals =
-                            match results.instruments[0].fundamental with
+                            match instruments[0].fundamental with
                             | Some f ->
                                 let keyValuePairs =
                                     f
                                     |> Seq.map (fun kvp -> KeyValuePair<string,string>(kvp.Key, kvp.Value.ToString()))
                                 Dictionary<string, string>(keyValuePairs)
                             | None -> Dictionary<string, string>()
-                        let data = results.instruments[0]
+                        let data = instruments[0]
 
                         let mapped : StockProfile = {
-                            Symbol = data.symbol |> Option.defaultValue ""
-                            Description = data.description |> Option.defaultValue ""
-                            SecurityName = data.description |> Option.defaultValue ""
-                            Exchange = data.exchange |> Option.defaultValue ""
-                            Cusip = data.cusip |> Option.defaultValue ""
-                            IssueType = data.assetType |> Option.defaultValue ""
+                            Symbol = data.symbol
+                            Description = data.description
+                            SecurityName = data.description
+                            Exchange = data.exchange
+                            Cusip = data.cusip
+                            IssueType = data.assetType
                             Fundamentals = fundamentals
                         }
                         
@@ -706,20 +661,20 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             let connectedStateFunc state = task {
                 let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
                 
-                let! results = this.CallApi<InstrumentsResponse> state resource HttpMethod.Get None None
+                let! results = this.CallApi<InstrumentsResponse> state resource None
                 
                 return
                     results
-                    |> Result.map(fun results ->
-                        results.instruments
-                        |> Seq.filter (fun i -> i.assetType.IsSome && i.assetType.Value |> isStockType)
+                    |> Result.map(fun results -> results.instruments |> Option.defaultValue [||])
+                    |> Result.map(fun instruments ->
+                        instruments
+                        |> Seq.filter (fun i -> i.assetType |> isStockType)
                         |> Seq.map (fun i ->
                             {
-                                Region = ""
-                                Symbol = i.symbol |> Option.defaultValue ""
-                                SecurityName = i.description |> Option.defaultValue ""
-                                Exchange = i.exchange |> Option.defaultValue ""
-                                AssetType = i.assetType |> Option.defaultValue ""
+                                Symbol = i.symbol |> Ticker
+                                SecurityName = i.description
+                                Exchange = i.exchange
+                                AssetType = i.assetType |> parseAssetType
                             }
                         )
                         |> Seq.sortBy (fun r ->
@@ -729,14 +684,16 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         )
                         |> Seq.sortBy (fun r ->
                             match r.AssetType with
-                            | "EQUITY" -> 0
-                            | "MUTUAL_FUND" -> 2
-                            | "ETF" -> 3
-                            | "INDEX" -> 4
-                            | "CASH_EQUIVALENT" -> 5
-                            | "FIXED_INCOME" -> 6
-                            | "CURRENCY" -> 7
-                            | _ -> 8
+                            | Equity -> 0
+                            | Option -> 1
+                            | ETF -> 2
+                            // | "MUTUAL_FUND" -> 2
+                            // | "ETF" -> 3
+                            // | "INDEX" -> 4
+                            // | "CASH_EQUIVALENT" -> 5
+                            // | "FIXED_INCOME" -> 6
+                            // | "CURRENCY" -> 7
+                            // | _ -> 8
                         )
                         |> Seq.truncate limit
                         |> Seq.toArray
@@ -751,7 +708,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             let accountFunc state = task {
                 
                 let accountNumbersResource = "/accounts/accountNumbers" |> TraderApiUrl
-                let! accountNumbers = this.CallApi<AccountNumber []> state accountNumbersResource HttpMethod.Get None None
+                let! accountNumbers = this.CallApi<AccountNumber []> state accountNumbersResource None
                 match accountNumbers with
                 | Error error -> return Error error
                 | Ok accountNumbers ->
@@ -763,7 +720,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     let toEnteredTime = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
                     
                     let ordersResource = $"/accounts/{accountId}/orders?fromEnteredTime={fromEnteredTime}&toEnteredTime={toEnteredTime}" |> TraderApiUrl
-                    let! orders = this.CallApi<OrderStrategy []> state ordersResource HttpMethod.Get None None
+                    let! orders = this.CallApi<OrderStrategy []> state ordersResource None
                     match orders with
                     | Error error -> return Error error
                     | Ok orders ->
@@ -779,7 +736,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                         Type = o.orderType |> parseOrderType
                                         Instruction = l.instruction |> parseOrderInstruction
                                         Ticker = Ticker l.instrument.symbol
-                                        AssetType = l.instrument.assetType
+                                        AssetType = l.instrument.assetType |> parseAssetType
                                         ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
                                         OrderId = o.orderId.ToString()
                                         CanBeCancelled = o.cancelable
@@ -788,7 +745,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                 )
 
                         let resource = $"/accounts/{accountId}?fields=positions" |> TraderApiUrl
-                        let! response = this.CallApi<AccountsResponse> state resource HttpMethod.Get None None
+                        let! response = this.CallApi<AccountsResponse> state resource None
                         
                         return
                             response
@@ -844,7 +801,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.CancelOrder (user: UserState) (orderId: string) = task {
             let cancelExecution user = task {
                 let resource = "/accounts/accountNumbers" |> TraderApiUrl
-                let! response = this.CallApi<AccountNumber []> user resource HttpMethod.Get None None
+                let! response = this.CallApi<AccountNumber []> user resource None
                 match response with
                 | Error error -> return Error error
                 | Ok accounts ->
@@ -976,7 +933,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
                 let resource = $"/chains?{parameters}" |> MarketDataUrl
                 
-                let! chainResponse = this.CallApi<OptionChain> state resource HttpMethod.Get None None
+                let! chainResponse = this.CallApi<OptionChain> state resource None
                 
                 return chainResponse
                 |> Result.map (fun chain ->
@@ -1027,7 +984,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 let dateStr = date.ToString("yyyy-MM-dd")
                 let resource = $"/markets?date={dateStr}&markets=equity" |> MarketDataUrl
 
-                let! wrapper = this.CallApi<MarketHoursWrapper> state resource HttpMethod.Get None None
+                let! wrapper = this.CallApi<MarketHoursWrapper> state resource None
 
                 return
                     match wrapper with
@@ -1062,7 +1019,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 
                 let resource = $"/pricehistory?periodType=month&frequencyType={frequencyType}&startDate={startUnix}&endDate={endUnix}&symbol={ticker.Value}" |> MarketDataUrl
 
-                let! response = this.CallApi<PriceHistoryResponse> state resource HttpMethod.Get None None
+                let! response = this.CallApi<PriceHistoryResponse> state resource None
 
                 match response with
                 | Error error -> return Error error

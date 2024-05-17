@@ -548,6 +548,7 @@ export interface Link {
 export interface StockSearchResult {
     symbol: string
     securityName: string
+    assetType: string
 }
 
 export interface ReviewList {

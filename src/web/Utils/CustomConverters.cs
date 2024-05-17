@@ -216,3 +216,11 @@ public class OrderInstructionConverter : GenericConverterWithToString<OrderInstr
         throw new NotImplementedException("OrderInstruction is not deserializable");
     }
 }
+
+public class AssetTypeConverter : GenericConverterWithToString<AssetType>
+{
+    public override AssetType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException("AssetType is not deserializable");
+    }
+}

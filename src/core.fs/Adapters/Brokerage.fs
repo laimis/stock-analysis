@@ -33,20 +33,22 @@ type MarketHours() =
     member val product : string = "" with get, set
     member val productName : string = "" with get, set
     
+type AssetType =
+    | Equity | Option | ETF 
+    
 [<CLIMutable>]
 type SearchResult =
     {
-        Symbol:string
+        Symbol:Ticker
         SecurityName:string
-        AssetType:string
-        Region:string
+        AssetType:AssetType
         Exchange:string
     }       
 
 [<CLIMutable>]
 type StockQueryResult =
     {
-        Symbol:string
+        Symbol:Ticker
         CompanyName:string
         LatestPrice:decimal
         LatestSource:string
@@ -61,7 +63,7 @@ type StockQueryResult =
 [<CLIMutable>]
 type StockQuote =
     {
-        symbol : string
+        symbol : Ticker
         bidPrice : decimal
         bidSize : decimal
         askPrice : decimal
@@ -93,7 +95,7 @@ type Order = {
     Ticker : Ticker
     Type : OrderType
     Instruction : OrderInstruction
-    AssetType : string
+    AssetType : AssetType
     ExecutionTime : DateTimeOffset option
     CanBeCancelled : bool
     } with
@@ -114,7 +116,7 @@ type Order = {
     member this.CanBeRecorded : bool = match this.Status with | Filled -> true | _ -> false
     member this.IsSellOrder : bool = match this.Instruction with | Sell -> true | SellShort -> true | _ -> false
     member this.IsBuyOrder : bool = match this.Instruction with | Buy -> true | BuyToCover -> true | _ -> false
-    member this.IsOption : bool = this.AssetType = "OPTION"
+    member this.IsOption : bool = this.AssetType = AssetType.Option
     member this.IsShort : bool = this.Instruction = SellShort
     
     
