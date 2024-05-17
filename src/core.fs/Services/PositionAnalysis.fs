@@ -39,7 +39,6 @@ module PositionAnalysis =
         let EMA20AboveSMA50Bars = "EMA20AboveSMA50Bars"
         let SMA50Above200Bars = "SMA50Above200Bars"
         
-
     let generate (position:StockPositionWithCalculations) (bars:PriceBars) orders =
         
         let stopLoss = 

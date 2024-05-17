@@ -20,6 +20,7 @@ namespace core.Stocks
         public DateTimeOffset Opened { get; private set; }
         public FSharpOption<DateTimeOffset> Closed { get; private set; }
         public bool IsClosed => FSharpOption<DateTimeOffset>.get_IsSome(Closed);
+        public bool IsOpen => !IsClosed;
         public bool Purchased { get; private set; }
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);

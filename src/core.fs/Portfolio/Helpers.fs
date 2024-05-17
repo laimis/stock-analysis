@@ -8,7 +8,7 @@ open core.fs.Stocks
 
 module Helpers =
 
-    let getViolations (account:BrokerageAccount) localPositions (pendingPositions:PendingStockPosition seq) (prices:Dictionary<Ticker,StockQuote>) =
+    let getViolations (account:BrokerageAccount) localPositions (pendingPositions:PendingStockPositionState seq) (prices:Dictionary<Ticker,StockQuote>) =
         
         match account.Connected with
         | false -> Seq.empty
@@ -25,8 +25,7 @@ module Helpers =
                 let localPositionOption = localPositions |> Seq.tryFind (fun (x:StockPositionWithCalculations) -> x.Ticker = brokeragePosition.Ticker)
                 let localPendingPositionOption =
                     pendingPositions
-                    |> Seq.tryFind (fun (x:PendingStockPosition) -> x.State.Ticker = brokeragePosition.Ticker)
-                    |> Option.map _.State
+                    |> Seq.tryFind (fun (x:PendingStockPositionState) -> x.Ticker = brokeragePosition.Ticker)
                 
                 match localPositionOption with
                 | None ->

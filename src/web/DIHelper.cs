@@ -69,7 +69,6 @@ namespace web
                     services.AddSingleton(type);
                 }
             }
-
             
             services.AddSingleton<ISubscriptions>(s => 
                 new stripe.Subscriptions(
@@ -92,20 +91,9 @@ namespace web
                     s.GetService<ILogger<twilioclient.TwilioClientWrapper>>(),
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
-            var tdAmeritradeCallbackUrl = configuration.GetValue<string>("TDAMERITRADE_CALLBACK_URL");
             var schwabCallbackUrl = configuration.GetValue<string>("SCHWAB_CALLBACK_URL");
             
-            if (tdAmeritradeCallbackUrl != null)
-            {
-                services.AddSingleton<IBrokerage>(s =>
-                    new tdameritradeclient.TDAmeritradeClient(
-                        s.GetService<IBlobStorage>(),
-                        tdAmeritradeCallbackUrl,
-                        configuration.GetValue<string>("TDAMERITRADE_CLIENT_ID"),
-                        s.GetService<ILogger<tdameritradeclient.TDAmeritradeClient>>()
-                    ));
-            }
-            else if (schwabCallbackUrl != null)
+            if (schwabCallbackUrl != null)
             {
                 services.AddSingleton<IBrokerage>(s =>
                     new SchwabClient.SchwabClient(

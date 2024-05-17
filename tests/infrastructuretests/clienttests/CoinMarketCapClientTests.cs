@@ -5,7 +5,7 @@ using Microsoft.FSharp.Core;
 using testutils;
 using Xunit;
 
-namespace coinmarketcaptests
+namespace clienttests
 {
     [Trait("Category", "Integration")]
     public class CoinMarketCapClientTests

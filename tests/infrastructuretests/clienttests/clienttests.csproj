@@ -2,15 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
+    <RootNamespace>clienttests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="coverlet.msbuild" Version="6.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="xunit" Version="2.8.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,9 +27,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\testutils\testutils.csproj" />
-    <ProjectReference Include="..\..\..\src\infrastructure\secedgar\secedgar.csproj" />
+    <ProjectReference Include="..\..\..\src\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\..\..\src\core\core.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\coinmarketcap\coinmarketcap.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\schwabclient\schwabclient.fsproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\secedgar\secedgar.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\storage.memory\storage.memory.csproj" />
+    <ProjectReference Include="..\..\testutils\testutils.csproj" />
   </ItemGroup>
 
 </Project>

@@ -777,6 +777,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.toArray
                 
             let! pendingPositions = storage.GetPendingStockPositions query.UserId
+            let pendingPositions = pendingPositions |> Seq.map (_.State) |> Seq.filter _.IsOpen |> Seq.toArray
                 
             let! accountResponse = brokerage.GetAccount(user.State)
             let account =

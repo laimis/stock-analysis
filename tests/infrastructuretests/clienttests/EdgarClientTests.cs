@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
 using core.Shared;
 using secedgar;
+using Xunit;
 
 namespace secedgartests;
 
