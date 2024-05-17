@@ -996,9 +996,10 @@ export interface BrokerageOrder {
     assetType: string
     quantity: number
     status: string
+    instruction: string
     ticker: string
     description: string
-    date: string
+    executionTime: string
     canBeCancelled: boolean
     canBeRecorded: boolean
     isActive: boolean

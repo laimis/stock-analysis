@@ -77,39 +77,45 @@ type StockQuote =
     }
     member this.Price : decimal = this.regularMarketLastPrice
 
-type Order() =
-    
-    member val OrderId : string = "" with get, set
-    member val Cancelable : bool = false with get, set
-    member val Price : decimal = 0m with get, set
-    member val Quantity : int = 0 with get, set
-    member val Status : string = "" with get, set
-    member val Ticker : Ticker option = None with get, set
-    member val Description : string = "" with get, set
-    member val Type : string = "" with get, set
-    member val AssetType : string = "" with get, set
-    member val Date : DateTimeOffset option = None with get, set
-    
+type OrderStatus =
+    | Filled | Working | PendingActivation | Expired | Canceled | Rejected
+type OrderInstruction =
+    | Buy | Sell | BuyToCover | SellShort
+type OrderType =
+    | Market | Limit | StopMarket
+
+[<CLIMutable>]
+type Order = {
+    OrderId : string
+    Price : decimal
+    Quantity : int
+    Status : OrderStatus
+    Ticker : Ticker
+    Type : OrderType
+    Instruction : OrderInstruction
+    AssetType : string
+    ExecutionTime : DateTimeOffset option
+    CanBeCancelled : bool
+    } with
     member this.StatusOrder : int =
         match this.Status with
-        | "WORKING" -> 0
-        | "PENDING_ACTIVATION" -> 0
-        | "FILLED" -> 1
-        | "EXPIRED" -> 2
-        | "CANCELED" -> 3
-        | _ -> 4
-    member this.CanBeCancelled : bool = this.Cancelable
+        | Working -> 0
+        | PendingActivation -> 0
+        | Rejected -> 1
+        | Filled -> 2
+        | Expired -> 3
+        | Canceled -> 4
+        
     member this.IsActive : bool =
         match this.Status with
-        | "WORKING" -> true
-        | "PENDING_ACTIVATION" -> true
+        | Working -> true
+        | PendingActivation -> true
         | _ -> false
-    member this.CanBeRecorded : bool = this.Status = "FILLED"
-    member this.IncludeInResponses : bool = this.Status <> "CANCELED" && this.Status <> "REJECTED" && this.Status <> "EXPIRED"
-    member this.IsSellOrder : bool = this.Type = "SELL" || this.Type = "SELL_SHORT"
-    member this.IsBuyOrder : bool = this.Type = "BUY" || this.Type = "BUY_TO_COVER"
+    member this.CanBeRecorded : bool = match this.Status with | Filled -> true | _ -> false
+    member this.IsSellOrder : bool = match this.Instruction with | Sell -> true | SellShort -> true | _ -> false
+    member this.IsBuyOrder : bool = match this.Instruction with | Buy -> true | BuyToCover -> true | _ -> false
     member this.IsOption : bool = this.AssetType = "OPTION"
-    member this.IsShort : bool = this.Type = "SELL_SHORT"
+    member this.IsShort : bool = this.Instruction = SellShort
     
     
 type StockPosition(ticker:Ticker, averageCost:decimal, quantity:decimal) =

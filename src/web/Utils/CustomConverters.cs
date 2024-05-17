@@ -192,3 +192,27 @@ public class TrendTypeConverter : GenericConverterWithToString<Trends.TrendType>
         return Trends.TrendType.FromString(reader.GetString());
     }
 }
+
+public class OrderStatusConverter : GenericConverterWithToString<OrderStatus>
+{
+    public override OrderStatus Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException("OrderStatus is not deserializable");
+    }
+}
+
+public class OrderTypeConverter : GenericConverterWithToString<OrderType>
+{
+    public override OrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException("OrderType is not deserializable");
+    }
+}
+
+public class OrderInstructionConverter : GenericConverterWithToString<OrderInstruction>
+{
+    public override OrderInstruction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException("OrderInstruction is not deserializable");
+    }
+}

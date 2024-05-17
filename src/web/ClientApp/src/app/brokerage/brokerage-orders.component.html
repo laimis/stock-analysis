@@ -19,13 +19,14 @@
                         <th>Type</th>
                         <th>Quantity</th>
                         <th class="text-end">Price</th>
+                        <th>Time</th>
                         <th></th>
                     </tr>
                     </thead>
                 }
                 <tbody>
                     @for (p of groupedOrder; track p; let i = $index) {
-                        <tr [ngClass]="{'table-success': p.isActive && p.type === 'BUY', 'table-info': p.isActive && p.type === 'SELL', 'table-light': !p.isActive}">
+                        <tr [ngClass]="{'table-success': p.isActive && p.instruction === 'Buy', 'table-info': p.isActive && p.instruction === 'Sell', 'table-light': !p.isActive}">
                             <td>
                                 <div class="small">{{ p.status }}</div>
                             </td>
@@ -36,6 +37,7 @@
                             <td>{{ p.type }}</td>
                             <td>{{ p.quantity }}</td>
                             <td class="text-end">{{ p.price === 0 ? 'MARKET' : p.price | currency }}</td>
+                            <td class="text-end">{{ p.executionTime | date: 'short' }}</td>
                             <td class="text-end">
                                 @if (p.canBeCancelled) {
                                     <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel

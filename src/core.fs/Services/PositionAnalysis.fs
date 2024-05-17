@@ -83,7 +83,7 @@ module PositionAnalysis =
         
         let hasSellOrderInOrders = 
             orders
-            |> Array.exists (fun (o:Order) -> o.IsSellOrder && o.Ticker.Value = position.Ticker)
+            |> Array.exists (fun (o:Order) -> o.IsSellOrder && o.Ticker = position.Ticker)
             
         let unrealizedProfit =  position.Profit + position.NumberOfShares * (bars.Last.Close - position.AverageCostPerShare)
         let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare

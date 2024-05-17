@@ -54,12 +54,13 @@ type Instrument = {
     description: string
 }
 
+[<CLIMutable>]
 type OrderLeg = {
-    orderLegType: string option
+    orderLegType: string
     legId: int64
-    instrument: Instrument option
-    instruction: string option
-    positionEffect: string option
+    instrument: Instrument
+    instruction: string
+    positionEffect: string
     quantity: float
 }
 
@@ -76,34 +77,30 @@ type OrderActivity = {
     executionLegs: ExecutionLeg [] option
 }
 
+[<CLIMutable>]
 type OrderStrategy = {
-    session: string option
-    duration: string option
-    orderType: string option
-    cancelTime: string option
-    complexOrderStrategyType: string option
+    session: string
+    duration: string
+    orderType: string
+    cancelTime: string
     quantity: float
     filledQuantity: float
     remainingQuantity: float
     stopPrice: decimal option
     stopType: string option
     price: decimal option
-    orderStrategyType: string option
     orderId: int64
     cancelable: bool
     editable: bool
-    status: string option
-    enteredTime: string option
+    status: string
+    enteredTime: string
     closeTime: string option
-    tag: string option
-    accountId: int64
-    statusDescription: string option
+    tag: string
     orderLegCollection: OrderLeg [] option
     orderActivityCollection: OrderActivity [] option
 }
     with
     
-        member this.IsPending = this.status = Some "WORKING"
         
         member this.ResolvePrice() =
             match this.orderActivityCollection with
@@ -461,6 +458,31 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | DayPlus -> "SEAMLESS"
         | GtcPlus -> "SEAMLESS"
         
+    let parseOrderStatus status =
+        match status with
+        | "WORKING" -> OrderStatus.Working
+        | "FILLED" -> OrderStatus.Filled
+        | "CANCELED" -> OrderStatus.Canceled
+        | "REJECTED" -> OrderStatus.Rejected
+        | "EXPIRED" -> OrderStatus.Expired
+        | "PENDING_ACTIVATION" -> OrderStatus.PendingActivation
+        | _ -> failwith $"Unknown order status: {status}"
+        
+    let parseOrderType orderType =
+        match orderType with
+        | "LIMIT" -> OrderType.Limit
+        | "MARKET" -> OrderType.Market
+        | "STOP" -> OrderType.StopMarket
+        | _ -> failwith $"Unknown order type: {orderType}"
+        
+    let parseOrderInstruction instruction =
+        match instruction with
+        | "BUY" -> OrderInstruction.Buy
+        | "SELL" -> OrderInstruction.Sell
+        | "SELL_SHORT" -> OrderInstruction.SellShort
+        | "BUY_TO_COVER" -> OrderInstruction.BuyToCover
+        | _ -> failwith $"Unknown order instruction: {instruction}"
+        
     let mapSchwabQuoteResponseToStockResponse symbol (schwabResponse:SchwabStockQuoteResponse) : StockQuote =
         {
             symbol = symbol
@@ -750,17 +772,18 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             orders
                             |> Array.collect(fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.map(fun l -> o, l))
                             |> Array.map(fun (o, l) ->
-                                    let order = Order()
-                                    order.Date <- o.closeTime |> Option.map DateTimeOffset.Parse
-                                    order.Status <- o.status |> Option.defaultValue ""
-                                    order.OrderId <- o.orderId.ToString()
-                                    order.Quantity <- int l.quantity
-                                    order.Price <- o.ResolvePrice()
-                                    order.Cancelable <- o.cancelable
-                                    order.Ticker <- Ticker l.instrument.Value.symbol |> Some
-                                    order.Description <- l.instrument.Value.description
-                                    order.Type <- l.instruction |> Option.defaultValue ""
-                                    order.AssetType <- l.instrument.Value.assetType
+                                    let order = {
+                                        Price = o.ResolvePrice()
+                                        Quantity = int l.quantity
+                                        Status = o.status |> parseOrderStatus
+                                        Type = o.orderType |> parseOrderType
+                                        Instruction = l.instruction |> parseOrderInstruction
+                                        Ticker = Ticker l.instrument.symbol
+                                        AssetType = l.instrument.assetType
+                                        ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
+                                        OrderId = o.orderId.ToString()
+                                        CanBeCancelled = o.cancelable
+                                    }
                                     order
                                 )
 
