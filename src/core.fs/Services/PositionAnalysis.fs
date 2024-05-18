@@ -62,9 +62,7 @@ module PositionAnalysis =
                 // position might be opened before the first bar in the dataset
                 match position.Opened with
                 | x when x < bars.Bars[0].Date -> bars.Bars
-                | _ ->
-                    Console.WriteLine($"Unable to find start bar for {position.Ticker} on {position.Opened}")
-                    [||]
+                | _ -> failwith $"Unable to find start bar for {position.Ticker} on {position.Opened}, bars count: {bars.Length}"
                 
         let max = barsFromOpen |> Array.maxBy (fun (b:PriceBar) -> b.High) |> _.High
         let gain = (max - position.CompletedPositionCostPerShare) / position.CompletedPositionCostPerShare

@@ -437,11 +437,22 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 |> Array.choose id
                 |> Array.map (fun (brokeragePosition, pendingPosition) ->
                     
-                    // let's open the position with the pending position
+                    // let's look if we can find the orders for this position in the brokerage account
+                    let firstOrder =
+                        brokerageAccount.Orders
+                        |> Array.filter (fun o -> o.Ticker = brokeragePosition.Ticker && o.ExecutionTime.IsSome)
+                        |> Array.sortBy (fun o -> o.ExecutionTime.Value)
+                        |> Array.tryHead
+                        
+                    let openDate =
+                        match firstOrder with
+                        | Some order -> order.ExecutionTime.Value
+                        | None -> DateTimeOffset.UtcNow
+                    
                     let position =
-                        StockPosition.``open`` pendingPosition.Ticker pendingPosition.NumberOfShares brokeragePosition.AverageCost DateTimeOffset.UtcNow
-                        |> StockPosition.setStop pendingPosition.StopPrice DateTimeOffset.UtcNow
-                        |> StockPosition.setLabel "strategy" pendingPosition.Strategy DateTimeOffset.UtcNow
+                        StockPosition.``open`` pendingPosition.Ticker pendingPosition.NumberOfShares brokeragePosition.AverageCost openDate
+                        |> StockPosition.setStop pendingPosition.StopPrice openDate
+                        |> StockPosition.setLabel "strategy" pendingPosition.Strategy openDate
                         
                     position
                 )
