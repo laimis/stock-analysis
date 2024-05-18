@@ -143,12 +143,6 @@ module PositionAnalysis =
             (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
         ]
         
-        let positionSizeUnbalancedFilter = [
-            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)
-            (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value < 14m)
-        ]
-        
         let shortsInUptrendFilter = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.EMA20AboveSMA50Bars && o.Value > 0.0m)
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
@@ -178,17 +172,6 @@ module PositionAnalysis =
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PriceAboveEMA20Bars && o.Value = 1m)
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
         ]
-        
-        let tickersAndTheirCosts =
-            tickerOutcomes // we are only interested in this for positions that have stops set, and right now only longs
-            |> TickerOutcomes.filter positionSizeUnbalancedFilter
-            |> Seq.map (fun tos -> (tos.ticker, tos.outcomes |> Seq.find (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value > 0.0m)))
-            |> Seq.map (fun (ticker, outcome) -> (ticker, outcome.Value))
-            
-        let costAnalysis =
-            tickersAndTheirCosts
-            |> Seq.map snd
-            |> DistributionStatistics.calculate
         
         [
             AnalysisOutcomeEvaluation(
@@ -238,15 +221,6 @@ module PositionAnalysis =
                     yield! withRiskAmountFilters
                     (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (o.Value < 40m || o.Value > 60m))
                     // actual risk limits should come from user configuration
-                ]
-            )
-            AnalysisOutcomeEvaluation(
-                "Unbalanced Position Size",
-                OutcomeType.Negative,
-                PositionAnalysisKeys.PositionSize,
-                tickerOutcomes |> TickerOutcomes.filter [
-                    yield! positionSizeUnbalancedFilter
-                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.PositionSize && costAnalysis.mean / o.Value < 0.8m)
                 ]
             )
             AnalysisOutcomeEvaluation(
