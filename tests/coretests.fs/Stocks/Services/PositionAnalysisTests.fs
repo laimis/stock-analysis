@@ -3,7 +3,6 @@ module coretests.fs.Stocks.Services.PositionAnalysisTests
 open Xunit
 open core.Shared
 open core.fs.Adapters.Brokerage
-open core.fs.Adapters.Stocks
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Stocks
@@ -29,7 +28,7 @@ let createTestData() =
             Quantity = 1
             Status = OrderStatus.Working
             Type = OrderType.Market
-            AssetType = "equity"
+            AssetType = AssetType.Equity
             ExecutionTime = None
             OrderId = "orderId"
             CanBeCancelled = true 
