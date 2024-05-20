@@ -52,7 +52,7 @@ namespace core.fs.Alerts
                 ``when`` = ``when``
                 ticker = ticker
                 description = "Stop price"
-                sourceLists = ["Stop price"]
+                sourceLists = [Constants.PortfolioIdentifier]
                 userId = userId
                 alertType = SentimentType.Negative
                 valueFormat = ValueFormat.Currency
