@@ -11,6 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json.Serialization;
 using web.Utils;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Primitives;
 
 namespace web
@@ -95,8 +96,12 @@ namespace web
                 app.UseHsts();
             }
 
+            var staticFileExtensionProvider = new FileExtensionContentTypeProvider();
+            staticFileExtensionProvider.Mappings[".avif"] = "image/avif";
+            
             var staticFileOptions = new StaticFileOptions
             {
+                ContentTypeProvider = staticFileExtensionProvider,
                 OnPrepareResponse = ctx =>
                 {
                     if (ctx.File.Name == "index.html")
