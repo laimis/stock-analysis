@@ -91,6 +91,10 @@ export class BrokerageNewOrderComponent {
     reset() {
         this.numberOfShares = null
         this.errors = null
+        this.selectedTicker = null
+        this.positionId = null
+        this.quote = null
+        this.price = null
     }
 
     onTickerSelected(ticker: string) {

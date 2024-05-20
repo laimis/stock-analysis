@@ -34,7 +34,7 @@
                                 <app-stock-link-and-tradingview-link
                                     [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
                             </td>
-                            <td>{{ p.type }}</td>
+                            <td>{{ p.type }} {{ p.instruction }}</td>
                             <td>{{ p.quantity }}</td>
                             <td class="text-end">{{ p.price === 0 ? 'MARKET' : p.price | currency }}</td>
                             <td class="text-end">{{ p.executionTime | date: 'short' }}</td>
