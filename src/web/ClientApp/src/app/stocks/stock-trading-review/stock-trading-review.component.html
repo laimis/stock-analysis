@@ -99,7 +99,7 @@
         </div>
     </section>
     }
-    <section>
+    <section *ngIf="currentPosition && currentPosition.isClosed">
         <h5>Daily Gain Breakdown</h5>
         <div class="row">
             <div class="col">
