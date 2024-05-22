@@ -348,10 +348,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 "grant_type", "refresh_token"
                 "refresh_token", user.BrokerageRefreshToken
                 "client_id", clientId
+                if fullRefresh then "access_type", "offline"
             ]
-
-        if fullRefresh then
-            postData.Add("access_type", "offline")
             
         let url = "/oauth/token" |> AuthAUrl |> generateUrl
 

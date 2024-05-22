@@ -17,7 +17,7 @@ type PriceAvailability =
 
 let private generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
-    $"{studiesDirectory}/{filename}"
+    $"{studiesDirectory}/prices/{filename}"
 
 let private priceCache = ConcurrentDictionary<string,PriceBars>()
 
@@ -42,6 +42,7 @@ let private notAvailableBasedOnMessage failIfNone (message:string) =
         match message with
         | x when x.Contains("No candles for historical prices for") -> Some NotAvailableForever
         | x when x.Contains("Invalid open price") -> Some NotAvailableForever
+        | x when x.Contains("Invalid low price") -> Some NotAvailableForever
         | x when x.Contains("Individual App's transactions per seconds restriction reached") -> Some NotAvailable
         | _ -> None
     
@@ -122,7 +123,10 @@ let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDa
     | _ -> return prices |> toPriceBarOption
 }
 
-let saveCsv filename content = async {
+let saveCsv (filename:string) content = async {
+    let dir = System.IO.Path.GetDirectoryName(filename)
+    if not (System.IO.Directory.Exists(dir)) then
+        System.IO.Directory.CreateDirectory(dir) |> ignore
     do! System.IO.File.WriteAllTextAsync(filename, content) |> Async.AwaitTask
 }
 

@@ -29,7 +29,7 @@ type Signal =
 
 type SignalWithPriceProperties =
     CsvProvider<
-        Schema = "screenerid (int), date (string), ticker (string), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal)",
+        Schema = "screenerid (int), date (string), ticker (string), open (decimal), close (decimal), high (decimal), low (decimal), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal)",
         HasHeaders=false
     >
 
@@ -339,7 +339,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
         |> Seq.map (fun (r,g) ->
             let gapSize = match g with | None -> 0m | Some g -> g.GapSizePct
             let prices, container = prices[r.Ticker]
-            let index,_ = prices.TryFindByDate r.Date |> Option.get
+            let index,price = prices.TryFindByDate r.Date |> Option.get
             let sma20 = container.sma20.Values |> findSmaValue index
             let sma50 = container.sma50.Values |> findSmaValue index
             let sma150 = container.sma150.Values |> findSmaValue index
@@ -349,6 +349,10 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
                 ticker=r.Ticker,
                 date=r.Date,
                 screenerid=r.Screenerid,
+                ``open``=price.Open,
+                close=price.Close,
+                high=price.High,
+                low=price.Low,
                 gap=gapSize,
                 sma20=sma20,
                 sma50=sma50,
@@ -593,6 +597,134 @@ module Trading =
             
         return allOutcomes
     }
+    
+let private priceTransform (context:EnvironmentContext) userState = async {
+    let studiesDirectory = context.GetArgumentValue "-d"
+        
+    let brokerage = context.Brokerage()    
+    let pricesWrapper =
+        {
+            new IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
+                    brokerage.GetPriceHistory userState ticker PriceFrequency.Daily start ``end``
+        }
+    
+    let! transformed =
+        context.GetArgumentValue "-f"
+        |> Signal.Load |> _.Rows
+        |> transformSignals pricesWrapper studiesDirectory
+        
+    let outputFilename = context.GetArgumentValue "-o"
+    do! transformed.SaveToString() |> appendCsv outputFilename
+}
+
+let private importData (context:EnvironmentContext) = async {
+    let importUrl = context.GetArgumentValue "-i"
+    let! response = Http.AsyncRequest(importUrl)
+    let csv =
+        match response.Body with
+        | Text text -> text
+        | _ -> failwith "Unexpected response from screener"
+    let outputFilename = context.GetArgumentValue "-o"
+    do! csv |> saveCsv outputFilename
+}
+
+// TODO: this function is a bit nuts. WIP to refactor
+// but using it as is while I feel it out how do I want to
+// deal with stuff like VERY specific strategy behavior
+let private filterToCertainGapsOnly (context:EnvironmentContext) userState = async {
+    let inputFilename = context.GetArgumentValue "-f"
+    let outputFilename = context.GetArgumentValue "-o"
+    let studiesDirectory = context.GetArgumentValue "-d"
+    
+    let brokerage = context.Brokerage()    
+    let pricesWrapper =
+        {
+            new IGetPriceHistory with 
+                member this.GetPriceHistory start ``end`` ticker =
+                    brokerage.GetPriceHistory userState ticker PriceFrequency.Daily start ``end``
+        }
+    
+    let signals = SignalWithPriceProperties.Load inputFilename |> _.Rows
+    let! runFilter =
+        signals
+        |> Seq.filter (fun r -> r.Gap > 0.01m)
+        |> Seq.map (fun r -> async {
+                // for each of those, take only those that has a volume that's going down
+    
+                let! prices = getPricesFromCsv studiesDirectory r.Ticker
+                let index = prices.TryFindByDate r.Date |> Option.get
+                
+                let barData =
+                    prices.Bars
+                    |> Array.mapi (fun i bar ->
+                        let startIndex = max 0 (i - 59)
+                        let endIndex = i
+                        let volumeWindow = prices.Bars[startIndex..endIndex] |> Array.map (fun b -> decimal b.Volume)
+                        let avgVolume = if volumeWindow.Length > 0 then volumeWindow |> Array.average else 0m
+                        (bar, avgVolume)
+                )
+                
+                // let's make sure that the volume ratio at the day of the signal is more than 1.3x
+                let _,signalAvgVolume = barData[index |> fst]
+                return
+                    match signalAvgVolume with
+                    | x when x < 1.3m -> None
+                    | _ ->
+                        
+                        let findNextSignalBar (bars: PriceBar[]) (index: int) =
+                            let startIndex = index + 1
+                            let endIndex = bars.Length - 1
+                            
+                            let indexBar = bars[index]
+                            let avgVolume = barData[index] |> snd
+                            
+                            let isSignalBar (bar:PriceBar) =
+                                let volume = decimal bar.Volume
+                                let close = bar.Close
+                                let indexBarOpenOrClose = min indexBar.Open indexBar.Close
+                                let age = bar.Date - indexBar.Date
+                                volume >= 1.3m * avgVolume
+                                    && close >= indexBarOpenOrClose
+                                    && close < indexBarOpenOrClose * 1.1m
+                                    && age.TotalDays >= 14
+                                    && age.TotalDays <= 90
+                                    && bar.Open < bar.Close
+                            
+                            bars.[startIndex..endIndex]
+                            |> Array.tryFind isSignalBar
+                            |> Option.map (fun bar -> r, bar, avgVolume)
+                        
+                        findNextSignalBar prices.Bars (index |> fst)
+            }
+        )
+        |> Async.Sequential
+        
+    let filtered =
+        runFilter
+        |> Seq.choose id
+        |> Seq.distinctBy (fun (r, bar, _) -> r.Ticker + bar.DateStr)
+        |> Seq.map (fun (r, bar, _) ->
+            // System.Console.WriteLine($"{r.Ticker} {r.Date} {bar.DateStr}")
+            // System.Console.ReadLine() |> ignore
+            SignalWithPriceProperties.Row(
+                ticker=r.Ticker,
+                date=bar.DateStr,
+                screenerid=r.Screenerid,
+                ``open``=bar.Open,
+                close=bar.Close,
+                high=bar.High,
+                low=bar.Low,
+                gap=0,
+                sma20=r.Sma20,
+                sma50=r.Sma50,
+                sma150=r.Sma150,
+                sma200=r.Sma200)
+        )
+        
+    let output = new SignalWithPriceProperties(filtered)
+    do! output.SaveToString() |> appendCsv outputFilename
+}   
 
 let run (context:EnvironmentContext) =
     
@@ -601,37 +733,17 @@ let run (context:EnvironmentContext) =
     | None -> failwith "User not found"
     | Some _ -> ()
 
-    let studiesDirectory = context.GetArgumentValue "-d"
-        
     let actions = [
         if context.HasArgument "-i" then fun () -> async {
-            let importUrl = context.GetArgumentValue "-i"
-            let! response = Http.AsyncRequest(importUrl)
-            let csv =
-                match response.Body with
-                | Text text -> text
-                | _ -> failwith "Unexpected response from screener"
-            let outputFilename = context.GetArgumentValue "-o"
-            do! csv |> saveCsv outputFilename
+            do! importData context
         }
         
         if context.HasArgument "-pt" then fun () -> async {
-            
-            let brokerage = context.Brokerage()    
-            let pricesWrapper =
-                {
-                    new IGetPriceHistory with 
-                        member this.GetPriceHistory start ``end`` ticker =
-                            brokerage.GetPriceHistory user.Value.State ticker PriceFrequency.Daily start ``end``
-                }
-            
-            let! transformed =
-                context.GetArgumentValue "-f"
-                |> Signal.Load |> _.Rows
-                |> transformSignals pricesWrapper studiesDirectory
-                
-            let outputFilename = context.GetArgumentValue "-o"
-            do! transformed.SaveToString() |> appendCsv outputFilename
+            do! priceTransform context user.Value.State
+        }
+        
+        if context.HasArgument "-ft" then fun () -> async {
+            do! filterToCertainGapsOnly context user.Value.State
         }
     ]
 
