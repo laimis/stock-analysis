@@ -13,7 +13,7 @@ namespace testutils
         
         public static PriceBars PriceBars(Ticker ticker)
         {
-            var content = File.ReadAllText($"{TestDataPath}/{ticker.Value}.csv");
+            var content = File.ReadAllText($"{TestDataPath}/prices/{ticker.Value}.csv");
 
             var array = content.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => new PriceBar(s))

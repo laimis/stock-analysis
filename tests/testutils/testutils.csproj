@@ -12,6 +12,9 @@
         <Content Include="testdata\studies\*.csv">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <Content Include="testdata\prices\*.csv">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 
