@@ -77,7 +77,6 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
             this.createGroups();
         });
     }
-    
     createGroups() {
         const compareTickers = (a: StockAlert, b: StockAlert) => a.ticker.localeCompare(b.ticker);
 
@@ -97,7 +96,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
             const group = {
                 identifier: identifier,
                 alerts: alerts,
-                expanded: false
+                expanded: this.selectedSourceList !== 'All'
             }
             groups.push(group);
         })
