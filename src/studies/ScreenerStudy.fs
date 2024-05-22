@@ -225,9 +225,9 @@ let private fetchPriceFeeds (brokerage:IGetPriceHistory) studiesDirectory ticker
             let! prices = tryGetPricesFromCsv studiesDirectory ticker
             match prices with
             | Available _ -> return (ticker, prices)
-            | NotAvailableForever -> return (ticker, prices)
-            | _ ->
-                // if not available, try pinging brokerage and record to csv 
+            | NotAvailableForever _ -> return (ticker, prices)
+            | NotAvailable _ ->
+                // if not available but temporarily, try pinging brokerage and record to csv 
                 let! prices = ticker |> Ticker |> getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory earliestDateMinus365 today
                 return (ticker, prices)
         })
@@ -236,7 +236,7 @@ let private fetchPriceFeeds (brokerage:IGetPriceHistory) studiesDirectory ticker
     // run the fetch at least 10 times, until there are non NotAvailable records left
     let rec runFetchUntilAllAvailable (count:int) = async {
         let! results = runFetch()
-        let failed = results |> Seq.filter (fun (_, prices) -> match prices with | NotAvailable -> true | _ -> false) |> Seq.length
+        let failed = results |> Seq.filter (fun (_, prices) -> match prices with | NotAvailable _ -> true | _ -> false) |> Seq.length
         if failed = 0 || count = 0 then
             return results
         else
@@ -691,7 +691,7 @@ let private filterToCertainGapsOnly (context:EnvironmentContext) userState = asy
                                     && age.TotalDays <= 90
                                     && bar.Open < bar.Close
                             
-                            bars.[startIndex..endIndex]
+                            bars[startIndex..endIndex]
                             |> Array.tryFind isSignalBar
                             |> Option.map (fun bar -> r, bar, avgVolume)
                         

@@ -78,8 +78,9 @@ let ``Get prices with brokerage should not go to brokerage if price exists on fi
 
     let! priceBars = setupGetPricesWithBrokerageMock mock None None TestDataGenerator.NET
     
-    priceBars |> Option.isSome |> should equal true
-    priceBars.Value.Length |> should equal 505
+    match priceBars with
+    | Ok priceBars -> priceBars.Length |> should equal 505
+    | Error error -> failwith error
 }
 
 [<Fact>]
@@ -109,8 +110,9 @@ let ``Get prices with brokerage should go to brokerage if price does not exists 
     
     let! priceBars = ticker |> getPriceBars
     
-    priceBars |> Option.isSome |> should equal true
-    priceBars.Value.Length |> should equal 1
+    match priceBars with
+    | Ok priceBars -> priceBars.Length |> should equal 1
+    | Error error -> failwith error
     
     // let's call it again and ensure that it brokerage will not be bothered because DataHelpers cache price data on disk
     let! _ = ticker |> getPriceBars
@@ -137,13 +139,9 @@ let ``Make sure error is recorded if brokerage fails``() = async {
     
     let! priceBars = ticker |> getPriceBars
     
-    // feels like this test knows too much, but have no other good way to test this
-    let priceFile = Path.Combine(testDataPath, ticker.Value + ".csv")
-    
-    let contents = File.ReadAllText priceFile
-    
-    contents |> should equal $"ERROR: {transactionRateErrorMessage}"
-    priceBars |> Option.isNone |> should equal true
+    match priceBars with
+    | Ok _ -> failwith "Should have failed"
+    | Error error -> error |> should equal $"ERROR: {transactionRateErrorMessage}"
 }
 
 [<Fact>]
@@ -166,11 +164,11 @@ let ``When prices are not available for perpetuity, brokerage is not pinged``() 
     
     let! priceBars = ticker |> getPriceBars
     
-    priceBars |> Option.isNone |> should equal true
+    priceBars |> Result.isError |> should equal true
     
     let! priceBars = ticker |> getPriceBars
     
-    priceBars |> Option.isNone |> should equal true
+    priceBars |> Result.isError |> should equal true
     
     call |> should equal 1
 }
@@ -191,11 +189,7 @@ let ``If getting price data throws, it gets recorded``() = async {
     
     let! priceBars = ticker |> getPriceBars
     
-    // feels like this test knows too much, but have no other good way to test this
-    let priceFile = Path.Combine(testDataPath, ticker.Value + ".csv")
-    
-    let contents = File.ReadAllText priceFile
-    
-    contents |> should equal $"ERROR: {transactionRateErrorMessage}"
-    priceBars |> Option.isNone |> should equal true
+    match priceBars with
+    | Ok _ -> failwith "Should have failed"
+    | Error error -> error |> should equal transactionRateErrorMessage
 }

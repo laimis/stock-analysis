@@ -12,8 +12,8 @@ type IGetPriceHistory =
 
 type PriceAvailability =
     | Available of PriceBars
-    | NotAvailableForever
-    | NotAvailable
+    | NotAvailableForever of string
+    | NotAvailable of string
 
 let private generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
@@ -40,10 +40,10 @@ let getPricesFromCsv studiesDirectory ticker = async {
 let private notAvailableBasedOnMessage failIfNone (message:string) =
     let notAvailableType =
         match message with
-        | x when x.Contains("No candles for historical prices for") -> Some NotAvailableForever
-        | x when x.Contains("Invalid open price") -> Some NotAvailableForever
-        | x when x.Contains("Invalid low price") -> Some NotAvailableForever
-        | x when x.Contains("Individual App's transactions per seconds restriction reached") -> Some NotAvailable
+        | x when x.Contains("No candles for historical prices for") -> Some (NotAvailableForever x)
+        | x when x.Contains("Invalid open price") -> Some (NotAvailableForever x)
+        | x when x.Contains("Invalid low price") -> Some (NotAvailableForever x)
+        | x when x.Contains("Individual App's transactions per seconds restriction reached") -> Some (NotAvailable x)
         | _ -> None
     
     if notAvailableType.IsNone && failIfNone then
@@ -53,11 +53,11 @@ let private notAvailableBasedOnMessage failIfNone (message:string) =
    
 let private readPricesFromFileSystem path = async {
     match System.IO.File.Exists(path) with
-    | false -> return NotAvailable
+    | false -> return NotAvailable "Price file missing"
     | true ->
         let content = System.IO.File.ReadAllLines(path)
         match content with
-        | [||] -> return NotAvailable
+        | [||] -> return NotAvailable "Price file empty"
         | _ ->
             let checkIfNotAvailable = content[0] |> notAvailableBasedOnMessage false
             match checkIfNotAvailable with
@@ -107,8 +107,9 @@ let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDa
     
     let toPriceBarOption priceAvailability =
         match priceAvailability with
-        | Available priceBars -> Some priceBars
-        | _ -> None
+        | Available priceBars -> Ok priceBars
+        | NotAvailable e -> Error e
+        | NotAvailableForever e -> Error e
         
     // check first if we have prices for this ticker and date range
     // if we do, return them
@@ -117,7 +118,7 @@ let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDa
     let! prices = tryGetPricesFromCsv studiesDirectory ticker
     
     match prices with
-    | NotAvailable ->
+    | NotAvailable _ ->
         let! priceOption = getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory startDate endDate ticker
         return priceOption |> toPriceBarOption
     | _ -> return prices |> toPriceBarOption
