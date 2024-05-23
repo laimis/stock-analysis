@@ -5,7 +5,7 @@ import {DashboardComponent} from './dashboard/dashboard.component';
 import {ErrorDisplayComponent} from './shared/error-display/error-display.component';
 import {EventsComponent} from './events/events.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import {LandingComponent} from './landing/landing.component';
 import {NavMenuComponent} from './nav-menu/nav-menu.component';
 import {NgModule} from '@angular/core';
@@ -184,8 +184,7 @@ let routes: Routes = [
     {path: '**', pathMatch: 'full', component: PageNotFoundComponent, canActivate: [WithLoginStatus]},
 ];
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AdminEmailComponent,
         AdminWeeklyComponent,
         AdminUsersComponent,
@@ -195,7 +194,6 @@ let routes: Routes = [
         EventsComponent,
         LandingComponent,
         NavMenuComponent,
-
         OptionsComponent,
         OptionStatsComponent,
         OptionChainComponent,
@@ -204,7 +202,6 @@ let routes: Routes = [
         OptionOpenComponent,
         OptionPerformanceComponent,
         OptionClosedComponent,
-
         PaymentsComponent,
         PrivacyComponent,
         ProfileComponent,
@@ -214,10 +211,8 @@ let routes: Routes = [
         ProfileVerifyComponent,
         SummaryComponent,
         OwnedOptionComponent,
-
         PlaygroundComponent,
         InflectionPointsComponent,
-
         StockDetailsComponent,
         StockFundamentalsComponent,
         StockPositionReportsComponent,
@@ -225,7 +220,6 @@ let routes: Routes = [
         StockTransactionComponent,
         StockOwnershipComponent,
         StockViolationsComponent,
-
         StockTradingDashboardComponent,
         StockTradingPositionComponent,
         StockTradingPositionsComponent,
@@ -238,20 +232,15 @@ let routes: Routes = [
         StockTradingSimulationsComponent,
         TradingPerformanceSummaryComponent,
         TradingActualVsSimulatedPositionComponent,
-
         BrokerageOrdersComponent,
         BrokerageNewOrderComponent,
-
         TransactionsComponent,
         TermsComponent,
-
         FailuresuccesschainComponent,
         RecentSellsComponent,
-
         CryptoDashboardComponent,
         CryptoOwnershipGridComponent,
         CryptoDetailsComponent,
-
         StockAnalysisComponent,
         OutcomesComponent,
         OutcomesReportComponent,
@@ -261,7 +250,6 @@ let routes: Routes = [
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
         TradesReportComponent,
-
         AlertsComponent,
         StockNewPositionComponent,
         StockListsDashboardComponent,
@@ -274,18 +262,13 @@ let routes: Routes = [
         StockTradingStrategiesComponent,
         StockLinkComponent,
         StockLinkAndTradingviewLinkComponent,
-
         OptionBrokeragePositionsComponent,
         OptionBrokerageOrdersComponent,
-
         RoutineDashboardComponent,
         RoutineComponent,
         RoutinesActiveRoutineComponent,
-
     ],
-    imports: [
-        BrowserModule,
-        HttpClientModule,
+    bootstrap: [AppComponent], imports: [BrowserModule,
         FormsModule,
         StockSearchComponent,
         LoadingComponent,
@@ -296,13 +279,10 @@ let routes: Routes = [
         NgOptimizedImage,
         StockTradingChartsComponent,
         ReactiveFormsModule,
-        TradingViewLinkComponent
-    ],
-    providers: [
-        {provide: "windowObject", useValue: window},
-        Title
-    ],
-    bootstrap: [AppComponent]
-})
+        TradingViewLinkComponent], providers: [
+        { provide: "windowObject", useValue: window },
+        Title,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule {
 }

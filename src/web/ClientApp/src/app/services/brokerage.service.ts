@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Observable, of} from "rxjs";
 import {tap} from "rxjs/operators";
 import {BrokerageAccount, brokerageordercommand} from "./stocks.service";
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 
 export enum BrokerageOrderType {
     Market = 'Market',
