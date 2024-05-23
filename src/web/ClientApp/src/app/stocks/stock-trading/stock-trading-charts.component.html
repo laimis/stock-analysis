@@ -4,8 +4,11 @@
         <div class="row">
             <div class="col mb-4">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body d-none d-sm-block">
                         <canvasjs-chart [options]="option" [styles]="{height: '800px', width: '100%'}"></canvasjs-chart>
+                    </div>
+                    <div class="card-body d-block d-sm-none">
+                        <canvasjs-chart [options]="option"></canvasjs-chart>
                     </div>
                 </div>
             </div>
