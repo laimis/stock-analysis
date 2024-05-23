@@ -33,7 +33,7 @@ function createUnrealizedProfitChart(entries: PositionInstance[], quotes: Map<st
             label: p.ticker,
             toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${unrealizedProfit(p, quotes[p.ticker]).toFixed(2)}`,
             indexLabel: '{label}', // Add the ticker symbol as the index label
-            // indexLabelFontSize: 12, // Adjust the font size of the index label
+            indexLabelFontSize: 12, // Adjust the font size of the index label
             // indexLabelFontColor: "black" // Adjust the font color of the index label
         }
     })
@@ -53,6 +53,7 @@ function createUnrealizedProfitChart(entries: PositionInstance[], quotes: Map<st
             title: "Profit",
             gridThickness: 0.1,
         },
+        dataPointWidth: 10,
         data: [
             {
                 type: "scatter",
@@ -78,6 +79,7 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
             y: unrealizedGainPercent,
             label: position.ticker,
             indexLabel: '{label}', // Add the ticker symbol as the index label
+            indexLabelFontSize: 12, // Adjust the font size of the index label
             toolTipContent: `<strong>${position.ticker}</strong><br/>Days Held: ${position.daysHeld}<br/>Unrealized Gain: ${unrealizedGainPercent.toFixed(2)}%`
         };
     });
@@ -88,6 +90,7 @@ function createDaysHeldVsGainPercentChart(positions: PositionInstance[], quotes:
         title: {
             text: "Days Held vs. Unrealized Gain %",
         },
+        dataPointWidth: 10,
         axisX: {
             title: "Days Held",
             gridThickness: 0.1
@@ -289,6 +292,7 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         y: unrealizedGainPercentage(position, quotes[position.ticker]),
         label: position.ticker,
         indexLabel: '{label}', // Add the ticker symbol as the index label
+        indexLabelFontSize: 12, // Adjust the font size of the index label
         toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker]).toFixed(2)}%<br/>Unrealized Gain %: ${unrealizedGainPercentage(position, quotes[position.ticker]).toFixed(2)}%`
     }));
 
@@ -298,6 +302,7 @@ function createStopPriceDistanceChart(positions: PositionInstance[], quotes: Map
         title: {
             text: "Unrealized Gain % vs Stop Price Distance %",
         },
+        dataPointWidth: 10,
         axisX: {
             title: "Stop Price Distance (%)",
             gridThickness: 0.1,
