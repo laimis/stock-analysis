@@ -11,6 +11,7 @@
     <Compile Include="DataHelpers.fs" />
     <Compile Include="MarketTrendsStudy.fs" />
     <Compile Include="ScreenerStudy.fs" />
+    <Compile Include="BreakoutStudy.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

@@ -1033,7 +1033,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     if Array.isEmpty payload then
                         return $"No candles for historical prices for {ticker.Value}" |> ServiceError |> Error
                     else
-                        return PriceBars(payload) |> Ok
+                        return PriceBars(payload, frequency) |> Ok
             }
             
             return! execIfConnectedToBrokerage state execFunc

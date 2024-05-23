@@ -21,7 +21,7 @@ let ``Givens prices SMAs are correct``() =
                     volume = 1000)
         |]
 
-    let view = PricesView(PriceBars(prices))
+    let view = PricesView(PriceBars(prices, Daily))
 
     Assert.Equal(504, view.Prices.Length)
     Assert.Equal(5, view.MovingAverages.Length)

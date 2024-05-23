@@ -27,7 +27,7 @@ let private readPricesFromCsv (path:string) = async {
         | false, _ ->
             if ServiceHelper.logger <> null then ServiceHelper.logger.LogInformation("Reading prices from file {path}", path)
             let! csv = System.IO.File.ReadAllLinesAsync(path) |> Async.AwaitTask
-            let bars = csv |> Array.map PriceBar |> PriceBars
+            let bars = PriceBars(csv |> Array.map PriceBar, Daily)
             priceCache.TryAdd(path, bars) |> ignore
             return bars
     }

@@ -19,7 +19,7 @@ namespace testutils
                 .Select(s => new PriceBar(s))
                 .ToArray();
 
-            return new PriceBars(array);
+            return new PriceBars(array, PriceFrequency.Daily);
         }
 
         public static PriceBars IncreasingPriceBars(int numOfBars = 10)
@@ -40,7 +40,7 @@ namespace testutils
                     )
                 .ToArray();
             
-            return new PriceBars(array);
+            return new PriceBars(array, PriceFrequency.Daily);
         }
         
         public static string RandomEmail() => $"{Guid.NewGuid().ToString()}@gmail.com";
