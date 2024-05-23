@@ -3,4 +3,5 @@ open studies
 
 Environment.GetCommandLineArgs()
 |> ServiceHelper.init None
-|> ScreenerStudy.run
+|> BreakoutStudy.run
+|> Async.RunSynchronously

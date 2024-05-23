@@ -1,105 +1,88 @@
 module studies.BreakoutStudy
 
+open System
+open core.Shared
 open core.fs.Adapters.Stocks
 open studies.DataHelpers
-open studies.ScreenerStudy
 open studies.ServiceHelper
 
+// let arr = Array.init 10 (fun i -> i)
+// Console.WriteLine("Array:")
+// arr |> Array.iter (fun i -> Console.Write("{0}", i))
+// Console.WriteLine()
 
+// take 5 from the index of interest
+// let index = 9
+// let howMany = 5
+// let last5 = arr.[(index-howMany+1)..(index)]
+// Console.WriteLine("Last 5:")
+// last5 |> Array.iter (fun i -> Console.Write("{0}", i))
 
-// TODO: this function is a bit nuts. WIP to refactor
-// but using it as is while I feel it out how do I want to
-// deal with stuff like VERY specific strategy behavior
+let private normalizeByAverage (values:float array) =
+    let average = values |> Array.average
+    values |> Array.map (fun v -> v / average)
+    
+let private normalizeMinMax values =
+    let min = values |> Array.min
+    let max = values |> Array.max
+    values |> Array.map (fun v -> (v - min) / (max - min))
+    
+let calculateBestFitLine normalization (values:float array) =
+    let x = [|0.0..(values.Length - 1 |> float)|]
+    let y = values |> normalization
+    MathNet.Numerics.Fit.Line(x, y)
+    
+let describe method line = Console.WriteLine("{0}: {1}", method, line)
+    
+let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset) (endDate:DateTimeOffset) period =
+    
+    // get april 16th, 2024 bar
+    let startIndex,startBar = prices.TryFindByDate(startDate) |> Option.get
+    let endIndex,endBar = prices.TryFindByDate(endDate) |> Option.get
+    let last60InclusiveTheIndex = prices.Bars[startIndex..endIndex]
+    
+    Console.WriteLine("First bar: {0}", last60InclusiveTheIndex |> Array.head)
+    Console.WriteLine("Last bar: {0}", last60InclusiveTheIndex |> Array.last)
+    Console.WriteLine("Number of bars: {0}", last60InclusiveTheIndex.Length)
+    Console.WriteLine("Number of days: {0}", (endDate - startDate).Days |> int)
+    
+    // calculate average volume for those bars
+    let totalVolume = last60InclusiveTheIndex |> Seq.map (_.Volume) |> Seq.sum |> decimal
+    let averageVolume = totalVolume / decimal period
+    let volumeRate = decimal endBar.Volume / averageVolume
+    Console.WriteLine("Average Volume: {0}", averageVolume)
+    Console.WriteLine("Volume Rate at breakout: {0}", volumeRate)
+    
+    let volumes = last60InclusiveTheIndex |> Array.map (fun b -> b.Volume |> float)
+    
+    Console.WriteLine("Slope of the volume:")
+    volumes |> calculateBestFitLine normalizeMinMax |> describe "MinMax"
+    volumes |> calculateBestFitLine normalizeByAverage |> describe "Average"
+    volumes |> calculateBestFitLine id |> describe "None"
+    
+    let closingPrices = last60InclusiveTheIndex |> Array.map (fun b -> b.Close |> float)
+    
+    Console.WriteLine("Slope of the closing prices:")
+    closingPrices |> calculateBestFitLine normalizeMinMax |> describe "MinMax"
+    closingPrices |> calculateBestFitLine normalizeByAverage |> describe "Average"
+    closingPrices |> calculateBestFitLine id |> describe "None"
+    
 let private filterToCertainGapsOnly (context:EnvironmentContext) userState = async {
-    let inputFilename = context.GetArgumentValue "-f"
-    let outputFilename = context.GetArgumentValue "-o"
-    let studiesDirectory = context.GetArgumentValue "-d"
     
-    let brokerage = context.Brokerage()    
-    let pricesWrapper =
-        {
-            new IGetPriceHistory with 
-                member this.GetPriceHistory start ``end`` ticker =
-                    brokerage.GetPriceHistory userState ticker PriceFrequency.Daily start ``end``
-        }
+    let! prices = getPricesFromCsv (context.GetArgumentValue "-d") (Ticker("SE"))
+    // let start = DateTimeOffset(2024, 3, 4, 0, 0, 0, TimeSpan.Zero)
+    // let end' = DateTimeOffset(2024, 4, 16, 0, 0, 0, TimeSpan.Zero)
+    // from jan 24th to march 4 of 2024
+    let start = DateTimeOffset(2024, 1, 24, 0, 0, 0, TimeSpan.Zero)
+    let end' = DateTimeOffset(2024, 3, 4, 0, 0, 0, TimeSpan.Zero)
+    let period = 60
     
-    let signals = SignalWithPriceProperties.Load inputFilename |> _.Rows
-    let! runFilter =
-        signals
-        |> Seq.filter (fun r -> r.Gap > 0.01m)
-        |> Seq.map (fun r -> async {
-                // for each of those, take only those that has a volume that's going down
-    
-                let! prices = getPricesFromCsv studiesDirectory r.Ticker
-                let index = prices.TryFindByDate r.Date |> Option.get
-                
-                let barData =
-                    prices.Bars
-                    |> Array.mapi (fun i bar ->
-                        let startIndex = max 0 (i - 59)
-                        let endIndex = i
-                        let volumeWindow = prices.Bars[startIndex..endIndex] |> Array.map (fun b -> decimal b.Volume)
-                        let avgVolume = if volumeWindow.Length > 0 then volumeWindow |> Array.average else 0m
-                        (bar, avgVolume)
-                )
-                
-                // let's make sure that the volume ratio at the day of the signal is more than 1.3x
-                let _,signalAvgVolume = barData[index |> fst]
-                return
-                    match signalAvgVolume with
-                    | x when x < 1.3m -> None
-                    | _ ->
-                        
-                        let findNextSignalBar (bars: PriceBar[]) (index: int) =
-                            let startIndex = index + 1
-                            let endIndex = bars.Length - 1
-                            
-                            let indexBar = bars[index]
-                            let avgVolume = barData[index] |> snd
-                            
-                            let isSignalBar (bar:PriceBar) =
-                                let volume = decimal bar.Volume
-                                let close = bar.Close
-                                let indexBarOpenOrClose = min indexBar.Open indexBar.Close
-                                let age = bar.Date - indexBar.Date
-                                volume >= 1.3m * avgVolume
-                                    && close >= indexBarOpenOrClose
-                                    && close < indexBarOpenOrClose * 1.1m
-                                    && age.TotalDays >= 14
-                                    && age.TotalDays <= 90
-                                    && bar.Open < bar.Close
-                            
-                            bars[startIndex..endIndex]
-                            |> Array.tryFind isSignalBar
-                            |> Option.map (fun bar -> r, bar, avgVolume)
-                        
-                        findNextSignalBar prices.Bars (index |> fst)
-            }
-        )
-        |> Async.Sequential
-        
-    let filtered =
-        runFilter
-        |> Seq.choose id
-        |> Seq.distinctBy (fun (r, bar, _) -> r.Ticker + bar.DateStr)
-        |> Seq.map (fun (r, bar, _) ->
-            // System.Console.WriteLine($"{r.Ticker} {r.Date} {bar.DateStr}")
-            // System.Console.ReadLine() |> ignore
-            SignalWithPriceProperties.Row(
-                ticker=r.Ticker,
-                date=bar.DateStr,
-                screenerid=r.Screenerid,
-                ``open``=bar.Open,
-                close=bar.Close,
-                high=bar.High,
-                low=bar.Low,
-                gap=0,
-                sma20=r.Sma20,
-                sma50=r.Sma50,
-                sma150=r.Sma150,
-                sma200=r.Sma200)
-        )
-        
-    let output = new SignalWithPriceProperties(filtered)
-    do! output.SaveToString() |> appendCsv outputFilename
+    calculateAndPrintSlope prices start end' period
 }   
+
+let run (context:EnvironmentContext) = async {  
+    let! user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask
+    match user with
+    | None -> failwith "User not found"
+    | Some user -> return! filterToCertainGapsOnly context user.State
+}
