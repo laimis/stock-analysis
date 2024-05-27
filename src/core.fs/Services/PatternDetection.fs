@@ -1,10 +1,55 @@
 module core.fs.Services.PatternDetection
 
+open System
 open core.fs
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 
+[<Literal>]
+let contractingVolumeBreakoutName = "Contracting Volume Breakout"
+[<Literal>]
+let minimumBarsForPattern = 40
+let volumeRateThreshold = 1.3m
+let slopeThreshold = 0.0
+
+let contractingVolumeBreakout (bars: PriceBars) =
+    let barsOfInterest = // don't look too far back, just the last 40 bars unless there are less than 40 bars
+        match bars.Length with
+        | x when x < minimumBarsForPattern -> bars.Bars
+        | _ -> bars.Bars.[^(minimumBarsForPattern-1)..]
+        
+    Console.WriteLine($"Bars from {barsOfInterest.[0].Date} to {barsOfInterest.[^0].Date}")
+    
+    let volumes = barsOfInterest |> Array.map _.Volume
+    let volumeStats = 
+        volumes
+        |> Array.map decimal
+        |> DistributionStatistics.calculate
+        
+    let lastBar = bars.Last
+    let lastVolume = decimal lastBar.Volume
+    let lastVolumeRate = lastVolume / volumeStats.mean
+    
+    let x = [|0.0..(volumes.Length - 1 |> float)|]
+    let y = volumes |> Array.map float
+    let struct (_, b) = MathNet.Numerics.Fit.Line(x, y)
+    
+    let description = $"{contractingVolumeBreakoutName}: {lastVolumeRate:N1}x, {b:N2}"
+        
+    if lastVolumeRate > volumeRateThreshold && b < slopeThreshold && (lastBar.Close > lastBar.Open) then
+        Some({
+            date = lastBar.Date
+            name = contractingVolumeBreakoutName
+            description = description
+            value = lastVolumeRate
+            valueFormat = ValueFormat.Number
+            sentimentType = SentimentType.Positive
+        })
+    else
+        Console.WriteLine($"No pattern detected: {description}")
+        None
+            
 let private toVolumeMultiplierString (multiplier: decimal option) =
     match multiplier with
     | Some m -> ", volume x" + m.ToString("N1")
@@ -41,7 +86,9 @@ let gap (gapType: GapType) (name: string) (sentimentType: SentimentType) (bars: 
             } |> Some
         | _ -> None
 
+[<Literal>]
 let gapUpName = "Gap Up"
+[<Literal>]
 let gapDownName = "Gap Down"
 let gapDown = gap GapType.Down gapDownName SentimentType.Negative
 let gapUp = gap GapType.Up gapUpName SentimentType.Positive
@@ -68,18 +115,20 @@ let private reversal (isReversal: PriceBar -> PriceBar -> bool) (sentimentType: 
         else
             None
 
+[<Literal>]
 let upsideReversalName = "Upside Reversal"
 let upsideReversal =
     let isUpsideReversal (current:PriceBar) (previous:PriceBar) = current.Close > previous.High && current.Low < previous.Low
     reversal isUpsideReversal SentimentType.Positive upsideReversalName
 
+[<Literal>]
 let downsideReversalName = "Downside Reversal"
 let downsideReversal =
     let isDownsideReversal (current:PriceBar) (previous:PriceBar) = current.Close < previous.Low && current.High > previous.High
     reversal isDownsideReversal SentimentType.Negative downsideReversalName
     
+[<Literal>]
 let highest1YearVolumeName = "Highest 1 year volume"
-
 let highest1YearVolume (bars: PriceBars) =
     if bars.Length < 2 then
         None
@@ -118,6 +167,7 @@ let highest1YearVolume (bars: PriceBars) =
             else
                 None
                 
+[<Literal>]
 let highVolumeName = "High Volume"
 
 let highVolume (bars: PriceBars) =
@@ -152,6 +202,7 @@ let patternGenerators =
         highVolumeName, highVolume
         gapUpName, gapUp
         gapDownName, gapDown
+        contractingVolumeBreakoutName, contractingVolumeBreakout
     ]
     |> Map.ofList
 

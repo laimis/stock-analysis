@@ -3,6 +3,8 @@ module studies.BreakoutStudy
 open System
 open core.Shared
 open core.fs.Adapters.Stocks
+open core.fs.Services
+open core.fs.Services.Analysis
 open studies.DataHelpers
 open studies.ServiceHelper
 
@@ -27,6 +29,10 @@ let private normalizeMinMax values =
     let max = values |> Array.max
     values |> Array.map (fun v -> (v - min) / (max - min))
     
+let private normalizeWithinZeroAndMax values =
+    let max = values |> Array.max
+    values |> Array.map (fun v -> v / max)
+    
 let calculateBestFitLine normalization (values:float array) =
     let x = [|0.0..(values.Length - 1 |> float)|]
     let y = values |> normalization
@@ -34,50 +40,66 @@ let calculateBestFitLine normalization (values:float array) =
     
 let describe method line = Console.WriteLine("{0}: {1}", method, line)
     
-let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset) (endDate:DateTimeOffset) period =
+let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
     
-    // get april 16th, 2024 bar
+    let period = 60
+    
+    let averageVolumeAndRateAtLastBar (bars:PriceBar array) =
+        let stats = DistributionStatistics.calculate (bars |> Array.map (fun b -> b.Volume |> decimal))
+        let volumeRate = bars |> Array.last |> _.Volume |> decimal |> fun x -> x / stats.mean
+        (stats.mean, volumeRate)
+        
     let startIndex,startBar = prices.TryFindByDate(startDate) |> Option.get
     let endIndex,endBar = prices.TryFindByDate(endDate) |> Option.get
-    let last60InclusiveTheIndex = prices.Bars[startIndex..endIndex]
+    let barsForDateRange = prices.Bars[startIndex..endIndex]
+    let barsLast60 = prices.Bars[endIndex - period..endIndex]
     
-    Console.WriteLine("First bar: {0}", last60InclusiveTheIndex |> Array.head)
-    Console.WriteLine("Last bar: {0}", last60InclusiveTheIndex |> Array.last)
-    Console.WriteLine("Number of bars: {0}", last60InclusiveTheIndex.Length)
+    Console.WriteLine("First bar: {0}", barsForDateRange |> Array.head)
+    Console.WriteLine("Last bar: {0}", barsForDateRange |> Array.last)
+    Console.WriteLine("Number of bars: {0}", barsForDateRange.Length)
     Console.WriteLine("Number of days: {0}", (endDate - startDate).Days |> int)
     
+    // see if pattern detection would trigger
+    let breakoutPattern = PatternDetection.contractingVolumeBreakout (barsForDateRange |> PriceBars)
+    match breakoutPattern with
+    | Some pattern -> Console.WriteLine("Pattern detected: {0}", pattern.description)
+    | None -> Console.WriteLine("No pattern detected")
+    
     // calculate average volume for those bars
-    let totalVolume = last60InclusiveTheIndex |> Seq.map (_.Volume) |> Seq.sum |> decimal
-    let averageVolume = totalVolume / decimal period
-    let volumeRate = decimal endBar.Volume / averageVolume
-    Console.WriteLine("Average Volume: {0}", averageVolume)
+    let averageVolume, volumeRate = averageVolumeAndRateAtLastBar barsForDateRange
+    Console.WriteLine()
+    Console.WriteLine("Average Volume from {0} to {1}: {2}", startBar.DateStr, endBar.DateStr, averageVolume)
     Console.WriteLine("Volume Rate at breakout: {0}", volumeRate)
     
-    let volumes = last60InclusiveTheIndex |> Array.map (fun b -> b.Volume |> float)
+    let averageVolume60, volumeRate60 = averageVolumeAndRateAtLastBar barsLast60
+    Console.WriteLine()
+    Console.WriteLine("Average Volume from {0} to {1}: {2}", barsLast60 |> Array.head |> _.DateStr, barsLast60 |> Array.last |> _.DateStr, averageVolume60)
+    Console.WriteLine("Volume Rate at breakout: {0}", volumeRate60)
     
-    Console.WriteLine("Slope of the volume:")
+    let volumes = barsForDateRange |> Array.map (fun b -> b.Volume |> float)
+    
+    Console.WriteLine()
+    Console.WriteLine("Slope of the volume: {0} to {1}", startBar.DateStr, endBar.DateStr)
     volumes |> calculateBestFitLine normalizeMinMax |> describe "MinMax"
+    volumes |> calculateBestFitLine normalizeWithinZeroAndMax |> describe "ZeroMax"
     volumes |> calculateBestFitLine normalizeByAverage |> describe "Average"
     volumes |> calculateBestFitLine id |> describe "None"
     
-    let closingPrices = last60InclusiveTheIndex |> Array.map (fun b -> b.Close |> float)
+    let closingPrices = barsForDateRange |> Array.map (fun b -> b.Close |> float)
     
-    Console.WriteLine("Slope of the closing prices:")
+    Console.WriteLine()
+    Console.WriteLine("Slope of the closing prices: {0} to {1}", startBar.DateStr, endBar.DateStr)
     closingPrices |> calculateBestFitLine normalizeMinMax |> describe "MinMax"
+    closingPrices |> calculateBestFitLine normalizeWithinZeroAndMax |> describe "ZeroMax"
     closingPrices |> calculateBestFitLine normalizeByAverage |> describe "Average"
     closingPrices |> calculateBestFitLine id |> describe "None"
     
 let private filterToCertainGapsOnly (context:EnvironmentContext) userState = async {
     
     let! prices = getPricesFromCsv (context.GetArgumentValue "-d") (Ticker("SE"))
-    // let start = DateTimeOffset(2024, 3, 4, 0, 0, 0, TimeSpan.Zero)
-    // let end' = DateTimeOffset(2024, 4, 16, 0, 0, 0, TimeSpan.Zero)
-    // from jan 24th to march 4 of 2024
-    let start = DateTimeOffset(2024, 1, 24, 0, 0, 0, TimeSpan.Zero)
-    let end' = DateTimeOffset(2024, 3, 4, 0, 0, 0, TimeSpan.Zero)
-    let period = 60
-    
-    calculateAndPrintSlope prices start end' period
+    let start = DateTimeOffset(2024, 3, 4, 0, 0, 0, TimeSpan.Zero)
+    let end' = DateTimeOffset(2024, 4, 16, 0, 0, 0, TimeSpan.Zero)
+    calculateAndPrintSlope prices start end'
 }   
 
 let run (context:EnvironmentContext) = async {  
