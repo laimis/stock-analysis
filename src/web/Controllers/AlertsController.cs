@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using core.fs.Adapters.Logging;
 using core.fs.Alerts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,5 +49,35 @@ namespace web.Controllers
         [HttpGet("emailJob")]
         [Authorize("admin")]
         public Task EmailJob() => handler.Handle(new RunEmailJob());
+
+        [HttpGet("triggerWeekly")]
+        [Authorize("admin")]
+        public Task TriggerWeekly(
+            [FromServices] ILogger logger,
+            [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts)
+        {
+            weeklyAlerts.Execute(logger, CancellationToken.None);
+            return Task.CompletedTask;
+        }
+        
+        [HttpGet("triggerDaily")]
+        [Authorize("admin")]
+        public Task TriggerDaily(
+            [FromServices] ILogger logger,
+            [FromServices] MonitoringServices.PatternMonitoringService dailyAlerts)
+        {
+            dailyAlerts.Execute(logger, CancellationToken.None);
+            return Task.CompletedTask;
+        }
+        
+        [HttpGet("triggerEmail")]
+        [Authorize("admin")]
+        public Task TriggerEmail(
+            [FromServices] ILogger logger,
+            [FromServices] MonitoringServices.AlertEmailService emailAlerts)
+        {
+            emailAlerts.Execute(logger, CancellationToken.None);
+            return Task.CompletedTask;
+        }
     }
 }
