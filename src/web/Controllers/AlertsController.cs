@@ -55,11 +55,7 @@ namespace web.Controllers
         [Authorize("admin")]
         public Task TriggerWeekly(
             [FromServices] ILogger logger,
-            [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts)
-        {
-            weeklyAlerts.Execute(true, logger, CancellationToken.None);
-            return Task.CompletedTask;
-        }
+            [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts) => weeklyAlerts.Execute(true, logger, CancellationToken.None);
         
         [HttpGet("triggerDaily")]
         [Authorize("admin")]
