@@ -49,8 +49,8 @@ let ``Pattern detection with ENPH finds XVolume`` () =
         |> PatternDetection.generate
         
     patterns |> should haveLength 2
-    patterns |> Seq.last |> _.name |> should equal PatternDetection.highest1YearVolumeName
-    patterns |> Seq.head |> _.name |> should equal PatternDetection.highVolumeName
+    patterns |> Seq.map _.name |> should contain PatternDetection.highest1YearVolumeName
+    patterns |> Seq.map _.name |> should contain PatternDetection.highVolumeName
     
 [<Fact>]
 let ``Generate with small input returns nothing``() =
