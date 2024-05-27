@@ -78,8 +78,8 @@ public class PatternMonitoringServiceHost(
 }
 
 public class WeeklyUpsideReversalServiceHost(
-    ILogger<MonitoringServices.WeeklyUpsideMonitoringService> logger,
-    MonitoringServices.WeeklyUpsideMonitoringService service)
+    ILogger<MonitoringServices.WeeklyMonitoringService> logger,
+    MonitoringServices.WeeklyMonitoringService service)
     : GenericBackgroundServiceHost(new WrappingLogger(logger))
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);

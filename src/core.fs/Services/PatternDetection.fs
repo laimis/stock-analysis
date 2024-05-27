@@ -204,19 +204,14 @@ let patternGenerators =
         gapDownName, gapDown
         contractingVolumeBreakoutName, contractingVolumeBreakout
     ]
-    |> Map.ofList
 
 let availablePatterns =
     patternGenerators
-    |> Map.toSeq
-    |> Seq.map (fun (name, _) -> name)
-    |> Seq.toList        
+    |> List.map fst      
     
 let generate (bars: PriceBars) =
     
     patternGenerators
-    |> Map.toSeq
-    |> Seq.map (fun (_, generator) -> generator bars)
-    |> Seq.choose id
-    |> Seq.toList
+    |> List.map (fun (_, generator) -> generator bars)
+    |> List.choose id
 

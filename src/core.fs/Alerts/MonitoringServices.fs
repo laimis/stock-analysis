@@ -32,7 +32,7 @@ type private StopLossCheck = {
     user: UserState
 }
 
-type private WeeklyUpsideCheckResult =
+type private WeeklyPatternCheckResult =
     | Success of Ticker * Pattern list
     | Failure of Ticker
 
@@ -382,10 +382,10 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
         now.Add(monitoringFrequency)
 
 
-type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage) =
+type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage) =
 
     let tickersToCheck = Dictionary<UserState, HashSet<Ticker>>()
-    let weeklyUpsidesDiscovered = Dictionary<UserState, List<TriggeredAlert>>()
+    let weeklyAlertsDiscovered = Dictionary<UserState, List<TriggeredAlert>>()
 
     let loadTickersToCheckForUser (logger:ILogger) (pair:EmailIdPair) = async {
         let! user = pair.Id |> accounts.GetUser |> Async.AwaitTask
@@ -424,21 +424,16 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
             match prices with
             | Error err ->
                 logger.LogError($"Weekly job could not get price history for {ticker}: {err.Message}")
-                WeeklyUpsideCheckResult.Failure ticker
+                WeeklyPatternCheckResult.Failure ticker
             | Ok bars ->
-                let patterns =
-                    [
-                        PatternDetection.upsideReversal(bars)
-                        PatternDetection.downsideReversal(bars)
-                    ]
-                    |> List.choose id
-                (ticker, patterns) |> WeeklyUpsideCheckResult.Success
+                let patterns = PatternDetection.generate bars
+                (ticker, patterns) |> WeeklyPatternCheckResult.Success
     }
 
     let runCheckForUser (logger:ILogger) (cancellationToken:CancellationToken) (user:UserState) (tickers: HashSet<Ticker>) = async {
 
-        if weeklyUpsidesDiscovered.ContainsKey(user) |> not then
-            weeklyUpsidesDiscovered.Add(user, List<TriggeredAlert>())
+        if weeklyAlertsDiscovered.ContainsKey(user) |> not then
+            weeklyAlertsDiscovered.Add(user, List<TriggeredAlert>())
 
         let! work =
             tickers
@@ -446,10 +441,10 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
             |> Seq.map (runCheckForUserTicker logger cancellationToken user)
             |> Async.Sequential
 
-        let succeeded = work |> Seq.choose (function WeeklyUpsideCheckResult.Success (t,p) -> Some (t,p) | _ -> None) |> Seq.toList
-        let failed = work |> Seq.choose (function WeeklyUpsideCheckResult.Failure x -> Some x | _ -> None) |> Seq.toList
+        let succeeded = work |> Seq.choose (function WeeklyPatternCheckResult.Success (t,p) -> Some (t,p) | _ -> None) |> Seq.toList
+        let failed = work |> Seq.choose (function WeeklyPatternCheckResult.Failure x -> Some x | _ -> None) |> Seq.toList
 
-        logger.LogInformation($"Weekly upside reversal check for {user.Id} successfully checked {succeeded.Length} tickers, and failed for {failed.Length} tickers")
+        logger.LogInformation($"Weekly pattern check for {user.Id} successfully checked {succeeded.Length} tickers, and failed for {failed.Length} tickers")
         
         succeeded
         |> List.map (fun (ticker, patterns) ->
@@ -457,11 +452,11 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
             |> List.map (fun p -> TriggeredAlert.PatternAlert p ticker ["Watchlist"] DateTimeOffset.UtcNow (user.Id |> UserId))
         )
         |> List.concat
-        |> weeklyUpsidesDiscovered[user].AddRange
+        |> weeklyAlertsDiscovered[user].AddRange
 
         let removed = succeeded |> Seq.map fst |> Seq.map tickers.Remove |> Seq.map (fun b -> if b then 1 else 0) |> Seq.sum
 
-        logger.LogInformation($"Weekly upside reversal check for {user.Id} removed {removed} tickers from the check list")
+        logger.LogInformation($"Weekly pattern check for {user.Id} removed {removed} tickers from the check list")
     }
 
     let runChecks (logger:ILogger) (cancellationToken:CancellationToken) = async {
@@ -474,10 +469,10 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
     }
 
     let sendEmails (logger:ILogger) (cancellationToken:CancellationToken) = async {
-        logger.LogInformation $"Weekly upside reversal emails discovered for {weeklyUpsidesDiscovered.Count} users"
+        logger.LogInformation $"Weekly pattern check emails discovered for {weeklyAlertsDiscovered.Count} users"
 
         let! _ =
-            weeklyUpsidesDiscovered
+            weeklyAlertsDiscovered
             |> Seq.filter (fun pair -> pair.Value.Count > 0)
             |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
             |> Seq.map (fun pair -> async {
@@ -486,13 +481,13 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
 
                 do!
                     pair.Value
-                    |> generateEmailDataPayloadForAlertsWithGroupingFunction "NGTD: Weekly Alerts" marketHours [] (fun a -> "Weekly " + a.identifier)
+                    |> generateEmailDataPayloadForAlertsWithGroupingFunction "NGTD: Weekly Patterns" marketHours [] (fun a -> "Weekly " + a.identifier)
                     |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
                     |> Async.AwaitTask
             })
             |> Async.Sequential
 
-        weeklyUpsidesDiscovered.Clear()
+        weeklyAlertsDiscovered.Clear()
     }
 
     let tickersToCheckCount() = tickersToCheck |> Seq.map _.Value |> Seq.map _.Count |> Seq.sum
@@ -509,12 +504,12 @@ type WeeklyUpsideMonitoringService(accounts:IAccountStorage, brokerage:IBrokerag
 
         match isWeekend() with
         | false ->
-            logger.LogInformation("Not running weekly upside reversal check because it is not Friday or the weekend")
+            logger.LogInformation("Not running weekly pattern check because it is not Friday or the weekend")
         | true ->
-            logger.LogInformation("Running weekly upside reversal check")
+            logger.LogInformation("Running weekly pattern check")
 
             if tickersToCheckCount() = 0 then
-                weeklyUpsidesDiscovered.Clear()
+                weeklyAlertsDiscovered.Clear()
                 logger.LogInformation("No tickers to check, loading them")
                 do! loadTickersToCheck logger cancellationToken
 
