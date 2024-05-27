@@ -34,8 +34,8 @@ module PercentChangesTests =
         Assert.Equal(21, percentChangeStatistics.buckets.Length)
         
         // first bucket should be min
-        Assert.Equal(percentChangeStatistics.min, percentChangeStatistics.buckets.[0].value)
-        Assert.Equal(1, percentChangeStatistics.buckets.[0].frequency)
+        Assert.Equal(percentChangeStatistics.min, percentChangeStatistics.buckets[0].value)
+        Assert.Equal(1, percentChangeStatistics.buckets[0].frequency)
         
         // make sure there are four buckets with values assigned
         Assert.Equal(4, percentChangeStatistics.buckets |> Array.filter (fun x -> x.frequency <> 0) |> Array.length)

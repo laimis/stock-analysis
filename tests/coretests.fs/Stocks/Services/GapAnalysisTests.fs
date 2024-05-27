@@ -17,15 +17,15 @@ let ``Number of Gaps Detected Matches`` () =
 
 [<Fact>]
 let ``Gap PercentChange Correct`` () =
-    System.Math.Round(gaps.[0].PercentChange, 3) |> should equal 0.052m
+    System.Math.Round(gaps[0].PercentChange, 3) |> should equal 0.052m
 
 [<Fact>]
 let ``Gap RelativeVolume Correct`` () =
-    gaps.[0].RelativeVolume |> Option.get |> should equal 0.94m
+    gaps[0].RelativeVolume |> Option.get |> should equal 0.94m
 
 [<Fact>]
 let ``Gap GapType Correct`` () =
-    gaps.[0].Type |> should equal GapAnalysis.GapType.Up
+    gaps[0].Type |> should equal GapAnalysis.GapType.Up
 
 [<Fact(Skip = "Need to review if the logic is correct")>]
 let ``ClosedQuickly Matches`` () =
