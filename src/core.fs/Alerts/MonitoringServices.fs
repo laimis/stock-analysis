@@ -500,9 +500,8 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
 
     interface IApplicationService
 
-    member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
-
-        match isWeekend() with
+    member _.Execute forceRun (logger:ILogger) (cancellationToken:CancellationToken) = task {
+        match isWeekend() || forceRun with
         | false ->
             logger.LogInformation("Not running weekly pattern check because it is not Friday or the weekend")
         | true ->

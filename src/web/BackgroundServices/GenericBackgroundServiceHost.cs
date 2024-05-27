@@ -84,7 +84,7 @@ public class WeeklyUpsideReversalServiceHost(
 {
     protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
 
-    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => await service.Execute(logger, stoppingToken);
+    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => await service.Execute(false, logger, stoppingToken);
 }
 
 public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshBrokerageConnectionService service)

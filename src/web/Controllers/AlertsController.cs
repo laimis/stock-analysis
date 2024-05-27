@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +57,7 @@ namespace web.Controllers
             [FromServices] ILogger logger,
             [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts)
         {
-            weeklyAlerts.Execute(logger, CancellationToken.None);
+            weeklyAlerts.Execute(true, logger, CancellationToken.None);
             return Task.CompletedTask;
         }
         
