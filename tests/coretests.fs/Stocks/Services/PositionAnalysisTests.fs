@@ -1,5 +1,6 @@
 module coretests.fs.Stocks.Services.PositionAnalysisTests
 
+open System
 open Xunit
 open core.Shared
 open core.fs.Adapters.Brokerage
@@ -31,7 +32,9 @@ let createTestData() =
             AssetType = AssetType.Equity
             ExecutionTime = None
             OrderId = "orderId"
-            CanBeCancelled = true 
+            CanBeCancelled = true
+            EnteredTime = DateTimeOffset.UtcNow
+            ExpirationTime = None 
         }
     |]
     

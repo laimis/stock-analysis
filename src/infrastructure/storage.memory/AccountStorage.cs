@@ -1,4 +1,5 @@
 ﻿using core.fs.Accounts;
+using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.Storage;
 using Microsoft.FSharp.Core;
 using storage.shared;
@@ -10,6 +11,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new();
     private static readonly Dictionary<UserId, List<AccountBalancesSnapshot>> _snapshots = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
+    private static readonly Dictionary<UserId, List<Order>> _orders = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -80,21 +82,20 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
 
-
-    public Task SaveViewModel<T>(T user, UserId userId)
+    public Task<IEnumerable<Order>> GetAccountBrokerageOrders(UserId userId)
     {
-        if (user == null)
+        _orders.TryGetValue(userId, out var orders);
+        return Task.FromResult<IEnumerable<Order>>(orders ?? new List<Order>());
+    }
+    
+    public Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<Order> order)
+    {
+        if (_orders.ContainsKey(userId) == false)
         {
-            throw new ArgumentNullException(nameof(user));
+            _orders[userId] = [];
         }
         
-        _viewModels[userId] = user;
+        _orders[userId].AddRange(order);
         return Task.CompletedTask;
-    }
-
-    public Task<T?> ViewModel<T>(UserId userId)
-    {
-        _viewModels.TryGetValue(userId, out object? vm);
-        return Task.FromResult((T?)vm);
     }
 }

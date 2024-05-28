@@ -61,7 +61,7 @@ type OrderLeg = {
     instrument: Instrument
     instruction: string
     positionEffect: string
-    quantity: float
+    quantity: decimal
 }
 
 type ExecutionLeg = {
@@ -82,7 +82,7 @@ type OrderStrategy = {
     session: string
     duration: string
     orderType: string
-    cancelTime: string
+    cancelTime: string option
     quantity: float
     filledQuantity: float
     remainingQuantity: float
@@ -729,13 +729,15 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             |> Array.map(fun (o, l) ->
                                     let order = {
                                         Price = o.ResolvePrice()
-                                        Quantity = int l.quantity
+                                        Quantity = l.quantity
                                         Status = o.status |> parseOrderStatus
                                         Type = o.orderType |> parseOrderType
                                         Instruction = l.instruction |> parseOrderInstruction
                                         Ticker = Ticker l.instrument.symbol
                                         AssetType = l.instrument.assetType |> parseAssetType
                                         ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
+                                        EnteredTime = o.enteredTime |> DateTimeOffset.Parse
+                                        ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
                                         OrderId = o.orderId.ToString()
                                         CanBeCancelled = o.cancelable
                                     }

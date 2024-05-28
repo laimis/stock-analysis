@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using core.Account;
 using core.fs.Adapters.Storage;
 using core.fs.Accounts;
+using core.fs.Adapters.Brokerage;
+using core.Shared;
 using Microsoft.FSharp.Core;
 using storage.postgres;
 using Xunit;
@@ -112,6 +114,51 @@ namespace storagetests
             
             // saving the same snapshot should not blow up but just do update
             await storage.SaveAccountBalancesSnapshot(userId, balances);
+        }
+
+        [Fact]
+        public async Task AccountOrdersWork()
+        {
+            var storage = GetStorage();
+            
+            var userId = UserId.NewUserId(Guid.NewGuid());
+
+            var order = new Order
+            {
+                Instruction = OrderInstruction.Sell,
+                Price = 10m,
+                Quantity = 1,
+                Status = OrderStatus.Working,
+                Ticker = new Ticker("AAPL"),
+                Type = OrderType.Limit,
+                AssetType = AssetType.Equity,
+                EnteredTime = DateTimeOffset.UtcNow,
+                ExpirationTime = DateTimeOffset.UtcNow,
+                ExecutionTime = FSharpOption<DateTimeOffset>.None,
+                OrderId = "123",
+                CanBeCancelled = true
+            };
+            
+            await storage.SaveAccountBrokerageOrders(userId, new [] { order });
+            
+            var fromDb = await storage.GetAccountBrokerageOrders(userId);
+            
+            Assert.Single(fromDb);
+            
+            var fromDbOrder = fromDb.First();
+            
+            Assert.Equal(order.Instruction, fromDbOrder.Instruction);
+            Assert.Equal(order.Price, fromDbOrder.Price);
+            Assert.Equal(order.Quantity, fromDbOrder.Quantity);
+            Assert.Equal(order.Status, fromDbOrder.Status);
+            Assert.Equal(order.Ticker.Value, fromDbOrder.Ticker.Value);
+            Assert.Equal(order.Type, fromDbOrder.Type);
+            Assert.Equal(order.AssetType, fromDbOrder.AssetType);
+            Assert.Equal(order.EnteredTime, fromDbOrder.EnteredTime, TimeSpan.FromSeconds(1));
+            Assert.Equal(order.ExpirationTime.Value, fromDbOrder.ExpirationTime.Value, TimeSpan.FromSeconds(1));
+            Assert.Equal(order.ExecutionTime, fromDbOrder.ExecutionTime);
+            Assert.Equal(order.OrderId, fromDbOrder.OrderId);
+            Assert.Equal(order.CanBeCancelled, fromDbOrder.CanBeCancelled);
         }
     }
 }

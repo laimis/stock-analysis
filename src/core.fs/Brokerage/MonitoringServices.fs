@@ -47,6 +47,10 @@ type AccountMonitoringService(
                     let marketNow = marketHours.ToMarketTime DateTime.UtcNow |> _.ToString("yyyy-MM-dd")
                     let snapshot = AccountBalancesSnapshot(cash.Value, equity.Value, longValue.Value, shortValue.Value, marketNow)
                     do! snapshot |> accounts.SaveAccountBalancesSnapshot (user.State.Id |> UserId) |> Async.AwaitTask
+                    
+                    // save orders
+                    do! account.Orders |> accounts.SaveAccountBrokerageOrders (user.State.Id |> UserId) |> Async.AwaitTask
+                    
                     logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
                     
             })

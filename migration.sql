@@ -107,3 +107,22 @@ CREATE TABLE accountbalancessnapshots (
     PRIMARY KEY (userid,date) 
 );
 ALTER TABLE accountbalancessnapshots OWNER TO stocks;
+
+CREATE TABLE accountbrokerageorders (
+    orderid text NOT NULL,
+    price decimal NOT NULL,
+    quantity decimal NOT NULL,
+    status text NOT NULL,
+    ticker text NOT NULL,
+    ordertype text NOT NULL,
+    instruction text NOT NULL,
+    assettype text NOT NULL,
+    executiontime text NULL,
+    enteredtime text NOT NULL,
+    expirationtime text NULL,
+    canbecancelled boolean,
+    userid uuid NOT NULL,
+    modified timestamptz NOT NULL,
+    PRIMARY KEY (userid,orderid) 
+);
+ALTER TABLE accountbrokerageorders OWNER TO stocks;

@@ -90,23 +90,17 @@ type OrderType =
 type Order = {
     OrderId : string
     Price : decimal
-    Quantity : int
+    Quantity : decimal
     Status : OrderStatus
     Ticker : Ticker
     Type : OrderType
     Instruction : OrderInstruction
     AssetType : AssetType
     ExecutionTime : DateTimeOffset option
+    EnteredTime: DateTimeOffset
+    ExpirationTime: DateTimeOffset option
     CanBeCancelled : bool
     } with
-    member this.StatusOrder : int =
-        match this.Status with
-        | Working -> 0
-        | PendingActivation -> 0
-        | Rejected -> 1
-        | Filled -> 2
-        | Expired -> 3
-        | Canceled -> 4
         
     member this.IsActive : bool =
         match this.Status with

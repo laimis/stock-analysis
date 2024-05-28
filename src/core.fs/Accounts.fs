@@ -25,6 +25,17 @@ type AccountBalancesSnapshot(cash:decimal,equity:decimal,longValue:decimal,short
     member _.ShortValue = shortValue
     member _.Date = date
     
+type AccountBrokerageOrder(orderId:Guid, userId:Guid, timestamp:DateTimeOffset, symbol:string, quantity:int, price:decimal, side:string, orderType:string, status:string) =
+    member _.OrderId = orderId
+    member _.UserId = userId
+    member _.Timestamp = timestamp
+    member _.Symbol = symbol
+    member _.Quantity = quantity
+    member _.Price = price
+    member _.Side = side
+    member _.OrderType = orderType
+    member _.Status = status
+    
 type ProcessIdToUserAssociation(Id:Guid, UserIdent:UserId, Timestamp:DateTimeOffset) =
     
     new(userId, timestamp:DateTimeOffset) = ProcessIdToUserAssociation(Guid.NewGuid(), userId, timestamp)
