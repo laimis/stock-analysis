@@ -158,7 +158,7 @@ let ``Set stop sets first stop`` () =
         |> StockPosition.setStop (Some 29m) (DateTimeOffset.Parse("2020-01-25"))
         |> StockPositionWithCalculations
         
-    position.FirstStop.Value |> should equal 28m
+    position.FirstStop().Value |> should equal 28m
     
 [<Fact>]
 let ``Profit calculations are accurate``() =

@@ -9,7 +9,6 @@ open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
-open core.fs.Portfolio
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
@@ -47,14 +46,6 @@ type DailyTickerReportQuery =
         Ticker: Ticker
     }
     
-type DailyPositionReportView =
-    {
-        DailyProfit: ChartDataPointContainer<decimal>
-        DailyGainPct: ChartDataPointContainer<decimal>
-        DailyObv: ChartDataPointContainer<decimal>
-        DailyClose: ChartDataPointContainer<decimal>
-        Ticker: Ticker
-    }
     
 type GapReportQuery =
     {
@@ -245,7 +236,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | profit when profit > 10m -> 1
         | _ -> 0
         
-    let dailyBreakdownReport userState ticker start end' shares costBasis stopPrice = task {
+    let dailyBreakdownReport userState ticker start end' position = task {
             
         let! pricesResponse =
             brokerage.GetPriceHistory
@@ -256,15 +247,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 end'
                 
         return pricesResponse |> Result.map (fun prices ->
-            let close, profit, pct, obv = PositionAnalysis.dailyPLAndGain prices shares costBasis stopPrice
-            
-            {
-                DailyProfit = profit
-                DailyGainPct = pct
-                DailyObv = obv
-                DailyClose = close
-                Ticker = ticker
-            }
+            PositionAnalysis.dailyPLAndGain prices position
         )
     }
     
@@ -312,10 +295,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | Some closed -> closed |> marketHours.GetMarketEndOfDayTimeInUtc |> Some
                     | None -> None
                 
-                let shares = position.NumberOfShares
-                let costBasis = position.AverageCostPerShare
-                
-                return! dailyBreakdownReport user.State position.Ticker start ``end`` shares costBasis (position.FirstStop())                   
+                return! dailyBreakdownReport user.State position.Ticker start ``end`` (position |> Some)                   
     }
     
     member _.Handle (query:DailyTickerReportQuery) = task {
@@ -326,7 +306,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         let! user = accounts.GetUser query.UserId
         let ticker = query.Ticker
                 
-        return! dailyBreakdownReport user.Value.State ticker start end' 0m 0m None
+        return! dailyBreakdownReport user.Value.State ticker start end' None
     }
     
     member _.Handle (query:GapReportQuery) = task {

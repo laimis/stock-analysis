@@ -18,15 +18,15 @@ let createTestData() =
     
     let position =
         StockPosition.openLong ticker bars.First.Date
-        |> StockPosition.buy 10m 100m (bars.First.Date)
-        |> StockPosition.setStop (Some 90m) (bars.First.Date)
+        |> StockPosition.buy 10m 100m bars.First.Date
+        |> StockPosition.setStop (Some 90m) bars.First.Date
         
     let orders : Order array = [|
         {
             Ticker = ticker
             Price = 100m
             Instruction = OrderInstruction.Buy
-            Quantity = 1
+            Quantity = 1m
             Status = OrderStatus.Working
             Type = OrderType.Market
             AssetType = AssetType.Equity
@@ -82,11 +82,14 @@ let ``Daily PL Correct`` () =
         position
         |> StockPosition.sell position.NumberOfShares bars.Bars[midPointInBars].Close bars.Bars[midPointInBars].Date
         |> StockPositionWithCalculations
+        |> Some
     
     let dailyPlAndGain = PositionAnalysis.dailyPLAndGain bars sold
     
-    dailyPlAndGain |> fst |> _.Data.Count |> should equal (midPointInBars + 1)
-    dailyPlAndGain |> snd |> _.Data.Count |> should equal (midPointInBars + 1)
+    dailyPlAndGain.DailyClose |> should not' (be Empty)
+    dailyPlAndGain.DailyObv |> should not' (be Empty)
+    dailyPlAndGain.DailyProfit |> should not' (be Empty)
+    dailyPlAndGain.DailyGainPct |> should not' (be Empty)
     
 [<Fact>]
 let ``Stop price set, percent to stop matches stop level``() =

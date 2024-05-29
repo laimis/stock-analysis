@@ -293,10 +293,18 @@ module PositionAnalysis =
             )
         ]
 
-    let dailyPLAndGain (bars:PriceBars) numberOfShares costBasis firstStop =
+    let dailyPLAndGain (bars:PriceBars) (optionalPosition:StockPositionWithCalculations option) =
         
         let firstBar = 0
         let lastBar = bars.Bars.Length - 1
+        
+        let numberOfShares, costBasis, firstStop =
+            match optionalPosition with
+            | Some position ->
+                let numberOfSharesMultiplier = if position.IsShort then -1.0m else 1.0m
+                position.NumberOfShares * numberOfSharesMultiplier, position.AverageCostPerShare, position.FirstStop()
+            | None -> 1m, bars.Bars[0].Close, None
+        
         
         let zeroLine = ChartAnnotationLine(0.0m, ChartAnnotationLineType.Horizontal) |> Some
         let stopLine =
@@ -304,16 +312,6 @@ module PositionAnalysis =
             | None -> None
             | Some stopPrice -> ChartAnnotationLine(stopPrice, ChartAnnotationLineType.Horizontal) |> Some
             
-        let costBasis =
-            match costBasis with
-            | 0m -> bars.Bars[firstBar].Close
-            | _ -> costBasis
-            
-        let numberOfShares =
-            match numberOfShares with
-            | 0m -> 1.0m
-            | _ -> numberOfShares
-        
         let close = ChartDataPointContainer<decimal>("Close", DataPointChartType.Line, stopLine)
         let profit = ChartDataPointContainer<decimal>("Profit", DataPointChartType.Line, zeroLine)
         let gainPct = ChartDataPointContainer<decimal>("Gain %", DataPointChartType.Line, zeroLine)
@@ -341,4 +339,9 @@ module PositionAnalysis =
             gainPct.Add(bar.Date, currentGainPct)
             obv.Add(bar.Date, obvValue)
         
-        (close, profit, gainPct, obv)
+        {
+            DailyProfit = profit
+            DailyGainPct = gainPct
+            DailyObv = obv
+            DailyClose = close
+        }

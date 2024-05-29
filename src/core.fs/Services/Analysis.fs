@@ -56,6 +56,14 @@ type AnalysisOutcomeEvaluation(name:string,``type``:OutcomeType,sortColumn:strin
     member val SortColumn = sortColumn
     member val MatchingTickers = matchingTickers
 
+type DailyPositionBreakdown =
+    {
+        DailyProfit: ChartDataPointContainer<decimal>
+        DailyGainPct: ChartDataPointContainer<decimal>
+        DailyObv: ChartDataPointContainer<decimal>
+        DailyClose: ChartDataPointContainer<decimal>
+    }
+
 type Pattern = 
     {
         date: System.DateTimeOffset
