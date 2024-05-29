@@ -86,10 +86,10 @@ let ``Daily PL Correct`` () =
     
     let dailyPlAndGain = PositionAnalysis.dailyPLAndGain bars sold
     
-    dailyPlAndGain.DailyClose |> should not' (be Empty)
-    dailyPlAndGain.DailyObv |> should not' (be Empty)
-    dailyPlAndGain.DailyProfit |> should not' (be Empty)
-    dailyPlAndGain.DailyGainPct |> should not' (be Empty)
+    dailyPlAndGain.DailyClose.Data |> should not' (be Empty)
+    dailyPlAndGain.DailyObv.Data |> should not' (be Empty)
+    dailyPlAndGain.DailyProfit.Data |> should not' (be Empty)
+    dailyPlAndGain.DailyGainPct.Data |> should not' (be Empty)
     
 [<Fact>]
 let ``Stop price set, percent to stop matches stop level``() =
