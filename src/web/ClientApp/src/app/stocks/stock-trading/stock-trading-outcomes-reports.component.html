@@ -100,6 +100,7 @@
     }
 
     @for (gap of gaps; track gap) {
+        <h5>Gaps for {{ gap.ticker }}</h5>
         <app-gaps [gaps]="gap"></app-gaps>
     }
 </div>

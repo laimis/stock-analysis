@@ -3,7 +3,7 @@ import {Title} from '@angular/platform-browser';
 import {
     BrokerageOrder,
     ChartMarker,
-    DailyPositionReport,
+    DailyPositionReport, DataPointContainer,
     PositionChartInformation,
     PositionInstance,
     PriceFrequency,
@@ -13,6 +13,8 @@ import {
 } from 'src/app/services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {catchError, tap} from "rxjs/operators";
+import {concat} from "rxjs";
 
 
 @Component({
@@ -28,6 +30,7 @@ export class StockTradingReviewComponent {
     scoresErrors: string[];
     pricesErrors: string[]
     dailyPositionReport: DailyPositionReport
+    dailyBreakdownsToRender: DataPointContainer[]
     positionChartInformation: PositionChartInformation;
     @Input()
     quotes: object
@@ -69,9 +72,9 @@ export class StockTradingReviewComponent {
         this.assignedNote = this.currentPosition.gradeNote
         this.simulationResults = null
         this.dailyPositionReport = null
-        this.runTradingStrategies(this.currentPosition);
         this.positionChartInformation = null
         this.setTitle();
+        this.loadPositionData(this.currentPosition);
     }
 
     getPrice(position: PositionInstance) {
@@ -140,59 +143,53 @@ export class StockTradingReviewComponent {
     private setTitle() {
         this.title.setTitle(`Trading Review - ${this.currentPosition.ticker} - Nightingale Trading`)
     }
-
-    private getPositionReport(position: PositionInstance) {
-        this.stockService.reportDailyPositionReport(
-            position.ticker,
-            position.positionId).subscribe(
-            (r: DailyPositionReport) => {
-                this.scoresErrors = null
-                this.dailyPositionReport = r;
-                this.getPrices(position);
-            },
-            (error) => {
-                this.dailyPositionReport = null
-                this.scoresErrors = GetErrors(error)
-                this.getPrices(position);
-            }
-        );
-    }
-
-    private runTradingStrategies(position: PositionInstance) {
-        this.stockPositionsService.simulatePosition(position.positionId).subscribe(
-            (r: TradingStrategyResults) => {
-                this.simulationErrors = null
-                this.simulationResults = r;
-                this.getPositionReport(position)
-            },
-            (error) => {
-                this.simulationErrors = GetErrors(error)
-                this.getPositionReport(position)
-            }
-        );
-    }
-
-    private getPrices(position: PositionInstance) {
-        this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily).subscribe(
-            (r: Prices) => {
-
-                let markers: ChartMarker[] = []
-
-                this.pricesErrors = null
-                this.positionChartInformation = {
-                    averageBuyPrice: position.averageCostPerShare,
-                    stopPrice: position.stopPrice,
-                    markers: markers,
-                    prices: r,
-                    ticker: position.ticker,
-                    transactions: position.transactions
-                }
-            },
-            (error) => {
-                this.positionChartInformation = null
-                this.pricesErrors = GetErrors(error)
-            }
-        );
+    
+    private loadPositionData(position: PositionInstance) {
+        const simulationPromise = this.stockPositionsService.simulatePosition(position.positionId)
+            .pipe(
+                tap(r => {
+                    this.simulationErrors = null
+                    this.simulationResults = r
+                }),
+                catchError(e => {
+                    this.simulationErrors = GetErrors(e)
+                    return []
+                })
+            )
+        
+        const reportPromise = this.stockService.reportDailyPositionReport(position.ticker, position.positionId)
+            .pipe(
+                tap(r => {
+                    this.scoresErrors = null
+                    this.dailyPositionReport = r
+                    this.dailyBreakdownsToRender = position.isOpen ? [r.dailyClose, r.dailyObv] : [r.dailyClose, r.dailyObv, r.dailyGainPct, r.dailyProfit]
+                }),
+                catchError(e => {
+                    this.scoresErrors = GetErrors(e)
+                    return []
+                })
+            )
+        
+        const pricesPromise = this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily)
+            .pipe(
+                tap(r => {
+                    this.pricesErrors = null
+                    this.positionChartInformation = {
+                        averageBuyPrice: position.averageCostPerShare,
+                        stopPrice: position.stopPrice,
+                        markers: [],
+                        prices: r,
+                        ticker: position.ticker,
+                        transactions: position.transactions
+                    }
+                }),
+                catchError(e => {
+                    this.pricesErrors = GetErrors(e)
+                    return []
+                })
+            )
+        
+        concat(simulationPromise, reportPromise, pricesPromise).subscribe()
     }
 
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;

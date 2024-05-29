@@ -99,7 +99,7 @@
         </div>
     </section>
     }
-    <section *ngIf="currentPosition && currentPosition.isClosed">
+    <section *ngIf="currentPosition">
         <h5>Daily Gain Breakdown</h5>
         @if (scoresErrors) {
             <app-error-display [errors]="scoresErrors"></app-error-display>
@@ -108,7 +108,7 @@
             <app-loading></app-loading>
         }
         @if (dailyPositionReport) {
-            @for(dailyBreakdown of [dailyPositionReport.dailyClose, dailyPositionReport.dailyObv, dailyPositionReport.dailyGainPct, dailyPositionReport.dailyProfit]; track dailyBreakdown) {
+            @for(dailyBreakdown of dailyBreakdownsToRender; track dailyBreakdown) {
                 <app-daily-outcome-scores [dailyScores]="dailyBreakdown"></app-daily-outcome-scores>
             }    
         }

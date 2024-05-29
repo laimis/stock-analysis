@@ -36,11 +36,6 @@
                           (click)="toggleVisibility(stopPriceReadonlyDiv); toggleVisibility(stopPriceEditDiv)"></span>
                 </div>
                 <div>{{ candidateStopPrice | currency }}</div>
-                @if (!_position.isClosed) {
-                    <div>
-                        <span class="text-muted"> {{ _position.percentToStopFromCost | percent:'1.2-2' }} from avg cost</span>
-                    </div>
-                }
             </div>
             <div class="col-md-3 visually-hidden" #stopPriceEditDiv>
                 <label class="form-label stat-label" for="candidateStopPrice">Stop Price</label>
