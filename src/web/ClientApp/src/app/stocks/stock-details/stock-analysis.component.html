@@ -3,7 +3,12 @@
         <h5>Chart</h5>
         <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
     </section>
-    <section>
+    <section *ngIf="dailyBreakdowns">
+        @for(b of dailyBreakdowns; track b) {
+            <app-daily-outcome-scores [dailyScores]="b"></app-daily-outcome-scores>
+        }
+    </section>
+    <section *ngIf="gaps">
         <h5>{{ gaps.ticker }} Gaps</h5>
         <app-gaps [gaps]="gaps"></app-gaps>
     </section>
@@ -12,11 +17,9 @@
         <app-percent-change-distribution [percentChangeDistribution]="percentChangeDistribution">
         </app-percent-change-distribution>
     </section>
-    <section>
+    <section *ngIf="chartInfo">
         <h5>ATR Chart</h5>
-        @if (chartInfo) {
-            <app-line-chart [dataContainer]="chartInfo.prices.atr"></app-line-chart>
-        }
+        <app-line-chart [dataContainer]="chartInfo.prices.atr"></app-line-chart>
     </section>
     <section>
         <h5>Single bar outcomes</h5>

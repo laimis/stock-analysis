@@ -1,6 +1,7 @@
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
+    DailyPositionReport, DataPointContainer,
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
@@ -11,6 +12,8 @@ import {
     StocksService,
     TickerOutcomes
 } from 'src/app/services/stocks.service';
+import {catchError, tap} from "rxjs/operators";
+import {concat} from "rxjs";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -24,6 +27,8 @@ export class StockAnalysisComponent {
     dailyOutcomesReport: OutcomesReport;
     dailyOutcomes: TickerOutcomes;
 
+    dailyBreakdowns: DataPointContainer[];
+    
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
@@ -48,7 +53,7 @@ export class StockAnalysisComponent {
             averageBuyPrice: null,
             stopPrice: null
         }
-        this.getOutcomesReportAllBars();
+        this.loadData(this.ticker)
     }
 
     getValue(o: StockAnalysisOutcome) {
@@ -68,31 +73,54 @@ export class StockAnalysisComponent {
     negativeCount(outcomes: TickerOutcomes) {
         return outcomes.outcomes.filter(r => r.outcomeType === 'Negative').length;
     }
-
-    private getOutcomesReportAllBars() {
-        this.stockService.reportOutcomesAllBars([this.ticker]).subscribe(report => {
-            this.gaps = report.gaps[0];
-            this.multipleBarOutcomes = report.outcomes[0]
-
-            this.getOutcomesReportSingleBarDaily();
-        });
+    
+    private loadData(ticker:string) {
+        const dailyReport = this.stockService.reportDailyTickerReport(ticker)
+            .pipe(
+                tap(report => {
+                    this.dailyBreakdowns = [report.dailyClose, report.dailyObv]
+                    }),
+                catchError(err => {
+                    console.error(err);
+                    return [];
+                })
+            );
+        
+        const multipleBarOutcomesPromise = this.stockService.reportOutcomesAllBars([ticker])
+            .pipe(
+                tap(report => {
+                    this.multipleBarOutcomes = report.outcomes[0];
+                    this.gaps = report.gaps[0]
+                    }),
+                catchError(err => {
+                    console.error(err);
+                    return [];
+                })
+            )
+        
+        const dailyOutcomesPromise = this.stockService.reportOutcomesSingleBarDaily([ticker])
+            .pipe(
+                tap(report => {
+                    this.dailyOutcomes = report.outcomes[0];
+                    this.dailyOutcomesReport = report;
+                    }),
+                catchError(err => {
+                    console.error(err);
+                    return [];
+                })
+            )
+        
+        const percentDistribution = this.stockService.reportTickerPercentChangeDistribution(ticker)
+            .pipe(
+                tap(data => {
+                    this.percentChangeDistribution = data;
+                    }),
+                catchError(err => {
+                    console.error(err);
+                    return [];
+                })
+            )
+        
+        concat(dailyReport, multipleBarOutcomesPromise, dailyOutcomesPromise, percentDistribution).subscribe();
     }
-
-    private getOutcomesReportSingleBarDaily() {
-
-        this.stockService.reportOutcomesSingleBarDaily([this.ticker]).subscribe(report => {
-            this.dailyOutcomes = report.outcomes[0];
-            this.dailyOutcomesReport = report;
-            this.percentDistribution();
-        });
-    }
-
-    private percentDistribution() {
-        this.stockService.reportTickerPercentChangeDistribution(this.ticker).subscribe(
-            data => {
-                this.percentChangeDistribution = data;
-            }
-        );
-    }
-
 }

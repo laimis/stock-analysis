@@ -379,11 +379,13 @@ export class StocksService {
         return this.http.get<OutcomesReport>('/api/reports/positions')
     }
 
-    reportDailyPositionReport(
-        ticker: string,
-        positionId: string
-    ) {
-        var endpoint = '/api/reports/dailypositionreport/' + ticker + '/' + positionId
+    reportDailyPositionReport(positionId: string) {
+        var endpoint = '/api/reports/dailypositionreport/' + positionId
+        return this.http.get<DailyPositionReport>(endpoint)
+    }
+    
+    reportDailyTickerReport(ticker: string) {
+        var endpoint = '/api/reports/dailytickerreport/' + ticker
         return this.http.get<DailyPositionReport>(endpoint)
     }
 

@@ -293,27 +293,26 @@ module PositionAnalysis =
             )
         ]
 
-    let dailyPLAndGain (bars:PriceBars) (position:StockPositionWithCalculations) =
+    let dailyPLAndGain (bars:PriceBars) numberOfShares costBasis firstStop =
         
-        let firstBar = 
-            bars.Bars
-            |> Array.findIndex (fun b -> b.Date.Date >= position.Opened.Date)
-        
-        let lastBar = 
-            match position.Closed with
-            | Some closed ->
-                bars.Bars
-                |> Array.findIndexBack (fun b -> b.Date.Date <= closed.Date)
-            | None -> bars.Length - 1
-        
-        let shares = position.CompletedPositionShares * (match position.IsShort with | true -> -1.0m | false -> 1.0m)
-        let costBasis = position.AverageBuyCostPerShare
+        let firstBar = 0
+        let lastBar = bars.Bars.Length - 1
         
         let zeroLine = ChartAnnotationLine(0.0m, ChartAnnotationLineType.Horizontal) |> Some
         let stopLine =
-            match position.FirstStop() with
+            match firstStop with
             | None -> None
             | Some stopPrice -> ChartAnnotationLine(stopPrice, ChartAnnotationLineType.Horizontal) |> Some
+            
+        let costBasis =
+            match costBasis with
+            | 0m -> bars.Bars[firstBar].Close
+            | _ -> costBasis
+            
+        let numberOfShares =
+            match numberOfShares with
+            | 0m -> 1.0m
+            | _ -> numberOfShares
         
         let close = ChartDataPointContainer<decimal>("Close", DataPointChartType.Line, stopLine)
         let profit = ChartDataPointContainer<decimal>("Profit", DataPointChartType.Line, zeroLine)
@@ -325,7 +324,7 @@ module PositionAnalysis =
             
             let currentClose = bar.Close
             let currentGainPct = (currentClose - costBasis) / costBasis * 100.0m
-            let currentProfit = shares * (currentClose - costBasis)
+            let currentProfit = numberOfShares * (currentClose - costBasis)
             
             let obvValue =
                 match obv.Data.Count with

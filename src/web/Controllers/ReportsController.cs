@@ -64,15 +64,25 @@ namespace web.Controllers
                 )
             );
 
-        [HttpGet("DailyPositionReport/{ticker}/{positionId}")]
-        public Task<ActionResult> DailyPositionReport(string ticker, string positionId) =>
+        [HttpGet("DailyPositionReport/{positionId}")]
+        public Task<ActionResult> DailyPositionReport(string positionId) =>
             this.OkOrError(
                 service.Handle(
                     new DailyPositionReportQuery(
                         User.Identifier(),
-                        new Ticker(ticker),
                         StockPositionId.NewStockPositionId(Guid.Parse(positionId)
                         )
+                    )
+                )
+            );
+        
+        [HttpGet("DailyTickerReport/{ticker}")]
+        public Task<ActionResult> DailyTickerReport(string ticker) =>
+            this.OkOrError(
+                service.Handle(
+                    new DailyTickerReportQuery(
+                        User.Identifier(),
+                        new Ticker(ticker)
                     )
                 )
             );

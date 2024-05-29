@@ -35,17 +35,16 @@ type ChainView =
         links: ChainLinkView seq
     }
     
-type DailyOutcomeScoreReportView =
-    {
-        Ticker: Ticker
-        DailyScores: ChartDataPointContainer<int>
-    }
-    
 type DailyPositionReportQuery =
     {
         UserId: UserId
-        Ticker: Ticker
         PositionId: StockPositionId
+    }
+    
+type DailyTickerReportQuery =
+    {
+        UserId: UserId
+        Ticker: Ticker
     }
     
 type DailyPositionReportView =
@@ -54,7 +53,7 @@ type DailyPositionReportView =
         DailyGainPct: ChartDataPointContainer<decimal>
         DailyObv: ChartDataPointContainer<decimal>
         DailyClose: ChartDataPointContainer<decimal>
-        Ticker: string
+        Ticker: Ticker
     }
     
 type GapReportQuery =
@@ -246,6 +245,29 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         | profit when profit > 10m -> 1
         | _ -> 0
         
+    let dailyBreakdownReport userState ticker start end' shares costBasis stopPrice = task {
+            
+        let! pricesResponse =
+            brokerage.GetPriceHistory
+                userState
+                ticker
+                PriceFrequency.Daily
+                start
+                end'
+                
+        return pricesResponse |> Result.map (fun prices ->
+            let close, profit, pct, obv = PositionAnalysis.dailyPLAndGain prices shares costBasis stopPrice
+            
+            {
+                DailyProfit = profit
+                DailyGainPct = pct
+                DailyObv = obv
+                DailyClose = close
+                Ticker = ticker
+            }
+        )
+    }
+    
     interface IApplicationService
     
     member _.Handle(request:ChainQuery) = task {
@@ -289,28 +311,22 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     match position.Closed with
                     | Some closed -> closed |> marketHours.GetMarketEndOfDayTimeInUtc |> Some
                     | None -> None
-                    
-                System.Console.WriteLine($"Start: {start}, End: {``end``}")
                 
-                let! pricesResponse =
-                    brokerage.GetPriceHistory
-                        user.State
-                        request.Ticker
-                        PriceFrequency.Daily
-                        start
-                        ``end``
-                        
-                return pricesResponse |> Result.map (fun prices ->
-                    let close, profit, pct, obv = PositionAnalysis.dailyPLAndGain prices position
-                    
-                    {
-                        DailyProfit = profit
-                        DailyGainPct = pct
-                        DailyObv = obv
-                        DailyClose = close
-                        Ticker = request.Ticker.Value
-                    }
-                )                   
+                let shares = position.NumberOfShares
+                let costBasis = position.AverageCostPerShare
+                
+                return! dailyBreakdownReport user.State position.Ticker start ``end`` shares costBasis (position.FirstStop())                   
+    }
+    
+    member _.Handle (query:DailyTickerReportQuery) = task {
+        
+        let start = DateTimeOffset.UtcNow.AddDays(-30) |> Some
+        let end' = DateTimeOffset.UtcNow |> Some
+        
+        let! user = accounts.GetUser query.UserId
+        let ticker = query.Ticker
+                
+        return! dailyBreakdownReport user.Value.State ticker start end' 0m 0m None
     }
     
     member _.Handle (query:GapReportQuery) = task {

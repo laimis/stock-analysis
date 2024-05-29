@@ -157,7 +157,7 @@ export class StockTradingReviewComponent {
                 })
             )
         
-        const reportPromise = this.stockService.reportDailyPositionReport(position.ticker, position.positionId)
+        const reportPromise = this.stockService.reportDailyPositionReport(position.positionId)
             .pipe(
                 tap(r => {
                     this.scoresErrors = null
