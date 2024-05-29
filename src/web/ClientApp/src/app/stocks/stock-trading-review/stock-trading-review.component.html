@@ -101,32 +101,17 @@
     }
     <section *ngIf="currentPosition && currentPosition.isClosed">
         <h5>Daily Gain Breakdown</h5>
-        <div class="row">
-            <div class="col">
-                @if (scoresErrors) {
-                    <app-error-display [errors]="scoresErrors"></app-error-display>
-                }
-                @if (!dailyPositionReport && !scoresErrors) {
-                    <app-loading></app-loading>
-                }
-                @if (dailyPositionReport) {
-                    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyGainPct">
-                    </app-daily-outcome-scores>
-                }
-            </div>
-            <div class="col">
-                @if (scoresErrors) {
-                    <app-error-display [errors]="scoresErrors"></app-error-display>
-                }
-                @if (!dailyPositionReport && !scoresErrors) {
-                    <app-loading></app-loading>
-                }
-                @if (dailyPositionReport) {
-                    <app-daily-outcome-scores [dailyScores]="dailyPositionReport.dailyProfit">
-                    </app-daily-outcome-scores>
-                }
-            </div>
-        </div>
+        @if (scoresErrors) {
+            <app-error-display [errors]="scoresErrors"></app-error-display>
+        }
+        @if (!dailyPositionReport && !scoresErrors) {
+            <app-loading></app-loading>
+        }
+        @if (dailyPositionReport) {
+            @for(dailyBreakdown of [dailyPositionReport.dailyClose, dailyPositionReport.dailyObv, dailyPositionReport.dailyGainPct, dailyPositionReport.dailyProfit]; track dailyBreakdown) {
+                <app-daily-outcome-scores [dailyScores]="dailyBreakdown"></app-daily-outcome-scores>
+            }    
+        }
 
     </section>
 

@@ -297,29 +297,49 @@ module PositionAnalysis =
         
         let firstBar = 
             bars.Bars
-            |> Array.findIndex (fun b -> b.Date >= position.Opened)
+            |> Array.findIndex (fun b -> b.Date.Date >= position.Opened.Date)
         
         let lastBar = 
             match position.Closed with
             | Some closed ->
                 bars.Bars
-                |> Array.findIndexBack (fun b -> b.Date <= closed)
+                |> Array.findIndexBack (fun b -> b.Date.Date <= closed.Date)
             | None -> bars.Length - 1
         
         let shares = position.CompletedPositionShares * (match position.IsShort with | true -> -1.0m | false -> 1.0m)
         let costBasis = position.AverageBuyCostPerShare
         
-        let profit = ChartDataPointContainer<decimal>("Profit", DataPointChartType.Line)
-        let gainPct = ChartDataPointContainer<decimal>("Gain %", DataPointChartType.Line)
+        let zeroLine = ChartAnnotationLine(0.0m, ChartAnnotationLineType.Horizontal) |> Some
+        let stopLine =
+            match position.FirstStop() with
+            | None -> None
+            | Some stopPrice -> ChartAnnotationLine(stopPrice, ChartAnnotationLineType.Horizontal) |> Some
+        
+        let close = ChartDataPointContainer<decimal>("Close", DataPointChartType.Line, stopLine)
+        let profit = ChartDataPointContainer<decimal>("Profit", DataPointChartType.Line, zeroLine)
+        let gainPct = ChartDataPointContainer<decimal>("Gain %", DataPointChartType.Line, zeroLine)
+        let obv = ChartDataPointContainer<decimal>("OBV", DataPointChartType.Line, zeroLine)
         
         for i in firstBar..lastBar do
             let bar = bars.Bars[i]
             
-            let currentPrice = bar.Close
-            let currentGainPct = (currentPrice - costBasis) / costBasis * 100.0m
-            let currentProfit = shares * (currentPrice - costBasis)
+            let currentClose = bar.Close
+            let currentGainPct = (currentClose - costBasis) / costBasis * 100.0m
+            let currentProfit = shares * (currentClose - costBasis)
             
+            let obvValue =
+                match obv.Data.Count with
+                | 0 -> 0.0m
+                | _ ->
+                    let lastObvValue = obv.Data[obv.Data.Count - 1].Value
+                    let prevClose = bars.Bars[i - 1].Close
+                    match currentClose > prevClose with
+                    | true -> lastObvValue + decimal bar.Volume
+                    | false -> lastObvValue - decimal bar.Volume
+            
+            close.Add(bar.Date, currentClose)
             profit.Add(bar.Date, currentProfit)
             gainPct.Add(bar.Date, currentGainPct)
+            obv.Add(bar.Date, obvValue)
         
-        (profit, gainPct)
+        (close, profit, gainPct, obv)

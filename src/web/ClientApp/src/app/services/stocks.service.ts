@@ -886,6 +886,8 @@ export interface DailyPositionReport {
     ticker: string
     dailyProfit: DataPointContainer
     dailyGainPct: DataPointContainer
+    dailyObv: DataPointContainer
+    dailyClose: DataPointContainer
 }
 
 export interface TickerCountPair {

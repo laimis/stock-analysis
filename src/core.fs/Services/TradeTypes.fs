@@ -58,7 +58,7 @@ module ProfitPoints =
         member this.Prices = prices
         
     let getProfitPointWithStopPrice (level:int) (position:StockPositionWithCalculations)  =
-        let riskPerShare = position.CompletedPositionCostPerShare - position.FirstStop.Value
+        let riskPerShare = position.CompletedPositionCostPerShare - position.FirstStop().Value
         position.CompletedPositionCostPerShare + riskPerShare * decimal(level)
      
     let getProfitPointWithPercentGain (level:int) (percentGain:decimal) (position:StockPositionWithCalculations) =

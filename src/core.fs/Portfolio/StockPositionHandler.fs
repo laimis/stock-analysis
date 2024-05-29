@@ -685,7 +685,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     user,
                     numberOfShares=calculations.CompletedPositionShares,
                     price=calculations.CompletedPositionCostPerShare,
-                    stopPrice=calculations.FirstStop,
+                    stopPrice=calculations.FirstStop(),
                     ticker=position.Ticker,
                     ``when``=position.Opened,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd

@@ -499,7 +499,13 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         match acquisitionSlots with
             | [] -> 0m
             | _ -> acquisitionSlots |> List.average
-        
+            
+            
+    let averageSaleCostPerShare =
+        match liquidationSlots with
+            | [] -> 0m
+            | _ -> liquidationSlots |> List.average
+            
     let averageCostPerShare =
         let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
         let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
@@ -568,10 +574,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     member this.AverageBuyCostPerShare = averageBuyCostPerShare
             
-    member this.AverageSaleCostPerShare =
-        match liquidationSlots with
-            | [] -> 0m
-            | _ -> liquidationSlots |> List.average
+    member this.AverageSaleCostPerShare = averageSaleCostPerShare
         
     member this.GainPct =
         match this.IsShort with
@@ -618,7 +621,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         | Some riskedAmount when riskedAmount = 0m -> 0m
         | Some riskedAmount -> this.Profit / riskedAmount
         
-    member this.FirstStop =
+    member this.FirstStop() =
         let stopSets =
             stockPosition.Transactions
             |> List.map (fun x -> match x with | Stop s -> Some s | _ -> None)

@@ -354,9 +354,9 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
         let calculations = position |> StockPositionWithCalculations
         
         let stopPrice =
-            match calculations.FirstStop with
+            match calculations.FirstStop() with
             | None -> Some (calculations.CompletedPositionCostPerShare * TradingStrategyConstants.DefaultStopPriceMultiplier)
-            | _ -> calculations.FirstStop
+            | _ -> calculations.FirstStop()
             
         let numberOfShares =
             match position.StockPositionType with

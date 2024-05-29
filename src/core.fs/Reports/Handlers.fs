@@ -52,6 +52,8 @@ type DailyPositionReportView =
     {
         DailyProfit: ChartDataPointContainer<decimal>
         DailyGainPct: ChartDataPointContainer<decimal>
+        DailyObv: ChartDataPointContainer<decimal>
+        DailyClose: ChartDataPointContainer<decimal>
         Ticker: string
     }
     
@@ -287,6 +289,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     match position.Closed with
                     | Some closed -> closed |> marketHours.GetMarketEndOfDayTimeInUtc |> Some
                     | None -> None
+                    
+                System.Console.WriteLine($"Start: {start}, End: {``end``}")
                 
                 let! pricesResponse =
                     brokerage.GetPriceHistory
@@ -297,11 +301,13 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                         ``end``
                         
                 return pricesResponse |> Result.map (fun prices ->
-                    let profit, pct = PositionAnalysis.dailyPLAndGain prices position
+                    let close, profit, pct, obv = PositionAnalysis.dailyPLAndGain prices position
                     
                     {
                         DailyProfit = profit
                         DailyGainPct = pct
+                        DailyObv = obv
+                        DailyClose = close
                         Ticker = request.Ticker.Value
                     }
                 )                   

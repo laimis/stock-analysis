@@ -131,21 +131,15 @@ public class BrokerageAccountServiceHost(
 {
     private bool _failed;
 
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now)
-    {
-        if (_failed)
-        {
-            return now.AddMinutes(1);
-        }
-        
-        return service.NextRun(now);
-    }
+    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) =>
+        _failed ? now.AddMinutes(1) : service.NextRun(now);
 
     protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken)
     {
         try
         {
             await service.Execute(logger, stoppingToken);
+            _failed = false;
         }
         catch (Exception e)
         {
