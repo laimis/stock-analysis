@@ -21,6 +21,7 @@ jobs:
               id: get_logs
               run: |
                   logs=$(doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }})
+                  echo "::set-output name=logs::$(echo $logs | jq -aRs .)"
                   
             - name: Check for errors
               if: contains(steps.get_logs.outputs.logs, 'error:')
