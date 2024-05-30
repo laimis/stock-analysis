@@ -73,6 +73,7 @@ let private _patternMonitorTimes = [
     TimeOnly.Parse("14:35")
     TimeOnly.Parse("15:45")
     TimeOnly.Parse("16:15")
+    TimeOnly.Parse("17:00") // to allow more time for data to come in
 ]
 let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
     let easternTime = marketHours.ToMarketTime(referenceTimeUtc)
@@ -102,9 +103,8 @@ let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
 
 type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, portfolio:IPortfolioStorage, marketHours:IMarketHours) =
 
-    // need to decide how I will log these
     let marketStartTime = TimeOnly(9, 30, 0)
-    let marketEndTime = TimeOnly(16, 0, 0)
+    let latestStopLossToRun = TimeOnly(16, 30, 0)
     let checks = List<StopLossCheck>()
 
     let runStopLossCheck (logger:ILogger) (check:StopLossCheck) = async {
@@ -203,7 +203,7 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
             let nextScan =
                 match TimeOnly.FromTimeSpan(nowInEasterTimezone.TimeOfDay) with
                 | t when t < marketStartTime -> marketStartTimeInEastern
-                | t when t > marketEndTime -> marketStartTimeInEastern.AddDays(1)
+                | t when t > latestStopLossToRun -> marketStartTimeInEastern.AddDays(1)
                 | _ -> nowInEasterTimezone.AddMinutes(5)
 
             let adjustedScanTime =
@@ -552,7 +552,7 @@ type AlertEmailService(
     let runTimes =
         [
             TimeOnly.Parse("09:50")
-            TimeOnly.Parse("16:20")
+            TimeOnly.Parse("17:20")
         ]
 
     let processAlerts (user:User) alerts = async {
