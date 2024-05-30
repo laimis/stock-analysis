@@ -1,0 +1,31 @@
+name: App Log Monitoring
+
+on:
+    schedule:
+        - cron: '*/5 * * * *'  # Run every 5 minutes
+
+jobs:
+    monitor_logs:
+        runs-on: ubuntu-latest
+        
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Install doctl
+              uses: digitalocean/action-doctl@v2
+              with:
+                  token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+            - name: Retrieve app logs
+              id: get_logs
+              run: |
+                  logs=$(doctl apps logs ${{ secrets.APP_ID }})
+                  echo "::set-output name=logs::$logs"
+
+            - name: Check for errors
+              if: contains(steps.get_logs.outputs.logs, 'error:')
+              run: |
+                  echo "Errors found in the app logs:"
+                  echo "${{ steps.get_logs.outputs.logs }}"
+                  exit 1
