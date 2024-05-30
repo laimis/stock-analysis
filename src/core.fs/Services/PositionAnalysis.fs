@@ -302,7 +302,7 @@ module PositionAnalysis =
             match optionalPosition with
             | Some position ->
                 let numberOfSharesMultiplier = if position.IsShort then -1.0m else 1.0m
-                position.NumberOfShares * numberOfSharesMultiplier, position.AverageCostPerShare, position.FirstStop()
+                position.CompletedPositionShares * numberOfSharesMultiplier, position.AverageCostPerShare, position.FirstStop()
             | None -> 1m, bars.Bars[0].Close, None
         
         
