@@ -20,7 +20,7 @@ jobs:
             - name: Retrieve app logs
               id: get_logs
               run: |
-                  logs=$(doctl apps logs ${{ secrets.APP_ID }})
+                  logs=$(doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }})
                   echo "::set-output name=logs::$logs"
 
             - name: Check for errors
