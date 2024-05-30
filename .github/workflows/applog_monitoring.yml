@@ -29,3 +29,15 @@ jobs:
                   echo "Errors found in the app logs:"
                   echo "${{ steps.get_logs.outputs.logs }}"
                   exit 1
+                  
+            - name: Disable workflow
+              if: steps.check_errors.outputs.has_errors == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "Disabling the workflow to prevent further notifications."
+                  gh workflow disable "App Log Monitoring"
+
+            - name: Fail the workflow
+              if: steps.check_errors.outputs.has_errors == 'true'
+              run: exit 1
