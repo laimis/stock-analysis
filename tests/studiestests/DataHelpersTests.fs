@@ -6,16 +6,17 @@ open Xunit
 open FsUnit
 open core.fs.Adapters.Stocks
 open studies
+open studies.DataHelpers
 open testutils
 
 let testDataPath = TestDataGenerator.TestDataPath
 let transactionRateErrorMessage = "Individual App's transactions per seconds restriction reached"
     
-let setupGetPricesWithBrokerageMock mock = DataHelpers.getPricesWithBrokerage mock testDataPath
+let setupGetPricesWithBrokerageMock mock = getPricesWithBrokerage mock testDataPath
     
 let setupGetPricesWithNoBrokerageAccess =
     {
-        new DataHelpers.IGetPriceHistory with 
+        new IGetPriceHistory with 
             member this.GetPriceHistory start ``end`` ticker = task {
                 return [||] |> PriceBars |> Ok
             }
@@ -29,7 +30,7 @@ let ``Append csv, appends instead of overwriting`` () = async {
     
     File.WriteAllText(path, "test")
     
-    do! DataHelpers.appendCsv path "abc"
+    do! appendCsv path "abc"
     
     let lines = File.ReadAllText path
     
@@ -44,7 +45,7 @@ let ``Save csv, overwrites instead of appending`` () = async {
     
     File.WriteAllText(path, "test")
     
-    do! DataHelpers.saveCsv path "abc"
+    do! saveCsv path "abc"
     
     let lines = File.ReadAllText path
     
@@ -56,12 +57,12 @@ let ``Save csv, overwrites instead of appending`` () = async {
 [<Fact>]
 let ``Reading prices from csv works`` () = async {
     
-    let! priceBars = DataHelpers.getPricesFromCsv testDataPath TestDataGenerator.NET
+    let! priceBars = getPricesFromCsv testDataPath TestDataGenerator.NET
     
     priceBars.Length |> should equal 505
     
     // read second time to hit cache path ... not sure how to test explicitly that it hit cache
-    let! priceBars = DataHelpers.getPricesFromCsv testDataPath TestDataGenerator.NET
+    let! priceBars = getPricesFromCsv testDataPath TestDataGenerator.NET
     
     priceBars.Length |> should equal 505
 }
@@ -71,7 +72,7 @@ let ``Get prices with brokerage should not go to brokerage if price exists on fi
     
     let mock =
         {
-            new DataHelpers.IGetPriceHistory with 
+            new IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker =
                     failwith "Should not have called brokerage"
         }
@@ -80,7 +81,7 @@ let ``Get prices with brokerage should not go to brokerage if price exists on fi
     
     match priceBars with
     | Ok priceBars -> priceBars.Length |> should equal 505
-    | Error error -> failwith error
+    | Error error -> error |> PriceNotAvailableError.getError |> failwith
 }
 
 [<Fact>]
@@ -91,7 +92,7 @@ let ``Get prices with brokerage should go to brokerage if price does not exists 
         
     let mock =
         {
-            new DataHelpers.IGetPriceHistory with 
+            new IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker =
                     task {
                         callCount <- callCount + 1
@@ -112,7 +113,7 @@ let ``Get prices with brokerage should go to brokerage if price does not exists 
     
     match priceBars with
     | Ok priceBars -> priceBars.Length |> should equal 1
-    | Error error -> failwith error
+    | Error error -> error |> PriceNotAvailableError.getError |> failwith
     
     // let's call it again and ensure that it brokerage will not be bothered because DataHelpers cache price data on disk
     let! _ = ticker |> getPriceBars
@@ -126,7 +127,7 @@ let ``Make sure error is recorded if brokerage fails``() = async {
     
     let mock =
         {
-            new DataHelpers.IGetPriceHistory with 
+            new IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker =
                     task {
                         return core.fs.ServiceError(transactionRateErrorMessage) |> Error
@@ -150,7 +151,7 @@ let ``When prices are not available for perpetuity, brokerage is not pinged``() 
     
     let mock =
         {
-            new DataHelpers.IGetPriceHistory with 
+            new IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker =
                     task {
                         call <- call + 1
@@ -178,7 +179,7 @@ let ``If getting price data throws, it gets recorded``() = async {
     ServiceHelperTests.initServiceHelper [||] |> ignore
     let mock =
         {
-            new DataHelpers.IGetPriceHistory with 
+            new IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker =
                     failwith transactionRateErrorMessage
         }

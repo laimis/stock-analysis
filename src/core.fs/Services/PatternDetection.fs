@@ -34,8 +34,8 @@ let contractingVolumeBreakout (bars: PriceBars) =
         
         let x = [|0.0..(volumes.Length - 1 |> float)|]
         let y = volumes |> Array.map float
-        let struct (_, b) = MathNet.Numerics.Fit.Line(x, y)
-        
+        let struct (_, b) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(x, y)
+       
         let description = $"{contractingVolumeBreakoutName}: {lastVolumeRate:N1}x, {b:N2}"
             
         if lastVolumeRate > volumeRateThreshold && b < slopeThreshold && (lastBar.Close > lastBar.Open) then

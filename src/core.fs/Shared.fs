@@ -142,6 +142,8 @@ type DataPoint<'a>(label:string,value:'a,isDate:bool,ticker:string option) =
     member this.Ticker = ticker
     member this.IsDate = isDate
     
+    override this.ToString() = $"{label}: {value}"
+    
 type ChartDataPointContainer<'a>(label:string,chartType:DataPointChartType,annotationLine:ChartAnnotationLine option) =
     
     let data = List<DataPoint<'a>>()

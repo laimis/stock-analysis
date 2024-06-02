@@ -10,10 +10,15 @@ open core.fs.Adapters.Stocks
 type IGetPriceHistory =
     abstract member GetPriceHistory : start:DateTimeOffset option -> ``end``:DateTimeOffset option -> ticker:core.Shared.Ticker -> Task<Result<PriceBars,ServiceError>>
 
-type PriceAvailability =
-    | Available of PriceBars
+type PriceNotAvailableError =
     | NotAvailableForever of string
     | NotAvailable of string
+    
+    with
+        static member getError (error:PriceNotAvailableError) =
+            match error with
+            | NotAvailableForever x -> x
+            | NotAvailable x -> x
 
 let private generatePriceCsvPath studiesDirectory ticker =
     let filename = $"{ticker}.csv"
@@ -53,18 +58,18 @@ let private notAvailableBasedOnMessage failIfNone (message:string) =
    
 let private readPricesFromFileSystem path = async {
     match System.IO.File.Exists(path) with
-    | false -> return NotAvailable "Price file missing"
+    | false -> return NotAvailable "Price file missing" |> Error
     | true ->
         let content = System.IO.File.ReadAllLines(path)
         match content with
-        | [||] -> return NotAvailable "Price file empty"
+        | [||] -> return NotAvailable "Price file empty"  |> Error
         | _ ->
             let checkIfNotAvailable = content[0] |> notAvailableBasedOnMessage false
             match checkIfNotAvailable with
-            | Some x -> return x
+            | Some x -> return x |> Error
             | None ->
                 let! prices = path |> readPricesFromCsv
-                return Available prices
+                return Ok prices
 }
                 
 let callLogFuncIfSetup func =
@@ -93,24 +98,17 @@ let getPricesFromBrokerageAndRecordToCsv (brokerage:IGetPriceHistory) studiesDir
         match response with
         | Ok prices ->
             recordPrices prices
-            return Available prices
+            return Ok prices
         | Error e ->
             recordError e.Message
-            return notAvailableBasedOnMessage true e.Message |> Option.get
+            return notAvailableBasedOnMessage true e.Message |> Option.get |> Error
     with
         | e ->
             recordError e.Message
-            return notAvailableBasedOnMessage true e.Message |> Option.get
+            return notAvailableBasedOnMessage true e.Message |> Option.get |> Error
 }
                 
 let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDate endDate ticker = async {
-    
-    let toPriceBarOption priceAvailability =
-        match priceAvailability with
-        | Available priceBars -> Ok priceBars
-        | NotAvailable e -> Error e
-        | NotAvailableForever e -> Error e
-        
     // check first if we have prices for this ticker and date range
     // if we do, return them
     // if we don't, get them from brokerage and store them on a filesystem
@@ -118,10 +116,9 @@ let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDa
     let! prices = tryGetPricesFromCsv studiesDirectory ticker
     
     match prices with
-    | NotAvailable _ ->
-        let! priceOption = getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory startDate endDate ticker
-        return priceOption |> toPriceBarOption
-    | _ -> return prices |> toPriceBarOption
+    | Error _ ->
+        return! getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory startDate endDate ticker
+    | Ok _ -> return prices
 }
 
 let saveCsv (filename:string) content = async {

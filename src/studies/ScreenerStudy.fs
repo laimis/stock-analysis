@@ -224,19 +224,22 @@ let private fetchPriceFeeds (brokerage:IGetPriceHistory) studiesDirectory ticker
             // first try to get prices from local file
             let! prices = tryGetPricesFromCsv studiesDirectory ticker
             match prices with
-            | Available _ -> return (ticker, prices)
-            | NotAvailableForever _ -> return (ticker, prices)
-            | NotAvailable _ ->
-                // if not available but temporarily, try pinging brokerage and record to csv 
-                let! prices = ticker |> Ticker |> getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory earliestDateMinus365 today
-                return (ticker, prices)
+            | Ok _ -> return (ticker, prices)
+            | Error err ->
+                match err with
+                | NotAvailableForever _ ->
+                    return (ticker, prices)
+                | NotAvailable _ ->
+                    // if not available but temporarily, try pinging brokerage and record to csv 
+                    let! prices = ticker |> Ticker |> getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory earliestDateMinus365 today
+                    return (ticker, prices)
         })
         |> Async.Sequential
         
     // run the fetch at least 10 times, until there are non NotAvailable records left
     let rec runFetchUntilAllAvailable (count:int) = async {
         let! results = runFetch()
-        let failed = results |> Seq.filter (fun (_, prices) -> match prices with | NotAvailable _ -> true | _ -> false) |> Seq.length
+        let failed = results |> Seq.filter (fun (_, prices) -> match prices with | Error _ -> true | _ -> false) |> Seq.length
         if failed = 0 || count = 0 then
             return results
         else
@@ -260,12 +263,12 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
     
     let! results = fetchPriceFeeds brokerage studiesDirectory tickerDatePairs
         
-    let failed = results |> Array.filter (fun (_, prices) -> match prices with | Available _ -> false | _ -> true)
+    let failed = results |> Array.filter (fun (_, prices) -> match prices with | Error _ -> true | _ -> false)
     let prices =
         results
         |> Array.choose (fun (ticker, prices) ->
             match prices with
-            | Available prices ->
+            | Ok prices ->
                 Some (ticker, (prices, prices |> MovingAveragesContainer.Generate))
             | _ -> None
         )

@@ -2,9 +2,11 @@ module studies.BreakoutStudy
 
 open System
 open core.Shared
+open core.fs
 open core.fs.Adapters.Stocks
 open core.fs.Services
 open core.fs.Services.Analysis
+open core.fs.Services.Analysis.MultipleBarPriceAnalysis
 open studies.DataHelpers
 open studies.ServiceHelper
 
@@ -36,18 +38,18 @@ let private normalizeWithinZeroAndMax values =
 let calculateBestFitLine normalization (values:float array) =
     let x = [|0.0..(values.Length - 1 |> float)|]
     let y = values |> normalization
-    MathNet.Numerics.Fit.Line(x, y)
+    MathNet.Numerics.LinearRegression.SimpleRegression.Fit(x, y)
     
 let describe method line = Console.WriteLine("{0}: {1}", method, line)
+    
+let averageVolumeAndRateAtLastBar (bars:PriceBar array) =
+    let stats = DistributionStatistics.calculate (bars[0..(bars.Length-2)] |> Array.map (fun b -> b.Volume |> decimal))
+    let volumeRate = bars |> Array.last |> _.Volume |> decimal |> fun x -> x / stats.mean
+    (stats.mean, volumeRate)
     
 let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
     
     let period = 60
-    
-    let averageVolumeAndRateAtLastBar (bars:PriceBar array) =
-        let stats = DistributionStatistics.calculate (bars |> Array.map (fun b -> b.Volume |> decimal))
-        let volumeRate = bars |> Array.last |> _.Volume |> decimal |> fun x -> x / stats.mean
-        (stats.mean, volumeRate)
         
     let startIndex,startBar = prices.TryFindByDate(startDate) |> Option.get
     let endIndex,endBar = prices.TryFindByDate(endDate) |> Option.get
@@ -93,13 +95,86 @@ let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset)
     closingPrices |> calculateBestFitLine normalizeWithinZeroAndMax |> describe "ZeroMax"
     closingPrices |> calculateBestFitLine normalizeByAverage |> describe "Average"
     closingPrices |> calculateBestFitLine id |> describe "None"
-    
+   
+type MatchedBreakout = {
+    Bars: PriceBar array
+    Atr: DataPoint<decimal> array
+    VolumeRate: decimal
+    VolumeSlope: float
+    AtrSlope: float
+}
+    with
+        member this.Start = this.Bars |> Array.head
+        member this.End = this.Bars |> Array.last
+        
 let private filterToCertainGapsOnly (context:EnvironmentContext) userState = async {
     
-    let! prices = getPricesFromCsv (context.GetArgumentValue "-d") (Ticker("SE"))
-    let start = DateTimeOffset(2024, 3, 4, 0, 0, 0, TimeSpan.Zero)
-    let end' = DateTimeOffset(2024, 4, 16, 0, 0, 0, TimeSpan.Zero)
-    calculateAndPrintSlope prices start end'
+    let debugBars bars =
+        Console.WriteLine("Bars: {0}, {1}, {2}", bars |> Array.head, bars |> Array.last, bars.Length)
+        
+    let debug (matched:MatchedBreakout) =
+        Console.WriteLine($"Start: {matched.Start.DateStr}, End: {matched.End.DateStr}, Rate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, AtrSlope: {matched.AtrSlope:N2}")
+        
+    Console.Write("Ticker: ")
+    let tickerSymbol = Console.ReadLine()
+    let ticker = Ticker(tickerSymbol)
+    
+    let! priceBars = context.Brokerage().GetPriceHistory userState ticker PriceFrequency.Daily None None |> Async.AwaitTask
+    match priceBars with
+    | Error err -> failwith err.Message
+    | Ok bars ->
+            
+        let atr = Indicators.averageTrueRage bars |> _.DataPoints
+        
+        // window of 40 bars
+        // let bars =
+        bars.Bars
+        |> Array.windowed 41
+        |> Array.map (
+            fun window ->
+                
+                let preceding = window[0..39]
+                let volX = [|0.0..(preceding.Length - 1 |> float)|]
+                let volY = preceding |> Array.map (fun b -> b.Volume |> float)
+                let struct (_, volumeSlope) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(volX, volY)
+                let negativeVolumeSlope = volumeSlope < 0.0
+                
+                let _, rate = averageVolumeAndRateAtLastBar window
+                let highBreakout = rate > 1.3m
+                
+                let lastBar = window |> Array.last
+                let closedPositive = lastBar.Close > lastBar.Open
+                
+                // find the atr bar for the date of the last bar
+                let atrEndIndex = atr |> Array.findIndex (fun b -> b.Label = lastBar.DateStr)
+                let atrStartIndex =
+                    match atrEndIndex - window.Length - 1 with
+                    | x when x < 0 -> 0
+                    | x -> x
+                    
+                let atrWindow = atr[atrStartIndex+2..atrEndIndex]
+                let atrX = [|0.0..(atrWindow.Length - 1 |> float)|]
+                let atrY = atrWindow |> Array.map (fun b -> b.Value |> float)
+                let struct (_, atrSlope) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(atrX, atrY)
+                let negativeAtrSlope = atrSlope < 0.0
+                
+                match negativeVolumeSlope && highBreakout && closedPositive && negativeAtrSlope with
+                | true ->
+                    Some {
+                        Bars = window
+                        Atr = atrWindow
+                        AtrSlope = atrSlope
+                        VolumeRate = rate
+                        VolumeSlope = volumeSlope 
+                    }
+                | false -> None
+        )
+        |> Array.choose id
+        |> Array.iter(fun matched ->
+            debug matched
+            // Console.ReadLine() |> ignore
+        )
+            
 }   
 
 let run (context:EnvironmentContext) = async {  
