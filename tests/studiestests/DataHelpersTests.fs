@@ -142,7 +142,7 @@ let ``Make sure error is recorded if brokerage fails``() = async {
     
     match priceBars with
     | Ok _ -> failwith "Should have failed"
-    | Error error -> error |> should equal $"{transactionRateErrorMessage}"
+    | Error error -> error |> PriceNotAvailableError.getError |> should equal $"{transactionRateErrorMessage}"
 }
 
 [<Fact>]
@@ -192,5 +192,5 @@ let ``If getting price data throws, it gets recorded``() = async {
     
     match priceBars with
     | Ok _ -> failwith "Should have failed"
-    | Error error -> error |> should equal transactionRateErrorMessage
+    | Error error -> error |> PriceNotAvailableError.getError |> should equal transactionRateErrorMessage
 }

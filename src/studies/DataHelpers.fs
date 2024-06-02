@@ -116,8 +116,10 @@ let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDa
     let! prices = tryGetPricesFromCsv studiesDirectory ticker
     
     match prices with
-    | Error _ ->
-        return! getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory startDate endDate ticker
+    | Error error ->
+        match error with
+        | NotAvailableForever _ -> return prices
+        | NotAvailable _ -> return! getPricesFromBrokerageAndRecordToCsv brokerage studiesDirectory startDate endDate ticker
     | Ok _ -> return prices
 }
 
