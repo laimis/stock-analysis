@@ -25,23 +25,22 @@ jobs:
             - name: Retrieve app logs
               id: get_logs
               run: |
-                  logs=$(doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }})
-#                  echo "::set-output name=logs::$logs"
-            
+                  {
+                    echo 'APP_LOGS<<EOF'
+                    doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }}
+                    echo EOF
+                  } >> "$GITHUB_OUTPUT"
             - name: Output logs
-              run: echo "${{ steps.get_logs.outputs.logs }}"
+              run: echo "${{ steps.get_logs.outputs.APP_LOGS }}"
                   
             - name: Check for errors
               id: check_errors
-              if: contains(steps.get_logs.outputs.logs, 'error:') || contains(steps.get_logs.outputs.logs, 'fail:')
+              if: contains(steps.get_logs.outputs.APP_LOGS, 'error:') || contains(steps.get_logs.outputs.APP_LOGS, 'fail:')
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   echo "Errors found in the app logs:"
-                  echo "${{ steps.get_logs.outputs.logs }}"
+                  echo "${{ steps.get_logs.outputs.APP_LOGS }}"
                   echo "Disabling the workflow to prevent further notifications."
                   gh workflow disable "App Log Monitoring"
-
-            - name: Fail the workflow
-              if: contains(steps.get_logs.outputs.logs, 'error:')
-              run: exit 1
+                  exit 1
