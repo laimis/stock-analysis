@@ -207,9 +207,9 @@ function createDaysHeldDistributionChart(positions: PositionInstance[]) {
 function unrealizedGainPercentage(position: PositionInstance, quote: StockQuote) {
     // need abs for short positions
     return position.isShort ?
-        (quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100
-        :
         (position.averageCostPerShare - quote.price) / position.averageCostPerShare * 100
+        :
+        (quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100
 }
 
 function createUnrealizedGainPercentageDistributionChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
