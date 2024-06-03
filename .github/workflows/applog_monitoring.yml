@@ -25,11 +25,9 @@ jobs:
             - name: Retrieve app logs
               id: get_logs
               run: |
-                  {
-                    echo 'APP_LOGS<<EOF'
-                    doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }}
-                    echo EOF
-                  } >> "$GITHUB_OUTPUT"
+                  echo 'APP_LOGS<<EOF' >> $GITHUB_OUTPUT
+                  doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }} >> $GITHUB_OUTPUT
+                  echo EOF >> $GITHUB_OUTPUT
             - name: Output logs
               run: echo "${{ steps.get_logs.outputs.APP_LOGS }}"
                   
