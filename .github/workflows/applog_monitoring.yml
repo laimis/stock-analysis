@@ -3,6 +3,11 @@ name: App Log Monitoring
 on:
     schedule:
         - cron: '*/5 * * * *'  # Run every 5 minutes
+          
+    # also run on push to main branch
+    push:
+        branches:
+            - main
 
 jobs:
     monitor_logs:
@@ -21,7 +26,10 @@ jobs:
               id: get_logs
               run: |
                   logs=$(doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }})
-                  echo "::set-output name=logs::$logs"
+#                  echo "::set-output name=logs::$logs"
+            
+            - name: Output logs
+              run: echo "${{ steps.get_logs.outputs.logs }}"
                   
             - name: Check for errors
               id: check_errors
