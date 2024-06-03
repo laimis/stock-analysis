@@ -30,8 +30,11 @@ jobs:
                   echo "APP_LOGS<<EOF" >> $GITHUB_OUTPUT
                   doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }} >> $GITHUB_OUTPUT
                   echo "EOF" >> $GITHUB_OUTPUT
+            
             - name: Output logs
-              run: echo "${{ steps.get_logs.outputs.APP_LOGS }}"
+              run: |
+                  echo "${{ steps.get_logs.outputs.APP_LOGS }}" > logs.txt
+                  cat logs.txt
                   
             - name: Check for errors
               id: check_errors

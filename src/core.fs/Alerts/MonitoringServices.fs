@@ -104,7 +104,7 @@ let nextPatternMonitoringRun referenceTimeUtc (marketHours:IMarketHours) =
 type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, container:StockAlertContainer, portfolio:IPortfolioStorage, marketHours:IMarketHours) =
 
     let marketStartTime = TimeOnly(9, 30, 0)
-    let latestStopLossToRun = TimeOnly(16, 30, 0)
+    let latestStopLossToRun = TimeOnly(17, 00, 0)
     let checks = List<StopLossCheck>()
 
     let runStopLossCheck (logger:ILogger) (check:StopLossCheck) = async {
