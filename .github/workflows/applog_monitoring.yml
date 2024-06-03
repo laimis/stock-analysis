@@ -4,10 +4,12 @@ on:
     schedule:
         - cron: '*/5 * * * *'  # Run every 5 minutes
           
-    # also run on push to main branch
+    # also run on push to main branch, but only if applog_monitoring.yml file was in the changes
     push:
         branches:
             - main
+        paths:
+            - .github/workflows/applog_monitoring.yml
 
 jobs:
     monitor_logs:
