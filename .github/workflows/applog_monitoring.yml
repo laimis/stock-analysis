@@ -33,7 +33,7 @@ jobs:
             
             - name: Output logs
               run: |
-                  echo -e "${{ steps.get_logs.outputs.APP_LOGS }}"
+                  echo "${{ steps.get_logs.outputs.APP_LOGS }}" | sed 's/`/_/g' 
                   
             - name: Check for errors
               id: check_errors
@@ -41,8 +41,7 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  echo "Errors found in the app logs:"
-                  echo "${{ steps.get_logs.outputs.APP_LOGS }}"
+                  echo "Errors found in the app logs"
                   echo "Disabling the workflow to prevent further notifications."
                   gh workflow disable "App Log Monitoring"
                   exit 1
