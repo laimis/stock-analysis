@@ -33,8 +33,7 @@ jobs:
             
             - name: Output logs
               run: |
-                  set -f
-                  printf '%s\n' "${{ steps.get_logs.outputs.APP_LOGS }}"
+                  echo -e "${{ steps.get_logs.outputs.APP_LOGS }}"
                   
             - name: Check for errors
               id: check_errors
