@@ -33,7 +33,8 @@ jobs:
             
             - name: Output logs
               run: |
-                  echo "${{ steps.get_logs.outputs.APP_LOGS }}" | sed 's/`/_/g' 
+                  escaped_output=$(echo "${{ steps.get_logs.outputs.APP_LOGS }}" | sed 's/`/_/g')
+                  echo "${{ escaped_output }}"
                   
             - name: Check for errors
               id: check_errors
