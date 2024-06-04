@@ -31,18 +31,14 @@ jobs:
                   doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }} >> $GITHUB_OUTPUT
                   echo "EOF" >> $GITHUB_OUTPUT
             
-            - name: Output logs
-              run: |
-                  escaped_output=$(echo "${{ steps.get_logs.outputs.APP_LOGS }}" | sed 's/`/_/g')
-                  echo "${{ escaped_output }}"
-                  
             - name: Check for errors
               id: check_errors
               if: contains(steps.get_logs.outputs.APP_LOGS, 'error:') || contains(steps.get_logs.outputs.APP_LOGS, 'fail:')
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  echo "Errors found in the app logs"
                   echo "Disabling the workflow to prevent further notifications."
                   gh workflow disable "App Log Monitoring"
+                  echo "Errors found in the app logs:"
+                  echo "${{ steps.get_logs.outputs.APP_LOGS }}"
                   exit 1
