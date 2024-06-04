@@ -535,6 +535,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | :? TimeoutRejectedException as e ->
             logError "Timeout function {function} with exception: {exception}" [|resource; e.Message|]
             return e.Message |> ServiceError |> Error
+        | e ->
+            logError "Failed to call {function} with exception: {exception}" [|resource; e.Message|]
+            return e.Message |> ServiceError |> Error
     }
     
     member private this.GetQuote (tickers:Ticker seq) (state:UserState) = task {
