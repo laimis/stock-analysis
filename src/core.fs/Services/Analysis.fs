@@ -1,6 +1,5 @@
 namespace core.fs.Services.Analysis
 
-open System
 open System.Collections.Generic
 open core.Shared
 open core.fs
@@ -189,42 +188,13 @@ module AnalysisOutcomeEvaluationScoringHelper =
         counts
 
 module Histogram =
-    let private rounded (value:decimal) = System.Math.Round(value, 4)
-    let private floored (value:decimal) = System.Math.Floor(value)
     
     let calculate (min:decimal) max numberOfBuckets (numbers:decimal seq) : array<ValueWithFrequency> =
         
-        let bucketSize = (max - min) / decimal(numberOfBuckets)
+        let histogram = MathNet.Numerics.Statistics.Histogram(numbers |> Seq.map float, numberOfBuckets, min |> float, max |> float)
         
-        // if the bucket size is really small, use just two decimal places
-        // otherwise use 0 decimal places
-        let bucketSize = 
-            if bucketSize < 1m then
-                bucketSize |> rounded
-            else
-                bucketSize |> floored
-        
-        let min = 
-            if bucketSize < 1m then
-                min |> rounded
-            else
-                min |> floored
-        
-        let result =
-            List<ValueWithFrequency>(
-                [0 .. numberOfBuckets - 1]
-                |> List.map (fun i -> {value = min + (decimal(i) * bucketSize); frequency = 0})
-            )
-        numbers
-        |> Seq.iter ( fun n ->
-            if n > result[result.Count - 1].value then
-                result[result.Count - 1] <- {value = result[result.Count - 1].value; frequency = result[result.Count - 1].frequency + 1}
-            else
-                let firstSlot = result |> Seq.findIndex (fun x -> x.value >= n)
-                result[firstSlot] <- {value = result[firstSlot].value; frequency = result[firstSlot].frequency + 1}
-        )
-        
-        result.ToArray()
+        [|0..histogram.BucketCount-1|]
+        |> Array.map (fun i -> { value = histogram.Item(i).LowerBound |> decimal; frequency = histogram.Item(i).Count |> int })
         
     let calculateFromSequence symmetric numberOfBuckets (numbers:decimal seq) =
         let min, max =
@@ -277,28 +247,24 @@ module DistributionStatistics =
                 buckets = [||] 
             }
         else
-            let numbers = numbers |> Seq.map float
+            let floats = numbers |> Seq.map float
         
-            let stats = MathNet.Numerics.Statistics.DescriptiveStatistics(numbers)
-            let histogram = MathNet.Numerics.Statistics.Histogram(numbers, 21)
-            
-            let buckets =
-                [|0..histogram.BucketCount-1|]
-                |> Array.map (fun i -> { value = histogram.Item(i).LowerBound |> decimal; frequency = histogram.Item(i).Count |> int })
+            let stats = MathNet.Numerics.Statistics.DescriptiveStatistics(floats)
+            let buckets = Histogram.calculateFromSequence false 21 numbers
             
             let kurtosis =
                 match stats.Kurtosis with
-                | x when Double.IsNaN(x) -> 0m
+                | x when System.Double.IsNaN(x) -> 0m
                 | _ -> stats.Kurtosis |> decimal
                 
             let skewness =
                 match stats.Skewness with
-                | x when Double.IsNaN(x) -> 0m
+                | x when System.Double.IsNaN(x) -> 0m
                 | _ -> stats.Skewness |> decimal
                 
             let stdDev =
                 match stats.StandardDeviation with
-                | x when Double.IsNaN(x) -> 0m
+                | x when System.Double.IsNaN(x) -> 0m
                 | _ -> stats.StandardDeviation |> decimal
             
             {
@@ -307,7 +273,7 @@ module DistributionStatistics =
                 min = stats.Minimum |> decimal
                 max = stats.Maximum |> decimal
                 mean = stats.Mean |> decimal
-                median = numbers |> Seq.toArray |> Array.sort |> (fun a -> a[a.Length / 2]) |> decimal
+                median = floats |> Seq.toArray |> Array.sort |> (fun a -> a[a.Length / 2]) |> decimal
                 skewness = skewness
                 stdDev = stdDev
                 buckets = buckets

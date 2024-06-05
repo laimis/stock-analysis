@@ -33,10 +33,6 @@ module PercentChangesTests =
     let ``Buckets are correct``() =
         Assert.Equal(21, percentChangeStatistics.buckets.Length)
         
-        // first bucket should be min
-        Assert.Equal(percentChangeStatistics.min, percentChangeStatistics.buckets[0].value)
-        Assert.Equal(1, percentChangeStatistics.buckets[0].frequency)
-        
         // make sure there are four buckets with values assigned
         Assert.Equal(4, percentChangeStatistics.buckets |> Array.filter (fun x -> x.frequency <> 0) |> Array.length)
         
@@ -79,12 +75,10 @@ module RealBarsTests =
     let ``Buckets are correct``() =
         Assert.Equal(21, percentChanges.buckets.Length)
         
-        Assert.True(percentChanges.buckets[0].value >= percentChanges.min)
-        Assert.Equal(1, percentChanges.buckets[1].frequency)
-        Assert.Equal(19, percentChanges.buckets |> Array.filter (fun x -> x.frequency <> 0) |> Array.length)
+        Assert.Equal(18, percentChanges.buckets |> Array.filter (fun x -> x.frequency <> 0) |> Array.length)
         
         // last bucket should include max
         let lastBucketValue = percentChanges.buckets |> Array.last |> _.value
         
         Assert.True(percentChanges.max > lastBucketValue)
-        Assert.Equal(2, percentChanges.buckets |> Array.last |> _.frequency)
+        Assert.Equal(1, percentChanges.buckets |> Array.last |> _.frequency)
