@@ -6,6 +6,7 @@ open core.fs.Services.Trends
 open testutils
 
 let trends = TestDataGenerator.PriceBars(TestDataGenerator.NET) |> TrendCalculator.generate TestDataGenerator.NET TrendType.Ema20OverSma50
+let rounded (precision:int) (value:decimal) = System.Math.Round(value, precision)
 
 [<Fact>]
 let ``trends length is correct``() =
@@ -29,7 +30,7 @@ let ``All trend bars stats are correct``() =
     let stats = trends.BarStatistics
     
     stats.count |> should equal 12
-    stats.mean |> should equal 41.08
+    stats.mean |> rounded 2 |> should equal 41.08
     stats.median |> should equal 45
     stats.max |> should equal 91
     stats.min |> should equal 1
@@ -40,7 +41,7 @@ let ``Up trend bars stats are correct``() =
     let stats = trends.UpBarStatistics
     
     stats.count |> should equal 6
-    stats.mean |> should equal 44.83
+    stats.mean |> rounded 2 |> should equal 44.83
     stats.median |> should equal 45
     stats.max |> should equal 91
     stats.min |> should equal 16
@@ -51,7 +52,7 @@ let ``Down trend bars stats are correct``() =
     let stats = trends.DownBarStatistics
     
     stats.count |> should equal 6
-    stats.mean |> should equal 37.33
+    stats.mean |> rounded 2 |> should equal 37.33
     stats.median |> should equal 47
     stats.max |> should equal 68
     stats.min |> should equal 1

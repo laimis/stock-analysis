@@ -1,5 +1,6 @@
 namespace core.fs.Services.Analysis
 
+open System
 open System.Collections.Generic
 open core.Shared
 open core.fs
@@ -191,7 +192,6 @@ module Histogram =
     let private rounded (value:decimal) = System.Math.Round(value, 4)
     let private floored (value:decimal) = System.Math.Floor(value)
     
-    // by default number of buckets should be 21
     let calculate (min:decimal) max numberOfBuckets (numbers:decimal seq) : array<ValueWithFrequency> =
         
         let bucketSize = (max - min) / decimal(numberOfBuckets)
@@ -277,73 +277,37 @@ module DistributionStatistics =
                 buckets = [||] 
             }
         else
-            let length = numbers |> Seq.length
-            let mean = System.Math.Round(numbers |> Seq.average, 2)
-            let min = System.Math.Round(numbers |> Seq.min, 2)
-            let max = System.Math.Round(numbers |> Seq.max, 2)
+            let numbers = numbers |> Seq.map float
+        
+            let stats = MathNet.Numerics.Statistics.DescriptiveStatistics(numbers)
+            let histogram = MathNet.Numerics.Statistics.Histogram(numbers, 21)
             
-            let median =
-                System.Math.Round(
-                numbers
-                |> Seq.sort
-                |> Seq.skip (length / 2)
-                |> Seq.head,
-                2)
+            let buckets =
+                [|0..histogram.BucketCount-1|]
+                |> Array.map (fun i -> { value = histogram.Item(i).LowerBound |> decimal; frequency = histogram.Item(i).Count |> int })
             
-            let count = length
-            
-            let stdDevDouble =
-                System.Math.Round(
-                numbers
-                |> Seq.map (fun x -> System.Math.Pow(double(x - mean), 2))
-                |> Seq.sum
-                |> fun x -> x / ((length - 1) |> float)
-                |> System.Math.Sqrt,
-                2)
-            
-            let stdDev = 
-                match stdDevDouble with
-                | double.PositiveInfinity -> 0m
-                | double.NegativeInfinity -> 0m
-                | x when System.Double.IsNaN(x) -> 0m
-                | _ -> decimal stdDevDouble
-                    
-            let skewnessDouble =
-                numbers
-                |> Seq.map (fun x -> System.Math.Pow(double(x - mean), 3))
-                |> Seq.sum
-                |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 3)
+            let kurtosis =
+                match stats.Kurtosis with
+                | x when Double.IsNaN(x) -> 0m
+                | _ -> stats.Kurtosis |> decimal
                 
-            
-            let skewness = 
-                match skewnessDouble with
-                | double.PositiveInfinity -> 0m
-                | double.NegativeInfinity -> 0m
-                | x when System.Double.IsNaN(x) -> 0m
-                | _ -> decimal skewnessDouble
-            
-            let kurtosisDouble = 
-                numbers
-                |> Seq.map (fun x -> System.Math.Pow(double(x - mean), 4))
-                |> Seq.sum
-                |> fun x -> x / double(count) / System.Math.Pow(double stdDev, 4) - 3.0
-            
-            let kurtosis = 
-                match kurtosisDouble with
-                | double.PositiveInfinity -> 0m
-                | double.NegativeInfinity -> 0m
-                | x when System.Double.IsNaN(x) -> 0m
-                | _ -> decimal kurtosisDouble
+            let skewness =
+                match stats.Skewness with
+                | x when Double.IsNaN(x) -> 0m
+                | _ -> stats.Skewness |> decimal
                 
-            let buckets = numbers |> Histogram.calculate min max 21
+            let stdDev =
+                match stats.StandardDeviation with
+                | x when Double.IsNaN(x) -> 0m
+                | _ -> stats.StandardDeviation |> decimal
             
             {
-                count = count
+                count = stats.Count
                 kurtosis = kurtosis
-                min = min
-                max = max
-                mean = mean
-                median = median
+                min = stats.Minimum |> decimal
+                max = stats.Maximum |> decimal
+                mean = stats.Mean |> decimal
+                median = numbers |> Seq.toArray |> Array.sort |> (fun a -> a[a.Length / 2]) |> decimal
                 skewness = skewness
                 stdDev = stdDev
                 buckets = buckets
