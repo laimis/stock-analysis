@@ -29,6 +29,7 @@ module MultipleBarPriceAnalysis =
         let AverageTrueRange = "AverageTrueRange"
         let GreenStreak = "GreenStreak"
         let GapPercentage = "GapPercentage"
+        let OnBalanceVolume = "OBV"
         
         let private MovingAverage interval exponential =
             let ``type`` = match exponential with | true -> "ema" | false -> "sma"
@@ -64,6 +65,25 @@ module MultipleBarPriceAnalysis =
                 )
                 
             ATRContainer(period, dataPoints)
+            
+        let onBalanceVolume (prices:PriceBars) =
+            
+            [|0..prices.Length - 1|]
+            |> Array.mapFold (fun prevObv i ->
+                
+                let currentBar = prices.Bars[i]
+                
+                let obv =
+                    match i with
+                    | 0 -> 0L
+                    | _ ->
+                        let previousBar = prices.Bars[i - 1]
+                        prevObv + (if currentBar.Close > previousBar.Close then currentBar.Volume else if currentBar.Close < previousBar.Close then -currentBar.Volume else 0L)
+                
+                let result = DataPoint<decimal>(currentBar.Date, obv)
+                result, obv
+            ) 0L
+            |> fst
                 
     module MovingAveragesAnalysis =
             
@@ -367,7 +387,7 @@ module MultipleBarPriceAnalysis =
             
         let private generateAverageTrueRangeOutcome (prices:PriceBars) =
             
-            let dataPoints = prices |> Indicators.averageTrueRage |> fun x -> x.DataPoints
+            let dataPoints = prices |> Indicators.averageTrueRage |> _.DataPoints
             
             match dataPoints with
             | [||] -> None
@@ -420,6 +440,18 @@ module MultipleBarPriceAnalysis =
                 message = $"Current price is {currentPrice:C2}"
             )
             
+        let private generateOnBalanceVolumeOutcome (prices:PriceBars) =
+            
+            let obv = Indicators.onBalanceVolume prices |> Array.last |> _.Value
+            
+            AnalysisOutcome(
+                key = MultipleBarOutcomeKeys.OnBalanceVolume,
+                outcomeType = OutcomeType.Neutral,
+                value = obv,
+                valueType = ValueFormat.Currency,
+                message = $"On Balance Volume: {obv}"
+            )
+            
         let generate (prices: PriceBars) =
             
             let atrOutcome = prices |> generateAverageTrueRangeOutcome
@@ -439,6 +471,7 @@ module MultipleBarPriceAnalysis =
                 if atrOutcome.IsSome then atrOutcome.Value
                 prices |> generateGapOutcome
                 prices |> generateGreenStreakOutcome
+                prices |> generateOnBalanceVolumeOutcome
             ]
     
     let run prices =

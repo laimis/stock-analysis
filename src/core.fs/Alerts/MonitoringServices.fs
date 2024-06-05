@@ -336,6 +336,7 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
 
         if now > nextPatternMonitoringRunDateTime then
             container.AddNotice("Running pattern monitoring checks")
+            container.ClearNonStopLossAlerts()
             do! generatePatternMonitoringChecks()
 
         let startingNumberOfChecks = listOfChecks.Count

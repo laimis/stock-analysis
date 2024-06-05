@@ -88,3 +88,7 @@ let ``Price above EMA20 bars is positive and matches`` () =
 [<Fact>]
 let ``SMA50 above SMA200 bars is positive and matches`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50AboveSMA200Bars |> should equal -205m
+    
+[<Fact>]
+let ``On Balance Volume is present and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.OnBalanceVolume |> should equal 41298923m

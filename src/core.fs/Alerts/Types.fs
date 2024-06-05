@@ -96,6 +96,12 @@ namespace core.fs.Alerts
                     | _ -> list
                 
                 recentlyTriggered[alert.userId] <- (newList @ [alert])
+                
+        let clearAlerts condition =
+            alerts.Values
+            |> Seq.filter condition
+            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId; Identifier = Constants.StopLossIdentifier })
+            |> Seq.iter (fun x -> alerts.TryRemove(x) |> ignore)
         
         member _.Register (alert:TriggeredAlert) =
             let key = { Ticker = alert.ticker; UserId = alert.userId; Identifier = alert.identifier  }
@@ -137,8 +143,7 @@ namespace core.fs.Alerts
             notices |> Seq.sortByDescending (_.``when``)
 
         member this.ClearStopLossAlert() =
-            alerts.Values
-            |> Seq.filter (fun x -> x.identifier = Constants.StopLossIdentifier)
-            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId; Identifier = Constants.StopLossIdentifier })
-            |> Seq.iter (fun x -> alerts.TryRemove(x) |> ignore)
+            clearAlerts (fun x -> x.identifier = Constants.StopLossIdentifier)
             
+        member this.ClearNonStopLossAlerts() =
+            clearAlerts (fun x -> x.identifier <> Constants.StopLossIdentifier)

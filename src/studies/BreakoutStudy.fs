@@ -1,6 +1,7 @@
 module studies.BreakoutStudy
 
 open System
+open XPlot.Plotly
 open core.Shared
 open core.fs
 open core.fs.Adapters.Stocks
@@ -98,22 +99,168 @@ let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset)
    
 type MatchedBreakout = {
     Bars: PriceBar array
-    Atr: DataPoint<decimal> array
     VolumeRate: decimal
     VolumeSlope: float
-    AtrSlope: float
+    CloseSlope: float
 }
     with
         member this.Start = this.Bars |> Array.head
         member this.End = this.Bars |> Array.last
+    
+let plotData (bars: PriceBars) =
+    
+    let barsOfInterest = bars.Bars
+    
+    let closes = barsOfInterest |> Array.map (fun bar -> bar.Close)
+    let volumes = barsOfInterest |> Array.map (fun bar -> decimal bar.Volume)
+    
+    let struct(closeIntercept, closeSlope) = MathNet.Numerics.Fit.Line([|0..(barsOfInterest.Length - 2)|] |> Array.map float, closes |> Array.take (barsOfInterest.Length - 1) |> Array.map float)
+
+    let x = [|0..(barsOfInterest.Length - 1)|]
+    
+    let obv = Indicators.onBalanceVolume bars
+
+    let priceBarTrace =
+        XPlot.Plotly.Candlestick(
+            x = x,
+            ``open`` = (barsOfInterest |> Array.map (fun bar -> bar.Open)),
+            high = (barsOfInterest |> Array.map (fun bar -> bar.High)),
+            low = (barsOfInterest |> Array.map (fun bar -> bar.Low)),
+            close = (barsOfInterest |> Array.map (fun bar -> bar.Close)),
+            showlegend = false
+        ) :> Trace
         
-let private filterToCertainGapsOnly (context:EnvironmentContext) userState = async {
+    let closeTrace = 
+        XPlot.Plotly.Scatter(
+            x = x,
+            y = (closes |> Array.map float),
+            mode = "lines",
+            name = "Close"
+        ) :> Trace
+        
+    let obvTrace = 
+        XPlot.Plotly.Scatter(
+            x = x,
+            y = (obv |> Array.map (fun d -> d.Value |> float)),
+            mode = "lines",
+            name = "OBV",
+            showlegend = false,
+            yaxis = "y2"
+        ) :> Trace
+        
+    let closeSlopeTrace = 
+        XPlot.Plotly.Scatter(
+            x = x,
+            y = (x |> Array.map (fun x -> closeIntercept + closeSlope * float x)),
+            mode = "lines",
+            name = "Close Slope",
+            showlegend = false
+        ) :> Trace
+
+    let volumeTrace = 
+        Bar(
+            x = x,
+            y = (volumes |> Array.map float),
+            name = "Volume",
+            showlegend = false
+        ) :> Trace
+    
+    let struct (volumeIntercept, volumeSlope) = MathNet.Numerics.Fit.Line(x |> Array.take (x.Length - 1) |> Array.map float, volumes |> Array.take (volumes.Length - 1) |> Array.map float)
+    
+    let volumeSlopeTrace = 
+        XPlot.Plotly.Scatter(
+            x = x,
+            y = (x |> Array.map (fun x -> volumeIntercept + volumeSlope * float x)),
+            mode = "lines",
+            name = "Volume Slope",
+            showlegend = false
+        )
+
+    let priceLayout =
+        Layout(
+            title = "Price",
+            xaxis = Xaxis(title = "Bar Index"),
+            yaxis = Yaxis(title = "Price"),
+            yaxis2 = Yaxis(title = "OBV", overlaying = "y", side = "right")
+        )
+
+    let volumeLayout =
+        Layout(
+            title = "Volume",
+            xaxis = Xaxis(title = "Bar Index"),
+            yaxis = Yaxis(title = "Volume")
+        )
+
+    let priceChart = 
+        [ priceBarTrace; closeSlopeTrace; obvTrace ]
+        |> Chart.Plot
+        |> Chart.WithLayout priceLayout
+
+    let volumeChart =
+        [ volumeTrace; volumeSlopeTrace ]
+        |> Chart.Plot
+        |> Chart.WithLayout volumeLayout
+
+    // let combinedChart =
+    [ priceChart; volumeChart ]
+        |> Chart.ShowAll // Arrange the charts in a 1x2 grid (one row, two columns)
+
+    // combinedChart |> Chart.Show
+    
+let private contractingVolumeBreakout (bars: PriceBars) =
+    
+    let contractingVolumeBreakoutName = "Contracting Volume Breakout"
+    let volumeRateThreshold = 1.3m
+    let volumeSlopeThreshold = 0.0
+    let rangeSlopeThreshold = 0.0
+    
+    let barsOfInterest = bars.Bars[0..bars.Length-2]
+        
+    let volumes = barsOfInterest |> Array.map (fun bar -> decimal bar.Volume)
+    let ranges = barsOfInterest |> Array.map (fun bar -> bar.High - bar.Low)
+    
+    let volumeStats = volumes |> DistributionStatistics.calculate
+    let rangeStats = ranges |> DistributionStatistics.calculate
+    
+    let lastBar = bars.Last
+    let lastVolume = decimal lastBar.Volume
+    let lastVolumeRate = lastVolume / volumeStats.mean
+    let lastRange = ranges |> Seq.last
+    
+    let x = [|0.0..(volumes.Length - 1 |> float)|]
+    let volY = volumes |> Array.map float
+    let struct (_, volSlope) = MathNet.Numerics.Fit.Line(x, volY)
+    
+    let rangeY = ranges |> Seq.map float |> Seq.toArray
+    let struct (_, rangeSlope) = MathNet.Numerics.Fit.Line(x, rangeY)
+    
+    let struct (_, closeSlope) = MathNet.Numerics.Fit.Line(x, barsOfInterest |> Array.map (fun bar -> bar.Close |> float))
+   
+    let description = $"{contractingVolumeBreakoutName}: {lastVolumeRate:N1}x, Vol Slope: {volSlope:N2}, Price Slope: {closeSlope:N2}"
+        
+    if lastVolumeRate > volumeRateThreshold && 
+       volSlope < volumeSlopeThreshold &&
+       lastBar.Close > lastBar.Open &&
+       rangeSlope < rangeSlopeThreshold then
+
+        Some({
+            date = lastBar.Date
+            name = contractingVolumeBreakoutName
+            description = description
+            value = lastVolumeRate
+            valueFormat = ValueFormat.Number
+            sentimentType = SentimentType.Positive
+        })
+    else
+        None
+            
+let private runInternal (context:EnvironmentContext) userState = async {
     
     let debugBars bars =
         Console.WriteLine("Bars: {0}, {1}, {2}", bars |> Array.head, bars |> Array.last, bars.Length)
         
     let debug (matched:MatchedBreakout) =
-        Console.WriteLine($"Start: {matched.Start.DateStr}, End: {matched.End.DateStr}, Rate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, AtrSlope: {matched.AtrSlope:N2}")
+        Console.WriteLine($"Start: {matched.Start.DateStr}, End: {matched.End.DateStr}, Rate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, AtrSlope: {matched.CloseSlope:N2}")
         
     Console.Write("Ticker: ")
     let tickerSymbol = Console.ReadLine()
@@ -126,53 +273,17 @@ let private filterToCertainGapsOnly (context:EnvironmentContext) userState = asy
             
         let atr = Indicators.averageTrueRage bars |> _.DataPoints
         
-        // window of 40 bars
-        // let bars =
         bars.Bars
         |> Array.windowed 41
-        |> Array.map (
+        |> Array.iter (
             fun window ->
-                
-                let preceding = window[0..39]
-                let volX = [|0.0..(preceding.Length - 1 |> float)|]
-                let volY = preceding |> Array.map (fun b -> b.Volume |> float)
-                let struct (_, volumeSlope) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(volX, volY)
-                let negativeVolumeSlope = volumeSlope < 0.0
-                
-                let _, rate = averageVolumeAndRateAtLastBar window
-                let highBreakout = rate > 1.3m
-                
-                let lastBar = window |> Array.last
-                let closedPositive = lastBar.Close > lastBar.Open
-                
-                // find the atr bar for the date of the last bar
-                let atrEndIndex = atr |> Array.findIndex (fun b -> b.Label = lastBar.DateStr)
-                let atrStartIndex =
-                    match atrEndIndex - window.Length - 1 with
-                    | x when x < 0 -> 0
-                    | x -> x
-                    
-                let atrWindow = atr[atrStartIndex+2..atrEndIndex]
-                let atrX = [|0.0..(atrWindow.Length - 1 |> float)|]
-                let atrY = atrWindow |> Array.map (fun b -> b.Value |> float)
-                let struct (_, atrSlope) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(atrX, atrY)
-                let negativeAtrSlope = atrSlope < 0.0
-                
-                match negativeVolumeSlope && highBreakout && closedPositive && negativeAtrSlope with
-                | true ->
-                    Some {
-                        Bars = window
-                        Atr = atrWindow
-                        AtrSlope = atrSlope
-                        VolumeRate = rate
-                        VolumeSlope = volumeSlope 
-                    }
-                | false -> None
-        )
-        |> Array.choose id
-        |> Array.iter(fun matched ->
-            debug matched
-            // Console.ReadLine() |> ignore
+                let breakout = contractingVolumeBreakout (window |> PriceBars)
+                match breakout with
+                | Some pattern ->
+                    Console.WriteLine(window[window.Length-1].DateStr + ": " + pattern.description)
+                    plotData (window |> PriceBars)
+                    Console.ReadLine() |> ignore
+                | None -> ()
         )
             
 }   
@@ -181,5 +292,5 @@ let run (context:EnvironmentContext) = async {
     let! user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask
     match user with
     | None -> failwith "User not found"
-    | Some user -> return! filterToCertainGapsOnly context user.State
+    | Some user -> return! runInternal context user.State
 }
