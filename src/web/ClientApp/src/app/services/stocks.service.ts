@@ -316,6 +316,10 @@ export class StocksService {
     }
 
     // -------------------- reports -------------------------
+    reportPortfolioCorrelations(): Observable<TickerCorrelation[]> {
+        return this.http.get<TickerCorrelation[]>('/api/reports/portfolio/correlations')
+    }
+    
     chainReport(): Observable<Chain> {
         return this.http.get<Chain>('/api/reports/chain')
     }
@@ -537,6 +541,11 @@ export interface Sell {
 
 export interface Chain {
     links: Link[]
+}
+
+export interface TickerCorrelation {
+    ticker: string
+    correlations: number[]
 }
 
 export interface Link {

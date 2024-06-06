@@ -1,6 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {PositionInstance, StockQuote, StocksService, StockTradingPositions} from '../services/stocks.service';
+import {
+    PositionInstance,
+    StockQuote,
+    StocksService,
+    StockTradingPositions, TickerCorrelation
+} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
@@ -53,6 +58,7 @@ export class PlaygroundComponent implements OnInit {
     status: string;
     testTicker: string;
     chartOptions: any[] = []
+    correlations: TickerCorrelation[];
 
     constructor(
         private stocks: StocksService,
@@ -70,7 +76,13 @@ export class PlaygroundComponent implements OnInit {
         }, (error) => {
             this.errors = GetErrors(error)
         })
+        
+        this.stocks.reportPortfolioCorrelations().subscribe((data) => {
+            this.correlations = data
+        })
     }
+
+    
 
     createChartOptions(positions: StockTradingPositions) {
         const entries = positions.current

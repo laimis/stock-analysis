@@ -189,12 +189,15 @@ module AnalysisOutcomeEvaluationScoringHelper =
 
 module Histogram =
     
+    let private rounded (value:decimal) =
+        System.Math.Round(value, 4)
+        
     let calculate (min:decimal) max numberOfBuckets (numbers:decimal seq) : array<ValueWithFrequency> =
         
         let histogram = MathNet.Numerics.Statistics.Histogram(numbers |> Seq.map float, numberOfBuckets, min |> float, max |> float)
         
         [|0..histogram.BucketCount-1|]
-        |> Array.map (fun i -> { value = histogram.Item(i).LowerBound |> decimal; frequency = histogram.Item(i).Count |> int })
+        |> Array.map (fun i -> { value = histogram.Item(i).LowerBound |> decimal |> rounded; frequency = histogram.Item(i).Count |> int })
         
     let calculateFromSequence symmetric numberOfBuckets (numbers:decimal seq) =
         let min, max =

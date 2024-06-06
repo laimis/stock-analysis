@@ -1,6 +1,12 @@
 import {Component, Input} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
-import {OutcomesReport, PositionInstance, StockGaps, StocksService} from '../../services/stocks.service';
+import {
+    OutcomesReport,
+    PositionInstance,
+    StockGaps,
+    StocksService,
+    TickerCorrelation
+} from '../../services/stocks.service';
 import {catchError, finalize, map} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
 
@@ -16,20 +22,23 @@ export class StockPositionReportsComponent {
     singleBarReportWeekly: OutcomesReport;
     positionsReport: OutcomesReport;
     gaps: StockGaps[] = [];
+    correlationReport: TickerCorrelation[];
     tickerFilter: string;
 
     loading = {
         daily: false,
         weekly: false,
         allBars: false,
-        positions: false
+        positions: false,
+        correlation: false
     }
 
     errors = {
         daily: null,
         weekly: null,
         allBars: null,
-        positions: null
+        positions: null,
+        correlation: null
     }
     tickers: string[] = []
 
@@ -55,6 +64,7 @@ export class StockPositionReportsComponent {
         this.loading.daily = true
         this.loading.weekly = true
         this.loading.positions = true
+        this.loading.correlation = true
 
         const positionReport$ = this.service.reportPositions().pipe(
             map(report => {
@@ -93,8 +103,21 @@ export class StockPositionReportsComponent {
             ),
             finalize(() => this.loading.weekly = false)
         )
+        
+        const correlationReport$ = this.service.reportPortfolioCorrelations().pipe(
+            map(report => {
+                this.correlationReport = report
+            }),
+            catchError(
+                error => {
+                    this.handleApiError("Unable to load correlation data", error, (e) => this.errors.correlation = e)
+                    return EMPTY
+                }
+            ),
+            finalize(() => this.loading.correlation = false)
+        )
 
-        concat(positionReport$, dailyReport$, weeklyReport$).subscribe()
+        concat(positionReport$, dailyReport$, weeklyReport$, correlationReport$).subscribe()
     }
 
     loadAllTimeData(positions: PositionInstance[]) {

@@ -103,4 +103,14 @@
         <h5>Gaps for {{ gap.ticker }}</h5>
         <app-gaps [gaps]="gap"></app-gaps>
     }
+    
+    @if (errors.correlation) {
+        <app-error-display [errors]="errors.correlation"></app-error-display>
+    }
+    @if (loading.correlation) {
+        <app-loading></app-loading>
+    }
+    @if (correlationReport) {
+        <app-correlations [correlations]="correlationReport"></app-correlations>
+    }
 </div>

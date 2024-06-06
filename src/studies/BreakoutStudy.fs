@@ -240,8 +240,9 @@ let private contractingVolumeBreakout (bars: PriceBars) =
         
     if lastVolumeRate > volumeRateThreshold && 
        volSlope < volumeSlopeThreshold &&
-       lastBar.Close > lastBar.Open &&
-       rangeSlope < rangeSlopeThreshold then
+       lastBar.Close > lastBar.Open
+       // && rangeSlope < rangeSlopeThreshold
+       then
 
         Some({
             date = lastBar.Date

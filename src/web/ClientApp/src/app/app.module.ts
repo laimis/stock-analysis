@@ -105,6 +105,7 @@ import {TradesReportComponent} from "./reports/trades-report/trades-report.compo
 import {TrendsReportComponent} from "./reports/trends-report/trends-report.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
 import {StockTradingChartsComponent} from "./stocks/stock-trading/stock-trading-charts.component";
+import {CorrelationsComponent} from "./shared/reports/correlations.component";
 
 
 let routes: Routes = [
@@ -279,7 +280,7 @@ let routes: Routes = [
         NgOptimizedImage,
         StockTradingChartsComponent,
         ReactiveFormsModule,
-        TradingViewLinkComponent], providers: [
+        TradingViewLinkComponent, CorrelationsComponent], providers: [
         { provide: "windowObject", useValue: window },
         Title,
         provideHttpClient(withInterceptorsFromDi())

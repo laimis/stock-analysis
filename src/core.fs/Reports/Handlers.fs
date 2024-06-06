@@ -161,6 +161,11 @@ type PercentChangeStatisticsView =
         AllTime: DistributionStatistics
     }
     
+type PortfolioCorrelationQuery =
+    {
+        UserId: UserId
+    }
+    
 type SellsQuery =
     {
         UserId: UserId
@@ -252,6 +257,46 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
     }
     
     interface IApplicationService
+    
+    member _.Handle(request:PortfolioCorrelationQuery) = task {
+        let! user = accounts.GetUser request.UserId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            
+            let! stocks = storage.GetStockPositions request.UserId
+            
+            let! prices = 
+                stocks
+                |> Seq.filter (_.IsOpen)
+                |> Seq.map (fun stock -> async {
+                    let! priceResponse =
+                        brokerage.GetPriceHistory
+                            user.State
+                            stock.Ticker
+                            PriceFrequency.Daily
+                            (DateTimeOffset.UtcNow.AddDays(-60) |> Some)
+                            None |> Async.AwaitTask
+                    match priceResponse with
+                    | Error e -> return None
+                    | Ok prices -> return Some (stock.Ticker, prices)
+                })
+                |> Async.Sequential
+                
+            let successOnly = prices |> Array.choose id
+            
+            let matrix = successOnly |> Array.map snd |> Array.map _.Bars |> Array.map (fun bars -> bars |> Array.map (fun b -> b.Close |> float))
+            
+            let correlations = PositionAnalysis.correlations matrix
+            
+            // let's go over successOnly again, and for each stock, let's find the correlation
+            // with all other stocks
+            return successOnly
+            |> Array.mapi (fun index (ticker, _) ->
+                let row = correlations.GetValue(index) :?> float[]
+                {|ticker=ticker; correlations=row|}
+            ) |> Ok
+    }
     
     member _.Handle(request:ChainQuery) = task {
         let! stocks = storage.GetStockPositions request.UserId

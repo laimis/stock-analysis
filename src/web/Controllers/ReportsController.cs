@@ -63,6 +63,14 @@ namespace web.Controllers
                     new OutcomesReportForPositionsQuery(User.Identifier())
                 )
             );
+        
+        [HttpGet("portfolio/correlations")]
+        public Task<ActionResult> PortfolioCorrelations() =>
+            this.OkOrError(
+                service.Handle(
+                    new PortfolioCorrelationQuery(User.Identifier())
+                )
+            );
 
         [HttpGet("DailyPositionReport/{positionId}")]
         public Task<ActionResult> DailyPositionReport(string positionId) =>

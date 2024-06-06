@@ -293,6 +293,11 @@ module PositionAnalysis =
             )
         ]
 
+    let correlations (matrix:float array array) =
+        let answer = MathNet.Numerics.Statistics.Correlation.PearsonMatrix(matrix)
+        
+        [|0..answer.RowCount-1|] |> Array.map (fun index -> answer.Row(index).ToArray())
+        
     let dailyPLAndGain (bars:PriceBars) (optionalPosition:StockPositionWithCalculations option) =
         
         let firstBar = 0
