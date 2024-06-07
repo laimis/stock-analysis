@@ -301,6 +301,10 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
             | Error err ->
                 logger.LogError($"Pattern monitor could not get price history for {ticker}: {err.Message}")
             | Ok response ->
+                // see how many bars did we get, I suspect we get only one bar from time to time
+                match response.Length with
+                | x when x <= 1 -> logger.LogWarning($"Pattern monitor got only {response.Length} bars for {ticker}")
+                | _ -> ()
                 priceCache.Add(ticker, response)
 
             return prices
