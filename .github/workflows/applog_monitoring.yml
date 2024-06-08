@@ -28,7 +28,7 @@ jobs:
               id: get_logs
               run: |
                   echo "APP_LOGS<<EOF" >> $GITHUB_OUTPUT
-                  doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }} >> $GITHUB_OUTPUT
+                  doctl apps logs ${{ secrets.DIGITALOCEAN_APP_ID }} --tail 50 >> $GITHUB_OUTPUT
                   echo "EOF" >> $GITHUB_OUTPUT
             
             - name: Check for errors
