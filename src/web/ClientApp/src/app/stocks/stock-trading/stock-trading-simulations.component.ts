@@ -17,6 +17,7 @@ export class StockTradingSimulationsComponent implements OnInit {
     errors: string[];
     numberOfTrades: number = 40;
     closePositions: boolean = true;
+    loading: boolean = false;
 
     constructor(
         private stockPositions: StockPositionsService,
@@ -37,12 +38,18 @@ export class StockTradingSimulationsComponent implements OnInit {
                 this.numberOfTrades = parseInt(n);
             }
 
-            this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
-                this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
-                this.fetchSpyPrices();
-            }, error => {
-                this.errors = GetErrors(error)
-            });
+        });
+    }
+    
+    simulateTrades() {
+        this.loading = true
+        this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
+            this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
+            this.loading = false;
+            this.fetchSpyPrices();
+        }, error => {
+            this.errors = GetErrors(error)
+            this.loading = false;
         });
     }
 
