@@ -21,22 +21,6 @@
                     <span class="text-muted">Earliest date:</span> {{ results[0].performance.earliestDate | date }},
                     <span class="text-muted">latest date:</span> {{ results[0].performance.latestDate | date }}
                 </div>
-                @if (spyPrices) {
-                    <div>
-                        <span class="text-muted">SPY during that time advanced from </span>
-                        {{ spyPrices[0].close| currency }} to {{ spyPrices[spyPrices.length - 1].close | currency }}
-                        <span
-                            class="text-muted">for gain of </span>{{ (spyPrices[spyPrices.length - 1].close - spyPrices[0].close) / spyPrices[0].close | percent }}
-                    </div>
-                }
-                @if (qqqPrices) {
-                    <div>
-                        <span class="text-muted">QQQ during that time advanced from </span>
-                        {{ qqqPrices[0].close| currency }} to {{ qqqPrices[qqqPrices.length - 1].close | currency }}
-                        <span
-                            class="text-muted">for gain of </span>{{ (qqqPrices[qqqPrices.length - 1].close - qqqPrices[0].close) / qqqPrices[0].close | percent }}
-                    </div>
-                }
             </div>
             <div class="col-2">
                 <a [href]="getExportUrl()" class="btn btn-primary btn-sm float-end">Export</a>
@@ -44,6 +28,16 @@
         </div>
         <app-error-display [errors]="errors"></app-error-display>
         <app-stock-trading-strategies [results]=results></app-stock-trading-strategies>
+        <div class="row mt-3">
+            @for(b of benchmarks; track b) {
+                <div>
+                    <span class="text-muted">{{ b.ticker }} during that time advanced from </span>
+                    {{ b.prices[0].close| currency }} to {{ b.prices[b.prices.length - 1].close | currency }}
+                    <span class="text-muted">for gain of </span>
+                    {{ (b.prices[b.prices.length - 1].close - b.prices[0].close) / b.prices[0].close | percent }}
+                </div>
+            }
+        </div>
     </section>
     
 </div>

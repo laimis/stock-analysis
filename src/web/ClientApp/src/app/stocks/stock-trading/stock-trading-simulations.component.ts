@@ -3,6 +3,8 @@ import {ActivatedRoute} from '@angular/router';
 import {PriceBar, PriceFrequency, StocksService, TradingStrategyPerformance} from '../../services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {catchError, concatAll, tap} from "rxjs/operators";
+import {concat, forkJoin} from "rxjs";
 
 @Component({
     selector: 'app-stock-trading-simulations',
@@ -12,12 +14,11 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 
 export class StockTradingSimulationsComponent implements OnInit {
     results: TradingStrategyPerformance[];
-    spyPrices: PriceBar[];
-    qqqPrices: PriceBar[];
     errors: string[];
     numberOfTrades: number = 40;
     closePositions: boolean = true;
     loading: boolean = false;
+    benchmarks: {ticker: string, prices: PriceBar[] }[] = [];
 
     constructor(
         private stockPositions: StockPositionsService,
@@ -43,17 +44,18 @@ export class StockTradingSimulationsComponent implements OnInit {
     
     simulateTrades() {
         this.loading = true
+        this.benchmarks = [];
         this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
             this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
             this.loading = false;
-            this.fetchSpyPrices();
+            this.fetchBenchmarks();
         }, error => {
             this.errors = GetErrors(error)
             this.loading = false;
         });
     }
 
-    fetchSpyPrices() {
+    fetchBenchmarks() {
         const earliest = this.results[0].performance.earliestDate;
         const latest = this.results[0].performance.latestDate;
         
@@ -61,13 +63,31 @@ export class StockTradingSimulationsComponent implements OnInit {
         const earliestDate = earliest.substring(0, earliest.indexOf('T'));
         const latestDate = latest.substring(0, latest.indexOf('T'));
         
-        this.stocks.getStockPricesForDates("SPY", PriceFrequency.Daily, earliestDate, latestDate).subscribe(prices => {
-            this.spyPrices = prices.prices;
-        });
-
-        this.stocks.getStockPricesForDates("QQQ", PriceFrequency.Daily, earliestDate, latestDate).subscribe(prices => {
-            this.qqqPrices = prices.prices;
-        });
+        let benchmarkTickers = ["SPY", "QQQ", "ARKK", "IWM"];
+        let observables = benchmarkTickers.map(benchmark =>
+            this.stocks.getStockPricesForDates(benchmark, PriceFrequency.Daily, earliestDate, latestDate).pipe(
+                tap(
+                    prices => {
+                        this.benchmarks.push({ticker: benchmark, prices: prices.prices});
+                    }
+                ),
+                catchError(error => {
+                    this.errors = GetErrors(error);
+                    return [];
+                })
+            )
+        )
+        
+        // wait for all observables to complete
+        forkJoin(observables).subscribe(
+            () => {
+                console.log('Benchmark prices fetched:', this.benchmarks);
+            },
+            error => {
+                // Handle any errors that occurred
+                console.error('Error fetching benchmark prices:', error);
+            }
+        );
     }
 
     backgroundCssClassForActual(results: TradingStrategyPerformance[], strategyIndex: number, positionIndex: number) {
