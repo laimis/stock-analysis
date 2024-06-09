@@ -47,9 +47,13 @@ export class StockTradingSimulationsComponent implements OnInit {
     }
 
     fetchSpyPrices() {
-        const earliestDate = this.results[0].performance.earliestDate;
-        const latestDate = this.results[0].performance.latestDate;
-
+        const earliest = this.results[0].performance.earliestDate;
+        const latest = this.results[0].performance.latestDate;
+        
+        // take only date portion of the date
+        const earliestDate = earliest.substring(0, earliest.indexOf('T'));
+        const latestDate = latest.substring(0, latest.indexOf('T'));
+        
         this.stocks.getStockPricesForDates("SPY", PriceFrequency.Daily, earliestDate, latestDate).subscribe(prices => {
             this.spyPrices = prices.prices;
         });

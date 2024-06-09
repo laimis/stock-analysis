@@ -198,7 +198,7 @@ export class StocksService {
     }
 
     getStockPricesForDates(symbol: string, frequency: PriceFrequency, start: string, end: string): Observable<Prices> {
-        return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}?frequeyncy=${frequency}`)
+        return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}?frequency=${frequency}`)
     }
 
     importTransactions(file: any): Observable<any> {
