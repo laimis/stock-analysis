@@ -85,6 +85,9 @@ type StockPositionState =
     member this.NumberOfShares =
         this.ShareTransactions
         |> List.map (fun x -> match x.Type with | Buy -> x.NumberOfShares | Sell -> -x.NumberOfShares) |> List.sum
+        
+    member this.HasLabel key value =
+        this.Labels.ContainsKey(key) && this.Labels[key] = value
     member this.AggregateId = this.PositionId |> StockPositionId.guid
         
     interface IAggregate with

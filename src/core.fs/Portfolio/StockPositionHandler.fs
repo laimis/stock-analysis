@@ -678,28 +678,14 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
     
     member _.Handle (command:SimulateUserTrades) = task {
         
-        let runSimulation (runner:TradingStrategyRunner) user (position:StockPositionState) closeIfOpenAtEnd = async {
-            let calculations = position |> StockPositionWithCalculations
+        let runSimulation (runner:TradingStrategyRunner) user closeIfOpenAtEnd (position:StockPositionState) = async {
             let! results =
                 runner.Run(
                     user,
-                    numberOfShares=calculations.CompletedPositionShares,
-                    price=calculations.CompletedPositionCostPerShare,
-                    stopPrice=calculations.FirstStop(),
-                    ticker=position.Ticker,
-                    ``when``=position.Opened,
+                    position=position,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             
-            let actualTradingResult = {
-                StrategyName = TradingStrategyConstants.ActualTradesName
-                Position = calculations
-                MaxDrawdownPct = 0m
-                MaxGainPct = 0m
-                MaxDrawdownPctRecent = 0m
-                MaxGainPctRecent = 0m 
-            }
-            results.Insert(0, actualTradingResult)
             return results.Results
         }
         
@@ -725,8 +711,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let positions =
                 stocks
-                |> Seq.filter _.StopPrice.IsSome
-                |> Seq.sortByDescending (fun p -> match p.Closed with | Some c -> c | None -> DateTimeOffset.MinValue)
+                |> Seq.filter (fun s -> s.StopPrice.IsSome && s.IsClosed && s.HasLabel "strategy" "longterm" |> not)
+                |> Seq.sortByDescending _.Closed.Value
                 |> Seq.truncate command.NumberOfTrades
                 |> Seq.toList
                 
@@ -734,7 +720,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let! simulations =
                 positions
-                |> Seq.map (fun p -> runSimulation runner user.State p command.ClosePositionIfOpenAtTheEnd)
+                |> List.map (runSimulation runner user.State command.ClosePositionIfOpenAtTheEnd)
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
