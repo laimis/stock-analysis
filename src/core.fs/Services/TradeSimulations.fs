@@ -38,7 +38,7 @@ type TradingStrategy(name:string) =
     
     abstract member ApplyPriceBarToPositionInternal : SimulationContext -> PriceBar -> StockPositionState
     
-    member this.ApplyPriceBarToPosition (context:SimulationContext) (bar:PriceBar) =
+    member private this.ApplyPriceBarToPosition (context:SimulationContext) (bar:PriceBar) =
         
         match context.Position.Closed with
         | Some _ -> context
@@ -110,7 +110,6 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
             |> TradingStrategy.ClosePosition bar.Close bar.Date
         else
             context.Position
-            
 
 type TradingStrategyActualTrade() =
     
@@ -155,7 +154,7 @@ type TradingStrategyActualTrade() =
                 MaxGainPctRecent = maxGainPctRecent
                 Position = positionWithCalculations
                 StrategyName = TradingStrategyConstants.ActualTradesName
-            }    
+            }
 
 type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPointFunc,stopPriceFunc) =
     
@@ -257,13 +256,18 @@ module TradingStrategyFactory =
     let createCloseAfterFixedNumberOfDays numberOfDays : ITradingStrategy =
         let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days", exitCondition)
+        
+    let createLastSellStrategy (position:StockPositionState) : ITradingStrategy =
+        let exitCondition = fun (_:SimulationContext) (bar:PriceBar) -> position.Closed.IsSome && bar.Date.Date = position.Closed.Value.Date
+        TradingStrategyCloseOnCondition("Close last sell", exitCondition)
     
-    let getStrategies() : ITradingStrategy seq =
+    let getStrategies (actualTrade:StockPositionState option) : ITradingStrategy seq =
         [
             createProfitPointsTrade 3 // 3 profit points
             createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
             createCloseAfterFixedNumberOfDays 15
             createCloseAfterFixedNumberOfDays 30
+            if actualTrade.IsSome then createLastSellStrategy actualTrade.Value
         ]
     
 type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours) =
@@ -304,20 +308,18 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             match prices with
             | Error err -> results.MarkAsFailed($"Failed to get price history for {ticker}: {err.Message}")
             | Ok bars ->
+                let stockPosition =
+                    StockPosition.``open`` ticker numberOfShares price ``when``
+                    |> StockPosition.setStop stopPrice ``when``
+                    |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
+                    
                 match bars.Bars with
                 | [||] -> results.MarkAsFailed($"No price history found for {ticker}")
                 | _ ->
                     
-                    TradingStrategyFactory.getStrategies()
+                    TradingStrategyFactory.getStrategies actualTrade
                     |> Seq.iter ( fun strategy ->
-                        
-                        let result =
-                            StockPosition.``open`` ticker numberOfShares price ``when``
-                            |> StockPosition.setStop stopPrice ``when``
-                            |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
-                            |> strategy.Run bars closeIfOpenAtTheEnd
-                            
-                        results.Add(result)
+                        stockPosition |> strategy.Run bars closeIfOpenAtTheEnd |> results.Add
                     )
                     
                     match actualTrade with
