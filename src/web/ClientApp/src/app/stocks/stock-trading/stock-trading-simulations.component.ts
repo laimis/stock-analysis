@@ -1,6 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {PriceBar, PriceFrequency, StocksService, TradingStrategyPerformance} from '../../services/stocks.service';
+import {
+    PositionInstance,
+    PriceBar,
+    PriceFrequency,
+    StocksService,
+    TradingStrategyPerformance
+} from '../../services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {catchError, concatAll, tap} from "rxjs/operators";
@@ -15,7 +21,7 @@ import {concat, forkJoin} from "rxjs";
 export class StockTradingSimulationsComponent implements OnInit {
     results: TradingStrategyPerformance[];
     errors: string[];
-    numberOfTrades: number = 40;
+    numberOfTrades: number = 10;
     closePositions: boolean = true;
     loading: boolean = false;
     benchmarks: {ticker: string, prices: PriceBar[] }[] = [];
@@ -53,6 +59,30 @@ export class StockTradingSimulationsComponent implements OnInit {
             this.errors = GetErrors(error)
             this.loading = false;
         });
+    }
+    
+    selectedStrategy:string = 'Actual trades ⭐';
+    getSelectedStrategyEntry() {
+        return this.getStrategyEntry(this.selectedStrategy);
+    }
+    getStrategyEntry(name:string) {
+        return this.results.find(result => result.strategyName === name)
+    }
+    findActualTrade(position:PositionInstance) {
+        return this.getStrategyEntry("Actual trades ⭐").positions.find(p => p.ticker === position.ticker && p.opened === position.opened)
+    }
+    
+    biggestWinnersComparedToActual() {
+        const positions = this.getSelectedStrategyEntry().positions.slice();
+        
+        positions.sort((a, b) => {
+                let bActualProfit = this.findActualTrade(b).profit;
+                let aActualProfit = this.findActualTrade(a).profit;
+                return (b.profit - bActualProfit) - (a.profit - aActualProfit)
+            }
+        );
+        
+        return positions.slice(0, 20);
     }
 
     fetchBenchmarks() {

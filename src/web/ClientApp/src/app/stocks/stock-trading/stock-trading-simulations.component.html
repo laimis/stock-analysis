@@ -39,5 +39,69 @@
             }
         </div>
     </section>
+    <section *ngIf="results">
+        
+        <!-- section to select the strategy to view -->
+        <div class="mb-3">
+            <label for="strategySelect" class="form-label">Select a strategy to view:</label>
+            <select class="form-select" id="strategySelect" [(ngModel)]="selectedStrategy">
+                <option *ngFor="let strategy of results" [value]="strategy.strategyName" [selected]="selectedStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
+            </select>
+        </div>
+        
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Opened</th>
+                    <th>Closed</th>
+                    <th>Profit</th>
+                    <th>Gain %</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(trade of getSelectedStrategyEntry().positions; track trade) {
+                    <tr>
+                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="trade.ticker"></app-stock-link-and-tradingview-link></td>
+                        <td>{{ trade.opened | date }}</td>
+                        <td>{{ trade.closed | date }} ({{ trade.daysHeld }} vs {{ findActualTrade(trade).daysHeld }})</td>
+                        <td>{{ trade.profit | currency }} vs {{ findActualTrade(trade).profit | currency }}</td>
+                        <td>{{ trade.gainPct | percent }} vs {{ findActualTrade(trade).gainPct | percent }}</td>
+                        <td>{{ trade.completedPositionCostPerShare * trade.completedPositionShares | currency }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+        <h3>Biggest Winners compared to Actual</h3>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Opened</th>
+                    <th>Closed</th>
+                    <th>Profit</th>
+                    <th>Gain %</th>
+                    <th>Profit Diff</th>
+                    <th>Gain %  Diff</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(trade of biggestWinnersComparedToActual(); track trade) {
+                    <tr>
+                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="trade.ticker"></app-stock-link-and-tradingview-link></td>
+                        <td>{{ trade.opened | date }}</td>
+                        <td>{{ trade.closed | date }} ({{ trade.daysHeld }})</td>
+                        <td>{{ trade.profit | currency }}</td>
+                        <td>{{ trade.gainPct | percent }}</td>
+                        <td>{{trade.profit - findActualTrade(trade).profit | currency}}</td>
+                        <td>{{trade.gainPct - findActualTrade(trade).gainPct | percent}}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+    </section>
     
 </div>

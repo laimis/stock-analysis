@@ -690,16 +690,16 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         }
         
         let mapToStrategyPerformance (name:string, results:TradingStrategyResult seq) =
-            let positions = results |> Seq.map (_.Position) |> Seq.toArray
-            let performance =
-                try
-                    TradingPerformance.Create name positions
-                with
-                    // TODO: something is throwing Value was either too large or too small for a Decimal
-                    // for certain simulations.
-                    // ignoring it here because I need the results, but need to look at it at some point
-                    | :?OverflowException -> TradingPerformance.Create name (Array.Empty<StockPositionWithCalculations>())
-            
+            let positions = results |> Seq.map (_.Position) |> Seq.toArray |> Array.sortBy _.Closed
+            let performance = TradingPerformance.Create name positions
+                // try
+                //     TradingPerformance.Create name positions
+                // with
+                //     // TODO: something is throwing Value was either too large or too small for a Decimal
+                //     // for certain simulations.
+                //     // ignoring it here because I need the results, but need to look at it at some point
+                //     | :?OverflowException -> TradingPerformance.Create name (Array.Empty<StockPositionWithCalculations>())
+                //
             {performance = performance; strategyName = name; positions = positions}
         
         let! user = accounts.GetUser(command.UserId)
