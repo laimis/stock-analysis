@@ -58,7 +58,6 @@ export class PlaygroundComponent implements OnInit {
     status: string;
     testTicker: string;
     chartOptions: any[] = []
-    correlations: TickerCorrelation[];
 
     constructor(
         private stocks: StocksService,
@@ -76,13 +75,18 @@ export class PlaygroundComponent implements OnInit {
         }, (error) => {
             this.errors = GetErrors(error)
         })
-        
-        this.stocks.reportPortfolioCorrelations().subscribe((data) => {
-            this.correlations = data
-        })
     }
 
-    
+    correlations: TickerCorrelation[];
+    daysForCorrelations: number = 60
+    loadingCorrelations: boolean = false
+    runCorrelations() {
+        this.loadingCorrelations = true
+        this.stocks.reportPortfolioCorrelations(this.daysForCorrelations).subscribe((data) => {
+            this.correlations = data
+            this.loadingCorrelations = false
+        })
+    }
 
     createChartOptions(positions: StockTradingPositions) {
         const entries = positions.current

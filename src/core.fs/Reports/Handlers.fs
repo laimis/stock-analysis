@@ -163,6 +163,7 @@ type PercentChangeStatisticsView =
     
 type PortfolioCorrelationQuery =
     {
+        Days: int
         UserId: UserId
     }
     
@@ -275,10 +276,10 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                             user.State
                             stock.Ticker
                             PriceFrequency.Daily
-                            (DateTimeOffset.UtcNow.AddDays(-60) |> Some)
+                            (DateTimeOffset.UtcNow.AddDays(-request.Days) |> Some)
                             None |> Async.AwaitTask
                     match priceResponse with
-                    | Error e -> return None
+                    | Error _ -> return None
                     | Ok prices -> return Some (stock.Ticker, prices)
                 })
                 |> Async.Sequential

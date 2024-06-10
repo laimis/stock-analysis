@@ -24,6 +24,7 @@ export class StockPositionReportsComponent {
     gaps: StockGaps[] = [];
     correlationReport: TickerCorrelation[];
     tickerFilter: string;
+    daysForCorrelations = 60
 
     loading = {
         daily: false,
@@ -104,7 +105,7 @@ export class StockPositionReportsComponent {
             finalize(() => this.loading.weekly = false)
         )
         
-        const correlationReport$ = this.service.reportPortfolioCorrelations().pipe(
+        const correlationReport$ = this.service.reportPortfolioCorrelations(this.daysForCorrelations).pipe(
             map(report => {
                 this.correlationReport = report
             }),

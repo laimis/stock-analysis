@@ -16,5 +16,11 @@
         </div>
     </div>
     
+    <!-- create a form that allows to select number of days for correlations -->
+    <div class="mt-4">
+        <label for="days" class="form-label">Number of days</label>
+        <input class="form-control" type="number" id="days" [(ngModel)]="daysForCorrelations" [disabled]="loadingCorrelations" />
+        <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
+    </div>
     <app-correlations [correlations]="correlations"></app-correlations>
 </div>

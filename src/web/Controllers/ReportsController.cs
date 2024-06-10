@@ -65,10 +65,10 @@ namespace web.Controllers
             );
         
         [HttpGet("portfolio/correlations")]
-        public Task<ActionResult> PortfolioCorrelations() =>
+        public Task<ActionResult> PortfolioCorrelations([FromQuery] int days) =>
             this.OkOrError(
                 service.Handle(
-                    new PortfolioCorrelationQuery(User.Identifier())
+                    new PortfolioCorrelationQuery(days, User.Identifier())
                 )
             );
 
