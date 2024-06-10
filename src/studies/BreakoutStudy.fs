@@ -260,8 +260,11 @@ let private runInternal (context:EnvironmentContext) userState = async {
     let debugBars bars =
         Console.WriteLine("Bars: {0}, {1}, {2}", bars |> Array.head, bars |> Array.last, bars.Length)
         
-    let debug (matched:MatchedBreakout) =
+    let toString (matched:MatchedBreakout) =
         Console.WriteLine($"Start: {matched.Start.DateStr}, End: {matched.End.DateStr}, Rate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, AtrSlope: {matched.CloseSlope:N2}")
+    
+    let toStringPattern (pattern:Pattern) =
+        $"Date: {pattern.date}, Name: {pattern.name}, Description: {pattern.description}, Value: {pattern.value:N2}"
         
     Console.Write("Ticker: ")
     let tickerSymbol = Console.ReadLine()
@@ -274,19 +277,24 @@ let private runInternal (context:EnvironmentContext) userState = async {
             
         let atr = Indicators.averageTrueRage bars |> _.DataPoints
         
-        bars.Bars
-        |> Array.windowed 41
-        |> Array.iter (
-            fun window ->
-                let breakout = contractingVolumeBreakout (window |> PriceBars)
-                match breakout with
-                | Some pattern ->
-                    Console.WriteLine(window[window.Length-1].DateStr + ": " + pattern.description)
-                    plotData (window |> PriceBars)
-                    Console.ReadLine() |> ignore
-                | None -> ()
-        )
+        let matches =
+            bars.Bars
+            |> Array.windowed 41
+            |> Array.map (fun window ->
+                match contractingVolumeBreakout (window |> PriceBars) with
+                | Some pattern -> Some (window, pattern)
+                | None -> None)
+            |> Array.choose id
             
+        // print all matches with index
+        matches |> Array.iteri (fun i (_,pattern) -> Console.WriteLine("{0}: {1}", i, toStringPattern pattern))
+        
+        Console.Write("Which one to plot:")
+        let index = Console.ReadLine() |> int
+        
+        let (bars,_) = matches.[index]
+        
+        plotData (bars |> PriceBars)
 }   
 
 let run (context:EnvironmentContext) = async {  

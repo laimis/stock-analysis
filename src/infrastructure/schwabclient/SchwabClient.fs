@@ -660,45 +660,51 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.Search (state: UserState) (query: string) (limit: int) = task {
             
             let connectedStateFunc state = task {
-                let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
-                
-                let! results = this.CallApi<InstrumentsResponse> state resource None
-                
-                return
-                    results
-                    |> Result.map(fun results -> results.instruments |> Option.defaultValue [||])
-                    |> Result.map(fun instruments ->
-                        instruments
-                        |> Seq.filter (fun i -> i.assetType |> isStockType)
-                        |> Seq.map (fun i ->
-                            {
-                                Symbol = i.symbol |> Ticker
-                                SecurityName = i.description
-                                Exchange = i.exchange
-                                AssetType = i.assetType |> parseAssetType
-                            }
+                // schwab API freaks out if the query is only a single letter, doesn't return an error and instead
+                // returns a body that has a single character that is not a valid json, so we need to check for that
+                if query.Length <= 1 then
+                    return Ok [||]
+                else
+                    
+                    let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
+                    
+                    let! results = this.CallApi<InstrumentsResponse> state resource None
+                    
+                    return
+                        results
+                        |> Result.map(fun results -> results.instruments |> Option.defaultValue [||])
+                        |> Result.map(fun instruments ->
+                            instruments
+                            |> Seq.filter (fun i -> i.assetType |> isStockType)
+                            |> Seq.map (fun i ->
+                                {
+                                    Symbol = i.symbol |> Ticker
+                                    SecurityName = i.description
+                                    Exchange = i.exchange
+                                    AssetType = i.assetType |> parseAssetType
+                                }
+                            )
+                            |> Seq.sortBy (fun r ->
+                                match r.Exchange with
+                                | "Pink Sheet" -> 1
+                                | _ -> 0
+                            )
+                            |> Seq.sortBy (fun r ->
+                                match r.AssetType with
+                                | Equity -> 0
+                                | Option -> 1
+                                | ETF -> 2
+                                // | "MUTUAL_FUND" -> 2
+                                // | "ETF" -> 3
+                                // | "INDEX" -> 4
+                                // | "CASH_EQUIVALENT" -> 5
+                                // | "FIXED_INCOME" -> 6
+                                // | "CURRENCY" -> 7
+                                // | _ -> 8
+                            )
+                            |> Seq.truncate limit
+                            |> Seq.toArray
                         )
-                        |> Seq.sortBy (fun r ->
-                            match r.Exchange with
-                            | "Pink Sheet" -> 1
-                            | _ -> 0
-                        )
-                        |> Seq.sortBy (fun r ->
-                            match r.AssetType with
-                            | Equity -> 0
-                            | Option -> 1
-                            | ETF -> 2
-                            // | "MUTUAL_FUND" -> 2
-                            // | "ETF" -> 3
-                            // | "INDEX" -> 4
-                            // | "CASH_EQUIVALENT" -> 5
-                            // | "FIXED_INCOME" -> 6
-                            // | "CURRENCY" -> 7
-                            // | _ -> 8
-                        )
-                        |> Seq.truncate limit
-                        |> Seq.toArray
-                    )
             }
             
             return! execIfConnectedToBrokerage state connectedStateFunc

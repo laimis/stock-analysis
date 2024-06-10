@@ -124,7 +124,7 @@ export class StockTradingSummaryComponent {
             let group = {
                 strategy: key,
                 positions,
-                cost: this.reduce(groupPositions, (p: PositionInstance) => p.averageCostPerShare * p.numberOfShares),
+                cost: this.reduce(groupPositions, (p: PositionInstance) => p.isShort === false ? p.averageCostPerShare * p.numberOfShares : 0),
                 risk: this.reduce(groupPositions, (p: PositionInstance) => p.costAtRiskBasedOnStopPrice),
                 profit: this.reduce(groupPositions, (p: PositionInstance) => this.getUnrealizedProfit(p)),
                 length: groupPositions.length
