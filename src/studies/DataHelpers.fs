@@ -75,6 +75,13 @@ let private readPricesFromFileSystem path = async {
 let callLogFuncIfSetup func =
     if ServiceHelper.logger <> null then func(ServiceHelper.logger)
     
+    
+
+let getTickersWithPriceHistory studiesDirectory =
+    $"{studiesDirectory}/prices"
+    |> System.IO.Directory.GetFiles
+    |> Array.map System.IO.Path.GetFileNameWithoutExtension
+    
 let tryGetPricesFromCsv studiesDirectory ticker =
     let path = generatePriceCsvPath studiesDirectory ticker
     path |> readPricesFromFileSystem

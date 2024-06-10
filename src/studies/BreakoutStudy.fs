@@ -301,5 +301,10 @@ let run (context:EnvironmentContext) = async {
     let! user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask
     match user with
     | None -> failwith "User not found"
-    | Some user -> return! runInternal context user.State
+    | Some user ->
+        
+        let tickersWithPriceAvailable =
+            "-d" |> context.GetArgumentValue |> getTickersWithPriceHistory
+        
+        Console.WriteLine($"Tickers with price history: {tickersWithPriceAvailable.Length}")
 }

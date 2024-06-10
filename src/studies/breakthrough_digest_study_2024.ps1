@@ -21,8 +21,7 @@ function TransformSignals() {
         Remove-Item -Path $outputFile -ErrorAction SilentlyContinue
     }
     
-    & .\dev_secret.bat -pt -d $studyDirectory -f "$studyDirectory\signals_newhighs.csv" -o $outputFile
-    & .\dev_secret.bat -pt -d $studyDirectory -f "$studyDirectory\signals_topgainers.csv" -o $outputFile
+    & .\dev_secret.bat -d $studyDirectory
 }
 
 function FilterGaps() {
