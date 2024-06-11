@@ -1,9 +1,12 @@
 $ErrorActionPreference = "Stop"
 
-$studyDirectory = "d:\\studies\\breakthrough_digest_study_2024"
+$studyDirectory = "d:\\studies\\breakout_study_2024"
 
 # create timestamp based on date and time
 $timestampPortion = [System.DateTime]::Now.ToString("yyyyMMdd_hhmmss")
+
+$resultsDirectory = "$($studyDirectory)\\results_$($timestampPortion)"
+
 
 write-host "I continue to execute happily!"
 
@@ -35,8 +38,6 @@ function SeedParameterFiles() {
     $resultsDirectoryFile = "results_directory.txt"
     $studyDirectoryFile = "study_directory.txt"
     
-    $resultsDirectory = "$($studyDirectory)\\results_$($timestampPortion)"
-
     #ensure results directory exists
     if (-not (Test-Path $resultsDirectory)) {
         New-Item -ItemType Directory -Path $resultsDirectory

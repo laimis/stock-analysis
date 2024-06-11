@@ -60,8 +60,8 @@ let describeSignals (records:ISignal seq) =
             let tickers = records |> Seq.map (_.Ticker) |> Seq.distinct |> Seq.length
             let screenerIds = records |> Seq.map (_.Screenerid) |> Seq.distinct |> Seq.length
             
-            let minimumDate = records |> Seq.minBy (_.Date)
-            let maximumDate = records |> Seq.maxBy (_.Date)
+            let minimumDate = records |> Seq.minBy (_.Date) |> _.Date
+            let maximumDate = records |> Seq.maxBy (_.Date) |> _.Date
 
             printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
             printfn $"Minimum date: %A{minimumDate}"
