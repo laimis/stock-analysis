@@ -66,7 +66,7 @@ function ExecuteNotebook() {
     $resultsDirectory | Out-File -FilePath $resultsDirectoryFile -Force -NoNewline
 
     # execute notebook
-    jupyter nbconvert --ExecutePreprocessor.timeout=None --InteractiveShell.iopub_timeout=0 --execute --to html --no-input .\notebook.ipynb
+    jupyter nbconvert --ExecutePreprocessor.timeout=None --InteractiveShell.iopub_timeout=0 --execute --to html --no-input .\screeners_notebook.ipynb
 
     # if last exit code is not 0, exit
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
