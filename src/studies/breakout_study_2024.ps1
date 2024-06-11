@@ -93,12 +93,12 @@ function ExecuteNotebook() {
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     # clear output
-    jupyter nbconvert --clear-output .\notebook.ipynb
+    jupyter nbconvert --clear-output .\breakout_notebook.ipynb
 
     # move file to secret file
     $outputName = "$($resultsDirectory)\notebook_$($filter)_$($filterDirection).html"
-    Write-Host "Moving notebook.html to $outputName"
-    Move-Item -Path notebook.html -Destination $outputName -Force
+    Write-Host "Moving breakout_notebook.html to $outputName"
+    Move-Item -Path breakout_notebook.html -Destination $outputName -Force
 
     ClearParameterFiles
 }
