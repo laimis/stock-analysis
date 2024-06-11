@@ -10,6 +10,7 @@ open core.fs.Services.Analysis
 open core.fs.Services.Analysis.MultipleBarPriceAnalysis
 open studies.DataHelpers
 open studies.ServiceHelper
+open FSharp.Data
 
 // let arr = Array.init 10 (fun i -> i)
 // Console.WriteLine("Array:")
@@ -22,6 +23,13 @@ open studies.ServiceHelper
 // let last5 = arr.[(index-howMany+1)..(index)]
 // Console.WriteLine("Last 5:")
 // last5 |> Array.iter (fun i -> Console.Write("{0}", i))
+
+type BreakoutSignalRecord =
+    CsvProvider<
+        Schema = "date (string), ticker (string), volumeSlope (decimal), priceSlope (decimal)",
+        HasHeaders=false
+    >
+
 
 let private normalizeByAverage (values:float array) =
     let average = values |> Array.average
@@ -102,6 +110,7 @@ type MatchedBreakout = {
     VolumeRate: decimal
     VolumeSlope: float
     CloseSlope: float
+    Ticker: string
 }
     with
         member this.Start = this.Bars |> Array.head
@@ -207,7 +216,7 @@ let plotData (bars: PriceBars) =
 
     // combinedChart |> Chart.Show
     
-let private contractingVolumeBreakout (bars: PriceBars) =
+let private contractingVolumeBreakout ticker (bars: PriceBars) =
     
     let contractingVolumeBreakoutName = "Contracting Volume Breakout"
     let volumeRateThreshold = 1.3m
@@ -245,12 +254,11 @@ let private contractingVolumeBreakout (bars: PriceBars) =
        then
 
         Some({
-            date = lastBar.Date
-            name = contractingVolumeBreakoutName
-            description = description
-            value = lastVolumeRate
-            valueFormat = ValueFormat.Number
-            sentimentType = SentimentType.Positive
+            Bars = bars.Bars
+            VolumeRate = lastVolumeRate
+            VolumeSlope = volSlope
+            CloseSlope = closeSlope
+            Ticker = ticker
         })
     else
         None
@@ -281,13 +289,13 @@ let private runInternal (context:EnvironmentContext) userState = async {
             bars.Bars
             |> Array.windowed 41
             |> Array.map (fun window ->
-                match contractingVolumeBreakout (window |> PriceBars) with
+                match contractingVolumeBreakout tickerSymbol (window |> PriceBars) with
                 | Some pattern -> Some (window, pattern)
                 | None -> None)
             |> Array.choose id
             
         // print all matches with index
-        matches |> Array.iteri (fun i (_,pattern) -> Console.WriteLine("{0}: {1}", i, toStringPattern pattern))
+        matches |> Array.iteri (fun i (_,pattern) -> Console.WriteLine("{0}: {1}", i, toString pattern))
         
         Console.Write("Which one to plot:")
         let index = Console.ReadLine() |> int
@@ -295,7 +303,25 @@ let private runInternal (context:EnvironmentContext) userState = async {
         let (bars,_) = matches.[index]
         
         plotData (bars |> PriceBars)
-}   
+}
+
+let getPricesForTickerOption studiesDirectory ticker = async {
+    let! priceAvailability = tryGetPricesFromCsv studiesDirectory ticker
+    match priceAvailability with
+    | Ok prices ->
+        return Some (ticker, prices)
+    | Error _ ->
+        return None
+}
+
+let getBreakoutPatternsForTickerIfAvailable tickerSymbol (bars:PriceBars) =
+        bars.Bars
+        |> Array.windowed 41
+        |> Array.map (fun window ->
+            match contractingVolumeBreakout tickerSymbol (window |> PriceBars) with
+            | Some pattern -> Some (window, pattern)
+            | None -> None)
+        |> Array.choose id
 
 let run (context:EnvironmentContext) = async {  
     let! user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask
@@ -303,8 +329,59 @@ let run (context:EnvironmentContext) = async {
     | None -> failwith "User not found"
     | Some user ->
         
-        let tickersWithPriceAvailable =
-            "-d" |> context.GetArgumentValue |> getTickersWithPriceHistory
+        let studiesDirectory = "-d" |> context.GetArgumentValue 
+        let tickersWithPriceAvailable = studiesDirectory |> getTickersWithPriceHistory
+            
+        // for each of these tickers, try to obtain price history
+        let! tryPriceHistory =
+            tickersWithPriceAvailable
+            |> Array.map(getPricesForTickerOption studiesDirectory) 
+            |> Async.Parallel
+            
+        let priceHistory = tryPriceHistory |> Array.choose id
         
-        Console.WriteLine($"Tickers with price history: {tickersWithPriceAvailable.Length}")
+        Console.WriteLine($"Tickers with price history: {priceHistory.Length}")
+        
+        let matchingPatterns =
+            priceHistory
+            |> Array.map (fun (ticker, prices) -> getBreakoutPatternsForTickerIfAvailable ticker prices)
+            |> Array.concat
+        
+        Console.WriteLine($"Matching patterns: {matchingPatterns.Length}")
+            
+        // prune the list so that the signals that are within two weeks of each other are removed
+        
+        let signals =
+            matchingPatterns
+            |> Array.groupBy (fun (_,pattern) -> pattern.Ticker)
+            |> Array.collect(fun (ticker,tickerSignals) ->
+                tickerSignals
+                |> Array.map snd
+                |> Array.fold (fun (acc:MatchedBreakout array) signal ->
+                    match acc with
+                    | [||] -> [|signal|]
+                    | _ ->
+                        let previousSignal = acc |> Array.head
+                        match signal.End.Date - previousSignal.End.Date with
+                        | x when x.TotalDays > 14 -> Array.append [|signal|] acc
+                        | _ -> acc
+                ) [||]
+                |> Array.rev
+            )
+            |> Array.map( fun breakout -> 
+                    BreakoutSignalRecord.Row(
+                        date = breakout.End.DateStr,
+                        ticker = breakout.Ticker,
+                        volumeSlope = decimal breakout.VolumeSlope,
+                        priceSlope = decimal breakout.CloseSlope
+                    )
+                )
+            
+        Console.WriteLine($"Signals: {signals.Length}")
+            
+        let outputPath = context.GetArgumentValue "-o"
+        
+        let csv = new BreakoutSignalRecord(signals)
+        
+        csv.Save(outputPath)
 }

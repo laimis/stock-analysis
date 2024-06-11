@@ -13,27 +13,15 @@ function FetchData() {
     & .\dev_secret.bat -i "https://localhost:5001/screeners/29/results/export" -o "$studyDirectory\signals_topgainers.csv"
 }
 
-function TransformSignals() {
-    $outputFile = "$studyDirectory\\signals_transformed.csv"
+function GenerateSignals() {
+    $outputFile = "$studyDirectory\\signals.csv"
 
     # check if output file exists, and if it does, remove it
     if (Test-Path $outputFile) {
         Remove-Item -Path $outputFile -ErrorAction SilentlyContinue
     }
     
-    & .\dev_secret.bat -d $studyDirectory
-}
-
-function FilterGaps() {
-    $inputFile = "$studyDirectory\\signals_transformed.csv"
-    $outputFile = "$studyDirectory\\signals_transformed_filtered.csv"
-    
-    # check if output file exists, and if it does, remove it
-    if (Test-Path $outputFile) {
-        Remove-Item -Path $outputFile -ErrorAction SilentlyContinue
-    }
-    
-    & .\dev_secret.bat -ft -d $studyDirectory -f "$inputFile" -o $outputFile
+    & .\dev_secret.bat -d $studyDirectory -o $outputFile
 }
 
 # write a function that will call jupyter notebook to execute the notebook, each time creating two files before calling jupyter (accept as params):
@@ -103,11 +91,8 @@ if ($args -contains "--fetch") {
     FetchData
 }
 
-if ($args -contains "--transform") {
-    TransformSignals
-}
-if ($args -contains "--filter") {
-    FilterGaps
+if ($args -contains "--generate") {
+    GenerateSignals
 }
 
 if ($args -contains "--execute") {
