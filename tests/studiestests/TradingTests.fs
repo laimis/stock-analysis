@@ -5,6 +5,7 @@ open Xunit
 open FsUnit
 open core.fs.Stocks
 open studies
+open studies.DataHelpers
 open studies.ScreenerStudy
 open testutils
 
@@ -16,7 +17,9 @@ let runTradesSetupWithSignals signals strategies = async {
     
     let! transformed = transformSignals getPricesFunc DataHelpersTests.testDataPath signals
     
-    let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv TestDataGenerator.TestDataPath) transformed.Rows strategies
+    let signals = transformed.Rows |> Seq.map SignalWithPricePropertiesWrapper |> Seq.cast<ISignal>
+    
+    let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv TestDataGenerator.TestDataPath) signals strategies
     
     return outcomes
 }
@@ -269,9 +272,11 @@ let ``Specific test``() = async {
         
     let! transformed = transformSignals mock "d:\\studies\\" signals
     
+    let signals = transformed.Rows |> Seq.map SignalWithPricePropertiesWrapper |> Seq.cast<ISignal>
+    
     let strategies = [Trading.strategyWithStopLossPercent false StockPositionType.Short None None]
     
-    let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv "d:\\studies\\") transformed.Rows strategies
+    let! outcomes = Trading.runTrades (DataHelpers.getPricesFromCsv "d:\\studies\\") signals strategies
     
     let outcome = outcomes |> List.head
     

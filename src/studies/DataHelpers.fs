@@ -10,6 +10,66 @@ open core.fs.Adapters.Stocks
 type IGetPriceHistory =
     abstract member GetPriceHistory : start:DateTimeOffset option -> ``end``:DateTimeOffset option -> ticker:core.Shared.Ticker -> Task<Result<PriceBars,ServiceError>>
 
+type ISignal =
+    abstract member Ticker : string
+    abstract member Date : string
+    abstract member Screenerid : int option
+    abstract member Gap : decimal option
+    abstract member Sma20 : decimal option
+    abstract member Sma50 : decimal option
+    abstract member Sma150 : decimal option
+    abstract member Sma200 : decimal option
+    
+let verifySignals (records:ISignal seq) minimumRecordsExpected =
+        
+        // make sure there is at least some records in here, ideally in thousands
+        let numberOfRecords = records |> Seq.length
+        match numberOfRecords with
+        | x when x < minimumRecordsExpected -> failwith $"{x} is not enough records, expecting at least {minimumRecordsExpected}"
+        | _ -> ()
+
+        let verifyCondition failureConditionFunc messageIfFound =
+            records
+            |> Seq.map (fun r -> match failureConditionFunc r with | true -> Some r | false -> None)
+            |> Seq.choose id
+            |> Seq.tryHead
+            |> Option.iter (fun r -> r |> messageIfFound |> failwith)
+
+        // make sure all the dates are set (and can be parsed?)
+        let invalidDate = fun (r:ISignal) -> match DateTimeOffset.TryParse(r.Date) with | true, _ -> false | false, _ -> true
+        let messageIfInvalidDate = fun (r:ISignal) -> $"date is invalid for record {r.Date}, {r.Ticker}"
+        verifyCondition invalidDate messageIfInvalidDate
+
+        let invalidTicker = fun (r:ISignal) -> String.IsNullOrWhiteSpace(r.Ticker)
+        let messageIfInvalidTicker = fun (r:ISignal) -> $"ticker is blank for record {r.Screenerid}, {r.Date}"
+        verifyCondition invalidTicker messageIfInvalidTicker
+
+        let invalidScreenerId = fun (r:ISignal) -> r.Screenerid.IsSome && r.Screenerid.Value = 0
+        let messageIfInvalidScreenerId = fun (r:ISignal) -> $"screenerid is blank for record {r.Ticker}, {r.Date}"
+        verifyCondition invalidScreenerId messageIfInvalidScreenerId
+
+        records
+        
+let describeSignals (records:ISignal seq) =
+
+        let numberOfRecords = records |> Seq.length
+
+        match numberOfRecords with
+        | x when x > 0 ->
+            let dates = records |> Seq.map (_.Date) |> Seq.distinct |> Seq.length
+            let tickers = records |> Seq.map (_.Ticker) |> Seq.distinct |> Seq.length
+            let screenerIds = records |> Seq.map (_.Screenerid) |> Seq.distinct |> Seq.length
+            
+            let minimumDate = records |> Seq.minBy (_.Date)
+            let maximumDate = records |> Seq.maxBy (_.Date)
+
+            printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
+            printfn $"Minimum date: %A{minimumDate}"
+            printfn $"Maximum date: %A{maximumDate}"
+            printfn ""
+        | _ ->
+            printfn $"No records found in the input"
+    
 type PriceNotAvailableError =
     | NotAvailableForever of string
     | NotAvailable of string

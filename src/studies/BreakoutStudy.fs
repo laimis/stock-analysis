@@ -3,7 +3,6 @@ module studies.BreakoutStudy
 open System
 open XPlot.Plotly
 open core.Shared
-open core.fs
 open core.fs.Adapters.Stocks
 open core.fs.Services
 open core.fs.Services.Analysis
@@ -29,7 +28,19 @@ type BreakoutSignalRecord =
         Schema = "date (string), ticker (string), volumeSlope (decimal), priceSlope (decimal)",
         HasHeaders=false
     >
-
+    
+type BreakoutSignalRecordWrapper(row:BreakoutSignalRecord.Row) =
+    interface ISignal with
+        member this.Date = row.Date
+        member this.Ticker = row.Ticker
+        member this.Gap = None
+        member this.Screenerid = None
+        member this.Sma20 = None
+        member this.Sma50 = None
+        member this.Sma150 = None
+        member this.Sma200 = None
+        
+        
 
 let private normalizeByAverage (values:float array) =
     let average = values |> Array.average
@@ -350,7 +361,6 @@ let run (context:EnvironmentContext) = async {
         Console.WriteLine($"Matching patterns: {matchingPatterns.Length}")
             
         // prune the list so that the signals that are within two weeks of each other are removed
-        
         let signals =
             matchingPatterns
             |> Array.groupBy (fun (_,pattern) -> pattern.Ticker)
@@ -368,6 +378,31 @@ let run (context:EnvironmentContext) = async {
                 ) [||]
                 |> Array.rev
             )
+        
+        Console.WriteLine($"Signals: {signals.Length}")
+        
+        // now, get rid of signals where I don't have price data
+        let! withPrices =
+            signals
+            |> Array.map( fun breakout -> async { 
+                let! prices = getPricesFromCsv studiesDirectory breakout.Ticker
+                
+                // get the bar at the breakout day
+                let barWithIndex = prices.TryFindByDate breakout.End.Date
+                match barWithIndex with
+                | Some (index, bar) ->
+                    let nextDayBar = prices.Bars |> Array.tryItem (index + 1)
+                    match nextDayBar with
+                    | Some _ -> return Some breakout
+                    | None -> return None
+                | None -> return None
+            }
+            )
+            |> Async.Sequential
+            
+        let signals =
+            withPrices
+            |> Array.choose id
             |> Array.map( fun breakout -> 
                     BreakoutSignalRecord.Row(
                         date = breakout.End.DateStr,
@@ -377,8 +412,8 @@ let run (context:EnvironmentContext) = async {
                     )
                 )
             
-        Console.WriteLine($"Signals: {signals.Length}")
-            
+        Console.WriteLine($"Signals with prices: {signals.Length}")
+        
         let outputPath = context.GetArgumentValue "-o"
         
         let csv = new BreakoutSignalRecord(signals)
