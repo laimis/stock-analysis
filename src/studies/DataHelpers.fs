@@ -30,22 +30,22 @@ let verifySignals (records:ISignal seq) minimumRecordsExpected =
 
         let verifyCondition failureConditionFunc messageIfFound =
             records
-            |> Seq.map (fun r -> match failureConditionFunc r with | true -> Some r | false -> None)
+            |> Seq.mapi (fun i r -> match failureConditionFunc r with | true -> Some (i,r) | false -> None)
             |> Seq.choose id
             |> Seq.tryHead
-            |> Option.iter (fun r -> r |> messageIfFound |> failwith)
+            |> Option.iter (fun (i,r) -> (i,r) |> messageIfFound |> failwith)
 
         // make sure all the dates are set (and can be parsed?)
         let invalidDate = fun (r:ISignal) -> match DateTimeOffset.TryParse(r.Date) with | true, _ -> false | false, _ -> true
-        let messageIfInvalidDate = fun (r:ISignal) -> $"date is invalid for record {r.Date}, {r.Ticker}"
+        let messageIfInvalidDate = fun (i:int, r:ISignal) -> $"date is invalid for record {i}: {r.Date}, {r.Ticker}"
         verifyCondition invalidDate messageIfInvalidDate
 
         let invalidTicker = fun (r:ISignal) -> String.IsNullOrWhiteSpace(r.Ticker)
-        let messageIfInvalidTicker = fun (r:ISignal) -> $"ticker is blank for record {r.Screenerid}, {r.Date}"
+        let messageIfInvalidTicker = fun (i:int, r:ISignal) -> $"ticker is blank for record {i}: {r.Screenerid |> Option.map string}, {r.Date}"
         verifyCondition invalidTicker messageIfInvalidTicker
 
         let invalidScreenerId = fun (r:ISignal) -> r.Screenerid.IsSome && r.Screenerid.Value = 0
-        let messageIfInvalidScreenerId = fun (r:ISignal) -> $"screenerid is blank for record {r.Ticker}, {r.Date}"
+        let messageIfInvalidScreenerId = fun (i:int, r:ISignal) -> $"screenerid is blank for record {i}: {r.Ticker}, {r.Date}"
         verifyCondition invalidScreenerId messageIfInvalidScreenerId
 
         records

@@ -38,21 +38,21 @@ let ``Verification fails if ticker is blank``() =
     let row = Signal.Row(date="2023-01-01", ticker="", screenerid=1)
     let signals = row |> SignalWrapper :> ISignal |> Seq.singleton
     (fun () -> verifySignals signals 1 |> ignore)
-    |> should (throwWithMessage "ticker is blank for record 1, 2023-01-01") typeof<Exception>
+    |> should (throwWithMessage "ticker is blank for record 0: Some(1), 2023-01-01") typeof<Exception>
 
 [<Fact>]
 let ``Verification fails if date is blank``() =
     let row = Signal.Row(date="", ticker=TestDataGenerator.NET.Value, screenerid=1)
     let signals = row |> SignalWrapper :> ISignal |> Seq.singleton
     (fun () -> verifySignals signals 1 |> ignore)
-    |> should (throwWithMessage "date is invalid for record 1, NET") typeof<Exception>
+    |> should (throwWithMessage "date is invalid for record 0: , NET") typeof<Exception>
 
 [<Fact>]
 let ``Verification fails if screenerid is blank``() =
     let row = Signal.Row(date="2023-01-01", ticker=TestDataGenerator.NET.Value, screenerid=0)
     let signals = row |> SignalWrapper :> ISignal |> Seq.singleton
     (fun () -> verifySignals signals 1 |> ignore)
-    |> should (throwWithMessage "screenerid is blank for record NET, 2023-01-01") typeof<Exception>
+    |> should (throwWithMessage "screenerid is blank for record 0: NET, 2023-01-01") typeof<Exception>
 
 [<Fact>]
 let ``Describe records for Signal works``() =
