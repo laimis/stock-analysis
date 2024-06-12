@@ -27,6 +27,10 @@ function GenerateSignals() {
     & .\dev_secret.bat -d $studyDirectory -o $outputFile
 }
 
+function InteractiveRun() {
+    & .\dev_secret.bat -d $studyDirectory --interactive
+}
+
 function SeedParameterFiles() {
     param (
         [string]$filter,
@@ -119,6 +123,10 @@ if ($args -contains "--seed") {
 
 if ($args -contains "--clear") {
     ClearParameterFiles
+}
+
+if ($args -contains "--interactive") {
+    InteractiveRun
 }
 
 if ($args -contains "--execute") {

@@ -9,7 +9,8 @@
     <div class="card mt-4">
         <div class="card-body">
             <h5 class="card-title">Scatter plot demo</h5>
-
+            <button (click)="runScatterPlot()" class="btn btn-primary">Run Scatter Plot</button>
+            <app-loading *ngIf="loadingScatterPlot"></app-loading>
             @for (option of chartOptions; track option) {
                 <canvasjs-chart [options]="option"></canvasjs-chart>
             }
@@ -17,10 +18,23 @@
     </div>
     
     <!-- create a form that allows to select number of days for correlations -->
-    <div class="mt-4">
-        <label for="days" class="form-label">Number of days</label>
-        <input class="form-control" type="number" id="days" [(ngModel)]="daysForCorrelations" [disabled]="loadingCorrelations" />
-        <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Correlation demo</h5>
+            <label for="days" class="form-label">Number of days</label>
+            <input class="form-control" type="number" id="days" [(ngModel)]="daysForCorrelations" [disabled]="loadingCorrelations" />
+            <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
+            <app-loading *ngIf="loadingCorrelations"></app-loading>
+            <app-correlations *ngIf="correlations" [correlations]="correlations"></app-correlations>
+        </div>
     </div>
-    <app-correlations [correlations]="correlations"></app-correlations>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Combined Daily Chart Demo</h5>
+            <button (click)="runCombinedDailyChart()" class="btn btn-primary">Run Combined Daily Chart</button>
+            <app-loading *ngIf="loadingCombinedDailyChart"></app-loading>
+            <canvasjs-chart *ngIf="combinedDailyChartOptions" [options]="combinedDailyChartOptions"></canvasjs-chart>
+        </div>
+    </div>
 </div>

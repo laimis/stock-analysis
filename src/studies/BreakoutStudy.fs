@@ -274,13 +274,13 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
     else
         None
             
-let private runInternal (context:EnvironmentContext) userState = async {
+let private runInteractive (context:EnvironmentContext) userState = async {
     
     let debugBars bars =
         Console.WriteLine("Bars: {0}, {1}, {2}", bars |> Array.head, bars |> Array.last, bars.Length)
         
     let toString (matched:MatchedBreakout) =
-        Console.WriteLine($"Start: {matched.Start.DateStr}, End: {matched.End.DateStr}, Rate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, AtrSlope: {matched.CloseSlope:N2}")
+        $"DAte: {matched.End.DateStr}, VolumeRate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, PriceSlope: {matched.CloseSlope:N2}"
     
     let toStringPattern (pattern:Pattern) =
         $"Date: {pattern.date}, Name: {pattern.name}, Description: {pattern.description}, Value: {pattern.value:N2}"
@@ -294,8 +294,6 @@ let private runInternal (context:EnvironmentContext) userState = async {
     | Error err -> failwith err.Message
     | Ok bars ->
             
-        let atr = Indicators.averageTrueRage bars |> _.DataPoints
-        
         let matches =
             bars.Bars
             |> Array.windowed 41
@@ -334,89 +332,101 @@ let getBreakoutPatternsForTickerIfAvailable tickerSymbol (bars:PriceBars) =
             | None -> None)
         |> Array.choose id
 
+let runStudy (context:EnvironmentContext) (userState) = async {
+    
+    let studiesDirectory = context.GetArgumentValue "-d"
+    
+    let tickersWithPriceAvailable = studiesDirectory |> getTickersWithPriceHistory
+            
+    // for each of these tickers, try to obtain price history
+    let! tryPriceHistory =
+        tickersWithPriceAvailable
+        |> Array.map(getPricesForTickerOption studiesDirectory) 
+        |> Async.Parallel
+        
+    let priceHistory = tryPriceHistory |> Array.choose id
+    
+    Console.WriteLine($"Tickers with price history: {priceHistory.Length}")
+    
+    let matchingPatterns =
+        priceHistory
+        |> Array.map (fun (ticker, prices) -> getBreakoutPatternsForTickerIfAvailable ticker prices)
+        |> Array.concat
+    
+    Console.WriteLine($"Matching patterns: {matchingPatterns.Length}")
+        
+    // prune the list so that the signals that are within two weeks of each other are removed
+    let signals =
+        matchingPatterns
+        |> Array.groupBy (fun (_,pattern) -> pattern.Ticker)
+        |> Array.collect(fun (ticker,tickerSignals) ->
+            tickerSignals
+            |> Array.map snd
+            |> Array.fold (fun (acc:MatchedBreakout array) signal ->
+                match acc with
+                | [||] -> [|signal|]
+                | _ ->
+                    let previousSignal = acc |> Array.head
+                    match signal.End.Date - previousSignal.End.Date with
+                    | x when x.TotalDays > 14 -> Array.append [|signal|] acc
+                    | _ -> acc
+            ) [||]
+            |> Array.rev
+        )
+    
+    Console.WriteLine($"Signals: {signals.Length}")
+    
+    // now, get rid of signals where I don't have price data
+    let! withPrices =
+        signals
+        |> Array.map( fun breakout -> async { 
+            let! prices = getPricesFromCsv studiesDirectory breakout.Ticker
+            
+            // get the bar at the breakout day
+            let barWithIndex = prices.TryFindByDate breakout.End.Date
+            match barWithIndex with
+            | Some (index, bar) ->
+                let nextDayBar = prices.Bars |> Array.tryItem (index + 1)
+                match nextDayBar with
+                | Some _ -> return Some breakout
+                | None -> return None
+            | None -> return None
+        }
+        )
+        |> Async.Sequential
+        
+    let signals =
+        withPrices
+        |> Array.choose id
+        |> Array.map( fun breakout -> 
+                BreakoutSignalRecord.Row(
+                    date = breakout.End.DateStr,
+                    ticker = breakout.Ticker,
+                    volumeSlope = decimal breakout.VolumeSlope,
+                    priceSlope = decimal breakout.CloseSlope
+                )
+            )
+        
+    Console.WriteLine($"Signals with prices: {signals.Length}")
+    
+    let outputPath = context.GetArgumentValue "-o"
+    
+    let csv = new BreakoutSignalRecord(signals)
+    
+    csv.Save(outputPath)
+}
+
 let run (context:EnvironmentContext) = async {  
     let! user = "laimis@gmail.com" |> context.Storage().GetUserByEmail |> Async.AwaitTask
     match user with
     | None -> failwith "User not found"
     | Some user ->
         
-        let studiesDirectory = "-d" |> context.GetArgumentValue 
-        let tickersWithPriceAvailable = studiesDirectory |> getTickersWithPriceHistory
-            
-        // for each of these tickers, try to obtain price history
-        let! tryPriceHistory =
-            tickersWithPriceAvailable
-            |> Array.map(getPricesForTickerOption studiesDirectory) 
-            |> Async.Parallel
-            
-        let priceHistory = tryPriceHistory |> Array.choose id
-        
-        Console.WriteLine($"Tickers with price history: {priceHistory.Length}")
-        
-        let matchingPatterns =
-            priceHistory
-            |> Array.map (fun (ticker, prices) -> getBreakoutPatternsForTickerIfAvailable ticker prices)
-            |> Array.concat
-        
-        Console.WriteLine($"Matching patterns: {matchingPatterns.Length}")
-            
-        // prune the list so that the signals that are within two weeks of each other are removed
-        let signals =
-            matchingPatterns
-            |> Array.groupBy (fun (_,pattern) -> pattern.Ticker)
-            |> Array.collect(fun (ticker,tickerSignals) ->
-                tickerSignals
-                |> Array.map snd
-                |> Array.fold (fun (acc:MatchedBreakout array) signal ->
-                    match acc with
-                    | [||] -> [|signal|]
-                    | _ ->
-                        let previousSignal = acc |> Array.head
-                        match signal.End.Date - previousSignal.End.Date with
-                        | x when x.TotalDays > 14 -> Array.append [|signal|] acc
-                        | _ -> acc
-                ) [||]
-                |> Array.rev
-            )
-        
-        Console.WriteLine($"Signals: {signals.Length}")
-        
-        // now, get rid of signals where I don't have price data
-        let! withPrices =
-            signals
-            |> Array.map( fun breakout -> async { 
-                let! prices = getPricesFromCsv studiesDirectory breakout.Ticker
+        let funcToRun =
+            match context.HasArgument "--interactive" with
+            | true -> runInteractive
+            | false -> runStudy
                 
-                // get the bar at the breakout day
-                let barWithIndex = prices.TryFindByDate breakout.End.Date
-                match barWithIndex with
-                | Some (index, bar) ->
-                    let nextDayBar = prices.Bars |> Array.tryItem (index + 1)
-                    match nextDayBar with
-                    | Some _ -> return Some breakout
-                    | None -> return None
-                | None -> return None
-            }
-            )
-            |> Async.Sequential
-            
-        let signals =
-            withPrices
-            |> Array.choose id
-            |> Array.map( fun breakout -> 
-                    BreakoutSignalRecord.Row(
-                        date = breakout.End.DateStr,
-                        ticker = breakout.Ticker,
-                        volumeSlope = decimal breakout.VolumeSlope,
-                        priceSlope = decimal breakout.CloseSlope
-                    )
-                )
-            
-        Console.WriteLine($"Signals with prices: {signals.Length}")
         
-        let outputPath = context.GetArgumentValue "-o"
-        
-        let csv = new BreakoutSignalRecord(signals)
-        
-        csv.Save(outputPath)
+        return! funcToRun context user.State
 }

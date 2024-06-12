@@ -1,15 +1,17 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
+    DailyPositionReport, DataPointContainer,
     PositionInstance,
     StockQuote,
     StocksService,
-    StockTradingPositions, TickerCorrelation
+    TickerCorrelation
 } from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
+import {CanvasJSChart} from "@canvasjs/angular-charts";
 
 
 function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
@@ -47,6 +49,42 @@ function createProfitScatter(entries: PositionInstance[], quotes: Map<string, St
     }
 }
 
+function createData(container: DataPointContainer, useY2: boolean) {
+    return {
+        type: "line",
+        dataPoints: container.data.map(d => {
+            return {x: new Date(Date.parse(d.label)), y: d.value}
+        }),
+        showInLegend: true,
+        name: container.label,
+        axisYType: useY2 ? "secondary" : "primary"
+    }
+}
+
+function createCombinedDailyChart(report:DailyPositionReport) {
+    console.log(report)
+    const data = [
+        createData(report.dailyClose, false),
+        createData(report.dailyObv, true)
+    ]
+
+    return {
+        exportEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Daily Close / OBV",
+        },
+        axisX: {
+            title: "Date",
+            valueFormatString: "YYYY-MM-DD",
+            gridThickness: 0.1,
+        },
+        axisY: {title: "Close", gridThickness: 0.1},
+        axisY2: {title: "OBV", gridThickness: 0.1},
+        data: data
+    }
+}
+
 @Component({
     selector: 'app-playground',
     templateUrl: './playground.component.html',
@@ -57,8 +95,7 @@ export class PlaygroundComponent implements OnInit {
     errors: string[];
     status: string;
     testTicker: string;
-    chartOptions: any[] = []
-
+    
     constructor(
         private stocks: StocksService,
         private stockPositions: StockPositionsService,
@@ -69,12 +106,6 @@ export class PlaygroundComponent implements OnInit {
         const tickerParam = this.route.snapshot.queryParamMap.get('tickers')
         this.tickers = tickerParam ? tickerParam.split(',') : ['AMD']
         this.testTicker = this.tickers[0]
-
-        this.stockPositions.getTradingEntries().subscribe((data) => {
-            this.createChartOptions(data)
-        }, (error) => {
-            this.errors = GetErrors(error)
-        })
     }
 
     correlations: TickerCorrelation[];
@@ -88,13 +119,35 @@ export class PlaygroundComponent implements OnInit {
         })
     }
 
-    createChartOptions(positions: StockTradingPositions) {
-        const entries = positions.current
-        const quotes = positions.prices
+    chartOptions: any[] = []
+    loadingScatterPlot: boolean = false
+    runScatterPlot() {
+        this.loadingScatterPlot = true
+        this.stockPositions.getTradingEntries().subscribe((data) => {
+            const tradingPositions = data.current
+            const quotes = data.prices
 
-        const profitScatter = createProfitScatter(entries, quotes)
+            const profitScatter = createProfitScatter(tradingPositions, quotes)
 
-        this.chartOptions.push(profitScatter)
+            this.chartOptions.push(profitScatter)
+            this.loadingScatterPlot = false
+        }, (error) => {
+            this.errors = GetErrors(error)
+            this.loadingScatterPlot = false
+        })
+    }
+    
+    loadingCombinedDailyChart: boolean = false
+    combinedDailyChartOptions: any
+    runCombinedDailyChart() {
+        this.loadingCombinedDailyChart = true
+        this.stocks.reportDailyPositionReport("6d5e5329-ecc8-41c5-aba1-d94ed914885f").subscribe((data) => {
+            this.combinedDailyChartOptions = createCombinedDailyChart(data)
+            this.loadingCombinedDailyChart = false
+        }, (error) => {
+            this.errors = GetErrors(error)
+            this.loadingCombinedDailyChart = false
+        })
     }
 
     run() {
