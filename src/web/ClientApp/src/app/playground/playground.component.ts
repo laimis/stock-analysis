@@ -11,7 +11,6 @@ import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
-import {CanvasJSChart} from "@canvasjs/angular-charts";
 
 
 function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
@@ -46,42 +45,6 @@ function createProfitScatter(entries: PositionInstance[], quotes: Map<string, St
                 dataPoints: mapped
             }
         ]
-    }
-}
-
-function createData(container: DataPointContainer, useY2: boolean) {
-    return {
-        type: "line",
-        dataPoints: container.data.map(d => {
-            return {x: new Date(Date.parse(d.label)), y: d.value}
-        }),
-        showInLegend: true,
-        name: container.label,
-        axisYType: useY2 ? "secondary" : "primary"
-    }
-}
-
-function createCombinedDailyChart(report:DailyPositionReport) {
-    console.log(report)
-    const data = [
-        createData(report.dailyClose, false),
-        createData(report.dailyObv, true)
-    ]
-
-    return {
-        exportEnabled: true,
-        zoomEnabled: true,
-        title: {
-            text: "Daily Close / OBV",
-        },
-        axisX: {
-            title: "Date",
-            valueFormatString: "YYYY-MM-DD",
-            gridThickness: 0.1,
-        },
-        axisY: {title: "Close", gridThickness: 0.1},
-        axisY2: {title: "OBV", gridThickness: 0.1},
-        data: data
     }
 }
 
@@ -138,11 +101,11 @@ export class PlaygroundComponent implements OnInit {
     }
     
     loadingCombinedDailyChart: boolean = false
-    combinedDailyChartOptions: any
+    dailyReport: DailyPositionReport
     runCombinedDailyChart() {
         this.loadingCombinedDailyChart = true
         this.stocks.reportDailyPositionReport("6d5e5329-ecc8-41c5-aba1-d94ed914885f").subscribe((data) => {
-            this.combinedDailyChartOptions = createCombinedDailyChart(data)
+            this.dailyReport = data
             this.loadingCombinedDailyChart = false
         }, (error) => {
             this.errors = GetErrors(error)

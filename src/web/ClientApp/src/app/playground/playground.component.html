@@ -34,7 +34,7 @@
             <h5 class="card-title">Combined Daily Chart Demo</h5>
             <button (click)="runCombinedDailyChart()" class="btn btn-primary">Run Combined Daily Chart</button>
             <app-loading *ngIf="loadingCombinedDailyChart"></app-loading>
-            <canvasjs-chart *ngIf="combinedDailyChartOptions" [options]="combinedDailyChartOptions"></canvasjs-chart>
+            <app-daily-outcome-scores *ngIf="dailyReport" [report]="dailyReport"></app-daily-outcome-scores>
         </div>
     </div>
 </div>

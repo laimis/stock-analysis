@@ -1,1 +1,10 @@
-<app-line-chart [dataContainer]="dailyScores"></app-line-chart>
+<canvasjs-chart *ngIf="obvAndCloseOptions" [options]="obvAndCloseOptions"></canvasjs-chart>
+
+<div class="row">
+    <div class="col">
+        <app-line-chart *ngIf="gainContainer" [dataContainer]="gainContainer"></app-line-chart>
+    </div>
+    <div class="col">
+        <app-line-chart *ngIf="profitContainer" [dataContainer]="profitContainer"></app-line-chart>
+    </div>
+</div>

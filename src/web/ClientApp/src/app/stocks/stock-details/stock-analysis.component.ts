@@ -1,8 +1,7 @@
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
-    DailyPositionReport, DataPointContainer,
-    OutcomesReport,
+    DailyPositionReport, OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
     Prices,
@@ -27,7 +26,7 @@ export class StockAnalysisComponent {
     dailyOutcomesReport: OutcomesReport;
     dailyOutcomes: TickerOutcomes;
 
-    dailyBreakdowns: DataPointContainer[];
+    dailyBreakdowns: DailyPositionReport
     
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
@@ -77,9 +76,7 @@ export class StockAnalysisComponent {
     private loadData(ticker:string) {
         const dailyReport = this.stockService.reportDailyTickerReport(ticker)
             .pipe(
-                tap(report => {
-                    this.dailyBreakdowns = [report.dailyClose, report.dailyObv]
-                    }),
+                tap(report => {this.dailyBreakdowns = report}),
                 catchError(err => {
                     console.error(err);
                     return [];

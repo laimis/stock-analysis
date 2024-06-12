@@ -4,9 +4,7 @@
         <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
     </section>
     <section *ngIf="dailyBreakdowns">
-        @for(b of dailyBreakdowns; track b) {
-            <app-daily-outcome-scores [dailyScores]="b"></app-daily-outcome-scores>
-        }
+        <app-daily-outcome-scores [report]="dailyBreakdowns"></app-daily-outcome-scores>
     </section>
     <section *ngIf="gaps">
         <h5>{{ gaps.ticker }} Gaps</h5>

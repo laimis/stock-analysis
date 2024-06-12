@@ -30,7 +30,6 @@ export class StockTradingReviewComponent {
     scoresErrors: string[];
     pricesErrors: string[]
     dailyPositionReport: DailyPositionReport
-    dailyBreakdownsToRender: DataPointContainer[]
     positionChartInformation: PositionChartInformation;
     @Input()
     quotes: object
@@ -162,7 +161,6 @@ export class StockTradingReviewComponent {
                 tap(r => {
                     this.scoresErrors = null
                     this.dailyPositionReport = r
-                    this.dailyBreakdownsToRender = position.isOpen ? [r.dailyClose, r.dailyObv] : [r.dailyClose, r.dailyObv, r.dailyGainPct, r.dailyProfit]
                 }),
                 catchError(e => {
                     this.scoresErrors = GetErrors(e)
