@@ -199,7 +199,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                     10
                     true
                     zeroLineAnnotationVertical
-        
+                    
         let gainPctDistribution =
             let label = "Gain % Distribution"
             match trades.Length with
@@ -216,6 +216,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         let profitByIndex = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Column)
         trades |> Seq.sortBy _.Profit |> Seq.iteri (fun i p -> profitByIndex.Add(i.ToString(), p.Profit) |> ignore)
         
+        let rrByIndex = ChartDataPointContainer<decimal>("RR", DataPointChartType.Column)
+        trades |> Seq.sortBy _.RR |> Seq.iteri (fun i p -> rrByIndex.Add(i.ToString(), p.RR) |> ignore)
+        
         [
             equityCurve
             profitVsDaysHeld
@@ -226,6 +229,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             gainPctDistribution
             rrDistribution
             profitByIndex
+            rrByIndex
             wins
             avgWinPct
             avgLossPct
