@@ -270,17 +270,18 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let! prices = 
                 stocks
                 |> Seq.filter (_.IsOpen)
-                |> Seq.map (fun stock -> async {
+                |> Seq.map (_.Ticker)
+                |> Seq.map (fun ticker -> async {
                     let! priceResponse =
                         brokerage.GetPriceHistory
                             user.State
-                            stock.Ticker
+                            ticker
                             PriceFrequency.Daily
                             (DateTimeOffset.UtcNow.AddDays(-request.Days) |> Some)
                             None |> Async.AwaitTask
                     match priceResponse with
                     | Error _ -> return None
-                    | Ok prices -> return Some (stock.Ticker, prices)
+                    | Ok prices -> return Some (ticker, prices)
                 })
                 |> Async.Sequential
                 

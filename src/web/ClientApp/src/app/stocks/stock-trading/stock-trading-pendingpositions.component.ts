@@ -54,10 +54,20 @@ export class StockTradingPendingPositionsComponent implements OnInit {
         )
     }
 
-    closePendingPosition(position: PendingStockPosition) {
-        this.stockService.closePendingPosition(position.id).subscribe(
+    closingPosition:PendingStockPosition = null
+    closeReason: string = null
+    showCloseModel(position: PendingStockPosition) {
+        this.closingPosition = position
+    }
+    closeCloseModal() {
+        this.closingPosition = null
+    }
+    confirmClosePosition() {
+        this.stockService.closePendingPosition(this.closingPosition.id, this.closeReason).subscribe(
             (_) => {
-                this.pendingPositionClosed.emit(position);
+                this.pendingPositionClosed.emit(this.closingPosition);
+                this.closingPosition = null;
+                this.closeReason = null;
                 this.refreshPendingPositions()
             },
             (error) => {

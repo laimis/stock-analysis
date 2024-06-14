@@ -65,6 +65,17 @@ namespace core.Stocks
         public string Notes { get; }
         public string Strategy { get; }
     }
+    
+    public class PendingStockPositionRealized : AggregateEvent
+    {
+        public PendingStockPositionRealized(Guid id, Guid aggregateId, DateTimeOffset when, decimal price)
+            : base(id, aggregateId, when)
+        {
+            Price = price;
+        }
+
+        public decimal Price { get; }
+    }
 
     public class PendingStockPositionClosed : AggregateEvent
     {
@@ -77,5 +88,20 @@ namespace core.Stocks
 
         public bool Purchased { get; }
         public decimal? Price { get; }
+    }
+    
+    public class PendingStockPositionClosedWithReason : AggregateEvent
+    {
+        public PendingStockPositionClosedWithReason(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string reason)
+            : base(id, aggregateId, when)
+        {
+            Reason = reason;
+        }
+
+        public string Reason { get; }
     }
 }

@@ -133,9 +133,10 @@ namespace coretests.Stocks
         {
             var pending = CreateTestPendingPosition();
 
-            pending.Close();
+            pending.Close("provided reason");
 
             Assert.NotNull(pending.State.Closed);
+            Assert.Equal("provided reason", pending.State.CloseReason);
         }
 
         [Fact]
@@ -143,15 +144,22 @@ namespace coretests.Stocks
         {
             var pending = CreateTestPendingPosition();
             
-            pending.Close();
+            pending.Close("asdas");
             
             var closed = pending.State.Closed;
             var eventCount = pending.Events.Count();
             
-            pending.Close();
+            pending.Close("asdasd");
             
             Assert.Equal(closed, pending.State.Closed);
             Assert.Equal(eventCount, pending.Events.Count());
+        }
+
+        [Fact]
+        public void MissingCloseReason_Throws()
+        {
+            var pending = CreateTestPendingPosition();
+            Assert.Throws<InvalidOperationException>(() => pending.Close(""));
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using core.Shared;
-using core.Stocks;
 using Microsoft.FSharp.Core;
 
 namespace core.Stocks
@@ -17,15 +16,16 @@ namespace core.Stocks
         public FSharpOption<decimal> StopPrice { get; private set; }
         public string Notes { get; private set; }
         public string Strategy { get; private set; }
-        public DateTimeOffset Opened { get; private set; }
+        public DateTimeOffset Created { get; private set; }
         public FSharpOption<DateTimeOffset> Closed { get; private set; }
         public bool IsClosed => FSharpOption<DateTimeOffset>.get_IsSome(Closed);
         public bool IsOpen => !IsClosed;
         public bool Purchased { get; private set; }
+        public string CloseReason { get; private set; }
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 
-        protected void ApplyInternal(dynamic obj) => ApplyInternal(obj);
+        private void ApplyInternal(dynamic obj) => ApplyInternal(obj);
 
         public PendingStockPositionState SetPrice(decimal price)
         {
@@ -54,7 +54,7 @@ namespace core.Stocks
 
         private void ApplyInternal(PendingStockPositionCreatedWithStrategy created)
         {
-            Opened = created.When;
+            Created = created.When;
             Id = created.AggregateId;
             Notes = created.Notes;
             NumberOfShares = created.NumberOfShares;
@@ -67,8 +67,29 @@ namespace core.Stocks
 
         private void ApplyInternal(PendingStockPositionClosed closed)
         {
+            // closed should not be used anymore, and we are changing the event either to closedwithreason or realized
+            if (closed.Price.HasValue)
+            {
+                ApplyInternal(new PendingStockPositionRealized(closed.Id, closed.AggregateId, closed.When, closed.Price.Value));
+            }
+            else
+            {
+                ApplyInternal(new PendingStockPositionClosedWithReason(closed.Id, closed.AggregateId, closed.When, "Reason not provided"));
+            }
+        }
+        
+        
+        private void ApplyInternal(PendingStockPositionClosedWithReason closed)
+        {
             Closed = closed.When;
-            Purchased = closed.Purchased;
+            CloseReason = closed.Reason;
+        }
+
+        private void ApplyInternal(PendingStockPositionRealized realized)
+        {
+            Price = realized.Price;
+            Purchased = true;
+            Closed = realized.When;
         }
     }
 }

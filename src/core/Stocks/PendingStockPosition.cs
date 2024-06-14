@@ -71,30 +71,33 @@ namespace core.Stocks
             }
 
             Apply(
-                new PendingStockPositionClosed(
+                new PendingStockPositionRealized(
                     Guid.NewGuid(),
                     State.Id,
                     when : DateTimeOffset.UtcNow,
-                    purchased: true,
                     price: price
                 )
             );
         }
 
-        public void Close()
+        public void Close(string reason)
         {
             if (State.IsClosed)
             {
                 return;
             }
             
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                throw new InvalidOperationException("Reason cannot be blank");
+            }
+            
             Apply(
-                new PendingStockPositionClosed(
+                new PendingStockPositionClosedWithReason(
                     Guid.NewGuid(),
                     State.Id,
                     when : DateTimeOffset.UtcNow,
-                    purchased: false,
-                    price: null
+                    reason: reason
                 )
             );
         }

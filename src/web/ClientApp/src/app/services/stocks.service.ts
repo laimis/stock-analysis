@@ -144,17 +144,14 @@ export class StocksService {
     getPendingStockPositions(): Observable<PendingStockPosition[]> {
         return this.http.get<PendingStockPosition[]>('/api/stocks/pendingpositions')
     }
-
-    //
-
-    // monit
-
+    
     createPendingStockPosition(cmd: pendingstockpositioncommand): Observable<PendingStockPosition> {
         return this.http.post<PendingStockPosition>('/api/stocks/pendingpositions', cmd)
     }
 
-    closePendingPosition(id: string): Observable<any> {
-        return this.http.delete<any>('/api/stocks/pendingpositions/' + id)
+    closePendingPosition(id: string, reason: string): Observable<any> {
+        const cmd = {positionId: id, reason}
+        return this.http.post<any>('/api/stocks/pendingpositions/' + id + '/close', cmd)
     }
 
     getCryptos(): Observable<any> {

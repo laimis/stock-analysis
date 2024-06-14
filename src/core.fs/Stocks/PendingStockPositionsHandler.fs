@@ -38,7 +38,8 @@ type Close =
     {
         [<Required>]
         PositionId: Guid
-        UserId: UserId
+        [<Required>]
+        Reason: string
     }
     
 type Export =
@@ -111,14 +112,14 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                     return Ok ()
     }
     
-    member this.Handle (command:Close) = task {
-        let! user = accounts.GetUser(command.UserId)
+    member this.Handle (command:Close, userId:UserId) = task {
+        let! user = accounts.GetUser(userId)
         
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
-            let! existing = portfolio.GetPendingStockPositions(command.UserId)
+            let! existing = portfolio.GetPendingStockPositions(userId)
             
             let found = existing |> Seq.tryFind (fun x -> x.State.Id = command.PositionId)
             
@@ -139,9 +140,9 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                         |> Async.Sequential
                         |> Async.StartAsTask
                         
-                    position.Close()
+                    position.Close(command.Reason);
                 
-                    do! portfolio.SavePendingPosition position command.UserId
+                    do! portfolio.SavePendingPosition position userId
                 
                     return Ok ()
     }
@@ -155,11 +156,11 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
             
             let! positions = portfolio.GetPendingStockPositions(command.UserId)
             
-            let data = positions |> Seq.sortByDescending _.State.Opened;
+            let data = positions |> Seq.sortByDescending _.State.Created
                 
-            let filename = CSVExport.generateFilename("pendingpositions");
+            let filename = CSVExport.generateFilename("pendingpositions")
 
-            let response = ExportResponse(filename, CSVExport.pendingPositions CultureUtils.DefaultCulture csvWriter data);
+            let response = ExportResponse(filename, CSVExport.pendingPositions CultureUtils.DefaultCulture csvWriter data)
             
             return Ok response
     }
@@ -177,9 +178,9 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 positions
                 |> Seq.map _.State
                 |> Seq.filter (fun x -> x.IsClosed |> not)
-                |> Seq.sortByDescending _.Opened
+                |> Seq.sortByDescending _.Created
             
-            let tickers = data |> Seq.map(fun x -> x.Ticker)
+            let tickers = data |> Seq.map(_.Ticker)
             let! priceResponse = brokerage.GetQuotes user.State tickers
             let prices = priceResponse |> Result.defaultValue (Dictionary<Ticker, StockQuote>())
                 

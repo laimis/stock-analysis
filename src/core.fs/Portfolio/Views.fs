@@ -47,7 +47,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
     // date from oldest to most recent
     let closedPositions = inputPositions |> Array.sortBy (_.Closed.Value)
     
-    let rounded (value:decimal) = Math.Round(value, 4)
+    let roundedToPlaces (value:decimal) (places:int) = Math.Round(value, places)
+    let rounded4 (value:decimal) = roundedToPlaces value 4
+    let rounded2 (value:decimal) = roundedToPlaces value 2
     
     let generateHistogramDataContainer (label:string) trades valueFunc (buckets:int) symmetric annotation =
         
@@ -66,6 +68,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         // go over each closed transaction and calculate number of wins for each window
         let profits = ChartDataPointContainer<decimal>("Profits", DataPointChartType.Line, zeroLineAnnotationHorizontal)
         let equityCurve = ChartDataPointContainer<decimal>("Equity Curve", DataPointChartType.Line, zeroLineAnnotationHorizontal)
+        let drawDowns = ChartDataPointContainer<decimal>("Draw downs", DataPointChartType.Line)
         let profitsFixedNumberOfTrades = ChartDataPointContainer<decimal>($"Profits (last {tradeInterval} trades)", DataPointChartType.Line, zeroLineAnnotationHorizontal)
         let wins = ChartDataPointContainer<decimal>("Win %", DataPointChartType.Line, ChartAnnotationLine(0.4m, ChartAnnotationLineType.Horizontal) |> Option.Some)
         let avgWinPct = ChartDataPointContainer<decimal>("Avg Win %", DataPointChartType.Line, ChartAnnotationLine(0.12m, ChartAnnotationLineType.Horizontal) |> Option.Some)
@@ -94,10 +97,9 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
                 let lastDate = trades[trades.Length-1].Closed.Value.Date
                 (lastDate - firstDate).TotalDays |> int
         
-        let mutable equity = 0m
         
         [0..days]
-        |> Seq.iter (fun i ->
+        |> Seq.fold (fun (equity, maxEquity, maxDrawdown) i ->
             let firstDate = trades[0].Closed.Value.Date
             let start = firstDate.AddDays(i)
             let ``end`` = firstDate.AddDays(float i+20.0)
@@ -105,20 +107,20 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             let perfView = trades |> Seq.filter (fun t -> t.Closed.Value.Date >= start && t.Closed.Value.Date < ``end``) |> TradingPerformance.Create name
             
             profits.Add(start, perfView.Profit)
-            wins.Add(start, perfView.WinPct |> rounded)
-            avgWinPct.Add(start, perfView.WinAvgReturnPct |> rounded)
-            avgLossPct.Add(start, perfView.LossAvgReturnPct |> rounded)
-            ev.Add(start, perfView.EV |> rounded)
-            avgWinAmount.Add(start, perfView.AvgWinAmount |> rounded)
-            avgLossAmount.Add(start, perfView.AvgLossAmount |> rounded)
-            gainPctRatio.Add(start, perfView.ReturnPctRatio |> rounded)
-            profitRatio.Add(start, perfView.ProfitRatio |> rounded)
-            rrRatio.Add(start, perfView.rrRatio |> rounded)
-            maxWin.Add(start, perfView.MaxWinAmount |> rounded)
-            maxLoss.Add(start, perfView.MaxLossAmount |> rounded)
-            rrSum.Add(start, perfView.rrSum |> rounded)
-            rrAverage.Add(start, perfView.AverageRR |> rounded)
-            invested.Add(start, perfView.TotalCost |> rounded)
+            wins.Add(start, perfView.WinPct |> rounded4)
+            avgWinPct.Add(start, perfView.WinAvgReturnPct |> rounded4)
+            avgLossPct.Add(start, perfView.LossAvgReturnPct |> rounded4)
+            ev.Add(start, perfView.EV |> rounded4)
+            avgWinAmount.Add(start, perfView.AvgWinAmount |> rounded4)
+            avgLossAmount.Add(start, perfView.AvgLossAmount |> rounded4)
+            gainPctRatio.Add(start, perfView.ReturnPctRatio |> rounded4)
+            profitRatio.Add(start, perfView.ProfitRatio |> rounded4)
+            rrRatio.Add(start, perfView.rrRatio |> rounded4)
+            maxWin.Add(start, perfView.MaxWinAmount |> rounded4)
+            maxLoss.Add(start, perfView.MaxLossAmount |> rounded4)
+            rrSum.Add(start, perfView.rrSum |> rounded4)
+            rrAverage.Add(start, perfView.AverageRR |> rounded4)
+            invested.Add(start, perfView.TotalCost |> rounded4)
             tradeCount.Add(start, perfView.NumberOfTrades)
             
             // number of positions opened on start day
@@ -129,11 +131,21 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             let numberOfPositionsClosed = trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.length
             positionsClosedByDateContainer.Add(start, decimal numberOfPositionsClosed)
             
-            // calculate equity curve
-            equity <- equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (_.Profit))
+            let newEquity = equity + (trades |> Seq.filter (fun t -> t.Closed.Value.Date = start) |> Seq.sumBy (_.Profit))
             
-            equityCurve.Add(start, equity)
-        )
+            // calculate equity curve
+            equityCurve.Add(start, newEquity)
+            
+            let newMaxEquity = Math.Max(maxEquity, newEquity)
+            
+            let drawDown = newEquity - newMaxEquity
+            
+            let newMaxDrawdown = Math.Min(maxDrawdown, drawDown)
+            
+            drawDowns.Add(start, drawDown)
+            
+            (newEquity, newMaxEquity, newMaxDrawdown)
+        ) (0m, 0m, 0m) |> ignore
         
         // moving average of RR using fixed number of trades instead of date
         trades
@@ -221,6 +233,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
         
         [
             equityCurve
+            drawDowns
             profitVsDaysHeld
             profits
             profitsFixedNumberOfTrades
@@ -329,7 +342,6 @@ type PortfolioView =
         OpenOptionCount: int
         OpenCryptoCount: int
     }
-
 
 type TradingEntriesView =
     {

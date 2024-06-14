@@ -30,7 +30,7 @@ public class PendingPositionsController(PendingStockPositionsHandler pendingStoc
             )
         );
 
-    [HttpDelete("{id}")]
-    public Task<ActionResult> ClosePendingStockPosition([FromRoute] Guid id) =>
-        this.OkOrError(pendingStockPositionsHandler.Handle(new Close(id, User.Identifier())));
+    [HttpPost("{id}/close")]
+    public Task<ActionResult> ClosePendingStockPosition([FromBody] Close cmd) =>
+        this.OkOrError(pendingStockPositionsHandler.Handle(cmd, User.Identifier()));
 }

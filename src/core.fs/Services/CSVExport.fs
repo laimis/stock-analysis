@@ -25,8 +25,8 @@ module CSVExport =
     let private currency culture (value:decimal) = value.ToString(CURRENCY_FORMAT, culture)
     let private percent culture (value:decimal) = value.ToString(PERCENT_FORMAT, culture)
     let private currencyOption culture (opt:decimal option) = opt |> Option.map (currency culture) |> Option.defaultValue ""
-    let private date (value:System.DateTimeOffset) = value.ToString(DATE_FORMAT)
-    let private dateOption (opt:System.DateTimeOffset option) = opt |> Option.map date |> Option.defaultValue ""
+    let private date (value:DateTimeOffset) = value.ToString(DATE_FORMAT)
+    let private dateOption (opt:DateTimeOffset option) = opt |> Option.map date |> Option.defaultValue ""
     
     type PendingPositionRecord =
         {
@@ -34,10 +34,11 @@ module CSVExport =
             Bid:decimal
             NumberOfShares:decimal
             StopPrice:string
-            Opened:string
+            Created:string
             Closed:string
             Purchased:bool
             Strategy:string
+            CloseReason:string
             Notes:string
         }
         
@@ -171,11 +172,12 @@ module CSVExport =
                     Bid = p.State.Bid
                     NumberOfShares = p.State.NumberOfShares
                     StopPrice = p.State.StopPrice |> currencyOption culture
-                    Opened = p.State.Opened |> date
+                    Created = p.State.Created |> date
                     Closed = p.State.Closed |> dateOption
                     Purchased = p.State.Purchased
                     Strategy = p.State.Strategy
                     Notes = p.State.Notes
+                    CloseReason = p.State.CloseReason 
                 }
             )
             
@@ -346,6 +348,6 @@ module CSVExport =
 
 
     let generateFilename prefix =
-        prefix + "_" + System.DateTime.UtcNow.ToString("yyyyMMdd_hhmss") + ".csv"
+        prefix + "_" + DateTime.UtcNow.ToString("yyyyMMdd_hhmss") + ".csv"
 
 

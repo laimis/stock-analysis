@@ -57,11 +57,38 @@
                         </div>
                     </div>
                     <div class="card-footer no-border">
-                        <button class="btn btn-warning btn-sm" (click)="closePendingPosition(position)">Close</button>
+                        <button class="btn btn-warning btn-sm" (click)="showCloseModel(position)">Close</button>
                     </div>
                 </div>
             }
         }
     </div>
 
+    <!-- Add the modal HTML -->
+    <div class="modal" tabindex="-1" role="dialog" [style.display]="closingPosition ? 'block' : 'none'">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="border-bottom: none">Confirm Position Close</h5>
+                    <button type="button" class="btn-close" (click)="closeCloseModal()">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to close this position?</p>
+                    <div class="mb-3">
+                        <label for="closeReasonInput" class="form-label">Reason for Closing:</label>
+                        <textarea class="form-control" id="closeReasonInput" rows="3" [(ngModel)]="closeReason"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" (click)="confirmClosePosition()">Close Position</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add the modal backdrop -->
+    <div class="modal-backdrop fade show" [style.display]="closingPosition ? 'block' : 'none'"></div>
+
 </section>
+
