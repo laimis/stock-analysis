@@ -123,6 +123,8 @@ type SetStop =
         StopPrice:decimal option
         [<Required>]
         PositionId:StockPositionId
+        [<Required>]
+        Reason:string
     }
 
 type GradePosition =
@@ -973,6 +975,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             do!
                 existing
                 |> StockPosition.setStop cmd.StopPrice DateTimeOffset.UtcNow
+                |> StockPosition.addNotes (("Change stop: " + cmd.Reason) |> Some) DateTimeOffset.UtcNow
                 |> storage.SaveStockPosition userId stock
                 
             return Ok ()

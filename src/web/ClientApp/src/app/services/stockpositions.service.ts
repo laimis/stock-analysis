@@ -106,8 +106,8 @@ export class StockPositionsService {
         return this.http.delete(`/api/portfolio/stockpositions/${positionId}/transactions/${transactionId}`)
     }
 
-    setStopPrice(positionId: string, stopPrice: number): Observable<object> {
-        return this.http.post(`/api/portfolio/stockpositions/${positionId}/stop`, {stopPrice, positionId})
+    setStopPrice(positionId: string, stopPrice: number, reason:string): Observable<object> {
+        return this.http.post(`/api/portfolio/stockpositions/${positionId}/stop`, {stopPrice, positionId, reason})
     }
 
     deleteStopPrice(positionId: string): Observable<object> {

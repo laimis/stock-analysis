@@ -32,26 +32,14 @@
             <div class="col-md-3" #stopPriceReadonlyDiv>
                 <div class="stat-label">
                     Stop Price
-                    <span class="bi bi-pencil" role="button"
-                          (click)="toggleVisibility(stopPriceReadonlyDiv); toggleVisibility(stopPriceEditDiv)"></span>
+                    <span class="bi bi-pencil" role="button" (click)="openStopModal()"></span>
                 </div>
                 <div>{{ candidateStopPrice | currency }}</div>
-            </div>
-            <div class="col-md-3 visually-hidden" #stopPriceEditDiv>
-                <label class="form-label stat-label" for="candidateStopPrice">Stop Price</label>
-                <span class="bi bi-x-circle ms-2" role="button"
-                      (click)="toggleVisibility(stopPriceReadonlyDiv); toggleVisibility(stopPriceEditDiv)"></span>
-                <div class="input-group">
-                    <input class="form-control" step="0.01" id="candidateStopPrice" [(ngModel)]="candidateStopPrice"
-                           type="number">
-                    <button class="btn btn-outline-secondary"
-                            (click)="setStopPrice([stopPriceEditDiv,stopPriceReadonlyDiv]);">Update
-                    </button>
-                </div>
                 <div>
                     <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
                 </div>
             </div>
+            
             <div class="col-md-3" #riskReadonlyDiv>
                 <div class="stat-label">
                     Risk Amount
@@ -267,6 +255,35 @@
         </div>
         <!-- Add the modal backdrop -->
         <div class="modal-backdrop fade show" [style.display]="showCloseModal ? 'block' : 'none'"></div>
+
+
+        <!-- Add the modal HTML -->
+        <div class="modal" tabindex="-1" role="dialog" [style.display]="showStopModal ? 'block' : 'none'">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" style="border-bottom: none">Stop Adjustment</h5>
+                        <button type="button" class="btn-close" (click)="closeStopModal()">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <app-error-display [errors]="stopErrors"></app-error-display>
+                        <label class="form-label" for="stopPriceInput">Stop Price</label>
+                        <input class="form-control" id="stopPriceInput" type="number" #stopPriceInput value="{{candidateStopPrice}}">
+                        <div class="mb-3">
+                            <label for="closeReasonInput" class="form-label">Reason for Changing Stop:</label>
+                            <textarea class="form-control" id="stopReasonInput" rows="3" [(ngModel)]="stopReason"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closeStopModal()">Cancel</button>
+                        <button type="button" class="btn btn-primary" (click)="confirmStop(stopPriceInput.value)">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add the modal backdrop -->
+        <div class="modal-backdrop fade show" [style.display]="showStopModal ? 'block' : 'none'"></div>
         
     </div>
 }

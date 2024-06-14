@@ -106,15 +106,6 @@ export class StockTradingPositionComponent {
         return false
     }
 
-    setStopPrice(elementVisibilityToToggle: HTMLElement[]) {
-        this.stockService.setStopPrice(this._position.positionId, this.candidateStopPrice).subscribe(
-            (_) => {
-                this._position.stopPrice = this.candidateStopPrice
-                elementVisibilityToToggle.forEach(this.toggleVisibility)
-            }
-        )
-    }
-
     deleteStopPrice() {
         if (confirm("Are you sure you want to delete the stop price?")) {
             this.stockService.deleteStopPrice(this._position.positionId).subscribe(
@@ -173,22 +164,61 @@ export class StockTradingPositionComponent {
 
     showCloseModal: boolean = false;
     closeReason: string = '';
-
     openCloseModal() {
         this.showCloseModal = true;
     }
-
     closeCloseModal() {
         this.showCloseModal = false;
         this.closeReason = '';
     }
-
     confirmClosePosition() {
         // Call the existing closePosition() method
         this.closePosition(this.closeReason);
 
         // Close the modal
         this.closeCloseModal();
+    }
+    
+    showStopModal: boolean = false;
+    stopReason: string = '';
+    stopErrors = [];
+    openStopModal() {
+        this.showStopModal = true;
+    }
+    closeStopModal() {
+        this.showStopModal = false;
+        this.stopReason = '';
+    }
+    confirmStop(stopPriceValue: string) {
+        this.stopErrors = []
+        // Parse the stop price value
+        let stopPrice = parseFloat(stopPriceValue)
+        if (isNaN(stopPrice)) {
+            this.stopErrors = ["Please provide a valid stop"]
+            return
+        }
+        
+        // check that stop reason is not empty
+        if (!this.stopReason) {
+            this.stopErrors = ["Please provide a reason for the stop"]
+            return
+        }
+        
+        this.stockService.setStopPrice(this._position.positionId, stopPrice, this.stopReason).subscribe(
+            (_) => {
+                this.candidateStopPrice = stopPrice
+                this._position.stopPrice = stopPrice
+                this.closeStopModal()
+            },
+            err => {
+                let errors = GetErrors(err)
+                alert("Error setting stop price: " + errors.join(", "))
+                this.closeStopModal()
+            }
+        )
+        
+        // Close the modal
+        this.closeStopModal();
     }
 
     deleteTransaction(transactionId: string) {
