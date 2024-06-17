@@ -19,13 +19,13 @@ open FSharp.Data
 // take 5 from the index of interest
 // let index = 9
 // let howMany = 5
-// let last5 = arr.[(index-howMany+1)..(index)]
+// let last5 = arr[(index-howMany+1)..(index)]
 // Console.WriteLine("Last 5:")
 // last5 |> Array.iter (fun i -> Console.Write("{0}", i))
 
 type BreakoutSignalRecord =
     CsvProvider<
-        Schema = "date (string), ticker (string), volumeSlope (decimal), priceSlope (decimal)",
+        Schema = "date (string), ticker (string), breakoutVolumeRate (decimal), volumeSlope (decimal), priceSlope (decimal)",
         HasHeaders=false
     >
     
@@ -141,7 +141,7 @@ let plotData (bars: PriceBars) =
     let obv = Indicators.onBalanceVolume bars
 
     let priceBarTrace =
-        XPlot.Plotly.Candlestick(
+        Candlestick(
             x = x,
             ``open`` = (barsOfInterest |> Array.map (fun bar -> bar.Open)),
             high = (barsOfInterest |> Array.map (fun bar -> bar.High)),
@@ -151,7 +151,7 @@ let plotData (bars: PriceBars) =
         ) :> Trace
         
     let closeTrace = 
-        XPlot.Plotly.Scatter(
+        Scatter(
             x = x,
             y = (closes |> Array.map float),
             mode = "lines",
@@ -159,7 +159,7 @@ let plotData (bars: PriceBars) =
         ) :> Trace
         
     let obvTrace = 
-        XPlot.Plotly.Scatter(
+        Scatter(
             x = x,
             y = (obv |> Array.map (fun d -> d.Value |> float)),
             mode = "lines",
@@ -169,7 +169,7 @@ let plotData (bars: PriceBars) =
         ) :> Trace
         
     let closeSlopeTrace = 
-        XPlot.Plotly.Scatter(
+        Scatter(
             x = x,
             y = (x |> Array.map (fun x -> closeIntercept + closeSlope * float x)),
             mode = "lines",
@@ -188,7 +188,7 @@ let plotData (bars: PriceBars) =
     let struct (volumeIntercept, volumeSlope) = MathNet.Numerics.Fit.Line(x |> Array.take (x.Length - 1) |> Array.map float, volumes |> Array.take (volumes.Length - 1) |> Array.map float)
     
     let volumeSlopeTrace = 
-        XPlot.Plotly.Scatter(
+        Scatter(
             x = x,
             y = (x |> Array.map (fun x -> volumeIntercept + volumeSlope * float x)),
             mode = "lines",
@@ -232,36 +232,27 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
     let contractingVolumeBreakoutName = "Contracting Volume Breakout"
     let volumeRateThreshold = 1.3m
     let volumeSlopeThreshold = 0.0
-    let rangeSlopeThreshold = 0.0
     
     let barsOfInterest = bars.Bars[0..bars.Length-2]
         
     let volumes = barsOfInterest |> Array.map (fun bar -> decimal bar.Volume)
-    let ranges = barsOfInterest |> Array.map (fun bar -> bar.High - bar.Low)
     
     let volumeStats = volumes |> DistributionStatistics.calculate
-    let rangeStats = ranges |> DistributionStatistics.calculate
     
     let lastBar = bars.Last
     let lastVolume = decimal lastBar.Volume
     let lastVolumeRate = lastVolume / volumeStats.mean
-    let lastRange = ranges |> Seq.last
     
     let x = [|0.0..(volumes.Length - 1 |> float)|]
     let volY = volumes |> Array.map float
     let struct (_, volSlope) = MathNet.Numerics.Fit.Line(x, volY)
     
-    let rangeY = ranges |> Seq.map float |> Seq.toArray
-    let struct (_, rangeSlope) = MathNet.Numerics.Fit.Line(x, rangeY)
     
     let struct (_, closeSlope) = MathNet.Numerics.Fit.Line(x, barsOfInterest |> Array.map (fun bar -> bar.Close |> float))
    
-    let description = $"{contractingVolumeBreakoutName}: {lastVolumeRate:N1}x, Vol Slope: {volSlope:N2}, Price Slope: {closeSlope:N2}"
-        
     if lastVolumeRate > volumeRateThreshold && 
        volSlope < volumeSlopeThreshold &&
        lastBar.Close > lastBar.Open
-       // && rangeSlope < rangeSlopeThreshold
        then
 
         Some({
@@ -276,15 +267,9 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
             
 let private runInteractive (context:EnvironmentContext) userState = async {
     
-    let debugBars bars =
-        Console.WriteLine("Bars: {0}, {1}, {2}", bars |> Array.head, bars |> Array.last, bars.Length)
-        
     let toString (matched:MatchedBreakout) =
         $"DAte: {matched.End.DateStr}, VolumeRate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, PriceSlope: {matched.CloseSlope:N2}"
     
-    let toStringPattern (pattern:Pattern) =
-        $"Date: {pattern.date}, Name: {pattern.name}, Description: {pattern.description}, Value: {pattern.value:N2}"
-        
     Console.Write("Ticker: ")
     let tickerSymbol = Console.ReadLine()
     let ticker = Ticker(tickerSymbol)
@@ -309,7 +294,7 @@ let private runInteractive (context:EnvironmentContext) userState = async {
         Console.Write("Which one to plot:")
         let index = Console.ReadLine() |> int
         
-        let (bars,_) = matches.[index]
+        let bars,_ = matches[index]
         
         plotData (bars |> PriceBars)
 }
@@ -332,7 +317,7 @@ let getBreakoutPatternsForTickerIfAvailable tickerSymbol (bars:PriceBars) =
             | None -> None)
         |> Array.choose id
 
-let runStudy (context:EnvironmentContext) (userState) = async {
+let runStudy (context:EnvironmentContext) _ = async {
     
     let studiesDirectory = context.GetArgumentValue "-d"
     
@@ -348,6 +333,14 @@ let runStudy (context:EnvironmentContext) (userState) = async {
     
     Console.WriteLine($"Tickers with price history: {priceHistory.Length}")
     
+    // filter out tickers that don't have expected most recent price data
+    let mostRecentDate = "2024-05-21"
+    let priceHistory =
+        priceHistory
+        |> Array.filter (fun (_, prices) -> prices.Bars |> Array.last |> _.DateStr = mostRecentDate)
+        
+    Console.WriteLine($"Tickers with most recent ({mostRecentDate}) price data: {priceHistory.Length}")
+    
     let matchingPatterns =
         priceHistory
         |> Array.map (fun (ticker, prices) -> getBreakoutPatternsForTickerIfAvailable ticker prices)
@@ -359,7 +352,8 @@ let runStudy (context:EnvironmentContext) (userState) = async {
     let signals =
         matchingPatterns
         |> Array.groupBy (fun (_,pattern) -> pattern.Ticker)
-        |> Array.collect(fun (ticker,tickerSignals) ->
+        |> Array.collect(fun (_,tickerSignals) ->
+            
             tickerSignals
             |> Array.map snd
             |> Array.fold (fun (acc:MatchedBreakout array) signal ->
@@ -385,7 +379,7 @@ let runStudy (context:EnvironmentContext) (userState) = async {
             // get the bar at the breakout day
             let barWithIndex = prices.TryFindByDate breakout.End.Date
             match barWithIndex with
-            | Some (index, bar) ->
+            | Some (index, _) ->
                 let nextDayBar = prices.Bars |> Array.tryItem (index + 1)
                 match nextDayBar with
                 | Some _ -> return Some breakout
@@ -402,6 +396,7 @@ let runStudy (context:EnvironmentContext) (userState) = async {
                 BreakoutSignalRecord.Row(
                     date = breakout.End.DateStr,
                     ticker = breakout.Ticker,
+                    breakoutVolumeRate = breakout.VolumeRate,
                     volumeSlope = decimal breakout.VolumeSlope,
                     priceSlope = decimal breakout.CloseSlope
                 )
