@@ -82,7 +82,7 @@ export class StockTradingSimulationsComponent implements OnInit {
             }
         );
         
-        return positions.slice(0, 20);
+        return positions;
     }
 
     fetchBenchmarks() {

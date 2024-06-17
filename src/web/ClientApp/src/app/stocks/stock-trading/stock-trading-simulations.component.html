@@ -81,8 +81,8 @@
                     <th>Ticker</th>
                     <th>Opened</th>
                     <th>Closed</th>
-                    <th>Profit</th>
-                    <th>Gain %</th>
+                    <th>Profit vs Actual</th>
+                    <th>Gain % vs Actual</th>
                     <th>Profit Diff</th>
                     <th>Gain %  Diff</th>
                 </tr>
@@ -93,10 +93,10 @@
                         <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="trade.ticker"></app-stock-link-and-tradingview-link></td>
                         <td>{{ trade.opened | date }}</td>
                         <td>{{ trade.closed | date }} ({{ trade.daysHeld }})</td>
-                        <td>{{ trade.profit | currency }}</td>
-                        <td>{{ trade.gainPct | percent }}</td>
-                        <td>{{trade.profit - findActualTrade(trade).profit | currency}}</td>
-                        <td>{{trade.gainPct - findActualTrade(trade).gainPct | percent}}</td>
+                        <td>{{ trade.profit | currency }} vs {{ findActualTrade(trade).profit | currency }}</td>
+                        <td>{{ trade.gainPct | percent }} vs {{ findActualTrade(trade).gainPct | percent }}</td>
+                        <td>{{ trade.profit - findActualTrade(trade).profit | currency }}</td>
+                        <td>{{ trade.gainPct - findActualTrade(trade).gainPct | percent }}</td>
                     </tr>
                 }
             </tbody>
