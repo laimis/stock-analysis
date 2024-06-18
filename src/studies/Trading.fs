@@ -4,50 +4,39 @@ module studies.Trading
     open System.Collections.Generic
     open core.fs.Adapters.Stocks
     open core.fs.Services.Analysis
+    open core.fs.Stocks
     open studies.DataHelpers
     open FSharp.Data
     
-    type TradeOutcomeOutput =
-        CsvProvider<
-            Sample = "screenerid (int option), date (string), ticker (string), gap (decimal option), sma20 (decimal option), sma50 (decimal option), sma150 (decimal option), sma200 (decimal option), strategy (string), longOrShort (string), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
-            HasHeaders=true
-        >
+    // type TradeOutcomeOutput =
+    //     CsvProvider<
+    //         Sample = "screenerid (int option), date (string), ticker (string), gap (decimal option), sma20 (decimal option), sma50 (decimal option), sma150 (decimal option), sma200 (decimal option), strategy (string), longOrShort (string), opened (string), openPrice (decimal), closed (string), closePrice (decimal), percentGain (decimal), numberOfDaysHeld (int)",
+    //         HasHeaders=true
+    //     >
+    
+    type TradeOutcome = {
+        Signal:ISignal
+        OpenBar:PriceBar
+        CloseBar:PriceBar
+        Strategy:string
+        PositionType:StockPositionType
+    }
+        with
+            member this.Ticker = this.Signal.Ticker
+            member this.OpenPrice = this.OpenBar.Open
+            member this.Opened = this.OpenBar.Date
+            member this.ClosePrice = this.CloseBar.Close
+            member this.Closed = this.CloseBar.Date
+            member this.NumberOfDaysHeld = (this.CloseBar.Date - this.OpenBar.Date).TotalDays |> int
+            member this.PercentGain =
+             let gainFactor = 
+                 match this.PositionType with
+                 | StockPositionType.Long -> 1m
+                 | StockPositionType.Short -> -1m
+             (this.ClosePrice - this.OpenPrice) / this.OpenPrice * gainFactor
 
-    module TradeOutcomeOutput =
-
-        let create strategy positionType (signal:ISignal) (openBar:PriceBar) (closeBar:PriceBar) =
-
-            let openPrice = openBar.Open
-            let closePrice = closeBar.Close
-
-            let daysHeld = closeBar.Date - openBar.Date
-
-            let longOrShortString, gainFactor =
-                match positionType with
-                | core.fs.Stocks.StockPositionType.Long -> "long", 1m
-                | core.fs.Stocks.StockPositionType.Short -> "short", -1m
-
-            // calculate gain percentage
-            let gain = (closePrice - openPrice) / openPrice * gainFactor
-
-            TradeOutcomeOutput.Row(
-                screenerid=signal.Screenerid,
-                date=signal.Date,
-                ticker=signal.Ticker,
-                gap=signal.Gap,
-                sma20=signal.Sma20,
-                sma50=signal.Sma50,
-                sma150=signal.Sma150,
-                sma200=signal.Sma200,
-                strategy=strategy,
-                longOrShort=longOrShortString,
-                opened=openBar.DateStr,
-                openPrice=openPrice,
-                closed=closeBar.DateStr,
-                closePrice=closePrice,
-                percentGain=gain,
-                numberOfDaysHeld=(daysHeld.TotalDays |> int)
-            )
+            static member Create signal openBar closeBar strategyName positionType =
+             { Signal = signal; OpenBar = openBar; CloseBar = closeBar; Strategy = strategyName; PositionType = positionType }
 
     type TradeSummary = {
         StrategyName:string
@@ -65,7 +54,7 @@ module studies.Trading
     }
 
     module TradeSummary =
-        let create name (outcomes:TradeOutcomeOutput.Row seq) =
+        let create name (outcomes:TradeOutcome seq) =
             // summarize the outcomes
             let numberOfTrades = outcomes |> Seq.length
             let winners = outcomes |> Seq.filter (fun o -> o.PercentGain > 0m)
@@ -147,7 +136,7 @@ module studies.Trading
                 if verbose then printfn $"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{closeBar.Date} because {reason}"
                 closeBar
         
-        TradeOutcomeOutput.create name positionType signal openBar closeBar
+        TradeOutcome.Create signal openBar closeBar name positionType
 
     let strategyWithStopLossPercent verbose positionType numberOfBarsToHold (stopLossPercent:decimal option) (signal:ISignal,prices:PriceBars) =
         
@@ -165,8 +154,8 @@ module studies.Trading
             
         let buyOrSell =
             match positionType with
-            | core.fs.Stocks.StockPositionType.Long -> "Buy"
-            | core.fs.Stocks.StockPositionType.Short -> "Sell"
+            | StockPositionType.Long -> "Buy"
+            | StockPositionType.Short -> "Sell"
             
         let name = String.concat " " ([buyOrSell; holdPeriod; stopLossPortion] |> List.filter (fun x -> x <> ""))
             
@@ -185,20 +174,20 @@ module studies.Trading
             match stopLossPercent with
             | None ->
                 match positionType with
-                | core.fs.Stocks.StockPositionType.Long -> 0m
-                | core.fs.Stocks.StockPositionType.Short -> Decimal.MaxValue
+                | StockPositionType.Long -> 0m
+                | StockPositionType.Short -> Decimal.MaxValue
             | Some stopLossPercent ->
                 let multiplier =
                     match positionType with
-                    | core.fs.Stocks.StockPositionType.Long -> 1m - stopLossPercent
-                    | core.fs.Stocks.StockPositionType.Short -> 1m + stopLossPercent
+                    | StockPositionType.Long -> 1m - stopLossPercent
+                    | StockPositionType.Short -> 1m + stopLossPercent
                 openDay.Open * multiplier
         
         let stopLossFunc (index, bar:PriceBar) =
             let stopPriceReached =
                 match positionType with
-                | core.fs.Stocks.StockPositionType.Long -> bar.Close < stopPrice
-                | core.fs.Stocks.StockPositionType.Short -> bar.Close > stopPrice
+                | StockPositionType.Long -> bar.Close < stopPrice
+                | StockPositionType.Short -> bar.Close > stopPrice
                 
             let closeDayReached = bar.Date >= closeBar.Date
             (index, bar, stopPriceReached, closeDayReached)
@@ -217,7 +206,7 @@ module studies.Trading
             let closeDayReached = bar.Date >= closeBar.Date
             (index, bar, stopPriceReached, closeDayReached)
         
-        strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
+        strategyWithGenericStopLoss verbose name Long stopLossFunc (signal,prices)
         
     let strategyWithProfitTarget verbose positionType stopLoss target (signal:ISignal,prices:PriceBars) =
         
@@ -226,29 +215,29 @@ module studies.Trading
         
         let profitTarget =
             match positionType with
-            | core.fs.Stocks.StockPositionType.Long ->
+            | StockPositionType.Long ->
                 openDay.Open * (1m + target)
-            | core.fs.Stocks.StockPositionType.Short ->
+            | StockPositionType.Short ->
                 openDay.Open * (1m - target)
                 
         let stopPrice =
             match positionType with
-            | core.fs.Stocks.StockPositionType.Long ->
+            | StockPositionType.Long ->
                 openDay.Open * (1m - stopLoss)
-            | core.fs.Stocks.StockPositionType.Short ->
+            | StockPositionType.Short ->
                 openDay.Open * (1m + stopLoss)
         
         let stopLossFunc (index, bar:PriceBar) =
             let closeDayReached = bar.Date >= closeBar.Date
             let stopPriceReached =
                 match positionType with
-                | core.fs.Stocks.StockPositionType.Long -> bar.Close < stopPrice
-                | core.fs.Stocks.StockPositionType.Short -> bar.Close > stopPrice
+                | StockPositionType.Long -> bar.Close < stopPrice
+                | StockPositionType.Short -> bar.Close > stopPrice
                 
             let targetReached =
                 match positionType with
-                | core.fs.Stocks.StockPositionType.Long -> bar.Close > profitTarget
-                | core.fs.Stocks.StockPositionType.Short -> bar.Close < profitTarget
+                | StockPositionType.Long -> bar.Close > profitTarget
+                | StockPositionType.Short -> bar.Close < profitTarget
                 
             (index, bar, stopPriceReached || targetReached, closeDayReached)
             
@@ -260,12 +249,12 @@ module studies.Trading
             
         let buyOrSell =
             match positionType with
-            | core.fs.Stocks.StockPositionType.Long -> "Buy"
-            | core.fs.Stocks.StockPositionType.Short -> "Sell"
+            | StockPositionType.Long -> "Buy"
+            | StockPositionType.Short -> "Sell"
             
         let name = String.concat " " ([buyOrSell; profitTargetPorition; stopLossPortion] |> List.filter (fun x -> x <> ""))
         
-        strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
+        strategyWithGenericStopLoss verbose name Long stopLossFunc (signal,prices)
         
     let strategyWithSignalCloseAsStop verbose (signal:ISignal,prices:PriceBars) =
         
@@ -279,7 +268,7 @@ module studies.Trading
             let closeDayReached = bar.Date >= closeBar.Date
             (index, bar, stopPriceReached, closeDayReached)
         
-        strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
+        strategyWithGenericStopLoss verbose name Long stopLossFunc (signal,prices)
         
         
     let strategyWithTrailingStop verbose positionType stopLossPercent (signal:ISignal,prices:PriceBars) =
@@ -288,8 +277,8 @@ module studies.Trading
         
         let buyOrSell = 
             match positionType with
-            | core.fs.Stocks.StockPositionType.Long -> "Buy"
-            | core.fs.Stocks.StockPositionType.Short -> "Sell"
+            | StockPositionType.Long -> "Buy"
+            | StockPositionType.Short -> "Sell"
             
         let name = $"{buyOrSell} and use trailing stop, SL of {stopLossPercent}%%"
         
@@ -305,9 +294,9 @@ module studies.Trading
             
             let refValue, stopReached =
                 match positionType with
-                | core.fs.Stocks.StockPositionType.Long ->
+                | StockPositionType.Long ->
                     Math.Max(bar.Close, stopLossReferencePrice.Value), bar.Close < stopLossReferencePrice.Value * (1m - stopLossPercent)
-                | core.fs.Stocks.StockPositionType.Short ->
+                | StockPositionType.Short ->
                     Math.Min(bar.Close, stopLossReferencePrice.Value), bar.Close > stopLossReferencePrice.Value * (1m + stopLossPercent)
                     
             stopLossReferencePrice.Value <- refValue
@@ -361,19 +350,19 @@ module studies.Trading
             |> List.map (fun strategy ->
                 
                 // track outcomes by ticker and open/close dates
-                let map = Dictionary<string, List<TradeOutcomeOutput.Row>>()
+                let map = Dictionary<string, List<TradeOutcome>>()
                 
                 signalsWithPriceBars
                 |> List.map strategy
-                |> List.map (fun (outcome:TradeOutcomeOutput.Row) ->
+                |> List.map (fun (outcome:TradeOutcome) ->
                     match map.TryGetValue(outcome.Ticker) with
                     | false, _ ->
-                        let list = List<TradeOutcomeOutput.Row>()
+                        let list = List<TradeOutcome>()
                         list.Add(outcome)
                         map.Add(outcome.Ticker, list)
                         Some outcome
                     | true, list ->
-                        let fallsInsideExistingTrade = list |> Seq.exists (fun (x:TradeOutcomeOutput.Row) -> outcome.Opened >= x.Opened && outcome.Opened <= x.Closed)
+                        let fallsInsideExistingTrade = list |> Seq.exists (fun (x:TradeOutcome) -> outcome.Opened >= x.Opened && outcome.Opened <= x.Closed)
                         match fallsInsideExistingTrade with
                         | true -> None
                         | false ->

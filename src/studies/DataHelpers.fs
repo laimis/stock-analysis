@@ -14,11 +14,6 @@ type ISignal =
     abstract member Ticker : string
     abstract member Date : string
     abstract member Screenerid : int option
-    abstract member Gap : decimal option
-    abstract member Sma20 : decimal option
-    abstract member Sma50 : decimal option
-    abstract member Sma150 : decimal option
-    abstract member Sma200 : decimal option
     
 let verifySignals (records:ISignal seq) minimumRecordsExpected =
         

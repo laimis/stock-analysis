@@ -3,6 +3,7 @@ module studiestests.TypeTests
 open System
 open Xunit
 open FsUnit
+open core.fs.Adapters.Stocks
 open studies.Trading
 open studies.DataHelpers
 open studies.ScreenerStudy
@@ -62,15 +63,23 @@ let ``Describe records for Signal works``() =
 let generateTradeOutcomes gains =
     gains
         |> List.map( fun g ->
-            TradeOutcomeOutput.Row(
-                    screenerid = (1 |> Some), date = "2022-08-08", ticker = "NET",
-                    gap = (0m |> Some), sma20 = (0m |> Some), sma50 = (0m |> Some), sma150 = (0m |> Some), sma200 = (0m |> Some),
-                    strategy = "B&H with trailing stop", longOrShort = "long",
-                    opened = "2022-08-08", openPrice = 74.425m,
-                    closed = "2022-08-17", closePrice = 74.51m,
-                    percentGain = g,
-                    numberOfDaysHeld = 9
-                )
+            let sampleSignal = {
+                new ISignal with
+                    member this.Ticker = "NET"
+                    member this.Date = "2022-08-08"
+                    member this.Screenerid = 1 |> Some
+            }
+            
+            let openBar = PriceBar(DateTimeOffset.Parse("2022-08-08"), 10, 10, 10, 10, 10)
+            let closeBar = PriceBar(DateTimeOffset.Parse("2022-08-17"), 10, 10, 10, 10m * g, 10)
+            
+            {
+                Signal = sampleSignal
+                OpenBar = openBar
+                CloseBar = closeBar
+                Strategy = "B&H with trailing stop"
+                PositionType = core.fs.Stocks.StockPositionType.Long
+            }
         )
 
 [<Fact>]
@@ -78,7 +87,7 @@ let ``Creating trade outcomes works``() =
 
     let outcomes = [0.02m; 0.01m; 1m; -0.05m; -0.08m] |> generateTradeOutcomes
 
-    let summary = studies.Trading.TradeSummary.create "B&H with trailing stop" outcomes
+    let summary = TradeSummary.create "B&H with trailing stop" outcomes
 
     summary.Gains |> Seq.map (fun g -> Math.Round(g, 4)) |> should equal [0.02m; 0.01m; 1m; -0.05m; -0.08m]
     summary.Losers |> should equal 2

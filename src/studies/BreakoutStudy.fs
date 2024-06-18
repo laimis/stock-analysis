@@ -10,6 +10,7 @@ open core.fs.Services.Analysis.MultipleBarPriceAnalysis
 open studies.DataHelpers
 open studies.ServiceHelper
 open FSharp.Data
+open studies.Trading
 
 // let arr = Array.init 10 (fun i -> i)
 // Console.WriteLine("Array:")
@@ -29,19 +30,45 @@ type BreakoutSignalRecord =
         HasHeaders=false
     >
     
+type BreakoutTradeOutcomeRecord =
+    CsvProvider<
+        Schema = "date(string), ticker(string), breakoutVolumeRate(decimal), volumeSlope(decimal), priceSlope(decimal), longOrShort(string), opened(string), openPrice(decimal), closed(string), closePrice(decimal), percentGain(decimal), numberOfDaysHeld(int)",
+        HasHeaders = false
+    >
+    
 type BreakoutSignalRecordWrapper(row:BreakoutSignalRecord.Row) =
+    member this.Row = row
+    
     interface ISignal with
         member this.Date = row.Date
         member this.Ticker = row.Ticker
-        member this.Gap = None
         member this.Screenerid = None
-        member this.Sma20 = None
-        member this.Sma50 = None
-        member this.Sma150 = None
-        member this.Sma200 = None
         
+let createTradeOutcomesOutput (tradeOutcomes:TradeOutcome seq) =
+    // let's extract breakout signal wrapper with row
+    let rows =
+        tradeOutcomes
+        |> Seq.map( fun t ->
+            let wrapper = t.Signal :?> BreakoutSignalRecordWrapper
+            let signal = wrapper.Row
+            
+            BreakoutTradeOutcomeRecord.Row(
+                date = signal.Date,
+                ticker = signal.Ticker,
+                breakoutVolumeRate = signal.BreakoutVolumeRate,
+                volumeSlope = signal.VolumeSlope,
+                priceSlope = signal.PriceSlope,
+                longOrShort = (match t.PositionType with | core.fs.Stocks.StockPositionType.Long -> "long" | core.fs.Stocks.StockPositionType.Short -> "short"),
+                opened = t.OpenBar.DateStr,
+                openPrice = t.OpenBar.Open,
+                closed = t.CloseBar.DateStr,
+                closePrice = t.CloseBar.Close,
+                percentGain = t.PercentGain,
+                numberOfDaysHeld = t.NumberOfDaysHeld
+            )
+        )
+    new BreakoutTradeOutcomeRecord(rows)
         
-
 let private normalizeByAverage (values:float array) =
     let average = values |> Array.average
     values |> Array.map (fun v -> v / average)
@@ -115,7 +142,7 @@ let private calculateAndPrintSlope (prices:PriceBars) (startDate:DateTimeOffset)
     closingPrices |> calculateBestFitLine normalizeWithinZeroAndMax |> describe "ZeroMax"
     closingPrices |> calculateBestFitLine normalizeByAverage |> describe "Average"
     closingPrices |> calculateBestFitLine id |> describe "None"
-   
+    
 type MatchedBreakout = {
     Bars: PriceBar array
     VolumeRate: decimal
@@ -143,10 +170,10 @@ let plotData (bars: PriceBars) =
     let priceBarTrace =
         Candlestick(
             x = x,
-            ``open`` = (barsOfInterest |> Array.map (fun bar -> bar.Open)),
-            high = (barsOfInterest |> Array.map (fun bar -> bar.High)),
-            low = (barsOfInterest |> Array.map (fun bar -> bar.Low)),
-            close = (barsOfInterest |> Array.map (fun bar -> bar.Close)),
+            ``open`` = (barsOfInterest |> Array.map (_.Open)),
+            high = (barsOfInterest |> Array.map (_.High)),
+            low = (barsOfInterest |> Array.map (_.Low)),
+            close = (barsOfInterest |> Array.map (_.Close)),
             showlegend = false
         ) :> Trace
         
@@ -229,7 +256,6 @@ let plotData (bars: PriceBars) =
     
 let private contractingVolumeBreakout ticker (bars: PriceBars) =
     
-    let contractingVolumeBreakoutName = "Contracting Volume Breakout"
     let volumeRateThreshold = 1.3m
     let volumeSlopeThreshold = 0.0
     
@@ -268,7 +294,7 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
 let private runInteractive (context:EnvironmentContext) userState = async {
     
     let toString (matched:MatchedBreakout) =
-        $"DAte: {matched.End.DateStr}, VolumeRate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, PriceSlope: {matched.CloseSlope:N2}"
+        $"Date: {matched.End.DateStr}, VolumeRate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, PriceSlope: {matched.CloseSlope:N2}"
     
     Console.Write("Ticker: ")
     let tickerSymbol = Console.ReadLine()
@@ -421,7 +447,6 @@ let run (context:EnvironmentContext) = async {
             match context.HasArgument "--interactive" with
             | true -> runInteractive
             | false -> runStudy
-                
         
         return! funcToRun context user.State
 }

@@ -31,12 +31,7 @@ type SignalWrapper(row:Signal.Row) =
         member this.Ticker = row.Ticker
         member this.Date = row.Date
         member this.Screenerid = row.Screenerid |> Some
-        member this.Gap = None
-        member this.Sma20 = None
-        member this.Sma50 = None
-        member this.Sma150 = None
-        member this.Sma200 = None
-
+        
 type SignalWithPriceProperties =
     CsvProvider<
         Schema = "screenerid (int), date (string), ticker (string), open (decimal), close (decimal), high (decimal), low (decimal), gap (decimal), sma20 (decimal), sma50 (decimal), sma150 (decimal), sma200 (decimal)",
@@ -48,11 +43,6 @@ type SignalWithPricePropertiesWrapper(row:SignalWithPriceProperties.Row) =
         member this.Ticker = row.Ticker
         member this.Date = row.Date
         member this.Screenerid = row.Screenerid |> Some
-        member this.Gap = row.Gap |> Some
-        member this.Sma20 = row.Sma20 |> Some
-        member this.Sma50 = row.Sma50 |> Some
-        member this.Sma150 = row.Sma150 |> Some
-        member this.Sma200 = row.Sma200 |> Some
         
 
 let private getEarliestDateByTicker (records:Signal.Row seq) =

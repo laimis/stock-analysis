@@ -264,10 +264,10 @@ let ``Specific test``() = async {
     
     let mock =
         {
-            new DataHelpers.IGetPriceHistory with 
+            new IGetPriceHistory with 
                 member this.GetPriceHistory start ``end`` ticker = task {
                     return [||] |> core.fs.Adapters.Stocks.PriceBars |> Ok
-                }
+                    }
         }
         
     let! transformed = transformSignals mock "d:\\studies\\" signals
