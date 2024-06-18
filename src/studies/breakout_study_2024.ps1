@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 $studyDirectory = "d:\\studies\\breakout_study_2024"
 
 # create timestamp based on date and time
-$timestampPortion = [System.DateTime]::Now.ToString("yyyyMMdd_hhmmss")
+$timestampPortion = [System.DateTime]::Now.ToString("yyyyMMdd_HHmmss")
 
 $resultsDirectory = "$($studyDirectory)\\results_$($timestampPortion)"
 

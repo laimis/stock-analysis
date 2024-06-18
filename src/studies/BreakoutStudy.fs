@@ -337,7 +337,7 @@ let runStudy (context:EnvironmentContext) _ = async {
     let mostRecentDate = "2024-05-21"
     let priceHistory =
         priceHistory
-        |> Array.filter (fun (_, prices) -> prices.Bars |> Array.last |> _.DateStr = mostRecentDate)
+        |> Array.filter (fun (_, prices) -> prices.Bars |> Array.last |> (fun b -> b.DateStr = mostRecentDate))
         
     Console.WriteLine($"Tickers with most recent ({mostRecentDate}) price data: {priceHistory.Length}")
     

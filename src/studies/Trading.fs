@@ -219,6 +219,54 @@ module studies.Trading
         
         strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
         
+    let strategyWithProfitTarget verbose positionType stopLoss target (signal:ISignal,prices:PriceBars) =
+        
+        let closeBar = prices.Last
+        let openDay, _ = findNextDayBarAndIndex signal prices
+        
+        let profitTarget =
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long ->
+                openDay.Open * (1m + target)
+            | core.fs.Stocks.StockPositionType.Short ->
+                openDay.Open * (1m - target)
+                
+        let stopPrice =
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long ->
+                openDay.Open * (1m - stopLoss)
+            | core.fs.Stocks.StockPositionType.Short ->
+                openDay.Open * (1m + stopLoss)
+        
+        let stopLossFunc (index, bar:PriceBar) =
+            let closeDayReached = bar.Date >= closeBar.Date
+            let stopPriceReached =
+                match positionType with
+                | core.fs.Stocks.StockPositionType.Long -> bar.Close < stopPrice
+                | core.fs.Stocks.StockPositionType.Short -> bar.Close > stopPrice
+                
+            let targetReached =
+                match positionType with
+                | core.fs.Stocks.StockPositionType.Long -> bar.Close > profitTarget
+                | core.fs.Stocks.StockPositionType.Short -> bar.Close < profitTarget
+                
+            (index, bar, stopPriceReached || targetReached, closeDayReached)
+            
+        let stopLossPortion =
+            "SL of " + stopLoss.ToString("0.00") + "%"
+            
+        let profitTargetPorition =
+            "PT of " + target.ToString("0.00") + "%"
+            
+        let buyOrSell =
+            match positionType with
+            | core.fs.Stocks.StockPositionType.Long -> "Buy"
+            | core.fs.Stocks.StockPositionType.Short -> "Sell"
+            
+        let name = String.concat " " ([buyOrSell; profitTargetPorition; stopLossPortion] |> List.filter (fun x -> x <> ""))
+        
+        strategyWithGenericStopLoss verbose name core.fs.Stocks.Long stopLossFunc (signal,prices)
+        
     let strategyWithSignalCloseAsStop verbose (signal:ISignal,prices:PriceBars) =
         
         let name = "Buy and use signal close as stop"
