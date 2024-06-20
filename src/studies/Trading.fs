@@ -347,10 +347,12 @@ module studies.Trading
         
         let allOutcomes =
             strategies
-            |> List.map (fun strategy ->
+            |> List.mapi (fun i strategy ->
                 
                 // track outcomes by ticker and open/close dates
                 let map = Dictionary<string, List<TradeOutcome>>()
+                
+                printfn $"  Executing strategy {i+1}..."
                 
                 signalsWithPriceBars
                 |> List.map strategy

@@ -131,10 +131,10 @@ if ($args -contains "--interactive") {
 
 if ($args -contains "--execute") {
     ExecuteNotebook -filter "NoFilter" -filterDirection "All"
-    ExecuteNotebook -filter "MyCycle" -filterDirection "Down"
-    ExecuteNotebook -filter "MyCycle" -filterDirection "Up"
-    ExecuteNotebook -filter "SpyShortTermCycle" -filterDirection "Down"
-    ExecuteNotebook -filter "SpyShortTermCycle" -filterDirection "Up"
-    ExecuteNotebook -filter "SpyLongTermCycle" -filterDirection "Down"
-    ExecuteNotebook -filter "SpyLongTermCycle" -filterDirection "Up"
+#     ExecuteNotebook -filter "MyCycle" -filterDirection "Down"
+#     ExecuteNotebook -filter "MyCycle" -filterDirection "Up"
+#     ExecuteNotebook -filter "SpyShortTermCycle" -filterDirection "Down"
+#     ExecuteNotebook -filter "SpyShortTermCycle" -filterDirection "Up"
+#     ExecuteNotebook -filter "SpyLongTermCycle" -filterDirection "Down"
+#     ExecuteNotebook -filter "SpyLongTermCycle" -filterDirection "Up"
 }

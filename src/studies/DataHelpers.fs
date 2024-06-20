@@ -195,3 +195,36 @@ let saveCsv (filename:string) content = async {
 let appendCsv filename content = async {
     do! System.IO.File.AppendAllTextAsync(filename, content) |> Async.AwaitTask
 }
+
+type CyclePhase =
+    | Up
+    | Down
+
+let industryCyclePhase (signal:ISignal) =
+    match signal.Date with
+    | x when x >= "2022-04-22" && x <= "2022-05-25" -> Down
+    | x when x >= "2022-06-10" && x <= "2022-07-07" -> Down
+    | x when x >= "2022-08-19" && x <= "2022-10-17" -> Down
+    | x when x >= "2022-12-20" && x <= "2023-01-06" -> Down
+    | x when x >= "2023-02-16" && x <= "2023-03-28" -> Down
+    | x when x >= "2023-05-02" && x <= "2023-06-02" -> Down
+    | x when x >= "2023-08-02" && x <= "2023-11-02" -> Down
+    | x when x >= "2024-01-05" && x <= "2024-01-16" -> Down
+    | x when x >= "2024-04-04" && x <= "2024-04-16" -> Down
+    | _ -> Up
+
+let spyShortTermPhase (signal:ISignal) = 
+    match signal.Date with
+    | x when x >= "2022-01-20" && x <= "2022-03-25" -> Down
+    | x when x >= "2022-04-26" && x <= "2022-07-28" -> Down
+    | x when x >= "2022-09-14" && x <= "2022-11-09" -> Down
+    | x when x >= "2022-12-27" && x <= "2023-01-25" -> Down
+    | x when x >= "2023-03-10" && x <= "2023-04-10" -> Down
+    | x when x >= "2023-08-22" && x <= "2023-11-14" -> Down
+    | x when x >= "2024-04-19" && x <= "2024-05-13" -> Down
+    | _ -> Up
+    
+let spyLongTermPhase (signal:ISignal) =
+    match signal.Date with
+    | x when x >= "2022-03-11" && x <= "2023-01-25" -> Down
+    | _ -> Up

@@ -32,8 +32,8 @@ type BreakoutSignalRecord =
     
 type BreakoutTradeOutcomeRecord =
     CsvProvider<
-        Schema = "date(string), ticker(string), breakoutVolumeRate(decimal), volumeSlope(decimal), priceSlope(decimal), longOrShort(string), opened(string), openPrice(decimal), closed(string), closePrice(decimal), percentGain(decimal), numberOfDaysHeld(int)",
-        HasHeaders = false
+        Sample = "date(string), ticker(string), breakoutVolumeRate(decimal), volumeSlope(decimal), priceSlope(decimal), industryCycle(string), spyShortTermCycle(string), spyLongTermCycle(string), longOrShort(string), opened(string), openPrice(decimal), closed(string), closePrice(decimal), percentGain(decimal), numberOfDaysHeld(int)",
+        HasHeaders = true
     >
     
 type BreakoutSignalRecordWrapper(row:BreakoutSignalRecord.Row) =
@@ -58,6 +58,9 @@ let createTradeOutcomesOutput (tradeOutcomes:TradeOutcome seq) =
                 breakoutVolumeRate = signal.BreakoutVolumeRate,
                 volumeSlope = signal.VolumeSlope,
                 priceSlope = signal.PriceSlope,
+                industryCycle = (industryCyclePhase t.Signal |> _.ToString()),
+                spyShortTermCycle = (spyShortTermPhase t.Signal |> _.ToString()),
+                spyLongTermCycle = (spyLongTermPhase t.Signal |> _.ToString()),
                 longOrShort = (match t.PositionType with | core.fs.Stocks.StockPositionType.Long -> "long" | core.fs.Stocks.StockPositionType.Short -> "short"),
                 opened = t.OpenBar.DateStr,
                 openPrice = t.OpenBar.Open,
