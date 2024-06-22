@@ -33,12 +33,23 @@ let contractingVolumeBreakout (bars: PriceBars) =
         let lastVolumeRate = lastVolume / volumeStats.mean
         
         let x = [|0.0..(volumes.Length - 1 |> float)|]
-        let y = volumes |> Array.map float
-        let struct (_, b) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(x, y)
+        let yVol = volumes |> Array.map float
+        let xScale = volumes.Length - 1 |> float
+        let yVolScale = Array.max yVol - Array.min yVol
+    
+        let struct (_, volSlope) = MathNet.Numerics.LinearRegression.SimpleRegression.Fit(x, yVol)
+        let adjustedVolSlope = volSlope * xScale / yVolScale
+        let angleVolDegrees = System.Math.Atan(adjustedVolSlope) * 180.0 / System.Math.PI
+        
+        let closes = barsOfInterest |> Array.map (fun bar -> bar.Close |> float)
+        let struct (_, closeSlope) = MathNet.Numerics.Fit.Line(x, closes)
+        let yCloseScale = Array.max closes - Array.min closes
+        let adjustedCloseSlope = closeSlope * xScale / yCloseScale
+        let angleCloseDegrees = System.Math.Atan(adjustedCloseSlope) * 180.0 / System.Math.PI
        
-        let description = $"{contractingVolumeBreakoutName}: {lastVolumeRate:N1}x, {b:N2}"
+        let description = $"{contractingVolumeBreakoutName}: vr: {lastVolumeRate:N1}x, va: {angleVolDegrees:N2}°, pa: {angleCloseDegrees:N2}°"
             
-        if lastVolumeRate > volumeRateThreshold && b < slopeThreshold && (lastBar.Close > lastBar.Open) then
+        if lastVolumeRate > volumeRateThreshold && volSlope < slopeThreshold && (lastBar.Close > lastBar.Open) then
             Some({
                 date = lastBar.Date
                 name = contractingVolumeBreakoutName

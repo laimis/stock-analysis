@@ -71,7 +71,7 @@ let generateTradeOutcomes gains =
             }
             
             let openBar = PriceBar(DateTimeOffset.Parse("2022-08-08"), 10, 10, 10, 10, 10)
-            let closeBar = PriceBar(DateTimeOffset.Parse("2022-08-17"), 10, 10, 10, 10m * g, 10)
+            let closeBar = PriceBar(DateTimeOffset.Parse("2022-08-17"), 10, 10, 10, 10m + (g * 10m), 10)
             
             {
                 Signal = sampleSignal
