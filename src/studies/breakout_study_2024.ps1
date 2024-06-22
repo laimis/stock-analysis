@@ -32,13 +32,6 @@ function InteractiveRun() {
 }
 
 function SeedParameterFiles() {
-    param (
-        [string]$filter,
-        [string]$filterDirection
-    )
-
-    $filterFile = "filter.txt"
-    $filterDirectionFile = "filter_direction.txt"
     $resultsDirectoryFile = "results_directory.txt"
     $studyDirectoryFile = "study_directory.txt"
     
@@ -47,18 +40,12 @@ function SeedParameterFiles() {
         New-Item -ItemType Directory -Path $resultsDirectory
     }
     
-    #ensure results subdirectory with format filter_filterDirection exists
-    $resultsSubDirectory = "$resultsDirectory\\$($filter)_$($filterDirection)"
+    #ensure results subdirectory exists
+    $resultsSubDirectory = "$resultsDirectory\\outcomes"
     if (-not (Test-Path $resultsSubDirectory)) {
         New-Item -ItemType Directory -Path $resultsSubDirectory
     }
 
-    # write filter to file
-    $filter | Out-File -FilePath $filterFile -Force -NoNewline
-
-    # write filter direction to file
-    $filterDirection | Out-File -FilePath $filterDirectionFile -Force -NoNewline
-    
     # write results directory to file
     $resultsDirectory | Out-File -FilePath $resultsDirectoryFile -Force -NoNewline
     
@@ -67,29 +54,18 @@ function SeedParameterFiles() {
 }
 
 function ClearParameterFiles() {
-    $filterFile = "filter.txt"
-    $filterDirectionFile = "filter_direction.txt"
     $resultsDirectoryFile = "results_directory.txt"
     $studyDirectoryFile = "study_directory.txt"
 
-    Remove-Item -Path $filterFile -Force
-    Remove-Item -Path $filterDirectionFile -Force
     Remove-Item -Path $resultsDirectoryFile -Force
     Remove-Item -Path $studyDirectoryFile -Force
 }
 
-# write a function that will call jupyter notebook to execute the notebook, each time creating two files before calling jupyter (accept as params):
-# 1. filter.txt where you specify NoFilter, MyFilter, SpyShortTermFilter, and SpyLongTermFilter
-# 2. for each of those, specify filter_direction.txt, with All for NoFilter, Down and Up for the rest
 function ExecuteNotebook() {
-    param (
-        [string]$filter,
-        [string]$filterDirection
-    )
     
-    SeedParameterFiles -filter $filter -filterDirection $filterDirection
+    SeedParameterFiles
     
-    Write-Host "Executing notebook with filter $filter and filter direction $filterDirection, output to $resultsDirectory"
+    Write-Host "Executing notebook, output to $resultsDirectory"
     
     # execute notebook
     jupyter nbconvert --ExecutePreprocessor.timeout=None --InteractiveShell.iopub_timeout=0 --execute --to html --no-input .\breakout_notebook.ipynb
@@ -101,9 +77,11 @@ function ExecuteNotebook() {
     jupyter nbconvert --clear-output .\breakout_notebook.ipynb
 
     # move file to secret file
-    $outputName = "$($resultsDirectory)\notebook_$($filter)_$($filterDirection).html"
+    $outputName = "$($resultsDirectory)\notebook.html"
     Write-Host "Moving breakout_notebook.html to $outputName"
     Move-Item -Path breakout_notebook.html -Destination $outputName -Force
+    
+    start $outputName
 
     ClearParameterFiles
 }
@@ -118,7 +96,7 @@ if ($args -contains "--generate") {
 }
 
 if ($args -contains "--seed") {
-    SeedParameterFiles -filter "NoFilter" -filterDirection "All"
+    SeedParameterFiles
 }
 
 if ($args -contains "--clear") {
@@ -130,11 +108,5 @@ if ($args -contains "--interactive") {
 }
 
 if ($args -contains "--execute") {
-    ExecuteNotebook -filter "NoFilter" -filterDirection "All"
-#     ExecuteNotebook -filter "MyCycle" -filterDirection "Down"
-#     ExecuteNotebook -filter "MyCycle" -filterDirection "Up"
-#     ExecuteNotebook -filter "SpyShortTermCycle" -filterDirection "Down"
-#     ExecuteNotebook -filter "SpyShortTermCycle" -filterDirection "Up"
-#     ExecuteNotebook -filter "SpyLongTermCycle" -filterDirection "Down"
-#     ExecuteNotebook -filter "SpyLongTermCycle" -filterDirection "Up"
+    ExecuteNotebook
 }

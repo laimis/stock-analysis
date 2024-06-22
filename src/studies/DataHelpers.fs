@@ -199,9 +199,11 @@ let appendCsv filename content = async {
 type CyclePhase =
     | Up
     | Down
+    | Unknown
 
 let industryCyclePhase (signal:ISignal) =
     match signal.Date with
+    | x when x <= "2022-04-21" -> Unknown
     | x when x >= "2022-04-22" && x <= "2022-05-25" -> Down
     | x when x >= "2022-06-10" && x <= "2022-07-07" -> Down
     | x when x >= "2022-08-19" && x <= "2022-10-17" -> Down
@@ -215,6 +217,7 @@ let industryCyclePhase (signal:ISignal) =
 
 let spyShortTermPhase (signal:ISignal) = 
     match signal.Date with
+    | x when x <= "2022-01-19" -> Unknown
     | x when x >= "2022-01-20" && x <= "2022-03-25" -> Down
     | x when x >= "2022-04-26" && x <= "2022-07-28" -> Down
     | x when x >= "2022-09-14" && x <= "2022-11-09" -> Down
@@ -226,5 +229,6 @@ let spyShortTermPhase (signal:ISignal) =
     
 let spyLongTermPhase (signal:ISignal) =
     match signal.Date with
+    | x when x <= "2022-03-19" -> Unknown
     | x when x >= "2022-03-11" && x <= "2023-01-25" -> Down
     | _ -> Up

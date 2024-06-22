@@ -49,9 +49,12 @@ module studies.Trading
         AvgLoss:decimal
         AvgGainLoss:decimal
         EV:decimal
-        Gains:decimal seq
-        GainDistribution:core.fs.Services.Analysis.DistributionStatistics
+        Trades:TradeOutcome seq
     }
+        with
+            member this.Gains = this.Trades |> Seq.map (_.PercentGain)
+            member this.GainDistribution = this.Gains |> DistributionStatistics.calculate 
+
 
     module TradeSummary =
         let create name (outcomes:TradeOutcome seq) =
@@ -77,9 +80,6 @@ module studies.Trading
             let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> Math.Abs)
             let totalGain = outcomes |> Seq.sumBy (_.PercentGain)
 
-            let gains = outcomes |> Seq.map (_.PercentGain)
-            let gainDistribution = DistributionStatistics.calculate gains
-
             // return trade summary
             {
                 StrategyName = name
@@ -92,8 +92,7 @@ module studies.Trading
                 AvgLoss = avg_loss
                 AvgGainLoss = avg_gain_loss
                 EV = ev
-                Gains = gains
-                GainDistribution = gainDistribution
+                Trades = outcomes
             }
     
     let private validateStopLossPercent stopLossPercent =
@@ -252,9 +251,9 @@ module studies.Trading
             | StockPositionType.Long -> "Buy"
             | StockPositionType.Short -> "Sell"
             
-        let name = String.concat " " ([buyOrSell; profitTargetPorition; stopLossPortion] |> List.filter (fun x -> x <> ""))
+        let name = String.concat " " ([buyOrSell; stopLossPortion; profitTargetPorition] |> List.filter (fun x -> x <> ""))
         
-        strategyWithGenericStopLoss verbose name Long stopLossFunc (signal,prices)
+        strategyWithGenericStopLoss verbose name positionType stopLossFunc (signal,prices)
         
     let strategyWithSignalCloseAsStop verbose (signal:ISignal,prices:PriceBars) =
         

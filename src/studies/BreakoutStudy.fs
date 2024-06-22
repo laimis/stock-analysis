@@ -26,13 +26,13 @@ open studies.Trading
 
 type BreakoutSignalRecord =
     CsvProvider<
-        Schema = "date (string), ticker (string), breakoutVolumeRate (decimal), volumeSlope (decimal), priceSlope (decimal)",
-        HasHeaders=false
+        Sample = "date (string), ticker (string), breakoutVolumeRate (decimal), volumeSlope (decimal), volumeDegrees (decimal), priceSlope (decimal), priceDegrees (decimal)",
+        HasHeaders=true
     >
     
 type BreakoutTradeOutcomeRecord =
     CsvProvider<
-        Sample = "date(string), ticker(string), breakoutVolumeRate(decimal), volumeSlope(decimal), priceSlope(decimal), industryCycle(string), spyShortTermCycle(string), spyLongTermCycle(string), longOrShort(string), opened(string), openPrice(decimal), closed(string), closePrice(decimal), percentGain(decimal), numberOfDaysHeld(int)",
+        Sample = "date(string), ticker(string), breakoutVolumeRate(decimal), volumeSlope(decimal), volumeDegrees(decimal), priceSlope(decimal), priceDegrees(decimal), industryCycle(string), spyShortTermCycle(string), spyLongTermCycle(string), longOrShort(string), opened(string), openPrice(decimal), closed(string), closePrice(decimal), percentGain(decimal), numberOfDaysHeld(int)",
         HasHeaders = true
     >
     
@@ -67,7 +67,9 @@ let createTradeOutcomesOutput (tradeOutcomes:TradeOutcome seq) =
                 closed = t.CloseBar.DateStr,
                 closePrice = t.CloseBar.Close,
                 percentGain = t.PercentGain,
-                numberOfDaysHeld = t.NumberOfDaysHeld
+                numberOfDaysHeld = t.NumberOfDaysHeld,
+                volumeDegrees = signal.VolumeDegrees,
+                priceDegrees = signal.PriceDegrees
             )
         )
     new BreakoutTradeOutcomeRecord(rows)
@@ -150,7 +152,9 @@ type MatchedBreakout = {
     Bars: PriceBar array
     VolumeRate: decimal
     VolumeSlope: float
-    CloseSlope: float
+    VolumeDegrees: float
+    PriceSlope: float
+    PriceDegrees: float
     Ticker: string
 }
     with
@@ -250,6 +254,7 @@ let plotData (bars: PriceBars) =
         [ volumeTrace; volumeSlopeTrace ]
         |> Chart.Plot
         |> Chart.WithLayout volumeLayout
+        
 
     // let combinedChart =
     [ priceChart; volumeChart ]
@@ -261,6 +266,7 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
     
     let volumeRateThreshold = 1.3m
     let volumeSlopeThreshold = 0.0
+    let minimumOpenPrice = 9.0m // I want to avoid penny stocks, and just stocks in general that trade <$10
     
     let barsOfInterest = bars.Bars[0..bars.Length-2]
         
@@ -276,19 +282,30 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
     let volY = volumes |> Array.map float
     let struct (_, volSlope) = MathNet.Numerics.Fit.Line(x, volY)
     
+    let xScale = volumes.Length - 1 |> float
+    let yVolScale = Array.max volY - Array.min volY
+    let adjustedVolSlope = volSlope * xScale / yVolScale
+    let angleVolDegrees = Math.Atan(adjustedVolSlope) * 180.0 / Math.PI
     
-    let struct (_, closeSlope) = MathNet.Numerics.Fit.Line(x, barsOfInterest |> Array.map (fun bar -> bar.Close |> float))
+    let closes = barsOfInterest |> Array.map (fun bar -> bar.Close |> float)
+    let struct (_, closeSlope) = MathNet.Numerics.Fit.Line(x, closes)
+    let yCloseScale = Array.max closes - Array.min closes
+    let adjustedCloseSlope = closeSlope * xScale / yCloseScale
+    let angleCloseDegrees = Math.Atan(adjustedCloseSlope) * 180.0 / Math.PI
    
     if lastVolumeRate > volumeRateThreshold && 
        volSlope < volumeSlopeThreshold &&
-       lastBar.Close > lastBar.Open
+       lastBar.Close > lastBar.Open &&
+       lastBar.Open > minimumOpenPrice
        then
 
         Some({
             Bars = bars.Bars
             VolumeRate = lastVolumeRate
             VolumeSlope = volSlope
-            CloseSlope = closeSlope
+            VolumeDegrees = angleVolDegrees
+            PriceSlope = closeSlope
+            PriceDegrees = angleCloseDegrees
             Ticker = ticker
         })
     else
@@ -297,7 +314,7 @@ let private contractingVolumeBreakout ticker (bars: PriceBars) =
 let private runInteractive (context:EnvironmentContext) userState = async {
     
     let toString (matched:MatchedBreakout) =
-        $"Date: {matched.End.DateStr}, VolumeRate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, PriceSlope: {matched.CloseSlope:N2}"
+        $"Date: {matched.End.DateStr}, VolumeRate: {matched.VolumeRate:N2}x, VolumeSlope: {matched.VolumeSlope:N2}, PriceSlope: {matched.PriceSlope:N2}"
     
     Console.Write("Ticker: ")
     let tickerSymbol = Console.ReadLine()
@@ -427,7 +444,9 @@ let runStudy (context:EnvironmentContext) _ = async {
                     ticker = breakout.Ticker,
                     breakoutVolumeRate = breakout.VolumeRate,
                     volumeSlope = decimal breakout.VolumeSlope,
-                    priceSlope = decimal breakout.CloseSlope
+                    priceSlope = decimal breakout.PriceSlope,
+                    volumeDegrees = decimal breakout.VolumeDegrees,
+                    priceDegrees = decimal breakout.PriceDegrees
                 )
             )
         
