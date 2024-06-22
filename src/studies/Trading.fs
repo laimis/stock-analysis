@@ -24,9 +24,9 @@ module studies.Trading
         with
             member this.Ticker = this.Signal.Ticker
             member this.OpenPrice = this.OpenBar.Open
-            member this.Opened = this.OpenBar.Date
+            member this.Opened = this.OpenBar.DateStr
             member this.ClosePrice = this.CloseBar.Close
-            member this.Closed = this.CloseBar.Date
+            member this.Closed = this.CloseBar.DateStr
             member this.NumberOfDaysHeld = (this.CloseBar.Date - this.OpenBar.Date).TotalDays |> int
             member this.PercentGain =
              let gainFactor = 
