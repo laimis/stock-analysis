@@ -367,7 +367,7 @@ function createPositionLabelsPieChart(positions: PositionInstance[]) {
 function createRealizedVsUnrealizedProfitChart(positions: PositionInstance[], quotes: Map<string, StockQuote>) {
     const chartData = positions.map(position => {
         const realizedProfit = position.profit;
-        const unrealizedProfitAmt = unrealizedProfit(position, quotes[position.ticker]);
+        const unrealizedProfitAmt = unrealizedProfit(position, quotes[position.ticker]) - realizedProfit;
         return {
             label: position.ticker,
             realized: realizedProfit,
