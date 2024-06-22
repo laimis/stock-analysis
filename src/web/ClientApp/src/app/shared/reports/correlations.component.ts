@@ -20,6 +20,8 @@ export class CorrelationsComponent {
     private _correlations: TickerCorrelation[];
     correlationTickers: string[];
     sortedCorrelations: TickerCorrelation[];
+    selectedTicker: string;
+    sortDirection: number = 1;
 
     @Input()
     set correlations(value: TickerCorrelation[]) {
@@ -33,6 +35,13 @@ export class CorrelationsComponent {
 
     sortByCorrelation(ticker: string) {
 
+        if (this.selectedTicker === ticker) {
+            this.sortDirection = this.sortDirection * -1
+        } else {
+            this.sortDirection = 1
+        }
+        this.selectedTicker = ticker
+        
         let correlationsToSortBy = this.correlations.find(c => c.ticker === ticker)
 
         // copy the array so we don't sort the original
@@ -43,6 +52,10 @@ export class CorrelationsComponent {
 
                 let aCorrelation = correlationsToSortBy.correlations[aIndex]
                 let bCorrelation = correlationsToSortBy.correlations[bIndex]
+                
+                if (this.sortDirection === -1) {
+                    return aCorrelation - bCorrelation
+                }
                 return bCorrelation - aCorrelation
             })
     }

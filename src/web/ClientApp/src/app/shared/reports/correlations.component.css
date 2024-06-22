@@ -1,0 +1,10 @@
+.correlations-section {
+    overflow-x: auto;
+}
+
+.correlations-section .fixed-side {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+}
