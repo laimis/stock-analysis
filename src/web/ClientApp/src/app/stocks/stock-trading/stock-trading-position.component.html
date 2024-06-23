@@ -192,9 +192,16 @@
                     ({{ _position.notes.length }})
                 </div>
                 <div #notesContainer>
-                    @for (note of _position.notes; track note) {
-                        <div style="white-space: pre-wrap;">{{ note }}</div>
-                    }
+                    <table class="table table-striped table-sm">
+                        <tbody>
+                            @for (note of _position.notes; track note) {
+                            <tr>
+                                <td style="width: 120px;">{{ note.created | date }}</td>
+                                <td style="white-space: pre-wrap;">{{ note.content }}</td>   
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -56,6 +56,7 @@ export class CorrelationsComponent {
                 if (this.sortDirection === -1) {
                     return aCorrelation - bCorrelation
                 }
+                
                 return bCorrelation - aCorrelation
             })
     }

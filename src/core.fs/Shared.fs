@@ -167,3 +167,10 @@ type ChartDataPointContainer<'a>(label:string,chartType:DataPointChartType,annot
     member this.Add(timestamp:DateTimeOffset,value:'a) =
         data.Add(DataPoint(timestamp,value))
     member this.Add(point) = data.Add(point)
+
+type Note =
+    {
+        id: Guid
+        content: string
+        created: DateTimeOffset
+    }

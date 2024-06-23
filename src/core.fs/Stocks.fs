@@ -65,7 +65,7 @@ type StockPositionState =
         Transactions: StockPositionTransaction list
         StopPrice: decimal option
         RiskAmount: decimal option
-        Notes: string list
+        Notes: core.fs.Note list
         Labels: Dictionary<string, string>
         Grade: TradeGrade option
         GradeNote : string option
@@ -125,7 +125,7 @@ type StockPositionRiskAmountSet(id, aggregateId, ``when``, riskAmount) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.RiskAmount = riskAmount
 
-type StockPositionNotesAdded(id, aggregateId, ``when``, notes) =
+type StockPositionNotesAdded(id, aggregateId, ``when``, notes:string) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.Notes = notes
     
@@ -183,7 +183,7 @@ module StockPosition =
             { p with Transactions = newTransactions; StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? StockPositionNotesAdded as x ->
-            { p with Notes = p.Notes @ [x.Notes]; Version = p.Version + 1; Events = p.Events @ [x] }
+            { p with Notes = p.Notes @ [{created = x.When; content = x.Notes; id = x.Id }]; Version = p.Version + 1; Events = p.Events @ [x] }
         
         | :? StockPurchased as x ->
             let newTransactions = p.Transactions @ [Share { Ticker = p.Ticker; TransactionId = x.Id; Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
@@ -242,7 +242,7 @@ module StockPosition =
         match notes with
             | None -> stockPosition
             | Some notes when String.IsNullOrWhiteSpace(notes) -> stockPosition
-            | Some notes when stockPosition.Notes |> List.contains notes -> stockPosition
+            | Some notes when stockPosition.Notes |> List.exists (fun n -> n.content = notes) -> stockPosition
             | Some notes ->
                 let e = StockPositionNotesAdded(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, notes)
                 apply e stockPosition

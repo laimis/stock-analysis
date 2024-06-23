@@ -1090,6 +1090,12 @@ export interface KeyValuePair {
     value: string
 }
 
+export interface Note {
+    id: string
+    content: string
+    created: string
+}
+
 export interface PositionInstance {
     positionId: string,
     isOpen: boolean,
@@ -1107,7 +1113,7 @@ export interface PositionInstance {
     gainPct: number,
     isClosed: boolean,
     lastTransaction: string,
-    notes: string[],
+    notes: Note[],
     labels: KeyValuePair[],
     isShort: boolean,
     numberOfShares: number,
