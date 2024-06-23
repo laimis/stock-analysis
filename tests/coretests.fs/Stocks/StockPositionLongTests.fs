@@ -162,7 +162,7 @@ let ``Adding note works``() =
         |> StockPosition.addNotes (Some "this is a note") DateTimeOffset.UtcNow
         
     position.Notes |> should haveLength 1
-    position.Notes |> List.head |> should equal "this is a note"
+    position.Notes |> List.head |> _.content |> should equal "this is a note"
     
     let events = position.Events
     
@@ -271,7 +271,7 @@ let ``Assign grade to closed position should succeed`` () =
         |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly!") DateTimeOffset.UtcNow
         
     position.Grade |> should equal (Some (TradeGrade("A")))
-    position.Notes |> should contain "this trade went perfectly!"
+    position.Notes |> List.map _.content |> should contain "this trade went perfectly!"
     position.GradeNote.Value |> should be (equal "this trade went perfectly!")
 
 [<Fact>]
@@ -285,13 +285,13 @@ let ``Assign grade to graded position, updates grade and note`` () =
         |> StockPosition.assignGrade (TradeGrade("A")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
         
     position.Grade |> should equal (Some (TradeGrade("A")))
-    position.Notes |> should contain "this trade went perfectly! (updated)"
+    position.Notes |> List.map _.content |> should contain "this trade went perfectly! (updated)"
     position.GradeNote.Value |> should be (equal "this trade went perfectly! (updated)")
     
     let position = position |> StockPosition.assignGrade (TradeGrade("B")) (Some "this trade went perfectly! (updated)") DateTimeOffset.UtcNow
     
     position.Grade |> should equal (Some (TradeGrade("B")))
-    position.Notes |> should contain "this trade went perfectly! (updated)"
+    position.Notes |> List.map _.content |> should contain "this trade went perfectly! (updated)"
     position.GradeNote.Value |> should be (equal "this trade went perfectly! (updated)")
 
 [<Fact>]
@@ -337,5 +337,5 @@ let ``Notes are appended with most recent last``() =
         |> StockPosition.addNotes (Some "this is another note") DateTimeOffset.UtcNow
         
     position.Notes |> should haveLength 2
-    position.Notes |> List.head |> should equal "this is a note"
-    position.Notes |> List.last |> should equal "this is another note"
+    position.Notes |> List.head |> _.content |> should equal "this is a note"
+    position.Notes |> List.last |> _.content |> should equal "this is another note"
