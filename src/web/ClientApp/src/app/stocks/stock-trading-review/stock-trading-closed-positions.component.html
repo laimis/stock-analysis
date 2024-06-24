@@ -195,12 +195,16 @@
                             @if (showNotes === i) {
                                 <tr>
                                     <td colspan="9">
-                                        @for (n of p.notes; track n) {
-                                            <div class="mb-2">
-                                                <!-- <span class="badge bg-secondary me-1"></span> -->
-                                                {{ n }}
-                                            </div>
-                                        }
+                                        <table class="table table-striped table-sm">
+                                            <tbody>
+                                                @for (note of p.notes; track note) {
+                                                    <tr>
+                                                        <td style="width: 120px;">{{ note.created | date }}</td>
+                                                        <td style="white-space: pre-wrap;">{{ note.content }}</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             }

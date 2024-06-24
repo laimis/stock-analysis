@@ -6,8 +6,7 @@ function Get-LastCommitMessage {
     return $lastCommit
 }
 
-function Exit-With-Error ($message) {
-    write-host $message
+function Speak-Message ($message) {
     $voice = New-Object -ComObject Sapi.spvoice
     
     # get voices, use one where Id contains ZIRA
@@ -15,6 +14,11 @@ function Exit-With-Error ($message) {
     $voice.Voice = $voices | Where-Object { $_.Id.Contains("ZIRA") }
     $voice.rate = 0
     $voice.speak($message)
+}
+
+function Exit-With-Error ($message) {
+    write-host $message
+    Speak-Message $message
     exit 1
 }
 
@@ -137,3 +141,5 @@ foreach($manifest in $manifests)
     write-host "Deleting manifest $($manifest.digest)"
     Invoke-Expression "doctl registry repository delete-manifest web $($manifest.digest) -f"
 }
+
+Speak-Message "Release Complete"
