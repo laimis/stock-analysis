@@ -25,7 +25,7 @@
             <input class="form-control" type="number" id="days" [(ngModel)]="daysForCorrelations" [disabled]="loadingCorrelations" />
             <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
             <app-loading *ngIf="loadingCorrelations"></app-loading>
-            <app-correlations *ngIf="correlations" [correlations]="correlations"></app-correlations>
+            <app-correlations *ngIf="correlations" [correlations]="correlations" [days]="daysForCorrelations"></app-correlations>
         </div>
     </div>
     

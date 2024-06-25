@@ -305,9 +305,7 @@ module PositionAnalysis =
         
         let invalidIndexes =
             matrix
-            |> Array.mapi (fun i row ->
-                Console.WriteLine($"Row {i} has length {row.Length}, expected {expectedLength}")
-                i, row.Length)
+            |> Array.mapi (fun i row -> i, row.Length)
             |> Array.filter (fun (_, length) -> length <> expectedLength) |> Array.map fst |> HashSet
             
         let matrixToSend =
@@ -330,7 +328,9 @@ module PositionAnalysis =
         |> Array.mapi (fun index row ->
             match index with
             | x when invalidIndexes.Contains(x) -> Array.init answer.ColumnCount (fun _ -> 0.0)
-            | _ -> answer.Row(row).ToArray()
+            | _ ->
+                answer.Row(row).ToArray()
+                |> Array.mapi (fun i value -> if invalidIndexes.Contains(i) then 0.0 else value)
         )
         
     let dailyPLAndGain (bars:PriceBars) (optionalPosition:StockPositionWithCalculations option) =

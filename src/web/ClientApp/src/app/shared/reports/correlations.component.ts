@@ -35,6 +35,9 @@ export class CorrelationsComponent {
     get correlations() {
         return this._correlations
     }
+    
+    @Input()
+    days: number
 
     sortByCorrelation(ticker: string) {
 

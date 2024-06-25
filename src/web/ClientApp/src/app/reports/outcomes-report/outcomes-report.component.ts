@@ -26,6 +26,7 @@ export class OutcomesReportComponent implements OnInit {
     singleBarReportWeekly: OutcomesReport;
     earningsOutcomes: TickerOutcomes[];
     correlationsReport: TickerCorrelation[]
+    correlationsDays: number = 60;
     excludeEarningsTitle: string = "Exclude Earnings";
 
     constructor(
@@ -117,7 +118,7 @@ export class OutcomesReportComponent implements OnInit {
                 catchError(errors => this.errors = GetErrors(errors))
             )
         
-        const correlationsReport = this.stocksService.reportCorrelations(this.tickers, 60)
+        const correlationsReport = this.stocksService.reportCorrelations(this.tickers, this.correlationsDays)
             .pipe(
                 map(report => this.correlationsReport = report),
                 catchError(errors => this.errors = GetErrors(errors))

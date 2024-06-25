@@ -212,3 +212,7 @@ let ``correlations of unequal sizes return zero``() =
     correlations |> should not' (be Empty)
     correlations |> Array.head |> should not' (be Empty)
     correlations |> Array.item 1 |> Array.head |> should be (equal 0.0)
+    
+    // correlation for the index 1 across all other indexes should be zero
+    correlations
+    |> Array.iter(fun row -> row |> Array.item 1 |> should be (equal 0.0))

@@ -262,28 +262,23 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
         )
     }
     
-    interface IApplicationService
-    
-    member _.Handle(request:PortfolioCorrelationQuery) = task {
-        let! user = accounts.GetUser request.UserId
+    let runCorrelations userId numberOfDays tickers = task {
+        let! user = accounts.GetUser userId
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
             
-            let! stocks = storage.GetStockPositions request.UserId
-            
-            let! prices = 
-                stocks
-                |> Seq.filter (_.IsOpen)
-                |> Seq.map (_.Ticker)
+            let! prices =
+                tickers
                 |> Seq.map (fun ticker -> async {
                     let! priceResponse =
                         brokerage.GetPriceHistory
                             user.State
                             ticker
                             PriceFrequency.Daily
-                            (DateTimeOffset.UtcNow.AddDays(-request.Days) |> Some)
-                            None |> Async.AwaitTask
+                            (DateTimeOffset.UtcNow.AddDays(-numberOfDays) |> Some)
+                            None
+                        |> Async.AwaitTask
                     match priceResponse with
                     | Error _ -> return None
                     | Ok prices -> return Some (ticker, prices)
@@ -296,13 +291,28 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             
             let correlations = PositionAnalysis.correlations matrix
             
-            // let's go over successOnly again, and for each stock, let's find the correlation
-            // with all other stocks
             return successOnly
             |> Array.mapi (fun index (ticker, _) ->
                 let row = correlations.GetValue(index) :?> float[]
                 {|ticker=ticker; correlations=row|}
             ) |> Ok
+    }
+    
+    interface IApplicationService
+    
+    member _.Handle(request:PortfolioCorrelationQuery) = task {
+        let! stocks = storage.GetStockPositions request.UserId
+            
+        let tickers = 
+            stocks
+            |> Seq.filter (_.IsOpen)
+            |> Seq.map (_.Ticker)
+            
+        return! runCorrelations request.UserId request.Days tickers
+    }
+    
+    member _.HandleCorrelationsQuery userId (query:CorrelationsQuery) = task {
+        return! runCorrelations userId query.Days query.Tickers
     }
     
     member _.Handle(request:ChainQuery) = task {
@@ -380,42 +390,6 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
                 {gaps=gaps; ticker=query.Ticker.Value}
             )
-    }
-    
-    member _.HandleCorrelationsQuery userId (query:CorrelationsQuery) = task {
-        let! user = accounts.GetUser userId
-        match user with
-        | None -> return "User not found" |> ServiceError |> Error
-        | Some user ->
-            
-            let! prices =
-                query.Tickers
-                |> Seq.map (fun ticker -> async {
-                    let! priceResponse =
-                        brokerage.GetPriceHistory
-                            user.State
-                            ticker
-                            PriceFrequency.Daily
-                            None
-                            None
-                        |> Async.AwaitTask
-                    match priceResponse with
-                    | Error _ -> return None
-                    | Ok prices -> return Some (ticker, prices)
-                })
-                |> Async.Sequential
-                
-            let successOnly = prices |> Array.choose id
-            
-            let matrix = successOnly |> Array.map snd |> Array.map _.Bars |> Array.map (fun bars -> bars |> Array.map (fun b -> b.Close |> float))
-            
-            let correlations = PositionAnalysis.correlations matrix
-            
-            return successOnly
-            |> Array.mapi (fun index (ticker, _) ->
-                let row = correlations.GetValue(index) :?> float[]
-                {|ticker=ticker; correlations=row|}
-            ) |> Ok
     }
     
     member _.HandleOutcomesReport userId (query:OutcomesReportQuery) = task {

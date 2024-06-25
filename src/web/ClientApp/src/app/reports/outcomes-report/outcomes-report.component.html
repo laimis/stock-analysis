@@ -106,7 +106,7 @@
         <app-loading></app-loading>
     }
     @if (correlationsReport) {
-        <app-correlations [correlations]="correlationsReport"></app-correlations>
+        <app-correlations [correlations]="correlationsReport" [days]="correlationsDays"></app-correlations>
     } @else {
         <app-loading></app-loading>
     }

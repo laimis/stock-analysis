@@ -1011,6 +1011,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         }
 
         member this.GetPriceHistory (state: UserState) (ticker: Ticker) (frequency: PriceFrequency) (startDate: DateTimeOffset option) (endDate: DateTimeOffset option) = task {
+            
             let execFunc state = task {
                 let fromOption (option:DateTimeOffset option) (defaultValue:DateTimeOffset) =
                     match option with
