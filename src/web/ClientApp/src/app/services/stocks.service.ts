@@ -317,6 +317,10 @@ export class StocksService {
         return this.http.get<TickerCorrelation[]>('/api/reports/portfolio/correlations?days=' + days)
     }
     
+    reportCorrelations(tickers: string[], days:number): Observable<TickerCorrelation[]> {
+        return this.http.post<TickerCorrelation[]>('/api/reports/correlations', {tickers, days})
+    }
+    
     chainReport(): Observable<Chain> {
         return this.http.get<Chain>('/api/reports/chain')
     }

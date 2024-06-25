@@ -11,7 +11,9 @@
         <tbody>
             @for (correlation of sortedCorrelations; track correlation) {
                 <tr>
-                    <td class="fixed-side">{{ correlation.ticker }}</td>
+                    <td class="fixed-side">
+                        <app-stock-link-and-tradingview-link [ticker]="correlation.ticker"></app-stock-link-and-tradingview-link>
+                    </td>
                     @for (c of correlation.correlations; track c) {
                         <td
                             [ngClass]="{'bg-negative': c <= -0.9, 'bg-success': c >= 0.9, 'bg-warning': c <= -0.8 && c > -0.9, 'bg-info': c >= 0.8 && c < 0.9}">

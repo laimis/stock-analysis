@@ -103,7 +103,12 @@ type OutcomesReportQuery =
             
             start, ``end``
             
-    
+type CorrelationsQuery =
+    {
+        Days: int
+        Tickers: Ticker array
+    }
+
 type OutcomesReportForPositionsQuery =
     {
         UserId: UserId
@@ -375,6 +380,42 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 let gaps = prices |> detectGaps Constants.NumberOfDaysForRecentAnalysis
                 {gaps=gaps; ticker=query.Ticker.Value}
             )
+    }
+    
+    member _.HandleCorrelationsQuery userId (query:CorrelationsQuery) = task {
+        let! user = accounts.GetUser userId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            
+            let! prices =
+                query.Tickers
+                |> Seq.map (fun ticker -> async {
+                    let! priceResponse =
+                        brokerage.GetPriceHistory
+                            user.State
+                            ticker
+                            PriceFrequency.Daily
+                            None
+                            None
+                        |> Async.AwaitTask
+                    match priceResponse with
+                    | Error _ -> return None
+                    | Ok prices -> return Some (ticker, prices)
+                })
+                |> Async.Sequential
+                
+            let successOnly = prices |> Array.choose id
+            
+            let matrix = successOnly |> Array.map snd |> Array.map _.Bars |> Array.map (fun bars -> bars |> Array.map (fun b -> b.Close |> float))
+            
+            let correlations = PositionAnalysis.correlations matrix
+            
+            return successOnly
+            |> Array.mapi (fun index (ticker, _) ->
+                let row = correlations.GetValue(index) :?> float[]
+                {|ticker=ticker; correlations=row|}
+            ) |> Ok
     }
     
     member _.HandleOutcomesReport userId (query:OutcomesReportQuery) = task {

@@ -1,6 +1,7 @@
 namespace core.fs.Services
 
 open System
+open System.Collections.Generic
 open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
@@ -294,9 +295,43 @@ module PositionAnalysis =
         ]
 
     let correlations (matrix:float array array) =
-        let answer = MathNet.Numerics.Statistics.Correlation.PearsonMatrix(matrix)
+        // expect all the arrays to be the same length as the first one
+        // if you find an array that doesn't match the first one's length
+        // either add elements to it or remove elements from it
+        // but then replace the results with all zeros because we want to
+        // somehow indicate that the data is not valid
         
-        [|0..answer.RowCount-1|] |> Array.map (fun index -> answer.Row(index).ToArray())
+        let expectedLength = matrix[0].Length
+        
+        let invalidIndexes =
+            matrix
+            |> Array.mapi (fun i row ->
+                Console.WriteLine($"Row {i} has length {row.Length}, expected {expectedLength}")
+                i, row.Length)
+            |> Array.filter (fun (_, length) -> length <> expectedLength) |> Array.map fst |> HashSet
+            
+        let matrixToSend =
+            matrix
+            |> Array.map (
+                fun row ->
+                    match row.Length with
+                    | x when x = expectedLength -> row
+                    | x when x > expectedLength -> row[0..expectedLength-1]
+                    | x when x < expectedLength ->
+                        let diff = expectedLength - x
+                        let padding = Array.init diff (fun _ -> 0.0)
+                        padding |> Array.append row
+                    | _ -> failwith "should never get here"
+            )
+        
+        let answer = MathNet.Numerics.Statistics.Correlation.PearsonMatrix(matrixToSend)
+        
+        [|0..answer.RowCount-1|]
+        |> Array.mapi (fun index row ->
+            match index with
+            | x when invalidIndexes.Contains(x) -> Array.init answer.ColumnCount (fun _ -> 0.0)
+            | _ -> answer.Row(row).ToArray()
+        )
         
     let dailyPLAndGain (bars:PriceBars) (optionalPosition:StockPositionWithCalculations option) =
         

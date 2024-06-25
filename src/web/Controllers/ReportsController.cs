@@ -7,6 +7,7 @@ using web.Utils;
 using core.fs.Reports;
 using core.fs.Stocks;
 using core.Shared;
+using MathNet.Numerics.Statistics;
 
 namespace web.Controllers
 {
@@ -70,6 +71,12 @@ namespace web.Controllers
                 service.Handle(
                     new PortfolioCorrelationQuery(days, User.Identifier())
                 )
+            );
+        
+        [HttpPost("correlations")]
+        public Task<ActionResult> Correlations([FromBody] CorrelationsQuery query) =>
+            this.OkOrError(
+                service.HandleCorrelationsQuery(User.Identifier(), query)
             );
 
         [HttpGet("DailyPositionReport/{positionId}")]

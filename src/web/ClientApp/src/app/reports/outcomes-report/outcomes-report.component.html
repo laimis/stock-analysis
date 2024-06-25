@@ -105,4 +105,9 @@
     } @else {
         <app-loading></app-loading>
     }
+    @if (correlationsReport) {
+        <app-correlations [correlations]="correlationsReport"></app-correlations>
+    } @else {
+        <app-loading></app-loading>
+    }
 </div>

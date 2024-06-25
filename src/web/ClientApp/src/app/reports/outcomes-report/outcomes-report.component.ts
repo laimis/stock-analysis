@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
-import {OutcomesReport, StocksService, TickerOutcomes} from '../../services/stocks.service';
+import {OutcomesReport, StocksService, TickerCorrelation, TickerOutcomes} from '../../services/stocks.service';
 import {catchError, map, tap} from "rxjs/operators";
 import {concat} from "rxjs";
 
@@ -25,6 +25,7 @@ export class OutcomesReportComponent implements OnInit {
     singleBarReportDaily: OutcomesReport;
     singleBarReportWeekly: OutcomesReport;
     earningsOutcomes: TickerOutcomes[];
+    correlationsReport: TickerCorrelation[]
     excludeEarningsTitle: string = "Exclude Earnings";
 
     constructor(
@@ -89,11 +90,6 @@ export class OutcomesReportComponent implements OnInit {
             return
         }
 
-        this.allBarsReport = null
-        this.singleBarReportDaily = null
-        this.singleBarReportWeekly = null
-        this.earningsOutcomes = null
-
         this.reset()
 
         const singleBarDailyReport = this.stocksService.reportOutcomesSingleBarDaily(this.tickers, "Earnings", this.earnings, this.endDate)
@@ -120,8 +116,14 @@ export class OutcomesReportComponent implements OnInit {
                 map(report => this.allBarsReport = report),
                 catchError(errors => this.errors = GetErrors(errors))
             )
+        
+        const correlationsReport = this.stocksService.reportCorrelations(this.tickers, 60)
+            .pipe(
+                map(report => this.correlationsReport = report),
+                catchError(errors => this.errors = GetErrors(errors))
+            )
 
-        concat(singleBarDailyReport, singleBarWeekly, allBarsReport).subscribe()
+        concat(singleBarDailyReport, singleBarWeekly, allBarsReport, correlationsReport).subscribe()
     }
 
     onTickerChange(activeTicker: string) {
@@ -149,5 +151,6 @@ export class OutcomesReportComponent implements OnInit {
         this.singleBarReportDaily = null;
         this.singleBarReportWeekly = null;
         this.earningsOutcomes = [];
+        this.correlationsReport = null;
     }
 }

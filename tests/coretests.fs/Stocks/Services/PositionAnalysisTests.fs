@@ -183,3 +183,32 @@ let ``When position is opened before the available data, analysis takes all bars
     let outcomes = PositionAnalysis.generate position bars [||]
     
     outcomes |> Seq.exists (fun o -> o.Key = PositionAnalysis.PositionAnalysisKeys.DaysHeld && o.Value > 0m) |> should equal true
+    
+[<Fact>]
+let ``correlations works`` () =
+    
+    let _, bars, _ = createTestData()
+    
+    // duplicate bars closing array
+    let closes = bars.Bars |> Array.map (fun b -> b.Close |> float)
+    let matrix = Array.init 10 (fun _ -> closes)
+    
+    let correlations = PositionAnalysis.correlations matrix
+    
+    correlations |> should not' (be Empty)
+    correlations |> Array.head |> should not' (be Empty)
+    correlations |> Array.head |> Array.head |> should be (equal 1.0)
+    
+[<Fact>]
+let ``correlations of unequal sizes return zero``() =
+    
+    let _, bars, _ = createTestData()
+    
+    let closes = bars.Bars |> Array.map (fun b -> b.Close |> float)
+    let matrix = Array.init 10 (fun i -> if i = 1 then closes[0..closes.Length-2] else closes)
+    
+    let correlations = PositionAnalysis.correlations matrix
+    
+    correlations |> should not' (be Empty)
+    correlations |> Array.head |> should not' (be Empty)
+    correlations |> Array.item 1 |> Array.head |> should be (equal 0.0)

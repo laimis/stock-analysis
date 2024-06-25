@@ -185,7 +185,8 @@ let routes: Routes = [
     {path: '**', pathMatch: 'full', component: PageNotFoundComponent, canActivate: [WithLoginStatus]},
 ];
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AdminEmailComponent,
         AdminWeeklyComponent,
         AdminUsersComponent,
@@ -261,15 +262,15 @@ let routes: Routes = [
         StockSECFilingsComponent,
         StockTradingAnalysisDashboardComponent,
         StockTradingStrategiesComponent,
-        StockLinkComponent,
-        StockLinkAndTradingviewLinkComponent,
         OptionBrokeragePositionsComponent,
         OptionBrokerageOrdersComponent,
         RoutineDashboardComponent,
         RoutineComponent,
         RoutinesActiveRoutineComponent,
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
+    bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
         FormsModule,
         StockSearchComponent,
         LoadingComponent,
@@ -280,10 +281,16 @@ let routes: Routes = [
         NgOptimizedImage,
         StockTradingChartsComponent,
         ReactiveFormsModule,
-        TradingViewLinkComponent, CorrelationsComponent], providers: [
-        { provide: "windowObject", useValue: window },
+        StockLinkComponent,
+        TradingViewLinkComponent,
+        StockLinkAndTradingviewLinkComponent,
+        CorrelationsComponent
+    ],
+    providers: [
+        {provide: "windowObject", useValue: window},
         Title,
         provideHttpClient(withInterceptorsFromDi())
-    ] })
+    ]
+})
 export class AppModule {
 }

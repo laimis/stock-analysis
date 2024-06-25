@@ -10,7 +10,7 @@
                                     <app-stock-link class="position-ticker" [ticker]="position.ticker"></app-stock-link>
                                     <span class="position-price">{{ getPrice(position) | currency }}</span>
                                     <i
-                                        (click)="toggleVisibility(detailDiv); toggleVisibility(positionNotesDiv)"
+                                        (click)="toggleVisibility(detailDiv);"
                                         class="bi bi-info-square-fill ms-2" role="button"></i>
                                 </div>
                                 <div class="col text-center">
@@ -19,20 +19,6 @@
                                     <span class="position-gain float-end">{{ getMetricToRender(metricFunc(position)) }}</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-text" #positionNotesDiv>
-                        <div #notesContainer>
-                            <table class="table table-striped table-sm">
-                                <tbody>
-                                    @for (note of position.notes; track note) {
-                                        <tr>
-                                            <td style="width: 120px;">{{ note.created | date }}</td>
-                                            <td style="white-space: pre-wrap;">{{ note.content }}</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                     <div class="card-text visually-hidden" #detailDiv>
