@@ -1,9 +1,11 @@
-<section>
-    @if (justOrders === false) {
-        <h5>Brokerage Orders</h5>
-    }
-    <app-error-display [errors]="errors"></app-error-display>
-    <div>
+<section class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h3 class="card-title">
+            <i class="bi bi-building me-2"></i>Brokerage Orders
+        </h3>
+        
+        <app-error-display [errors]="errors"></app-error-display>
+    
         @if (isEmpty && filteredTickers.length > 0) {
             <div>
                 No brokerage orders found for {{ filteredTickers.join(', ') }}

@@ -1,5 +1,5 @@
 @if (workflowStarted === false) {
-    <section class="container">
+    <section class="card shadow-sm mb-4">
         @if (positionEntered) {
             <div class="alert alert-primary">Position has been successfully opened</div>
         }
@@ -8,16 +8,18 @@
             <div class="alert alert-primary">Pending position has been successfully created</div>
         }
 
-        <div>
+        <div class="card-body">
             <button class="btn btn-primary" (click)="startNewPosition()">Start New Position</button>
         </div>
     </section>
 } @else {
-    <section class="container">
-        <h3 class="mb-4">
-            Initiate Position
-            <span class="float-end fs-6">max loss: {{ maxLoss | currency }}</span>
-        </h3>
+    <section class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">
+                Initiate Position
+                <span class="float-end fs-6">max loss: {{ maxLoss | currency }}</span>    
+            </h5>
+            
         @if (!presetTicker) {
             <div class="row mb-3">
                 <div class="col">
@@ -253,5 +255,6 @@
                 </div>
             }
         }
+        </div>
     </section>
 }

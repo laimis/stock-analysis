@@ -41,6 +41,12 @@ export class StockAnalysisComponent {
         private decimalPipe: DecimalPipe
     ) {
     }
+    
+    @Input()
+    startDate: string
+    
+    @Input()
+    endDate: string
 
     @Input()
     set prices(prices: Prices) {

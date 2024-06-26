@@ -57,22 +57,26 @@
         (pendingPositionCreated)="loadOrders()">
     </app-stock-trading-new-position>
 
-    <section>
-        <h3>Brokerage</h3>
-        <app-brokerage-new-order [ticker]="stock.ticker"
-                                 (brokerageOrderEntered)="brokerageOrderEntered($event)"></app-brokerage-new-order>
+    <app-brokerage-new-order [ticker]="stock.ticker"
+                             (brokerageOrderEntered)="brokerageOrderEntered($event)"></app-brokerage-new-order>
 
-        <app-brokerage-orders
-            [filteredTickers]="[stock.ticker]"
-            [orders]="orders"
-            [positionId]="currentPosition?.positionId"
-            (ordersChanged)="brokerageOrderEntered($event)">
-        </app-brokerage-orders>
-    </section>
+    <app-brokerage-orders
+        [filteredTickers]="[stock.ticker]"
+        [orders]="orders"
+        [positionId]="currentPosition?.positionId"
+        (ordersChanged)="brokerageOrderEntered($event)">
+    </app-brokerage-orders>
 
-    <section>
-        <h3>Manual Entry</h3>
-        <app-stock-transaction [ticker]="stock.ticker" [position]="currentPosition"></app-stock-transaction>
+    <section class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">
+                <i class="bi bi-pencil-square me-2"></i>Manual Entry
+            </h3>
+            <app-stock-transaction
+                [ticker]="stock.ticker"
+                [position]="currentPosition">
+            </app-stock-transaction>
+        </div>
     </section>
 }
 @if (stock && stockOwnership && isActive('stocks')) {
@@ -91,5 +95,5 @@
     <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
 }
 @if (isActive('analysis')) {
-    <app-stock-analysis [ticker]=stock.ticker [prices]="prices"></app-stock-analysis>
+    <app-stock-analysis [ticker]=stock.ticker [prices]="prices" [startDate]="startDate" [endDate]="endDate"></app-stock-analysis>
 }

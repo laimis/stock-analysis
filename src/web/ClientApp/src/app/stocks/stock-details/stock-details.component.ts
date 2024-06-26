@@ -34,6 +34,8 @@ export class StockDetailsComponent implements OnInit {
     prices: Prices
     orders: BrokerageOrder[]
     activeTab: string = ''
+    startDate: string
+    endDate: string
 
     loading = {
         stock: false,
@@ -63,6 +65,11 @@ export class StockDetailsComponent implements OnInit {
             const ticker = param['ticker']
             if (ticker) {
                 this.ticker = ticker;
+                // set the startDate and endDate to come from the query params, if they exist
+                // if they do not, default startDate to 365 days ago and endDate to today
+                this.startDate = this.route.snapshot.queryParams['startDate'] || new Date(new Date().setDate(new Date().getDate() - 365)).toISOString().split('T')[0]
+                this.endDate = this.route.snapshot.queryParams['endDate'] || new Date().toISOString().split('T')[0]
+                
                 this.loadData();
             } else {
                 this.errors.stock = ['No ticker provided']
@@ -126,7 +133,7 @@ export class StockDetailsComponent implements OnInit {
 
     loadStockOwnership() {
         let pricesPromise = 
-            this.stocks.getStockPrices(this.ticker, 365, PriceFrequency.Daily)
+            this.stocks.getStockPricesForDates(this.ticker, PriceFrequency.Daily, this.startDate, this.endDate)
                 .pipe(
                     tap(result => this.prices = result),
                     catchError(error => {

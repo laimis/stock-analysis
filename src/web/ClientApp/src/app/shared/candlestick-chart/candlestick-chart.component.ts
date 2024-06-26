@@ -81,7 +81,7 @@ export class CandlestickChartComponent implements OnDestroy {
             this.renderChart(value);
         }
     }
-
+    
     ngOnDestroy(): void {
         this.removeChart();
     }
@@ -178,8 +178,7 @@ export class CandlestickChartComponent implements OnDestroy {
             from: priceBars[priceBars.length - numberOfVisibleBars].time,
             to: priceBars[priceBars.length - 1].time
         });
-
-
+    
     }
 
     private removeChart() {

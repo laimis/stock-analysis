@@ -52,22 +52,25 @@ a {
     color: #353535;
 }
 
-
-section {
-    margin-top: 20px;
-    padding-right: 10px;
+section.card {
+    border-radius: 0.5rem;
 }
 
-section h5 {
-    margin-top: 0;
-    padding: 0;
-    border-bottom: 1px solid #858484;
+.card-header {
+    border-bottom: none;
 }
 
-section h3 {
-    margin-top: 0;
-    padding: 0;
-    border-bottom: 1px solid #858484;
+.card-header h5 {
+    font-weight: 600;
+    color: #333;
+}
+
+.text-muted small {
+    font-size: 0.85rem;
+}
+
+.card-body {
+    padding: 1.25rem;
 }
 
 .bg-negative {

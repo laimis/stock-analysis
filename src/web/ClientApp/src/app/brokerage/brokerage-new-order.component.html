@@ -1,5 +1,10 @@
-<section><h5>Brokerage Order</h5>
-    <app-error-display [errors]="errors"></app-error-display>
+<section class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h3 class="card-title">
+            <i class="bi bi-building me-2"></i>New Order
+        </h3>
+
+        <app-error-display [errors]="errors"></app-error-display>
     <div> @if (submittedOrder === false) {
         <div class="row">
             <div class="col-md">
@@ -114,5 +119,7 @@
                     </div>
                 </div>
             }
-        } </div>
+        } 
+    </div>
+        </div>
 </section>
