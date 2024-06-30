@@ -554,12 +554,13 @@ type AlertEmailService(
         logger:ILogger,
         marketHours:IMarketHours) =
 
+    // this is how often this aggregation service will run
     let runTimes =
         [
             TimeOnly.Parse("09:50")
             TimeOnly.Parse("17:20")
         ]
-
+   
     let processAlerts (user:User) alerts = async {
         
         let toAlertCountPairs (sequence:TriggeredAlert seq) =
@@ -583,15 +584,17 @@ type AlertEmailService(
                 )
             
         if fromStorage = None then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
-                
-        let recipient = Recipient(email=user.State.Email, name=user.State.Name)
-       
-        logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
-        do!
-            alerts
-            |> generateEmailDataPayloadForAlerts "NGTD: Alerts" marketHours diffCount
-            |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
-            |> Async.AwaitTask
+        
+        // only email if we are at the end of the day
+        if marketHours.IsMarketOpen(DateTimeOffset.UtcNow) |> not then
+            let recipient = Recipient(email=user.State.Email, name=user.State.Name)
+            
+            logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
+            do!
+                alerts
+                |> generateEmailDataPayloadForAlerts "NGTD: Alerts" marketHours diffCount
+                |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
+                |> Async.AwaitTask
     }
 
     interface IApplicationService

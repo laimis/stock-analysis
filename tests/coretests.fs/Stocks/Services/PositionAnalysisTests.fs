@@ -190,8 +190,7 @@ let ``correlations works`` () =
     let _, bars, _ = createTestData()
     
     // duplicate bars closing array
-    let closes = bars.Bars |> Array.map (fun b -> b.Close |> float)
-    let matrix = Array.init 10 (fun _ -> closes)
+    let matrix = Array.init 10 (fun _ -> bars.Bars)
     
     let correlations = PositionAnalysis.correlations matrix
     
@@ -204,8 +203,8 @@ let ``correlations of unequal sizes return zero``() =
     
     let _, bars, _ = createTestData()
     
-    let closes = bars.Bars |> Array.map (fun b -> b.Close |> float)
-    let matrix = Array.init 10 (fun i -> if i = 1 then closes[0..closes.Length-2] else closes)
+    let data = bars.Bars
+    let matrix = Array.init 10 (fun i -> if i = 1 then data[0..data.Length-2] else data)
     
     let correlations = PositionAnalysis.correlations matrix
     

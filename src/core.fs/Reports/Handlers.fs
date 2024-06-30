@@ -287,7 +287,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let successOnly = prices |> Array.choose id
             
-            let matrix = successOnly |> Array.map snd |> Array.map _.Bars |> Array.map (fun bars -> bars |> Array.map (fun b -> b.Close |> float))
+            let matrix = successOnly |> Array.map snd |> Array.map _.Bars
             
             let correlations = PositionAnalysis.correlations matrix
             

@@ -213,6 +213,7 @@ let industryCyclePhase (signal:ISignal) =
     | x when x >= "2023-08-02" && x <= "2023-11-02" -> Down
     | x when x >= "2024-01-05" && x <= "2024-01-16" -> Down
     | x when x >= "2024-04-04" && x <= "2024-04-16" -> Down
+    | x when x >= "2024-05-29" && x <= "2024-06-14" -> Down
     | _ -> Up
 
 let spyShortTermPhase (signal:ISignal) = 

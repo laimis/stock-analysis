@@ -294,22 +294,32 @@ module PositionAnalysis =
             )
         ]
 
-    let correlations (matrix:float array array) =
+    let correlations (matrix:PriceBar array array) =
         // expect all the arrays to be the same length as the first one
         // if you find an array that doesn't match the first one's length
         // either add elements to it or remove elements from it
         // but then replace the results with all zeros because we want to
         // somehow indicate that the data is not valid
         
-        let expectedLength = matrix[0].Length
+        let matrixOfChanges =
+            matrix
+            |> Array.map (
+                fun row ->
+                    row
+                    |> Array.map (fun bar -> bar.Close |> float)
+                    |> Array.pairwise
+                    |> Array.map (fun (prev, current) -> (current - prev) / prev)
+            )
+            
+        let expectedLength = matrixOfChanges[0].Length
         
         let invalidIndexes =
-            matrix
+            matrixOfChanges
             |> Array.mapi (fun i row -> i, row.Length)
             |> Array.filter (fun (_, length) -> length <> expectedLength) |> Array.map fst |> HashSet
             
         let matrixToSend =
-            matrix
+            matrixOfChanges
             |> Array.map (
                 fun row ->
                     match row.Length with
