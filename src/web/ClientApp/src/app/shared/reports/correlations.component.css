@@ -8,3 +8,19 @@
     background-color: white;
     z-index: 1;
 }
+
+.high-negative {
+    background-color: #f4573d;
+}
+
+.middle-negative {
+    background-color: #fbc0b6;
+}
+
+.high-positive {
+    background-color: #29982d;
+}
+
+.middle-positive {
+    background-color: #69b76c;
+}
