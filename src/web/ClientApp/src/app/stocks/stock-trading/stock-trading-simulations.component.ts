@@ -21,7 +21,7 @@ import {concat, forkJoin} from "rxjs";
 export class StockTradingSimulationsComponent implements OnInit {
     results: TradingStrategyPerformance[];
     errors: string[];
-    numberOfTrades: number = 10;
+    numberOfTrades: number = 40;
     closePositions: boolean = true;
     loading: boolean = false;
     benchmarks: {ticker: string, prices: PriceBar[] }[] = [];

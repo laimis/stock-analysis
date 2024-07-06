@@ -265,7 +265,7 @@ module PositionAnalysis =
                 tickerOutcomes |> TickerOutcomes.filter [
                     (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
                     (fun o -> o.Key = PositionAnalysisKeys.UnrealizedGain && o.Value > gainPctThreshold)
-                    (fun o -> o.Key = PositionAnalysisKeys.StopDiffToCost && o.Value < 0m)
+                    (fun o -> o.Key = PositionAnalysisKeys.StopDiffToCost && o.Value < 0.1m) // within 10 cents is OK
                 ]
             )
             AnalysisOutcomeEvaluation(
