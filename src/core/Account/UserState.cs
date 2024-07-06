@@ -1,5 +1,6 @@
 using System;
 using core.Shared;
+using Microsoft.FSharp.Core;
 
 namespace core.Account
 {
@@ -24,7 +25,7 @@ namespace core.Account
         public DateTimeOffset BrokerageRefreshTokenExpires { get; private set; }
         public bool ConnectedToBrokerage { get; private set; }
         public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
-        public decimal? MaxLoss { get; private set; }
+        public FSharpOption<decimal> MaxLoss { get; private set; }
 
         internal void ApplyInternal(UserCreated c)
         {
@@ -96,8 +97,8 @@ namespace core.Account
             switch (e.Key)
             {
                 case "maxLoss":
-                    var maxLoss = Decimal.Parse(e.Value);
-                    MaxLoss = maxLoss;
+                    var maxLoss = decimal.Parse(e.Value);
+                    MaxLoss = FSharpOption<decimal>.Some(maxLoss);
                     break;
                 default:
                     throw new InvalidOperationException($"Unknown setting: {e.Key}");

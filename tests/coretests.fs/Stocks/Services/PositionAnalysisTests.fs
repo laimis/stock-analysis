@@ -2,6 +2,7 @@ module coretests.fs.Stocks.Services.PositionAnalysisTests
 
 open System
 open Xunit
+open core.Account
 open core.Shared
 open core.fs.Adapters.Brokerage
 open core.fs.Services
@@ -51,7 +52,9 @@ let generateEvaluationsFromTestData() =
         }
     ]
     
-    PositionAnalysis.evaluate outcomes
+    let defaultUser = UserState()
+    
+    PositionAnalysis.evaluate defaultUser outcomes
 
 
 [<Fact>]

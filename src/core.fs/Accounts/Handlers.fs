@@ -43,7 +43,7 @@ namespace core.fs.Accounts
                 BrokerageAccessTokenExpired = state.BrokerageAccessTokenExpired
                 BrokerageAccessTokenExpirationDate = state.BrokerageAccessTokenExpires
                 BrokerageRefreshTokenExpirationDate = state.BrokerageRefreshTokenExpires
-                MaxLoss = if state.MaxLoss.HasValue then Some state.MaxLoss.Value else None
+                MaxLoss = state.MaxLoss
             }
             
         static member notFound() =

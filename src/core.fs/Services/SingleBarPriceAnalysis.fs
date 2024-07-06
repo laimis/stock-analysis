@@ -28,36 +28,40 @@ module SingleBarPriceAnalysis =
     
     let movingAveragesAnalysis (bars:PriceBars) =
         
-        let outcomes =  bars |> MultipleBarPriceAnalysis.MovingAveragesAnalysis.generate
-        
-        let ema20AboveSMA50Outcome =
-            outcomes
-            |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EMA20AboveSMA50Bars)
-            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.EMA20AboveSMA50Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+        // only do this analysis for daily bars
+        match bars.Frequency with
+        | Daily ->
+            let outcomes =  bars |> MultipleBarPriceAnalysis.MovingAveragesAnalysis.generate
             
-        let sma50AboveSMA200Outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50AboveSMA200Bars)
-            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50AboveSMA200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+            let ema20AboveSMA50Outcome =
+                outcomes
+                |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.EMA20AboveSMA50Bars)
+                |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.EMA20AboveSMA50Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+                
+            let sma50AboveSMA200Outcome =
+                outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SMA50AboveSMA200Bars)
+                |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.SMA50AboveSMA200Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
+                
+            let sma200outcome =
+                outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SimpleMovingAverage 200)
+                |> Option.filter (fun o -> o.Value = 0m |> not)
+                |> Option.map (fun o ->
+                    let currentBar = bars.Last        
+                    let pctDiff = (currentBar.Close - o.Value) / o.Value
+                    AnalysisOutcome (SingleBarOutcomeKeys.PriceAboveSMA200, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 200 day SMA")   
+                )
+                
+            let priceAboveEMA20BarsOutcome =
+                outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAboveEMA20Bars)
+                |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.PriceAboveEMA20Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
             
-        let sma200outcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.SimpleMovingAverage 200)
-            |> Option.filter (fun o -> o.Value = 0m |> not)
-            |> Option.map (fun o ->
-                let currentBar = bars.Last        
-                let pctDiff = (currentBar.Close - o.Value) / o.Value
-                AnalysisOutcome (SingleBarOutcomeKeys.PriceAboveSMA200, (if pctDiff >= 0m then OutcomeType.Positive else OutcomeType.Negative), pctDiff, ValueFormat.Percentage, "Percentage that price is above 200 day SMA")   
-            )
-            
-        let priceAboveEMA20BarsOutcome =
-            outcomes |> Seq.tryFind (fun x -> x.Key = MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PriceAboveEMA20Bars)
-            |> Option.map (fun o -> AnalysisOutcome (SingleBarOutcomeKeys.PriceAboveEMA20Bars, o.OutcomeType, o.Value, o.ValueType, o.Message))
-        
-        [
-            ema20AboveSMA50Outcome
-            sma50AboveSMA200Outcome
-            sma200outcome
-            priceAboveEMA20BarsOutcome
-        ] |> List.choose id
+            [
+                ema20AboveSMA50Outcome
+                sma50AboveSMA200Outcome
+                sma200outcome
+                priceAboveEMA20BarsOutcome
+            ] |> List.choose id
+        | _ -> []
         
     let priceAnalysis (bars:PriceBars) =
         

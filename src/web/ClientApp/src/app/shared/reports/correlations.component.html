@@ -17,7 +17,7 @@
                     </td>
                     @for (c of correlation.correlations; track c) {
                         <td
-                            [ngClass]="{'high-negative': c <= -0.5, 'high-positive': c >= 0.5, 'middle-negative': c <= -0.3 && c > -0.5, 'middle-positiveg': c >= 0.3 && c < 0.5}">
+                            [ngClass]="{'high-negative': c <= -0.5, 'high-positive': c >= 0.5, 'middle-negative': c <= -0.3 && c > -0.5, 'middle-positive': c >= 0.3 && c < 0.5}">
                             {{ c | number:'1.2-2' }}
                         </td>
                     }

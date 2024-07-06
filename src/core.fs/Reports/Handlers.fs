@@ -563,7 +563,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 
             let failed = tasks |> Seq.map (fun t -> match t with | Error (position,message) -> Some $"{position.Ticker}: {message}" | _ -> None) |> Seq.choose id
                 
-            let evaluations = PositionAnalysis.evaluate outcomes
+            let evaluations = PositionAnalysis.evaluate user.State outcomes
             
             return OutcomesReportView(evaluations, outcomes, [], patterns, failed) |> Ok
     }

@@ -2,6 +2,7 @@ namespace core.fs.Services
 
 open System
 open System.Collections.Generic
+open core.Account
 open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
@@ -132,12 +133,15 @@ module PositionAnalysis =
             AnalysisOutcome(PositionAnalysisKeys.SMA50Above200Bars, OutcomeType.Neutral, sma50overSMA200, ValueFormat.Number, $"SMA50 over SMA200 bars: {sma50overSMA200}")
         ]
         
-    let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
+    let evaluate (userState:UserState) (tickerOutcomes:seq<TickerOutcomes>) =
         
+        // NOTE: would be nice to have these come from user configuration
         let percentToStopThreshold = -0.02m
         let recentlyOpenThreshold = TimeSpan.FromDays(5)
         let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
         let gainPctThreshold = 0.07m
+        let minimumRiskAmount = 40m
+        let maximumRiskAmount = 80m
         
         let withRiskAmountFilters = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
@@ -220,8 +224,7 @@ module PositionAnalysis =
                 PositionAnalysisKeys.RiskAmount,
                 tickerOutcomes |> TickerOutcomes.filter [
                     yield! withRiskAmountFilters
-                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (o.Value < 40m || o.Value > 60m))
-                    // actual risk limits should come from user configuration
+                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (o.Value < minimumRiskAmount || o.Value > (userState.MaxLoss |> Option.defaultValue maximumRiskAmount)))
                 ]
             )
             AnalysisOutcomeEvaluation(
