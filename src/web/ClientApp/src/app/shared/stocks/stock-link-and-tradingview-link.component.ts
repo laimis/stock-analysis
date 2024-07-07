@@ -1,6 +1,5 @@
 import {Component, Input} from "@angular/core";
 import {TradingViewLinkComponent} from "./trading-view-link.component";
-import {AppModule} from "../../app.module";
 import {StockLinkComponent} from "./stock-link.component";
 
 @Component({

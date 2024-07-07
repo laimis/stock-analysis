@@ -2,7 +2,6 @@ import {Component, Input} from '@angular/core';
 import {TickerCorrelation} from '../../services/stocks.service';
 import {DecimalPipe, NgClass, NgIf} from "@angular/common";
 import {LoadingComponent} from "../loading/loading.component";
-import {AppModule} from "../../app.module";
 import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tradingview-link.component";
 
 @Component({
@@ -15,7 +14,6 @@ import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tra
         NgIf,
         NgClass,
         StockLinkAndTradingviewLinkComponent
-
     ],
     standalone: true
 })

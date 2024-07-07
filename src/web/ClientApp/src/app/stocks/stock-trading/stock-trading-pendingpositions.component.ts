@@ -3,11 +3,28 @@ import {BrokerageOrder, PendingStockPosition, StocksService} from 'src/app/servi
 import {GetErrors} from 'src/app/services/utils';
 import {stockPendingPositionExportLink} from "../../services/links.service";
 import {BrokerageService} from "../../services/brokerage.service";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {LoadingComponent} from "../../shared/loading/loading.component";
+import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
+import {CurrencyPipe, DatePipe, PercentPipe} from "@angular/common";
+import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
+import {FormsModule} from "@angular/forms";
 
 @Component({
     selector: 'app-stock-trading-pendingpositions',
     templateUrl: './stock-trading-pendingpositions.component.html',
-    styleUrls: ['./stock-trading-pendingpositions.component.css']
+    styleUrls: ['./stock-trading-pendingpositions.component.css'],
+    imports: [
+        ErrorDisplayComponent,
+        LoadingComponent,
+        StockLinkAndTradingviewLinkComponent,
+        PercentPipe,
+        CurrencyPipe,
+        DatePipe,
+        BrokerageOrdersComponent,
+        FormsModule
+    ],
+    standalone: true
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
     errors: string[];

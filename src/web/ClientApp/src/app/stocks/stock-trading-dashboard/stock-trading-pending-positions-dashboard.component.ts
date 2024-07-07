@@ -2,13 +2,22 @@ import {Component, OnInit} from '@angular/core';
 import {BrokerageOrder} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
+import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
+import {StockTradingPendingPositionsComponent} from "../stock-trading/stock-trading-pendingpositions.component";
+import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
 
 @Component({
-    selector: 'app-stock-new-position',
-    templateUrl: './stock-new-position.component.html',
-    styleUrls: ['./stock-new-position.component.css']
+    selector: 'app-stock-trading-pending-positions-dashboard',
+    templateUrl: './stock-trading-pending-positions-dashboard.component.html',
+    standalone: true,
+    styleUrls: ['./stock-trading-pending-positions-dashboard.component.css'],
+    imports: [
+        StockTradingNewPositionComponent,
+        StockTradingPendingPositionsComponent,
+        BrokerageOrdersComponent
+    ]
 })
-export class StockTradingDashboardComponent implements OnInit {
+export class StockTradingPendingPositionsDashboardComponent implements OnInit {
     feedbackMessage: string;
     orders: BrokerageOrder[];
 

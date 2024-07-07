@@ -1,4 +1,4 @@
-import {DatePipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, PercentPipe, NgIf} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
     DataPointContainer,
@@ -22,12 +22,33 @@ import {
     toHistogram
 } from "../../services/prices.service";
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {StockSearchComponent} from "../stock-search/stock-search.component";
+import {FormsModule} from "@angular/forms";
+import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
+import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
+import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
+import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
+import {GapsComponent} from "../../shared/reports/gaps.component";
 
 @Component({
     selector: 'app-stock-trading-new-position',
     templateUrl: './stock-trading-new-position.component.html',
     styleUrls: ['./stock-trading-new-position.component.css'],
-    providers: [DatePipe]
+    providers: [DatePipe],
+    imports: [
+        CurrencyPipe,
+        StockSearchComponent,
+        FormsModule,
+        PercentPipe,
+        StockLinkComponent,
+        TradingViewLinkComponent,
+        NgClass,
+        LineChartComponent,
+        NgIf,
+        CandlestickChartComponent,
+        GapsComponent
+    ],
+    standalone: true
 })
 export class StockTradingNewPositionComponent {
     strategies: { key: string; value: string; }[];

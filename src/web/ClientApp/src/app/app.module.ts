@@ -46,7 +46,6 @@ import {CryptoDashboardComponent} from './cryptos/crypto-dashboard/crypto-dashbo
 import {CryptoOwnershipGridComponent} from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import {CryptoDetailsComponent} from './cryptos/crypto-details/crypto-details.component';
 import {StockTradingPositionsComponent} from './stocks/stock-trading/stock-trading-positions.component';
-import {StockTradingNewPositionComponent} from './stocks/stock-trading/stock-trading-new-position.component';
 import {StockTradingPerformanceComponent} from './stocks/stock-trading-review/stock-trading-performance.component';
 import {StockTradingReviewComponent} from './stocks/stock-trading-review/stock-trading-review.component';
 import {
@@ -67,7 +66,7 @@ import {OutcomesReportComponent} from './reports/outcomes-report/outcomes-report
 import {GapsReportComponent} from './reports/gaps/gaps-report.component';
 import {GapsComponent} from './shared/reports/gaps.component';
 import {PercentChangeDistributionComponent} from './shared/reports/percent-change-distribution.component';
-import {StockTradingDashboardComponent} from './stocks/stock-trading-dashboard/stock-trading-dashboard.component';
+import {StockTradingPendingPositionsDashboardComponent} from './stocks/stock-trading-dashboard/stock-trading-pending-positions-dashboard.component';
 import {TradingPerformanceSummaryComponent} from './shared/stocks/trading-performance-summary.component';
 import {TradingActualVsSimulatedPositionComponent} from './shared/stocks/trading-actual-vs-simulated.component';
 import {StockListsDashboardComponent} from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
@@ -77,7 +76,6 @@ import {DailyOutcomeScoresComponent} from './shared/reports/daily-outcome-scores
 import {
     StockTradingReviewDashboardComponent
 } from './stocks/stock-trading-review/stock-trading-review-dashboard.component';
-import {StockTradingPendingPositionsComponent} from './stocks/stock-trading/stock-trading-pendingpositions.component';
 import {StockSECFilingsComponent} from './stocks/stock-details/stock-secfilings.component';
 import {
     StockTradingAnalysisDashboardComponent
@@ -105,6 +103,8 @@ import {TrendsReportComponent} from "./reports/trends-report/trends-report.compo
 import {LoadingComponent} from "./shared/loading/loading.component";
 import {StockTradingChartsComponent} from "./stocks/stock-trading/stock-trading-charts.component";
 import {CorrelationsComponent} from "./shared/reports/correlations.component";
+import {StockTradingNewPositionComponent} from "./stocks/stock-trading/stock-trading-new-position.component";
+import {StockTradingDashboardComponent} from "./stocks/stock-trading/stock-trading-dashboard.component";
 
 
 let routes: Routes = [
@@ -159,7 +159,7 @@ let routes: Routes = [
 
     {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
     {path: 'stocks/lists/:id', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
-    {path: 'stocks/newposition', component: StockTradingDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
+    {path: 'stocks/newposition', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
     {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
     {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
 
@@ -221,11 +221,10 @@ let routes: Routes = [
         StockTransactionComponent,
         StockOwnershipComponent,
         StockViolationsComponent,
-        StockTradingDashboardComponent,
         StockTradingPositionComponent,
         StockTradingPositionsComponent,
-        StockTradingNewPositionComponent,
         StockTradingClosedPositionsComponent,
+        StockTradingDashboardComponent,
         StockTradingPerformanceComponent,
         StockTradingReviewComponent,
         StockTradingSummaryComponent,
@@ -233,7 +232,6 @@ let routes: Routes = [
         StockTradingSimulationsComponent,
         TradingPerformanceSummaryComponent,
         TradingActualVsSimulatedPositionComponent,
-        BrokerageOrdersComponent,
         BrokerageNewOrderComponent,
         TransactionsComponent,
         TermsComponent,
@@ -247,17 +245,13 @@ let routes: Routes = [
         OutcomesReportComponent,
         OutcomesAnalysisReportComponent,
         GapsReportComponent,
-        GapsComponent,
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
         TradesReportComponent,
         AlertsComponent,
-        StockTradingDashboardComponent,
         StockListsDashboardComponent,
         StockListComponent,
-        CandlestickChartComponent,
         StockTradingReviewDashboardComponent,
-        StockTradingPendingPositionsComponent,
         StockSECFilingsComponent,
         StockTradingAnalysisDashboardComponent,
         StockTradingStrategiesComponent,
@@ -283,7 +277,11 @@ let routes: Routes = [
         StockLinkComponent,
         TradingViewLinkComponent,
         StockLinkAndTradingviewLinkComponent,
-        CorrelationsComponent
+        CorrelationsComponent,
+        StockTradingNewPositionComponent,
+        BrokerageOrdersComponent,
+        CandlestickChartComponent,
+        GapsComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},
