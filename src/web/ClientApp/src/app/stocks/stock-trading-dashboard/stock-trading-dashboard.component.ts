@@ -8,7 +8,7 @@ import {GetErrors} from "../../services/utils";
     templateUrl: './stock-new-position.component.html',
     styleUrls: ['./stock-new-position.component.css']
 })
-export class StockNewPositionComponent implements OnInit {
+export class StockTradingDashboardComponent implements OnInit {
     feedbackMessage: string;
     orders: BrokerageOrder[];
 

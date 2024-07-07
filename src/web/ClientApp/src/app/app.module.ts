@@ -45,7 +45,6 @@ import {RecentSellsComponent} from './recentsells/recentsells.component';
 import {CryptoDashboardComponent} from './cryptos/crypto-dashboard/crypto-dashboard.component';
 import {CryptoOwnershipGridComponent} from './cryptos/crypto-dashboard/crypto-ownership-grid.component';
 import {CryptoDetailsComponent} from './cryptos/crypto-details/crypto-details.component';
-import {StockTradingDashboardComponent} from './stocks/stock-trading/stock-trading-dashboard.component';
 import {StockTradingPositionsComponent} from './stocks/stock-trading/stock-trading-positions.component';
 import {StockTradingNewPositionComponent} from './stocks/stock-trading/stock-trading-new-position.component';
 import {StockTradingPerformanceComponent} from './stocks/stock-trading-review/stock-trading-performance.component';
@@ -68,7 +67,7 @@ import {OutcomesReportComponent} from './reports/outcomes-report/outcomes-report
 import {GapsReportComponent} from './reports/gaps/gaps-report.component';
 import {GapsComponent} from './shared/reports/gaps.component';
 import {PercentChangeDistributionComponent} from './shared/reports/percent-change-distribution.component';
-import {StockNewPositionComponent} from './stocks/stock-buy/stock-new-position.component';
+import {StockTradingDashboardComponent} from './stocks/stock-trading-dashboard/stock-trading-dashboard.component';
 import {TradingPerformanceSummaryComponent} from './shared/stocks/trading-performance-summary.component';
 import {TradingActualVsSimulatedPositionComponent} from './shared/stocks/trading-actual-vs-simulated.component';
 import {StockListsDashboardComponent} from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
@@ -160,7 +159,7 @@ let routes: Routes = [
 
     {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
     {path: 'stocks/lists/:id', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
-    {path: 'stocks/newposition', component: StockNewPositionComponent, canActivate: [AuthGuard], title: 'New Position'},
+    {path: 'stocks/newposition', component: StockTradingDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
     {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
     {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
 
@@ -253,7 +252,7 @@ let routes: Routes = [
         DailyOutcomeScoresComponent,
         TradesReportComponent,
         AlertsComponent,
-        StockNewPositionComponent,
+        StockTradingDashboardComponent,
         StockListsDashboardComponent,
         StockListComponent,
         CandlestickChartComponent,
