@@ -11,10 +11,9 @@
                 No brokerage orders found for {{ filteredTickers.join(', ') }}
             </div>
         }
-        @for (groupedOrder of groupedOrders; track groupedOrder) {
-            <table class="table">
-                @if (groupedOrder.length > 0 && justOrders === false) {
-                    <thead>
+        <table class="table">
+            @if (justOrders === false) {
+                <thead>
                     <tr>
                         <th style="width: 100px;"></th>
                         <th>Stock</th>
@@ -24,36 +23,36 @@
                         <th>Time</th>
                         <th></th>
                     </tr>
-                    </thead>
+                </thead>
+            }
+            <tbody>
+        @for (groupedOrder of groupedOrders; track groupedOrder) {
+            
+                @for (p of groupedOrder; track p; let i = $index) {
+                    <tr [ngClass]="{'table-success': p.isActive && p.instruction === 'Buy', 'table-info': p.isActive && p.instruction === 'Sell', 'table-light': !p.isActive}">
+                        <td>
+                            <div class="small">{{ p.status }}</div>
+                        </td>
+                        <td>
+                            <app-stock-link-and-tradingview-link
+                                [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
+                        </td>
+                        <td>{{ p.type }} {{ p.instruction }}</td>
+                        <td>{{ p.quantity }}</td>
+                        <td class="text-end">{{ p.price === 0 ? 'MARKET' : p.price | currency }}</td>
+                        <td class="text-end">{{ p.executionTime | date: 'short' }}</td>
+                        <td class="text-end">
+                            @if (p.canBeCancelled) {
+                                <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel
+                                </button>
+                            }
+                            @if (p.canBeRecorded && positionId) {
+                                <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
+                            }
+                        </td>
+                    </tr>
                 }
-                <tbody>
-                    @for (p of groupedOrder; track p; let i = $index) {
-                        <tr [ngClass]="{'table-success': p.isActive && p.instruction === 'Buy', 'table-info': p.isActive && p.instruction === 'Sell', 'table-light': !p.isActive}">
-                            <td>
-                                <div class="small">{{ p.status }}</div>
-                            </td>
-                            <td>
-                                <app-stock-link-and-tradingview-link
-                                    [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
-                            </td>
-                            <td>{{ p.type }} {{ p.instruction }}</td>
-                            <td>{{ p.quantity }}</td>
-                            <td class="text-end">{{ p.price === 0 ? 'MARKET' : p.price | currency }}</td>
-                            <td class="text-end">{{ p.executionTime | date: 'short' }}</td>
-                            <td class="text-end">
-                                @if (p.canBeCancelled) {
-                                    <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel
-                                    </button>
-                                }
-                                @if (p.canBeRecorded && positionId) {
-                                    <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
                 @if (groupedOrder.length > 0 && justOrders === false) {
-                    <tfoot>
                     <tr>
                         <td></td>
                         <td></td>
@@ -66,9 +65,9 @@
                         </td>
                         <td></td>
                     </tr>
-                    </tfoot>
                 }
-            </table>
-        }
+            }
+            </tbody>
+        </table>
     </div>
 </section>
