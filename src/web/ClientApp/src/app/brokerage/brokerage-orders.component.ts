@@ -3,7 +3,7 @@ import {BrokerageOrder, stocktransactioncommand} from 'src/app/services/stocks.s
 import {GetErrors} from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
-import {CurrencyPipe, DatePipe, NgClass} from "@angular/common";
+import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../shared/stocks/stock-link-and-tradingview-link.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 
@@ -18,7 +18,8 @@ let orderBy = (a: BrokerageOrder, b: BrokerageOrder) => a.ticker.localeCompare(b
         StockLinkAndTradingviewLinkComponent,
         CurrencyPipe,
         DatePipe,
-        ErrorDisplayComponent
+        ErrorDisplayComponent,
+        NgIf
     ],
     standalone: true
 })

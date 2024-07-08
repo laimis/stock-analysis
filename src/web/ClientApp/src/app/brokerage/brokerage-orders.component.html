@@ -11,23 +11,20 @@
                 No brokerage orders found for {{ filteredTickers.join(', ') }}
             </div>
         }
-        <table class="table">
-            @if (justOrders === false) {
-                <thead>
-                    <tr>
-                        <th style="width: 100px;"></th>
-                        <th>Stock</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th class="text-end">Price</th>
-                        <th>Time</th>
-                        <th></th>
-                    </tr>
-                </thead>
-            }
+        <table class="table" *ngIf="isEmpty === false">
+            <thead *ngIf="justOrders === false">
+                <tr>
+                    <th style="width: 100px;"></th>
+                    <th>Stock</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th class="text-end">Price</th>
+                    <th>Time</th>
+                    <th></th>
+                </tr>
+            </thead>
             <tbody>
-        @for (groupedOrder of groupedOrders; track groupedOrder) {
-            
+            @for (groupedOrder of groupedOrders; track groupedOrder) {
                 @for (p of groupedOrder; track p; let i = $index) {
                     <tr [ngClass]="{'table-success': p.isActive && p.instruction === 'Buy', 'table-info': p.isActive && p.instruction === 'Sell', 'table-light': !p.isActive}">
                         <td>
@@ -52,20 +49,18 @@
                         </td>
                     </tr>
                 }
-                @if (groupedOrder.length > 0 && justOrders === false) {
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <b class="float-end">Total</b>
-                        </td>
-                        <td class="text-end">
-                            {{ getTotal(groupedOrder) | currency }}
-                        </td>
-                        <td></td>
-                    </tr>
-                }
+                <tr *ngIf="groupedOrder.length > 0 && justOrders === false">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <b class="float-end">Total</b>
+                    </td>
+                    <td class="text-end">
+                        {{ getTotal(groupedOrder) | currency }}
+                    </td>
+                    <td></td>
+                </tr>
             }
             </tbody>
         </table>
