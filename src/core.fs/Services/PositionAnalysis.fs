@@ -192,6 +192,12 @@ module PositionAnalysis =
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.PercentToStopLoss && o.Value >= percentToStopThreshold && o.Value <= 0.0m) ]
             )
             AnalysisOutcomeEvaluation(
+                $"Opened 30 days ago",
+                OutcomeType.Neutral,
+                PositionAnalysisKeys.DaysHeld,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value = 30m) ]
+            )
+            AnalysisOutcomeEvaluation(
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
                 PositionAnalysisKeys.UnrealizedProfit,
