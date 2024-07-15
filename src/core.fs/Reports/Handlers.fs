@@ -541,11 +541,15 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | Error error -> return Error (position, error.Message) 
                     | Ok prices ->
                         
-                        let outcomes = PositionAnalysis.generate calculations prices brokerageAccount.Orders
-                        let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
-                        let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
-                        
-                        return Ok (tickerOutcome, tickerPatterns)
+                        try    
+                            let outcomes = PositionAnalysis.generate calculations prices brokerageAccount.Orders
+                            let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
+                            let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
+                            
+                            return Ok (tickerOutcome, tickerPatterns)
+                        with
+                        | exn ->
+                            return Error (position, exn.Message)
                     }
                 )
                 |> Async.Sequential
