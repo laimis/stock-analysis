@@ -80,7 +80,7 @@ type StockQuote =
     member this.Price : decimal = this.regularMarketLastPrice
 
 type OrderStatus =
-    | Filled | Working | PendingActivation | Expired | Canceled | Rejected | Accepted
+    | Filled | Working | PendingActivation | Expired | Canceled | Rejected | Accepted | Replaced
 type OrderInstruction =
     | Buy | Sell | BuyToCover | SellShort
 type OrderType =
