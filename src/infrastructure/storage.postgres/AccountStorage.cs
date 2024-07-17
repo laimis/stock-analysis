@@ -127,6 +127,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 OrderStatus.Tags.Expired => "Expired",
                 OrderStatus.Tags.Canceled => "Canceled",
                 OrderStatus.Tags.Rejected => "Rejected",
+                OrderStatus.Tags.Accepted => "Accepted",
                 _ => throw new Exception($"Unknown order status: {status}")
             };
         }
@@ -139,6 +140,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 "Expired" => OrderStatus.Expired,
                 "Canceled" => OrderStatus.Canceled,
                 "Rejected" => OrderStatus.Rejected,
+                "Accepted" => OrderStatus.Accepted,
                 _ => throw new Exception($"Unknown order status: {status}")
             };
 
