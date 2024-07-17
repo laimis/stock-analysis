@@ -409,6 +409,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "EXPIRED" -> OrderStatus.Expired
         | "PENDING_ACTIVATION" -> OrderStatus.PendingActivation
         | "ACCEPTED" -> OrderStatus.Accepted
+        | "REPLACED" -> OrderStatus.Replaced
         | _ -> failwith $"Unknown order status: {status}"
         
     let parseOrderType orderType =
