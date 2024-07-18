@@ -7,8 +7,14 @@ import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../shared/stocks/stock-link-and-tradingview-link.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 
-let orderBy = (a: BrokerageOrder, b: BrokerageOrder) => a.ticker.localeCompare(b.ticker)
-
+let orderBy = (a: BrokerageOrder, b: BrokerageOrder) => {
+    let tickerComparison = a.ticker.localeCompare(b.ticker)
+    if (tickerComparison === 0) {
+        return a.executionTime > b.executionTime ? -1 : 1
+    } else {
+        return tickerComparison
+    }
+}
 @Component({
     selector: 'app-brokerage-orders',
     templateUrl: './brokerage-orders.component.html',
@@ -63,9 +69,8 @@ export class BrokerageOrdersComponent {
         if (this._orders) {
             const buys = this._orders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
             const sells = this._orders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const filledBuys = this._orders.filter(o => o.isBuyOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const filledSells = this._orders.filter(o => o.isSellOrder && !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            this.groupedOrders = [buys, sells, filledBuys, filledSells]
+            const filled = this._orders.filter(o => !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+            this.groupedOrders = [buys, sells, filled]
             this.isEmpty = this.groupedOrders.every(o => o.length == 0)
         }
     }
