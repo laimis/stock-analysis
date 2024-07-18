@@ -1,71 +1,82 @@
 <section class="card shadow-sm mb-4">
     <div class="card-body">
-        <h3 class="card-title">
+        <h3 class="card-title d-flex align-items-center">
             <i class="bi bi-building me-2"></i>Brokerage Orders
         </h3>
 
         <app-error-display [errors]="errors"></app-error-display>
 
         @if (isEmpty && filteredTickers.length > 0) {
-            <div>
+            <div class="alert alert-info">
                 No brokerage orders found for {{ filteredTickers.join(', ') }}
             </div>
         }
-        <table class="table" *ngIf="isEmpty === false">
-            <thead *ngIf="justOrders === false">
-            <tr>
-                <th style="width: 100px;"></th>
-                <th>Stock</th>
-                <th>Type</th>
-                <th>Quantity</th>
-                <th class="text-end">Price</th>
-                <th>Time</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (groupedOrder of groupedOrders; track groupedOrder) {
-                    @for (p of groupedOrder; track p; let i = $index) {
-                        <tr [ngClass]="{'buy-order': p.instruction === 'Buy', 'sell-order': p.instruction === 'Sell', 'inactive-order': !p.isActive}">
-                            <td>
-                                <div class="small">{{ p.status }}</div>
-                            </td>
-                            <td>
-                                <app-stock-link-and-tradingview-link [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
-                            </td>
-                            <td>
-                            <span class="order-type-badge" [ngClass]="{'buy-badge': p.instruction === 'Buy', 'sell-badge': p.instruction === 'Sell'}">
-                                {{ p.type }} {{ p.instruction }}
-                            </span>
-                            </td>
-                            <td>{{ p.quantity }}</td>
-                            <td class="text-end">{{ p.price === 0 ? 'MARKET' : p.price | currency }}</td>
-                            <td class="text-end">{{ p.executionTime | date: 'short' }}</td>
-                            <td class="text-end">
-                                @if (p.canBeCancelled) {
-                                    <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel
-                                    </button>
-                                }
-                                @if (p.canBeRecorded && positionId) {
-                                    <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
-                                }
-                            </td>
-                        </tr>
+        <div class="table-responsive" *ngIf="isEmpty === false">
+            <table class="table table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th style="width: 100px;">Status</th>
+                    <th>Stock</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th class="text-end">Price</th>
+                    <th>Time</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (groupedOrder of groupedOrders; track groupedOrder) {
+                        @for (p of groupedOrder; track p; let i = $index) {
+                            <tr [ngClass]="{
+                            'table-success': p.isActive && p.instruction === 'Buy',
+                            'table-danger': p.isActive && p.instruction === 'Sell',
+                            'table-secondary': !p.isActive
+                        }">
+                                <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-success': p.status === 'Active',
+                                    'bg-secondary': p.status !== 'Active'
+                                }">{{ p.status }}</span>
+                                </td>
+                                <td>
+                                    <app-stock-link-and-tradingview-link [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
+                                </td>
+                                <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-success': p.instruction === 'Buy',
+                                    'bg-danger': p.instruction === 'Sell'
+                                }">
+                                    {{ p.type }} {{ p.instruction }}
+                                </span>
+                                </td>
+                                <td>{{ p.quantity }}</td>
+                                <td class="text-end">{{ p.price === 0 ? 'MARKET' : (p.price | currency) }}</td>
+                                <td>{{ p.executionTime | date: 'short' }}</td>
+                                <td class="text-end">
+                                    @if (p.canBeCancelled) {
+                                        <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
+                                    }
+                                    @if (p.canBeRecorded && positionId) {
+                                        <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        @if (groupedOrder.length > 0 && justOrders === false) {
+                            <tr class="table-info">
+                                <td colspan="3"></td>
+                                <td>
+                                    <b class="float-end">Total</b>
+                                </td>
+                                <td class="text-end">
+                                    {{ getTotal(groupedOrder) | currency }}
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
+                        }
                     }
-                    <tr *ngIf="groupedOrder.length > 0 && justOrders === false">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <b class="float-end">Total</b>
-                        </td>
-                        <td class="text-end">
-                            {{ getTotal(groupedOrder) | currency }}
-                        </td>
-                        <td></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>

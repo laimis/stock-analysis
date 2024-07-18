@@ -1,22 +1,19 @@
-.buy-order {
-    background-color: #d4edda;
+.table-success {
+    background-color: rgba(25, 135, 84, 0.1) !important;
 }
-.sell-order {
-    background-color: #f8d7da;
+.table-danger {
+    background-color: rgba(220, 53, 69, 0.1) !important;
 }
-.inactive-order {
-    background-color: #f8f9fa;
+.table-secondary {
+    background-color: rgba(108, 117, 125, 0.1) !important;
 }
-.order-type-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-weight: bold;
+.table th {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
-.buy-badge {
-    background-color: #28a745;
-    color: white;
-}
-.sell-badge {
-    background-color: #dc3545;
-    color: white;
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+    font-weight: 600;
 }
