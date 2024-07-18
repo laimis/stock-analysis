@@ -1,0 +1,22 @@
+.buy-order {
+    background-color: #d4edda;
+}
+.sell-order {
+    background-color: #f8d7da;
+}
+.inactive-order {
+    background-color: #f8f9fa;
+}
+.order-type-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+}
+.buy-badge {
+    background-color: #28a745;
+    color: white;
+}
+.sell-badge {
+    background-color: #dc3545;
+    color: white;
+}
