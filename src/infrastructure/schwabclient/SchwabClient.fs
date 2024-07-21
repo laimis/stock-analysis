@@ -432,6 +432,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "EQUITY" -> AssetType.Equity
         | "OPTION" -> AssetType.Option
         | "ETF" -> AssetType.ETF
+        | "COLLECTIVE_INVESTMENT" -> AssetType.ETF
         | _ -> failwith $"Unknown asset type: {assetType}"
         
     let mapSchwabQuoteResponseToStockResponse symbol (schwabResponse:SchwabStockQuoteResponse) : StockQuote =
