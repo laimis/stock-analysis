@@ -109,17 +109,12 @@ module SingleBarPriceAnalysis =
                     | 0m -> 0m
                     | _ -> Math.Abs(percentChange * 100m/sigmaRatioDenominator)
                         
-                let sigmaRatioOutcomeType =
-                    match sigmaRatio with
-                    | x when x > 1m -> OutcomeType.Positive
-                    | x when x < -1m -> OutcomeType.Negative
-                    | _ -> OutcomeType.Neutral
-            
                 let sigmaRatio = Math.Round (sigmaRatio, 2)
                 
-                yield AnalysisOutcome (SingleBarOutcomeKeys.SigmaRatio,sigmaRatioOutcomeType, sigmaRatio, ValueFormat.Number, $"Sigma ratio is {sigmaRatio}.")
+                yield AnalysisOutcome (SingleBarOutcomeKeys.SigmaRatio, percentChangeOutcomeType, sigmaRatio, ValueFormat.Number, $"Sigma ratio is {sigmaRatio}.")
                 
                 let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
+                
                 yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
                 
                 let atr = MultipleBarPriceAnalysis.PriceAnalysis.generateAverageTrueRangeOutcome bars |> Option.get
@@ -128,7 +123,7 @@ module SingleBarPriceAnalysis =
                 
                 let changeRatioVsATR = Math.Round (dollarChange / atr.Value, 2)
                 
-                yield AnalysisOutcome (SingleBarOutcomeKeys.DollarChangeVsATR, OutcomeType.Neutral, changeRatioVsATR, ValueFormat.Number, $"Dollar change vs ATR is {changeRatioVsATR}.")
+                yield AnalysisOutcome (SingleBarOutcomeKeys.DollarChangeVsATR, percentChangeOutcomeType, changeRatioVsATR, ValueFormat.Number, $"Dollar change vs ATR is {changeRatioVsATR}.")
                 
             // see if there was a gap down or gap up
             let gaps = bars |> GapAnalysis.detectGaps Constants.NumberOfDaysForRecentAnalysis
