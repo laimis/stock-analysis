@@ -96,3 +96,12 @@ let ``PriceAbove200SMA is correct`` () =
 [<Fact>]
 let ``TrueRange is correct`` () =
     SingleBarPriceAnalysis.SingleBarOutcomeKeys.TrueRange |> firstOutcome |> should equal 6m
+    
+[<Fact>]
+let ``DollarChange is correct`` () =
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.DollarChange |> firstOutcome |> should equal 4.53m
+    
+[<Fact>]
+let ``PercentDifferenceFromLow is correct`` () =
+    SingleBarPriceAnalysis.SingleBarOutcomeKeys.DollarChangeVsATR |> firstOutcome |> MultipleBarPriceAnalysisTests.rounded 2 |> should equal 1.14m
+

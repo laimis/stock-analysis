@@ -385,7 +385,7 @@ module MultipleBarPriceAnalysis =
                 message = $"%% Change StD: {descriptor.stdDev}"
             )
             
-        let private generateAverageTrueRangeOutcome (prices:PriceBars) =
+        let generateAverageTrueRangeOutcome (prices:PriceBars) =
             
             let dataPoints = prices |> Indicators.averageTrueRage |> _.DataPoints
             

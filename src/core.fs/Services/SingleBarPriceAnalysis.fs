@@ -15,6 +15,7 @@ module SingleBarPriceAnalysis =
         let RelativeVolume = "RelativeVolume"
         let Volume = "Volume"
         let PercentChange = "PercentChange"
+        let DollarChange = "DollarChange"
         let ClosingRange = "ClosingRange"
         let Open = "Open"
         let Close = "Close"
@@ -25,6 +26,7 @@ module SingleBarPriceAnalysis =
         let NewLow = "NewLow"
         let SigmaRatio = "SigmaRatio"
         let TrueRange = "TrueRange"
+        let DollarChangeVsATR = "DollarChangeVsATR"
     
     let movingAveragesAnalysis (bars:PriceBars) =
         
@@ -86,6 +88,11 @@ module SingleBarPriceAnalysis =
             
                 // add change as outcome
                 yield AnalysisOutcome (SingleBarOutcomeKeys.PercentChange, percentChangeOutcomeType, percentChange, ValueFormat.Percentage, $"%% change from close is {percentChange}.")
+            
+                let dollarChange = currentBar.Close - yesterday.Close    
+                
+                // add dollar change as outcome
+                yield AnalysisOutcome (SingleBarOutcomeKeys.DollarChange, percentChangeOutcomeType, dollarChange, ValueFormat.Currency, $"Dollar change from close is {currentBar.Close - yesterday.Close}.")
                 
                 // generate percent change statistical data for NumberOfDaysForRecentAnalysis days
                 let descriptor = Constants.NumberOfDaysForRecentAnalysis |> previousBars.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
@@ -112,6 +119,14 @@ module SingleBarPriceAnalysis =
                 
                 yield AnalysisOutcome (SingleBarOutcomeKeys.SigmaRatio,sigmaRatioOutcomeType, sigmaRatio, ValueFormat.Number, $"Sigma ratio is {sigmaRatio}.")
                 
+                let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
+                yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
+                
+                let atr = MultipleBarPriceAnalysis.PriceAnalysis.generateAverageTrueRangeOutcome bars |> Option.get
+                
+                let changeRatioVsATR = Math.Round (dollarChange / atr.Value, 2)
+                
+                yield AnalysisOutcome (SingleBarOutcomeKeys.DollarChangeVsATR, OutcomeType.Neutral, changeRatioVsATR, ValueFormat.Number, $"Dollar change vs ATR is {changeRatioVsATR}.")
                 
             // see if there was a gap down or gap up
             let gaps = bars |> GapAnalysis.detectGaps Constants.NumberOfDaysForRecentAnalysis
@@ -181,10 +196,6 @@ module SingleBarPriceAnalysis =
              // add new low as outcome
             yield AnalysisOutcome (SingleBarOutcomeKeys.NewLow, (if newLow then OutcomeType.Negative else OutcomeType.Neutral), (if newLow then -1m else 0m), ValueFormat.Boolean, "New low reached")
             
-            if previousBars.Length > 0 then
-                let trueRange = previousBars.Last |> Some |> currentBar.TrueRange
-                yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
-                
             yield MultipleBarPriceAnalysis.PriceAnalysis.generateGreenStreakOutcome bars
         ]
         
@@ -364,5 +375,19 @@ module SingleBarPriceAnalysisEvaluation =
                 OutcomeType.Negative,
                 SingleBarOutcomeKeys.PriceBelowEMA20Bars,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.PriceAboveEMA20Bars && o.Value = -1m)  ]
+            )
+            
+            AnalysisOutcomeEvaluation(
+                "Dollar Change 3x+ ATR Positive",
+                OutcomeType.Positive,
+                SingleBarOutcomeKeys.DollarChangeVsATR,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.DollarChangeVsATR && o.Value >= 3m)  ]
+            )
+            
+            AnalysisOutcomeEvaluation(
+                "Dollar Change 3x+ ATR Negative",
+                OutcomeType.Negative,
+                SingleBarOutcomeKeys.DollarChangeVsATR,
+                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = SingleBarOutcomeKeys.DollarChangeVsATR && o.Value <= -3m)  ]
             )
         ]
