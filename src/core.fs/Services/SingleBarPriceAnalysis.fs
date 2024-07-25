@@ -124,6 +124,8 @@ module SingleBarPriceAnalysis =
                 
                 let atr = MultipleBarPriceAnalysis.PriceAnalysis.generateAverageTrueRangeOutcome bars |> Option.get
                 
+                yield AnalysisOutcome (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRange, atr.OutcomeType, atr.Value, atr.ValueType, atr.Message)
+                
                 let changeRatioVsATR = Math.Round (dollarChange / atr.Value, 2)
                 
                 yield AnalysisOutcome (SingleBarOutcomeKeys.DollarChangeVsATR, OutcomeType.Neutral, changeRatioVsATR, ValueFormat.Number, $"Dollar change vs ATR is {changeRatioVsATR}.")
