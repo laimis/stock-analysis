@@ -34,6 +34,16 @@
                     </div>
                 </div>
             </div>
+            <div class="card-footer">
+                @if (result.closedPositions.length > 0) {
+                    <div class="row mt-4">
+                        <div class="col">Closed Position Totals</div>
+                        <div class="col">{{ closedPositionProfit() | currency }}</div>
+                        <div class="col">{{ closedPositionRR() | number:'1.0-2' }}</div>
+                        <div class="col"></div>
+                    </div>
+                }
+            </div>
         </div>
         <div class="card mb-4">
             <div class="card-body">
@@ -70,14 +80,6 @@
                 @if (result.closedPositions.length === 0) {
                     <div class="text-center py-4">
                         <p class="text-muted mb-0">No stock positions closed</p>
-                    </div>
-                }
-                @if (result.closedPositions.length > 0) {
-                    <div class="row mt-4">
-                        <div class="col">Totals</div>
-                        <div class="col">{{ closedPositionProfit() | currency }}</div>
-                        <div class="col">{{ closedPositionRR() | number:'1.0-2' }}</div>
-                        <div class="col"></div>
                     </div>
                 }
             </div>
