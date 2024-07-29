@@ -16,22 +16,6 @@
                 <div class="col-md mb-4 mt-2 text-center">
                     <div class="card h-100">
                         <div class="card-body">
-                            <h5 class="card-title text-muted">Long Value</h5>
-                            <p class="card-text fs-4">{{ brokerageAccount.longMarketValue | currency }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Short Value</h5>
-                            <p class="card-text fs-4">{{ brokerageAccount.shortMarketValue | currency }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
                             <h5 class="card-title text-muted">Cash</h5>
                             <p class="card-text fs-4"
                                *ngIf="brokerageAccount && brokerageAccount.connected">{{ brokerageAccount.cashBalance | currency }}</p>
@@ -39,44 +23,59 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md mb-4 mt-2 text-center">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Profit</h5>
+                            <p class="card-text fs-4">{{ totalProfit | currency }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md mb-4 mt-2 text-center">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Positions Long / Short</h5>
+                            <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         } @else {
-            <p class="text-muted">No brokerage account connected</p>
+            <div class="row mb-4">
+                <div class="col-md mb-4 mt-2 text-center">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Long Invested</h5>
+                            <p class="card-text fs-4">{{ totalLongCost | currency }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md mb-4 mt-2 text-center">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Short Invested</h5>
+                            <p class="card-text fs-4">{{ totalShortCost | currency }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md mb-4 mt-2 text-center">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Profit</h5>
+                            <p class="card-text fs-4">N/A (brokerage unavailable)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md mb-4 mt-2 text-center">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Positions Long / Short</h5>
+                            <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-        <div class="row mb-4">
-            <div class="col-md mb-4 mt-2 text-center">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-muted">Long Invested</h5>
-                        <p class="card-text fs-4">{{ totalLongCost | currency }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md mb-4 mt-2 text-center">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-muted">Short Invested</h5>
-                        <p class="card-text fs-4">{{ totalShortCost | currency }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md mb-4 mt-2 text-center">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-muted">Positions Long / Short</h5>
-                        <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md mb-4 mt-2 text-center">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-muted">Profit</h5>
-                        <p class="card-text fs-4">{{ totalProfit | currency }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     @if (positionGroups) {
