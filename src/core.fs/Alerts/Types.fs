@@ -100,7 +100,7 @@ namespace core.fs.Alerts
         let clearAlerts condition =
             alerts.Values
             |> Seq.filter condition
-            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId; Identifier = Constants.StopLossIdentifier })
+            |> Seq.map (fun x -> { Ticker = x.ticker; UserId = x.userId; Identifier = x.identifier })
             |> Seq.iter (fun x -> alerts.TryRemove(x) |> ignore)
         
         member _.Register (alert:TriggeredAlert) =
