@@ -312,27 +312,30 @@ type PatternMonitoringService(accounts:IAccountStorage,brokerage:IBrokerage,cont
 
     let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
 
-        let! priceResponse = getPrices logger alertCheck.user alertCheck.ticker |> Async.AwaitTask
+        match alertCheck.user.ConnectedToBrokerage with
+        | false -> return None
+        | true ->
+            let! priceResponse = getPrices logger alertCheck.user alertCheck.ticker |> Async.AwaitTask
 
-        match priceResponse with
-        | Error _ -> return None
-        | Ok prices ->
+            match priceResponse with
+            | Error _ -> return None
+            | Ok prices ->
 
-            let userId = alertCheck.user.Id |> UserId
+                let userId = alertCheck.user.Id |> UserId
 
-            PatternDetection.availablePatterns
-            |> Seq.iter( fun pattern ->
-                container.Deregister alertCheck.ticker pattern userId
-            )
+                PatternDetection.availablePatterns
+                |> Seq.iter( fun pattern ->
+                    container.Deregister alertCheck.ticker pattern userId
+                )
 
-            let patterns = PatternDetection.generate prices
+                let patterns = PatternDetection.generate prices
 
-            patterns |> List.iter (fun p ->
-                let alert = TriggeredAlert.PatternAlert p alertCheck.ticker alertCheck.listNames DateTimeOffset.UtcNow userId
-                container.Register alert
-            )
+                patterns |> List.iter (fun p ->
+                    let alert = TriggeredAlert.PatternAlert p alertCheck.ticker alertCheck.listNames DateTimeOffset.UtcNow userId
+                    container.Register alert
+                )
 
-            return Some (alertCheck,patterns.Length)
+                return Some (alertCheck,patterns.Length)
     }
 
     let runThroughMonitoringChecks logger (cancellationToken:CancellationToken) = task {
