@@ -204,7 +204,7 @@ type IBrokerageGetPriceHistory =
 type IBrokerage =
     inherit IBrokerageGetPriceHistory
     abstract member GetOAuthUrl : unit -> Task<string>
-    abstract member ConnectCallback : code:string -> Task<OAuthResponse>
+    abstract member ConnectCallback : code:string -> Task<Result<OAuthResponse, ServiceError>>
     abstract member GetAccessToken : state:UserState -> Task<OAuthResponse>
     abstract member RefreshAccessToken : state:UserState -> Task<OAuthResponse>
     abstract member GetAccount : state:UserState -> Task<Result<BrokerageAccount,ServiceError>>

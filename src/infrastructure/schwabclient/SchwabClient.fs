@@ -604,14 +604,16 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             request.Headers.Authorization <- AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")))
 
             let! response = _httpClient.SendAsync(request)
+            
+            match response.IsSuccessStatusCode with
+            | false ->
+                do! logIfFailed response "connect callback"
+                return ServiceError "Failed to connect to brokerage" |> Error
+            | true ->
 
-            do! logIfFailed response "connect callback"
+                let! responseString = response.Content.ReadAsStringAsync()
 
-            let! responseString = response.Content.ReadAsStringAsync()
-
-            logDebug "Response from schwab: {responseString}" [|responseString|]
-
-            return JsonSerializer.Deserialize<OAuthResponse>(responseString)
+                return JsonSerializer.Deserialize<OAuthResponse>(responseString) |> Ok
         }
 
         member _.GetOAuthUrl() = task {

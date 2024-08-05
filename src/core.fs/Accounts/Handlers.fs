@@ -416,15 +416,18 @@ namespace core.fs.Accounts
         member this.Handle(_:Connect) = brokerage.GetOAuthUrl()
             
         member this.HandleConnectCallback(cmd:ConnectCallback) = task {
-            let! r = brokerage.ConnectCallback(cmd.Code)
+            let! connectResponse = brokerage.ConnectCallback(cmd.Code)
             
-            let! user = storage.GetUser(cmd.UserId)
-            match user with
-            None -> return "User not found" |> ServiceError |> Error
-            | Some user ->
-                user.ConnectToBrokerage r.access_token r.refresh_token r.token_type r.expires_in r.scope
-                do! storage.Save(user)
-                return Ok ()
+            match connectResponse with
+            | Error error -> return error |> Error
+            | Ok accessToken ->
+                let! user = storage.GetUser(cmd.UserId)
+                match user with
+                None -> return "User not found" |> ServiceError |> Error
+                | Some user ->
+                    user.ConnectToBrokerage accessToken.access_token accessToken.refresh_token accessToken.token_type accessToken.expires_in accessToken.scope
+                    do! storage.Save(user)
+                    return Ok ()
         }
         
         member this.HandleDisconnect(cmd:BrokerageDisconnect) = task {
