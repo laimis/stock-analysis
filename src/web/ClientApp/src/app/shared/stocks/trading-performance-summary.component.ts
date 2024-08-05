@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {StockTradingPerformance} from 'src/app/services/stocks.service';
+import {LabelWithFrequency, StockTradingPerformance} from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -13,5 +13,10 @@ export class TradingPerformanceSummaryComponent {
 
     @Input()
     public performance: StockTradingPerformance
+
+    getPercentageOfGrade(grade: LabelWithFrequency): number {
+        let total = this.performance.gradeDistribution.map(g => g.frequency).reduce((a, b) => a + b, 0);
+        return grade.frequency / total;
+    }
 }
 

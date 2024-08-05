@@ -92,7 +92,7 @@
         @for (labelFrequency of performance.gradeDistribution; track labelFrequency) {
             <div class="col">
                 <div class="stat-label"># of {{ labelFrequency.label }} trades</div>
-                <div>{{ labelFrequency.frequency }}</div>
+                <div>{{ labelFrequency.frequency }} ({{getPercentageOfGrade(labelFrequency) | percent }})</div>
             </div>
         }
         <div class="col">
