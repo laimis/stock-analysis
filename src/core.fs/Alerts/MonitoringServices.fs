@@ -142,17 +142,22 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
         | Some user ->
             logger.LogInformation $"Found user {userId}"
 
-            let! stockPositions = userId |> portfolio.GetStockPositions
+            match user.State.ConnectedToBrokerage with
+            | false ->
+                logger.LogInformation($"User {userId} is not connected to a brokerage")
+                return []
+            | true ->
+                let! stockPositions = userId |> portfolio.GetStockPositions
 
-            let checks =
-                stockPositions
-                |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
-                |> Seq.map (fun p -> {ticker=p.Ticker; stopPrice=p.StopPrice.Value; user=user.State; isShort = p.StockPositionType = Short })
-                |> Seq.toList
+                let checks =
+                    stockPositions
+                    |> Seq.filter (fun s -> s.IsOpen && s.HasStopPrice)
+                    |> Seq.map (fun p -> {ticker=p.Ticker; stopPrice=p.StopPrice.Value; user=user.State; isShort = p.StockPositionType = Short })
+                    |> Seq.toList
 
-            logger.LogInformation("done")
+                logger.LogInformation("done")
 
-            return checks
+                return checks
     }
 
     interface IApplicationService
