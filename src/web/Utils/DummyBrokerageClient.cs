@@ -13,7 +13,7 @@ namespace web.Utils;
 
 public class DummyBrokerageClient : IBrokerage
 {
-    public Task<OAuthResponse> ConnectCallback(string code)
+    public Task<FSharpResult<OAuthResponse, ServiceError>> ConnectCallback(string code)
     {
         throw new NotImplementedException();
     }
