@@ -84,7 +84,7 @@ type OrderStatus =
 type OrderInstruction =
     | Buy | Sell | BuyToCover | SellShort
 type OrderType =
-    | Market | Limit | StopMarket
+    | Market | Limit | StopMarket | NetDebit | NetCredit
 
 [<CLIMutable>]
 type Order = {

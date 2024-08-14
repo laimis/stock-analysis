@@ -152,6 +152,8 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 OrderType.Tags.Limit => "Limit",
                 OrderType.Tags.Market => "Market",
                 OrderType.Tags.StopMarket => "Stop",
+                OrderType.Tags.NetCredit => "NetCredit",
+                OrderType.Tags.NetDebit => "NetDebit",
                 _ => throw new Exception($"Unknown order type: {orderType}")
             };
         private static OrderType GetOrderTypeFromString(string orderType) =>
@@ -160,6 +162,8 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 "Limit" => OrderType.Limit,
                 "Market" => OrderType.Market,
                 "Stop" => OrderType.StopMarket,
+                "NetCredit" => OrderType.NetCredit,
+                "NetDebit" => OrderType.NetDebit,
                 _ => throw new Exception($"Unknown order type: {orderType}")
             };
         

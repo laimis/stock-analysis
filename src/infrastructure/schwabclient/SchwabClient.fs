@@ -417,6 +417,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "LIMIT" -> OrderType.Limit
         | "MARKET" -> OrderType.Market
         | "STOP" -> OrderType.StopMarket
+        | "NET_DEBIT" -> OrderType.NetDebit
+        | "NET_CREDIT" -> OrderType.NetCredit
         | _ -> failwith $"Unknown order type: {orderType}"
         
     let parseOrderInstruction instruction =
