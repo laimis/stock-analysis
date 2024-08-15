@@ -427,6 +427,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "SELL" -> OrderInstruction.Sell
         | "SELL_SHORT" -> OrderInstruction.SellShort
         | "BUY_TO_COVER" -> OrderInstruction.BuyToCover
+        | "BUY_TO_OPEN" -> OrderInstruction.BuyToOpen
+        | "BUY_TO_CLOSE" -> OrderInstruction.BuyToClose
+        | "SELL_TO_OPEN" -> OrderInstruction.SellToOpen
+        | "SELL_TO_CLOSE" -> OrderInstruction.SellToClose
         | _ -> failwith $"Unknown order instruction: {instruction}"
         
     let parseAssetType assetType =

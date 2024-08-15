@@ -82,7 +82,7 @@ type StockQuote =
 type OrderStatus =
     | Filled | Working | PendingActivation | Expired | Canceled | Rejected | Accepted | Replaced
 type OrderInstruction =
-    | Buy | Sell | BuyToCover | SellShort
+    | Buy | Sell | BuyToCover | SellShort | BuyToOpen | BuyToClose | SellToOpen | SellToClose
 type OrderType =
     | Market | Limit | StopMarket | NetDebit | NetCredit
 

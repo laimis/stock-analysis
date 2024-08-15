@@ -174,6 +174,10 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 OrderInstruction.Tags.Sell => "Sell",
                 OrderInstruction.Tags.BuyToCover => "BuyToCover",
                 OrderInstruction.Tags.SellShort => "SellShort",
+                OrderInstruction.Tags.BuyToOpen => "BuyToOpen",
+                OrderInstruction.Tags.BuyToClose => "BuyToClose",
+                OrderInstruction.Tags.SellToOpen => "SellToOpen",
+                OrderInstruction.Tags.SellToClose => "SellToClose",
                 _ => throw new Exception($"Unknown order instruction: {instruction}")
             };
         private static OrderInstruction GetOrderInstructionFromString(string instruction) =>
@@ -183,6 +187,10 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 "Sell" => OrderInstruction.Sell,
                 "BuyToCover" => OrderInstruction.BuyToCover,
                 "SellShort" => OrderInstruction.SellShort,
+                "BuyToOpen" => OrderInstruction.BuyToOpen,
+                "BuyToClose" => OrderInstruction.BuyToClose,
+                "SellToOpen" => OrderInstruction.SellToOpen,
+                "SellToClose" => OrderInstruction.SellToClose,
                 _ => throw new Exception($"Unknown order instruction: {instruction}")
             };
 
