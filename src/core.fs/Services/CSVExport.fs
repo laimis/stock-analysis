@@ -22,6 +22,7 @@ module CSVExport =
     let private NUMBER_FORMAT = "G2"
     
     let private number culture (value:decimal) = value.ToString(NUMBER_FORMAT, culture)
+    let private numberOption culture (opt:decimal option) = opt |> Option.map (number culture) |> Option.defaultValue ""
     let private currency culture (value:decimal) = value.ToString(CURRENCY_FORMAT, culture)
     let private percent culture (value:decimal) = value.ToString(PERCENT_FORMAT, culture)
     let private currencyOption culture (opt:decimal option) = opt |> Option.map (currency culture) |> Option.defaultValue ""
@@ -171,7 +172,7 @@ module CSVExport =
                     Ticker = p.State.Ticker.Value
                     Bid = p.State.Bid
                     NumberOfShares = p.State.NumberOfShares
-                    StopPrice = p.State.StopPrice |> currencyOption culture
+                    StopPrice = p.State.StopPrice |> numberOption culture
                     Created = p.State.Created |> date
                     Closed = p.State.Closed |> dateOption
                     Purchased = p.State.Purchased
