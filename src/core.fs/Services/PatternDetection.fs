@@ -9,7 +9,7 @@ open core.fs.Services.GapAnalysis
 let contractingVolumeBreakoutName = "Contracting Volume Breakout"
 [<Literal>]
 let maximumBarsForPattern = 40
-let volumeRateThreshold = 1.3m
+let volumeRateThreshold = 2m
 let slopeThreshold = 0.0
 
 let contractingVolumeBreakout (bars: PriceBars) =
@@ -49,7 +49,7 @@ let contractingVolumeBreakout (bars: PriceBars) =
        
         let description = $"{contractingVolumeBreakoutName}: vr: {lastVolumeRate:N1}x, va: {angleVolDegrees:N2}°, pa: {angleCloseDegrees:N2}°"
             
-        if lastVolumeRate > volumeRateThreshold && volSlope < slopeThreshold && (lastBar.Close > lastBar.Open) then
+        if lastVolumeRate >= volumeRateThreshold && volSlope < slopeThreshold && (lastBar.Close > lastBar.Open) then
             Some({
                 date = lastBar.Date
                 name = contractingVolumeBreakoutName
