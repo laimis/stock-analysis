@@ -199,6 +199,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
             {
                 AssetType.Tags.Equity => "Equity",
                 AssetType.Tags.Option => "Option",
+                AssetType.Tags.ETF => "Etf",
                 _ => throw new Exception($"Unknown asset type: {assetType}")
             };
         private static AssetType GetAssetTypeFromString(string assetType) =>
@@ -206,6 +207,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
             {
                 "Equity" => AssetType.Equity,
                 "Option" => AssetType.Option,
+                "Etf" => AssetType.ETF,
                 _ => throw new Exception($"Unknown asset type: {assetType}")
             };
 
