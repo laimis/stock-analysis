@@ -4,14 +4,30 @@
             {{ feedbackMessage }}
         </div>
     }
+
+    <div class="tab-container mt-2">
+        <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
+            Pending Positions
+        </a>
+        <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
+            New Position
+        </a>
+        <a class="tab" [ngClass]="{'is-active': isActive('orders')}" [routerLink]="" (click)="activateTab('orders')">
+            Orders
+        </a>
+    </div>
+    
     <app-stock-trading-new-position
+        *ngIf="isActive('positions')"
         (pendingPositionCreated)="pendingPositionCreated()"
         (positionOpened)="positionOpened()">
     </app-stock-trading-new-position>
     <app-stock-trading-pendingpositions
+        *ngIf="isActive('pending')"
         (pendingPositionClosed)="pendingPositionClosed()">
     </app-stock-trading-pendingpositions>
     <app-brokerage-orders
+        *ngIf="isActive('orders')"
         (ordersChanged)="getOrders()"
         [orders]="orders"
     ></app-brokerage-orders>

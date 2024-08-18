@@ -5,6 +5,8 @@ import {GetErrors} from "../../services/utils";
 import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
 import {StockTradingPendingPositionsComponent} from "../stock-trading/stock-trading-pendingpositions.component";
 import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
+import {RouterLink} from "@angular/router";
+import {NgClass, NgIf} from "@angular/common";
 
 @Component({
     selector: 'app-stock-trading-pending-positions-dashboard',
@@ -14,7 +16,10 @@ import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.compone
     imports: [
         StockTradingNewPositionComponent,
         StockTradingPendingPositionsComponent,
-        BrokerageOrdersComponent
+        BrokerageOrdersComponent,
+        RouterLink,
+        NgClass,
+        NgIf
     ]
 })
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
@@ -50,5 +55,13 @@ export class StockTradingPendingPositionsDashboardComponent implements OnInit {
 
     pendingPositionClosed() {
         this.feedbackMessage = "Pending position closed";
+    }
+    
+    activeTab = 'pending';
+    isActive(tab: string) {
+        return tab === this.activeTab;
+    }
+    activateTab(tab: string) {
+        this.activeTab = tab;
     }
 }

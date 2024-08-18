@@ -1,5 +1,4 @@
 <section>
-    <h5>Pending Positions</h5>
     @if (errors) {
         <app-error-display [errors]="errors"></app-error-display>
     }
@@ -35,7 +34,7 @@
                                     </div>
                                     <div class="px-3 border-left">
                                         <span class="stat-label">Created: </span><span
-                                        class="fw-bold">{{ position.created | date }} ( {{ position.numberOfDaysActive }}</span>
+                                        class="fw-bold">{{ position.created | date }} ({{ position.numberOfDaysActive }} days ago)</span>
                                     </div>
                                     <div class="px-3 border-left">
                                         <span class="stat-label">Stop: </span> <span
