@@ -22,6 +22,7 @@ namespace core.Stocks
         public bool IsOpen => !IsClosed;
         public bool Purchased { get; private set; }
         public string CloseReason { get; private set; }
+        public int NumberOfDaysActive => (int)((IsClosed ? Closed.Value : DateTimeOffset.UtcNow) - Created).TotalDays;
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 

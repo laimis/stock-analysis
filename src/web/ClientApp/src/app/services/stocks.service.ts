@@ -1084,7 +1084,8 @@ export interface PendingStockPosition {
     numberOfShares: number,
     stopPrice: number,
     percentDiffBetweenBidAndPrice: number,
-    date: string
+    created: string
+    numberOfDaysActive: number
     notes: string
     strategy: string
 }
