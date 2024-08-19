@@ -105,6 +105,8 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 
                 let! order = orderTask
                 
+                position.AddOrderDetails(orderType.ToString(), duration.ToString());
+                
                 match order with
                 | Error err -> return Error err
                 | Ok _ ->

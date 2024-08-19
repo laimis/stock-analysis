@@ -162,5 +162,28 @@ namespace coretests.Stocks
             var pending = CreateTestPendingPosition();
             Assert.Throws<InvalidOperationException>(() => pending.Close(""));
         }
+
+        [Fact]
+        public void Purchase_Works()
+        {
+            var pending = CreateTestPendingPosition();
+            
+            pending.Purchase(pending.State.Bid + 1);
+            
+            Assert.Equal(pending.State.Bid + 1, pending.State.Price);
+            Assert.NotNull(pending.State.Closed);
+            Assert.True(pending.State.Purchased);
+        }
+
+        [Fact]
+        public void AddOrderDetails_Works()
+        {
+            var pending = CreateTestPendingPosition();
+            
+            pending.AddOrderDetails("limit", "gtc");
+            
+            Assert.Equal("limit", pending.State.OrderType);
+            Assert.Equal("gtc", pending.State.OrderDuration);
+        }
     }
 }

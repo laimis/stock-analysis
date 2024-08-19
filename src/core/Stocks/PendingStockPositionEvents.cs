@@ -77,6 +77,24 @@ namespace core.Stocks
         public decimal Price { get; }
     }
 
+    public class PendingStockPositionOrderDetailsAdded : AggregateEvent
+    {
+        public PendingStockPositionOrderDetailsAdded(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string orderType,
+            string orderDuration)
+            : base(id, aggregateId, when)
+        {
+            OrderType = orderType;
+            OrderDuration = orderDuration;
+        }
+        
+        public string OrderType { get; }
+        public string OrderDuration { get; }
+    }
+
     public class PendingStockPositionClosed : AggregateEvent
     {
         public PendingStockPositionClosed(Guid id, Guid aggregateId, DateTimeOffset when, bool purchased, decimal? price)

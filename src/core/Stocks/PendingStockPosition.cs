@@ -80,6 +80,29 @@ namespace core.Stocks
             );
         }
 
+        public void AddOrderDetails(string orderType, string orderDuration)
+        {
+            if (string.IsNullOrWhiteSpace(orderType))
+            {
+                throw new InvalidOperationException("Order type cannot be blank");
+            }
+            
+            if (string.IsNullOrWhiteSpace(orderDuration))
+            {
+                throw new InvalidOperationException("Order duration cannot be blank");
+            }
+            
+            Apply(
+                new PendingStockPositionOrderDetailsAdded(
+                    Guid.NewGuid(),
+                    State.Id,
+                    when : DateTimeOffset.UtcNow,
+                    orderType: orderType,
+                    orderDuration: orderDuration
+                )
+            );
+        }
+
         public void Close(string reason)
         {
             if (State.IsClosed)

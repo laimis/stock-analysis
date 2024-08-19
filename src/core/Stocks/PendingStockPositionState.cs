@@ -25,6 +25,8 @@ namespace core.Stocks
         public string CloseReason { get; private set; }
         public int NumberOfDaysActive => (int)((IsClosed ? Closed.Value : DateTimeOffset.UtcNow) - Created).TotalDays;
         public decimal StopLossAmount => HasStopPrice ? NumberOfShares * (StopPrice.Value - Bid) : 0;
+        public string OrderDuration { get; private set; }
+        public string OrderType { get; private set; }
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 
@@ -66,6 +68,12 @@ namespace core.Stocks
             Strategy = created.Strategy;
             Ticker = new Ticker(created.Ticker);
             UserId = created.UserId;
+        }
+        
+        private void ApplyInternal(PendingStockPositionOrderDetailsAdded details)
+        {
+            OrderType = details.OrderType;
+            OrderDuration = details.OrderDuration;
         }
 
         private void ApplyInternal(PendingStockPositionClosed closed)

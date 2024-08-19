@@ -40,6 +40,8 @@ module CSVExport =
             Purchased:bool
             Strategy:string
             CloseReason:string
+            OrderType:string
+            OrderDuration:string
             Notes:string
         }
         
@@ -178,7 +180,9 @@ module CSVExport =
                     Purchased = p.State.Purchased
                     Strategy = p.State.Strategy
                     Notes = p.State.Notes
-                    CloseReason = p.State.CloseReason 
+                    CloseReason = p.State.CloseReason
+                    OrderDuration = p.State.OrderDuration
+                    OrderType = p.State.OrderType 
                 }
             )
             
