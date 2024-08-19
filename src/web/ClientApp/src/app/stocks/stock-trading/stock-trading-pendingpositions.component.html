@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="px-3 border-left">
                                         <span class="stat-label">Stop: </span> <span
-                                        class="fw-bold">{{ position.stopPrice | currency }}</span>
+                                        class="fw-bold">{{ position.stopPrice | currency }} ({{position.stopLossAmount | currency}}</span>
                                     </div>
                                     <div class="pl-3 border-left">
                                         <span class="stat-label">Strategy: </span><span
@@ -81,7 +81,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
-                    <button type="button" class="btn btn-primary" (click)="confirmClosePosition()">Close Position</button>
+                    <button type="button" class="btn btn-primary" (click)="closeButton.disabled = true; confirmClosePosition()" #closeButton>Close Position</button>
                 </div>
             </div>
         </div>

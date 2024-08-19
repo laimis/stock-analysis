@@ -96,5 +96,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     getPendingPositionExportUrl() {
         return stockPendingPositionExportLink()
     }
+
+    protected readonly close = close;
 }
 

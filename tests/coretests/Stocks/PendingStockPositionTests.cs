@@ -19,6 +19,7 @@ namespace coretests.Stocks
             Assert.Equal(5, pending.State.StopPrice);
             Assert.Equal("alltimehigh", pending.State.Strategy);
             Assert.Equal(TestDataGenerator.AMD, pending.State.Ticker);
+            Assert.Equal(-500, pending.State.StopLossAmount);
             Assert.NotEqual(Guid.Empty, pending.State.UserId);
         }
 

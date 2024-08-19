@@ -19,10 +19,12 @@ namespace core.Stocks
         public DateTimeOffset Created { get; private set; }
         public FSharpOption<DateTimeOffset> Closed { get; private set; }
         public bool IsClosed => FSharpOption<DateTimeOffset>.get_IsSome(Closed);
+        public bool HasStopPrice => FSharpOption<decimal>.get_IsSome(StopPrice);
         public bool IsOpen => !IsClosed;
         public bool Purchased { get; private set; }
         public string CloseReason { get; private set; }
         public int NumberOfDaysActive => (int)((IsClosed ? Closed.Value : DateTimeOffset.UtcNow) - Created).TotalDays;
+        public decimal StopLossAmount => HasStopPrice ? NumberOfShares * (StopPrice.Value - Bid) : 0;
 
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 
