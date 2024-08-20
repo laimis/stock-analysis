@@ -1,11 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core.fs.Accounts;
-using core.fs.Alerts;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using web.Utils;
 
 namespace web.BackgroundServices;
 

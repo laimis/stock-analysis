@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using core.fs;
 using core.fs.Adapters.Authentication;
 using core.fs.Adapters.Brokerage;
@@ -22,10 +21,8 @@ using Microsoft.FSharp.Core;
 using secedgar;
 using securityutils;
 using storage.shared;
-using web.Utils;
-using MonitoringServices = core.fs.Portfolio.MonitoringServices;
 
-namespace web
+namespace web.Utils
 {
     public static class DIHelper
     {
