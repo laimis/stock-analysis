@@ -6,6 +6,7 @@ open Microsoft.Extensions.Logging
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Storage
 open web
+open web.Utils
 
 type EnvironmentContext(host:IHost, logger, commandLine) =
     member this.GetArgumentValue switch =
