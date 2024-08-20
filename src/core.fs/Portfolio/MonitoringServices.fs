@@ -11,17 +11,19 @@ open core.fs.Stocks
 type ThirtyDaySellService(
     accounts: IAccountStorage,
     emails: IEmailService,
-    portfolio: IPortfolioStorage) =
+    portfolio: IPortfolioStorage,
+    logger: ILogger) =
 
     interface IApplicationService
 
-    member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
+    member _.Execute() = task {
+        
+        logger.LogInformation("RUNNING THE GOOD STUFF")
         
         let! pairs = accounts.GetUserEmailIdPairs()
         
         let! _ =
             pairs
-            |> Seq.takeWhile (fun _ -> cancellationToken.IsCancellationRequested |> not)
             |> Seq.map (fun pair -> async {
                 let! user = pair.Id |> accounts.GetUser |> Async.AwaitTask
                 match user with
@@ -59,5 +61,3 @@ type ThirtyDaySellService(
         
         return ()
     }
-    
-    member _.NextRun (now:DateTimeOffset) = now.AddHours(24.0)

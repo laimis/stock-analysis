@@ -1,7 +1,6 @@
 module core.fs.Brokerage.MonitoringServices
 
 open System
-open System.Threading
 open System.Threading.Tasks
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
@@ -11,17 +10,17 @@ open core.fs.Adapters.Storage
 type AccountMonitoringService(
     accounts:IAccountStorage,
     brokerage:IBrokerage,
-    marketHours:IMarketHours) =
+    marketHours:IMarketHours,
+    logger:ILogger) =
     
     interface core.fs.IApplicationService
     
-    member _.Execute (logger:ILogger) (cancellationToken:CancellationToken) = task {
+    member _.Execute() = task {
         
         let! pairs = accounts.GetUserEmailIdPairs()
         
         let! users =
             pairs
-            |> Seq.takeWhile (fun _ -> not cancellationToken.IsCancellationRequested)
             |> Seq.map (fun pair -> pair.Id |> accounts.GetUser |> Async.AwaitTask)
             |> Async.Sequential
             
@@ -32,7 +31,6 @@ type AccountMonitoringService(
             
         let! _ =
             connectedUsers
-            |> Seq.takeWhile (fun _ -> not cancellationToken.IsCancellationRequested)
             |> Seq.map (fun user -> async {
                     
                 let! account = brokerage.GetAccount user.State |> Async.AwaitTask
@@ -58,11 +56,3 @@ type AccountMonitoringService(
             
         return Task.CompletedTask
     }
-    
-    member _.NextRun now =
-        // we always want to run after market closes
-        let nowInMarketTime = marketHours.ToMarketTime now
-        let nextRun =
-            nowInMarketTime.Date.AddDays(1.0).AddHours(16)
-            |> marketHours.ToUniversalTime
-        nextRun

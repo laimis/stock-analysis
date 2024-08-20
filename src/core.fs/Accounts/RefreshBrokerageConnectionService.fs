@@ -7,9 +7,9 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
     
-type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBrokerage) =
+type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBrokerage,logger:ILogger) =
     
-    let runBrokerageCheck (logger:ILogger) (cancellationToken:CancellationToken) userId = task {
+    let runBrokerageCheck userId = task {
         
         let! user = accounts.GetUser userId
         match user with
@@ -40,18 +40,16 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
     
     interface IApplicationService
     
-    member _.Execute (logger:ILogger) cancellationToken = task {
+    member _.Execute() = task {
             
         let! users = accounts.GetUserEmailIdPairs()
         
         let! _ =
             users
             |> Seq.map (fun emailIdPair ->
-                runBrokerageCheck logger cancellationToken emailIdPair.Id |> Async.AwaitTask)
+                runBrokerageCheck emailIdPair.Id |> Async.AwaitTask)
             |> Async.Sequential
             |> Async.StartAsTask
             
         ()
     }
-    
-    member _.NextRunTime (now:DateTimeOffset) = now.AddHours(12.0)

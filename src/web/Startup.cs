@@ -9,6 +9,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json.Serialization;
+using System.Threading;
+using core.fs.Portfolio;
+using Hangfire;
+using Hangfire.PostgreSql;
 using web.Utils;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.StaticFiles;
@@ -33,6 +37,13 @@ namespace web
         public void ConfigureServices(IServiceCollection services)
         {
             AuthHelper.Configure(Configuration, services, Configuration.GetValue<string>("ADMINEmail"));
+            
+            services.AddHangfire(config =>
+            {
+                Console.WriteLine("what is this");
+                config.UseDashboardMetrics();
+            });
+            services.AddHangfireServer();
 
             services
                 .AddControllers(
@@ -70,7 +81,7 @@ namespace web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -124,6 +135,79 @@ namespace web
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            app.UseHangfireDashboard();
+
+            var configuration = app.ApplicationServices.GetService<IConfiguration>();
+            
+            var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
+            if (backendJobsSwitch != "off")
+            {
+                logger.LogInformation("Backend jobs turned on");
+                
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
+                var rjo = new RecurringJobOptions
+                {
+                    TimeZone = tz
+                };
+
+                RecurringJob.AddOrUpdate<MonitoringServices.ThirtyDaySellService>(
+                    recurringJobId: nameof(MonitoringServices.ThirtyDaySellService),
+                    methodCall: service => service.Execute(),
+                    cronExpression: Cron.Daily(9, 0),
+                    options: rjo
+                );
+                
+                RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
+                    recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PatternMonitoringService),
+                    methodCall: service => service.Execute(),
+                    cronExpression: "45 6-13 * * 1-5"
+                );
+                
+                RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.StopLossMonitoringService>(
+                    recurringJobId: nameof(core.fs.Alerts.MonitoringServices.StopLossMonitoringService),
+                    methodCall: service => service.Execute(),
+                    cronExpression: "*/5 6-13 * * 1-5",
+                    options: rjo
+                );
+                
+                RecurringJob.AddOrUpdate<core.fs.Brokerage.MonitoringServices.AccountMonitoringService>(
+                    recurringJobId: nameof(core.fs.Brokerage.MonitoringServices.AccountMonitoringService),
+                    methodCall: service => service.Execute(),
+                    cronExpression: "0 15 * * *",
+                    options: rjo
+                );
+                
+                RecurringJob.AddOrUpdate<core.fs.Accounts.RefreshBrokerageConnectionService>(
+                    recurringJobId: nameof(core.fs.Accounts.RefreshConnection),
+                    methodCall: service => service.Execute(),
+                    cronExpression: "0 20 * * *",
+                    options: rjo
+                );
+                
+                var multipleExpressions = new[] { "50 6 * * 1-5", "20 14 * * 1-5" };
+                
+                foreach (var exp in multipleExpressions)
+                {
+                    RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.AlertEmailService>(
+                        recurringJobId: nameof(core.fs.Alerts.MonitoringServices.AlertEmailService),
+                        methodCall: service => service.Execute(),
+                        cronExpression: exp,
+                        options: rjo
+                    );
+                }
+                
+                RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.WeeklyMonitoringService>(
+                    recurringJobId: nameof(core.fs.Alerts.MonitoringServices.WeeklyMonitoringService),
+                    methodCall: service => service.Execute(false),
+                    cronExpression: "0 10 * * 6",
+                    options: rjo
+                );
+            }
+            else
+            {
+                logger.LogInformation("Backend jobs turned off");
+            }
         }
     }
 }

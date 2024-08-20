@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Adapters.Logging;
 using core.fs.Alerts;
@@ -55,25 +53,22 @@ namespace web.Controllers
         [Authorize("admin")]
         public Task TriggerWeekly(
             [FromServices] ILogger logger,
-            [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts) => weeklyAlerts.Execute(true, logger, CancellationToken.None);
+            [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts) => weeklyAlerts.Execute(true);
         
         [HttpGet("triggerDaily")]
         [Authorize("admin")]
-        public Task TriggerDaily(
-            [FromServices] ILogger logger,
-            [FromServices] MonitoringServices.PatternMonitoringService dailyAlerts)
+        public Task TriggerDaily([FromServices] MonitoringServices.PatternMonitoringService dailyAlerts)
         {
-            dailyAlerts.Execute(logger, CancellationToken.None);
+            dailyAlerts.Execute();
             return Task.CompletedTask;
         }
         
         [HttpGet("triggerEmail")]
         [Authorize("admin")]
         public Task TriggerEmail(
-            [FromServices] ILogger logger,
             [FromServices] MonitoringServices.AlertEmailService emailAlerts)
         {
-            emailAlerts.Execute(logger, CancellationToken.None);
+            emailAlerts.Execute();
             return Task.CompletedTask;
         }
     }
