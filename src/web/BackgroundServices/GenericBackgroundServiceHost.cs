@@ -1,11 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using core.fs.Accounts;
-using core.fs.Alerts;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using web.Utils;
 
 namespace web.BackgroundServices;
 
@@ -55,96 +51,4 @@ public abstract class GenericBackgroundServiceHost(core.fs.Adapters.Logging.ILog
     }
 
     protected abstract Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken);
-}
-
-public class StopLossServiceHost(
-    ILogger<StopLossServiceHost> logger,
-    MonitoringServices.StopLossMonitoringService stopLossMonitoringService)
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => stopLossMonitoringService.NextRunTime(now);
-
-    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => await stopLossMonitoringService.Execute(logger, stoppingToken);
-}
-
-public class PatternMonitoringServiceHost(
-    ILogger<PatternMonitoringServiceHost> logger,
-    MonitoringServices.PatternMonitoringService patternMonitoringService)
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => patternMonitoringService.NextRunTime(now);
-
-    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => patternMonitoringService.Execute(logger, stoppingToken);
-}
-
-public class WeeklyUpsideReversalServiceHost(
-    ILogger<MonitoringServices.WeeklyMonitoringService> logger,
-    MonitoringServices.WeeklyMonitoringService service)
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
-
-    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => await service.Execute(false, logger, stoppingToken);
-}
-
-public class BrokerageServiceHost(ILogger<BrokerageServiceHost> logger, RefreshBrokerageConnectionService service)
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
-
-    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
-}
-
-public class AlertEmailServiceHost(ILogger<AlertEmailServiceHost> logger, MonitoringServices.AlertEmailService service)
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    private bool _firstRun = true;
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRunTime(now);
-
-    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken)
-    {
-        if (_firstRun)
-        {
-            _firstRun = false;
-            logger.LogInformation("First run for alert emailing, sleeping for 5 minutes");
-            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
-        }
-        
-        await service.Execute(logger, stoppingToken);
-    }
-}
-
-public class ThirtyDaySellServiceHost(
-    ILogger<core.fs.Portfolio.MonitoringServices.ThirtyDaySellService> logger,
-    core.fs.Portfolio.MonitoringServices.ThirtyDaySellService service) 
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) => service.NextRun(now);
-    
-    protected override Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken) => service.Execute(logger, stoppingToken);
-}
-
-public class BrokerageAccountServiceHost(
-    ILogger<core.fs.Brokerage.MonitoringServices.AccountMonitoringService> logger,
-    core.fs.Brokerage.MonitoringServices.AccountMonitoringService service)
-    : GenericBackgroundServiceHost(new WrappingLogger(logger))
-{
-    private bool _failed;
-
-    protected override DateTimeOffset GetNextRunDateTime(DateTimeOffset now) =>
-        _failed ? now.AddMinutes(1) : service.NextRun(now);
-
-    protected override async Task Loop(core.fs.Adapters.Logging.ILogger logger, CancellationToken stoppingToken)
-    {
-        try
-        {
-            await service.Execute(logger, stoppingToken);
-            _failed = false;
-        }
-        catch (Exception e)
-        {
-            logger.LogError($"Brokerage account sync failed: {e}");
-            _failed = true;
-        }
-    }
 }

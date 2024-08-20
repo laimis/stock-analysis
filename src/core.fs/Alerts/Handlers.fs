@@ -72,8 +72,6 @@ namespace core.fs.Alerts
         }
         
         member this.Handle (_:RunEmailJob) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
-            do! alertEmailService.Execute logger CancellationToken.None |> Async.AwaitTask
+            do! alertEmailService.Execute() |> Async.AwaitTask
             return Ok ()
         }
-            
-            

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json.Serialization;
+using Hangfire;
 using web.Utils;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.StaticFiles;
@@ -33,6 +34,13 @@ namespace web
         public void ConfigureServices(IServiceCollection services)
         {
             AuthHelper.Configure(Configuration, services, Configuration.GetValue<string>("ADMINEmail"));
+            
+            services.AddHangfire(config =>
+            {
+                Console.WriteLine("what is this");
+                config.UseDashboardMetrics();
+            });
+            services.AddHangfireServer();
 
             services
                 .AddControllers(
@@ -70,7 +78,7 @@ namespace web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -124,6 +132,10 @@ namespace web
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            app.UseHangfireDashboard();
+
+            Jobs.ConfigureJobs(app, logger);
         }
     }
 }

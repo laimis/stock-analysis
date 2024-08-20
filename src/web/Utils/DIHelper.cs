@@ -12,6 +12,8 @@ using core.fs.Adapters.Subscriptions;
 using core.fs.Alerts;
 using core.Shared;
 using csvparser;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,10 +21,8 @@ using Microsoft.FSharp.Core;
 using secedgar;
 using securityutils;
 using storage.shared;
-using web.BackgroundServices;
-using web.Utils;
 
-namespace web
+namespace web.Utils
 {
     public static class DIHelper
     {
@@ -112,23 +112,6 @@ namespace web
             }
             
             StorageRegistrations(configuration, services, logger);
-            
-            var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
-            if (backendJobsSwitch != "off")
-            {
-                logger.LogInformation("Backend jobs turned on");
-                services.AddHostedService<ThirtyDaySellServiceHost>();
-                services.AddHostedService<PatternMonitoringServiceHost>();
-                services.AddHostedService<WeeklyUpsideReversalServiceHost>();
-                services.AddHostedService<StopLossServiceHost>();
-                services.AddHostedService<BrokerageServiceHost>();
-                services.AddHostedService<BrokerageAccountServiceHost>();
-                services.AddHostedService<AlertEmailServiceHost>();
-            }
-            else
-            {
-                logger.LogInformation("Backend jobs turned off");
-            }
         }
 
         private static void StorageRegistrations(IConfiguration configuration, IServiceCollection services, ILogger logger)
@@ -178,6 +161,7 @@ namespace web
             services.AddSingleton<IAccountStorage>(s => new storage.postgres.AccountStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IBlobStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IAggregateStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
+            GlobalConfiguration.Configuration.UsePostgreSqlStorage(opt => opt.UseNpgsqlConnection(cnn));
         }
     }
 }
