@@ -158,8 +158,10 @@ type PortfolioAnalysisService(
                     |> List.truncate 10
                     |> List.map (fun (days, profit) -> {| days = days; profit = profit |})
                     
-                let maxProfit = profitsByPeriod |> List.maxBy snd |> snd
+                let maxProfitEntry = profitsByPeriod |> List.maxBy snd
                 
+                let maxProfit = maxProfitEntry |> snd
+                let maxProfitDays = maxProfitEntry |> fst
                 let profitData =
                     profitsByPeriod
                     |> List.map (fun (days, profit) ->
@@ -174,11 +176,11 @@ type PortfolioAnalysisService(
                 let recipient = Recipient(email = user.State.Email, name = "")
                 do! emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.MaxProfits payload |> Async.AwaitTask
                 
-                logger.LogInformation($"Max profit for {user.State.Email} is {maxProfit}")
+                logger.LogInformation($"Max profit for {user.State.Email} is {maxProfit} when held for {maxProfitDays} days")
                 ()
                 
             })
-            |> Async.Parallel
+            |> Async.Sequential
         
         return ()
     }
