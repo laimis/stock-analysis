@@ -223,8 +223,7 @@ type OptionDescriptor = {
     rho: decimal
     openInterest: int64
     timeValue: decimal
-    expirationDate: int64
-    ExpirationDate: DateTimeOffset
+    expirationDate: string
     daysToExpiration: int
     percentChange: decimal
     markChange: decimal
@@ -961,13 +960,18 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         map
                         |> Seq.collect (fun (KeyValue(_, v)) -> v.Values |> Seq.collect id)
                         |> Seq.map (fun d ->
+                            let expirationDate =
+                                match DateTimeOffset.TryParse(d.expirationDate) with
+                                | false, _ -> failwith $"Could not parse expiration date: {d.expirationDate}"
+                                | true, dt -> dt |> Some
+                            
                             let detail = core.fs.Adapters.Options.OptionDetail(d.symbol.Value, d.putCall.Value.ToLower(), d.description.Value)
                             detail.Ask <- d.ask
                             detail.Bid <- d.bid
                             detail.StrikePrice <- d.strikePrice
                             detail.Volume <- d.totalVolume
                             detail.OpenInterest <- d.openInterest
-                            detail.ParsedExpirationDate <- d.ExpirationDate |> Some
+                            detail.ParsedExpirationDate <- expirationDate
                             detail.DaysToExpiration <- d.daysToExpiration
                             detail.Delta <- d.delta
                             detail.Gamma <- d.gamma
