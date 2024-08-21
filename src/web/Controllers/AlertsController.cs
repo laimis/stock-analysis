@@ -71,5 +71,11 @@ namespace web.Controllers
             emailAlerts.Execute();
             return Task.CompletedTask;
         }
+        
+        [HttpGet("triggerDayAnalysis")]
+        [Authorize("admin")]
+        public Task TriggerDayAnalysis(
+            [FromServices] core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService portfolioAnalysis) =>
+                portfolioAnalysis.ReportOnMaxProfitBasedOnDaysHeld();
     }
 }
