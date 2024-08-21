@@ -75,7 +75,10 @@ type PortfolioAnalysisService(
             
         let usersWithBrokerageConnection = users |> Seq.choose id |> Seq.filter (_.State.ConnectedToBrokerage)
         
+        // positions of interest
         let numberOfPositions = 40
+        let topDaysOfInterest = 10
+        let maxNumberOfDays = 60
         
         let! _ =
             usersWithBrokerageConnection
@@ -92,14 +95,17 @@ type PortfolioAnalysisService(
                     lastNPositionsClosed
                     |> Seq.map (fun p -> async {
                         let start = Some p.Opened
-                        let end' = Some (p.Closed.Value.Add(TimeSpan.FromDays(60.0)))
+                        let end' = Some (p.Closed.Value.Add(TimeSpan.FromDays(maxNumberOfDays)))
                         
-                        logger.LogInformation($"Getting price history for {p.Ticker} from {start.Value} to {end'.Value}")
-                        
-                        let! priceBars = brokerage.GetPriceHistory user.State p.Ticker PriceFrequency.Daily (Some p.Opened) (Some (p.Closed.Value.Add(TimeSpan.FromDays(60.0)))) |> Async.AwaitTask
+                        let! priceBars = brokerage.GetPriceHistory user.State p.Ticker PriceFrequency.Daily start end' |> Async.AwaitTask
                         return (p, priceBars)
                     })
                     |> Async.Sequential
+                    
+                // for the actual positions held, get the average days held and the total profit
+                let actualPositionsWithCalculations = lastNPositionsClosed |> Seq.map StockPositionWithCalculations
+                let actualProfit = Math.Round(actualPositionsWithCalculations |> Seq.sumBy (_.Profit),2)
+                let actualDaysHeld = actualPositionsWithCalculations |> Seq.averageBy (fun p -> p.DaysHeld |> decimal) |> int
                     
                 let positionsWithPrices =
                     positionsAndPriceBarResults
@@ -111,7 +117,7 @@ type PortfolioAnalysisService(
                     
                 // for each of those position/prices combination, run the analysis
                 // what would the profits be from holding for 1 day, 2 days, 3 days, etc.
-                let holdPeriods = [ 1 .. 60 ]
+                let holdPeriods = [ 1 .. maxNumberOfDays ]
                 
                 let profitsByPeriod =
                     holdPeriods
@@ -146,16 +152,11 @@ type PortfolioAnalysisService(
                             
                         (days, profitForHoldingDay)
                     )
-                    
-                // find the max profit and the day it was held
-                profitsByPeriod |> List.sortByDescending snd |> List.iter (fun (days, profit) ->
-                    logger.LogInformation($"Max profit for {user.State.Email} is {profit} when held for {days} days")
-                )
-                
+                 
                 let sortedProfitData =
                     profitsByPeriod
                     |> List.sortByDescending snd
-                    |> List.truncate 10
+                    |> List.truncate topDaysOfInterest
                     |> List.map (fun (days, profit) -> {| days = days; profit = profit |})
                     
                 let maxProfitEntry = profitsByPeriod |> List.maxBy snd
@@ -168,9 +169,12 @@ type PortfolioAnalysisService(
                         let percentage = Math.Round((profit / maxProfit) * 100m, 0)
                         {| days = days; profit = profit; percentage = percentage |}
                     )
+                    
+                let actualProfitPercentOfMax = Math.Round((actualProfit / maxProfit) * 100m, 0)
+                let actualData = {| profit = actualProfit; days = actualDaysHeld; percentage = actualProfitPercentOfMax; numberOfPositions = numberOfPositions |}
                 
                 let payload =
-                    {| sortedProfitData = sortedProfitData; profitData = profitData |}
+                    {| sortedProfitData = sortedProfitData; profitData = profitData; actualData = actualData |}
 
                 // // email the user with the max profit and the day it was held
                 let recipient = Recipient(email = user.State.Email, name = "")
