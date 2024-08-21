@@ -20,7 +20,8 @@
                     <th>Type</th>
                     <th>Quantity</th>
                     <th class="text-end">Price</th>
-                    <th>Time</th>
+                    <th>Entered</th>
+                    <th>Executed</th>
                     <th class="text-end">Actions</th>
                 </tr>
                 </thead>
@@ -51,6 +52,7 @@
                                 </td>
                                 <td>{{ p.quantity }}</td>
                                 <td class="text-end">{{ p.price === 0 ? 'MARKET' : (p.price | currency) }}</td>
+                                <td>{{ p.enteredTime | date: 'short' }}</td>
                                 <td>{{ p.executionTime | date: 'short' }}</td>
                                 <td class="text-end">
                                     @if (p.canBeCancelled) {

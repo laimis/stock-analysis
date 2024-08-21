@@ -1014,6 +1014,7 @@ export interface BrokerageOrder {
     ticker: string
     description: string
     executionTime: string
+    enteredTime: string
     canBeCancelled: boolean
     canBeRecorded: boolean
     isActive: boolean
