@@ -251,23 +251,13 @@ module CSVExport =
             |> Seq.collect (fun o -> o.ShareTransactions |> Seq.map (fun e -> (o, e)))
             |> Seq.sortBy (fun (_, e) -> e.Date)
             |> Seq.map (fun (o, e) ->
-                match e.Type with
-                | Buy -> 
-                    {
-                        Ticker = o.Ticker.Value
-                        Type = "buy"
-                        Amount = e.NumberOfShares
-                        Price = e.Price
-                        Date = e.Date |> date
-                    }
-                | Sell ->
-                    {
-                        Ticker = o.Ticker.Value
-                        Type = "sell"
-                        Amount = e.NumberOfShares
-                        Price = e.Price
-                        Date = e.Date |> date
-                    }
+                {
+                    Ticker = o.Ticker.Value
+                    Type = e.Type.ToString().ToLower()
+                    Amount = e.NumberOfShares
+                    Price = e.Price
+                    Date = e.Date |> date
+                }
             )
             |> Seq.filter (fun r -> r.Ticker <> "")
             
