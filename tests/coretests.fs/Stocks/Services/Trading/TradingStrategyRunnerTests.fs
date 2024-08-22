@@ -68,8 +68,8 @@ let ``Basic test``() = task {
     position.Profit |> should equal 1005
     position.GainPct |> should equal 1.005m
     position.RR |> should equal 2.01m
-    maxDrawdown |> should equal -0.001m
-    maxGain |> should equal 1.501m
+    maxDrawdown |> should equal 0m
+    maxGain |> should equal 1.5m
     position.DaysHeld |> should equal 15
 
     let oneThirdPercentBased = results.Results[1]
@@ -81,8 +81,8 @@ let ``Basic test``() = task {
     position.Profit |> should equal 137.3m
     position.GainPct |> should equal 0.1373m
     position.RR |> should equal 0.2746m
-    maxDrawdown |> should equal -0.001m
-    maxGain |> should equal 0.201m
+    maxDrawdown |> should equal 0m
+    maxGain |> should equal 0.2m
     position.DaysHeld |> should equal 2
 }
 
@@ -107,8 +107,8 @@ let ``With portion size too small, still sells at RR levels``() =
     position.Profit |> should equal 15
     position.GainPct |> should equal 0.75m
     position.RR |> should equal 1.5m
-    maxDrawdown |> should equal -0.001m
-    maxGain |> should equal 1.001m
+    maxDrawdown |> should equal 0m
+    maxGain |> should equal 1m
     position.DaysHeld |> should equal 10
 
 [<Fact>]
@@ -153,8 +153,8 @@ let ``With price falling, stop price exit executes``() =
     position.GainPct |> should equal -0.1m
     position.RR |> should equal -1m
     position.DaysHeld |> should equal 5
-    maxGain |> should equal 0.0002m
-    maxDrawdown |> should equal -0.1002m
+    maxGain |> should equal 0m
+    maxDrawdown |> should equal -0.1m
     
 [<Fact>]
 let ``With price falling, short position simulates profit taking``() =
@@ -202,5 +202,5 @@ let ``Close after fixed number of days, works``() =
     position.GainPct |> should equal 0.12m
     position.RR |> should equal 1.2m
     position.DaysHeld |> should equal 6
-    maxGain |> should equal 0.1202m
-    maxDrawdown |> should equal -0.0002m
+    maxGain |> should equal 0.12m
+    maxDrawdown |> should equal -0m
