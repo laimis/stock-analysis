@@ -257,17 +257,73 @@ module TradingStrategyFactory =
         let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days", exitCondition)
         
+    let createCloseAfterFixedNumberOfDaysWithStop (numberOfDays:int) (stopDescription:string) (stopPrice:decimal) : ITradingStrategy =
+        let daysHeldReached = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
+        let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
+            match context.Position.StockPositionType with
+            | Short -> bar.Close > stopPrice
+            | Long -> bar.Close < stopPrice
+        let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> daysHeldReached context bar || stopReached context bar
+        TradingStrategyCloseOnCondition($"Close after {numberOfDays} days with {stopDescription} stop", exitCondition)
+        
+    let createTrailingStop (stopDescription:string) (trailingPercentage:decimal) : ITradingStrategy =
+        let latestStop = ref 0m
+        let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
+            let stopReached =
+                match context.Position.StockPositionType with
+                | Short -> bar.Close > latestStop.Value
+                | Long -> bar.Close < latestStop.Value
+            
+            match stopReached with
+            | true -> true
+            | false ->
+                
+                match context.Position.StockPositionType with
+                | Short ->
+                    let newStopPriceCandidate = bar.Close * (1m + trailingPercentage)
+                    latestStop.Value <- Math.Min(latestStop.Value,newStopPriceCandidate)
+                | Long ->
+                    let newStopPriceCandidate = bar.Close * (1m - trailingPercentage)
+                    latestStop.Value <- Math.Max(latestStop.Value,newStopPriceCandidate)
+                
+                false
+                
+        TradingStrategyCloseOnCondition($"Trailing stop with {stopDescription}", stopReached)
+        
     let createLastSellStrategy (position:StockPositionState) : ITradingStrategy =
         let exitCondition = fun (_:SimulationContext) (bar:PriceBar) -> position.Closed.IsSome && bar.Date.Date = position.Closed.Value.Date
         TradingStrategyCloseOnCondition("Close last sell", exitCondition)
     
     let getStrategies (actualTrade:StockPositionState option) : ITradingStrategy seq =
+        let firstStop (position:StockPositionState) =
+            let defaultStop =
+                match position.StockPositionType with
+                | Short -> Decimal.MaxValue
+                | Long -> 0m
+            position |> StockPositionWithCalculations |> _.FirstStop() |> Option.defaultValue defaultStop
+            
+        let percentStopBasedOnCostPerShare (percentage:decimal) (position:StockPositionState) =
+            let costPerShare = position |> StockPositionWithCalculations |> _.CompletedPositionCostPerShare
+            let multiplier =
+                match position.StockPositionType with
+                | Short -> 1m + percentage
+                | Long -> 1m - percentage
+            costPerShare * multiplier
+            
         [
             createProfitPointsTrade 3 // 3 profit points
             createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
             createCloseAfterFixedNumberOfDays 15
             createCloseAfterFixedNumberOfDays 30
-            if actualTrade.IsSome then createLastSellStrategy actualTrade.Value
+            createTrailingStop "5%" 0.05m
+            createTrailingStop "10%" 0.10m
+            createTrailingStop "20%" 0.20m
+            if actualTrade.IsSome then
+                createLastSellStrategy actualTrade.Value
+                createCloseAfterFixedNumberOfDaysWithStop 30 "size based" (actualTrade.Value |> firstStop)
+                createCloseAfterFixedNumberOfDaysWithStop 30 "5% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
+                createCloseAfterFixedNumberOfDaysWithStop 30 "10% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
+                createCloseAfterFixedNumberOfDaysWithStop 30 "20% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
         ]
     
 type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours) =
