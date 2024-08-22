@@ -13,6 +13,7 @@
         <th (click)="sort('profitRatio')" class="sort-header">Profit Ratio</th>
         <th (click)="sort('returnPctRatio')" class="sort-header">Pct Ratio</th>
         <th (click)="sort('rrRatio')" class="sort-header">R/R Ratio</th>
+        <th (click)="sort('averageDaysHeld')" class="sort-header">Avg Days Held</th>
         <th (click)="sort('numberOfTrades')" class="sort-header">Trades</th>
     </tr>
     </thead>
@@ -31,6 +32,9 @@
                 <td>{{ r.performance.profitRatio | number:'1.0-2' }}</td>
                 <td>{{ r.performance.returnPctRatio | number:'1.0-2' }}</td>
                 <td>{{ r.performance.rrRatio | number:'1.0-2' }}</td>
+                <td>{{ r.performance.averageDaysHeld | number:'1.0-0' }} 
+                    <span class="small" style="white-space: pre">( {{ r.performance.winAvgDaysHeld | number:'1.0-0' }} / {{ r.performance.lossAvgDaysHeld | number:'1.0-0' }} )</span>
+                </td>
                 <td>{{ r.performance.numberOfTrades }}</td>
             </tr>
         }

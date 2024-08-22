@@ -953,7 +953,7 @@ export interface StockTradingPerformance {
     profit: number,
     profitRatio: number,
     returnPctRatio: number,
-    avgDaysHeld: number,
+    averageDaysHeld: number,
     avgWinAmount: number,
     maxWinAmount: number,
     winAvgRR: number,

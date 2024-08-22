@@ -745,7 +745,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         return
             results
             |> Result.map(fun results ->
-                let content = CSVExport.strategyPerformance csvWriter results
+                let content = CSVExport.strategyPerformance CultureUtils.DefaultCulture csvWriter results
                 let filename = CSVExport.generateFilename $"simulated-trades-{command.NumberOfTrades}"
                 ExportResponse(filename, content)
             ) 

@@ -91,7 +91,8 @@ module CSVExport =
     
     type TradesRecord =
         {
-            Symbol:string
+            StrategyName:string
+            Ticker:string
             PositionType:string
             NumberOfShares:string
             Opened:string
@@ -99,6 +100,8 @@ module CSVExport =
             DaysHeld:int
             AverageCostPerShare:string
             LastSellCostPerShare:string
+            AverageBuyCostPerShare:string
+            AverageSaleCostPerShare:string
             StopPrice:string
             Cost:string
             Profit:string
@@ -123,44 +126,38 @@ module CSVExport =
             Ticker:string
         }
         
-    type TradingStrategyResultRecord =
+    let private mapToTradeRecord culture strategyName (t:StockPositionWithCalculations) =
         {
-            StrategyName:string
-            Ticker:string
-            Profit:decimal
-            RR:decimal
-            ReturnPct:decimal
-            NumberOfShares:decimal
-            Cost:decimal
-            AverageBuyCostPerShare:decimal
-            AverageSaleCostPerShare:decimal
-            Opened:string
-            Closed:string
-            DaysHeld:int
+            StrategyName = strategyName
+            Ticker = t.Ticker.Value
+            PositionType = t.StockPositionType
+            NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> number culture
+            Opened = t.Opened |> date
+            Closed = t.Closed |> dateOption
+            DaysHeld = t.DaysHeld
+            AverageBuyCostPerShare = t.AverageBuyCostPerShare |> currency culture
+            AverageSaleCostPerShare = t.AverageSaleCostPerShare |> currency culture 
+            AverageCostPerShare = t.CompletedPositionCostPerShare |> currency culture
+            LastSellCostPerShare = t.ClosePrice |> currencyOption culture
+            StopPrice = t.StopPrice  |> currencyOption culture
+            Cost = t.Cost |> currency culture
+            Profit = t.Profit |> currency culture
+            ReturnPct = t.GainPct |> percent culture
+            RR = t.RR |> number culture
+            InitialRiskedAmount = t.InitialRiskedAmount |> currencyOption culture
+            RiskAmount = t.RiskedAmount |> currencyOption culture
+            Strategy= match t.TryGetLabelValue("strategy") with | true, v -> v | _ -> ""
+            Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
+            GradeNote = (if t.GradeNote.IsSome then t.GradeNote.Value else "")
         }
         
-    let strategyPerformance (writer:ICSVWriter) (strategies:seq<TradingStrategyPerformance>) =
+    let strategyPerformance (culture:IFormatProvider) (writer:ICSVWriter) (strategies:seq<TradingStrategyPerformance>) =
         
         let rows =
             strategies
             |> Seq.collect (fun strategy -> 
                 strategy.positions
-                |> Seq.map (fun r ->
-                    {
-                        StrategyName = strategy.strategyName
-                        Ticker = r.Ticker.Value
-                        Profit = Math.Round(r.Profit, 2)
-                        RR = Math.Round(r.RR, 2)
-                        ReturnPct = Math.Round(r.GainPct, 2) * 100m
-                        NumberOfShares = r.CompletedPositionShares
-                        Cost = r.CompletedPositionShares * r.CompletedPositionCostPerShare
-                        AverageBuyCostPerShare = r.CompletedPositionCostPerShare
-                        AverageSaleCostPerShare = r.AverageSaleCostPerShare
-                        Opened = r.Opened |> date
-                        Closed = r.Closed |> dateOption
-                        DaysHeld = r.DaysHeld
-                    }
-                )
+                |> Seq.map (mapToTradeRecord culture strategy.strategyName)
             )
             
         writer.Generate(rows)
@@ -199,28 +196,7 @@ module CSVExport =
         
         let rows =
             trades
-            |> Seq.map (fun t ->
-                {
-                    Symbol = t.Ticker.Value
-                    PositionType = t.StockPositionType
-                    NumberOfShares = (if t.IsClosed then t.CompletedPositionShares else t.NumberOfShares) |> number culture
-                    Opened = t.Opened |> date
-                    Closed = t.Closed |> dateOption
-                    DaysHeld = t.DaysHeld
-                    AverageCostPerShare = t.CompletedPositionCostPerShare |> currency culture
-                    LastSellCostPerShare = t.ClosePrice |> currencyOption culture
-                    StopPrice = t.StopPrice  |> currencyOption culture
-                    Cost = t.Cost |> currency culture
-                    Profit = t.Profit |> currency culture
-                    ReturnPct = t.GainPct |> percent culture
-                    RR = t.RR |> number culture
-                    InitialRiskedAmount = t.InitialRiskedAmount |> currencyOption culture
-                    RiskAmount = t.RiskedAmount |> currencyOption culture
-                    Strategy= match t.TryGetLabelValue("strategy") with | true, v -> v | _ -> ""
-                    Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
-                    GradeNote = (if t.GradeNote.IsSome then t.GradeNote.Value else "")
-                }
-            )
+            |> Seq.map (mapToTradeRecord culture "Actual Trade")
             
         writer.Generate(rows)
         

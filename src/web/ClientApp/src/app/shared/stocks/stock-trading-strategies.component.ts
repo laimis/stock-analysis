@@ -53,4 +53,5 @@ export class StockTradingStrategiesComponent {
         })
     }
 
+    protected readonly Number = Number;
 }
