@@ -968,10 +968,11 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         match stock with
         | None -> return "Stock position not found" |> ServiceError |> Error
         | Some existing ->
+            
             do!
                 existing
                 |> StockPosition.setStop cmd.StopPrice DateTimeOffset.UtcNow
-                |> StockPosition.addNotes (("Change stop: " + cmd.Reason) |> Some) DateTimeOffset.UtcNow
+                |> StockPosition.addNotes ($"Change stop: {cmd.StopPrice.Value} - {cmd.Reason}" |> Some) DateTimeOffset.UtcNow
                 |> storage.SaveStockPosition userId stock
                 
             return Ok ()
