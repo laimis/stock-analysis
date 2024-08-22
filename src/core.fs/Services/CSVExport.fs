@@ -146,9 +146,9 @@ module CSVExport =
             RR = t.RR |> number culture
             InitialRiskedAmount = t.InitialRiskedAmount |> currencyOption culture
             RiskAmount = t.RiskedAmount |> currencyOption culture
-            Strategy= match t.TryGetLabelValue("strategy") with | true, v -> v | _ -> ""
+            Strategy = t.TryGetLabelValue("strategy") |> Option.defaultValue ""
             Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
-            GradeNote = (if t.GradeNote.IsSome then t.GradeNote.Value else "")
+            GradeNote = t.GradeNote |> Option.defaultValue ""
         }
         
     let strategyPerformance (culture:IFormatProvider) (writer:ICSVWriter) (strategies:seq<TradingStrategyPerformance>) =

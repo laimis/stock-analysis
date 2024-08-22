@@ -88,6 +88,12 @@ type StockPositionState =
         
     member this.HasLabel key value =
         this.Labels.ContainsKey(key) && this.Labels[key] = value
+        
+    member this.TryGetLabelValue key =
+        match this.Labels.ContainsKey(key) with
+        | true -> Some this.Labels[key]
+        | false -> None
+    
     member this.AggregateId = this.PositionId |> StockPositionId.guid
         
     interface IAggregate with
@@ -661,7 +667,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.ContainsLabel key = stockPosition.Labels.ContainsKey(key)
         
     member this.GetLabelValue key = stockPosition.Labels[key]
-    member this.TryGetLabelValue key = stockPosition.Labels.TryGetValue(key)
+    member this.TryGetLabelValue key = stockPosition.TryGetLabelValue key
         
     member this.Labels = stockPosition.Labels |> Seq.map id
     

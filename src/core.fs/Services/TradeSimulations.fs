@@ -266,8 +266,12 @@ module TradingStrategyFactory =
         let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> daysHeldReached context bar || stopReached context bar
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days with {stopDescription} stop", exitCondition)
         
-    let createTrailingStop (stopDescription:string) (trailingPercentage:decimal) : ITradingStrategy =
-        let latestStop = ref 0m
+    let createTrailingStop (stopDescription:string) (trailingPercentage:decimal) (initialStop:decimal option)  : ITradingStrategy =
+        let latestStop =
+            match initialStop with
+            | Some stop -> ref stop
+            | None -> ref 0m
+            
         let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
             let stopReached =
                 match context.Position.StockPositionType with
@@ -315,15 +319,18 @@ module TradingStrategyFactory =
             createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
             createCloseAfterFixedNumberOfDays 15
             createCloseAfterFixedNumberOfDays 30
-            createTrailingStop "5%" 0.05m
-            createTrailingStop "10%" 0.10m
-            createTrailingStop "20%" 0.20m
+            createTrailingStop "5%" 0.05m None
+            createTrailingStop "10%" 0.10m None
+            createTrailingStop "20%" 0.20m None
             if actualTrade.IsSome then
                 createLastSellStrategy actualTrade.Value
                 createCloseAfterFixedNumberOfDaysWithStop 30 "size based" (actualTrade.Value |> firstStop)
                 createCloseAfterFixedNumberOfDaysWithStop 30 "5% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
                 createCloseAfterFixedNumberOfDaysWithStop 30 "10% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
                 createCloseAfterFixedNumberOfDaysWithStop 30 "20% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
+                createTrailingStop "5% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
+                createTrailingStop "10% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
+                createTrailingStop "20% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
         ]
     
 type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours) =
@@ -335,6 +342,12 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             match actualTrade.RiskAmount with
             | Some riskAmount -> stockPosition |> StockPosition.setRiskAmount riskAmount date
             | None -> stockPosition
+            
+    let setLabelsFromActualTradeIfSet (actualTrade:StockPositionState option) date (stockPosition:StockPositionState) =
+        match actualTrade with
+        | None -> stockPosition
+        | Some actualTrade ->
+            actualTrade.Labels |> Seq.fold (fun position label -> position |> StockPosition.setLabel label.Key label.Value date) stockPosition
     
     member this.Run(
             user:UserState,
@@ -368,6 +381,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                     StockPosition.``open`` ticker numberOfShares price ``when``
                     |> StockPosition.setStop stopPrice ``when``
                     |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
+                    |> setLabelsFromActualTradeIfSet actualTrade ``when``
                     
                 match bars.Bars with
                 | [||] -> results.MarkAsFailed($"No price history found for {ticker}")
