@@ -33,9 +33,9 @@ export class StockPositionsService {
         return this.http.get<PastStockTradingPerformance>('/api/portfolio/stockpositions/pasttradingperformance')
     }
 
-    simulatePosition(positionId: string): Observable<TradingStrategyResults> {
+    simulatePosition(positionId: string, closeIfOpenAtTheEnd: boolean): Observable<TradingStrategyResults> {
         return this.http.get<TradingStrategyResults>(
-            `/api/portfolio/stockpositions/${positionId}/simulate/trades`
+            `/api/portfolio/stockpositions/${positionId}/simulate/trades?closeIfOpenAtTheEnd=${closeIfOpenAtTheEnd}`
         )
     }
 

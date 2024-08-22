@@ -311,6 +311,8 @@ type TradingStrategyPerformance =
         strategyName : string
         performance: TradingPerformance
         positions: StockPositionWithCalculations[]
+        maxDrawdownPct: decimal[]
+        maxGainPct: decimal[]
     }
     
     with

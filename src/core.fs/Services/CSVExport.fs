@@ -109,6 +109,8 @@ module CSVExport =
             RR:string
             InitialRiskedAmount:string
             RiskAmount:string
+            MaxDrawdown:string
+            MaxGain:string
             Strategy:string
             Grade:string
             GradeNote:string
@@ -126,7 +128,7 @@ module CSVExport =
             Ticker:string
         }
         
-    let private mapToTradeRecord culture strategyName (t:StockPositionWithCalculations) =
+    let private mapToTradeRecord culture strategyName maxDrawdown maxGain (t:StockPositionWithCalculations) =
         {
             StrategyName = strategyName
             Ticker = t.Ticker.Value
@@ -146,6 +148,8 @@ module CSVExport =
             RR = t.RR |> number culture
             InitialRiskedAmount = t.InitialRiskedAmount |> currencyOption culture
             RiskAmount = t.RiskedAmount |> currencyOption culture
+            MaxDrawdown = maxDrawdown |> numberOption culture
+            MaxGain = maxGain |> numberOption culture
             Strategy = t.TryGetLabelValue("strategy") |> Option.defaultValue ""
             Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
             GradeNote = t.GradeNote |> Option.defaultValue ""
@@ -157,7 +161,10 @@ module CSVExport =
             strategies
             |> Seq.collect (fun strategy -> 
                 strategy.positions
-                |> Seq.map (mapToTradeRecord culture strategy.strategyName)
+                |> Seq.mapi (fun index position ->
+                    let maxDrawdown = strategy.maxDrawdownPct[index] |> Some
+                    let maxGain = strategy.maxGainPct[index] |> Some
+                    mapToTradeRecord culture strategy.strategyName maxDrawdown maxGain position)
             )
             
         writer.Generate(rows)
@@ -196,7 +203,7 @@ module CSVExport =
         
         let rows =
             trades
-            |> Seq.map (mapToTradeRecord culture "Actual Trade")
+            |> Seq.map (mapToTradeRecord culture "Actual Trade" None None)
             
         writer.Generate(rows)
         

@@ -95,6 +95,9 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
     
     member this.PercentDifferenceFromLow (value:decimal) =
         (this.Low - value) / value
+        
+    member this.percentDifferenceFromClose (value:decimal) =
+        (this.Close - value) / value
     
     member this.PercentDifferenceFromHigh (value:decimal) =
         (this.High - value) / value

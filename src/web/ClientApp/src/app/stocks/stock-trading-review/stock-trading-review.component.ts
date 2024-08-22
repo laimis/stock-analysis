@@ -144,7 +144,7 @@ export class StockTradingReviewComponent {
     }
     
     private loadPositionData(position: PositionInstance) {
-        const simulationPromise = this.stockPositionsService.simulatePosition(position.positionId)
+        const simulationPromise = this.stockPositionsService.simulatePosition(position.positionId, true)
             .pipe(
                 tap(r => {
                     this.simulationErrors = null

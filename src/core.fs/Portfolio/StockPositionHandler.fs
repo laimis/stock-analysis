@@ -173,9 +173,10 @@ type SetRisk =
     
 type SimulateTrade = 
     {
-        UserId: UserId
+        CloseIfOpenAtTheEnd: bool
         [<Required>]
         PositionId: StockPositionId
+        UserId: UserId
     }
     
 type SimulateTradeForTicker =
@@ -654,7 +655,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 let runner = TradingStrategyRunner(brokerage, marketHours)
-                let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=false)
+                let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=command.CloseIfOpenAtTheEnd)
                 return simulation |> Ok
     }
     
@@ -693,16 +694,10 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         
         let mapToStrategyPerformance (name:string, results:TradingStrategyResult seq) =
             let positions = results |> Seq.map (_.Position) |> Seq.toArray |> Array.sortBy _.Closed
+            let maxDrawdowns = results |> Seq.map (_.MaxDrawdownPct) |> Seq.toArray
+            let maxGains = results |> Seq.map (_.MaxGainPct) |> Seq.toArray
             let performance = TradingPerformance.Create name positions
-                // try
-                //     TradingPerformance.Create name positions
-                // with
-                //     // TODO: something is throwing Value was either too large or too small for a Decimal
-                //     // for certain simulations.
-                //     // ignoring it here because I need the results, but need to look at it at some point
-                //     | :?OverflowException -> TradingPerformance.Create name (Array.Empty<StockPositionWithCalculations>())
-                //
-            {performance = performance; strategyName = name; positions = positions}
+            {performance = performance; strategyName = name; positions = positions; maxDrawdownPct = maxDrawdowns; maxGainPct = maxGains }
         
         let! user = accounts.GetUser(command.UserId)
         match user with
@@ -850,7 +845,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.groupBy _.GetLabelValue(key="strategy")
                 |> Seq.map (fun (name, positions) ->
                     let performance = TradingPerformance.Create name positions
-                    {strategyName = name; performance = performance; positions = (positions |> Seq.toArray)}
+                    // TODO: can we figure out the max drawdown split thing here?
+                    {strategyName = name; performance = performance; positions = (positions |> Seq.toArray); maxDrawdownPct = [||]; maxGainPct = [||] }
                 )
                 |> Seq.sortByDescending _.performance.Profit
                 |> Seq.toArray

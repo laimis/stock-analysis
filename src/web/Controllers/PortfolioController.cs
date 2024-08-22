@@ -177,12 +177,13 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
         this.OkOrError(stockPositionHandler.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
 
     [HttpGet("stockpositions/{positionId}/simulate/trades")]
-    public Task<ActionResult> Trade([FromRoute] string positionId) =>
+    public Task<ActionResult> Trade([FromRoute] string positionId, [FromQuery]bool closeIfOpenAtTheEnd) =>
 
         this.OkOrError(
             stockPositionHandler.Handle(
                 new SimulateTrade(
-                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)), 
+                    closeIfOpenAtTheEnd: closeIfOpenAtTheEnd,
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
                     userId: User.Identifier()
                 )
             )
