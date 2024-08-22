@@ -21,11 +21,12 @@ type TradingStrategy(name:string) =
     
     static member CalculateMaxDrawdownAndGain (last10Bars:seq<PriceBar>) =
         
+        let referenceBar = last10Bars |> Seq.head
+                    
         let maxDrawdownPctRecent,maxGainPctRecent =
             last10Bars
             |> Seq.fold (fun (maxDrawdownPctRecent,maxGainPctRecent) bar ->
                 (
-                    let referenceBar = last10Bars |> Seq.head
                     Math.Min(maxDrawdownPctRecent,bar.PercentDifferenceFromLow(referenceBar.Close)),
                     Math.Max(maxGainPctRecent,bar.PercentDifferenceFromHigh(referenceBar.Close))
                 )
