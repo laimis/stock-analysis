@@ -5,7 +5,7 @@ import {
     PositionInstance,
     StockQuote,
     StocksService,
-    TickerCorrelation
+    TickerCorrelation, TradingStrategyResults
 } from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
@@ -167,4 +167,18 @@ export class PlaygroundComponent implements OnInit {
 
         concat([positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily]).subscribe()
     }
+
+    loadingActualVsSimulated: boolean = false
+    actualVsSimulated: TradingStrategyResults
+    runActualVsSimulated() {
+        this.loadingActualVsSimulated = true
+        this.stockPositions.simulatePosition("4fe57556-b6de-4c0c-b996-798e6159b2ce", true).subscribe((data) => {
+            this.actualVsSimulated = data
+            this.loadingActualVsSimulated = false
+        }, (error) => {
+            this.errors = GetErrors(error)
+            this.loadingActualVsSimulated = false
+        })
+    }
+    
 }

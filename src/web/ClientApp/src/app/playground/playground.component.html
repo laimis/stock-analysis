@@ -5,6 +5,14 @@
 
     {{ status }}
 
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Actual vs Simulated</h5>
+            <button (click)="runActualVsSimulated()" class="btn btn-primary">Run Actual vs Simulated</button>
+            <app-loading *ngIf="loadingActualVsSimulated"></app-loading>
+            <app-trading-actual-vs-simulated *ngIf="actualVsSimulated" [simulations]="actualVsSimulated"></app-trading-actual-vs-simulated>
+        </div>
+    </div>
 
     <div class="card mt-4">
         <div class="card-body">

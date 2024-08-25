@@ -113,8 +113,7 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
     
     override this.ApplyPriceBarToPositionInternal (context:SimulationContext) (bar:PriceBar) =
         if exitCondition context bar then
-            context.Position
-            |> TradingStrategy.ClosePosition bar.Close bar.Date
+            context.Position |> TradingStrategy.ClosePosition bar.Close bar.Date
         else
             context.Position
 
@@ -131,8 +130,8 @@ type TradingStrategyActualTrade() =
                         position, maxDrawdownPct, maxGainPct, last10Bars
                     else
                         let calculation = position |> StockPositionWithCalculations
-                        let maxDrawdownPct = Math.Min(maxDrawdownPct,bar.PercentDifferenceFromLow(calculation.AverageBuyCostPerShare))
-                        let maxGainPct = Math.Max(maxGainPct,bar.PercentDifferenceFromHigh(calculation.AverageBuyCostPerShare))
+                        let maxDrawdownPct = Math.Min(maxDrawdownPct, TradingStrategy.DrawdownFromBar bar calculation.AverageBuyCostPerShare)
+                        let maxGainPct = Math.Max(maxGainPct, TradingStrategy.GainFromBar bar calculation.AverageBuyCostPerShare)
                         
                         let newLast10Bars =
                             match last10Bars.Length with

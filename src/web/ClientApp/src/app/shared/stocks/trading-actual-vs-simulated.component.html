@@ -8,8 +8,8 @@
                 <th>Stop</th>
                 <th>R/R</th>
                 <th>% Gain</th>
-                <th>Gain</th>
-                <th>Drawdown</th>
+                <th>Max Fav Exc</th>
+                <th>Max Adv Exc</th>
                 <th>DaysHeld</th>
             </tr>
             </thead>
@@ -33,7 +33,7 @@
                                     <tbody>
                                         @for (e of r.position.events; track e) {
                                             <tr class="event" [ngClass]="'event-' + e.type">
-                                                <td>{{ e.date }}</td>
+                                                <td>{{ e.date | date }}</td>
                                                 <td>{{ e.type }}</td>
                                                 <td>{{ e.quantity }}</td>
                                                 <td>{{ e.value | currency }}</td>
