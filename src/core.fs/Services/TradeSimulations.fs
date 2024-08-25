@@ -52,8 +52,8 @@ type TradingStrategy(name:string) =
             let context = 
                 {
                     Position = position
-                    MaxDrawdown = 0m
-                    MaxGain = 0m
+                    MaxDrawdown = Decimal.MaxValue
+                    MaxGain = Decimal.MinValue
                     LastBar = bars.Bars[0] 
                 }
                 

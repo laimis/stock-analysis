@@ -49,7 +49,7 @@ let ``GainPct is accurate`` () =
 
 [<Fact>]
 let ``First Buy Cost Accurate`` () =
-    position.FirstBuyPrice |> should equal 30m
+    position.PositionOpenPrice |> should equal 30m
     
 [<Fact>]
 let ``Completed position cost per share accurate`` () =
@@ -73,8 +73,8 @@ let ``Short GainPct is accurate`` () =
     Assert.Equal(0.18m, shortPosition.GainPct, 2)
     
 [<Fact>]
-let ``Short First Buy Cost Accurate`` () =
-    shortPosition.FirstBuyPrice |> should equal 35m
+let ``Short Open Price Accurate`` () =
+    shortPosition.PositionOpenPrice |> should equal 40m
     
 [<Fact>]
 let ``Short Completed position cost per share accurate`` () =
