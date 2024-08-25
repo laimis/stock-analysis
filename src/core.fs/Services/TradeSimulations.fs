@@ -86,7 +86,13 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
         
         let positionAfterStopAdjustment =
             match stopPrice with
-            | Some stopPrice -> context.Position |> StockPosition.setStop (Some stopPrice) bar.Date
+            | Some _ ->
+                if stopPrice.Value <= 0m then
+                    // TODO: how can this happen?
+                    System.Console.WriteLine($"Attempted to set a negative stop price: {stopPrice.Value} for {context.Position.Ticker} via strategy {name}, skipping")
+                    context.Position
+                else
+                    context.Position |> StockPosition.setStop stopPrice bar.Date
             | None -> context.Position
             
         if doExit then
@@ -260,7 +266,13 @@ module TradingStrategyFactory =
                 match context.Position.StockPositionType with
                 | Short ->
                     let newStopPriceCandidate = bar.Close * (1m + trailingPercentage)
-                    latestStop.Value <- Math.Min(latestStop.Value,newStopPriceCandidate)
+                    // the initial stop is 0m if one is not set explicitly
+                    // and that breaks the math.min logic as that initial stop will always be selected
+                    // so we need to handle that appropriately
+                    latestStop.Value <-
+                        match latestStop.Value with
+                        | 0m -> newStopPriceCandidate
+                        | _ -> Math.Min(latestStop.Value,newStopPriceCandidate)
                 | Long ->
                     let newStopPriceCandidate = bar.Close * (1m - trailingPercentage)
                     latestStop.Value <- Math.Max(latestStop.Value,newStopPriceCandidate)
