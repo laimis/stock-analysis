@@ -143,7 +143,7 @@ type PortfolioAnalysisService(
                                     
                                 let c = p |> StockPositionWithCalculations
                                 let newPosition =
-                                    StockPosition.``open`` p.Ticker c.CompletedPositionShares c.FirstBuyPrice p.Opened
+                                    StockPosition.``open`` p.Ticker c.CompletedPositionShares c.CompletedPositionCostPerShare p.Opened
                                     |> StockPosition.sell c.CompletedPositionShares closeBar.Close closeBar.Date
                                     |> StockPositionWithCalculations
                                 newPosition.Profit

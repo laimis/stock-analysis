@@ -1143,8 +1143,6 @@ export interface PositionInstance {
 export interface TradingStrategyResult {
     maxDrawdownPct: number
     maxGainPct: number
-    maxDrawdownPctRecent: number
-    maxGainPctRecent: number
     position: PositionInstance
     strategyName: string
 }

@@ -18,15 +18,13 @@ type SimulationContext =
         Position:StockPositionState
         MaxGain:decimal
         MaxDrawdown:decimal
-        Last10Bars:List<PriceBar>
+        LastBar:PriceBar
     }
 
 type TradingStrategyResult =
     {
         MaxDrawdownPct:decimal
         MaxGainPct:decimal
-        MaxDrawdownPctRecent:decimal
-        MaxGainPctRecent:decimal
         Position:StockPositionWithCalculations
         StrategyName:string
     }

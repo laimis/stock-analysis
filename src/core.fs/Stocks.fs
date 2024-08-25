@@ -604,10 +604,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     
     member this.InitialRiskedAmount = riskAmounts |> List.tryHead |> Option.map _.RiskAmount
     
-    member this.FirstBuyPrice =
-        match buys with
+    member this.PositionOpenPrice =
+        match acquisitionSlots with
         | [] -> 0m
-        | _ -> buys |> List.head |> _.Price
+        | _ -> acquisitionSlots |> List.head
         
     member this.CompletedPositionCostPerShare =
         match completedPositionTransactions with

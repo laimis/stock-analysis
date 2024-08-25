@@ -1,7 +1,6 @@
 namespace core.fs.Services.Trading
 
 open System
-open System.Collections.Generic
 open core.Account
 open core.Shared
 open core.fs.Adapters.Brokerage
@@ -25,21 +24,6 @@ type TradingStrategy(name:string) =
         | true -> position |> StockPosition.close price date
         | false -> position
     
-    static member CalculateMaxDrawdownAndGain (last10Bars:seq<PriceBar>) =
-        
-        let referenceValue = last10Bars |> Seq.head |> _.Close
-                    
-        let maxDrawdownPctRecent,maxGainPctRecent =
-            last10Bars
-            |> Seq.fold (fun (maxDrawdownPctRecent,maxGainPctRecent) bar ->
-                (
-                    Math.Min(maxDrawdownPctRecent, referenceValue |> TradingStrategy.DrawdownFromBar bar),
-                    Math.Max(maxGainPctRecent, referenceValue |> TradingStrategy.GainFromBar bar)
-                )
-            ) (0m,0m)
-        
-        (maxDrawdownPctRecent,maxGainPctRecent)
-    
     member this.Name = name
     member this.NumberOfSharesAtStart = _numberOfSharesAtStart
     
@@ -52,20 +36,13 @@ type TradingStrategy(name:string) =
         | None -> 
             let latestPositionState = this.ApplyPriceBarToPositionInternal context bar
             
-            let last10bars = context.Last10Bars
-            
-            if last10bars.Count = 10 then
-                last10bars.RemoveAt(0)
-                
-            last10bars.Add(bar)
-            
             let latestPositionStateWithCalculations = latestPositionState |> StockPositionWithCalculations
             
             {
                 Position = latestPositionState
-                MaxDrawdown = Math.Min(context.MaxDrawdown, latestPositionStateWithCalculations.AverageBuyCostPerShare |> TradingStrategy.DrawdownFromBar bar)
-                MaxGain = Math.Max(context.MaxGain, latestPositionStateWithCalculations.AverageBuyCostPerShare |> TradingStrategy.GainFromBar bar)
-                Last10Bars = last10bars
+                MaxDrawdown = Math.Min(context.MaxDrawdown, latestPositionStateWithCalculations.PositionOpenPrice |> TradingStrategy.DrawdownFromBar bar)
+                MaxGain = Math.Max(context.MaxGain, latestPositionStateWithCalculations.PositionOpenPrice |> TradingStrategy.GainFromBar bar)
+                LastBar = bar 
             }
            
     interface  ITradingStrategy with
@@ -77,7 +54,7 @@ type TradingStrategy(name:string) =
                     Position = position
                     MaxDrawdown = 0m
                     MaxGain = 0m
-                    Last10Bars = List<PriceBar>(10)
+                    LastBar = bars.Bars[0] 
                 }
                 
             _numberOfSharesAtStart <- position.NumberOfShares |> abs
@@ -86,23 +63,16 @@ type TradingStrategy(name:string) =
                 bars.Bars
                 |> Seq.fold this.ApplyPriceBarToPosition context
                 
-            let maxDrawdownPctRecent,maxGainPctRecent = TradingStrategy.CalculateMaxDrawdownAndGain finalContext.Last10Bars
-            
             let positionWithCalculations =
                 match closeIfOpen && finalContext.Position.IsClosed = false with
                 | true ->
-                    let closingPrice = finalContext.Last10Bars[finalContext.Last10Bars.Count - 1].Close
-                    let closingDate = finalContext.Last10Bars[finalContext.Last10Bars.Count - 1].Date
-                    
-                    finalContext.Position |> TradingStrategy.ClosePosition closingPrice closingDate
+                    finalContext.Position |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
                 | false -> finalContext.Position
                 |> StockPositionWithCalculations
             
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
                 MaxGainPct = finalContext.MaxGain
-                MaxDrawdownPctRecent = maxDrawdownPctRecent
-                MaxGainPctRecent = maxGainPctRecent
                 Position = positionWithCalculations
                 StrategyName = this.Name
             }
@@ -123,41 +93,29 @@ type TradingStrategyActualTrade() =
     
         member this.Run (bars:PriceBars) (closeIfOpen:bool) (position:StockPositionState) =
             
-            let finalPosition, maxDrawdownPct, maxGainPct, last10Bars =
+            let finalPosition, maxDrawdownPct, maxGainPct, lastBar =
                 bars.Bars
-                |> Seq.fold (fun (position:StockPositionState, maxDrawdownPct, maxGainPct, last10Bars:PriceBar list) bar ->
-                    if position.IsClosed && bar.Date.Date = position.Closed.Value.Date then
-                        position, maxDrawdownPct, maxGainPct, last10Bars
+                |> Seq.fold (fun (position:StockPositionState, maxDrawdownPct, maxGainPct, lastBar) bar ->
+                    if position.IsClosed && bar.Date.Date > position.Closed.Value.Date then
+                        position, maxDrawdownPct, maxGainPct, lastBar
                     else
                         let calculation = position |> StockPositionWithCalculations
-                        let maxDrawdownPct = Math.Min(maxDrawdownPct, TradingStrategy.DrawdownFromBar bar calculation.AverageBuyCostPerShare)
-                        let maxGainPct = Math.Max(maxGainPct, TradingStrategy.GainFromBar bar calculation.AverageBuyCostPerShare)
+                        let maxDrawdownPct = Math.Min(maxDrawdownPct, TradingStrategy.DrawdownFromBar bar calculation.PositionOpenPrice)
+                        let maxGainPct = Math.Max(maxGainPct, TradingStrategy.GainFromBar bar calculation.PositionOpenPrice)
                         
-                        let newLast10Bars =
-                            match last10Bars.Length with
-                            | x when x = 10 -> last10Bars[1..9] @ [bar]
-                            | _ -> last10Bars @ [bar]
-                            
-                        position, maxDrawdownPct, maxGainPct, newLast10Bars  
-                ) (position, Decimal.MaxValue, Decimal.MinValue, [])
+                        position, maxDrawdownPct, maxGainPct, bar
+                ) (position, Decimal.MaxValue, Decimal.MinValue, bars.Bars[0])
                 
-            let maxDrawdownPctRecent,maxGainPctRecent = TradingStrategy.CalculateMaxDrawdownAndGain(last10Bars)
-            
             let positionWithCalculations =
                 match closeIfOpen with
                 | true ->
-                    let closingPrice = last10Bars[last10Bars.Length - 1].Close
-                    let closingDate = last10Bars[last10Bars.Length - 1].Date
-                    
-                    finalPosition |> TradingStrategy.ClosePosition closingPrice closingDate
+                    finalPosition |> TradingStrategy.ClosePosition lastBar.Close lastBar.Date
                 | false -> finalPosition
                 |> StockPositionWithCalculations
                 
             {
                 MaxDrawdownPct = maxDrawdownPct
                 MaxGainPct = maxGainPct
-                MaxDrawdownPctRecent = maxDrawdownPctRecent
-                MaxGainPctRecent = maxGainPctRecent
                 Position = positionWithCalculations
                 StrategyName = TradingStrategyConstants.ActualTradesName
             }
