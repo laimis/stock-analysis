@@ -33,7 +33,7 @@
                                     <tbody>
                                         @for (e of r.position.events; track e) {
                                             <tr class="event" [ngClass]="'event-' + e.type">
-                                                <td>{{ e.date | date }}</td>
+                                                <td>{{ e.date | parsedDate }}</td>
                                                 <td>{{ e.type }}</td>
                                                 <td>{{ e.quantity }}</td>
                                                 <td>{{ e.value | currency }}</td>

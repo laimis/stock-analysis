@@ -105,6 +105,7 @@ import {StockTradingChartsComponent} from "./stocks/stock-trading/stock-trading-
 import {CorrelationsComponent} from "./shared/reports/correlations.component";
 import {StockTradingNewPositionComponent} from "./stocks/stock-trading/stock-trading-new-position.component";
 import {StockTradingDashboardComponent} from "./stocks/stock-trading/stock-trading-dashboard.component";
+import {ParsedDatePipe} from "./services/parsedDate.filter";
 
 
 let routes: Routes = [
@@ -281,7 +282,8 @@ let routes: Routes = [
         StockTradingNewPositionComponent,
         BrokerageOrdersComponent,
         CandlestickChartComponent,
-        GapsComponent
+        GapsComponent,
+        ParsedDatePipe
     ],
     providers: [
         {provide: "windowObject", useValue: window},

@@ -3,10 +3,10 @@
     @for (position of positions; track position) {
         <section>
             <h5>
-                Position {{ position.opened | date:'shortDate' }}
+                Position {{ position.opened | parsedDate }}
                 @if (position.closed) {
                     <span class="float-end">
-                        closed {{ position.closed | date:'shortDate' }} for profit of {{ position.profit | currency }}
+                        closed {{ position.closed | parsedDate }} for profit of {{ position.profit | currency }}
                     </span>
                 }
             </h5>

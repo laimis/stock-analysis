@@ -33,7 +33,7 @@ type TradingStrategy(name:string) =
         
         match context.Position.Closed with
         | Some _ -> context
-        | None -> 
+        | None ->
             let latestPositionState = this.ApplyPriceBarToPositionInternal context bar
             
             let latestPositionStateWithCalculations = latestPositionState |> StockPositionWithCalculations
@@ -82,10 +82,17 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
     inherit TradingStrategy(name)
     
     override this.ApplyPriceBarToPositionInternal (context:SimulationContext) (bar:PriceBar) =
-        if exitCondition context bar then
-            context.Position |> TradingStrategy.ClosePosition bar.Close bar.Date
+        let doExit, stopPrice = exitCondition context bar
+        
+        let positionAfterStopAdjustment =
+            match stopPrice with
+            | Some stopPrice -> context.Position |> StockPosition.setStop (Some stopPrice) bar.Date
+            | None -> context.Position
+            
+        if doExit then
+            positionAfterStopAdjustment |> TradingStrategy.ClosePosition bar.Close bar.Date
         else
-            context.Position
+            positionAfterStopAdjustment
 
 type TradingStrategyActualTrade() =
     
@@ -218,7 +225,9 @@ module TradingStrategyFactory =
         TradingStrategyWithProfitPoints($"{numberOfProfitPoints} profit points at {percentGain}%% intervals", numberOfProfitPoints, profitPointFunc, stopFunc)
         
     let createCloseAfterFixedNumberOfDays numberOfDays : ITradingStrategy =
-        let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
+        let exitCondition = fun (context:SimulationContext) (bar:PriceBar) ->
+            let doExit = bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
+            doExit, None
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days", exitCondition)
         
     let createCloseAfterFixedNumberOfDaysWithStop (numberOfDays:int) (stopDescription:string) (stopPrice:decimal) : ITradingStrategy =
@@ -227,7 +236,9 @@ module TradingStrategyFactory =
             match context.Position.StockPositionType with
             | Short -> bar.Close > stopPrice
             | Long -> bar.Close < stopPrice
-        let exitCondition = fun (context:SimulationContext) (bar:PriceBar) -> daysHeldReached context bar || stopReached context bar
+        let exitCondition = fun (context:SimulationContext) (bar:PriceBar) ->
+            let doExit = daysHeldReached context bar || stopReached context bar
+            (doExit, Some stopPrice)
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days with {stopDescription} stop", exitCondition)
         
     let createTrailingStop (stopDescription:string) (trailingPercentage:decimal) (initialStop:decimal option)  : ITradingStrategy =
@@ -243,7 +254,7 @@ module TradingStrategyFactory =
                 | Long -> bar.Close < latestStop.Value
             
             match stopReached with
-            | true -> true
+            | true -> (true, Some latestStop.Value)
             | false ->
                 
                 match context.Position.StockPositionType with
@@ -254,12 +265,14 @@ module TradingStrategyFactory =
                     let newStopPriceCandidate = bar.Close * (1m - trailingPercentage)
                     latestStop.Value <- Math.Max(latestStop.Value,newStopPriceCandidate)
                 
-                false
+                (false, Some latestStop.Value)
                 
         TradingStrategyCloseOnCondition($"Trailing stop with {stopDescription}", stopReached)
         
     let createLastSellStrategy (position:StockPositionState) : ITradingStrategy =
-        let exitCondition = fun (_:SimulationContext) (bar:PriceBar) -> position.Closed.IsSome && bar.Date.Date = position.Closed.Value.Date
+        let exitCondition = fun (_:SimulationContext) (bar:PriceBar) ->
+            let doExit = position.Closed.IsSome && bar.Date.Date = position.Closed.Value.Date
+            doExit, None
         TradingStrategyCloseOnCondition("Close last sell", exitCondition)
     
     let getStrategies (actualTrade:StockPositionState option) : ITradingStrategy seq =

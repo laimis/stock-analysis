@@ -21,7 +21,7 @@
             </div>
             <div class="col-md-3">
                 <div class="stat-label">Opened</div>
-                <div>{{ _position.opened | date }} ({{ _position.daysHeld }})</div>
+                <div>{{ _position.opened | parsedDate }} ({{ _position.daysHeld }})</div>
             </div>
         </div>
         <div class="row mt-3">
@@ -196,7 +196,7 @@
                         <tbody>
                             @for (note of _position.notes; track note) {
                             <tr>
-                                <td style="width: 120px;">{{ note.created | date }}</td>
+                                <td style="width: 120px;">{{ note.created | parsedDate }}</td>
                                 <td style="white-space: pre-wrap;">{{ note.content }}</td>   
                             </tr>
                             }
@@ -212,7 +212,7 @@
             <div #eventContainer class="visually-hidden">
                 @for (t of _position.events; track t) {
                     <div [ngClass]="getCssClassForEvent(t)" class="row event">
-                        <div class="col">{{ t.date | date }}</div>
+                        <div class="col">{{ t.date | parsedDate }}</div>
                         <div class="col">{{ t.type }}</div>
                         <div class="col-8">{{ t.description }}</div>
                         <div class="col">
