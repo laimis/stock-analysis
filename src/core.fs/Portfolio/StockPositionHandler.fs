@@ -196,6 +196,11 @@ type SimulateUserTrades =
         ClosePositionIfOpenAtTheEnd: bool
     }
     
+type SimulateOpenTrades =
+    {
+        UserId: UserId
+    }
+    
 type ExportUserSimulatedTrades =
     {
         UserId: UserId
@@ -677,6 +682,58 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 )
                 
             return results |> Ok
+    }
+    
+    member _.Handle (command:SimulateOpenTrades) : Task<Result<Map<string,string list>,ServiceError>> = task {
+        let runSimulation (runner:TradingStrategyRunner) user (position:StockPositionState) = async {
+            let! results =
+                runner.Run(
+                    user,
+                    position=position,
+                    closeIfOpenAtTheEnd=false
+                ) |> Async.AwaitTask
+            
+            return results.Results
+        }
+        
+        let! user = accounts.GetUser command.UserId
+        
+        let! positions = command.UserId |> storage.GetStockPositions |> Async.AwaitTask
+                
+        let openPositions =
+            positions
+            |> Seq.filter (fun p -> p.IsOpen && (p.HasLabel "strategy" "longterm" |> not) && (p.HasLabel "strategy" "longterminterest" |> not))
+            
+        let simulator = TradingStrategyRunner(brokerage, marketHours)
+        
+        let! simulations =
+            openPositions
+            |> Seq.map (runSimulation simulator user.Value.State)
+            |> Async.Sequential
+        
+        let allOutcomes = simulations |> Seq.concat
+        
+        let today = DateTimeOffset.UtcNow.Date
+        
+        // now find the strategies that would have had actions today
+        let resultsWithTransactionsFromToday = allOutcomes |> Seq.filter (fun r -> r.Position.Events |> Seq.exists (fun t -> t.date.Date = today))
+        
+        return 
+            resultsWithTransactionsFromToday
+            |> Seq.groupBy (fun r -> r.Position.Ticker)
+            |> Seq.map (fun (ticker, results) ->
+                let descriptions =
+                    results
+                    |> Seq.map(fun r ->
+                        r.Position.Events
+                        |> List.filter (fun t -> t.date.Date = today)
+                        |> List.map (fun t -> $"{r.StrategyName}: {t.description}")
+                    )
+                    |> List.concat
+                (ticker.Value, descriptions)
+            )
+            |> Map.ofSeq
+            |> Ok
     }
     
     member _.Handle (command:SimulateUserTrades) = task {

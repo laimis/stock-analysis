@@ -7,7 +7,6 @@ using web.Utils;
 using core.fs.Reports;
 using core.fs.Stocks;
 using core.Shared;
-using MathNet.Numerics.Statistics;
 
 namespace web.Controllers
 {

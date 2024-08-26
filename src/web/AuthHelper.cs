@@ -10,8 +10,9 @@ namespace web
 {
     public class AuthHelper
     {
-        internal static void Configure(IConfiguration configuration, IServiceCollection services, string adminEmail)
+        internal static void Configure(IConfiguration configuration, IServiceCollection services)
         {
+            var adminEmail = configuration.GetValue<string>("ADMINEmail");
             if (string.IsNullOrWhiteSpace(adminEmail))
             {
                 throw new System.Exception("ADMINEmail is not set");

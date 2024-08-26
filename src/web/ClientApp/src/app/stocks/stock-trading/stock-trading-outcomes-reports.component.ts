@@ -2,19 +2,21 @@ import {Component, Input} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {
     OutcomesReport,
-    PositionInstance,
+    PositionInstance, SimulationNotices,
     StockGaps,
     StocksService,
     TickerCorrelation
 } from '../../services/stocks.service';
 import {catchError, finalize, map} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
+import {StockPositionsService} from "../../services/stockpositions.service";
 
 @Component({
     selector: 'app-stock-trading-outcomes-reports',
     templateUrl: './stock-trading-outcomes-reports.component.html',
     styleUrls: ['./stock-trading-outcomes-reports.component.css']
 })
+
 export class StockPositionReportsComponent {
 
     allBarsReport: OutcomesReport;
@@ -25,8 +27,13 @@ export class StockPositionReportsComponent {
     correlationReport: TickerCorrelation[];
     tickerFilter: string;
     daysForCorrelations = 60
+    openSimulationNotices: SimulationNotices = {}
+    getOpenSimulationKeys() {
+        return Object.keys(this.openSimulationNotices);
+    }
 
     loading = {
+        open: false,
         daily: false,
         weekly: false,
         allBars: false,
@@ -35,6 +42,7 @@ export class StockPositionReportsComponent {
     }
 
     errors = {
+        open: null,
         daily: null,
         weekly: null,
         allBars: null,
@@ -43,7 +51,7 @@ export class StockPositionReportsComponent {
     }
     tickers: string[] = []
 
-    constructor(private service: StocksService) {
+    constructor(private service: StocksService, private stockPositions: StockPositionsService) {
     }
 
     @Input()
@@ -66,7 +74,21 @@ export class StockPositionReportsComponent {
         this.loading.weekly = true
         this.loading.positions = true
         this.loading.correlation = true
+        this.loading.open = true
 
+        const openSimulationNotices$ = this.stockPositions.openPositionSimulationNotices().pipe(
+            map(notices => {
+                this.openSimulationNotices = notices
+            }),
+            catchError(
+                error => {
+                    this.handleApiError("Unable to load open simulation notices", error, (e) => this.errors.open = e)
+                    return EMPTY
+                }
+            ),
+            finalize(() => this.loading.open = false)
+        )
+        
         const positionReport$ = this.service.reportPositions().pipe(
             map(report => {
                 this.positionsReport = report
@@ -118,7 +140,7 @@ export class StockPositionReportsComponent {
             finalize(() => this.loading.correlation = false)
         )
 
-        concat(positionReport$, dailyReport$, weeklyReport$, correlationReport$).subscribe()
+        concat(openSimulationNotices$, positionReport$, dailyReport$, weeklyReport$, correlationReport$).subscribe()
     }
 
     loadAllTimeData(positions: PositionInstance[]) {

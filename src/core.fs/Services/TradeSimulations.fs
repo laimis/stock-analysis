@@ -96,7 +96,8 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
         
         let positionAfterStopAdjustment =
             match stopPrice with
-            | Some _ -> context.Position.GetPositionState() |> StockPosition.setStop stopPrice bar.Date
+            | Some sp ->
+                context.Position.GetPositionState() |> StockPosition.setStop stopPrice bar.Date
             | None -> context.Position.GetPositionState()
             
         if doExit then

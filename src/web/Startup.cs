@@ -33,14 +33,9 @@ namespace web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            AuthHelper.Configure(Configuration, services, Configuration.GetValue<string>("ADMINEmail"));
+            AuthHelper.Configure(Configuration, services);
             
-            services.AddHangfire(config =>
-            {
-                Console.WriteLine("what is this");
-                config.UseDashboardMetrics();
-            });
-            services.AddHangfireServer();
+            Jobs.AddJobs(Configuration, services, Logger);
 
             services
                 .AddControllers(
@@ -132,8 +127,6 @@ namespace web
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapFallbackToFile("index.html");
             });
-
-            app.UseHangfireDashboard();
 
             Jobs.ConfigureJobs(app, logger);
         }

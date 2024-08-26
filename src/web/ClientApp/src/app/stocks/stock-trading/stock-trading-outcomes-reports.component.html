@@ -26,6 +26,32 @@
             [outcomes]="allBarsReport.outcomes">
         </app-outcomes>
     }
+    
+    @if (errors.open) {
+        <app-error-display [errors]="errors.open"></app-error-display>
+    }
+    @if (loading.open) {
+        <app-loading></app-loading>
+    }
+    @if (openSimulationNotices) {
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-4" *ngFor="let group of getOpenSimulationKeys()">
+                        <div class="card-header bg-success text-white">
+                            <app-stock-link-and-tradingview-link ticker="{{group}}"></app-stock-link-and-tradingview-link>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" *ngFor="let notice of openSimulationNotices[group]">
+                                {{ notice }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
 
     @if (errors.positions) {
         <app-error-display [errors]="errors.positions"></app-error-display>

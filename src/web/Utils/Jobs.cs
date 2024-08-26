@@ -14,9 +14,10 @@ public static class Jobs
     {
         var configuration = app.ApplicationServices.GetService<IConfiguration>();
         
-        var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
-        if (backendJobsSwitch != "off")
+        if (BackendJobsEnabled(configuration))
         {
+            app.UseHangfireDashboard();
+         
             logger.LogInformation("Backend jobs turned on");
             
             var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
@@ -87,6 +88,25 @@ public static class Jobs
                 recurringJobId: nameof(MonitoringServices.PortfolioAnalysisService.ReportOnMaxProfitBasedOnDaysHeld),
                 methodCall: service => service.ReportOnMaxProfitBasedOnDaysHeld(),
                 cronExpression: Cron.Weekly(DayOfWeek.Saturday, 8));
+        }
+        else
+        {
+            logger.LogInformation("Backend jobs turned off");
+        }
+    }
+
+    private static bool BackendJobsEnabled(IConfiguration configuration)
+    {
+        var backendJobsSwitch = configuration.GetValue<string>("BACKEND_JOBS");
+        return backendJobsSwitch != "off";
+    }
+
+    public static void AddJobs(IConfiguration configuration, IServiceCollection services, ILogger logger)
+    {
+        if (BackendJobsEnabled(configuration))
+        {
+            services.AddHangfire(config => { config.UseDashboardMetrics(); });
+            services.AddHangfireServer();
         }
         else
         {

@@ -6,7 +6,7 @@ import {
     openpositioncommand,
     PastStockTradingPerformance,
     PastStockTradingPositions,
-    PositionInstance,
+    PositionInstance, SimulationNotices,
     StockOwnership,
     StockTradingPositions,
     stocktransactioncommand,
@@ -43,6 +43,10 @@ export class StockPositionsService {
         return this.http.get<TradingStrategyPerformance[]>(
             `/api/portfolio/stockpositions/simulate/trades?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
         )
+    }
+    
+    openPositionSimulationNotices() : Observable<SimulationNotices> {
+        return this.http.get<SimulationNotices>('/api/portfolio/stockpositions/simulate/opentrades/notices')
     }
 
     simulatePositionsExportUrl(closePositionIfOpenAtTheEnd: boolean, numberOfTrades: number): string {

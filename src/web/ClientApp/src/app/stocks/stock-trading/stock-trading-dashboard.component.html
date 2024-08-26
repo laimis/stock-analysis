@@ -31,7 +31,7 @@
             </a>
             <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]=""
                (click)="activateTab('summary')">
-                Summary
+                Overview
             </a>
             <a class="tab" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)"
                [ngClass]="{'disabled': !isActive('positions') && !isActive('openreview') && !isActive('charts')}">

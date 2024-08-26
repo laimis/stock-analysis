@@ -549,6 +549,10 @@ export interface TickerCorrelation {
     correlations: number[]
 }
 
+export interface SimulationNotices {
+    [key: string]: string[];
+}
+
 export interface Link {
     success: boolean
     level: number

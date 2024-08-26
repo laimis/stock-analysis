@@ -78,6 +78,16 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
                 )
             )
         );
+    
+    [HttpGet("stockpositions/simulate/opentrades/notices")]
+    public Task<ActionResult> SimulateOpenTradesNotices() =>
+        this.OkOrError(
+            stockPositionHandler.Handle(
+                new SimulateOpenTrades(
+                    userId: User.Identifier()
+                )
+            )
+        );
 
     [HttpGet("stockpositions/simulate/trades/export")]
     public Task<ActionResult> SimulateTradesExport(

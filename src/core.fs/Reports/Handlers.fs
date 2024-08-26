@@ -3,6 +3,7 @@ namespace core.fs.Reports
 open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
+open System.Threading.Tasks
 open core.Shared
 open core.fs
 open core.fs.Accounts
@@ -12,6 +13,7 @@ open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
+open core.fs.Services.Trading
 open core.fs.Services.Trends
 open core.fs.Stocks
 
@@ -192,8 +194,7 @@ type SellView =
         match this.CurrentPrice with
         | None -> 0m
         | Some value -> (value - this.Price) / this.Price
-        
-        
+
 type TrendsQuery =
     {
         UserId: UserId
@@ -524,6 +525,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
             let! tasks =
                 positions
                 |> Seq.append brokerageStockPositions
+                |> Seq.filter (fun p -> p.HasLabel "strategy" "longterminterest" |> not)
                 |> Seq.map (fun position -> async {
                     
                     let calculations = position |> StockPositionWithCalculations

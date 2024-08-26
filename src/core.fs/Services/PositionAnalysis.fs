@@ -225,15 +225,6 @@ module PositionAnalysis =
                 ]
             )
             AnalysisOutcomeEvaluation(
-                "Risk Amount too Small or too Big",
-                OutcomeType.Negative,
-                PositionAnalysisKeys.RiskAmount,
-                tickerOutcomes |> TickerOutcomes.filter [
-                    yield! withRiskAmountFilters
-                    (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.RiskAmount && (o.Value < minimumRiskAmount || o.Value > (userState.MaxLoss |> Option.defaultValue maximumRiskAmount)))
-                ]
-            )
-            AnalysisOutcomeEvaluation(
                 "Shorts in Uptrend",
                 OutcomeType.Negative,
                 PositionAnalysisKeys.EMA20AboveSMA50Bars,

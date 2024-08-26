@@ -1,7 +1,6 @@
 module core.fs.Portfolio.MonitoringServices
 
 open System
-open System.Threading
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage

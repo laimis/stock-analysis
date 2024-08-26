@@ -1,12 +1,14 @@
 namespace core.fs.Portfolio
 
 open System
+open System.Collections.Generic
 open Microsoft.FSharp.Collections
 open core.Shared
 open core.Stocks
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
+open core.fs.Reports
 open core.fs.Services.Analysis
 open core.fs.Services.Trading
 
