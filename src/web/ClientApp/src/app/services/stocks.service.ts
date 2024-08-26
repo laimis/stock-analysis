@@ -1145,6 +1145,7 @@ export interface TradingStrategyResult {
     maxGainPct: number
     position: PositionInstance
     strategyName: string
+    forcedClosed: boolean
 }
 
 export interface StrategyProfitPoint {
@@ -1158,7 +1159,7 @@ export interface TradingStrategyResults {
 
 export interface TradingStrategyPerformance {
     performance: StockTradingPerformance
-    positions: PositionInstance[]
+    results: TradingStrategyResult[]
     strategyName: string
     numberOfOpenPositions: number
 }

@@ -27,6 +27,7 @@ type TradingStrategyResult =
         MaxGainPct:decimal
         Position:StockPositionWithCalculations
         StrategyName:string
+        ForcedClosed:bool
     }
 
 type TradingStrategyResults() =
@@ -308,13 +309,11 @@ type TradingStrategyPerformance =
     {
         strategyName : string
         performance: TradingPerformance
-        positions: StockPositionWithCalculations[]
-        maxDrawdownPct: decimal[]
-        maxGainPct: decimal[]
+        results: TradingStrategyResult[]
     }
     
     with
         member this.NumberOfOpenPositions =
-            this.positions
-            |> Array.filter (fun p -> p.IsClosed = false)
+            this.results
+            |> Array.filter (fun p -> p.Position.IsOpen)
             |> Array.length

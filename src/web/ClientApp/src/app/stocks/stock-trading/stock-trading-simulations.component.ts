@@ -70,16 +70,16 @@ export class StockTradingSimulationsComponent implements OnInit {
         return this.results.find(result => result.strategyName === name)
     }
     findActualTrade(position:PositionInstance) {
-        return this.getStrategyEntry("Actual trades ⭐").positions.find(p => p.ticker === position.ticker && p.opened === position.opened)
+        return this.getStrategyEntry("Actual trades ⭐").results.find(r => r.position.ticker === position.ticker && r.position.opened === position.opened)
     }
     
     biggestWinnersComparedToActual() {
-        const positions = this.getSelectedStrategyEntry().positions.slice();
+        const positions = this.getSelectedStrategyEntry().results.slice();
         
         positions.sort((a, b) => {
-                let bActualProfit = this.findActualTrade(b).profit;
-                let aActualProfit = this.findActualTrade(a).profit;
-                return (b.profit - bActualProfit) - (a.profit - aActualProfit)
+                let bActualProfit = this.findActualTrade(b.position).position.profit;
+                let aActualProfit = this.findActualTrade(a.position).position.profit;
+                return (b.position.profit - bActualProfit) - (a.position.profit - aActualProfit)
             }
         );
         
@@ -122,11 +122,11 @@ export class StockTradingSimulationsComponent implements OnInit {
     }
 
     backgroundCssClassForActual(results: TradingStrategyPerformance[], strategyIndex: number, positionIndex: number) {
-        const simulatedPosition = results[strategyIndex].positions[positionIndex];
-        const actualPosition = results[0].positions[positionIndex];
+        const simulatedPosition = results[strategyIndex].results[positionIndex];
+        const actualPosition = results[0].results[positionIndex];
 
-        const simulatedProfit = simulatedPosition.profit;
-        const actualProfit = actualPosition.profit;
+        const simulatedProfit = simulatedPosition.position.profit;
+        const actualProfit = actualPosition.position.profit;
 
         return actualProfit >= simulatedProfit ? 'bg-success' : '';
     }

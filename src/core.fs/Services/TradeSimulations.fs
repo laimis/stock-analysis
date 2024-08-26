@@ -31,6 +31,14 @@ type TradingStrategy(name:string) =
         match position.IsOpen with
         | true -> position |> StockPosition.close price date
         | false -> position
+        
+    static member ForceCloseIfNecessary closeIfOpen (context:SimulationContext) =
+        match closeIfOpen && context.Position.IsOpen with
+        | true ->
+            (context.Position.GetPositionState()
+            |> TradingStrategy.ClosePosition context.LastBar.Close context.LastBar.Date
+            |> StockPositionWithCalculations, true)
+        | false -> (context.Position, false)
     
     member this.Name = name
     member this.NumberOfSharesAtStart = _numberOfSharesAtStart
@@ -69,19 +77,14 @@ type TradingStrategy(name:string) =
                 bars.Bars
                 |> Seq.fold this.ApplyPriceBarToPosition context
                 
-            let finalPosition =
-                match closeIfOpen && finalContext.Position.IsClosed = false with
-                | true ->
-                    finalContext.Position.GetPositionState()
-                    |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
-                    |> StockPositionWithCalculations
-                | false -> finalContext.Position
+            let finalPosition, forcedClosed = TradingStrategy.ForceCloseIfNecessary closeIfOpen finalContext
             
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
                 MaxGainPct = finalContext.MaxGain
                 Position = finalPosition
                 StrategyName = this.Name
+                ForcedClosed = forcedClosed 
             }
 
 type TradingStrategyCloseOnCondition(name:string,exitCondition) =
@@ -120,19 +123,14 @@ type TradingStrategyActualTrade() =
                         { Position = calcs; MaxDrawdown = maxDrawdownPct; MaxGain = maxGainPct; LastBar = bar }
                 ) {Position = calcs; MaxDrawdown = Decimal.MaxValue; MaxGain = Decimal.MinValue; LastBar = bars.Bars[0]}
                 
-            let finalPosition =
-                match closeIfOpen with
-                | true ->
-                    finalContext.Position.GetPositionState()
-                    |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
-                    |> StockPositionWithCalculations
-                | false -> finalContext.Position
+            let finalPosition, forcedClosed = TradingStrategy.ForceCloseIfNecessary closeIfOpen finalContext
                 
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
                 MaxGainPct = finalContext.MaxGain
                 Position = finalPosition
                 StrategyName = TradingStrategyConstants.ActualTradesName
+                ForcedClosed = forcedClosed
             }
 
 type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPointFunc,stopPriceFunc) =

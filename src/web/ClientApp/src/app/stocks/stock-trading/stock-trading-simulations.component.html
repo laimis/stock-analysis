@@ -61,14 +61,14 @@
                 </tr>
             </thead>
             <tbody>
-                @for(trade of getSelectedStrategyEntry().positions; track trade) {
+                @for(result of getSelectedStrategyEntry().results; track result) {
                     <tr>
-                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="trade.ticker"></app-stock-link-and-tradingview-link></td>
-                        <td>{{ trade.opened | date }}</td>
-                        <td>{{ trade.closed | date }} ({{ trade.daysHeld }} vs {{ findActualTrade(trade).daysHeld }})</td>
-                        <td>{{ trade.profit | currency }} vs {{ findActualTrade(trade).profit | currency }}</td>
-                        <td>{{ trade.gainPct | percent }} vs {{ findActualTrade(trade).gainPct | percent }}</td>
-                        <td>{{ trade.completedPositionCostPerShare * trade.completedPositionShares | currency }}</td>
+                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
+                        <td>{{ result.position.opened | parsedDate }}</td>
+                        <td>{{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }} vs {{ findActualTrade(result.position).position.daysHeld }})</td>
+                        <td>{{ result.position.profit | currency }} vs {{ findActualTrade(result.position).position.profit | currency }}</td>
+                        <td>{{ result.position.gainPct | percent }} vs {{ findActualTrade(result.position).position.gainPct | percent }}</td>
+                        <td>{{ result.position.completedPositionCostPerShare * result.position.completedPositionShares | currency }}</td>
                     </tr>
                 }
             </tbody>
@@ -88,15 +88,15 @@
                 </tr>
             </thead>
             <tbody>
-                @for(trade of biggestWinnersComparedToActual(); track trade) {
+                @for(result of biggestWinnersComparedToActual(); track result) {
                     <tr>
-                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="trade.ticker"></app-stock-link-and-tradingview-link></td>
-                        <td>{{ trade.opened | date }}</td>
-                        <td>{{ trade.closed | date }} ({{ trade.daysHeld }})</td>
-                        <td>{{ trade.profit | currency }} vs {{ findActualTrade(trade).profit | currency }}</td>
-                        <td>{{ trade.gainPct | percent }} vs {{ findActualTrade(trade).gainPct | percent }}</td>
-                        <td>{{ trade.profit - findActualTrade(trade).profit | currency }}</td>
-                        <td>{{ trade.gainPct - findActualTrade(trade).gainPct | percent }}</td>
+                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
+                        <td>{{ result.position.opened | parsedDate }}</td>
+                        <td>{{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }})</td>
+                        <td>{{ result.position.profit | currency }} vs {{ findActualTrade(result.position).position.profit | currency }}</td>
+                        <td>{{ result.position.gainPct | percent }} vs {{ findActualTrade(result.position).position.gainPct | percent }}</td>
+                        <td>{{ result.position.profit - findActualTrade(result.position).position.profit | currency }}</td>
+                        <td>{{ result.position.gainPct - findActualTrade(result.position).position.gainPct | percent }}</td>
                     </tr>
                 }
             </tbody>

@@ -160,11 +160,11 @@ module CSVExport =
         let rows =
             strategies
             |> Seq.collect (fun strategy -> 
-                strategy.positions
-                |> Seq.mapi (fun index position ->
-                    let maxDrawdown = strategy.maxDrawdownPct[index] |> Some
-                    let maxGain = strategy.maxGainPct[index] |> Some
-                    mapToTradeRecord culture strategy.strategyName maxDrawdown maxGain position)
+                strategy.results
+                |> Seq.map (fun result ->
+                    let maxDrawdown = result.MaxDrawdownPct |> Some
+                    let maxGain = result.MaxGainPct |> Some
+                    mapToTradeRecord culture strategy.strategyName maxDrawdown maxGain result.Position)
             )
             
         writer.Generate(rows)

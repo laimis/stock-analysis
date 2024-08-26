@@ -693,11 +693,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         }
         
         let mapToStrategyPerformance (name:string, results:TradingStrategyResult seq) =
-            let positions = results |> Seq.map (_.Position) |> Seq.toArray |> Array.sortBy _.Closed
-            let maxDrawdowns = results |> Seq.map (_.MaxDrawdownPct) |> Seq.toArray
-            let maxGains = results |> Seq.map (_.MaxGainPct) |> Seq.toArray
-            let performance = TradingPerformance.Create name positions
-            {performance = performance; strategyName = name; positions = positions; maxDrawdownPct = maxDrawdowns; maxGainPct = maxGains }
+            let performance = TradingPerformance.Create name (results |> Seq.map _.Position)
+            {performance = performance; strategyName = name; results = results |> Seq.toArray }
         
         let! user = accounts.GetUser(command.UserId)
         match user with
@@ -845,8 +842,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.groupBy _.GetLabelValue(key="strategy")
                 |> Seq.map (fun (name, positions) ->
                     let performance = TradingPerformance.Create name positions
-                    // TODO: can we figure out the max drawdown split thing here?
-                    {strategyName = name; performance = performance; positions = (positions |> Seq.toArray); maxDrawdownPct = [||]; maxGainPct = [||] }
+                    let results = positions |> Seq.map (fun p -> {TradingStrategyResult.Position =p; ForcedClosed = false; StrategyName = name; MaxDrawdownPct = 0m; MaxGainPct = 0m; }) |> Seq.toArray
+                    {strategyName = name; performance = performance; results = results }
                 )
                 |> Seq.sortByDescending _.performance.Profit
                 |> Seq.toArray

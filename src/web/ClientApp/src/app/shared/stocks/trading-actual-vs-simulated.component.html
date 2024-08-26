@@ -11,6 +11,7 @@
                 <th class="sort-header" (click)="sortChanged('maxGainPct')">Max Fav Exc</th>
                 <th class="sort-header" (click)="sortChanged('maxDrawdownPct')">Max Adv Exc</th>
                 <th class="sort-header" (click)="sortChanged('daysHeld')">DaysHeld</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -24,6 +25,10 @@
                         <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxGainPct | percent:'1.2-2' }}</td>
                         <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxDrawdownPct | percent:'1.2-2' }}</td>
                         <td>{{ r.position.daysHeld }}</td>
+                        <td>
+                            <!-- font awesome icon, green color -->
+                            <i class="fas fa-circle text-success" *ngIf="r.forcedClosed"></i>
+                        </td>
                     </tr>
                     @if (showDetails === i) {
                         <tr>
