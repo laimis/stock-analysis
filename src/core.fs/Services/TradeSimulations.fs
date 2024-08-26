@@ -13,8 +13,21 @@ type TradingStrategy(name:string) =
     
     let mutable _numberOfSharesAtStart = 0m
     
-    static member DrawdownFromBar (bar:PriceBar) referencePrice =
-        bar.percentDifferenceFromClose(referencePrice)
+    static member CalculateMAEPercentage (context:SimulationContext) (bar:PriceBar) =
+        let referencePrice = context.Position |> StockPositionWithCalculations |> _.PositionOpenPrice
+        let difference =
+            match context.Position.StockPositionType with
+            | Short -> (referencePrice - bar.Close) / referencePrice
+            | Long -> bar.percentDifferenceFromClose(referencePrice)
+        Math.Min(context.MaxDrawdown, difference)    
+    
+    static member CalculateMFEPercentage (context:SimulationContext) (bar:PriceBar) =
+        let referencePrice = context.Position |> StockPositionWithCalculations |> _.PositionOpenPrice
+        let difference =
+            match context.Position.StockPositionType with
+            | Short -> (referencePrice - bar.Close) / referencePrice
+            | Long -> bar.percentDifferenceFromClose(referencePrice)
+        Math.Max(context.MaxGain, difference)
     
     static member GainFromBar (bar:PriceBar) referencePrice =
         bar.percentDifferenceFromClose(referencePrice)
@@ -40,8 +53,8 @@ type TradingStrategy(name:string) =
             
             {
                 Position = latestPositionState
-                MaxDrawdown = Math.Min(context.MaxDrawdown, latestPositionStateWithCalculations.PositionOpenPrice |> TradingStrategy.DrawdownFromBar bar)
-                MaxGain = Math.Max(context.MaxGain, latestPositionStateWithCalculations.PositionOpenPrice |> TradingStrategy.GainFromBar bar)
+                MaxDrawdown = TradingStrategy.CalculateMAEPercentage context bar
+                MaxGain = TradingStrategy.CalculateMFEPercentage context bar
                 LastBar = bar 
             }
            
@@ -106,29 +119,28 @@ type TradingStrategyActualTrade() =
     
         member this.Run (bars:PriceBars) (closeIfOpen:bool) (position:StockPositionState) =
             
-            let finalPosition, maxDrawdownPct, maxGainPct, lastBar =
+            let finalContext =
                 bars.Bars
-                |> Seq.fold (fun (position:StockPositionState, maxDrawdownPct, maxGainPct, lastBar) bar ->
+                |> Seq.fold (fun (context:SimulationContext) bar ->
                     if position.IsClosed && bar.Date.Date > position.Closed.Value.Date then
-                        position, maxDrawdownPct, maxGainPct, lastBar
+                        context
                     else
-                        let calculation = position |> StockPositionWithCalculations
-                        let maxDrawdownPct = Math.Min(maxDrawdownPct, TradingStrategy.DrawdownFromBar bar calculation.PositionOpenPrice)
-                        let maxGainPct = Math.Max(maxGainPct, TradingStrategy.GainFromBar bar calculation.PositionOpenPrice)
+                        let maxDrawdownPct = TradingStrategy.CalculateMAEPercentage context bar
+                        let maxGainPct = TradingStrategy.CalculateMFEPercentage context bar
                         
-                        position, maxDrawdownPct, maxGainPct, bar
-                ) (position, Decimal.MaxValue, Decimal.MinValue, bars.Bars[0])
+                        { Position = position; MaxDrawdown = maxDrawdownPct; MaxGain = maxGainPct; LastBar = bar }
+                ) {Position = position; MaxDrawdown = Decimal.MaxValue; MaxGain = Decimal.MinValue; LastBar = bars.Bars[0]}
                 
             let positionWithCalculations =
                 match closeIfOpen with
                 | true ->
-                    finalPosition |> TradingStrategy.ClosePosition lastBar.Close lastBar.Date
-                | false -> finalPosition
+                    finalContext.Position |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
+                | false -> finalContext.Position
                 |> StockPositionWithCalculations
                 
             {
-                MaxDrawdownPct = maxDrawdownPct
-                MaxGainPct = maxGainPct
+                MaxDrawdownPct = finalContext.MaxDrawdown
+                MaxGainPct = finalContext.MaxGain
                 Position = positionWithCalculations
                 StrategyName = TradingStrategyConstants.ActualTradesName
             }

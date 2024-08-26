@@ -663,7 +663,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 | false -> (stopPrice - fromPrice) / fromPrice
                 
     member this.PercentToStopFromCost = this.PercentToStop this.AverageCostPerShare
-        
+    member this.GetPositionState() = stockPosition
     member this.ContainsLabel key = stockPosition.Labels.ContainsKey(key)
         
     member this.GetLabelValue key = stockPosition.Labels[key]

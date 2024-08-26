@@ -178,6 +178,10 @@ let ``With price falling, short position simulates profit taking``() =
     position.RR |> should equal 2.4m
     position.DaysHeld |> should equal 3
     
+    // mae and mfe are correctly calculated for shorts
+    result.MaxDrawdownPct |> should equal 0m
+    result.MaxGainPct |> should equal 0.15m
+    
 
 [<Fact>]
 let ``Close after fixed number of days, works``() =
