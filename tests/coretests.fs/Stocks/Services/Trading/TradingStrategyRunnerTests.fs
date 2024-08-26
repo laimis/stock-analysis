@@ -251,3 +251,25 @@ let ``Trailing stop adjusts as the short position drops`` () =
     result.MaxDrawdownPct |> should equal 0m
     position.StopPrice |> Option.get |> should equal 55m
     
+[<Fact>]
+let ``Fixed number of days but with stop for a long position that's falling, respects stop`` () =
+    let data = generatePriceBars 10 (fun i -> 50 - i |> decimal)
+    
+    let positionInstance =
+        StockPosition.openLong TestDataGenerator.NET data.First.Date
+        |> StockPosition.buy 5m 50m data.First.Date
+        |> StockPosition.setStop (Some 45m) data.First.Date
+        
+    let runner = TradingStrategyFactory.createCloseAfterFixedNumberOfDaysWithStop "desc" 30 45m
+    
+    let result = runner.Run data false positionInstance
+    
+    let position = result.Position
+    
+    position.IsClosed |> should equal true
+    position.DaysHeld |> should equal 6
+    position.Profit |> should equal -30
+    position.GainPct |> should equal -0.12m
+    position.RR |> should equal -1.2m
+    result.MaxGainPct |> should equal 0m
+    result.MaxDrawdownPct |> should equal -0.12m

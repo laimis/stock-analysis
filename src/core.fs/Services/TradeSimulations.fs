@@ -238,7 +238,7 @@ module TradingStrategyFactory =
             doExit, None
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days", exitCondition)
         
-    let createCloseAfterFixedNumberOfDaysWithStop (numberOfDays:int) (stopDescription:string) (stopPrice:decimal) : ITradingStrategy =
+    let createCloseAfterFixedNumberOfDaysWithStop (stopDescription:string) (numberOfDays:int) (stopPrice:decimal) : ITradingStrategy =
         let daysHeldReached = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
         let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
             match context.Position.IsShort with
@@ -316,7 +316,7 @@ module TradingStrategyFactory =
             costPerShare * multiplier
             
         [
-            createProfitPointsTrade 3 // 3 profit points
+            createProfitPointsTrade 3
             createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
             createCloseAfterFixedNumberOfDays 15
             createCloseAfterFixedNumberOfDays 30
@@ -325,10 +325,10 @@ module TradingStrategyFactory =
             createTrailingStop "20%" 0.20m None
             if actualTrade.IsSome then
                 createLastSellStrategy actualTrade.Value
-                createCloseAfterFixedNumberOfDaysWithStop 30 "size based" (actualTrade.Value |> firstStop)
-                createCloseAfterFixedNumberOfDaysWithStop 30 "5% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
-                createCloseAfterFixedNumberOfDaysWithStop 30 "10% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
-                createCloseAfterFixedNumberOfDaysWithStop 30 "20% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
+                createCloseAfterFixedNumberOfDaysWithStop "size based" 30 (actualTrade.Value |> firstStop)
+                createCloseAfterFixedNumberOfDaysWithStop "5% stop" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
+                createCloseAfterFixedNumberOfDaysWithStop "10% stop" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
+                createCloseAfterFixedNumberOfDaysWithStop "20% stop" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
                 createTrailingStop "5% w/ initial stop" 0.05m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "10% w/ initial stop" 0.10m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "20% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
