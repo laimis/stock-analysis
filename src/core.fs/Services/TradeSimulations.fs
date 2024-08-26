@@ -248,6 +248,11 @@ module TradingStrategyFactory =
         TradingStrategyCloseOnCondition($"Close after {numberOfDays} days with {stopDescription} stop", exitCondition)
         
     let createTrailingStop (stopDescription:string) (trailingPercentage:decimal) (initialStop:decimal option)  : ITradingStrategy =
+        if trailingPercentage <= 0m then
+            failwith "Trailing percentage must be greater than 0"
+        if trailingPercentage >= 1m then
+            failwith "Trailing percentage must be less than 1"
+        
         let latestStop =
             match initialStop with
             | Some stop -> ref stop
@@ -256,11 +261,12 @@ module TradingStrategyFactory =
         let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
             let stopReached =
                 match context.Position.StockPositionType with
-                | Short -> bar.Close > latestStop.Value
+                | Short -> bar.Close > latestStop.Value && latestStop.Value <> 0m
                 | Long -> bar.Close < latestStop.Value
             
             match stopReached with
-            | true -> (true, Some latestStop.Value)
+            | true ->
+                true, Some latestStop.Value
             | false ->
                 
                 match context.Position.StockPositionType with

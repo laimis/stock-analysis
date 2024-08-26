@@ -50,6 +50,7 @@ export class StockTradingSimulationsComponent implements OnInit {
     
     simulateTrades() {
         this.loading = true
+        this.errors = [];
         this.benchmarks = [];
         this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
             this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
