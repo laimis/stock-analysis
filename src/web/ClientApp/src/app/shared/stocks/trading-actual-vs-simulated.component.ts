@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {TradingStrategyResults} from 'src/app/services/stocks.service';
+import {TradingStrategyResult, TradingStrategyResults} from 'src/app/services/stocks.service';
 
 
 @Component({
@@ -11,12 +11,31 @@ export class TradingActualVsSimulatedPositionComponent {
 
     showDetails: number | null = null;
 
+    results: TradingStrategyResult[] = [];
+    sortedResults: TradingStrategyResult[] = [];
+    
     @Input()
-    simulations: TradingStrategyResults
+    set simulations(value: TradingStrategyResults) {
+        this.results = value.results;
+        this.sortResults();
+    }
 
     @Input()
     simulationErrors: string[];
 
+    sortColumn: string = 'profit';
+    sortDirection: string = 'desc';
+    
+    sortChanged(column: string) {
+        if (this.sortColumn == column) {
+            this.sortDirection = this.sortDirection == 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortColumn = column;
+            this.sortDirection = 'desc';
+        }
+        this.sortResults()
+    }
+    
     toggleShowDetails(index: number) {
         if (this.showDetails == index) {
             this.showDetails = null;
@@ -25,8 +44,21 @@ export class TradingActualVsSimulatedPositionComponent {
         }
     }
 
-    sortedResults() {
-        return this.simulations.results.sort((a, b) => b.position.profit - a.position.profit);
+    sortResults() {
+        console.log('sortResults', this.sortColumn, this.sortDirection);
+        this.sortedResults = this.results.sort((a, b) => {
+            
+            // we either use a and b directory or .position on a and b
+            // depending on the sort column
+            let bSort = (b.position[this.sortColumn] == null) ? b[this.sortColumn] : b.position[this.sortColumn];
+            let aSort = (a.position[this.sortColumn] == null) ? a[this.sortColumn] : a.position[this.sortColumn];
+            
+            if (this.sortDirection == 'desc') {
+                return bSort - aSort;
+            } else {
+                return aSort - bSort;
+            }});
+        
     }
 }
 

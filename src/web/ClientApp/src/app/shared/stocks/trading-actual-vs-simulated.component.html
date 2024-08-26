@@ -1,20 +1,20 @@
 <div>
-    @if (simulations) {
+    @if (sortedResults) {
         <table class="table table-hover simulation-table table-sm mt-2">
             <thead>
             <tr>
                 <th>Strategy</th>
-                <th>Profit</th>
-                <th>Stop</th>
-                <th>R/R</th>
-                <th>% Gain</th>
-                <th>Max Fav Exc</th>
-                <th>Max Adv Exc</th>
-                <th>DaysHeld</th>
+                <th class="sort-header" (click)="sortChanged('profit')">Profit</th>
+                <th class="sort-header" (click)="sortChanged('stopPrice')">Stop</th>
+                <th class="sort-header" (click)="sortChanged('rr')">R/R</th>
+                <th class="sort-header" (click)="sortChanged('gainPct')">% Gain</th>
+                <th class="sort-header" (click)="sortChanged('maxGainPct')">Max Fav Exc</th>
+                <th class="sort-header" (click)="sortChanged('maxDrawdownPct')">Max Adv Exc</th>
+                <th class="sort-header" (click)="sortChanged('daysHeld')">DaysHeld</th>
             </tr>
             </thead>
             <tbody>
-                @for (r of sortedResults(); track r; let i = $index) {
+                @for (r of sortedResults; track r; let i = $index) {
                     <tr (click)="toggleShowDetails(i)">
                         <td class="text-muted">{{ r.strategyName }}</td>
                         <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{ r.position.profit | currency }}</td>
