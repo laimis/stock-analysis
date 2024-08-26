@@ -231,6 +231,29 @@ let ``Trailing stop adjusts as the long position gains``() =
     position.StopPrice |> Option.get |> should equal 54m
     
 [<Fact>]
+let ``Trailing stop with initial stop starts with initial stop``() =
+    
+    let data = generatePriceBars 10 (fun i -> 50 + i |> decimal)
+    
+    let positionInstance =
+        StockPosition.openLong TestDataGenerator.NET data.First.Date
+        |> StockPosition.buy 5m 50m data.First.Date
+        |> StockPosition.setStop (Some 45m) data.First.Date
+        
+    let runner = TradingStrategyFactory.createTrailingStop "test trailing stop" 0.5m (Some 50m)
+    
+    let result = runner.Run data false positionInstance
+    
+    let position = result.Position
+    
+    position.IsClosed |> should equal false
+    result.MaxGainPct |> should equal 0.2m
+    result.MaxDrawdownPct |> should equal 0m
+    // the trailing stop should continuously be lower than the initial stop, so it should not come into play
+    // and initial stop should remain until trailing stop is higher
+    position.StopPrice |> Option.get |> should equal 50m
+    
+[<Fact>]
 let ``Trailing stop adjusts as the short position drops`` () =
     
     let data = generatePriceBars 10 (fun i -> 100 - i*5 |> decimal)

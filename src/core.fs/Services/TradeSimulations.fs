@@ -254,10 +254,8 @@ module TradingStrategyFactory =
             failwith "Trailing percentage must be greater than 0"
         if trailingPercentage >= 1m then
             failwith "Trailing percentage must be less than 1"
-        if initialStop.IsSome && initialStop.Value <= 0m then
-            failwith "Initial stop must be greater than 0"
-        if initialStop.IsSome && initialStop.Value >= 1m then
-            failwith "Initial stop must be less than 1"
+        if initialStop.IsSome && initialStop.Value < 0m then
+            failwith "Initial stop must be greater or equal to 0"
         
         let latestStop =
             match initialStop with
