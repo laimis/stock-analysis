@@ -15,7 +15,7 @@ module TradingStrategyConstants =
     
 type SimulationContext =
     {
-        Position:StockPositionState
+        Position:StockPositionWithCalculations
         MaxGain:decimal
         MaxDrawdown:decimal
         LastBar:PriceBar

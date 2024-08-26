@@ -13,24 +13,19 @@ type TradingStrategy(name:string) =
     
     let mutable _numberOfSharesAtStart = 0m
     
+    static member GetPercentDiffFromReferencePrice (bar:PriceBar) (context:SimulationContext) =
+        let referencePrice = context.Position.PositionOpenPrice
+        match context.Position.IsShort with
+        | true -> (referencePrice - bar.Close) / referencePrice
+        | false -> bar.percentDifferenceFromClose(referencePrice)
+        
     static member CalculateMAEPercentage (context:SimulationContext) (bar:PriceBar) =
-        let referencePrice = context.Position |> StockPositionWithCalculations |> _.PositionOpenPrice
-        let difference =
-            match context.Position.StockPositionType with
-            | Short -> (referencePrice - bar.Close) / referencePrice
-            | Long -> bar.percentDifferenceFromClose(referencePrice)
+        let difference = context |> TradingStrategy.GetPercentDiffFromReferencePrice bar
         Math.Min(context.MaxDrawdown, difference)    
     
     static member CalculateMFEPercentage (context:SimulationContext) (bar:PriceBar) =
-        let referencePrice = context.Position |> StockPositionWithCalculations |> _.PositionOpenPrice
-        let difference =
-            match context.Position.StockPositionType with
-            | Short -> (referencePrice - bar.Close) / referencePrice
-            | Long -> bar.percentDifferenceFromClose(referencePrice)
+        let difference = context |> TradingStrategy.GetPercentDiffFromReferencePrice bar
         Math.Max(context.MaxGain, difference)
-    
-    static member GainFromBar (bar:PriceBar) referencePrice =
-        bar.percentDifferenceFromClose(referencePrice)
     
     static member ClosePosition price date (position:StockPositionState) =
         match position.IsOpen with
@@ -49,10 +44,8 @@ type TradingStrategy(name:string) =
         | None ->
             let latestPositionState = this.ApplyPriceBarToPositionInternal context bar
             
-            let latestPositionStateWithCalculations = latestPositionState |> StockPositionWithCalculations
-            
             {
-                Position = latestPositionState
+                Position = latestPositionState |> StockPositionWithCalculations
                 MaxDrawdown = TradingStrategy.CalculateMAEPercentage context bar
                 MaxGain = TradingStrategy.CalculateMFEPercentage context bar
                 LastBar = bar 
@@ -64,7 +57,7 @@ type TradingStrategy(name:string) =
             
             let context = 
                 {
-                    Position = position
+                    Position = position |> StockPositionWithCalculations
                     MaxDrawdown = Decimal.MaxValue
                     MaxGain = Decimal.MinValue
                     LastBar = bars.Bars[0] 
@@ -76,17 +69,18 @@ type TradingStrategy(name:string) =
                 bars.Bars
                 |> Seq.fold this.ApplyPriceBarToPosition context
                 
-            let positionWithCalculations =
+            let finalPosition =
                 match closeIfOpen && finalContext.Position.IsClosed = false with
                 | true ->
-                    finalContext.Position |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
+                    finalContext.Position.GetPositionState()
+                    |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
+                    |> StockPositionWithCalculations
                 | false -> finalContext.Position
-                |> StockPositionWithCalculations
             
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
                 MaxGainPct = finalContext.MaxGain
-                Position = positionWithCalculations
+                Position = finalPosition
                 StrategyName = this.Name
             }
 
@@ -99,14 +93,8 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
         
         let positionAfterStopAdjustment =
             match stopPrice with
-            | Some _ ->
-                if stopPrice.Value <= 0m then
-                    // TODO: how can this happen?
-                    System.Console.WriteLine($"Attempted to set a negative stop price: {stopPrice.Value} for {context.Position.Ticker} via strategy {name}, skipping")
-                    context.Position
-                else
-                    context.Position |> StockPosition.setStop stopPrice bar.Date
-            | None -> context.Position
+            | Some _ -> context.Position.GetPositionState() |> StockPosition.setStop stopPrice bar.Date
+            | None -> context.Position.GetPositionState()
             
         if doExit then
             positionAfterStopAdjustment |> TradingStrategy.ClosePosition bar.Close bar.Date
@@ -119,6 +107,7 @@ type TradingStrategyActualTrade() =
     
         member this.Run (bars:PriceBars) (closeIfOpen:bool) (position:StockPositionState) =
             
+            let calcs = position |> StockPositionWithCalculations
             let finalContext =
                 bars.Bars
                 |> Seq.fold (fun (context:SimulationContext) bar ->
@@ -128,20 +117,21 @@ type TradingStrategyActualTrade() =
                         let maxDrawdownPct = TradingStrategy.CalculateMAEPercentage context bar
                         let maxGainPct = TradingStrategy.CalculateMFEPercentage context bar
                         
-                        { Position = position; MaxDrawdown = maxDrawdownPct; MaxGain = maxGainPct; LastBar = bar }
-                ) {Position = position; MaxDrawdown = Decimal.MaxValue; MaxGain = Decimal.MinValue; LastBar = bars.Bars[0]}
+                        { Position = calcs; MaxDrawdown = maxDrawdownPct; MaxGain = maxGainPct; LastBar = bar }
+                ) {Position = calcs; MaxDrawdown = Decimal.MaxValue; MaxGain = Decimal.MinValue; LastBar = bars.Bars[0]}
                 
-            let positionWithCalculations =
+            let finalPosition =
                 match closeIfOpen with
                 | true ->
-                    finalContext.Position |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
+                    finalContext.Position.GetPositionState()
+                    |> TradingStrategy.ClosePosition finalContext.LastBar.Close finalContext.LastBar.Date
+                    |> StockPositionWithCalculations
                 | false -> finalContext.Position
-                |> StockPositionWithCalculations
                 
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
                 MaxGainPct = finalContext.MaxGain
-                Position = positionWithCalculations
+                Position = finalPosition
                 StrategyName = TradingStrategyConstants.ActualTradesName
             }
 
@@ -151,12 +141,12 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
     
     let mutable _level = 1
     
-    member this.ExecuteProfitTake sellPrice date (position:StockPositionState) =
+    member this.ExecuteProfitTake sellPrice date (position:StockPositionWithCalculations) =
         
-        let executeProfitTake portion price date (position:StockPositionState) =
-            match position.StockPositionType with
-            | Short -> position |> StockPosition.buy portion price date
-            | Long -> position |> StockPosition.sell portion price date
+        let executeProfitTake portion price date (position:StockPositionWithCalculations) =
+            match position.IsShort with
+            | true -> position.GetPositionState() |> StockPosition.buy portion price date
+            | false -> position.GetPositionState() |> StockPosition.sell portion price date
             
         // figure out how much to sell based on the number of profit points
         // and how many shares we have left
@@ -189,7 +179,7 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
             
     override this.ApplyPriceBarToPositionInternal context bar =
         
-        let profitPrice = context.Position |> StockPositionWithCalculations |> profitPointFunc _level
+        let profitPrice = context.Position |> profitPointFunc _level
                 
         let stopReached price (position:StockPositionState) =
             match position.StopPrice with
@@ -199,15 +189,15 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
                 | Long -> price <= stopPrice
             | _ -> false
             
-        let profitTakeReached (bar:PriceBar) (position:StockPositionState) =
-            match position.StockPositionType with
-            | Short -> bar.Low < profitPrice
-            | Long -> bar.High > profitPrice
+        let profitTakeReached (bar:PriceBar) (position:StockPositionWithCalculations) =
+            match position.IsShort with
+            | true -> bar.Low < profitPrice
+            | false -> bar.High > profitPrice
         
-        let executeProfitTakeIfNecessary (position:StockPositionState) =
+        let executeProfitTakeIfNecessary (position:StockPositionWithCalculations) =
             match profitTakeReached bar position with
             | true -> this.ExecuteProfitTake profitPrice bar.Date position
-            | false -> position
+            | false -> position.GetPositionState()
         
         let closeIfNecessary (position:StockPositionState) =
             match stopReached bar.Close position with
@@ -251,9 +241,9 @@ module TradingStrategyFactory =
     let createCloseAfterFixedNumberOfDaysWithStop (numberOfDays:int) (stopDescription:string) (stopPrice:decimal) : ITradingStrategy =
         let daysHeldReached = fun (context:SimulationContext) (bar:PriceBar) -> bar.Date - context.Position.Opened > TimeSpan.FromDays(float numberOfDays)
         let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
-            match context.Position.StockPositionType with
-            | Short -> bar.Close > stopPrice
-            | Long -> bar.Close < stopPrice
+            match context.Position.IsShort with
+            | true -> bar.Close > stopPrice
+            | false -> bar.Close < stopPrice
         let exitCondition = fun (context:SimulationContext) (bar:PriceBar) ->
             let doExit = daysHeldReached context bar || stopReached context bar
             (doExit, Some stopPrice)
@@ -272,17 +262,17 @@ module TradingStrategyFactory =
             
         let stopReached = fun (context:SimulationContext) (bar:PriceBar) ->
             let stopReached =
-                match context.Position.StockPositionType with
-                | Short -> bar.Close > latestStop.Value && latestStop.Value <> 0m
-                | Long -> bar.Close < latestStop.Value
+                match context.Position.IsShort with
+                | true -> bar.Close > latestStop.Value && latestStop.Value <> 0m
+                | false -> bar.Close < latestStop.Value
             
             match stopReached with
             | true ->
                 true, Some latestStop.Value
             | false ->
                 
-                match context.Position.StockPositionType with
-                | Short ->
+                match context.Position.IsShort with
+                | true ->
                     let newStopPriceCandidate = bar.Close * (1m + trailingPercentage)
                     // the initial stop is 0m if one is not set explicitly
                     // and that breaks the math.min logic as that initial stop will always be selected
@@ -291,7 +281,7 @@ module TradingStrategyFactory =
                         match latestStop.Value with
                         | 0m -> newStopPriceCandidate
                         | _ -> Math.Min(latestStop.Value,newStopPriceCandidate)
-                | Long ->
+                | false ->
                     let newStopPriceCandidate = bar.Close * (1m - trailingPercentage)
                     latestStop.Value <- Math.Max(latestStop.Value,newStopPriceCandidate)
                 
