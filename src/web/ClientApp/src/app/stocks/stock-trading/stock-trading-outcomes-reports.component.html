@@ -1,17 +1,4 @@
 <div>
-    @if (allBarsReport || positionsReport || singleBarReportDaily || singleBarReportWeekly) {
-        <div class="mb-3 mt-3">
-            <label for="tickerFilter" class="form-label">Ticker filter</label>
-            <select #tickerSelect id="tickerFilter" name="tickerFilter" class="form-select" aria-label="Ticker filter"
-                    (change)="onTickerChange(tickerSelect.value)">
-                <option value="all">All</option>
-                @for (t of tickers; track t) {
-                    <option [value]="t">{{ t }}</option>
-                }
-            </select>
-        </div>
-    }
-
     @if (errors.allBars) {
         <app-error-display [errors]="errors.allBars"></app-error-display>
     }
@@ -34,7 +21,8 @@
         <app-loading></app-loading>
     }
     @if (openSimulationNotices) {
-        <div class="container">
+        <section class="container">
+            <h4>Open Position Simulation Notices</h4>
             <div class="row">
                 <div class="col-12">
                     <div class="card mb-4" *ngFor="let group of getOpenSimulationKeys()">
@@ -49,8 +37,20 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+    }
 
+    @if (allBarsReport || positionsReport || singleBarReportDaily || singleBarReportWeekly) {
+        <div class="mb-3 mt-3">
+            <label for="tickerFilter" class="form-label">Highlight Ticker</label>
+            <select #tickerSelect id="tickerFilter" name="tickerFilter" class="form-select" aria-label="Ticker filter"
+                    (change)="onTickerChange(tickerSelect.value)">
+                <option value="all">All</option>
+                @for (t of tickers; track t) {
+                    <option [value]="t">{{ t }}</option>
+                }
+            </select>
+        </div>
     }
 
     @if (errors.positions) {

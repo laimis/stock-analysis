@@ -27,7 +27,7 @@ export class StockPositionReportsComponent {
     correlationReport: TickerCorrelation[];
     tickerFilter: string;
     daysForCorrelations = 60
-    openSimulationNotices: SimulationNotices = {}
+    openSimulationNotices: SimulationNotices = null
     getOpenSimulationKeys() {
         return Object.keys(this.openSimulationNotices);
     }
