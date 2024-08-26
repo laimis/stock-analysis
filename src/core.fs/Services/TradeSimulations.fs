@@ -322,9 +322,9 @@ module TradingStrategyFactory =
                 createCloseAfterFixedNumberOfDaysWithStop 30 "size based" (actualTrade.Value |> firstStop)
                 createCloseAfterFixedNumberOfDaysWithStop 30 "5% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
                 createCloseAfterFixedNumberOfDaysWithStop 30 "10% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
-                createCloseAfterFixedNumberOfDaysWithStop 30 "20% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
-                createTrailingStop "5% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
-                createTrailingStop "10% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
+                createCloseAfterFixedNumberOfDaysWithStop 30 "20% stop" (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
+                createTrailingStop "5% w/ initial stop" 0.05m (actualTrade.Value |> firstStop |> Some)
+                createTrailingStop "10% w/ initial stop" 0.10m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "20% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
         ]
     
