@@ -21,7 +21,7 @@ open core.fs.Stocks
 type private PatternCheck = {
     ticker: Ticker
     listNames: string list
-    user: UserState
+    user: UserId
 }
 
 [<Struct>]
@@ -177,25 +177,26 @@ type PatternMonitoringService(
         | None ->
             return Seq.empty<PatternCheck>
         | Some user ->
+            let userId = user.State.Id |> UserId
             let! ownedStocks = emailIdPair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
             let portfolioList =
                 ownedStocks
                 |> Seq.filter (_.IsOpen)
                 |> Seq.map (_.Ticker)
-                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PortfolioIdentifier]; user=user.State})
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PortfolioIdentifier]; user=userId})
 
             let! pendingPositions = emailIdPair.Id |> portfolio.GetPendingStockPositions |> Async.AwaitTask
             let pendingList =
                 pendingPositions
                 |> Seq.filter (fun p -> p.State.IsClosed |> not)
                 |> Seq.map (_.State.Ticker)
-                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PendingIdentifier]; user=user.State})
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PendingIdentifier]; user=userId})
 
             let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
             let stockList =
                 lists
                 |> Seq.filter (_.State.ContainsTag(Constants.MonitorTagPattern))
-                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=user.State}))
+                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=userId}))
                 |> Seq.concat
 
             // create a map of all the tickers we are checking so we can remove duplicates, and we want to prefer portfolio list entries
@@ -258,30 +259,33 @@ type PatternMonitoringService(
 
     let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
 
-        match alertCheck.user.ConnectedToBrokerage with
-        | false -> return None
-        | true ->
-            let! priceResponse = getPrices logger alertCheck.user alertCheck.ticker |> Async.AwaitTask
+        let! user = accounts.GetUser alertCheck.user |> Async.AwaitTask
+        
+        match user with
+        | None -> return None
+        | Some user ->
+            match user.State.ConnectedToBrokerage with
+            | false -> return None
+            | true ->
+                let! priceResponse = getPrices logger user.State alertCheck.ticker |> Async.AwaitTask
 
-            match priceResponse with
-            | Error _ -> return None
-            | Ok prices ->
+                match priceResponse with
+                | Error _ -> return None
+                | Ok prices ->
 
-                let userId = alertCheck.user.Id |> UserId
+                    PatternDetection.availablePatterns
+                    |> Seq.iter( fun pattern ->
+                        container.Deregister alertCheck.ticker pattern alertCheck.user
+                    )
 
-                PatternDetection.availablePatterns
-                |> Seq.iter( fun pattern ->
-                    container.Deregister alertCheck.ticker pattern userId
-                )
+                    let patterns = PatternDetection.generate prices
 
-                let patterns = PatternDetection.generate prices
+                    patterns |> List.iter (fun p ->
+                        let alert = TriggeredAlert.PatternAlert p alertCheck.ticker alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user
+                        container.Register alert
+                    )
 
-                patterns |> List.iter (fun p ->
-                    let alert = TriggeredAlert.PatternAlert p alertCheck.ticker alertCheck.listNames DateTimeOffset.UtcNow userId
-                    container.Register alert
-                )
-
-                return Some (alertCheck,patterns.Length)
+                    return Some (alertCheck,patterns.Length)
     }
 
     let runThroughMonitoringChecks logger = task {
@@ -314,7 +318,7 @@ type PatternMonitoringService(
             if startingNumberOfChecks > 0 then
                 container.AddNotice($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
         | _ ->
-            container.AddNotice($"Pattern monitoring checks completed, {listOfChecks.Count} remaining")
+            container.AddNotice($"{completedChecks |> Seq.length} pattern monitoring checks completed, {listOfChecks.Count} remaining")
     }
 
     interface IApplicationService
