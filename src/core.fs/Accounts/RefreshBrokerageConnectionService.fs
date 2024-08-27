@@ -36,15 +36,6 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
                     let emailInput = {EmailInput.Body = message; From = Sender.NoReply.Email; Subject = "Refresh Brokerage Account"; To = user.State.Email; FromName = Sender.NoReply.Name }
                     
                     do! email.SendWithInput emailInput
-                    // let! refreshedToken = brokerage.RefreshAccessToken user.State
-                    //
-                    // match refreshedToken.IsError with
-                    // | true ->
-                    //     logger.LogError $"Brokerage connection for user {userId} could not be refreshed. Error: {refreshedToken.error}"
-                    // | false ->
-                    //     user.RefreshBrokerageConnection refreshedToken.access_token refreshedToken.refresh_token refreshedToken.token_type refreshedToken.expires_in refreshedToken.scope
-                    //     do! accounts.Save user
-                    //     logger.LogInformation $"Brokerage connection for user {userId} was refreshed."
                 | false ->
                     logger.LogInformation $"Brokerage connection for user {userId} is valid until {user.State.BrokerageRefreshTokenExpires}. Skipping refresh."  
     }

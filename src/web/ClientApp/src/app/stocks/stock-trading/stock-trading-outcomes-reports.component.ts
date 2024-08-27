@@ -27,11 +27,7 @@ export class StockPositionReportsComponent {
     correlationReport: TickerCorrelation[];
     tickerFilter: string;
     daysForCorrelations = 60
-    openSimulationNotices: SimulationNotices = null
-    getOpenSimulationKeys() {
-        return Object.keys(this.openSimulationNotices);
-    }
-
+    
     loading = {
         open: false,
         daily: false,
@@ -69,6 +65,22 @@ export class StockPositionReportsComponent {
         }
     }
 
+    openSimulationNotices: SimulationNotices = null
+    openSimulationKeys: string[] = null
+    expandedGroups: Set<string> = new Set();
+
+    toggleNotices(group: string) {
+        if (this.expandedGroups.has(group)) {
+            this.expandedGroups.delete(group);
+        } else {
+            this.expandedGroups.add(group);
+        }
+    }
+
+    isExpanded(group: string): boolean {
+        return this.expandedGroups.has(group);
+    }
+
     loadPositionData(positions: PositionInstance[]) {
         this.loading.daily = true
         this.loading.weekly = true
@@ -79,6 +91,7 @@ export class StockPositionReportsComponent {
         const openSimulationNotices$ = this.stockPositions.openPositionSimulationNotices().pipe(
             map(notices => {
                 this.openSimulationNotices = notices
+                this.openSimulationKeys = Object.keys(notices)
             }),
             catchError(
                 error => {

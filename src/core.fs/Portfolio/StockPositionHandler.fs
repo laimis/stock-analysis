@@ -713,10 +713,20 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         
         let allOutcomes = simulations |> Seq.concat
         
-        let today = DateTimeOffset.UtcNow.Date
-        
+        let latestMarketDate =
+            let eastern = marketHours.ToMarketTime DateTimeOffset.UtcNow
+            match eastern.Hour < 9 && eastern.Minute < 30 with
+            | true -> eastern.AddDays(-1)
+            | false -> eastern
+            |> fun d ->
+                match d.DayOfWeek with
+                | DayOfWeek.Saturday -> d.AddDays(-1)
+                | DayOfWeek.Sunday -> d.AddDays(-2)
+                | _ -> d
+            |> fun d -> d.Date
+            
         // now find the strategies that would have had actions today
-        let resultsWithTransactionsFromToday = allOutcomes |> Seq.filter (fun r -> r.Position.Events |> Seq.exists (fun t -> t.date.Date = today))
+        let resultsWithTransactionsFromToday = allOutcomes |> Seq.filter (fun r -> r.Position.Events |> Seq.exists (fun t -> t.date.Date = latestMarketDate))
         
         return 
             resultsWithTransactionsFromToday
@@ -726,7 +736,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     results
                     |> Seq.map(fun r ->
                         r.Position.Events
-                        |> List.filter (fun t -> t.date.Date = today)
+                        |> List.filter (fun t -> t.date.Date = latestMarketDate)
                         |> List.map (fun t -> $"{r.StrategyName}: {t.description}")
                     )
                     |> List.concat

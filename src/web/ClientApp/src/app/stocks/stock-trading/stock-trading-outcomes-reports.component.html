@@ -22,22 +22,38 @@
     }
     @if (openSimulationNotices) {
         <section class="container">
-            <h4>Open Position Simulation Notices</h4>
-            <div class="row">
+            <div class="row mt-4">
                 <div class="col-12">
-                    <div class="card mb-4" *ngFor="let group of getOpenSimulationKeys()">
-                        <div class="card-header bg-success text-white">
-                            <app-stock-link-and-tradingview-link ticker="{{group}}"></app-stock-link-and-tradingview-link>
+                    @for(group of openSimulationKeys; track group) {
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <app-stock-link-and-tradingview-link ticker="{{group}}"></app-stock-link-and-tradingview-link>
+                                <button class="btn btn-sm btn-light" (click)="toggleNotices(group)">
+                                    {{ isExpanded(group) ? 'Collapse' : 'Expand' }} Notices
+                                </button>
+                            </div>
+                            <div [ngClass]="{'collapse': !isExpanded(group)}">
+                                <ul class="list-group list-group-flush">
+                                    @for(notice of openSimulationNotices[group]; track notice) {
+                                        <li class="list-group-item">{{ notice }}</li>
+                                    }
+                                </ul>
+                            </div>
+                            @if(!isExpanded(group)) {
+                                <div class="card-footer text-muted">
+                                    {{ openSimulationNotices[group].length }} notices
+                                </div>
+                            }
                         </div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item" *ngFor="let notice of openSimulationNotices[group]">
-                                {{ notice }}
-                            </li>
-                        </ul>
-                    </div>
+                    } @empty {
+                        <div class="alert alert-info" role="alert">
+                            No open position simulation notices
+                        </div>
+                    }
                 </div>
             </div>
         </section>
+
     }
 
     @if (allBarsReport || positionsReport || singleBarReportDaily || singleBarReportWeekly) {
