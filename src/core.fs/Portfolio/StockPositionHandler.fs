@@ -713,9 +713,13 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         
         let allOutcomes = simulations |> Seq.concat
         
+        // all of this nonsense because if you look at the markets in the evening when it's past midnight in new york,
+        // the dates for the transaction will be "yesterday" in the eastern timezone
+        // also you might hit a weekend and need to adjust for that. I don't care about market holidays in this system
+        // but probably eventually should
         let latestMarketDate =
             let eastern = marketHours.ToMarketTime DateTimeOffset.UtcNow
-            match eastern.Hour < 9 && eastern.Minute < 30 with
+            match eastern.Hour < 9 || (eastern.Hour = 9 && eastern.Minute < 30) with
             | true -> eastern.AddDays(-1)
             | false -> eastern
             |> fun d ->
