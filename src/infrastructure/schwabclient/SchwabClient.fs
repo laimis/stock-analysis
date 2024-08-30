@@ -794,7 +794,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                             optionPosition.Ticker <- Some(Ticker ticker)
                                             optionPosition.Quantity <- if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
                                             optionPosition.AverageCost <- p.averagePrice
-                                            optionPosition.StrikePrice <- decimal strike
+                                            // looks like now strike has $ in front of it, remove it
+                                            optionPosition.StrikePrice <-  Decimal.Parse(strike.TrimStart('$'))
                                             optionPosition.ExpirationDate <- $"{expMonth} {expDay} {expYear}"
                                             optionPosition.MarketValue <- p.marketValue
                                             optionPosition.OptionType <- optionType.ToUpperInvariant()

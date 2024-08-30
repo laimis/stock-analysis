@@ -19,7 +19,7 @@ module CSVExport =
     [<Literal>]
     let private PERCENT_FORMAT = "P"
     [<Literal>]
-    let private NUMBER_FORMAT = "G2"
+    let private NUMBER_FORMAT = "N2"
     
     let private number culture (value:decimal) = value.ToString(NUMBER_FORMAT, culture)
     let private numberOption culture (opt:decimal option) = opt |> Option.map (number culture) |> Option.defaultValue ""
@@ -102,6 +102,7 @@ module CSVExport =
             LastSellCostPerShare:string
             AverageBuyCostPerShare:string
             AverageSaleCostPerShare:string
+            CompletedPositionCostPerShare:string
             StopPrice:string
             Cost:string
             Profit:string
@@ -137,17 +138,18 @@ module CSVExport =
             Opened = t.Opened |> date
             Closed = t.Closed |> dateOption
             DaysHeld = t.DaysHeld
-            AverageBuyCostPerShare = t.AverageBuyCostPerShare |> currency culture
-            AverageSaleCostPerShare = t.AverageSaleCostPerShare |> currency culture 
-            AverageCostPerShare = t.CompletedPositionCostPerShare |> currency culture
-            LastSellCostPerShare = t.ClosePrice |> currencyOption culture
-            StopPrice = t.StopPrice  |> currencyOption culture
-            Cost = t.Cost |> currency culture
-            Profit = t.Profit |> currency culture
+            AverageBuyCostPerShare = t.AverageBuyCostPerShare |> number culture
+            AverageSaleCostPerShare = t.AverageSaleCostPerShare |> number culture 
+            AverageCostPerShare = t.CompletedPositionCostPerShare |> number culture
+            LastSellCostPerShare = t.ClosePrice |> numberOption culture
+            CompletedPositionCostPerShare = t.CompletedPositionCostPerShare |> number culture
+            StopPrice = t.StopPrice  |> numberOption culture
+            Cost = t.Cost |> number culture
+            Profit = t.Profit |> number culture
             ReturnPct = t.GainPct |> percent culture
             RR = t.RR |> number culture
-            InitialRiskedAmount = t.InitialRiskedAmount |> currencyOption culture
-            RiskAmount = t.RiskedAmount |> currencyOption culture
+            InitialRiskedAmount = t.InitialRiskedAmount |> numberOption culture
+            RiskAmount = t.RiskedAmount |> numberOption culture
             MaxDrawdown = maxDrawdown |> numberOption culture
             MaxGain = maxGain |> numberOption culture
             Strategy = t.TryGetLabelValue("strategy") |> Option.defaultValue ""
