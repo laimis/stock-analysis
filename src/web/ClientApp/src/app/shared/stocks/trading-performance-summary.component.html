@@ -84,7 +84,7 @@
             <div>{{ performance.rrRatio | number:'1.0-2' }}</div>
         </div>
         <div class="col">
-            <div class="stat-label">Avg Return</div>
+            <div class="stat-label">Avg Return %</div>
             <div>{{ performance.avgReturnPct | percent:'1.2-2' }}</div>
         </div>
     </div>
@@ -100,8 +100,8 @@
             <div>{{ performance.averageRR | number:'1.0-2' }}</div>
         </div>
         <div class="col">
-            <div class="stat-label">Invested</div>
-            <div>{{ performance.totalCost | currency }}</div>
+            <div class="stat-label">Average Cost</div>
+            <div>{{ performance.avgCost | currency }}</div>
         </div>
     </div>
 </div>

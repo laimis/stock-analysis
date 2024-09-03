@@ -976,9 +976,9 @@ export interface StockTradingPerformance {
     rrSum: number,
     rrRatio: number,
     averageRR: number,
+    avgCost: number,
     earliestDate: string,
     latestDate: string,
-    totalCost: number,
     gradeDistribution: LabelWithFrequency[]
 }
 

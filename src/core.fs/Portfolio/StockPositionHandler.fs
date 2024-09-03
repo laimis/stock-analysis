@@ -696,23 +696,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             return results.Results
         }
         
-        let! user = accounts.GetUser command.UserId
-        
-        let! positions = command.UserId |> storage.GetStockPositions |> Async.AwaitTask
-                
-        let openPositions =
-            positions
-            |> Seq.filter (fun p -> p.IsOpen && (p.HasLabel "strategy" "longterm" |> not) && (p.HasLabel "strategy" "longterminterest" |> not))
-            
-        let simulator = TradingStrategyRunner(brokerage, marketHours)
-        
-        let! simulations =
-            openPositions
-            |> Seq.map (runSimulation simulator user.Value.State)
-            |> Async.Sequential
-        
-        let allOutcomes = simulations |> Seq.concat
-        
         // all of this nonsense because if you look at the markets in the evening when it's past midnight in new york,
         // the dates for the transaction will be "yesterday" in the eastern timezone
         // also you might hit a weekend and need to adjust for that. I don't care about market holidays in this system
@@ -728,6 +711,30 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 | DayOfWeek.Sunday -> d.AddDays(-2)
                 | _ -> d
             |> fun d -> d.Date
+        
+        let! user = accounts.GetUser command.UserId
+        
+        let! positions = command.UserId |> storage.GetStockPositions |> Async.AwaitTask
+        
+        // all not long term positions
+        // and either open or were closed today
+        let filterFunc =
+            fun (p:StockPositionState) ->
+                (p.HasLabel "strategy" "longterm" |> not) && (p.HasLabel "strategy" "longterminterest" |> not)
+                && (p.IsOpen || (p.IsClosed && p.Closed.Value.Date = latestMarketDate))
+        
+        let candidatePositions =
+            positions
+            |> Seq.filter filterFunc
+            
+        let simulator = TradingStrategyRunner(brokerage, marketHours)
+        
+        let! simulations =
+            candidatePositions
+            |> Seq.map (runSimulation simulator user.Value.State)
+            |> Async.Sequential
+        
+        let allOutcomes = simulations |> Seq.concat
             
         // now find the strategies that would have had actions today
         let resultsWithTransactionsFromToday = allOutcomes |> Seq.filter (fun r -> r.Position.Events |> Seq.exists (fun t -> t.date.Date = latestMarketDate))

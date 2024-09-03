@@ -27,7 +27,7 @@
                     @for(group of openSimulationKeys; track group) {
                         <div class="card mb-4">
                             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                                <app-stock-link-and-tradingview-link ticker="{{group}}"></app-stock-link-and-tradingview-link>
+                                <app-stock-link-and-tradingview-link ticker="{{group}}" [openInNewTab]="true"></app-stock-link-and-tradingview-link>
                                 <button class="btn btn-sm btn-light" (click)="toggleNotices(group)">
                                     {{ isExpanded(group) ? 'Collapse' : 'Expand' }} Notices
                                 </button>

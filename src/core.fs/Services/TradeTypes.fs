@@ -86,7 +86,6 @@ type TradingPerformance =
         WinAmount:decimal
         MaxWinAmount:decimal
         TotalDaysHeldWins:decimal
-        Profit:decimal
         WinReturnPctTotal:decimal
         WinMaxReturnPct:decimal
         WinRRTotal:decimal
@@ -97,12 +96,14 @@ type TradingPerformance =
         LossMaxReturnPct:decimal
         LossRRTotal:decimal
         TotalDaysHeldLosses:decimal
-        TotalDaysHeld:decimal
+        Profit:decimal
+        GainPctSum:decimal
         rrSum:decimal
+        CostSum:decimal
+        TotalDaysHeld:decimal
         EarliestDate:DateTimeOffset
         LatestDate:DateTimeOffset
         GradeDistribution:LabelWithFrequency[]
-        TotalCost:decimal
     }
         with
             member this.AvgWinAmount =
@@ -184,7 +185,12 @@ type TradingPerformance =
             member this.AvgReturnPct =
                 match this.NumberOfTrades with
                 | 0 -> 0m
-                | _ -> this.Profit / this.TotalCost
+                | _ -> this.GainPctSum / decimal this.NumberOfTrades
+                
+            member this.AvgCost =
+                match this.NumberOfTrades with
+                | 0 -> 0m
+                | _ -> this.CostSum / decimal this.NumberOfTrades
                 
             static member Create name (closedPositions:seq<StockPositionWithCalculations>) =
                 
@@ -195,8 +201,9 @@ type TradingPerformance =
                         NumberOfTrades = perf.NumberOfTrades + 1
                         TotalDaysHeld = perf.TotalDaysHeld + decimal(position.DaysHeld)
                         Profit = perf.Profit + position.Profit
-                        TotalCost = perf.TotalCost + position.Cost
+                        GainPctSum = perf.GainPctSum + position.GainPct
                         rrSum = perf.rrSum + position.RR
+                        CostSum = perf.CostSum + position.CompletedPositionCostPerShare * decimal(position.CompletedPositionShares)
                         EarliestDate = if position.Opened < perf.EarliestDate then position.Opened else perf.EarliestDate
                         LatestDate = if position.Closed.IsSome && position.Closed.Value > perf.LatestDate then position.Closed.Value else perf.LatestDate
                         GradeDistribution = 
@@ -295,7 +302,8 @@ type TradingPerformance =
                     EarliestDate = DateTimeOffset.MaxValue
                     LatestDate = DateTimeOffset.MinValue
                     GradeDistribution = [||]
-                    TotalCost = 0m
+                    GainPctSum = 0m
+                    CostSum = 0m 
                     TotalDaysHeldWins = 0m
                     TotalDaysHeldLosses = 0m 
                     WinReturnPctTotal = 0m
