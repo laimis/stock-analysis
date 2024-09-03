@@ -122,7 +122,7 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
             maxLoss.Add(start, perfView.MaxLossAmount |> rounded4)
             rrSum.Add(start, perfView.rrSum |> rounded4)
             rrAverage.Add(start, perfView.AverageRR |> rounded4)
-            invested.Add(start, perfView.TotalCost |> rounded4)
+            invested.Add(start, perfView.CostSum |> rounded4)
             tradeCount.Add(start, perfView.NumberOfTrades)
             
             // number of positions opened on start day
