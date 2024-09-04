@@ -52,6 +52,7 @@ type Instrument = {
     cusip: string
     symbol: string
     description: string
+    underlyingSymbol: string
 }
 
 [<CLIMutable>]
@@ -784,19 +785,23 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                     |> Array.filter (fun p -> p.instrument.Value.assetType = "OPTION")
                                     |> Array.map (fun p ->
                                         let description = p.instrument.Value.description
-                                        // description looks like this: AGI Jul 21 2023 13.0 Call
-                                        // AGI is ticker, Jul 21 2023 is expiration date, 13.0 is strike price
-                                        // and Call is CALL type, parse all of these values from the description
-
-                                        match description.Split(" ") with
-                                        | [| ticker; expMonth; expDay; expYear; strike; optionType |] ->
+                                        // description looks like this: Marriott Intl Inc 09/20/2024 $225 Put
+                                        // split it by space and get the parts from the end
+                                        let split = description.Split(" ")
+                                        
+                                        match split with
+                                        | x when x.Length > 3 ->
+                                            let optionType = split[split.Length - 1].ToUpperInvariant()
+                                            let strike = Decimal.Parse(split[split.Length - 2].TrimStart('$'))
+                                            let expirationDate = split[split.Length - 3]
+                                            let ticker = p.instrument.Value.underlyingSymbol
+                                            
                                             let optionPosition = OptionPosition()
                                             optionPosition.Ticker <- Some(Ticker ticker)
                                             optionPosition.Quantity <- if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
                                             optionPosition.AverageCost <- p.averagePrice
-                                            // looks like now strike has $ in front of it, remove it
-                                            optionPosition.StrikePrice <-  Decimal.Parse(strike.TrimStart('$'))
-                                            optionPosition.ExpirationDate <- $"{expMonth} {expDay} {expYear}"
+                                            optionPosition.StrikePrice <-  strike
+                                            optionPosition.ExpirationDate <- expirationDate
                                             optionPosition.MarketValue <- p.marketValue
                                             optionPosition.OptionType <- optionType.ToUpperInvariant()
                                             optionPosition

@@ -262,15 +262,18 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                 let! option = storage.GetOwnedOption query.OptionId query.UserId
                 let! chain = brokerage.GetOptions user.State option.State.Ticker None None None
                 
-                return
-                    chain |> Result.map (fun c ->
-                        let detail = c.FindMatchingOption(
-                            strikePrice = option.State.StrikePrice,
-                            expirationDate = option.State.ExpirationDate,
-                            optionType = option.State.OptionType
+                let detail =
+                        chain
+                        |> Result.map (fun c ->
+                            c.FindMatchingOption(
+                                strikePrice = option.State.StrikePrice,
+                                expirationDate = option.State.ExpirationDate,
+                                optionType = option.State.OptionType
+                            )
                         )
-                        OwnedOptionView(option.State, optionDetail = detail)
-                    )
+                        |> Result.defaultValue None
+                        
+                return OwnedOptionView(option.State, optionDetail = detail) |> Ok
         }
 
     member this.Handle(query: ChainQuery) =
