@@ -12,7 +12,8 @@ import {toggleVisuallyHidden} from "../../services/utils";
 export class OptionOpenComponent {
 
     premiumSum: number;
-    premiumCloseValue: number;
+    premiumCloseValueMin: number;
+    premiumCloseValueMax: number;
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
 
     constructor(private router: Router) {
@@ -31,11 +32,18 @@ export class OptionOpenComponent {
         }
         this._openOptions = value
         this.premiumSum = value.reduce((a, b) => a - b.premiumPaid + b.premiumReceived, 0)
-        this.premiumCloseValue = value.reduce((a, b) => {
+        this.premiumCloseValueMin = value.reduce((a, b) => {
             if (b.boughtOrSold == 'Bought') {
                 return a + b.detail?.bid
             } else {
                 return a - b.detail?.ask
+            }
+        }, 0) * 100
+        this.premiumCloseValueMax = value.reduce((a, b) => {
+            if (b.boughtOrSold == 'Bought') {
+                return a + b.detail?.ask
+            } else {
+                return a - b.detail?.bid
             }
         }, 0) * 100
     }

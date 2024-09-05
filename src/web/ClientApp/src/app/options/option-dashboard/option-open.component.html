@@ -26,10 +26,10 @@
                     }: <span class="fw-bold">{{ premiumSum | currency }}</span>
                 </div>
                 <div class="col text-center">
-                    Premium value to close: <span class="fw-bold">{{ premiumCloseValue | currency }}</span>
+                    Premium value to close: <span class="fw-bold">{{ premiumCloseValueMin | currency }} - {{ premiumCloseValueMax | currency }}</span>
                 </div>
                 <div class="col text-end">
-                    Net value: <span class="fw-bold">{{ premiumSum + premiumCloseValue | currency }}</span>
+                    Net value: <span class="fw-bold">{{ premiumSum + premiumCloseValueMin | currency }}</span>
                 </div>
             </div>
         </div>
