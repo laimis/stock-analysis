@@ -37,12 +37,15 @@ type StockPositionRiskTransaction = {
 }
 
 type StockPositionDividendTransaction = {
+    Ticker: Ticker
     ActivityId: string
+    Description: string
     NetAmount: decimal
     Date: DateTimeOffset
 }
 
 type StockPositionFeeTransaction = {
+    Ticker: Ticker
     ActivityId: string
     Description: string
     NetAmount: decimal
@@ -57,6 +60,7 @@ type PLTransaction = {
     SellPrice: decimal
     Profit: decimal
     GainPct: decimal
+    Type: StockTransactionType
 }
 
 type StockPositionTransaction =
@@ -258,11 +262,11 @@ module StockPosition =
             p // no op right now, not sure if I want to keep those around and marked as deleted but right now I am deleting them
         
         | :? StockPositionDividend as x ->
-            let newTransactions = p.Transactions @ [Dividend { ActivityId = x.ActivityId; NetAmount = x.NetAmount; Date = x.When }]
+            let newTransactions = p.Transactions @ [Dividend { ActivityId = x.ActivityId; Description = x.Description; NetAmount = x.NetAmount; Date = x.When; Ticker = p.Ticker }]
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionFee as x ->
-            let newTransactions = p.Transactions @ [Fee { ActivityId = x.ActivityId; Description = x.Description; NetAmount = x.NetAmount; Date = x.When }]
+            let newTransactions = p.Transactions @ [Fee { ActivityId = x.ActivityId; Description = x.Description; NetAmount = x.NetAmount; Date = x.When; Ticker = p.Ticker }]
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
@@ -488,6 +492,20 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         |> List.map (fun x -> match x with | Risk s -> Some s | _ -> None)
         |> List.choose id
         
+    let dividends =
+        stockPosition.Transactions
+        |> List.map (fun x -> match x with | Dividend s -> Some s | _ -> None)
+        |> List.choose id
+    
+    let dividendTotal = dividends |> List.sumBy _.NetAmount
+    
+    let fees =
+        stockPosition.Transactions
+        |> List.map (fun x -> match x with | Fee s -> Some s | _ -> None)
+        |> List.choose id
+        
+    let feeTotal = fees |> List.sumBy _.NetAmount
+        
     let buySlots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
     
@@ -547,7 +565,8 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 BuyPrice = averageAcquisitionPrice
                 GainPct = gainPct
                 SellPrice = liquidation.Price
-                NumberOfShares = liquidation.NumberOfShares 
+                NumberOfShares = liquidation.NumberOfShares
+                Type = liquidation.Type 
             }
             
             // and add it to the accumulator
@@ -651,7 +670,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 
         DateTimeOffset.UtcNow.Subtract(date).TotalDays |> int
         
-    member this.Profit = profit
+    member this.Profit = profit + dividendTotal + feeTotal
         
     member this.AverageBuyCostPerShare = averageBuyCostPerShare
             
@@ -671,6 +690,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.Transactions = transactions
         
     member this.PLTransactions = plTransactions
+    
+    member this.Dividends = dividends
+    
+    member this.Fees = fees
         
     member this.RiskedAmount = stockPosition.RiskAmount
     

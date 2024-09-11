@@ -412,7 +412,9 @@ type TransactionSummaryView(
     stockTransactions:PLTransaction list,
     optionTransactions:Transaction list,
     plStockTransactions:PLTransaction list,
-    plOptionTransactions:Transaction list) =
+    plOptionTransactions:Transaction list,
+    dividends:StockPositionDividendTransaction list,
+    fees:StockPositionFeeTransaction list) =
         
         member _.Start = start
         member _.End = ``end``
@@ -422,6 +424,17 @@ type TransactionSummaryView(
         member _.OptionTransactions = optionTransactions
         member _.PLStockTransactions = plStockTransactions
         member _.PLOptionTransactions = plOptionTransactions
+        member _.Dividends = dividends
+        member _.Fees = fees
         
-        member _.StockProfit = plStockTransactions |> Seq.sumBy (fun (t:PLTransaction) -> t.Profit)
+        member _.StockProfit =
+            plStockTransactions
+            |> Seq.sumBy (fun (t:PLTransaction) -> t.Profit)
+        member _.DividendProfit =
+            dividends
+            |> Seq.sumBy (fun (t:StockPositionDividendTransaction) -> t.NetAmount)
+        member _.FeeProfit =
+            fees
+            |> Seq.sumBy (fun (t:StockPositionFeeTransaction) -> t.NetAmount)
         member _.OptionProfit = plOptionTransactions |> Seq.sumBy (fun (t:Transaction) -> t.Amount)
+        member this.TotalProfit = this.StockProfit + this.DividendProfit + this.FeeProfit + this.OptionProfit

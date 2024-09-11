@@ -14,7 +14,7 @@ export class TransactionsComponent implements OnInit {
     groupBy: string = "month"
     filterType: string = ""
     txType: string = "tx"
-    loading: boolean = false
+    loading: boolean = true
     showDetails: string = ''
 
     constructor(
@@ -41,5 +41,15 @@ export class TransactionsComponent implements OnInit {
         }, _ => {
             this.loading = false
         })
+    }
+    
+    breakdownSelected(groupBy: string) {
+        this.groupBy = groupBy
+        this.loadData()
+    }
+
+    filterTypeSelected(filterType: string) {
+        this.filterType = filterType
+        this.loadData()
     }
 }

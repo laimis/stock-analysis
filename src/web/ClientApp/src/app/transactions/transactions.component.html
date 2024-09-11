@@ -1,7 +1,7 @@
 <div>
     <div class="row">
         <div class="col">
-            <select (ngModelChange)="loadData()" [(ngModel)]="groupBy" class="form-select filterDropdown" id="breakdownFilter"
+            <select (ngModelChange)="breakdownSelected($event)" [(ngModel)]="groupBy" class="form-select filterDropdown" id="breakdownFilter"
                     name="breakdownFilter">
                 <option value="month">Breakdown by Month</option>
                 <option value="week">Breakdown by Week</option>
@@ -10,20 +10,24 @@
             </select>
         </div>
         <div class="col">
-            <select (ngModelChange)="loadData()" [(ngModel)]="filterType" class="form-select filterDropdown" id="showFilter"
+            <select (ngModelChange)="filterTypeSelected($event)" [(ngModel)]="filterType" class="form-select filterDropdown" id="showFilter"
                     name="showFilter">
                 <option value="crypto">Crypto</option>
                 <option value="options">Options</option>
-                <option value="shares">Shares</option>
-                <option value="">Shares and Options</option>
+                <option value="fees">Fees</option>
+                <option value="dividends">Dividends</option>
+                <option value="stocks">Stock Trades</option>
+                <option value="">All</option>
             </select>
         </div>
         <div class="col">
             <select (ngModelChange)="loadData()" [(ngModel)]="ticker" class="form-select filterDropdown" id="symbolFilter"
                     name="symbolFilter">
                 <option value="">All Symbols</option>
-                @for (t of response.tickers; track t) {
-                    <option value="{{t}}">{{ t }}</option>
+                @if (response) {
+                    @for (t of response.tickers; track t) {
+                        <option value="{{t}}">{{ t }}</option>
+                    }
                 }
             </select>
         </div>
@@ -38,15 +42,6 @@
 
     @if (loading) {
         <app-loading></app-loading>
-    }
-
-    @if (!ticker && response.transactions.length === 0) {
-        <div class="mt-2">
-            <div class="alert alert-secondary">
-                You have no transactions on record. Once you record buy or sells of shares or options, they will show up
-                here.
-            </div>
-        </div>
     }
 
     @if (response) {
@@ -83,11 +78,10 @@
                                     <td>{{ t.date | date:'shortDate' }}</td>
                                     <td>
                                         @if (t.isOption) {
-                                            <app-stock-link [ticker]="t.ticker" [openInNewTab]=true></app-stock-link>
-                                        }
-                                        @if (t.isOption) {
                                             <a [routerLink]="[ '/optiondetails', t.aggregateId ]"
                                                target="_blank">{{ t.ticker }}</a>
+                                        } @else {
+                                            <app-stock-link [ticker]="t.ticker" [openInNewTab]=true></app-stock-link>
                                         }
                                     </td>
                                     <td>
@@ -105,6 +99,13 @@
                         </tbody>
                     </table>
                 }
+            </div>
+        } @empty {
+            <div class="mt-2">
+                <div class="alert alert-secondary">
+                    You have no transactions on record. Once you record buy or sells of shares or options, they will show up
+                    here.
+                </div>
             </div>
         }
     }

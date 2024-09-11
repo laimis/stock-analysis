@@ -19,7 +19,7 @@
                 <h4 class="card-title">Profit Summary</h4>
                 <div class="d-flex justify-content-between align-items-center flex-column flex-md-row">
                     <div class="mb-3 mb-md-0">
-                        <h4 class="display-6 mb-0">{{ result.stockProfit + result.optionProfit | currency }}</h4>
+                        <h4 class="display-6 mb-0">{{ result.totalProfit | currency }}</h4>
                         <p class="text-muted mb-0">Total Profit</p>
                     </div>
                     <div class="d-flex">
@@ -143,10 +143,59 @@
                                 <td [ngClass]="{'negative': p.profit < 0}">{{ p.profit | currency }}</td>
                                 <td>{{ p.date | date: 'MM/dd/yyyy' }}</td>
                             </tr>
-                        }
-                        @if (result.plStockTransactions.length === 0) {
+                        } @empty {
                             <tr>
                                 <td colspan="3" class="text-center py-4">No stock P&L transactions</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Dividends</h4>
+                <table class="table">
+                    <tbody>
+                        @for (g of result.dividends; track g) {
+                            <tr>
+                                <td style="width: 140px">
+                                    <app-trading-view-link [ticker]="g.ticker"></app-trading-view-link>
+                                    <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+                                </td>
+                                <td style="width: 140px">{{ g.netAmount | currency }}</td>
+                                <td style="width: 140px">{{ g.date | date }}</td>
+                                <td>{{ g.description }}</td>
+                            </tr>
+                        }
+                        @empty {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">No dividends</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Fees</h4>
+                <table class="table">
+                    <tbody>
+                        @for (g of result.fees; track g) {
+                            <tr>
+                                <td style="width: 140px">
+                                    <app-trading-view-link [ticker]="g.ticker"></app-trading-view-link>
+                                    <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
+                                </td>
+                                <td style="width: 140px">{{ g.netAmount | currency }}</td>
+                                <td style="width: 140px">{{ g.date | date }}</td>
+                                <td>{{ g.description }}</td>
+                            </tr>
+                        }
+                        @empty {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">No dividends</td>
                             </tr>
                         }
                     </tbody>

@@ -572,12 +572,15 @@ export interface ReviewList {
     end: string
     stockProfit: number
     optionProfit: number
+    totalProfit: number
     openPositions: PositionInstance[]
     closedPositions: PositionInstance[]
     plOptionTransactions: Transaction[]
     plStockTransactions: StockPLTransaction[]
     stockTransactions: Transaction[]
     optionTransactions: Transaction[]
+    dividends: StockDividendTransaction[]
+    fees: StockFeeTransaction[]
 }
 
 export class StockViolation {
@@ -633,6 +636,20 @@ export interface StockPLTransaction {
     sellPrice: number
     profit: number
     gainPct: number
+}
+
+export interface StockDividendTransaction {
+    ticker: string
+    date: string
+    netAmount: number
+    description: string
+}
+
+export interface StockFeeTransaction {
+    ticker: string
+    date: string
+    netAmount: number
+    description: string
 }
 
 export interface Price {

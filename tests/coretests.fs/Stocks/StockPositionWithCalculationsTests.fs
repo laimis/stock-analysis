@@ -16,6 +16,8 @@ let position =
     |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-01-25"))
     |> StockPosition.sell 10m 40m (DateTimeOffset.Parse("2020-02-25"))
     |> StockPosition.sell 10m 37m (DateTimeOffset.Parse("2020-03-21"))
+    |> StockPosition.processDividend (Guid.NewGuid().ToString()) (DateTimeOffset.Parse("2020-02-25")) "dividend" 10m
+    // |> StockPosition.processFee (Guid.NewGuid().ToString()) (DateTimeOffset.Parse("2020-02-25")) "dividend" -0.30m
     |> StockPositionWithCalculations
     
 let positionWithStop =
@@ -33,6 +35,7 @@ let shortPosition =
     |> StockPosition.sell 10m 37m (DateTimeOffset.Parse("2020-01-25"))
     |> StockPosition.buy 10m 35m (DateTimeOffset.Parse("2020-02-25"))
     |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-03-21"))
+    |> StockPosition.processDividend (Guid.NewGuid().ToString()) (DateTimeOffset.Parse("2020-02-25")) "dividend" -10m
     |> StockPositionWithCalculations
     
 [<Fact>]
@@ -94,7 +97,7 @@ let ``Short Days held is accurate`` () =
 
 [<Fact>]
 let ``Short position profit is accurate`` () =
-    shortPosition.Profit |> should equal 120m
+    shortPosition.Profit |> should equal 110m
     
 [<Fact>]
 let ``Short Cost is accurate`` () =
@@ -162,7 +165,7 @@ let ``Set stop sets first stop`` () =
     
 [<Fact>]
 let ``Profit calculations are accurate``() =
-    position.Profit |> should equal 120m
+    position.Profit |> should equal 130m
 
 [<Fact>]
 let ``Position closed date is accurate``() =    

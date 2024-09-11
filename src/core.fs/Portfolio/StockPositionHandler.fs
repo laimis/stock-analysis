@@ -938,7 +938,13 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
     member _.Handle(query:QueryTransactions) : Task<Result<TransactionsView, ServiceError>>  = task {
         
         let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
-            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, plTransaction.Ticker.Value, plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, $"{plTransaction.Type} {plTransaction.NumberOfShares} shares", plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
+            
+        let toSharedTransactionForDividend (stock:StockPositionWithCalculations) (dividend:StockPositionDividendTransaction) : Transaction =
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Dividend", dividend.NetAmount, dividend.NetAmount, dividend.Date, false)
+            
+        let toSharedTransactionForFee (stock:StockPositionWithCalculations) (fee:StockPositionFeeTransaction) : Transaction =
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Fee", fee.NetAmount, fee.NetAmount, fee.Date, false)
             
         let toTransactionsView (stocks:StockPositionWithCalculations seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
             let tickers = stocks |> Seq.map (_.Ticker) |> Seq.append (options |> Seq.map (_.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
@@ -949,6 +955,23 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     stocks
                     |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
                     |> Seq.collect (fun s -> s.PLTransactions |> Seq.map (toSharedTransaction s))
+                | false -> Seq.empty
+                
+            let stockDividends =
+                match query.Show = "dividends" || query.Show = null with
+                | true ->
+                    stocks
+                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
+                    |> Seq.collect (fun s -> s.Dividends |> Seq.map (toSharedTransactionForDividend s))
+                | false -> Seq.empty
+                
+            let stockFees =
+                match query.Show = "fees" || query.Show = null with
+                | true ->
+                    Console.WriteLine($"Stock fees running")
+                    stocks
+                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
+                    |> Seq.collect (fun s -> s.Fees |> Seq.map (toSharedTransactionForFee s))
                 | false -> Seq.empty
             
             let optionTransactions =
@@ -970,7 +993,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                     |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
                 | false -> Seq.empty
                 
-            let log = stockTransactions |> Seq.append optionTransactions |> Seq.append cryptoTransactions
+            let log = stockTransactions |> Seq.append stockDividends |> Seq.append stockFees |> Seq.append optionTransactions |> Seq.append cryptoTransactions
                 
             TransactionsView(log, query.GroupBy, tickers);
             
@@ -1006,6 +1029,20 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             |> Seq.sortBy _.Ticker
             |> Seq.toList
             
+        let dividends =
+            stocks
+            |> Seq.collect _.Dividends
+            |> Seq.filter (fun d -> d.Date >= DateTimeOffset(start))
+            |> Seq.sortBy _.Ticker
+            |> Seq.toList
+            
+        let fees =
+            stocks
+            |> Seq.collect _.Fees
+            |> Seq.filter (fun f -> f.Date >= DateTimeOffset(start))
+            |> Seq.sortBy _.Ticker
+            |> Seq.toList
+            
         let plOptionTransactions =
             options
             |> Seq.collect _.State.Transactions
@@ -1032,7 +1069,9 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             stockTransactions=List.empty<PLTransaction>,
             optionTransactions=optionTransactions,
             plStockTransactions=plStockTransactions,
-            plOptionTransactions=plOptionTransactions
+            plOptionTransactions=plOptionTransactions,
+            dividends=dividends,
+            fees=fees
         )
         
         return view

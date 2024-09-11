@@ -232,3 +232,11 @@ public class AccountTransactionTypeConverter : GenericConverterWithToString<Acco
         throw new NotImplementedException();
     }
 }
+
+public class StockTransactionTypeConverter : GenericConverterWithToString<StockTransactionType>
+{
+    public override StockTransactionType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException();
+    }
+}
