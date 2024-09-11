@@ -280,15 +280,16 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
             using var db = GetConnection();
         
             var query = @"
-        INSERT INTO accounttransactions (transactionid, description, type, tradedate, settlementdate, netamount, ticker, userid, inserted, applied)
-        VALUES (@TransactionId, @Description, @Type, @TradeDate, @SettlementDate, @NetAmount, @Ticker, @UserId, @Inserted, @Applied)
+        INSERT INTO accountbrokeragetransactions (transactionid, description, brokeragetype, tradedate, settlementdate, netamount, inferredticker, inferredtype, userid, inserted, applied)
+        VALUES (@TransactionId, @Description, @BrokerageType, @TradeDate, @SettlementDate, @NetAmount, @InferredTicker, @InferredType, @UserId, @Inserted, @Applied)
         ON CONFLICT (userid, transactionid) DO UPDATE 
         SET description = @Description, 
-            type = @Type, 
+            brokeragetype = @BrokerageType, 
             tradedate = @TradeDate, 
             settlementdate = @SettlementDate, 
             netamount = @NetAmount, 
-            ticker = @Ticker, 
+            inferredticker = @InferredTicker,
+            inferredtype = @InferredType,
             inserted = @Inserted, 
             applied = @Applied";
         
@@ -300,11 +301,12 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                 {
                     transaction.TransactionId,
                     transaction.Description,
-                    Type = GetTransactionTypeString(transaction.Type),
+                    transaction.BrokerageType,
                     TradeDate = transaction.TradeDate.ToString("u"),
                     SettlementDate = transaction.SettlementDate.ToString("u"),
                     transaction.NetAmount,
-                    Ticker = FSharpOption<Ticker>.get_IsNone(transaction.Ticker) ? null : transaction.Ticker.Value.Value,
+                    InferredTicker = FSharpOption<Ticker>.get_IsNone(transaction.InferredTicker) ? null : transaction.InferredTicker.Value.Value,
+                    InferredType = FSharpOption<AccountTransactionType>.get_IsNone(transaction.InferredType) ? null : GetTransactionTypeString(transaction.InferredType.Value),
                     UserId = userId.Item,
                     Inserted = DateTimeOffset.UtcNow.ToString("u"),
                     Applied = FSharpOption<DateTimeOffset>.get_IsNone(transaction.Applied) ? null : transaction.Applied.Value.ToString("u")
@@ -332,7 +334,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
         {
             using var db = GetConnection();
             
-            var query = @"SELECT transactionid, description, type, tradedate, settlementdate, netamount, ticker, inserted, applied FROM accounttransactions WHERE userid = :userId";
+            var query = @"SELECT transactionid, description, brokeragetype, tradedate, settlementdate, netamount, inferredticker, inferredtype, inserted, applied FROM accountbrokeragetransactions WHERE userid = :userId";
 
             var result = await db.QueryAsync(query, new { userId = userId.Item});
             
@@ -340,19 +342,21 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                 new AccountTransaction(
                     r.transactionid,
                     r.description,
-                    GetTransactionTypeFromString(r.type),
                     ParseWithHandling(r.tradedate),
                     ParseWithHandling(r.settlementdate),
                     r.netamount,
-                    r.ticker == null ? FSharpOption<Ticker>.None : new FSharpOption<Ticker>(new Ticker(r.ticker)),
+                    r.brokeragetype,
+                    GetTransactionTypeFromString(r.inferredtype),
+                    r.inferredticker == null ? FSharpOption<Ticker>.None : new FSharpOption<Ticker>(new Ticker(r.inferredticker)),
                     ParseWithHandling(r.inserted),
                     r.applied == null ? FSharpOption<DateTimeOffset>.None : new FSharpOption<DateTimeOffset>(ParseWithHandling(r.applied))
                 ));
 
-            AccountTransactionType GetTransactionTypeFromString(string type)
+            FSharpOption<AccountTransactionType> GetTransactionTypeFromString(string type)
             {
                 return type switch
                 {
+                    null => FSharpOption<AccountTransactionType>.None,
                     "Dividend" => AccountTransactionType.Dividend,
                     "Trade" => AccountTransactionType.Trade,
                     "Fee" => AccountTransactionType.Fee,

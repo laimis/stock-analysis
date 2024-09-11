@@ -57,6 +57,13 @@ public static class Jobs
                 options: rjo
             );
             
+            RecurringJob.AddOrUpdate<core.fs.Brokerage.MonitoringServices.AccountMonitoringService>(
+                recurringJobId: nameof(core.fs.Brokerage.MonitoringServices.AccountMonitoringService) + "ProcessTransactions",
+                methodCall: service => service.RunTransactionProcessing(),
+                cronExpression: Cron.Daily(hour: 15, minute: 10), // 3:10pm
+                options: rjo
+            );
+            
             RecurringJob.AddOrUpdate<core.fs.Accounts.RefreshBrokerageConnectionService>(
                 recurringJobId: nameof(core.fs.Accounts.RefreshConnection),
                 methodCall: service => service.Execute(),

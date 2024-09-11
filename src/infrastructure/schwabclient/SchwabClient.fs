@@ -740,16 +740,17 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         
         member this.GetTransactions(user: UserState) (types : AccountTransactionType array) = task {
             
+            // from the docs ...
+            // TRADE, RECEIVE_AND_DELIVER, DIVIDEND_OR_INTEREST, ACH_RECEIPT, ACH_DISBURSEMENT, CASH_RECEIPT, CASH_DISBURSEMENT,
+            // ELECTRONIC_FUND, WIRE_OUT, WIRE_IN, JOURNAL, MEMORANDUM, MARGIN_CALL, MONEY_MARKET, SMA_ADJUSTMENT    
             let mapTransactionTypeToString transactionType =
-                // TRADE, RECEIVE_AND_DELIVER, DIVIDEND_OR_INTEREST, ACH_RECEIPT, ACH_DISBURSEMENT, CASH_RECEIPT, CASH_DISBURSEMENT, ELECTRONIC_FUND, WIRE_OUT, WIRE_IN, JOURNAL, MEMORANDUM, MARGIN_CALL, MONEY_MARKET, SMA_ADJUSTMENT
                 match transactionType with
                 | Dividend -> "DIVIDEND_OR_INTEREST"
                 | Fee -> "DIVIDEND_OR_INTEREST"
                 | Interest -> "DIVIDEND_OR_INTEREST"
                 | Trade -> "TRADE"
-                | Transfer -> "ACH_RECEIPT,ACH_DISBURSEMENT,CASH_RECEIPT,CASH_DISBURSEMENT,ELECTRONIC_FUND,WIRE_OUT,WIRE_IN,JOURNAL,MEMORANDUM,MARGIN_CALL,MONEY_MARKET,SMA_ADJUSTMENT"
+                | Transfer -> "ACH_RECEIPT,ACH_DISBURSEMENT,CASH_RECEIPT,CASH_DISBURSEMENT,ELECTRONIC_FUND,WIRE_OUT,WIRE_IN"
                 | _ -> failwith "Unsupported transaction type " + transactionType.ToString()
-                
             
             let accountFunc state = task {
                 
@@ -762,12 +763,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     
                     // ISO-8601 format
                     let format = "yyyy-MM-dd'T'HH:mm:ss.000Z"
-                    let startDate = DateTimeOffset.UtcNow.AddMonths(-6).ToString(format)
+                    let startDate = DateTimeOffset.UtcNow.AddMonths(-11).ToString(format)
                     let endDate = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
                     let types = types |> Array.map mapTransactionTypeToString |> String.concat(",")
                     
                     let ordersResource = $"/accounts/{accountId}/transactions?startDate={startDate}&endDate={endDate}&types={types}" |> TraderApiUrl
-                    let! transactions = this.CallApi<TransactionItem []> state ordersResource None
+                    let! transactions = this.CallApi<TransactionItem []> state ordersResource (Some true)
                     match transactions with
                     | Error error -> return Error error
                     | Ok transactions ->
@@ -776,29 +777,15 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             transactions
                             |> Array.map(fun t ->
                                 
-                                let ``type``, ticker = 
-                                    match t.description with
-                                    | x when x.Contains("Dividend~") -> 
-                                        Dividend, Some(x.Split("~")[1])
-                                    | x when x.Contains("Dividend Short Sale~") -> 
-                                        Dividend, Some(x.Split("~")[1])
-                                    | x when x.Contains("ADR Fees~") -> 
-                                        Fee, Some(x.Split("~")[1])
-                                    | x when x.Contains(" Interest ") ->
-                                        Interest, None
-                                    | x when x.Contains("SCHWAB1 INT ") ->
-                                        Interest, None
-                                    | _ ->
-                                        Dividend, None // NOTE: this default being dividend is sketchy
-                                
                                 let accountTransaction = {
                                     TransactionId = t.activityId.ToString()
                                     Description = t.description
-                                    Type = ``type``
+                                    BrokerageType = t.``type``
                                     NetAmount = t.netAmount
                                     SettlementDate = t.settlementDate |> DateTimeOffset.Parse
                                     TradeDate = t.tradeDate |> DateTimeOffset.Parse
-                                    Ticker = ticker |> Option.map Ticker
+                                    InferredTicker = None
+                                    InferredType = None
                                     Inserted = None
                                     Applied = None 
                                 }

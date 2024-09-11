@@ -123,11 +123,12 @@ type AccountTransactionType =
 type AccountTransaction = {
     TransactionId : string
     Description : string
-    Type : AccountTransactionType
     TradeDate: DateTimeOffset
     SettlementDate: DateTimeOffset
     NetAmount: decimal
-    Ticker: Ticker option
+    BrokerageType: string
+    InferredType : AccountTransactionType option
+    InferredTicker: Ticker option
     Inserted: DateTimeOffset option
     Applied: DateTimeOffset option
 }
