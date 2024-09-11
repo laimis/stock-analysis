@@ -10,31 +10,6 @@ open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
 open core.fs.Stocks
 
-//
- // match t.description with
- //                                    | x when x.Contains("Dividend~") -> 
- //                                        Dividend, Some(x.Split("~")[1])
- //                                    | x when x.Contains("Dividend Short Sale~") -> 
- //                                        Dividend, Some(x.Split("~")[1])
- //                                    | x when x.Contains("ADR Fees~") -> 
- //                                        Fee, Some(x.Split("~")[1])
- //                                    | x when x.Contains(" Interest ") ->
- //                                        Interest, None
- //                                    | x when x.Contains("SCHWAB1 INT ") ->
- //                                        Interest, None
- //                                    | _ ->
- //                                        match t.``type`` with
- //                                        | "TRADE" -> Trade, None
- //                                        | "DIVIDEND_OR_INTEREST" -> Dividend, None
- //                                        | "ACH_RECEIPT" -> Transfer, None
- //                                        | "ACH_DISBURSEMENT" -> Transfer, None
- //                                        | "CASH_RECEIPT" -> Transfer, None
- //                                        | "CASH_DISBURSEMENT" -> Transfer, None
- //                                        | "ELECTRONIC_FUND" -> Transfer, None
- //                                        | "WIRE_OUT" -> Transfer, None
- //                                        | "WIRE_IN" -> Transfer, None
- //                                        | _ -> Other, None
- 
 type AccountMonitoringService(
     accounts:IAccountStorage,
     portfolio:IPortfolioStorage,
@@ -79,12 +54,12 @@ type AccountMonitoringService(
             | _ -> Other
         
         match t.InferredType.IsNone || inferredType <> t.InferredType.Value with
-        | true -> { t with InferredType = Some inferredType }
-        | false -> t
+        | true -> { t with InferredType = Some inferredType } |> Ok
+        | false -> t |> Error
     
     let rec resolveTicker (user:UserState) searchQuery callCounter (t:AccountTransaction) = async {
         match t.InferredTicker with
-        | Some _ -> return Some t
+        | Some _ -> return t |> Ok
         | None ->
             // first let's see if we have a hardcoded mapping
             let hardcodedMapping =
@@ -94,7 +69,7 @@ type AccountMonitoringService(
             match hardcodedMapping with
             | Some (_, ticker) ->
                 let newTransaction = { t with InferredTicker = ticker |> core.Shared.Ticker |> Some }
-                return Some newTransaction
+                return newTransaction |> Ok
             | None ->
                 
                 // let's see if the type is fee or dividend, then attempt to resovle the ticker from description by splitting ~ and taking second member
@@ -105,19 +80,19 @@ type AccountMonitoringService(
                 | true ->
                     let ticker = t.Description.Split "~" |> Array.item 1
                     let newTransaction = { t with InferredTicker = ticker |> core.Shared.Ticker |> Some }
-                    return Some newTransaction
+                    return newTransaction |> Ok
                 | false ->
                     // search only if call counter is less than 10 or transaction is not interest
                     let stopCondition = t.InferredType.Value = AccountTransactionType.Interest || callCounter >= 10
                     match stopCondition with
-                    | true -> return None
+                    | true -> return t |> Error
                     | false ->
                         // see if we can use description to resolve the ticker
                         let! result = brokerage.Search user SearchQueryType.Description searchQuery 10 |> Async.AwaitTask
                         match result with
                         | Error e ->
                             logger.LogInformation $"Unable to resolve ticker for {t.Description}: {e.Message}"
-                            return None
+                            return t |> Error
                         | Ok searchResults ->
                             match searchResults with
                             | [||] ->
@@ -129,12 +104,12 @@ type AccountMonitoringService(
                             | [|single|] ->
                                 logger.LogInformation $"Resolved ticker for {t.Description} to {single.Symbol} - {single.AssetType} - {single.SecurityName}"
                                 let newTransaction = { t with InferredTicker = Some single.Symbol }
-                                return Some newTransaction
+                                return newTransaction |> Ok
                             | _ ->
                                 logger.LogInformation $"Resolved ticker for {searchQuery} to {searchResults.Length} results"
                                 searchResults
                                 |> Array.iter (fun r -> logger.LogInformation $"\tResolved ticker for {t.Description} to {r.Symbol} - {r.AssetType} - {r.SecurityName}")
-                                return None
+                                return t |> Error
     }
     
     let processTransaction (user:UserState) (t:AccountTransaction) = async {
@@ -146,7 +121,7 @@ type AccountMonitoringService(
             |> Seq.tryFind (fun p -> p.Ticker = t.InferredTicker.Value && p.Opened < t.TradeDate)
             
         match previousPosition with
-        | None -> return None
+        | None -> return t |> Error
         | Some position ->
             
             let appliedPosition =
@@ -162,7 +137,7 @@ type AccountMonitoringService(
             
             let appliedTransaction = { t with Applied = Some DateTimeOffset.Now }
             
-            return Some appliedTransaction
+            return appliedTransaction |> Ok
     }
     
     interface core.fs.IApplicationService
@@ -194,22 +169,37 @@ type AccountMonitoringService(
                     transactions
                     |> Seq.filter (fun t -> t.Applied.IsNone)
                     |> Seq.map(resolveType)
+                    
+                let failedToResolveTypes =
+                    unappliedWithTypesResolved
+                    |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
                 
                 // the brokerage transactions do not have tickers most of the time, so we need to resolve them
                 // if possible, using search approach or hardcoded mappings
                 let! unappliedWithTickers =
                     unappliedWithTypesResolved
+                    |> Seq.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                     |> Seq.map(fun t -> resolveTicker user.State t.Description 0 t)
                     |> Async.Sequential
                     
-                // for each transaction that has a ticker, we can process it
-                let! appliedTransactionOptions =
+                let failedToResolveTickers =
                     unappliedWithTickers
-                    |> Seq.choose id
+                    |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
+                    
+                // for each transaction that has a ticker, we can process it
+                let! appliedTransactionResults =
+                    unappliedWithTickers
+                    |> Seq.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                     |> Seq.map(processTransaction user.State) 
                     |> Async.Sequential
                 
-                let appliedTransactions = appliedTransactionOptions |> Array.choose id
+                let failedToApplyTransactions =
+                    appliedTransactionResults
+                    |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
+                    
+                let appliedTransactions =
+                    appliedTransactionResults
+                    |> Array.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                 
                 logger.LogInformation $"Applied {appliedTransactions.Length} transactions for {user.State.Id}"
                 
@@ -235,10 +225,34 @@ type AccountMonitoringService(
                     |> Seq.map (fun t -> $"{t.InferredTicker}: {t.BrokerageType} - {t.Description}")
                     |> Seq.toArray
                     
-                match appliedDescriptions with
-                | [||] -> ()
+                // now combine all failed results and send them to the user
+                let failedResults =
+                    failedToResolveTypes
+                    |> Seq.map (fun t -> $"Failed to resolve type for {t.Description}")
+                    |> Seq.append
+                        (failedToResolveTickers
+                        |> Seq.map (fun t -> $"Failed to resolve ticker for {t.Description}")
+                        )
+                    |> Seq.append
+                        (failedToApplyTransactions
+                        |> Seq.map (fun t -> $"Failed to apply transaction for {t.Description}")
+                        )
+                    |> Seq.toArray
+                    
+                match appliedDescriptions, failedResults with
+                | [||], [||] -> ()
                 | _ ->
-                    let emailInput = {EmailInput.Body = appliedDescriptions |> String.concat "\n"; Subject = "Applied Transactions"; To = user.State.Email; From = Sender.Support.Email; FromName = Sender.Support.Name }
+                    let appliedDescriptions = appliedDescriptions |> String.concat "\n"
+                    let failedDescriptions = failedResults |> String.concat "\n"
+                    
+                    let plainTextBody = @$"
+                        Here are the transactions that were applied:
+                        {appliedDescriptions}
+                        q
+                        Here are the transactions that failed to be applied:
+                        {failedDescriptions}"
+                        
+                    let emailInput = {EmailInput.PlainBody = plainTextBody; HtmlBody = null; Subject = "Applied Transactions"; To = user.State.Email; From = Sender.Support.Email; FromName = Sender.Support.Name }
                     let! _ = emailService.SendWithInput emailInput |> Async.AwaitTask
                     ()
                     

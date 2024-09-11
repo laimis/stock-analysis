@@ -33,7 +33,7 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
                     
                     let message = $"Your brokerage connection is about to expire. Please refresh your connection by going to <a href=\"{refreshUrl}\">this link</a>."
                     
-                    let emailInput = {EmailInput.Body = message; From = Sender.NoReply.Email; Subject = "Refresh Brokerage Account"; To = user.State.Email; FromName = Sender.NoReply.Name }
+                    let emailInput = {EmailInput.PlainBody = null; HtmlBody = message; From = Sender.NoReply.Email; Subject = "Refresh Brokerage Account"; To = user.State.Email; FromName = Sender.NoReply.Name }
                     
                     do! email.SendWithInput emailInput
                 | false ->

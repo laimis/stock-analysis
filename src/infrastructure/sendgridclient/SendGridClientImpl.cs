@@ -23,11 +23,11 @@ namespace sendgridclient
             _logger = logger;
         }
 
-        public Task Send(Recipient recipient, Sender sender, string subject, string body)
+        public Task Send(Recipient recipient, Sender sender, string subject, string plainTextBody, string htmlBody)
         {
             return _sendGridClient switch {
-                not null => SendWithClient(recipient, sender, subject, body),
-                null => SendWithoutClient(recipient, sender, subject, body)
+                not null => SendWithClient(recipient, sender, subject, plainTextBody, htmlBody),
+                null => SendWithoutClient(recipient, sender, subject, plainTextBody ?? htmlBody)
             };
         }
 
@@ -38,11 +38,11 @@ namespace sendgridclient
             return Task.CompletedTask;
         }
 
-        private async Task SendWithClient(Recipient recipient, Sender sender, string subject, string body)
+        private async Task SendWithClient(Recipient recipient, Sender sender, string subject, string plainTextContent, string htmlContent)
         {
             var fromAddr = new EmailAddress(email: sender.Email, name: sender.Name);
             var toAddr = new EmailAddress(email: recipient.Email, name: recipient.Name);
-            var msg = MailHelper.CreateSingleEmail(fromAddr, toAddr, subject, body, null);
+            var msg = MailHelper.CreateSingleEmail(fromAddr, toAddr, subject, plainTextContent, htmlContent);
 
             await SendAndLog(msg);
         }
@@ -60,7 +60,8 @@ namespace sendgridclient
             recipient: new Recipient(email: obj.To, name: null),
             sender: new Sender(obj.From, obj.FromName),
             subject: obj.Subject,
-            body: obj.Body
+            plainTextBody: obj.PlainBody,
+            htmlBody: obj.HtmlBody
         );
 
         public Task SendWithTemplate(

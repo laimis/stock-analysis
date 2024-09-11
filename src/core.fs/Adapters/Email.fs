@@ -12,8 +12,8 @@ type EmailInput =
         FromName: string
         [<Required>]
         Subject: string
-        [<Required>]
-        Body: string
+        PlainBody: string
+        HtmlBody: string
         [<Required>]
         To: string
     }
@@ -59,5 +59,5 @@ type EmailTemplate(id:string) =
     
 type IEmailService =
     abstract SendWithTemplate : recipient:Recipient -> sender:Sender -> template:EmailTemplate -> properties:System.Object -> Task
-    abstract Send : recipient:Recipient -> sender:Sender -> subject:string -> body:string -> Task
+    abstract Send : recipient:Recipient -> sender:Sender -> subject:string -> plainTextBody:string -> htmlBody:string -> Task
     abstract SendWithInput : input:EmailInput -> Task

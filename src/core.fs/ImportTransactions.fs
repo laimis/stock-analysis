@@ -73,7 +73,7 @@ module ImportTransactions =
         member _.Handle(cmd:Command) = task {
             
             let sendEmail (user:User) subject body =
-                emailService.Send (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply subject body
+                emailService.Send (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply subject body null
             
             let createOptionTransaction r =
                 {
