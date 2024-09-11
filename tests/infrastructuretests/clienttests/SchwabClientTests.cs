@@ -30,7 +30,7 @@ namespace clienttests
                 new FSharpOption<ILogger<SchwabClient.SchwabClient>>(Mock.Of<ILogger<SchwabClient.SchwabClient>>())
             ) as IBrokerage;
             
-            var quote = await schwab.Search(user.State, "NET", 15);
+            var quote = await schwab.Search(user.State, SearchQueryType.Symbol, "NET", 15);
         
             var errorMessage = quote.IsError ? quote.ErrorValue.Message : null;
             Assert.Null(errorMessage);

@@ -171,12 +171,13 @@ namespace storagetests
             var transaction = new AccountTransaction
             {
                 NetAmount = 10m,
-                Type = AccountTransactionType.Dividend,
+                BrokerageType = "DIVIDEND_OR_INTEREST",
                 TradeDate = DateTimeOffset.UtcNow,
                 SettlementDate = DateTimeOffset.UtcNow,
                 Description = "desc",
-                Ticker = new Ticker("AAPL"),
                 TransactionId = "123",
+                InferredTicker = FSharpOption<Ticker>.Some(new Ticker("AAPL")),
+                InferredType = FSharpOption<AccountTransactionType>.Some(AccountTransactionType.Fee)
             };
             
             await storage.SaveAccountBrokerageTransactions(userId, new [] { transaction });
@@ -188,12 +189,12 @@ namespace storagetests
             var fromDbTransaction = fromDb.First();
             
             Assert.Equal(transaction.NetAmount, fromDbTransaction.NetAmount);
-            Assert.Equal(transaction.Type, fromDbTransaction.Type);
+            Assert.Equal(transaction.BrokerageType, fromDbTransaction.BrokerageType);
             Assert.Equal(transaction.SettlementDate, fromDbTransaction.SettlementDate, TimeSpan.FromSeconds(1));
             Assert.Equal(transaction.TradeDate, fromDbTransaction.TradeDate, TimeSpan.FromSeconds(1));
             Assert.Equal(transaction.Description, fromDbTransaction.Description);
-            Assert.Equal(transaction.Ticker.Value, fromDbTransaction.Ticker.Value);
-            Assert.Equal(transaction.Type, fromDbTransaction.Type);
+            Assert.Equal(transaction.InferredTicker.Value, fromDbTransaction.InferredTicker.Value);
+            Assert.Equal(transaction.InferredType, fromDbTransaction.InferredType);
         }
     }
 }
