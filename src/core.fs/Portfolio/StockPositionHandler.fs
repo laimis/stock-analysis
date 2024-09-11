@@ -968,7 +968,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             let stockFees =
                 match query.Show = "fees" || query.Show = null with
                 | true ->
-                    Console.WriteLine($"Stock fees running")
                     stocks
                     |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
                     |> Seq.collect (fun s -> s.Fees |> Seq.map (toSharedTransactionForFee s))
