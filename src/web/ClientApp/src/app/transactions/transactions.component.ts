@@ -52,4 +52,14 @@ export class TransactionsComponent implements OnInit {
         this.filterType = filterType
         this.loadData()
     }
+    
+    tickerSelected(ticker: string) {
+        this.ticker = ticker
+        this.loadData()
+    }
+
+    txTypeSelected(txType: string) {
+        this.txType = txType
+        this.loadData()
+    }
 }

@@ -21,7 +21,7 @@
             </select>
         </div>
         <div class="col">
-            <select (ngModelChange)="loadData()" [(ngModel)]="ticker" class="form-select filterDropdown" id="symbolFilter"
+            <select (ngModelChange)="tickerSelected($event)" [(ngModel)]="ticker" class="form-select filterDropdown" id="symbolFilter"
                     name="symbolFilter">
                 <option value="">All Symbols</option>
                 @if (response) {
@@ -32,7 +32,7 @@
             </select>
         </div>
         <div class="col">
-            <select (ngModelChange)="loadData()" [(ngModel)]="txType" class="form-select filterDropdown" id="txType"
+            <select (ngModelChange)="txTypeSelected($event)" [(ngModel)]="txType" class="form-select filterDropdown" id="txType"
                     name="txType">
                 <option value="pl">Realized Gain/Loss</option>
                 <option value="tx">All Transactions</option>
