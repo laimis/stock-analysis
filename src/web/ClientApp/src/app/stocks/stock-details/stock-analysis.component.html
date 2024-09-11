@@ -47,6 +47,14 @@
             <app-line-chart [dataContainer]="chartInfo.prices.atr"></app-line-chart>
         </div>
     </section>
+    
+    <!-- ATR % Chart -->
+    <section *ngIf="chartInfo" class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR % Chart</h5>
+            <app-line-chart [dataContainer]="chartInfo.prices.atrPercent"></app-line-chart>
+        </div>
+    </section>
 
     <!-- Single Bar Outcomes -->
     <section class="card shadow-sm mb-4">

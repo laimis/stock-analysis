@@ -42,13 +42,18 @@ namespace web.Controllers
             );
 
         [HttpDelete("orders/{orderId}")]
-        public Task<ActionResult> Delete([FromRoute] string orderId, [FromServices] BrokerageHandler service) =>
+        public Task<ActionResult> Delete([FromRoute] string orderId) =>
             this.OkOrError(
-                service.Handle(new CancelOrder(User.Identifier(), orderId)));
+                brokerageHandler.Handle(new CancelOrder(User.Identifier(), orderId)));
 
         [HttpGet("account")]
-        public Task<ActionResult> GetAccount([FromServices] BrokerageHandler service) =>
+        public Task<ActionResult> GetAccount() =>
             this.OkOrError(
-                service.Handle(new QueryAccount(User.Identifier())));
+                brokerageHandler.Handle(new QueryAccount(User.Identifier())));
+        
+        [HttpGet("transactions")]
+        public Task<ActionResult> GetTransactions() =>
+            this.OkOrError(
+                brokerageHandler.Handle(new QueryTransactions(User.Identifier())));
     }
 }

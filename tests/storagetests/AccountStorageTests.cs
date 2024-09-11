@@ -160,5 +160,41 @@ namespace storagetests
             Assert.Equal(order.OrderId, fromDbOrder.OrderId);
             Assert.Equal(order.CanBeCancelled, fromDbOrder.CanBeCancelled);
         }
+        
+        [Fact]
+        public async Task AccountTransactionsWork()
+        {
+            var storage = GetStorage();
+            
+            var userId = UserId.NewUserId(Guid.NewGuid());
+
+            var transaction = new AccountTransaction
+            {
+                NetAmount = 10m,
+                BrokerageType = "DIVIDEND_OR_INTEREST",
+                TradeDate = DateTimeOffset.UtcNow,
+                SettlementDate = DateTimeOffset.UtcNow,
+                Description = "desc",
+                TransactionId = "123",
+                InferredTicker = FSharpOption<Ticker>.Some(new Ticker("AAPL")),
+                InferredType = FSharpOption<AccountTransactionType>.Some(AccountTransactionType.Fee)
+            };
+            
+            await storage.SaveAccountBrokerageTransactions(userId, new [] { transaction });
+            
+            var fromDb = await storage.GetAccountBrokerageTransactions(userId);
+            
+            Assert.Single(fromDb);
+            
+            var fromDbTransaction = fromDb.First();
+            
+            Assert.Equal(transaction.NetAmount, fromDbTransaction.NetAmount);
+            Assert.Equal(transaction.BrokerageType, fromDbTransaction.BrokerageType);
+            Assert.Equal(transaction.SettlementDate, fromDbTransaction.SettlementDate, TimeSpan.FromSeconds(1));
+            Assert.Equal(transaction.TradeDate, fromDbTransaction.TradeDate, TimeSpan.FromSeconds(1));
+            Assert.Equal(transaction.Description, fromDbTransaction.Description);
+            Assert.Equal(transaction.InferredTicker.Value, fromDbTransaction.InferredTicker.Value);
+            Assert.Equal(transaction.InferredType, fromDbTransaction.InferredType);
+        }
     }
 }

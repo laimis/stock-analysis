@@ -43,7 +43,10 @@ type SearchResult =
         SecurityName:string
         AssetType:AssetType
         Exchange:string
-    }       
+    }
+    
+type SearchQueryType =
+    | Symbol | Description
 
 [<CLIMutable>]
 type StockQueryResult =
@@ -112,7 +115,23 @@ type Order = {
     member this.IsBuyOrder : bool = match this.Instruction with | Buy -> true | BuyToCover -> true | _ -> false
     member this.IsOption : bool = this.AssetType = AssetType.Option
     member this.IsShort : bool = this.Instruction = SellShort
+
+type AccountTransactionType =
+    Trade | Dividend | Interest | Fee | Transfer | Other
     
+[<CLIMutable>]
+type AccountTransaction = {
+    TransactionId : string
+    Description : string
+    TradeDate: DateTimeOffset
+    SettlementDate: DateTimeOffset
+    NetAmount: decimal
+    BrokerageType: string
+    InferredType : AccountTransactionType option
+    InferredTicker: Ticker option
+    Inserted: DateTimeOffset option
+    Applied: DateTimeOffset option
+}
     
 type StockPosition(ticker:Ticker, averageCost:decimal, quantity:decimal) =
     member val Ticker = ticker
@@ -216,6 +235,7 @@ type IBrokerage =
     abstract member GetQuote : state:UserState -> ticker:Ticker -> Task<Result<StockQuote,ServiceError>>
     abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<Result<Dictionary<Ticker, StockQuote>,ServiceError>>
     abstract member GetMarketHours : state:UserState -> start:DateTimeOffset -> Task<Result<MarketHours,ServiceError>>
-    abstract member Search : state:UserState -> query:string -> limit:int -> Task<Result<SearchResult[],ServiceError>>
+    abstract member Search : state:UserState -> searchQueryType:SearchQueryType -> query:string -> limit:int -> Task<Result<SearchResult[],ServiceError>>
     abstract member GetOptions : state:UserState -> ticker:Ticker -> expirationDate:DateTimeOffset option -> strikePrice:decimal option -> contractType:string option -> Task<Result<OptionChain,ServiceError>>
     abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<Result<StockProfile,ServiceError>>
+    abstract member GetTransactions : state:UserState -> types:AccountTransactionType array -> Task<Result<AccountTransaction[],ServiceError>>

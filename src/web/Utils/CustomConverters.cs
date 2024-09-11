@@ -224,3 +224,11 @@ public class AssetTypeConverter : GenericConverterWithToString<AssetType>
         throw new NotImplementedException("AssetType is not deserializable");
     }
 }
+
+public class AccountTransactionTypeConverter : GenericConverterWithToString<AccountTransactionType>
+{
+    public override AccountTransactionType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException();
+    }
+}

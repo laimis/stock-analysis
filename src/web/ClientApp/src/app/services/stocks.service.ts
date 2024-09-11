@@ -770,6 +770,7 @@ export interface Prices {
     prices: PriceBar[]
     movingAverages: MovingAveragesContainer
     atr: DataPointContainer
+    atrPercent: DataPointContainer
     percentChanges: DistributionStatistics
 }
 

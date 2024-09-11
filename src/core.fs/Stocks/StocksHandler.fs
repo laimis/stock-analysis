@@ -65,6 +65,15 @@ type PricesView(prices:PriceBars) =
         
         container
         
+    member _.ATRPercent =
+        let atrContainer = prices|> MultipleBarPriceAnalysis.Indicators.averageTrueRangePercentage
+
+        let container = ChartDataPointContainer<decimal>($"ATR %% ({atrContainer.Period} days)", DataPointChartType.Line)
+        
+        atrContainer.DataPoints |> Array.iter container.Add
+        
+        container
+        
 type QuoteQuery =
     {
         Ticker:Ticker
@@ -136,7 +145,7 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
         let! user = accounts.GetUser(query.UserId)
         match user with
         | None -> return "User not found" |> ServiceError |> Error
-        | Some user -> return! brokerage.Search user.State query.Term 10
+        | Some user -> return! brokerage.Search user.State SearchQueryType.Symbol query.Term 10
     }
     
     member _.Handle (query:CompanyFilingsQuery) = task {

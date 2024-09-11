@@ -36,6 +36,19 @@ type StockPositionRiskTransaction = {
     Date: DateTimeOffset
 }
 
+type StockPositionDividendTransaction = {
+    ActivityId: string
+    NetAmount: decimal
+    Date: DateTimeOffset
+}
+
+type StockPositionFeeTransaction = {
+    ActivityId: string
+    Description: string
+    NetAmount: decimal
+    Date: DateTimeOffset
+}
+
 type PLTransaction = {
     Ticker:Ticker
     Date: DateTimeOffset
@@ -50,6 +63,8 @@ type StockPositionTransaction =
     | Share of StockPositionShareTransaction
     | Stop of StockPositionStopTransaction
     | Risk of StockPositionRiskTransaction
+    | Dividend of StockPositionDividendTransaction
+    | Fee of StockPositionFeeTransaction
 
 type StockPositionType =
     | Long
@@ -156,6 +171,18 @@ type StockPositionGradeAssigned(id, aggregateId, ``when``, grade, gradeNote) =
     member this.Grade = grade
     member this.GradeNote = gradeNote
     
+type StockPositionDividend(id, aggregateId, ``when``, activityId, description, netAmount) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.ActivityId = activityId
+    member this.Description = description
+    member this.NetAmount = netAmount
+    
+type StockPositionFee(id, aggregateId, ``when``, activityId, description, netAmount) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.ActivityId = activityId
+    member this.Description = description
+    member this.NetAmount = netAmount
+    
 module StockPosition =
         
     let createInitialState (event: StockPositionOpened) =
@@ -229,6 +256,14 @@ module StockPosition =
             
         | :? StockPositionDeleted as _ ->
             p // no op right now, not sure if I want to keep those around and marked as deleted but right now I am deleting them
+        
+        | :? StockPositionDividend as x ->
+            let newTransactions = p.Transactions @ [Dividend { ActivityId = x.ActivityId; NetAmount = x.NetAmount; Date = x.When }]
+            { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
+            
+        | :? StockPositionFee as x ->
+            let newTransactions = p.Transactions @ [Fee { ActivityId = x.ActivityId; Description = x.Description; NetAmount = x.NetAmount; Date = x.When }]
+            { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
     
@@ -410,6 +445,35 @@ module StockPosition =
         let e = StockPositionTransactionDeleted(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, transactionId)
         apply e stockPosition
         
+    let processDividend activityId date description netAmount stockPosition =
+        
+        // check if the dividend is already processed
+        let alreadyProcessed =
+            stockPosition.Transactions
+            |> List.map (fun x -> match x with | Dividend s -> Some s | _ -> None)
+            |> List.choose id
+            |> List.exists (fun x -> x.ActivityId = activityId)
+            
+        match alreadyProcessed with
+        | true -> stockPosition
+        | false ->
+            let e = StockPositionDividend(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, activityId, description, netAmount)
+            apply e stockPosition
+            
+    let processFee activityId date description netAmount stockPosition =
+        
+        // check if the fee is already processed
+        let alreadyProcessed =
+            stockPosition.Transactions
+            |> List.map (fun x -> match x with | Fee s -> Some s | _ -> None)
+            |> List.choose id
+            |> List.exists (fun x -> x.ActivityId = activityId)
+            
+        match alreadyProcessed with
+        | true -> stockPosition
+        | false ->
+            let e = StockPositionFee(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, activityId, description, netAmount)
+            apply e stockPosition
         
 type StockPositionWithCalculations(stockPosition:StockPositionState) =
     
@@ -529,18 +593,26 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | Share s ->
                let ``type`` = match s.Type with | Buy -> "buy" | Sell -> "sell" |> _.ToLower()
                let description = $"{``type``} {s.NumberOfShares} @ {s.Price}"
-               {|id = s.TransactionId; date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
+               {|id = s.TransactionId.ToString(); date = s.Date; value = s.Price; ``type`` = ``type``; description = description; quantity = s.NumberOfShares |}
             | Risk r ->
                 let ``type`` = "risk"
                 let description = $"risk amount set to {r.RiskAmount}"
-                {|id = r.TransactionId; date = r.Date; value = r.RiskAmount; ``type`` = ``type``; description = description; quantity = 0m |}
+                {|id = r.TransactionId.ToString(); date = r.Date; value = r.RiskAmount; ``type`` = ``type``; description = description; quantity = 0m |}
             | Stop s ->
                let ``type`` = "stop"
                let description =
                    match s.StopPrice with
                    | Some stopPrice -> $"stop price set to {stopPrice}"
                    | None -> "stop deleted"
-               {|id = s.TransactionId; date = s.Date; value = (s.StopPrice |> Option.defaultValue 0m); ``type`` = ``type``; description = description; quantity = 0m |}
+               {|id = s.TransactionId.ToString(); date = s.Date; value = (s.StopPrice |> Option.defaultValue 0m); ``type`` = ``type``; description = description; quantity = 0m |}
+            | Dividend d ->
+                let ``type`` = "dividend"
+                let description = $"dividend of {d.NetAmount}"
+                {|id = d.ActivityId; date = d.Date; value = d.NetAmount; ``type`` = ``type``; description = description; quantity = 0m |}
+            | Fee f ->
+                let ``type`` = "fee"
+                let description = $"{f.Description} in the amount of {f.NetAmount}"
+                {|id = f.ActivityId; date = f.Date; value = f.NetAmount; ``type`` = ``type``; description = description; quantity = 0m |}
         )
             
     member this.IsShort = stockPosition.StockPositionType = Short

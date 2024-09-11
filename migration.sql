@@ -126,3 +126,19 @@ CREATE TABLE accountbrokerageorders (
     PRIMARY KEY (userid,orderid) 
 );
 ALTER TABLE accountbrokerageorders OWNER TO stocks;
+
+CREATE TABLE accountbrokeragetransactions (
+     transactionid text NOT NULL,
+     description text NOT NULL,
+     brokeragetype text NOT NULL,
+     tradedate text NOT NULL,
+     settlementdate text NOT NULL,
+     netamount decimal NOT NULL,
+     inferredticker text NULL,
+     inferredtype text NULL,
+     userid uuid NOT NULL,
+     inserted text NOT NULL,
+     applied text NULL,
+     PRIMARY KEY (userid, transactionid)
+);
+ALTER TABLE accountbrokeragetransactions OWNER TO stocks;

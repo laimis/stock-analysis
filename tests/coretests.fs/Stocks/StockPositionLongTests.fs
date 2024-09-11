@@ -339,3 +339,15 @@ let ``Notes are appended with most recent last``() =
     position.Notes |> should haveLength 2
     position.Notes |> List.head |> _.content |> should equal "this is a note"
     position.Notes |> List.last |> _.content |> should equal "this is another note"
+
+[<Fact>]
+let ``Dividends and fees are handled properly``() =
+    
+    let position =
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.processDividend "acitivityId" DateTimeOffset.UtcNow "Qualified Dividend" 1m
+        |> StockPosition.processFee "acitivityId2" DateTimeOffset.UtcNow "ADR Fee" 0.1m
+        
+    position.Transactions |> should haveLength 3
+    position.NumberOfShares |> should equal 1m

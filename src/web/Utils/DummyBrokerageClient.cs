@@ -28,7 +28,7 @@ public class DummyBrokerageClient : IBrokerage
         throw new NotImplementedException();
     }
 
-    public Task<FSharpResult<SearchResult[], ServiceError>> Search(UserState state, string query, int limit)
+    public Task<FSharpResult<AccountTransaction[], ServiceError>> GetTransactions(UserState state, AccountTransactionType[] types)
     {
         throw new NotImplementedException();
     }
@@ -93,6 +93,11 @@ public class DummyBrokerageClient : IBrokerage
     }
 
     public Task<FSharpResult<Dictionary<Ticker, StockQuote>, ServiceError>> GetQuotes(UserState user, IEnumerable<Ticker> tickers)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<FSharpResult<SearchResult[], ServiceError>> Search(UserState state, SearchQueryType searchQueryType, string query, int limit)
     {
         throw new NotImplementedException();
     }
