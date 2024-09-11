@@ -160,5 +160,40 @@ namespace storagetests
             Assert.Equal(order.OrderId, fromDbOrder.OrderId);
             Assert.Equal(order.CanBeCancelled, fromDbOrder.CanBeCancelled);
         }
+        
+        [Fact]
+        public async Task AccountTransactionsWork()
+        {
+            var storage = GetStorage();
+            
+            var userId = UserId.NewUserId(Guid.NewGuid());
+
+            var transaction = new AccountTransaction
+            {
+                NetAmount = 10m,
+                Type = AccountTransactionType.Dividend,
+                TradeDate = DateTimeOffset.UtcNow,
+                SettlementDate = DateTimeOffset.UtcNow,
+                Description = "desc",
+                Ticker = new Ticker("AAPL"),
+                TransactionId = "123",
+            };
+            
+            await storage.SaveAccountBrokerageTransactions(userId, new [] { transaction });
+            
+            var fromDb = await storage.GetAccountBrokerageTransactions(userId);
+            
+            Assert.Single(fromDb);
+            
+            var fromDbTransaction = fromDb.First();
+            
+            Assert.Equal(transaction.NetAmount, fromDbTransaction.NetAmount);
+            Assert.Equal(transaction.Type, fromDbTransaction.Type);
+            Assert.Equal(transaction.SettlementDate, fromDbTransaction.SettlementDate, TimeSpan.FromSeconds(1));
+            Assert.Equal(transaction.TradeDate, fromDbTransaction.TradeDate, TimeSpan.FromSeconds(1));
+            Assert.Equal(transaction.Description, fromDbTransaction.Description);
+            Assert.Equal(transaction.Ticker.Value, fromDbTransaction.Ticker.Value);
+            Assert.Equal(transaction.Type, fromDbTransaction.Type);
+        }
     }
 }

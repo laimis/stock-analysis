@@ -178,6 +178,18 @@ type InstrumentsResponse = {
     instruments: SearchItem [] option
 }
 
+type TransactionItem = {
+    activityId: int64
+    time: string
+    description: string
+    ``type``: string
+    status: string
+    tradeDate: string
+    settlementDate: string
+    netAmount: decimal
+    activityType: string
+}
+
 type RegularMarketQuote = {
     regularMarketLastPrice: decimal
 }
@@ -668,7 +680,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             return! execIfConnectedToBrokerage state execution
         }
 
-        member this.Search (state: UserState) (query: string) (limit: int) = task {
+        member this.Search (state: UserState) (searchType: SearchQueryType) (query: string) (limit: int) = task {
             
             let connectedStateFunc state = task {
                 // schwab API freaks out if the query is only a single letter, doesn't return an error and instead
@@ -677,7 +689,12 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     return Ok [||]
                 else
                     
-                    let resource = $"/instruments?symbol={query}.*&projection=symbol-regex" |> MarketDataUrl
+                    let projection =
+                        match searchType with
+                        | Symbol -> "symbol-regex"
+                        | Description -> "desc-regex"
+                    
+                    let resource = $"/instruments?symbol={query}.*&projection={projection}" |> MarketDataUrl
                     
                     let! results = this.CallApi<InstrumentsResponse> state resource None
                     
@@ -719,6 +736,80 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             }
             
             return! execIfConnectedToBrokerage state connectedStateFunc
+        }
+        
+        member this.GetTransactions(user: UserState) (types : AccountTransactionType array) = task {
+            
+            let mapTransactionTypeToString transactionType =
+                // TRADE, RECEIVE_AND_DELIVER, DIVIDEND_OR_INTEREST, ACH_RECEIPT, ACH_DISBURSEMENT, CASH_RECEIPT, CASH_DISBURSEMENT, ELECTRONIC_FUND, WIRE_OUT, WIRE_IN, JOURNAL, MEMORANDUM, MARGIN_CALL, MONEY_MARKET, SMA_ADJUSTMENT
+                match transactionType with
+                | Dividend -> "DIVIDEND_OR_INTEREST"
+                | Fee -> "DIVIDEND_OR_INTEREST"
+                | Interest -> "DIVIDEND_OR_INTEREST"
+                | Trade -> "TRADE"
+                | Transfer -> "ACH_RECEIPT,ACH_DISBURSEMENT,CASH_RECEIPT,CASH_DISBURSEMENT,ELECTRONIC_FUND,WIRE_OUT,WIRE_IN,JOURNAL,MEMORANDUM,MARGIN_CALL,MONEY_MARKET,SMA_ADJUSTMENT"
+                | _ -> failwith "Unsupported transaction type " + transactionType.ToString()
+                
+            
+            let accountFunc state = task {
+                
+                let accountNumbersResource = "/accounts/accountNumbers" |> TraderApiUrl
+                let! accountNumbers = this.CallApi<AccountNumber []> state accountNumbersResource None
+                match accountNumbers with
+                | Error error -> return Error error
+                | Ok accountNumbers ->
+                    let accountId = accountNumbers[0].hashValue
+                    
+                    // ISO-8601 format
+                    let format = "yyyy-MM-dd'T'HH:mm:ss.000Z"
+                    let startDate = DateTimeOffset.UtcNow.AddMonths(-6).ToString(format)
+                    let endDate = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
+                    let types = types |> Array.map mapTransactionTypeToString |> String.concat(",")
+                    
+                    let ordersResource = $"/accounts/{accountId}/transactions?startDate={startDate}&endDate={endDate}&types={types}" |> TraderApiUrl
+                    let! transactions = this.CallApi<TransactionItem []> state ordersResource None
+                    match transactions with
+                    | Error error -> return Error error
+                    | Ok transactions ->
+                        
+                        let accountTransactions =
+                            transactions
+                            |> Array.map(fun t ->
+                                
+                                let ``type``, ticker = 
+                                    match t.description with
+                                    | x when x.Contains("Dividend~") -> 
+                                        Dividend, Some(x.Split("~")[1])
+                                    | x when x.Contains("Dividend Short Sale~") -> 
+                                        Dividend, Some(x.Split("~")[1])
+                                    | x when x.Contains("ADR Fees~") -> 
+                                        Fee, Some(x.Split("~")[1])
+                                    | x when x.Contains(" Interest ") ->
+                                        Interest, None
+                                    | x when x.Contains("SCHWAB1 INT ") ->
+                                        Interest, None
+                                    | _ ->
+                                        Dividend, None // NOTE: this default being dividend is sketchy
+                                
+                                let accountTransaction = {
+                                    TransactionId = t.activityId.ToString()
+                                    Description = t.description
+                                    Type = ``type``
+                                    NetAmount = t.netAmount
+                                    SettlementDate = t.settlementDate |> DateTimeOffset.Parse
+                                    TradeDate = t.tradeDate |> DateTimeOffset.Parse
+                                    Ticker = ticker |> Option.map Ticker
+                                    Inserted = None
+                                    Applied = None 
+                                }
+                                accountTransaction
+                            )
+                            |> Array.sortBy _.TradeDate
+
+                        return accountTransactions |> Ok
+            }
+            
+            return! execIfConnectedToBrokerage user accountFunc    
         }
 
         member this.GetAccount(user: UserState) = task {

@@ -74,10 +74,20 @@ namespace storagetests
             var afterPurchase = StockPosition.buy(5m, 5m, DateTimeOffset.UtcNow, loaded.Value);
             
             await storage.SaveStockPosition(_userId, loaded, afterPurchase);
+            
+            var afterDividend = StockPosition.processDividend("activityid", DateTimeOffset.UtcNow, "some divident", 1m, afterPurchase);
 
+            await storage.SaveStockPosition(_userId, afterPurchase, afterDividend);
+            
+            var afterFee = StockPosition.processFee("activityid", DateTimeOffset.UtcNow, "some fee", 1m, afterDividend);
+            
+            await storage.SaveStockPosition(_userId, afterDividend, afterFee);
+            
+            var final = afterFee;
+            
             var reloaded = await storage.GetStockPosition(afterPurchase.PositionId, _userId);
 
-            AssertPositions(afterPurchase, reloaded);
+            AssertPositions(final, reloaded);
 
             await storage.Delete(_userId);
             

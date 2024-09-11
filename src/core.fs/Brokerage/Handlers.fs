@@ -42,6 +42,11 @@ type QueryAccount =
         UserId:UserId
     }
     
+type QueryTransactions =
+    {
+        UserId:UserId
+    }
+    
 type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage, portfolio:IPortfolioStorage) =
     
     let buy (data:BuyOrSellData) user = 
@@ -103,6 +108,15 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage, portfolio:
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user -> return! brokerage.GetAccount(user.State)
+    }
+    
+    member _.Handle (query:QueryTransactions) = task {
+        let! user = accounts.GetUser(query.UserId)
+        
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            return! brokerage.GetTransactions user.State [|AccountTransactionType.Dividend; AccountTransactionType.Interest; AccountTransactionType.Fee|]
     }
         
     

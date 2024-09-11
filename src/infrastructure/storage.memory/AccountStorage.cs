@@ -10,6 +10,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, User?> _users = new();
     private static readonly Dictionary<Guid, ProcessIdToUserAssociation> _associations = new();
     private static readonly Dictionary<UserId, List<AccountBalancesSnapshot>> _snapshots = new();
+    private static readonly Dictionary<UserId, List<AccountTransaction>> _transactions = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
     private static readonly Dictionary<UserId, List<Order>> _orders = new();
 
@@ -46,6 +47,24 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     {
         return Task.FromResult<IEnumerable<AccountBalancesSnapshot>>(
             _snapshots.GetValueOrDefault(userId, [])
+        );
+    }
+
+    public Task SaveAccountBrokerageTransactions(UserId userId, AccountTransaction[] transactions)
+    {
+        if (_transactions.ContainsKey(userId) == false)
+        {
+            _transactions[userId] = [];
+        }
+        
+        _transactions[userId].AddRange(transactions);
+        return Task.CompletedTask;
+    }
+    
+    public Task<IEnumerable<AccountTransaction>> GetAccountBrokerageTransactions(UserId userId)
+    {
+        return Task.FromResult<IEnumerable<AccountTransaction>>(
+            _transactions.GetValueOrDefault(userId, [])
         );
     }
 

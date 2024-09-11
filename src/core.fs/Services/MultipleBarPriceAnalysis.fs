@@ -27,6 +27,7 @@ module MultipleBarPriceAnalysis =
         let EarliestPrice = "EarliestPrice"
         let Gain = "Gain"
         let AverageTrueRange = "AverageTrueRange"
+        let AverageTrueRangePercentage = "AverageTrueRangePercentage"
         let GreenStreak = "GreenStreak"
         let GapPercentage = "GapPercentage"
         let OnBalanceVolume = "OBV"
@@ -44,19 +45,18 @@ module MultipleBarPriceAnalysis =
     
     module Indicators =
    
+        let atrPeriod = 14
+            
         type ATRContainer(period, dataPoints) =
             member this.Period = period
             member this.DataPoints = dataPoints
             
-        let averageTrueRage (prices:PriceBars) =
-            
-            let period = 14
-            
+        let private averateTrueRangeInternal func (prices:PriceBars) =
             let dataPoints =
                 prices.Bars
                 |> Array.pairwise
-                |> Array.map (fun (a, b) -> b, a |> Some |> b.TrueRange)
-                |> Array.windowed period
+                |> Array.map (fun (a, b) -> b, a |> Some |> func b)
+                |> Array.windowed atrPeriod
                 |> Array.map (fun x ->
                     let average = x |> Array.averageBy (fun (_, v) -> v)
                     let date = x |> Array.last |> fun (b, _) -> b.Date
@@ -64,7 +64,13 @@ module MultipleBarPriceAnalysis =
                     DataPoint<decimal>(date, average)
                 )
                 
-            ATRContainer(period, dataPoints)
+            ATRContainer(atrPeriod, dataPoints)
+            
+        let averageTrueRage (prices:PriceBars) =
+            averateTrueRangeInternal (fun (x:PriceBar) -> x.TrueRange) prices
+            
+        let averageTrueRangePercentage (prices:PriceBars) =
+            averateTrueRangeInternal (fun (x:PriceBar) -> x.TrueRangePercentage) prices
             
         let onBalanceVolume (prices:PriceBars) =
             
@@ -392,7 +398,7 @@ module MultipleBarPriceAnalysis =
             match dataPoints with
             | [||] -> None
             | _ ->
-                let value = dataPoints |> Array.last |> fun x -> x.Value
+                let value = dataPoints |> Array.last |> _.Value
         
                 AnalysisOutcome(
                     key = MultipleBarOutcomeKeys.AverageTrueRange,
@@ -400,6 +406,23 @@ module MultipleBarPriceAnalysis =
                     value = value,
                     valueType = ValueFormat.Currency,
                     message = $"Average True Range: {value}"
+                ) |> Some
+                
+        let generateAverageTrueRangePercentageOutcome (prices:PriceBars) =
+        
+            let dataPoints = prices |> Indicators.averageTrueRangePercentage |> _.DataPoints
+            
+            match dataPoints with
+            | [||] -> None
+            | _ ->
+                let value = dataPoints |> Array.last |> _.Value
+                
+                AnalysisOutcome(
+                    key = MultipleBarOutcomeKeys.AverageTrueRangePercentage,
+                    outcomeType = OutcomeType.Neutral,
+                    value = value,
+                    valueType = ValueFormat.Percentage,
+                    message = $"Average True Range Percentage: {value}"
                 ) |> Some
                 
         let generateGreenStreakOutcome (prices:PriceBars) =
@@ -455,6 +478,7 @@ module MultipleBarPriceAnalysis =
         let generate (prices: PriceBars) =
             
             let atrOutcome = prices |> generateAverageTrueRangeOutcome
+            let atrOutcomePercent = prices |> generateAverageTrueRangePercentageOutcome
                     
             [
                 prices |> generateCurrentPriceOutcome
@@ -469,6 +493,7 @@ module MultipleBarPriceAnalysis =
                 prices |> generatePercentChangeAverageOutcome
                 prices |> generatePercentChangeStandardDeviationOutcome
                 if atrOutcome.IsSome then atrOutcome.Value
+                if atrOutcomePercent.IsSome then atrOutcomePercent.Value
                 prices |> generateGapOutcome
                 prices |> generateGreenStreakOutcome
                 prices |> generateOnBalanceVolumeOutcome

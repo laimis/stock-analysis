@@ -119,6 +119,9 @@ type PriceBar(date:DateTimeOffset, ``open``:decimal, high:decimal, low:decimal, 
             
         candidates |> List.max
         
+    member this.TrueRangePercentage (previousBar:PriceBar option) =
+        this.TrueRange(previousBar) / this.Open
+        
     member this.HasGap (referenceBar:PriceBar) =
         // needed to add a check for valid bar here otherwise the gap condition
         // will evaluate to true, but when calculating the gap will come back with nonsensical

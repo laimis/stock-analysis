@@ -26,6 +26,7 @@ module SingleBarPriceAnalysis =
         let NewLow = "NewLow"
         let SigmaRatio = "SigmaRatio"
         let TrueRange = "TrueRange"
+        let TrueRangePercentage = "TrueRangePercentage"
         let DollarChangeVsATR = "DollarChangeVsATR"
     
     let movingAveragesAnalysis (bars:PriceBars) =
@@ -117,9 +118,17 @@ module SingleBarPriceAnalysis =
                 
                 yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRange, OutcomeType.Neutral, trueRange, ValueFormat.Currency, "True range")
                 
+                let trueRangePercentage = previousBars.Last |> Some |> currentBar.TrueRangePercentage
+                
+                yield AnalysisOutcome (SingleBarOutcomeKeys.TrueRangePercentage, OutcomeType.Neutral, trueRangePercentage, ValueFormat.Percentage, "True range percentage")
+                
                 let atr = MultipleBarPriceAnalysis.PriceAnalysis.generateAverageTrueRangeOutcome bars |> Option.get
                 
                 yield AnalysisOutcome (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRange, atr.OutcomeType, atr.Value, atr.ValueType, atr.Message)
+                
+                let atrp = MultipleBarPriceAnalysis.PriceAnalysis.generateAverageTrueRangePercentageOutcome bars |> Option.get
+                
+                yield AnalysisOutcome (MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRangePercentage, atrp.OutcomeType, atrp.Value, atrp.ValueType, atrp.Message)
                 
                 let changeRatioVsATR = Math.Round (dollarChange / atr.Value, 2)
                 

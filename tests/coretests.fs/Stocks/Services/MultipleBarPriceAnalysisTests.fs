@@ -92,3 +92,7 @@ let ``SMA50 above SMA200 bars is positive and matches`` () =
 [<Fact>]
 let ``On Balance Volume is present and matches`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.OnBalanceVolume |> should equal 41298923m
+    
+[<Fact>]
+let ``Average True Range Percentage is present and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRangePercentage |> rounded 2 |> should equal 0.08m

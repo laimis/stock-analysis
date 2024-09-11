@@ -274,6 +274,106 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                     CanBeCancelled = r.canbecancelled,
                 });
         }
+        
+        public async Task SaveAccountBrokerageTransactions(UserId userId, AccountTransaction[] transactions)
+        {
+            using var db = GetConnection();
+        
+            var query = @"
+        INSERT INTO accounttransactions (transactionid, description, type, tradedate, settlementdate, netamount, ticker, userid, inserted, applied)
+        VALUES (@TransactionId, @Description, @Type, @TradeDate, @SettlementDate, @NetAmount, @Ticker, @UserId, @Inserted, @Applied)
+        ON CONFLICT (userid, transactionid) DO UPDATE 
+        SET description = @Description, 
+            type = @Type, 
+            tradedate = @TradeDate, 
+            settlementdate = @SettlementDate, 
+            netamount = @NetAmount, 
+            ticker = @Ticker, 
+            inserted = @Inserted, 
+            applied = @Applied";
+        
+            using var tx = db.BeginTransaction();
+        
+            foreach (var transaction in transactions)
+            {
+                await db.ExecuteAsync(query, new
+                {
+                    transaction.TransactionId,
+                    transaction.Description,
+                    Type = GetTransactionTypeString(transaction.Type),
+                    TradeDate = transaction.TradeDate.ToString("u"),
+                    SettlementDate = transaction.SettlementDate.ToString("u"),
+                    transaction.NetAmount,
+                    Ticker = FSharpOption<Ticker>.get_IsNone(transaction.Ticker) ? null : transaction.Ticker.Value.Value,
+                    UserId = userId.Item,
+                    Inserted = DateTimeOffset.UtcNow.ToString("u"),
+                    Applied = FSharpOption<DateTimeOffset>.get_IsNone(transaction.Applied) ? null : transaction.Applied.Value.ToString("u")
+                });
+            }
+        
+            tx.Commit();
+            return;
+
+            string GetTransactionTypeString(AccountTransactionType type)
+            {
+                return type.Tag switch
+                {
+                    AccountTransactionType.Tags.Dividend => "Dividend",
+                    AccountTransactionType.Tags.Trade => "Trade",
+                    AccountTransactionType.Tags.Fee => "Fee",
+                    AccountTransactionType.Tags.Interest => "Interest",
+                    AccountTransactionType.Tags.Other => "Other",
+                    _ => throw new Exception($"Unknown transaction type: {type}")
+                };
+            }
+        }
+        
+        public async Task<IEnumerable<AccountTransaction>> GetAccountBrokerageTransactions(UserId userId)
+        {
+            using var db = GetConnection();
+            
+            var query = @"SELECT transactionid, description, type, tradedate, settlementdate, netamount, ticker, inserted, applied FROM accounttransactions WHERE userid = :userId";
+
+            var result = await db.QueryAsync(query, new { userId = userId.Item});
+            
+            return result.Select(r =>
+                new AccountTransaction(
+                    r.transactionid,
+                    r.description,
+                    GetTransactionTypeFromString(r.type),
+                    ParseWithHandling(r.tradedate),
+                    ParseWithHandling(r.settlementdate),
+                    r.netamount,
+                    r.ticker == null ? FSharpOption<Ticker>.None : new FSharpOption<Ticker>(new Ticker(r.ticker)),
+                    ParseWithHandling(r.inserted),
+                    r.applied == null ? FSharpOption<DateTimeOffset>.None : new FSharpOption<DateTimeOffset>(ParseWithHandling(r.applied))
+                ));
+
+            AccountTransactionType GetTransactionTypeFromString(string type)
+            {
+                return type switch
+                {
+                    "Dividend" => AccountTransactionType.Dividend,
+                    "Trade" => AccountTransactionType.Trade,
+                    "Fee" => AccountTransactionType.Fee,
+                    "Interest" => AccountTransactionType.Interest,
+                    "Other" => AccountTransactionType.Other,
+                    _ => throw new Exception($"Unknown transaction type: {type}")
+                };
+            }
+
+            DateTimeOffset ParseWithHandling(string input)
+            {
+                if (DateTimeOffset.TryParse(input, out var result))
+                {
+                    return result;
+                }
+                else
+                {
+                    throw new Exception($"Could not parse {input} as a DateTimeOffset");
+                }
+            }
+        }
 
         public async Task<FSharpOption<ProcessIdToUserAssociation>> GetUserAssociation(Guid id)
         {

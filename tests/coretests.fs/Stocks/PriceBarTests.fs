@@ -6,6 +6,7 @@ open testutils
 
 let bars = TestDataGenerator.PriceBars(TestDataGenerator.NET)
 let bar = bars.First
+let secondBar = bars.Bars[1]
 
 [<Fact>]
 let ``Closing range works``() =
@@ -24,7 +25,15 @@ let ``DateStr works``() =
 
 [<Fact>]
 let ``True range works``() =
-    Assert.Equal(6.67m, bar.TrueRange(None), 2)
+    Assert.Equal(6.67m, bar.TrueRange None, 2)
+    
+[<Fact>]
+let ``True range with prev bar works``() =
+    Assert.Equal(5.63m, secondBar.TrueRange (Some bar), 2)
+    
+[<Fact>]
+let ``True range percentage``() =
+    Assert.Equal(0.07m, secondBar.TrueRangePercentage (Some bar), 2)
 
 [<Fact>]
 let ``Length works``() =
