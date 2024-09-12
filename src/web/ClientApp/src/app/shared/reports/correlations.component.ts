@@ -21,6 +21,7 @@ export class CorrelationsComponent {
     private _correlations: TickerCorrelation[];
     correlationTickers: string[];
     sortedCorrelations: TickerCorrelation[];
+    avgCorrelation: number;
     selectedTicker: string;
     sortDirection: number = 1;
 
@@ -29,6 +30,7 @@ export class CorrelationsComponent {
         this._correlations = value;
         this.correlationTickers = value.map(c => c.ticker)
         this.sortByCorrelation(this.correlationTickers[0])
+        this.avgCorrelation = value.reduce((acc, c) => acc + c.averageCorrelation, 0) / value.length
     }
     get correlations() {
         return this._correlations
@@ -37,6 +39,20 @@ export class CorrelationsComponent {
     @Input()
     days: number
 
+    sortByAverageCorrelation() {
+        this.sortDirection = this.sortDirection * -1
+        this.sortedCorrelations = this.correlations.map(c => c)
+            .sort((a, b) => {
+                let aAverage = a.averageCorrelation
+                let bAverage = b.averageCorrelation
+                
+                if (this.sortDirection === -1) {
+                    return aAverage - bAverage
+                }
+                
+                return bAverage - aAverage
+            })
+    }
     sortByCorrelation(ticker: string) {
 
         if (this.selectedTicker === ticker) {

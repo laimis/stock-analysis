@@ -1,5 +1,8 @@
 <section class="correlations-section">
-    <h5>Correlations ({{days}} days)</h5>
+    <h5>
+        Correlations ({{days}} days)
+        <span class="float-end" *ngIf="avgCorrelation">Avg Correlation: {{avgCorrelation | number: '1.2-2'}}</span>
+    </h5>
     <table class="table table-striped" *ngIf="sortedCorrelations">
         <thead>
         <tr>
@@ -7,6 +10,7 @@
             @for (c of correlationTickers; track c) {
                 <th role="button" (click)="sortByCorrelation(c)">{{ c }}</th>
             }
+            <th (click)="sortByAverageCorrelation()">Avg</th>
         </tr>
         </thead>
         <tbody>
@@ -21,6 +25,7 @@
                             {{ c | number:'1.2-2' }}
                         </td>
                     }
+                    <td>{{correlation.averageCorrelation | number: '1.2-2'}}</td>
                 </tr>
             }
         </tbody>

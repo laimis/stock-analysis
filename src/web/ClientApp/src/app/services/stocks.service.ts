@@ -546,6 +546,7 @@ export interface Chain {
 
 export interface TickerCorrelation {
     ticker: string
+    averageCorrelation: number
     correlations: number[]
 }
 
