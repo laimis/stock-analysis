@@ -98,6 +98,7 @@ let ``Short Days held is accurate`` () =
 [<Fact>]
 let ``Short position profit is accurate`` () =
     shortPosition.Profit |> should equal 110m
+    shortPosition.ProfitWithoutDividendsAndFees |> should equal 120m
     
 [<Fact>]
 let ``Short Cost is accurate`` () =
@@ -166,6 +167,7 @@ let ``Set stop sets first stop`` () =
 [<Fact>]
 let ``Profit calculations are accurate``() =
     position.Profit |> should equal 130m
+    position.ProfitWithoutDividendsAndFees |> should equal 120m
 
 [<Fact>]
 let ``Position closed date is accurate``() =    

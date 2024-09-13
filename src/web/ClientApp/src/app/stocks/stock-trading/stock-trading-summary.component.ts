@@ -62,7 +62,7 @@ export class StockTradingSummaryComponent {
 
     getUnrealizedProfit(position: PositionInstance): number {
         let quote = this.quotes[position.ticker]
-        return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profit : 0
+        return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profitWithoutDividendsAndFees : 0
     }
 
     getSortFunc(property: string): (a: PositionGroup, b: PositionGroup) => number {

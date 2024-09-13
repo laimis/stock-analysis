@@ -671,6 +671,8 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         DateTimeOffset.UtcNow.Subtract(date).TotalDays |> int
         
     member this.Profit = profit + dividendTotal + feeTotal
+    
+    member this.ProfitWithoutDividendsAndFees = profit
         
     member this.AverageBuyCostPerShare = averageBuyCostPerShare
             

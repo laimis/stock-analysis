@@ -1151,6 +1151,7 @@ export interface PositionInstance {
     numberOfShares: number,
     opened: string,
     profit: number,
+    profitWithoutDividendsAndFees: number,
     riskedAmount: number,
     rr: number,
     rrWeighted: number,
