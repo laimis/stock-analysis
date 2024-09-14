@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using core.fs.Accounts;
@@ -274,14 +275,67 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                     CanBeCancelled = r.canbecancelled,
                 });
         }
+
+        static string GetTransactionTypeString(AccountTransactionType type)
+        {
+            return type.Tag switch
+            {
+                AccountTransactionType.Tags.Dividend => "Dividend",
+                AccountTransactionType.Tags.Trade => "Trade",
+                AccountTransactionType.Tags.Fee => "Fee",
+                AccountTransactionType.Tags.Interest => "Interest",
+                AccountTransactionType.Tags.Other => "Other",
+                _ => throw new Exception($"Unknown transaction type: {type}")
+            };
+        }
+
+        private static readonly string _accountBrokerageTransactionInsert =
+            @"INSERT INTO accountbrokeragetransactions (transactionid, description, brokeragetype, tradedate, settlementdate, netamount, inferredticker, inferredtype, userid, inserted, applied)
+        VALUES (@TransactionId, @Description, @BrokerageType, @TradeDate, @SettlementDate, @NetAmount, @InferredTicker, @InferredType, @UserId, @Inserted, @Applied)";
+
+        private static object ToAccountBrokerageTransactionRecord(UserId userId, AccountTransaction transaction)
+            => new
+            {
+                transaction.TransactionId,
+                transaction.Description,
+                transaction.BrokerageType,
+                TradeDate = transaction.TradeDate.ToString("u"),
+                SettlementDate = transaction.SettlementDate.ToString("u"),
+                transaction.NetAmount,
+                InferredTicker = FSharpOption<Ticker>.get_IsNone(transaction.InferredTicker)
+                    ? null
+                    : transaction.InferredTicker.Value.Value,
+                InferredType = FSharpOption<AccountTransactionType>.get_IsNone(transaction.InferredType)
+                    ? null
+                    : GetTransactionTypeString(transaction.InferredType.Value),
+                UserId = userId.Item,
+                Inserted = DateTimeOffset.UtcNow.ToString("u"),
+                Applied = FSharpOption<DateTimeOffset>.get_IsNone(transaction.Applied)
+                    ? null
+                    : transaction.Applied.Value.ToString("u")
+            };
+        
+        public async Task InsertAccountBrokerageTransactions(UserId userId, IEnumerable<AccountTransaction> transactions)
+        {
+            using var db = GetConnection();
+
+            var query = @$"{_accountBrokerageTransactionInsert} ON CONFLICT (userid, transactionid) DO NOTHING";
+        
+            using var tx = db.BeginTransaction();
+        
+            foreach (var transaction in transactions)
+            {
+                await db.ExecuteAsync(query, ToAccountBrokerageTransactionRecord(userId, transaction));
+            }
+        
+            tx.Commit();
+        }
         
         public async Task SaveAccountBrokerageTransactions(UserId userId, AccountTransaction[] transactions)
         {
             using var db = GetConnection();
         
-            var query = @"
-        INSERT INTO accountbrokeragetransactions (transactionid, description, brokeragetype, tradedate, settlementdate, netamount, inferredticker, inferredtype, userid, inserted, applied)
-        VALUES (@TransactionId, @Description, @BrokerageType, @TradeDate, @SettlementDate, @NetAmount, @InferredTicker, @InferredType, @UserId, @Inserted, @Applied)
+            var query = @$"{_accountBrokerageTransactionInsert} 
         ON CONFLICT (userid, transactionid) DO UPDATE 
         SET description = @Description, 
             brokeragetype = @BrokerageType, 
@@ -297,37 +351,10 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
         
             foreach (var transaction in transactions)
             {
-                await db.ExecuteAsync(query, new
-                {
-                    transaction.TransactionId,
-                    transaction.Description,
-                    transaction.BrokerageType,
-                    TradeDate = transaction.TradeDate.ToString("u"),
-                    SettlementDate = transaction.SettlementDate.ToString("u"),
-                    transaction.NetAmount,
-                    InferredTicker = FSharpOption<Ticker>.get_IsNone(transaction.InferredTicker) ? null : transaction.InferredTicker.Value.Value,
-                    InferredType = FSharpOption<AccountTransactionType>.get_IsNone(transaction.InferredType) ? null : GetTransactionTypeString(transaction.InferredType.Value),
-                    UserId = userId.Item,
-                    Inserted = DateTimeOffset.UtcNow.ToString("u"),
-                    Applied = FSharpOption<DateTimeOffset>.get_IsNone(transaction.Applied) ? null : transaction.Applied.Value.ToString("u")
-                });
+                await db.ExecuteAsync(query, ToAccountBrokerageTransactionRecord(userId, transaction));
             }
         
             tx.Commit();
-            return;
-
-            string GetTransactionTypeString(AccountTransactionType type)
-            {
-                return type.Tag switch
-                {
-                    AccountTransactionType.Tags.Dividend => "Dividend",
-                    AccountTransactionType.Tags.Trade => "Trade",
-                    AccountTransactionType.Tags.Fee => "Fee",
-                    AccountTransactionType.Tags.Interest => "Interest",
-                    AccountTransactionType.Tags.Other => "Other",
-                    _ => throw new Exception($"Unknown transaction type: {type}")
-                };
-            }
         }
         
         public async Task<IEnumerable<AccountTransaction>> GetAccountBrokerageTransactions(UserId userId)

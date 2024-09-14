@@ -61,6 +61,17 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
     
+    public Task InsertAccountBrokerageTransactions(UserId userId, IEnumerable<AccountTransaction> transactions)
+    {
+        if (_transactions.ContainsKey(userId) == false)
+        {
+            _transactions[userId] = [];
+        }
+        
+        _transactions[userId].InsertRange(0, transactions);
+        return Task.CompletedTask;
+    }
+    
     public Task<IEnumerable<AccountTransaction>> GetAccountBrokerageTransactions(UserId userId)
     {
         return Task.FromResult<IEnumerable<AccountTransaction>>(

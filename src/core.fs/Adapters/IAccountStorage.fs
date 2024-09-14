@@ -17,6 +17,7 @@ type IAccountStorage =
     abstract member SaveAccountBalancesSnapshot: userId:UserId -> balances:AccountBalancesSnapshot -> Task
     abstract member GetAccountBrokerageOrders: userId:UserId -> Task<Order seq>
     abstract member SaveAccountBrokerageOrders: userId:UserId -> orders:Order seq -> Task
+    abstract member InsertAccountBrokerageTransactions: userId:UserId -> transactions:AccountTransaction seq -> Task
     abstract member SaveAccountBrokerageTransactions: userId:UserId -> transactions:AccountTransaction[] -> Task
     abstract member GetAccountBrokerageTransactions: userId:UserId -> Task<AccountTransaction seq>
     abstract member GetUserAssociation: guid:Guid -> Task<ProcessIdToUserAssociation option>

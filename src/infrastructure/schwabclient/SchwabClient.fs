@@ -768,7 +768,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     let types = types |> Array.map mapTransactionTypeToString |> String.concat(",")
                     
                     let ordersResource = $"/accounts/{accountId}/transactions?startDate={startDate}&endDate={endDate}&types={types}" |> TraderApiUrl
-                    let! transactions = this.CallApi<TransactionItem []> state ordersResource (Some true)
+                    let! transactions = this.CallApi<TransactionItem []> state ordersResource None
                     match transactions with
                     | Error error -> return Error error
                     | Ok transactions ->

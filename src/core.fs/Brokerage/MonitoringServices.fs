@@ -170,6 +170,8 @@ type AccountMonitoringService(
                     |> Seq.filter (fun t -> t.Applied.IsNone)
                     |> Seq.map(resolveType)
                     
+                logger.LogInformation $"Resolved types for {unappliedWithTypesResolved |> Seq.length} transactions for {user.State.Id}"
+                    
                 let failedToResolveTypes =
                     unappliedWithTypesResolved
                     |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
@@ -304,7 +306,8 @@ type AccountMonitoringService(
                     | Error e ->
                         logger.LogError $"Unable to get brokerage transactions for {user.State.Id}: {e.Message}"
                     | Ok transactions ->
-                        do! transactions |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
+                        logger.LogInformation $"Got {transactions.Length} transactions for {user.State.Id}"
+                        do! transactions |> accounts.InsertAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
                         logger.LogInformation $"Saved transactions for {user.State.Id}: {transactions.Length} transactions"
                     ()
                     
