@@ -250,7 +250,7 @@ type AccountMonitoringService(
                     let plainTextBody = @$"
                         Here are the transactions that were applied:
                         {appliedDescriptions}
-                        q
+                        
                         Here are the transactions that failed to be applied:
                         {failedDescriptions}"
                         
