@@ -11,8 +11,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col">
-                        <div class="card-title">{{ profile.firstname }} {{ profile.lastname }}
-                            , {{ profile.subscriptionLevel }} Plan
+                        <div class="card-title">{{ profile.firstname }} {{ profile.lastname }}, {{ profile.subscriptionLevel }} Plan
                         </div>
                     </div>
                     <div class="col text-end">
@@ -23,7 +22,9 @@
                     <div class="col mb-1">
                         <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
                     </div>
-                    <div class="col text-end"></div>
+                    <div class="col text-end">
+                        <span class="text-muted">Interest Received: </span>{{ profile.interestReceived | currency }}
+                    </div>
                 </div>
             </div>
         </div>

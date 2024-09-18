@@ -112,6 +112,19 @@ type AccountMonitoringService(
                                 return t |> Error
     }
     
+    let applyInterest (user:User) (t:AccountTransaction) = async {
+        
+        // reload user account to have latest state
+        let! account = user.State.Id |> UserId |> accounts.GetUser |> Async.AwaitTask
+        
+        match account with
+        | None -> return t |> Error
+        | Some account ->
+            account.ApplyBrokerageInterest t.TradeDate t.TransactionId t.NetAmount
+            do! account |> accounts.Save |> Async.AwaitTask
+            return {t with Applied = DateTimeOffset.UtcNow |> Some } |> Ok
+    }
+    
     let processTransaction (user:UserState) (t:AccountTransaction) = async {
         let! stock = portfolio.GetStockPositions (user.Id |> UserId) |> Async.AwaitTask
         
@@ -175,56 +188,69 @@ type AccountMonitoringService(
                 let failedToResolveTypes =
                     unappliedWithTypesResolved
                     |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
+                    
+                // we will take interest transactions and apply it on the user's account
+                // and dividend transactions will be applied to the stock positions
+                let! interestTransactions =
+                    unappliedWithTypesResolved
+                    |> Seq.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
+                    |> Seq.filter (fun t -> t.InferredType.IsSome && t.InferredType.Value = AccountTransactionType.Interest)
+                    |> Seq.map (applyInterest user)
+                    |> Async.Sequential
+                    
+                let failedToApplyInterest =
+                    interestTransactions
+                    |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
+                    
+                let appliedInterest =
+                    interestTransactions
+                    |> Array.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                 
                 // the brokerage transactions do not have tickers most of the time, so we need to resolve them
                 // if possible, using search approach or hardcoded mappings
-                let! unappliedWithTickers =
+                let! dividendTransactionsWithResolveAttempt =
                     unappliedWithTypesResolved
                     |> Seq.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
+                    |> Seq.filter (fun t -> t.InferredType.IsSome && t.InferredType.Value = AccountTransactionType.Dividend)
                     |> Seq.map(fun t -> resolveTicker user.State t.Description 0 t)
                     |> Async.Sequential
                     
                 let failedToResolveTickers =
-                    unappliedWithTickers
+                    dividendTransactionsWithResolveAttempt
                     |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
                     
                 // for each transaction that has a ticker, we can process it
-                let! appliedTransactionResults =
-                    unappliedWithTickers
+                let! appliedDividendsResults =
+                    dividendTransactionsWithResolveAttempt
                     |> Seq.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                     |> Seq.map(processTransaction user.State) 
                     |> Async.Sequential
                 
-                let failedToApplyTransactions =
-                    appliedTransactionResults
+                let failedToApplyDividends =
+                    appliedDividendsResults
                     |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
                     
-                let appliedTransactions =
-                    appliedTransactionResults
+                let appliedDividends =
+                    appliedDividendsResults
                     |> Array.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                 
-                logger.LogInformation $"Applied {appliedTransactions.Length} transactions for {user.State.Id}"
+                // save applied dividend transactions
+                logger.LogInformation $"Applied {appliedDividends.Length} dividend transactions for {user.State.Id}"
+                do! appliedDividends |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
                 
-                // save applied transactions
-                do! appliedTransactions |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
-                
-                // reload transactions
-                let! transactions = accounts.GetAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
-                
-                // and any that are unprocessed and interest, mark them as applied as right now we treat them as no-op
-                let appliedInterestTransactions =
-                    transactions
-                    |> Seq.filter (fun t -> t.Applied.IsNone)
-                    |> Seq.filter (fun t -> t.InferredType.IsSome && t.InferredType.Value = AccountTransactionType.Interest)
-                    |> Seq.map (fun t -> { t with Applied = Some DateTimeOffset.Now })
-                    |> Seq.toArray
-                    
-                do! appliedInterestTransactions |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
+                // save applied interest
+                logger.LogInformation $"Applied {appliedInterest.Length} interest transactions for {user.State.Id}"
+                do! appliedInterest |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
                 
                 // send a list of applied transactions to the user
-                let appliedDescriptions =
-                    appliedTransactions
+                let appliedDividendDescriptions =
+                    appliedDividends
                     |> Seq.map (fun t -> $"{t.InferredTicker}: {t.BrokerageType} - {t.Description}")
+                    |> Seq.toArray
+                    
+                let appliedInterestDescriptions =
+                    appliedInterest
+                    |> Seq.map (fun t -> $"{t.BrokerageType}: {t.Description}")
                     |> Seq.toArray
                     
                 // now combine all failed results and send them to the user
@@ -236,20 +262,24 @@ type AccountMonitoringService(
                         |> Seq.map (fun t -> $"Failed to resolve ticker for {t.Description}")
                         )
                     |> Seq.append
-                        (failedToApplyTransactions
+                        (failedToApplyDividends
                         |> Seq.map (fun t -> $"Failed to apply transaction for {t.Description}")
                         )
                     |> Seq.toArray
                     
-                match appliedDescriptions, failedResults with
-                | [||], [||] -> ()
+                match appliedDividendDescriptions, appliedInterestDescriptions, failedResults with
+                | [||], [||], [||] -> ()
                 | _ ->
-                    let appliedDescriptions = appliedDescriptions |> String.concat "\n"
+                    let appliedDescriptions = appliedDividendDescriptions |> String.concat "\n"
+                    let appliedDescriptionsInterest = appliedInterestDescriptions |> String.concat "\n"
                     let failedDescriptions = failedResults |> String.concat "\n"
                     
                     let plainTextBody = @$"
-                        Here are the transactions that were applied:
+                        Here are the dividends that were applied:
                         {appliedDescriptions}
+                        
+                        Here are the interest transactions that were applied:
+                        {appliedDescriptionsInterest}
                         
                         Here are the transactions that failed to be applied:
                         {failedDescriptions}"

@@ -112,3 +112,13 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
     member this.SetSetting name value =
         let event = UserSettingSet(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow, name, value)
         this.Apply(event)
+        
+    member this.ApplyBrokerageInterest tradeDate activityId netAmount =
+        if netAmount <= 0.0m then
+            raise (ArgumentException(nameof(netAmount)))
+        if String.IsNullOrWhiteSpace(activityId) then
+            raise (ArgumentException(nameof(activityId)))
+            
+        if (this.State.ContainsBrokerageInterest activityId) |> not then
+            let event = UserBrokerageInterestApplied(Guid.NewGuid(), this.Id, tradeDate, activityId, netAmount)
+            this.Apply(event)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using core.Shared;
 using Microsoft.FSharp.Core;
 
@@ -26,6 +27,8 @@ namespace core.Account
         public bool ConnectedToBrokerage { get; private set; }
         public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
         public FSharpOption<decimal> MaxLoss { get; private set; }
+        private readonly HashSet<string> _interestHashSet = [];
+        public decimal InterestReceived { get; private set; }
 
         internal void ApplyInternal(UserCreated c)
         {
@@ -90,6 +93,17 @@ namespace core.Account
             BrokerageAccessToken = null;
             BrokerageRefreshToken = null;
             BrokerageAccessTokenExpires = DateTimeOffset.MinValue;
+        }
+
+        private void ApplyInternal(UserBrokerageInterestApplied e)
+        {
+            _interestHashSet.Add(e.ActivityId);
+            InterestReceived += e.NetAmount;
+        }
+
+        public bool ContainsBrokerageInterest(string activityId)
+        {
+            return _interestHashSet.Contains(activityId);
         }
 
         internal void ApplyInternal(UserSettingSet e)

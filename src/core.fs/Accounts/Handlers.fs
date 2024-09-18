@@ -26,6 +26,7 @@ namespace core.fs.Accounts
             BrokerageAccessTokenExpirationDate: DateTimeOffset
             BrokerageRefreshTokenExpirationDate: DateTimeOffset
             MaxLoss: decimal option
+            InterestReceived: decimal
         }
 
         static member fromUserState (isAdmin:bool) (state:UserState) =
@@ -44,6 +45,7 @@ namespace core.fs.Accounts
                 BrokerageAccessTokenExpirationDate = state.BrokerageAccessTokenExpires
                 BrokerageRefreshTokenExpirationDate = state.BrokerageRefreshTokenExpires
                 MaxLoss = state.MaxLoss
+                InterestReceived = state.InterestReceived 
             }
             
         static member notFound() =
@@ -62,6 +64,7 @@ namespace core.fs.Accounts
                 BrokerageAccessTokenExpirationDate = DateTimeOffset.MinValue
                 BrokerageRefreshTokenExpirationDate = DateTimeOffset.MinValue
                 MaxLoss = None
+                InterestReceived = 0.0m
             }    
     
     [<CLIMutable>]
@@ -251,8 +254,6 @@ namespace core.fs.Accounts
             | _ ->
                 user.SubscribeToPlan paymentInfo.PlanId result.CustomerId result.SubscriptionId
                 Ok ()
-        
-        
         
         interface IApplicationService
         member this.Handle (command:Authenticate) = task {

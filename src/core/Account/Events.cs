@@ -162,4 +162,16 @@ namespace core.Account
         public string Value { get; }
         public string Key { get; }
     }
+
+    public class UserBrokerageInterestApplied : AggregateEvent
+    {
+        public UserBrokerageInterestApplied(Guid id, Guid aggregateId, DateTimeOffset when, string activityId, decimal netAmount) : base(id, aggregateId, when)
+        {
+            ActivityId = activityId;
+            NetAmount = netAmount;
+        }
+
+        public string ActivityId { get; }
+        public decimal NetAmount { get; }
+    }
 }

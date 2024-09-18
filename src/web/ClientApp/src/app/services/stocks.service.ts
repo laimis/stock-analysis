@@ -1279,6 +1279,7 @@ export class AccountStatus {
     connectedToBrokerage: boolean
     brokerageRefreshTokenExpirationDate: string
     maxLoss: number
+    interestReceived: number
 }
 
 export interface TrackingPreview {

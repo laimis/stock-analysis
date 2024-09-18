@@ -122,5 +122,18 @@ namespace coretests.Account
             Assert.Equal(DateTimeOffset.UtcNow.AddDays(7), u.State.BrokerageRefreshTokenExpires,
                 TimeSpan.FromSeconds(1));
         }
+
+        [Fact]
+        public void InterestReceived_Works()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+            
+            u.ApplyBrokerageInterest(DateTimeOffset.UtcNow, "interest1", 13.2m);
+            u.ApplyBrokerageInterest(DateTimeOffset.UtcNow, "interest2", 13.2m);
+            // reapplying again, ignores it
+            u.ApplyBrokerageInterest(DateTimeOffset.UtcNow, "interest1", 13.2m);
+            
+            Assert.Equal(26.4m, u.State.InterestReceived);
+        }
     }
 }
