@@ -6,8 +6,6 @@
         <th (click)="sort('rrSum')" class="sort-header">R/R Sum</th>
         <th (click)="sort('winPct')" class="sort-header">Win %</th>
         <th (click)="sort('avgReturnPct')" class="sort-header">Avg %</th>
-        <th (click)="sort('winAvgReturnPct')" class="sort-header">Avg Win %</th>
-        <th (click)="sort('lossAvgReturnPct')" class="sort-header">Avg Loss %</th>
         <th (click)="sort('maxWinAmount')" class="sort-header">Max Win</th>
         <th (click)="sort('maxLossAmount')" class="sort-header">Max Loss</th>
         <th (click)="sort('ev')" class="sort-header">E/V</th>
@@ -16,6 +14,7 @@
         <th (click)="sort('rrRatio')" class="sort-header">R/R Ratio</th>
         <th (click)="sort('sharpeRatio')" class="sort-header">Sharpe Ratio</th>
         <th (click)="sort('averageDaysHeld')" class="sort-header">Avg Days Held</th>
+        <th (click)="sort('maxCashNeeded')" class="sort-header">Max Cash Needed</th>
         <th (click)="sort('numberOfTrades')" class="sort-header">Trades</th>
     </tr>
     </thead>
@@ -26,9 +25,9 @@
                 <td>{{ r.performance.profit | currency }}</td>
                 <td>{{ r.performance.rrSum | number:'1.0-2' }}</td>
                 <td>{{ r.performance.winPct | percent:'1.2-2' }}</td>
-                <td>{{ r.performance.avgReturnPct | percent:'1.2-2' }}</td>
-                <td>{{ r.performance.winAvgReturnPct | percent:'1.2-2' }}</td>
-                <td>{{ r.performance.lossAvgReturnPct | percent:'1.2-2' }}</td>
+                <td>{{ r.performance.avgReturnPct | percent:'1.2-2' }}
+                    <span class="small" style="white-space: pre">( {{ r.performance.winAvgReturnPct | percent:'1.2-2' }} / {{ r.performance.lossAvgReturnPct | percent:'1.2-2' }} )</span>
+                </td>
                 <td>{{ r.performance.maxWinAmount | currency }}</td>
                 <td>{{ r.performance.maxLossAmount | currency }}</td>
                 <td>{{ r.performance.ev | currency }}</td>
@@ -39,6 +38,7 @@
                 <td>{{ r.performance.averageDaysHeld | number:'1.0-0' }} 
                     <span class="small" style="white-space: pre">( {{ r.performance.winAvgDaysHeld | number:'1.0-0' }} / {{ r.performance.lossAvgDaysHeld | number:'1.0-0' }} )</span>
                 </td>
+                <td>{{ r.performance.maxCashNeeded | currency }}</td>
                 <td>{{ r.performance.numberOfTrades }}</td>
             </tr>
         }

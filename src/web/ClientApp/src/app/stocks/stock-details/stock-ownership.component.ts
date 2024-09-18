@@ -22,4 +22,7 @@ export class StockOwnershipComponent {
 
     @Output()
     ordersChanged: EventEmitter<string> = new EventEmitter<string>();
+    
+    @Output()
+    notesChanged: EventEmitter<string> = new EventEmitter<string>();
 }

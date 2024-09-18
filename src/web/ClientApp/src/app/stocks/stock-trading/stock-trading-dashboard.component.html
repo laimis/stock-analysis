@@ -80,6 +80,7 @@
     @if (isActive('positions') && positions) {
         <app-stock-trading-positions [positions]=sortedPositions [metricFunc]="metricFunc" [metricType]="metricType"
                                      [orders]="brokerageAccount.orders" [quotes]="quotes"
+                                     (notesChanged)="refresh()"
                                      (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
     }
     @if (isActive('openreview')) {

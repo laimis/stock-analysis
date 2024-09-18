@@ -17,7 +17,8 @@
                 [position]="position"
                 [quote]="quote"
                 [orders]="orders"
-                (brokerageOrdersChanged)="ordersChanged.emit($event)">
+                (brokerageOrdersChanged)="ordersChanged.emit($event)"
+                (notesChanged)="notesChanged.emit($event)">
             </app-stock-trading-position>
         </section>
     } @empty {

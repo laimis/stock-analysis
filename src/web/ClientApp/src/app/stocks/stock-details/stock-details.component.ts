@@ -108,6 +108,10 @@ export class StockDetailsComponent implements OnInit {
         this.loadStockOwnership()
         this.loadOrders()
     }
+    
+    notesChanged(notes: string) {
+        this.loadStockOwnership()
+    }
 
     loadStockDetails() {
         this.stocks.getStockDetails(this.ticker).subscribe(result => {

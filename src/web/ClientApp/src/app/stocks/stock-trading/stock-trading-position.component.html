@@ -141,6 +141,9 @@
                         <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showOrderForm = !showOrderForm">
                             Order Form
                         </button>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showNotesForm = !showNotesForm">
+                            Add Notes
+                        </button>
                     </div>
                 </div>
             </div>
@@ -172,6 +175,23 @@
                     </div>
                 </div>
             }
+            
+            @if (showNotesForm) {
+                <div class="row mt-3">
+                    <div class="col">
+                        <label for="notes" class="form-label">Notes
+                            <span *ngIf="notesControl.invalid" class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control"
+                                  id="notes" rows="3"
+                                  [formControl]="notesControl"
+                                  [required]="true"></textarea>
+                        
+                        <button class="btn btn-primary mt-2" (click)="addNotes()">Add Notes</button>
+                    </div>
+                </div>
+                
+            }
         }
         @if (_position.isOpen) {
             <div class="row mt-3">
@@ -191,7 +211,8 @@
                 <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes
                     ({{ _position.notes.length }})
                 </div>
-                <div #notesContainer>
+                <div class="card" #notesContainer>
+                    <div class="card-body">
                     <table class="table table-striped table-sm">
                         <tbody>
                             @for (note of _position.notes; track note) {
@@ -202,6 +223,7 @@
                             }
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -85,7 +85,8 @@
         [quote]="stock.quote"
         [orders]="orders"
         [positionChartInformation]="currentPositionChartInfo"
-        (ordersChanged)="brokerageOrderEntered($event)">
+        (ordersChanged)="brokerageOrderEntered($event)"
+        (notesChanged)="notesChanged($event)">
     </app-stock-ownership>
 }
 @if (isActive('options')) {

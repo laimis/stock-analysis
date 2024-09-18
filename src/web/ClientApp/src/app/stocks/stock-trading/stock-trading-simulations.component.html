@@ -49,32 +49,7 @@
             </select>
         </div>
         
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Ticker</th>
-                    <th>Opened</th>
-                    <th>Closed</th>
-                    <th>Profit</th>
-                    <th>Gain %</th>
-                    <th>Cost</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for(result of getSelectedStrategyEntry().results; track result) {
-                    <tr>
-                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
-                        <td>{{ result.position.opened | parsedDate }}</td>
-                        <td>{{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }} vs {{ findActualTrade(result.position).position.daysHeld }})</td>
-                        <td>{{ result.position.profit | currency }} vs {{ findActualTrade(result.position).position.profit | currency }}</td>
-                        <td>{{ result.position.gainPct | percent }} vs {{ findActualTrade(result.position).position.gainPct | percent }}</td>
-                        <td>{{ result.position.completedPositionCostPerShare * result.position.completedPositionShares | currency }}</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        
-        <h3>Biggest Winners compared to Actual</h3>
+        <h3>Actual compared to selected strategy</h3>
         <table class="table table-hover">
             <thead>
                 <tr>

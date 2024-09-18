@@ -8,6 +8,7 @@ import {
 } from '../../services/stocks.service';
 import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {FormControl} from "@angular/forms";
 
 @Component({
     selector: 'app-stock-trading-position',
@@ -31,6 +32,8 @@ export class StockTradingPositionComponent {
     positionDeleted = new EventEmitter()
     @Output()
     brokerageOrdersChanged = new EventEmitter<string>()
+    @Output()
+    notesChanged = new EventEmitter<string>()
 
     // constructor that takes stock service
     constructor(
@@ -219,6 +222,24 @@ export class StockTradingPositionComponent {
         
         // Close the modal
         this.closeStopModal();
+    }
+
+    showNotesForm: boolean = false;
+    notesControl = new FormControl('')
+    addNotes() {
+        if (this.notesControl.invalid === false) {
+            this.stockService.addNotes(this._position.positionId, this.notesControl.value).subscribe(
+                (_) => {
+                    this.notesControl.setValue('')
+                    this.showNotesForm = false
+                    this.notesChanged.emit()
+                },
+                err => {
+                    let errors = GetErrors(err)
+                    alert("Error adding notes: " + errors.join(", "))
+                }
+            )
+        }
     }
 
     deleteTransaction(transactionId: string) {

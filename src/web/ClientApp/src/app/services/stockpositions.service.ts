@@ -118,5 +118,7 @@ export class StockPositionsService {
         return this.http.delete(`/api/portfolio/stockpositions/${positionId}/stop`)
     }
 
-
+    addNotes(positionId: string, notes: string): Observable<object> {
+        return this.http.post(`/api/portfolio/stockpositions/${positionId}/notes`, {notes, positionId})
+    }
 }

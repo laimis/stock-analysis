@@ -108,6 +108,7 @@ type TradingPerformance =
         TotalDaysHeld:decimal
         EarliestDate:DateTimeOffset
         LatestDate:DateTimeOffset
+        MaxCashNeeded:decimal
         GradeDistribution:LabelWithFrequency[]
     }
         with
@@ -204,6 +205,48 @@ type TradingPerformance =
                 
             static member Create name (closedPositions:seq<StockPositionWithCalculations>) =
                 
+                // I need to calculate the max amount of cash needed to execute this
+                // strategy. It cannot be a simple sum of all the costs and needs to be
+                // a day by day calculations starting from the earliest open to the latest close
+                let earliestOpen = closedPositions |> Seq.minBy _.Opened
+                let latestClose = closedPositions |> Seq.maxBy _.Closed.Value
+                
+                let mapByDateOpened = 
+                    closedPositions
+                    |> Seq.groupBy (fun x -> x.Opened.Date)
+                    |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
+                    |> Map.ofSeq
+                    
+                let mapByDateClosed = 
+                    closedPositions
+                    |> Seq.groupBy (fun x -> x.Closed.Value.Date)
+                    |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
+                    |> Map.ofSeq
+                    
+                let dates = Array.init ((int (latestClose.Closed.Value.Date - earliestOpen.Opened.Date).TotalDays) + 1) (fun i -> earliestOpen.Opened.Date.AddDays(float i))
+                
+                let cashNeeded, maxCashNeed = 
+                    dates
+                    |> Array.fold (fun (currentCashNeeded, maxValue) date ->
+                        
+                        let cashNeededToday =
+                            match mapByDateOpened.TryFind date with
+                            | Some costs -> costs |> Seq.sum
+                            | None -> 0m
+                            
+                        let cashNotNeededToday =
+                            match mapByDateClosed.TryFind date with
+                            | Some costs -> costs |> Seq.sum
+                            | None -> 0m
+                            
+                        let newCashNeed = currentCashNeeded + cashNeededToday - cashNotNeededToday
+                        let newMaxValue = Math.Max(maxValue, newCashNeed)
+                        (newCashNeed, newMaxValue)
+                    ) (0m, 0m)
+                    
+                if cashNeeded <> 0m then
+                    failwith $"Cash needed should be zeroed out, but is {cashNeeded}"
+                    
                 let gainStats = MathNet.Numerics.Statistics.RunningStatistics()
                 
                 closedPositions
@@ -227,6 +270,7 @@ type TradingPerformance =
                         CostSum = perf.CostSum + position.CompletedPositionCostPerShare * decimal(position.CompletedPositionShares)
                         EarliestDate = if position.Opened < perf.EarliestDate then position.Opened else perf.EarliestDate
                         LatestDate = if position.Closed.IsSome && position.Closed.Value > perf.LatestDate then position.Closed.Value else perf.LatestDate
+                        MaxCashNeeded = maxCashNeed 
                         GradeDistribution = 
                             match position.Grade with
                             | Some grade ->
@@ -333,6 +377,7 @@ type TradingPerformance =
                     WinRRTotal = 0m
                     LossRRTotal = 0m
                     Name = name
+                    MaxCashNeeded = 0m 
                 }
 
 type TradingStrategyPerformance =
@@ -572,6 +617,11 @@ module TradingStrategyFactory =
         TradingStrategyCloseOnCondition("Buy and hold", exitCondition)
     
     let createProfitPointsBasedOnPctGainTrade percentGain numberOfProfitPoints : ITradingStrategy =
+        if percentGain <= 0m then
+            failwith "Percent gain must be greater than 0"
+        if percentGain >= 1m then
+            failwith "Percent gain must be less than 1, e.g. 0.07 for 7%"
+            
         let profitPointFunc = fun (level:int) -> ProfitPoints.getProfitPointWithPercentGain level percentGain
         let stopFunc = fun (level:int) (position:StockPositionWithCalculations) -> advancingStop level position ProfitPoints.getProfitPointWithStopPrice
         TradingStrategyWithProfitPoints($"{numberOfProfitPoints} profit points at {percentGain}%% intervals", numberOfProfitPoints, profitPointFunc, stopFunc)
@@ -659,8 +709,13 @@ module TradingStrategyFactory =
             
         [
             createBuyAndHold
-            createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
+            createProfitPointsBasedOnPctGainTrade 0.07m 3
+            createProfitPointsBasedOnPctGainTrade 0.10m 3
+            createProfitPointsBasedOnPctGainTrade 0.02m 3
             createCloseAfterFixedNumberOfDays 30
+            createCloseAfterFixedNumberOfDays 60
+            createCloseAfterFixedNumberOfDays 90
+            createCloseAfterFixedNumberOfDays 120
             createTrailingStop "5%" 0.05m None
             createTrailingStop "10%" 0.10m None
             createTrailingStop "20%" 0.20m None

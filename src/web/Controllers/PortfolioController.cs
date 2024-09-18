@@ -185,6 +185,10 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
     [HttpPost("stockpositions/{positionId}/buy")]
     public Task<ActionResult> Buy([FromBody]StockTransaction model) =>
         this.OkOrError(stockPositionHandler.Handle(BuyOrSell.NewBuy(model, User.Identifier())));
+    
+    [HttpPost("stockpositions/{positionId}/notes")]
+    public Task<ActionResult> AddNotes([FromBody]AddNotes model) =>
+        this.OkOrError(stockPositionHandler.Handle(User.Identifier(), model));
 
     [HttpGet("stockpositions/{positionId}/simulate/trades")]
     public Task<ActionResult> Trade([FromRoute] string positionId, [FromQuery]bool closeIfOpenAtTheEnd) =>

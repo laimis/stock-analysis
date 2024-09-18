@@ -22,6 +22,8 @@ export class StockTradingPositionsComponent {
     orders: BrokerageOrder[];
     @Output()
     brokerageOrdersChanged = new EventEmitter<string>()
+    @Output()
+    notesChanged = new EventEmitter<string>()
 
     constructor(
         private percentPipe: PercentPipe,

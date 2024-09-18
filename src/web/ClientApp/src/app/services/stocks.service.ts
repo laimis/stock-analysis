@@ -1000,6 +1000,7 @@ export interface StockTradingPerformance {
     gainPctStdDev:number,
     earliestDate: string,
     latestDate: string,
+    maxCashNeeded: number,
     gradeDistribution: LabelWithFrequency[]
 }
 

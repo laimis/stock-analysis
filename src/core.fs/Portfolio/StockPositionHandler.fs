@@ -28,6 +28,14 @@ type ImportStocks =
         UserId: UserId
         Content: string
     }
+    
+type AddNotes =
+    {
+        [<Required>]
+        PositionId: StockPositionId
+        [<Required>]
+        Notes: string
+    }
 
 type private ImportRecord =
     {
@@ -378,6 +386,25 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Async.StartAsTask
                 
             return results |> ResponseUtils.toOkOrConcatErrors
+    }
+    
+    member _.Handle(userId:UserId, cmd:AddNotes) = task {
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! position = storage.GetStockPosition cmd.PositionId userId
+            
+            match position with
+            | None -> return "Stock position not found" |> ServiceError |> Error
+            | Some state ->
+                
+                do!
+                    state
+                    |> StockPosition.addNotes (cmd.Notes |> Some) DateTimeOffset.UtcNow
+                    |> storage.SaveStockPosition userId position
+                
+                return Ok ()
     }
     
     member _.Handle(userId:UserId, cmd:OpenStockPosition) = task {
