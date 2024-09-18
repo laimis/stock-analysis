@@ -6,6 +6,7 @@ open core.Account
 open core.Shared
 open core.fs
 open core.fs.Adapters.Brokerage
+open core.fs.Adapters.Logging
 open core.fs.Adapters.Stocks
 open core.fs.Stocks
 
@@ -564,6 +565,11 @@ module TradingStrategyFactory =
     let createProfitPointsTrade numberOfProfitPoints : ITradingStrategy =
         let stopFunc = fun (level:int) position -> advancingStop level position ProfitPoints.getProfitPointWithStopPrice
         TradingStrategyWithProfitPoints($"Profit points: {numberOfProfitPoints}", numberOfProfitPoints, ProfitPoints.getProfitPointWithStopPrice, stopFunc)
+        
+    let createBuyAndHold : ITradingStrategy =
+        let exitCondition = fun (_:SimulationContext) (_:PriceBar) ->
+            false, None
+        TradingStrategyCloseOnCondition("Buy and hold", exitCondition)
     
     let createProfitPointsBasedOnPctGainTrade percentGain numberOfProfitPoints : ITradingStrategy =
         let profitPointFunc = fun (level:int) -> ProfitPoints.getProfitPointWithPercentGain level percentGain
@@ -652,9 +658,8 @@ module TradingStrategyFactory =
             costPerShare * multiplier
             
         [
-            createProfitPointsTrade 3
+            createBuyAndHold
             createProfitPointsBasedOnPctGainTrade TradingStrategyConstants.AvgPercentGain 3
-            createCloseAfterFixedNumberOfDays 15
             createCloseAfterFixedNumberOfDays 30
             createTrailingStop "5%" 0.05m None
             createTrailingStop "10%" 0.10m None
@@ -668,9 +673,12 @@ module TradingStrategyFactory =
                 createTrailingStop "5% w/ initial stop" 0.05m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "10% w/ initial stop" 0.10m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "20% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
+                
+            // createCloseAfterFixedNumberOfDays 15 - retired, consistently underperforms
+            // createProfitPointsTrade 3 - returned, consistently underperforms            
         ]
     
-type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours) =
+type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours, logger:ILogger) =
     
     let setRiskAmountFromActualTradeIfSet actualTrade date stockPosition =
         match actualTrade with
@@ -714,8 +722,22 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             match prices with
             | Error err -> results.MarkAsFailed($"Failed to get price history for {ticker}: {err.Message}")
             | Ok bars ->
+                
+                // purchase price can be very different from the bar price because
+                // of stock splits and what not. So if we see a big difference, we should
+                // use the bar open as purchase price. Use percent difference to determine
+                // if the difference is big enough to warrant using the bar open price
+                
+                let purchasePrice =
+                    let percentDiff = Math.Abs(price - bars.Bars[0].Open) / price
+                    match percentDiff > 0.2m with
+                    | true ->
+                        logger.LogInformation($"Price difference for {ticker} is too big by {percentDiff:P}. Using bar open price instead of {price} for purchase")
+                        bars.Bars[0].Open
+                    | false -> price
+                
                 let stockPosition =
-                    StockPosition.``open`` ticker numberOfShares price ``when``
+                    StockPosition.``open`` ticker numberOfShares purchasePrice ``when``
                     |> StockPosition.setStop stopPrice ``when``
                     |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
                     |> setLabelsFromActualTradeIfSet actualTrade ``when``

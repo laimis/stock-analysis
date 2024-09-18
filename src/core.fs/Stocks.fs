@@ -725,7 +725,12 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         match this.RiskedAmount with
         | None -> 0m
         | Some riskedAmount when riskedAmount = 0m -> 0m
-        | Some riskedAmount -> this.Profit / riskedAmount
+        | Some riskedAmount ->
+            match this.Profit with
+            | x when x = 0m ->
+                // take the initial cost, and divide it by the risked amount
+                this.Cost / riskedAmount * -1m
+            | _ -> this.Profit / riskedAmount
         
     member this.FirstStop() =
         let stopSets =

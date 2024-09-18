@@ -12,6 +12,7 @@ open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.CSV
+open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Trading
@@ -258,7 +259,7 @@ type TransactionSummary =
             
             (monday, sunday)
     
-type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser) =
+type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser,logger:ILogger) =
     
     interface IApplicationService
     
@@ -659,7 +660,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             match stock with
             | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
-                let runner = TradingStrategyRunner(brokerage, marketHours)
+                let runner = TradingStrategyRunner(brokerage, marketHours, logger)
                 let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=command.CloseIfOpenAtTheEnd)
                 return simulation |> Ok
     }
@@ -669,7 +670,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let runner = TradingStrategyRunner(brokerage, marketHours)
+            let runner = TradingStrategyRunner(brokerage, marketHours, logger)
                 
             let! results = runner.Run(
                     user.State,
@@ -727,7 +728,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             positions
             |> Seq.filter filterFunc
             
-        let simulator = TradingStrategyRunner(brokerage, marketHours)
+        let simulator = TradingStrategyRunner(brokerage, marketHours, logger)
         
         let! simulations =
             candidatePositions
@@ -788,7 +789,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.truncate command.NumberOfTrades
                 |> Seq.toList
                 
-            let runner = TradingStrategyRunner(brokerage, marketHours)
+            let runner = TradingStrategyRunner(brokerage, marketHours, logger)
             
             let! simulations =
                 positions

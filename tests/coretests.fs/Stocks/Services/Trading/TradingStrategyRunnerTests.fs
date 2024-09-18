@@ -2,6 +2,8 @@ module coretests.fs.Stocks.Services.Trading.TradingStrategyRunnerTests
 
 open System
 open System.Threading.Tasks
+open Castle.Core.Logging
+open Moq
 open Xunit
 open core.Account
 open core.fs.Adapters.Brokerage
@@ -40,7 +42,7 @@ let createRunner numberOfBars priceFunction =
                     prices |> Ok |> Task.FromResult
         }
     
-    TradingStrategyRunner(mock, MarketHoursAlwaysOn()), prices
+    TradingStrategyRunner(mock, MarketHoursAlwaysOn(), Mock.Of<core.fs.Adapters.Logging.ILogger>()), prices
 
 [<Fact>]
 let ``Basic test``() = task {
@@ -296,3 +298,29 @@ let ``Fixed number of days but with stop for a long position that's falling, res
     position.RR |> should equal -1.2m
     result.MaxGainPct |> should equal 0m
     result.MaxDrawdownPct |> should equal -0.12m
+    
+
+
+[<Fact>]
+let ``Buy and Hold holds until the end of bars`` () =
+    let data = generatePriceBars 10 (fun i -> 50 - i |> decimal)
+    
+    let positionInstance =
+        StockPosition.openLong TestDataGenerator.NET data.First.Date
+        |> StockPosition.buy 5m 50m data.First.Date
+        |> StockPosition.setStop (Some 45m) data.First.Date
+        
+    let runner = TradingStrategyFactory.createBuyAndHold
+    
+    let result = runner.Run data true positionInstance
+    
+    let position = result.Position
+    
+    position.IsClosed |> should equal true
+    result.ForcedClosed |> should equal true
+    position.DaysHeld |> should equal 10
+    position.Profit |> should equal -50m
+    position.GainPct |> should equal -0.2m
+    position.RR |> should equal -2m
+    result.MaxGainPct |> should equal 0m
+    result.MaxDrawdownPct |> should equal -0.2m
