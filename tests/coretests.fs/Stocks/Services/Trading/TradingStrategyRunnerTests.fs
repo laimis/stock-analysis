@@ -60,29 +60,29 @@ let ``Basic test``() = task {
             false
         )
 
-    let oneThirdResult = results.Results[0]
+    let testResult = results.Results |> Seq.find (fun r -> r.StrategyName = "3 profit points at 0.07% intervals")
 
-    let maxDrawdown = oneThirdResult.MaxDrawdownPct
-    let maxGain = oneThirdResult.MaxGainPct
-    let position = oneThirdResult.Position
-
-    position.IsClosed |> should equal true
-    position.Profit |> should equal 1005
-    position.GainPct |> should equal 1.005m
-    position.RR |> should equal 2.01m
-    maxDrawdown |> should equal 0m
-    maxGain |> should equal 1.5m
-    position.DaysHeld |> should equal 15
-
-    let oneThirdPercentBased = results.Results[1]
-    let maxDrawdown = oneThirdPercentBased.MaxDrawdownPct
-    let maxGain = oneThirdPercentBased.MaxGainPct
-    let position = oneThirdPercentBased.Position
+    let maxDrawdown = testResult.MaxDrawdownPct
+    let maxGain = testResult.MaxGainPct
+    let position = testResult.Position
 
     position.IsClosed |> should equal true
     position.Profit |> should equal 137.3m
     position.GainPct |> should equal 0.1373m
     position.RR |> should equal 0.2746m
+    maxDrawdown |> should equal 0m
+    maxGain |> should equal 0.2m
+    position.DaysHeld |> should equal 2
+
+    let oneThirdPercentBased = results.Results |> Seq.find (fun r -> r.StrategyName = "3 profit points at 0.10% intervals")
+    let maxDrawdown = oneThirdPercentBased.MaxDrawdownPct
+    let maxGain = oneThirdPercentBased.MaxGainPct
+    let position = oneThirdPercentBased.Position
+
+    position.IsClosed |> should equal true
+    position.Profit |> should equal 167m
+    position.GainPct |> should equal 0.167m
+    position.RR |> should equal 0.334m
     maxDrawdown |> should equal 0m
     maxGain |> should equal 0.2m
     position.DaysHeld |> should equal 2
