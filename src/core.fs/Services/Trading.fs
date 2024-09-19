@@ -81,6 +81,54 @@ module ProfitPoints =
         [1..levels]
         |> List.map (fun level -> func level)
         
+module TradingPerformance =
+    let calculateMaxCashNeeded (closedPositions:StockPositionWithCalculations seq) =
+        match closedPositions |> Seq.isEmpty with
+        | true -> 0m
+        | false ->
+        // I need to calculate the max amount of cash needed to execute this
+        // strategy. It cannot be a simple sum of all the costs and needs to be
+        // a day by day calculations starting from the earliest open to the latest close
+        let earliestOpen = closedPositions |> Seq.minBy _.Opened
+        let latestClose = closedPositions |> Seq.maxBy _.Closed.Value
+        
+        let mapByDateOpened = 
+            closedPositions
+            |> Seq.groupBy (fun x -> x.Opened.Date)
+            |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
+            |> Map.ofSeq
+            
+        let mapByDateClosed = 
+            closedPositions
+            |> Seq.groupBy (fun x -> x.Closed.Value.Date)
+            |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
+            |> Map.ofSeq
+            
+        let dates = Array.init ((int (latestClose.Closed.Value.Date - earliestOpen.Opened.Date).TotalDays) + 1) (fun i -> earliestOpen.Opened.Date.AddDays(float i))
+        
+        let cashNeeded, maxCashNeed = 
+            dates
+            |> Array.fold (fun (currentCashNeeded, maxValue) date ->
+                
+                let cashNeededToday =
+                    match mapByDateOpened.TryFind date with
+                    | Some costs -> costs |> Seq.sum
+                    | None -> 0m
+                    
+                let cashNotNeededToday =
+                    match mapByDateClosed.TryFind date with
+                    | Some costs -> costs |> Seq.sum
+                    | None -> 0m
+                    
+                let newCashNeed = currentCashNeeded + cashNeededToday - cashNotNeededToday
+                let newMaxValue = Math.Max(maxValue, newCashNeed)
+                (newCashNeed, newMaxValue)
+            ) (0m, 0m)
+            
+        if cashNeeded <> 0m then
+            failwith $"Cash needed should be zeroed out, but is {cashNeeded}"
+            
+        maxCashNeed
 
 type TradingPerformance =
     {
@@ -112,6 +160,7 @@ type TradingPerformance =
         GradeDistribution:LabelWithFrequency[]
     }
         with
+            
             member this.AvgWinAmount =
                 match this.Wins with
                 | 0 -> 0m
@@ -205,47 +254,7 @@ type TradingPerformance =
                 
             static member Create name (closedPositions:seq<StockPositionWithCalculations>) =
                 
-                // I need to calculate the max amount of cash needed to execute this
-                // strategy. It cannot be a simple sum of all the costs and needs to be
-                // a day by day calculations starting from the earliest open to the latest close
-                let earliestOpen = closedPositions |> Seq.minBy _.Opened
-                let latestClose = closedPositions |> Seq.maxBy _.Closed.Value
-                
-                let mapByDateOpened = 
-                    closedPositions
-                    |> Seq.groupBy (fun x -> x.Opened.Date)
-                    |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
-                    |> Map.ofSeq
-                    
-                let mapByDateClosed = 
-                    closedPositions
-                    |> Seq.groupBy (fun x -> x.Closed.Value.Date)
-                    |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
-                    |> Map.ofSeq
-                    
-                let dates = Array.init ((int (latestClose.Closed.Value.Date - earliestOpen.Opened.Date).TotalDays) + 1) (fun i -> earliestOpen.Opened.Date.AddDays(float i))
-                
-                let cashNeeded, maxCashNeed = 
-                    dates
-                    |> Array.fold (fun (currentCashNeeded, maxValue) date ->
-                        
-                        let cashNeededToday =
-                            match mapByDateOpened.TryFind date with
-                            | Some costs -> costs |> Seq.sum
-                            | None -> 0m
-                            
-                        let cashNotNeededToday =
-                            match mapByDateClosed.TryFind date with
-                            | Some costs -> costs |> Seq.sum
-                            | None -> 0m
-                            
-                        let newCashNeed = currentCashNeeded + cashNeededToday - cashNotNeededToday
-                        let newMaxValue = Math.Max(maxValue, newCashNeed)
-                        (newCashNeed, newMaxValue)
-                    ) (0m, 0m)
-                    
-                if cashNeeded <> 0m then
-                    failwith $"Cash needed should be zeroed out, but is {cashNeeded}"
+                let maxCashNeeded = TradingPerformance.calculateMaxCashNeeded closedPositions
                     
                 let gainStats = MathNet.Numerics.Statistics.RunningStatistics()
                 
@@ -270,7 +279,7 @@ type TradingPerformance =
                         CostSum = perf.CostSum + position.CompletedPositionCostPerShare * decimal(position.CompletedPositionShares)
                         EarliestDate = if position.Opened < perf.EarliestDate then position.Opened else perf.EarliestDate
                         LatestDate = if position.Closed.IsSome && position.Closed.Value > perf.LatestDate then position.Closed.Value else perf.LatestDate
-                        MaxCashNeeded = maxCashNeed 
+                        MaxCashNeeded = maxCashNeeded 
                         GradeDistribution = 
                             match position.Grade with
                             | Some grade ->
