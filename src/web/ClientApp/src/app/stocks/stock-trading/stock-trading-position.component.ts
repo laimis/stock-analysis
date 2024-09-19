@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-    BrokerageOrder,
+    BrokerageOrder, KeyValuePair,
     PositionEvent,
     PositionInstance,
     StockQuote,
@@ -19,7 +19,6 @@ export class StockTradingPositionComponent {
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
     numberOfProfitPoints: number = 4
-    positionProfitPoints: StrategyProfitPoint[] = []
     positionStrategy: string = null
     positionOrders: BrokerageOrder[] = [];
     allOrders: BrokerageOrder[] = [];
@@ -74,7 +73,14 @@ export class StockTradingPositionComponent {
         this.positionOrders = this.allOrders.filter(o => o.ticker == this._position.ticker)
     }
 
+    positionProfitPoints: StrategyProfitPoint[] = []
+    showProfitPoints = false;
     fetchProfitPoints() {
+        if (this.showProfitPoints) {
+            this.showProfitPoints = false
+            return
+        }
+        this.showProfitPoints = true
         this.stockService.getStrategyProfitPoints(
             this._position.positionId,
             this.numberOfProfitPoints).subscribe(
@@ -293,6 +299,45 @@ export class StockTradingPositionComponent {
             (err) => {
                 const errors = GetErrors(err)
                 alert("Error setting strategy: " + errors.join(", "))
+            }
+        )
+    }
+    
+    showAddLabelForm:boolean = false;
+    newLabelKey: string = '';
+    newLabelValue: string = '';
+    removeLabel(pair:KeyValuePair) {
+        this.stockService.deleteLabel(this._position.positionId, pair.key).subscribe(
+            _ => {
+                this._position.labels = this._position.labels.filter(l => l.key != pair.key)
+            },
+            (err) => {
+                const errors = GetErrors(err)
+                alert("Error removing label: " + errors.join(", "))
+            }
+        )
+    }
+    addLabel() {
+        if (this.newLabelKey === '' || this.newLabelValue === '') {
+            alert("Please provide a key and value for the label")
+            return
+        }
+
+        let label = {
+            key: this.newLabelKey,
+            value: this.newLabelValue
+        }
+
+        this.stockService.setLabel(this._position.positionId, label).subscribe(
+            _ => {
+                this._position.labels.push(label)
+                this.newLabelKey = ''
+                this.newLabelValue = ''
+                this.showAddLabelForm = false
+            },
+            (err) => {
+                const errors = GetErrors(err)
+                alert("Error adding label: " + errors.join(", "))
             }
         )
     }

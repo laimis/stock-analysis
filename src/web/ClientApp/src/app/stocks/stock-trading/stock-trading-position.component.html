@@ -1,5 +1,7 @@
 @if (_position) {
     <div class="mb-3">
+        <div class="card">
+        <div class="card-body">
         <div class="row">
             <div class="col-md-3">
                 <div class="stat-label">Cost/Share</div>
@@ -115,7 +117,7 @@
                 </div>
             </div>
         </div>
-        @if (!_position.isClosed) {
+        @if (_position.isOpen) {
             <div class="row mt-3">
                 <div class="col-md-3">
                     <div class="stat-label">Unrealized Profit</div>
@@ -141,58 +143,81 @@
                         <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showOrderForm = !showOrderForm">
                             Order Form
                         </button>
-                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showNotesForm = !showNotesForm">
-                            Add Notes
-                        </button>
+
                     </div>
                 </div>
             </div>
+        }
+        </div>
+        </div>
+        
+        @if (showProfitPoints) {
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <app-loading *ngIf="positionProfitPoints.length === 0"></app-loading>
+                            @for (ppp of positionProfitPoints; track ppp) {
+                                <div class="row mt-3">
+                                    @for (p of ppp.prices; track p; let i = $index) {
+                                        <div
+                                            [ngClass]="{'col':true, 'bg-positive':profitPointReached(p), 'text-white':profitPointReached(p)}">
+                                            <div class="stat-label">{{ ppp.name }} {{ i + 1 }}</div>
+                                            <div>{{ p | currency }}</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
 
-            <div class="row">
-                @if (positionProfitPoints.length > 0) {
-                    <div class="col">
-                        @for (ppp of positionProfitPoints; track ppp) {
-                            <div class="row mt-3">
-                                @for (p of ppp.prices; track p; let i = $index) {
-                                    <div
-                                        [ngClass]="{'col':true, 'bg-positive':profitPointReached(p), 'text-white':profitPointReached(p)}">
-                                        <div class="stat-label">{{ ppp.name }} {{ i + 1 }}</div>
-                                        <div>{{ p | currency }}</div>
-                                    </div>
-                                }
-                            </div>
+        @if (showOrderForm) {
+            <div class="row mt-3">
+                <div class="col">
+                    <app-brokerage-new-order [ticker]="_position.ticker"
+                                             [positionId]="_position.positionId"
+                                             (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
+                </div>
+            </div>
+        }
+
+        <!-- New labels section -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="d-flex align-items-center flex-wrap">
+                    <div class="labels-container d-flex flex-wrap">
+                        @for (label of _position.labels; track label) {
+                            <span class="badge bg-info-subtle text-dark me-1 mb-1">
+                                <strong>{{ label.key }}:</strong> {{ label.value }}
+                                <button type="button" class="btn btn-sm" aria-label="Remove" (click)="removeLabel(label)"><i class="bi bi-trash"></i>
+                                </button>
+                            </span>
                         }
                     </div>
-                }
+                    <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showAddLabelForm = !showAddLabelForm">
+                        <i class="bi bi-plus"></i> Add Label
+                    </button>
+                </div>
             </div>
+        </div>
 
-            @if (showOrderForm) {
-                <div class="row mt-3">
-                    <div class="col">
-                        <app-brokerage-new-order [ticker]="_position.ticker"
-                                                 [positionId]="_position.positionId"
-                                                 (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
+        <!-- Add label form (initially hidden) -->
+        @if (showAddLabelForm) {
+            <div class="row mt-2">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Key" [(ngModel)]="newLabelKey">
+                        <input type="text" class="form-control" placeholder="Value" [(ngModel)]="newLabelValue">
+                        <button class="btn btn-outline-secondary" type="button" (click)="addLabel()">Add</button>
+                        <button class="btn btn-outline-secondary" type="button" (click)="showAddLabelForm = false">Cancel</button>
                     </div>
                 </div>
-            }
-            
-            @if (showNotesForm) {
-                <div class="row mt-3">
-                    <div class="col">
-                        <label for="notes" class="form-label">Notes
-                            <span *ngIf="notesControl.invalid" class="text-danger">*</span>
-                        </label>
-                        <textarea class="form-control"
-                                  id="notes" rows="3"
-                                  [formControl]="notesControl"
-                                  [required]="true"></textarea>
-                        
-                        <button class="btn btn-primary mt-2" (click)="addNotes()">Add Notes</button>
-                    </div>
-                </div>
-                
-            }
+            </div>
         }
+        
         @if (_position.isOpen) {
             <div class="row mt-3">
                 <div class="col">
@@ -206,14 +231,33 @@
                 </div>
             </div>
         }
+        @if (showNotesForm) {
+            <div class="row mt-3">
+                <div class="col">
+                    <label for="notes" class="form-label">Notes
+                        <span *ngIf="notesControl.invalid" class="text-danger">*</span>
+                    </label>
+                    <textarea class="form-control"
+                              id="notes" rows="3"
+                              [formControl]="notesControl"
+                              [required]="true"></textarea>
+
+                    <button class="btn btn-primary mt-2" (click)="addNotes()">Add Notes</button>
+                    <button class="btn btn-outline-secondary mt-2 ms-2" (click)="showNotesForm = !showNotesForm">Cancel</button>
+                </div>
+            </div>
+        }
         <div class="row mt-3">
             <div class="col">
-                <div class="stat-label" style="cursor: pointer;" (click)="toggleVisibility(notesContainer)">Notes
-                    ({{ _position.notes.length }})
-                </div>
-                <div class="card" #notesContainer>
+                <div class="card">
+                    <div class="card-header">
+                        <span role="button" (click)="toggleVisibility(notesContainer)">Notes ({{ _position.notes.length }})</span>
+                        <button class="btn btn-outline-secondary btn-sm float-end" (click)="showNotesForm = !showNotesForm">
+                            Add Notes
+                        </button>
+                    </div>
                     <div class="card-body">
-                    <table class="table table-striped table-sm">
+                    <table class="table table-striped table-sm" #notesContainer>
                         <tbody>
                             @for (note of _position.notes; track note) {
                             <tr>
