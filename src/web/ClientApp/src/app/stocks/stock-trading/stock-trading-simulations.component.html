@@ -43,39 +43,53 @@
         
         <!-- section to select the strategy to view -->
         <div class="mb-3">
-            <label for="strategySelect" class="form-label">Select a strategy to view:</label>
-            <select class="form-select" id="strategySelect" [(ngModel)]="selectedStrategy">
-                <option *ngFor="let strategy of results" [value]="strategy.strategyName" [selected]="selectedStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
+            <label class="form-label">Select strategies to compare:</label>
+            <select class="form-select" id="strategySelectOne" [(ngModel)]="mainStrategy">
+                <option *ngFor="let strategy of results" [value]="strategy.strategyName" [selected]="mainStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
+            </select>
+            <select class="form-select" id="strategySelectTwo" [(ngModel)]="alternateStrategy">
+                <option *ngFor="let strategy of results" [value]="strategy.strategyName" [selected]="alternateStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
             </select>
         </div>
         
-        <h3>Actual compared to selected strategy</h3>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Ticker</th>
-                    <th>Opened</th>
-                    <th>Closed</th>
-                    <th>Profit vs Actual</th>
-                    <th>Gain % vs Actual</th>
-                    <th>Profit Diff</th>
-                    <th>Gain %  Diff</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for(result of biggestWinnersComparedToActual(); track result) {
+        <div *ngIf="mainStrategy && alternateStrategy">
+            <h3>{{mainStrategy}} vs {{alternateStrategy}}</h3>
+            <table class="table table-hover">
+                <thead>
                     <tr>
-                        <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
-                        <td>{{ result.position.opened | parsedDate }}</td>
-                        <td>{{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }})</td>
-                        <td>{{ result.position.profit | currency }} vs {{ findActualTrade(result.position).position.profit | currency }}</td>
-                        <td>{{ result.position.gainPct | percent }} vs {{ findActualTrade(result.position).position.gainPct | percent }}</td>
-                        <td>{{ result.position.profit - findActualTrade(result.position).position.profit | currency }}</td>
-                        <td>{{ result.position.gainPct - findActualTrade(result.position).position.gainPct | percent }}</td>
+                        <th>Ticker</th>
+                        <th>Opened - Closed </th>
+                        <th>Opened - Closed Alt</th>
+                        <th>Profit</th>
+                        <th>Profit Alt</th>
+                        <th>Profit Diff</th>
+                        <th>Gain %</th>
+                        <th>Gain % Alt</th>
+                        <th>Gain %  Diff</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @for(result of biggestWinnersComparedToActual(); track result) {
+                        <tr>
+                            <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
+                            <td>
+                                {{ result.position.opened | parsedDate }} - {{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }})
+                            </td>
+                            <td>
+                                {{ findTrade(result.position).position.opened | parsedDate }} - {{ findTrade((result.position)).forcedClosed ? 'open' : findTrade(result.position).position.closed | parsedDate }}
+                                ({{ findTrade(result.position).position.daysHeld }})
+                            </td>
+                            <td>{{ result.position.profit | currency }}</td>
+                            <td>{{ findTrade(result.position).position.profit | currency }}</td>
+                            <td>{{ result.position.profit - findTrade(result.position).position.profit | currency }}</td>
+                            <td>{{ result.position.gainPct | percent }}</td>
+                            <td>{{ findTrade(result.position).position.gainPct | percent }}</td>
+                            <td>{{ result.position.gainPct - findTrade(result.position).position.gainPct | percent }}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
         
     </section>
     

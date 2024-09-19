@@ -5,7 +5,7 @@ import {
     PriceBar,
     PriceFrequency,
     StocksService,
-    TradingStrategyPerformance
+    TradingStrategyPerformance, TradingStrategyResult
 } from '../../services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
@@ -62,23 +62,24 @@ export class StockTradingSimulationsComponent implements OnInit {
         });
     }
     
-    selectedStrategy:string = 'Actual trades ⭐';
-    getSelectedStrategyEntry() {
-        return this.getStrategyEntry(this.selectedStrategy);
-    }
+    mainStrategy:string = 'Actual trades ⭐';
+    alternateStrategy:string = '';
+    
     getStrategyEntry(name:string) {
         return this.results.find(result => result.strategyName === name)
     }
-    findActualTrade(position:PositionInstance) {
-        return this.getStrategyEntry("Actual trades ⭐").results.find(r => r.position.ticker === position.ticker && r.position.opened === position.opened)
+
+    findTrade(position:PositionInstance) {
+        let alternateStrategy = this.getStrategyEntry(this.alternateStrategy);
+        return alternateStrategy.results.find(r => r.position.ticker === position.ticker && r.position.opened === position.opened)
     }
     
     biggestWinnersComparedToActual() {
-        const positions = this.getSelectedStrategyEntry().results.slice();
+        const positions = this.getStrategyEntry(this.mainStrategy).results.slice();
         
         positions.sort((a, b) => {
-                let bActualProfit = this.findActualTrade(b.position).position.profit;
-                let aActualProfit = this.findActualTrade(a.position).position.profit;
+                let bActualProfit = this.findTrade(b.position).position.profit;
+                let aActualProfit = this.findTrade(a.position).position.profit;
                 return (b.position.profit - bActualProfit) - (a.position.profit - aActualProfit)
             }
         );
