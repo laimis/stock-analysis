@@ -4,14 +4,46 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>Transaction ID</th>
-            <th>Description</th>
-            <th>Trade Date</th>
-            <th>Settlement Date</th>
-            <th>Net Amount</th>
-            <th>Brokerage Type</th>
-            <th>Inferred Type</th>
-            <th>Inferred Ticker</th>
+            <th (click)="changeSort('transactionId')">
+                Transaction ID
+                <i *ngIf="sortColumn === 'transactionId'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('description')">
+                Description
+                <i *ngIf="sortColumn === 'description'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('tradeDate')">
+                Trade Date
+                <i *ngIf="sortColumn === 'tradeDate'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('settlementDate')">
+                Settlement Date
+                <i *ngIf="sortColumn === 'settlementDate'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('netAmount')">
+                Net Amount
+                <i *ngIf="sortColumn === 'netAmount'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('brokerageType')">
+                Brokerage Type
+                <i *ngIf="sortColumn === 'brokerageType'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('inferredType')">
+                Inferred Type
+                <i *ngIf="sortColumn === 'inferredType'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
+            <th (click)="changeSort('inferredTicker')">
+                Inferred Ticker
+                <i *ngIf="sortColumn === 'inferredTicker'"
+                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+            </th>
             <th>Actions</th>
         </tr>
         </thead>
