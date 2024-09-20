@@ -265,26 +265,42 @@ type AccountMonitoringService(
                         (failedToApplyDividends
                         |> Seq.map (fun t -> $"Failed to apply transaction for {t.Description}")
                         )
+                    |> Seq.append 
+                        (failedToApplyInterest
+                        |> Seq.map (fun t -> $"Failed to apply interest for {t.Description}")
+                        )
                     |> Seq.toArray
                     
                 match appliedDividendDescriptions, appliedInterestDescriptions, failedResults with
                 | [||], [||], [||] -> ()
                 | _ ->
-                    let appliedDescriptions = appliedDividendDescriptions |> String.concat "\n"
-                    let appliedDescriptionsInterest = appliedInterestDescriptions |> String.concat "\n"
-                    let failedDescriptions = failedResults |> String.concat "\n"
+                    let appliedDescriptions =
+                        match appliedDividendDescriptions with
+                        | [||] -> ""
+                        | _ ->
+                            let multiLine = appliedDividendDescriptions |> String.concat "\n"
+                            @$"Here are the dividends that were applied:\n\n{multiLine}\n\n"
+                            
+                    let appliedDescriptionsInterest =
+                        match appliedInterestDescriptions with
+                        | [||] -> ""
+                        | _ ->
+                            let multiline = appliedInterestDescriptions |> String.concat "\n"
+                            @$"Here are the interest transactions that were applied:\n\n{multiline}\n\n"
+                            
+                    let failedDescriptions =
+                        match failedResults with
+                        | [||] -> ""
+                        | _ ->
+                            let multiline = failedResults |> String.concat "\n"
+                            @$"Here are the transactions that failed to be applied:\n\n{multiline}\n\n"
                     
                     let plainTextBody = @$"
-                        Here are the dividends that were applied:
                         {appliedDescriptions}
-                        
-                        Here are the interest transactions that were applied:
                         {appliedDescriptionsInterest}
-                        
-                        Here are the transactions that failed to be applied:
                         {failedDescriptions}"
                         
-                    let emailInput = {EmailInput.PlainBody = plainTextBody; HtmlBody = null; Subject = "Applied Transactions"; To = user.State.Email; From = Sender.Support.Email; FromName = Sender.Support.Name }
+                    let emailInput = {EmailInput.PlainBody = plainTextBody; HtmlBody = null; Subject = "Brokerage Account Transaction Processing Report"; To = user.State.Email; From = Sender.Support.Email; FromName = Sender.Support.Name }
                     let! _ = emailService.SendWithInput emailInput |> Async.AwaitTask
                     ()
                     
