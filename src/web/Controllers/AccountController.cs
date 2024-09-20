@@ -226,5 +226,25 @@ namespace web.Controllers
         [Authorize]
         public Task<ActionResult> Settings([FromBody]SetSetting cmd)
             => this.OkOrError(handler.HandleSettings(User.Identifier(), cmd));
+        
+        [HttpGet("transactions")]
+        public Task<ActionResult> GetTransactions()
+        {
+            return this.OkOrError(
+                handler.Handle(
+                    new GetAccountTransactions(User.Identifier())
+                )
+            );
+        }
+
+        [HttpPost("transactions/{transactionId}/applied")]
+        public Task<ActionResult> ApplyTransaction(string transactionId)
+        {
+            return this.OkOrError(
+                handler.Handle(
+                    new MarkAccountTransactionAsApplied(User.Identifier(), transactionId)
+                )
+            );
+        }
     }
 }

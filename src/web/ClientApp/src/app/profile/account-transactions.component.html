@@ -1,0 +1,37 @@
+<div class="container mt-4">
+    <h2>Brokerage Transactions</h2>
+    <app-error-display [errors]="errors"></app-error-display>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Transaction ID</th>
+            <th>Description</th>
+            <th>Trade Date</th>
+            <th>Settlement Date</th>
+            <th>Net Amount</th>
+            <th>Brokerage Type</th>
+            <th>Inferred Type</th>
+            <th>Inferred Ticker</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let transaction of transactions">
+            <td>{{ transaction.transactionId }}</td>
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.tradeDate | parsedDate }}</td>
+            <td>{{ transaction.settlementDate | parsedDate }}</td>
+            <td>{{ transaction.netAmount | currency }}</td>
+            <td>{{ transaction.brokerageType }}</td>
+            <td>{{ transaction.inferredType }}</td>
+            <td>{{ transaction.inferredTicker }}</td>
+            <td>
+                <button *ngIf="!transaction.applied" class="btn btn-sm btn-primary" (click)="markAsApplied(transaction.transactionId)">
+                    Mark as Applied
+                </button>
+                <span *ngIf="transaction.applied">Applied</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

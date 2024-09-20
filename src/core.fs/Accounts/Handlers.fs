@@ -81,6 +81,18 @@ namespace core.fs.Accounts
         UserId: UserId
     }
     
+    [<Struct>]
+    type GetAccountTransactions = {
+        UserId: UserId
+    }
+    
+    [<Struct>]
+    type MarkAccountTransactionAsApplied = {
+        UserId: UserId
+        TransactionId: string
+    }
+    
+    [<Struct>]
     type Delete = {
         Feedback: string
     }
@@ -256,6 +268,26 @@ namespace core.fs.Accounts
                 Ok ()
         
         interface IApplicationService
+        
+        member this.Handle (query:GetAccountTransactions) = task {
+            let! user = storage.GetUser(query.UserId)
+            match user with
+            | None -> return "User not found" |> ServiceError |> Error
+            | Some _ ->
+                let! transactions = storage.GetAccountBrokerageTransactions query.UserId
+                return transactions |> Ok
+        }
+        member this.Handle (cmd:MarkAccountTransactionAsApplied) = task {
+            let! user = storage.GetUser(cmd.UserId)
+            match user with
+            | None -> return "User not found" |> ServiceError |> Error
+            | Some _ ->
+                let! transactions = storage.GetAccountBrokerageTransactions cmd.UserId
+                let transaction = transactions |> Seq.find (fun (t:AccountTransaction) -> t.TransactionId = cmd.TransactionId)
+                let applied = {transaction with Applied = DateTimeOffset.UtcNow |> Some}
+                do! [|applied|] |> storage.SaveAccountBrokerageTransactions cmd.UserId 
+                return Ok ()
+        }
         member this.Handle (command:Authenticate) = task {
             let! user = storage.GetUserByEmail(command.Email)
             

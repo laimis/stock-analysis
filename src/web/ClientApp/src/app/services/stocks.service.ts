@@ -265,11 +265,18 @@ export class StocksService {
         return this.http.post('/api/options/' + optionId + '/assign', {})
     }
 
+    // ---------- accounts ---------
+    getAccountTransactions(): Observable<AccountTransaction[]> {
+        return this.http.get<AccountTransaction[]>('/api/account/transactions')
+    }
+    
+    markTransactionAsApplied(transactionId: string): Observable<any> {
+        return this.http.post<any>('/api/account/transactions/' + transactionId + '/applied', {})
+    }
+    
     getProfile(): Observable<AccountStatus> {
         return this.http.get<AccountStatus>('/api/account/status')
     }
-
-    // ---------- accounts ---------
 
     createAccount(obj: object): Observable<object> {
         return this.http.post<object>('/api/account', obj)
@@ -1401,4 +1408,17 @@ export class Trends {
     endDateStr: string
     currentTrendRankByBars: number
     currentTrendRankByGain: number
+}
+
+export interface AccountTransaction {
+    transactionId: string;
+    description: string;
+    tradeDate: string;
+    settlementDate: string;
+    netAmount: number;
+    brokerageType: string;
+    inferredType?: string;
+    inferredTicker?: string;
+    inserted?: string;
+    applied?: string;
 }

@@ -106,6 +106,7 @@ import {CorrelationsComponent} from "./shared/reports/correlations.component";
 import {StockTradingNewPositionComponent} from "./stocks/stock-trading/stock-trading-new-position.component";
 import {StockTradingDashboardComponent} from "./stocks/stock-trading/stock-trading-dashboard.component";
 import {ParsedDatePipe} from "./services/parsedDate.filter";
+import {AccountTransactionsComponent} from "./profile/account-transactions.component";
 
 
 let routes: Routes = [
@@ -124,7 +125,8 @@ let routes: Routes = [
     {path: 'profile/login', component: ProfileLoginComponent},
     {path: 'profile/verify', component: ProfileVerifyComponent},
     {path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent},
-
+    {path: 'profile/transactions', component: AccountTransactionsComponent, canActivate: [AuthGuard]},
+    
     {path: 'options', component: OptionsComponent, canActivate: [AuthGuard]},
     {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
     {path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard]},
