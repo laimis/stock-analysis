@@ -22,6 +22,7 @@
     <Compile Include="Stocks\Services\MovingAveragesAnalysisTests.fs" />
     <Compile Include="Stocks\Services\VolumeAnalysisTests.fs" />
     <Compile Include="Stocks\Services\PositionAnalysisTests.fs" />
+    <Compile Include="Stocks\Services\PendingPositionAnalysisTests.fs" />
     <Compile Include="Stocks\Services\Trading\TradingStrategyRunnerTests.fs" />
     <Compile Include="Stocks\Services\Trading\ProfitPointTests.fs" />
     <Compile Include="Stocks\Services\TrendsTests.fs" />

@@ -1,4 +1,4 @@
-import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
     AnalysisOutcomeEvaluation,
@@ -6,12 +6,21 @@ import {
     StockAnalysisOutcome,
     TickerOutcomes
 } from '../../services/stocks.service';
+import {TradingViewLinkComponent} from "../stocks/trading-view-link.component";
+import {StockLinkComponent} from "../stocks/stock-link.component";
 
 @Component({
     selector: 'app-outcomes',
     templateUrl: './outcomes.component.html',
     styleUrls: ['./outcomes.component.css'],
-    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
+    providers: [PercentPipe, CurrencyPipe, DecimalPipe],
+    imports: [
+        NgClass,
+        TradingViewLinkComponent,
+        StockLinkComponent,
+        NgIf
+    ],
+    standalone: true
 })
 export class OutcomesComponent {
 

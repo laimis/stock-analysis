@@ -244,9 +244,7 @@ let routes: Routes = [
         CryptoOwnershipGridComponent,
         CryptoDetailsComponent,
         StockAnalysisComponent,
-        OutcomesComponent,
         OutcomesReportComponent,
-        OutcomesAnalysisReportComponent,
         GapsReportComponent,
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
@@ -285,7 +283,9 @@ let routes: Routes = [
         BrokerageOrdersComponent,
         CandlestickChartComponent,
         GapsComponent,
-        ParsedDatePipe
+        ParsedDatePipe,
+        OutcomesAnalysisReportComponent,
+        OutcomesComponent,
     ],
     providers: [
         {provide: "windowObject", useValue: window},

@@ -20,15 +20,20 @@ module TradingStrategyConstants =
 type SimulationContext =
     {
         Position:StockPositionWithCalculations
+        MaxGainFirst10Bars:decimal
         MaxGain:decimal
+        MaxDrawdownFirst10Bars:decimal
         MaxDrawdown:decimal
+        BarCount:int
         LastBar:PriceBar
     }
 
 type TradingStrategyResult =
     {
         MaxDrawdownPct:decimal
+        MaxDrawdownFirst10Bars:decimal
         MaxGainPct:decimal
+        MaxGainFirst10Bars:decimal
         Position:StockPositionWithCalculations
         StrategyName:string
         ForcedClosed:bool
@@ -125,7 +130,7 @@ module TradingPerformance =
                 (newCashNeed, newMaxValue)
             ) (0m, 0m)
             
-        if cashNeeded <> 0m then
+        if Math.Round(cashNeeded, 2) <> 0m then // we need to round because of floating point errors
             failwith $"Cash needed should be zeroed out, but is {cashNeeded}"
             
         maxCashNeed
@@ -446,11 +451,19 @@ type TradingStrategy(name:string) =
         | None ->
             let latestPositionState = this.ApplyPriceBarToPositionInternal context bar
             
+            let maxDrawdownPct = TradingStrategy.CalculateMAEPercentage context bar
+            let maxDrawdownFirst10Bars = if context.BarCount < 10 then maxDrawdownPct else context.MaxDrawdownFirst10Bars
+            let maxGainPct = TradingStrategy.CalculateMFEPercentage context bar
+            let maxGainFirst10Bars = if context.BarCount < 10 then maxGainPct else context.MaxGainFirst10Bars
+            
             {
                 Position = latestPositionState |> StockPositionWithCalculations
                 MaxDrawdown = TradingStrategy.CalculateMAEPercentage context bar
+                MaxDrawdownFirst10Bars = maxDrawdownFirst10Bars 
                 MaxGain = TradingStrategy.CalculateMFEPercentage context bar
-                LastBar = bar 
+                MaxGainFirst10Bars = maxGainFirst10Bars 
+                LastBar = bar
+                BarCount = context.BarCount + 1 
             }
            
     interface  ITradingStrategy with
@@ -461,7 +474,10 @@ type TradingStrategy(name:string) =
                 {
                     Position = position |> StockPositionWithCalculations
                     MaxDrawdown = Decimal.MaxValue
+                    MaxDrawdownFirst10Bars = Decimal.MaxValue
                     MaxGain = Decimal.MinValue
+                    MaxGainFirst10Bars = Decimal.MinValue
+                    BarCount = 0
                     LastBar = bars.Bars[0] 
                 }
                 
@@ -475,7 +491,9 @@ type TradingStrategy(name:string) =
             
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
+                MaxDrawdownFirst10Bars = finalContext.MaxDrawdownFirst10Bars
                 MaxGainPct = finalContext.MaxGain
+                MaxGainFirst10Bars = finalContext.MaxGainFirst10Bars
                 Position = finalPosition
                 StrategyName = this.Name
                 ForcedClosed = forcedClosed 
@@ -513,16 +531,20 @@ type TradingStrategyActualTrade() =
                         context
                     else
                         let maxDrawdownPct = TradingStrategy.CalculateMAEPercentage context bar
+                        let maxDrawdownFirst10Bars = if context.BarCount < 10 then maxDrawdownPct else context.MaxDrawdownFirst10Bars
                         let maxGainPct = TradingStrategy.CalculateMFEPercentage context bar
+                        let maxGainFirst10Bars = if context.BarCount < 10 then maxGainPct else context.MaxGainFirst10Bars
                         
-                        { Position = calcs; MaxDrawdown = maxDrawdownPct; MaxGain = maxGainPct; LastBar = bar }
-                ) {Position = calcs; MaxDrawdown = Decimal.MaxValue; MaxGain = Decimal.MinValue; LastBar = bars.Bars[0]}
+                        { Position = calcs; MaxDrawdown = maxDrawdownPct; MaxGain = maxGainPct; LastBar = bar; BarCount = context.BarCount + 1; MaxDrawdownFirst10Bars = maxDrawdownFirst10Bars; MaxGainFirst10Bars = maxGainFirst10Bars }
+                ) {Position = calcs; MaxDrawdown = Decimal.MaxValue; MaxGain = Decimal.MinValue; LastBar = bars.Bars[0]; BarCount = 0; MaxDrawdownFirst10Bars = Decimal.MaxValue; MaxGainFirst10Bars = Decimal.MinValue}
                 
             let finalPosition, forcedClosed = TradingStrategy.ForceCloseIfNecessary closeIfOpen finalContext
                 
             {
                 MaxDrawdownPct = finalContext.MaxDrawdown
+                MaxDrawdownFirst10Bars = finalContext.MaxDrawdownFirst10Bars
                 MaxGainPct = finalContext.MaxGain
+                MaxGainFirst10Bars = finalContext.MaxGainFirst10Bars
                 Position = finalPosition
                 StrategyName = TradingStrategyConstants.ActualTradesName
                 ForcedClosed = forcedClosed

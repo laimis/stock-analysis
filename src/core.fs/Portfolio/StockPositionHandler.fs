@@ -948,7 +948,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.groupBy _.GetLabelValue(key="strategy")
                 |> Seq.map (fun (name, positions) ->
                     let performance = TradingPerformance.Create name positions
-                    let results = positions |> Seq.map (fun p -> {TradingStrategyResult.Position =p; ForcedClosed = false; StrategyName = name; MaxDrawdownPct = 0m; MaxGainPct = 0m; }) |> Seq.toArray
+                    let results = positions |> Seq.map (fun p -> {TradingStrategyResult.Position =p; ForcedClosed = false; StrategyName = name; MaxDrawdownPct = 0m; MaxGainPct = 0m; MaxDrawdownFirst10Bars = 0m; MaxGainFirst10Bars = 0m; }) |> Seq.toArray
                     {strategyName = name; performance = performance; results = results }
                 )
                 |> Seq.sortByDescending _.performance.Profit

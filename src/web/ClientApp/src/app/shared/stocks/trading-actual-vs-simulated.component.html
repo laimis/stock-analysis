@@ -10,6 +10,8 @@
                 <th class="sort-header" (click)="sortChanged('gainPct')">% Gain</th>
                 <th class="sort-header" (click)="sortChanged('maxGainPct')">Max Fav Exc</th>
                 <th class="sort-header" (click)="sortChanged('maxDrawdownPct')">Max Adv Exc</th>
+                <th class="sort-header" (click)="sortChanged('maxGainFirst10Bars')">MFE 10</th>
+                <th class="sort-header" (click)="sortChanged('maxDrawdownFirst10Bars')">MAE 10</th>
                 <th class="sort-header" (click)="sortChanged('daysHeld')">DaysHeld</th>
                 <th></th>
             </tr>
@@ -24,6 +26,8 @@
                         <td>{{ r.position.gainPct | percent:'1.2-2' }}</td>
                         <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxGainPct | percent:'1.2-2' }}</td>
                         <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxDrawdownPct | percent:'1.2-2' }}</td>
+                        <td [ngClass]="{'bg-negative': r.maxGainFirst10Bars < r.maxDrawdownFirst10Bars * -1}">{{ r.maxGainFirst10Bars | percent:'1.2-2' }}</td>
+                        <td [ngClass]="{'bg-negative': r.maxGainFirst10Bars < r.maxDrawdownFirst10Bars * -1}">{{ r.maxDrawdownFirst10Bars | percent:'1.2-2' }}</td>
                         <td>{{ r.position.daysHeld }}</td>
                         <td>
                             <!-- font awesome icon, green color -->

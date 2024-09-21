@@ -32,6 +32,16 @@ namespace web.Controllers
                     )
                 )
             );
+        
+        [HttpGet("pendingpositions")]
+        public Task<ActionResult> PendingPositions() =>
+            this.OkOrError(
+                service.Handle(
+                    new PendingPositionsReportQuery(
+                        User.Identifier()
+                    )
+                )
+            );
 
         [HttpPost("outcomes")]
         public Task<ActionResult> TickersOutcomes(

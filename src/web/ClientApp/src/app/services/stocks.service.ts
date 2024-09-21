@@ -390,6 +390,10 @@ export class StocksService {
     reportPositions(): Observable<OutcomesReport> {
         return this.http.get<OutcomesReport>('/api/reports/positions')
     }
+    
+    reportPendingPositions(): Observable<OutcomesReport> {
+        return this.http.get<OutcomesReport>('/api/reports/pendingpositions')
+    }
 
     reportDailyPositionReport(positionId: string) {
         var endpoint = '/api/reports/dailypositionreport/' + positionId
@@ -918,7 +922,6 @@ export interface OutcomesReport {
     patterns: TickerPatterns[],
     failed: string[]
 }
-
 export interface DailyOutcomeScoresReport {
     ticker: string
     dailyScores: DataPointContainer
@@ -1176,7 +1179,9 @@ export interface PositionInstance {
 
 export interface TradingStrategyResult {
     maxDrawdownPct: number
+    maxDrawdownFirst10Bars: number
     maxGainPct: number
+    maxGainFirst10Bars: number
     position: PositionInstance
     strategyName: string
     forcedClosed: boolean

@@ -31,6 +31,11 @@ type ChainLinkView =
         date: DateTimeOffset
     }
     
+type PendingPositionsReportQuery =
+    {
+        UserId: UserId
+    }
+    
 type ChainView =
     {
         links: ChainLinkView seq
@@ -470,6 +475,57 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                 | OutcomesReportDuration.AllBars ->  MultipleBarPriceAnalysis.evaluate outcomes
             
             return OutcomesReportView(evaluations, outcomes, cleanedGaps, patterns, failed) |> Ok
+    }
+    
+    member _.Handle (query:PendingPositionsReportQuery) = task {
+        
+        let! user = accounts.GetUser query.UserId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            let! stocks = storage.GetPendingStockPositions query.UserId
+            
+            let active = stocks |> Seq.filter (fun p -> p.State.IsOpen)
+            
+            let! tasks =
+                active
+                |> Seq.map(fun p -> async {
+                    let! priceResponse =
+                        brokerage.GetPriceHistory
+                            user.State
+                            p.State.Ticker
+                            PriceFrequency.Daily
+                            None
+                            None
+                        |> Async.AwaitTask
+                    
+                    match priceResponse with
+                    | Error error -> return Error (p, error.Message) 
+                    | Ok prices ->
+                        
+                        try    
+                            let outcomes = PendingPositionAnalysis.generate p.State prices
+                            return Ok (p, outcomes)
+                        with
+                        | exn ->
+                            return Error (p, exn.Message)
+                })
+                |> Async.Sequential
+            
+            let outcomes =
+                tasks
+                |> Seq.map Result.toOption
+                |> Seq.choose id
+                |> Seq.fold (fun outcomes (_, outcome) ->
+                    let newOutcomes = outcomes @ [outcome]
+                    newOutcomes
+                ) []
+                
+            let failed = tasks |> Seq.map (fun t -> match t with | Error (position,message) -> Some $"{position.State.Ticker}: {message}" | _ -> None) |> Seq.choose id
+                
+            let evaluations = PendingPositionAnalysis.evaluate outcomes
+            
+            return OutcomesReportView(evaluations, outcomes, [], [], failed) |> Ok
     }
     
     member _.Handle (query:OutcomesReportForPositionsQuery) = task {

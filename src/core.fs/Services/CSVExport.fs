@@ -112,6 +112,8 @@ module CSVExport =
             RiskAmount:string
             MaxDrawdown:string
             MaxGain:string
+            MaxDrawdownFirst10Bars:string
+            MaxGainFirst10Bars:string
             Strategy:string
             Grade:string
             GradeNote:string
@@ -129,7 +131,7 @@ module CSVExport =
             Ticker:string
         }
         
-    let private mapToTradeRecord culture strategyName maxDrawdown maxGain (t:StockPositionWithCalculations) =
+    let private mapToTradeRecord culture strategyName maxDrawdown maxGain maxDrawdownFirst10Bars maxGainFirst10Bars (t:StockPositionWithCalculations) =
         {
             StrategyName = strategyName
             Ticker = t.Ticker.Value
@@ -152,6 +154,8 @@ module CSVExport =
             RiskAmount = t.RiskedAmount |> numberOption culture
             MaxDrawdown = maxDrawdown |> numberOption culture
             MaxGain = maxGain |> numberOption culture
+            MaxDrawdownFirst10Bars = maxDrawdownFirst10Bars |> numberOption culture
+            MaxGainFirst10Bars = maxGainFirst10Bars |> numberOption culture
             Strategy = t.TryGetLabelValue("strategy") |> Option.defaultValue ""
             Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
             GradeNote = t.GradeNote |> Option.defaultValue ""
@@ -166,7 +170,9 @@ module CSVExport =
                 |> Seq.map (fun result ->
                     let maxDrawdown = result.MaxDrawdownPct |> Some
                     let maxGain = result.MaxGainPct |> Some
-                    mapToTradeRecord culture strategy.strategyName maxDrawdown maxGain result.Position)
+                    let maxDrawdownFirst10Bars = result.MaxDrawdownFirst10Bars |> Some
+                    let maxGainFirst10Bars = result.MaxGainFirst10Bars |> Some
+                    mapToTradeRecord culture strategy.strategyName maxDrawdown maxGain maxDrawdownFirst10Bars maxGainFirst10Bars result.Position)
             )
             
         writer.Generate(rows)
@@ -205,7 +211,7 @@ module CSVExport =
         
         let rows =
             trades
-            |> Seq.map (mapToTradeRecord culture "Actual Trade" None None)
+            |> Seq.map (mapToTradeRecord culture "Actual Trade" None None None None)
             
         writer.Generate(rows)
         

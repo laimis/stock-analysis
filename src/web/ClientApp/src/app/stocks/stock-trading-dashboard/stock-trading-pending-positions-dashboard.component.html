@@ -15,6 +15,9 @@
         <a class="tab" [ngClass]="{'is-active': isActive('orders')}" [routerLink]="" (click)="activateTab('orders')">
             Orders
         </a>
+        <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+            Analysis
+        </a>
     </div>
     
     <app-stock-trading-new-position
@@ -31,4 +34,7 @@
         (ordersChanged)="getOrders()"
         [orders]="orders"
     ></app-brokerage-orders>
+    <app-stock-trading-pendingposition-analysis
+        *ngIf="isActive('analysis')"
+    ></app-stock-trading-pendingposition-analysis>
 </div>

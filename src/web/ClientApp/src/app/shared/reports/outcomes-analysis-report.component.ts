@@ -7,11 +7,25 @@ import {
     TickerPatterns
 } from '../../services/stocks.service';
 import {charts_getTradingViewLink} from 'src/app/services/links.service';
+import {LoadingComponent} from "../loading/loading.component";
+import {NgClass} from "@angular/common";
+import {TradingViewLinkComponent} from "../stocks/trading-view-link.component";
+import {StockLinkComponent} from "../stocks/stock-link.component";
+import {AppModule} from "../../app.module";
+import {OutcomesComponent} from "./outcomes.component";
 
 @Component({
     selector: 'app-outcomes-analysis-report',
     templateUrl: './outcomes-analysis-report.component.html',
-    styleUrls: ['./outcomes-analysis-report.component.css']
+    styleUrls: ['./outcomes-analysis-report.component.css'],
+    imports: [
+        LoadingComponent,
+        NgClass,
+        TradingViewLinkComponent,
+        StockLinkComponent,
+        OutcomesComponent
+    ],
+    standalone: true
 })
 export class OutcomesAnalysisReportComponent {
     tickersForSummary: TickerCountPair[] = []
