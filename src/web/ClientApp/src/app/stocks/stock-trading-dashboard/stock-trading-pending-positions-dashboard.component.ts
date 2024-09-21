@@ -5,7 +5,7 @@ import {GetErrors} from "../../services/utils";
 import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
 import {StockTradingPendingPositionsComponent} from "../stock-trading/stock-trading-pendingpositions.component";
 import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
-import {RouterLink} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {NgClass, NgIf} from "@angular/common";
 import {
     StockTradingPendingpositionAnalysisComponent
@@ -29,12 +29,18 @@ import {
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
     feedbackMessage: string;
     orders: BrokerageOrder[];
-
-    constructor(private brokerage: BrokerageService) {
+    
+    constructor(
+        private brokerage: BrokerageService,
+        private route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
+        this.route.params.subscribe(param => {
+            this.activeTab = param['tab'] || 'positions'
+        })
         this.getOrders()
+        
     }
 
     brokerageOrderEntered() {

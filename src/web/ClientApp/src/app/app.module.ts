@@ -163,6 +163,7 @@ let routes: Routes = [
     {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
     {path: 'stocks/lists/:id', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
     {path: 'stocks/newposition', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
+    {path: 'stocks/newposition/:tab', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
     {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
     {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
 
