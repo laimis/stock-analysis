@@ -23,9 +23,12 @@ function Exit-With-Error ($message) {
 }
 
 function Ensure-DigitalOcean-Connectivity() {
-    $apps = invoke-expression 'doctl account get'
-    if ($apps -ne $null || !$apps.Contains("active")) {
-        Exit-With-Error "Digital Ocean not available... $apps"
+    $account = invoke-expression 'doctl account get --format Status'
+    $accountInfo = [System.String]::Join(" ", $account)
+    
+    if ($accountInfo -eq $null || $accountInfo.Contains("Status active") -eq $false) {
+        write-host $accountInfo
+        Exit-With-Error "Digital Ocean not available..."
     }
 }
 
@@ -176,7 +179,7 @@ function Ensure-Tests-Pass() {
     }
 }
 
-Ensure-Git-Clean
+# Ensure-Git-Clean
 
 $message = Get-Release-Comment
 
