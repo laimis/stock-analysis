@@ -1,10 +1,10 @@
-# param($message)
+param($message)
 
-# # create a function to get the last commit message
-# function Get-LastCommitMessage {
-#     $lastCommit = Invoke-Expression 'git log -1 --pretty=format:%s'
-#     return $lastCommit
-# }
+# create a function to get the last commit message
+function Get-LastCommitMessage {
+    $lastCommit = Invoke-Expression 'git log -1 --pretty=format:%s'
+    return $lastCommit
+}
 
 function Speak-Message ($message) {
     $voice = New-Object -ComObject Sapi.spvoice
