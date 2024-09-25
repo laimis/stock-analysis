@@ -34,7 +34,7 @@ function Attempt-Garbage-Cleanup() {
 
     $manifests = ConvertFrom-Json ([System.String]::Join("", $manifestsJson))
 
-    if ($manifests.errors.Length -ne 0)
+    if ($manifests.errors -ne $null)
     {
         $msg = $manifests.errors
 
