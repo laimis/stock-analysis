@@ -23,9 +23,9 @@ function Exit-With-Error ($message) {
 }
 
 function Ensure-DigitalOcean-Connectivity() {
-    $apps = invoke-expression 'doctl apps list'
-    if ($apps -eq $null) {
-        Exit-With-Error "Digital Ocean not available..."
+    $apps = invoke-expression 'doctl account get'
+    if ($apps -ne $null || !$apps.Contains("active")) {
+        Exit-With-Error "Digital Ocean not available... $apps"
     }
 }
 
