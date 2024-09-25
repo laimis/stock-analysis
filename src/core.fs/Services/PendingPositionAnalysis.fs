@@ -48,7 +48,7 @@ let evaluate (tickerOutcomes:seq<TickerOutcomes>) =
             "Close to execution",
             OutcomeType.Neutral,
             PendingPositionAnalysisKeys.PercentFromPrice,
-            tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PendingPositionAnalysisKeys.PercentFromPrice && o.Value > 0.04m) ]
+            tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PendingPositionAnalysisKeys.PercentFromPrice && o.Value > -0.04m) ]
         )
         
         AnalysisOutcomeEvaluation(
