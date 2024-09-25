@@ -24,9 +24,9 @@ function Exit-With-Error ($message) {
 
 function Ensure-DigitalOcean-Connectivity() {
     $apps = invoke-expression 'doctl apps list'
-    write-host "listing apps"
-    write-host $apps
-    write-host "apps listed"
+    if ($apps -eq $null) {
+        Exit-With-Error "Digital Ocean not available..."
+    }
 }
 
 function Attempt-Garbage-Cleanup() {
@@ -151,7 +151,7 @@ function Ensure-Git-Clean() {
 
         # store message as multiline string
         $message = "
-    There are uncommitted changes in git, please make sure everything is committed before doing a release.
+    There are uncommitted changes in git.
     Git status:
     $gitStatus
     "
