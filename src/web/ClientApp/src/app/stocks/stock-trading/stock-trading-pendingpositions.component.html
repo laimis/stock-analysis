@@ -73,6 +73,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <app-error-display [errors]="closeErrors"></app-error-display>
                     <p>Are you sure you want to close this position?</p>
                     <div class="mb-3">
                         <label for="closeReasonInput" class="form-label">Reason for Closing:</label>

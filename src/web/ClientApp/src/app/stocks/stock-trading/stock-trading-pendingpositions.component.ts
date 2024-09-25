@@ -73,6 +73,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
 
     closingPosition:PendingStockPosition = null
     closeReason: string = null
+    closeErrors: string[] = null
     showCloseModel(position: PendingStockPosition) {
         this.closingPosition = position
     }
@@ -88,6 +89,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
                 this.refreshPendingPositions()
             },
             (error) => {
+                this.closeErrors = GetErrors(error)
                 console.log(error)
             }
         )
