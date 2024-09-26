@@ -5,16 +5,18 @@ import {NgIf} from "@angular/common";
 import {OutcomesAnalysisReportComponent} from "../../shared/reports/outcomes-analysis-report.component";
 import {OutcomesReport, StocksService} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
+import { OutcomesComponent } from "../../shared/reports/outcomes.component";
 
 @Component({
   selector: 'app-stock-trading-pendingposition-analysis',
   standalone: true,
     imports: [
-        LoadingComponent,
-        ErrorDisplayComponent,
-        NgIf,
-        OutcomesAnalysisReportComponent
-    ],
+    LoadingComponent,
+    ErrorDisplayComponent,
+    NgIf,
+    OutcomesAnalysisReportComponent,
+    OutcomesComponent
+],
   templateUrl: './stock-trading-pendingposition-analysis.component.html',
   styleUrl: './stock-trading-pendingposition-analysis.component.css'
 })
