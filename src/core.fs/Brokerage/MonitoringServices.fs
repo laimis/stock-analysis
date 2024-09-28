@@ -245,12 +245,12 @@ type AccountMonitoringService(
                 // send a list of applied transactions to the user
                 let appliedDividendDescriptions =
                     appliedDividends
-                    |> Seq.map (fun t -> $"{t.InferredTicker}: {t.BrokerageType} - {t.Description}")
+                    |> Seq.map (fun t -> $"{t.InferredTicker.Value }: {t.NetAmount}")
                     |> Seq.toArray
                     
                 let appliedInterestDescriptions =
                     appliedInterest
-                    |> Seq.map (fun t -> $"{t.BrokerageType}: {t.Description}")
+                    |> Seq.map (fun t -> $"{t.Description}: {t.NetAmount}")
                     |> Seq.toArray
                     
                 // now combine all failed results and send them to the user
@@ -263,11 +263,11 @@ type AccountMonitoringService(
                         )
                     |> Seq.append
                         (failedToApplyDividends
-                        |> Seq.map (fun t -> $"Failed to apply transaction for {t.Description}")
+                        |> Seq.map (fun t -> $"Failed to apply {t.NetAmount} transaction for {t.Description}")
                         )
                     |> Seq.append 
                         (failedToApplyInterest
-                        |> Seq.map (fun t -> $"Failed to apply interest for {t.Description}")
+                        |> Seq.map (fun t -> $"Failed to apply {t.NetAmount} interest for {t.Description}")
                         )
                     |> Seq.toArray
                     
@@ -279,21 +279,21 @@ type AccountMonitoringService(
                         | [||] -> ""
                         | _ ->
                             let multiLine = appliedDividendDescriptions |> String.concat "\n"
-                            @$"Here are the dividends that were applied:\n\n{multiLine}\n\n"
+                            @$"Here are the dividends that were applied:\\n\\n{multiLine}\\n\\n"
                             
                     let appliedDescriptionsInterest =
                         match appliedInterestDescriptions with
                         | [||] -> ""
                         | _ ->
                             let multiline = appliedInterestDescriptions |> String.concat "\n"
-                            @$"Here are the interest transactions that were applied:\n\n{multiline}\n\n"
+                            @$"Here are the interest transactions that were applied:\\n\\n{multiline}\\n\\n"
                             
                     let failedDescriptions =
                         match failedResults with
                         | [||] -> ""
                         | _ ->
                             let multiline = failedResults |> String.concat "\n"
-                            @$"Here are the transactions that failed to be applied:\n\n{multiline}\n\n"
+                            @$"Here are the transactions that failed to be applied:\\n\\n{multiline}\\n\\n"
                     
                     let plainTextBody = @$"
                         {appliedDescriptions}
