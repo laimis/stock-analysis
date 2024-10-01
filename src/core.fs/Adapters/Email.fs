@@ -56,6 +56,7 @@ type EmailTemplate(id:string) =
     
     static member SellAlert = EmailTemplate("d-a8ac152d334d471aaab2fead90a8f120")
     static member MaxProfits = EmailTemplate("d-b06887b67edc464489820284fcd81617")
+    static member BrokerageTransactions = EmailTemplate("d-42661e4810af471f92c72d926289e2d5")
     
 type IEmailService =
     abstract SendWithTemplate : recipient:Recipient -> sender:Sender -> template:EmailTemplate -> properties:System.Object -> Task

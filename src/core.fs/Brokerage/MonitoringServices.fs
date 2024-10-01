@@ -242,15 +242,20 @@ type AccountMonitoringService(
                 logger.LogInformation $"Applied {appliedInterest.Length} interest transactions for {user.State.Id}"
                 do! appliedInterest |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
                 
+                let getTickerOrBlank (t:AccountTransaction) =
+                    match t.InferredTicker with
+                    | Some ticker -> ticker.Value
+                    | None -> ""
+
                 // send a list of applied transactions to the user
-                let appliedDividendDescriptions =
+                let appliedDividendsMapped =
                     appliedDividends
-                    |> Seq.map (fun t -> $"{t.InferredTicker.Value }: {t.NetAmount}")
+                    |> Seq.map (fun t -> {|ticker = t |> getTickerOrBlank; netAmount = t.NetAmount; description = t.Description |})
                     |> Seq.toArray
                     
-                let appliedInterestDescriptions =
+                let appliedInterestMapped =
                     appliedInterest
-                    |> Seq.map (fun t -> $"{t.Description}: {t.NetAmount}")
+                    |> Seq.map (fun t -> {|description = t.Description; netAmount = t.NetAmount|})
                     |> Seq.toArray
                     
                 // now combine all failed results and send them to the user
@@ -271,37 +276,16 @@ type AccountMonitoringService(
                         )
                     |> Seq.toArray
                     
-                match appliedDividendDescriptions, appliedInterestDescriptions, failedResults with
+                match appliedDividendsMapped, appliedInterestMapped, failedResults with
                 | [||], [||], [||] -> ()
                 | _ ->
-                    let appliedDescriptions =
-                        match appliedDividendDescriptions with
-                        | [||] -> ""
-                        | _ ->
-                            let multiLine = appliedDividendDescriptions |> String.concat "\n"
-                            @$"Here are the dividends that were applied:\\n\\n{multiLine}\\n\\n"
-                            
-                    let appliedDescriptionsInterest =
-                        match appliedInterestDescriptions with
-                        | [||] -> ""
-                        | _ ->
-                            let multiline = appliedInterestDescriptions |> String.concat "\n"
-                            @$"Here are the interest transactions that were applied:\\n\\n{multiline}\\n\\n"
-                            
-                    let failedDescriptions =
-                        match failedResults with
-                        | [||] -> ""
-                        | _ ->
-                            let multiline = failedResults |> String.concat "\n"
-                            @$"Here are the transactions that failed to be applied:\\n\\n{multiline}\\n\\n"
                     
-                    let plainTextBody = @$"
-                        {appliedDescriptions}
-                        {appliedDescriptionsInterest}
-                        {failedDescriptions}"
-                        
-                    let emailInput = {EmailInput.PlainBody = plainTextBody; HtmlBody = null; Subject = "Brokerage Account Transaction Processing Report"; To = user.State.Email; From = Sender.Support.Email; FromName = Sender.Support.Name }
-                    let! _ = emailService.SendWithInput emailInput |> Async.AwaitTask
+                    let payload = {|appliedDividends = appliedDividendsMapped; appliedInterest = appliedInterestMapped; failures = failedResults|}
+
+                    let recipient = Recipient(user.State.Email, user.State.Name)
+                    let sender = Sender.Support
+
+                    let! _ = emailService.SendWithTemplate recipient sender (EmailTemplate.BrokerageTransactions) payload |> Async.AwaitTask
                     ()
                     
             })
