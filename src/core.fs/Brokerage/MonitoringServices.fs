@@ -261,18 +261,18 @@ type AccountMonitoringService(
                 // now combine all failed results and send them to the user
                 let failedResults =
                     failedToResolveTypes
-                    |> Seq.map (fun t -> $"Failed to resolve type for {t.Description}")
+                    |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to resolve type: {t.Description}"|})
                     |> Seq.append
                         (failedToResolveTickers
-                        |> Seq.map (fun t -> $"Failed to resolve ticker for {t.Description}")
+                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to resolve ticker for {t.Description}"|})
                         )
                     |> Seq.append
                         (failedToApplyDividends
-                        |> Seq.map (fun t -> $"Failed to apply {t.NetAmount} transaction for {t.Description}")
+                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply dividend: {t.Description}"|})
                         )
                     |> Seq.append 
                         (failedToApplyInterest
-                        |> Seq.map (fun t -> $"Failed to apply {t.NetAmount} interest for {t.Description}")
+                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply interest: {t.Description}"|})
                         )
                     |> Seq.toArray
                     
