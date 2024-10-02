@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     DailyPositionReport, DataPointContainer,
@@ -11,6 +11,9 @@ import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
+import { Input, OnChanges, SimpleChanges } from '@angular/core';
+import { CanvasJS } from '@canvasjs/angular-charts';
+
 
 // option-trade-builder.component.ts
 interface Option {
@@ -344,3 +347,98 @@ export class PlaygroundComponent implements OnInit {
     return breakEvenPoints;
   }
 }
+
+
+@Component({
+    selector: 'app-payoff-diagram',
+    standalone: true,
+    template: '<div id="payoffChartContainer" style="height: 370px; width: 100%;"></div>',
+  })
+  export class PayoffDiagramComponent implements OnChanges, OnInit {
+    @Input() selectedLegs: OptionLeg[];
+    private chart: any;
+  
+    ngOnInit() {
+      this.createChart();
+    }
+  
+    ngOnChanges(changes: SimpleChanges): void {
+      if (changes.selectedLegs) {
+        this.updateChart();
+      }
+    }
+  
+    private createChart(): void {
+      this.chart = new CanvasJS.Chart("payoffChartContainer", {
+        animationEnabled: true,
+        exportEnabled: true,
+        title: {
+          text: "Option Strategy Payoff Diagram"
+        },
+        axisX: {
+          title: "Underlying Price",
+          gridThickness: 1
+        },
+        axisY: {
+          title: "Profit/Loss",
+          gridThickness: 1,
+          valueFormatString: "$#,##0"
+        },
+        toolTip: {
+          shared: true
+        },
+        legend: {
+          cursor: "pointer",
+          verticalAlign: "top",
+          horizontalAlign: "center",
+          dockInsidePlotArea: true,
+        },
+        data: [{
+          type: "line",
+          name: "Payoff",
+          showInLegend: true,
+          dataPoints: this.calculatePayoffData()
+        }]
+      });
+  
+      this.chart.render();
+    }
+  
+    private updateChart(): void {
+      if (this.chart) {
+        this.chart.options.data[0].dataPoints = this.calculatePayoffData();
+        this.chart.render();
+      }
+    }
+  
+    private calculatePayoffData(): { x: number, y: number }[] {
+      if (!this.selectedLegs || this.selectedLegs.length === 0) {
+        return [];
+      }
+  
+      const data: { x: number, y: number }[] = [];
+      const minStrike = Math.min(...this.selectedLegs.map(leg => leg.option.strike));
+      const maxStrike = Math.max(...this.selectedLegs.map(leg => leg.option.strike));
+      const range = maxStrike - minStrike;
+  
+      for (let price = minStrike - range / 2; price <= maxStrike + range / 2; price += range / 40) {
+        let payoff = 0;
+        for (const leg of this.selectedLegs) {
+          const optionValue = this.calculateOptionValue(leg.option, price);
+          payoff += (leg.action === 'buy' ? 1 : -1) * (optionValue - leg.option.lastPrice) * leg.quantity * 100;
+        }
+        data.push({ x: price, y: payoff });
+      }
+  
+      return data;
+    }
+  
+    private calculateOptionValue(option: Option, underlyingPrice: number): number {
+      // This is a simplified calculation and doesn't account for time value or volatility
+      if (option.type === 'call') {
+        return Math.max(0, underlyingPrice - option.strike);
+      } else {
+        return Math.max(0, option.strike - underlyingPrice);
+      }
+    }
+  }
