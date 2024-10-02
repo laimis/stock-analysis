@@ -2,6 +2,8 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     DailyPositionReport, DataPointContainer,
+    OptionChain,
+    OptionDefinition,
     PositionInstance,
     StockQuote,
     StocksService,
@@ -16,25 +18,8 @@ import { CanvasJS } from '@canvasjs/angular-charts';
 
 
 // option-trade-builder.component.ts
-interface Option {
-    strike: number;
-    expiration: string;
-    type: 'call' | 'put';
-    bid: number;
-    ask: number;
-    lastPrice: number;
-    change: number;
-    volume: number;
-    openInterest: number;
-    impliedVolatility: number;
-    delta: number;
-    gamma: number;
-    theta: number;
-    vega: number;
-  }
-  
   interface OptionLeg {
-    option: Option;
+    option: OptionDefinition;
     action: 'buy' | 'sell';
     quantity: number;
   }
@@ -90,6 +75,7 @@ export class PlaygroundComponent implements OnInit {
     constructor(
         private stocks: StocksService,
         private stockPositions: StockPositionsService,
+        private stockService: StocksService,
         private route: ActivatedRoute) {
     }
 
@@ -214,37 +200,30 @@ export class PlaygroundComponent implements OnInit {
 
     // option business
     ticker: string = 'AAPL'; // Example ticker
-  options: Option[] = []; // Will be populated with stub data
+  options: OptionDefinition[] = []; // Will be populated with stub data
   selectedLegs: OptionLeg[] = [];
   
-  filteredOptions: Option[] = [];
+  filteredOptions: OptionDefinition[] = [];
   sortColumn: string = 'strike';
   sortDirection: 'asc' | 'desc' = 'asc';
   filterExpiration: string = '';
   filterType: 'all' | 'call' | 'put' = 'all';
+  optionChain: OptionChain;
 
   
   loadOptions(): void {
-    // Stub data - replace with actual service call later
-    this.options = [
-        {
-            strike: 150, expiration: '2023-06-16', type: 'call', bid: 5.10, ask: 5.20,
-            lastPrice: 5.15, change: 0.25, volume: 1500, openInterest: 10000,
-            impliedVolatility: 0.3, delta: 0.65, gamma: 0.04, theta: -0.05, vega: 0.1
-          },
-          {
-            strike: 155, expiration: '2023-06-16', type: 'call', bid: 3.20, ask: 3.30,
-            lastPrice: 3.25, change: 0.15, volume: 1200, openInterest: 8000,
-            impliedVolatility: 0.28, delta: 0.55, gamma: 0.05, theta: -0.04, vega: 0.09
-          },
-      // Add more stub data as needed
-    ];
+    this.stockService.getOptionChain(this.ticker).subscribe((data) => {
+            this.optionChain = data
+            this.options = this.optionChain.options
+            this.applyFiltersAndSort();
+        }
+    )
   }
 
   applyFiltersAndSort(): void {
     this.filteredOptions = this.options.filter(option => {
-      return (this.filterExpiration === '' || option.expiration === this.filterExpiration) &&
-             (this.filterType === 'all' || option.type === this.filterType);
+      return (this.filterExpiration === '' || option.expirationDate === this.filterExpiration) &&
+             (this.filterType === 'all' || option.side === this.filterType);
     });
 
     this.filteredOptions.sort((a, b) => {
@@ -266,14 +245,14 @@ export class PlaygroundComponent implements OnInit {
 
   getUniqueExpirations(): string[] {
     return this.options.reduce((expirations, option) => {
-      if (!expirations.includes(option.expiration)) {
-        expirations.push(option.expiration);
+      if (!expirations.includes(option.expirationDate)) {
+        expirations.push(option.expirationDate);
       }
       return expirations;
     }, []);
   }
 
-  addLeg(option: Option): void {
+  addLeg(option: OptionDefinition): void {
     this.selectedLegs.push({ option, action: 'buy', quantity: 1 });
   }
 
@@ -298,10 +277,10 @@ export class PlaygroundComponent implements OnInit {
 
   calculateMaxProfit(): number {
     // This is a simplified calculation and may not be accurate for all strategies
-    const longCalls = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.type === 'call');
-    const shortCalls = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.type === 'call');
-    const longPuts = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.type === 'put');
-    const shortPuts = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.type === 'put');
+    const longCalls = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.side === 'call');
+    const shortCalls = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.side === 'call');
+    const longPuts = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.side === 'put');
+    const shortPuts = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.side === 'put');
 
     if (longCalls.length > 0 || longPuts.length > 0) {
       return Infinity; // Unlimited profit potential
@@ -313,10 +292,10 @@ export class PlaygroundComponent implements OnInit {
 
   calculateMaxLoss(): number {
     // This is a simplified calculation and may not be accurate for all strategies
-    const longCalls = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.type === 'call');
-    const shortCalls = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.type === 'call');
-    const longPuts = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.type === 'put');
-    const shortPuts = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.type === 'put');
+    const longCalls = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.side === 'call');
+    const shortCalls = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.side === 'call');
+    const longPuts = this.selectedLegs.filter(leg => leg.action === 'buy' && leg.option.side === 'put');
+    const shortPuts = this.selectedLegs.filter(leg => leg.action === 'sell' && leg.option.side === 'put');
 
     if (shortCalls.length > 0 || shortPuts.length > 0) {
       return Infinity; // Unlimited loss potential
@@ -331,16 +310,16 @@ export class PlaygroundComponent implements OnInit {
     const totalCost = this.calculateTotalCost();
     const breakEvenPoints: number[] = [];
 
-    const calls = this.selectedLegs.filter(leg => leg.option.type === 'call');
-    const puts = this.selectedLegs.filter(leg => leg.option.type === 'put');
+    const calls = this.selectedLegs.filter(leg => leg.option.side === 'call');
+    const puts = this.selectedLegs.filter(leg => leg.option.side === 'put');
 
     if (calls.length > 0) {
-      const lowestCallStrike = Math.min(...calls.map(leg => leg.option.strike));
+      const lowestCallStrike = Math.min(...calls.map(leg => leg.option.strikePrice));
       breakEvenPoints.push(lowestCallStrike + totalCost / 100);
     }
 
     if (puts.length > 0) {
-      const highestPutStrike = Math.max(...puts.map(leg => leg.option.strike));
+      const highestPutStrike = Math.max(...puts.map(leg => leg.option.strikePrice));
       breakEvenPoints.push(highestPutStrike - totalCost / 100);
     }
 
@@ -417,15 +396,16 @@ export class PlaygroundComponent implements OnInit {
       }
   
       const data: { x: number, y: number }[] = [];
-      const minStrike = Math.min(...this.selectedLegs.map(leg => leg.option.strike));
-      const maxStrike = Math.max(...this.selectedLegs.map(leg => leg.option.strike));
+      const minStrike = Math.min(...this.selectedLegs.map(leg => leg.option.strikePrice));
+      const maxStrike = Math.max(...this.selectedLegs.map(leg => leg.option.strikePrice));
       const range = maxStrike - minStrike;
   
       for (let price = minStrike - range / 2; price <= maxStrike + range / 2; price += range / 40) {
         let payoff = 0;
         for (const leg of this.selectedLegs) {
           const optionValue = this.calculateOptionValue(leg.option, price);
-          payoff += (leg.action === 'buy' ? 1 : -1) * (optionValue - leg.option.lastPrice) * leg.quantity * 100;
+          // todo: do not use bid below, use mid or last
+          payoff += (leg.action === 'buy' ? 1 : -1) * (optionValue - leg.option.bid) * leg.quantity * 100;
         }
         data.push({ x: price, y: payoff });
       }
@@ -433,12 +413,12 @@ export class PlaygroundComponent implements OnInit {
       return data;
     }
   
-    private calculateOptionValue(option: Option, underlyingPrice: number): number {
+    private calculateOptionValue(option: OptionDefinition, underlyingPrice: number): number {
       // This is a simplified calculation and doesn't account for time value or volatility
-      if (option.type === 'call') {
-        return Math.max(0, underlyingPrice - option.strike);
+      if (option.side === 'call') {
+        return Math.max(0, underlyingPrice - option.strikePrice);
       } else {
-        return Math.max(0, option.strike - underlyingPrice);
+        return Math.max(0, option.strikePrice - underlyingPrice);
       }
     }
   }

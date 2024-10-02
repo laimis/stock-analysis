@@ -45,7 +45,7 @@
         </div>
     </div> -->
 
-    <h2>Option Trade Builder - {{ ticker }}</h2>
+    <h2>Option Trade Builder - {{ ticker }} <span *ngIf="optionChain">{{optionChain.stockPrice}}</span></h2>
   
   <div class="row">
     <div class="col-md-8">
@@ -74,7 +74,6 @@
             <th>Bid</th>
             <th>Ask</th>
             <th>Last</th>
-            <th>Change</th>
             <th>Volume</th>
             <th>OI</th>
             <th>IV</th>
@@ -87,18 +86,15 @@
         </thead>
         <tbody>
           <tr *ngFor="let option of filteredOptions">
-            <td>{{ option.strike }}</td>
-            <td>{{ option.expiration }}</td>
-            <td>{{ option.type }}</td>
+            <td>{{ option.strikePrice }}</td>
+            <td>{{ option.expirationDate }}</td>
+            <td>{{ option.side }}</td>
             <td>{{ option.bid | currency }}</td>
             <td>{{ option.ask | currency }}</td>
-            <td>{{ option.lastPrice | currency }}</td>
-            <td [ngClass]="{'text-success': option.change > 0, 'text-danger': option.change < 0}">
-              {{ option.change | number:'.2' }}
-            </td>
+            <td> Need Last </td>
             <td>{{ option.volume | number }}</td>
             <td>{{ option.openInterest | number }}</td>
-            <td>{{ option.impliedVolatility | percent:'.2' }}</td>
+            <td>{{ option.volatility| percent:'.2' }}</td>
             <td>{{ option.delta | number:'.2' }}</td>
             <td>{{ option.gamma | number:'.2' }}</td>
             <td>{{ option.theta | number:'.2' }}</td>
@@ -122,7 +118,7 @@
                 <option value="sell">Sell</option>
               </select>
               <input type="number" [(ngModel)]="leg.quantity" (change)="updateLegQuantity(i, leg.quantity)" min="1" style="width: 60px;">
-              {{ leg.option.type }} {{ leg.option.strike }} {{ leg.option.expiration }}
+              {{ leg.option.side }} {{ leg.option.strikePrice }} {{ leg.option.expirationDate }}
             </div>
             <button class="btn btn-sm btn-danger" (click)="removeLeg(i)">Remove</button>
           </div>
