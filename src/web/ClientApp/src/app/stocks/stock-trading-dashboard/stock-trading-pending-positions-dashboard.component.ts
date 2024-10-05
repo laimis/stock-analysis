@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BrokerageOrder} from "../../services/stocks.service";
+import {BrokerageStockOrder} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
 import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
@@ -28,7 +28,7 @@ import {
 })
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
     feedbackMessage: string;
-    orders: BrokerageOrder[];
+    orders: BrokerageStockOrder[];
     
     constructor(
         private brokerage: BrokerageService,

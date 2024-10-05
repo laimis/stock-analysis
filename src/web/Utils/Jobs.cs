@@ -35,17 +35,17 @@ public static class Jobs
             
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PatternMonitoringService),
-                methodCall: service => service.Execute(),
+                methodCall: service => service.RunPatternMonitoring(),
                 cronExpression: "45 6-13 * * 1-5"  // 6:45am to 1:45pm
             );
             BackgroundJob.Schedule<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
-                service => service.Execute(),
+                service => service.RunPatternMonitoring(),
                 TimeSpan.FromMinutes(1)
             );
             
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.StopLossMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.StopLossMonitoringService),
-                methodCall: service => service.Execute(),
+                methodCall: service => service.RunStopLossMonitoring(),
                 cronExpression: "*/5 6-13 * * 1-5",  // every 5 minutes from 6am to 1pm
                 options: rjo
             );

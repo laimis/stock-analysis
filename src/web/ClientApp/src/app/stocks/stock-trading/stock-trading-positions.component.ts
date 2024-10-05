@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {toggleVisuallyHidden} from 'src/app/services/utils';
-import {BrokerageOrder, OutcomeValueTypeEnum, PositionInstance, StockQuote} from '../../services/stocks.service';
+import {BrokerageStockOrder, OutcomeValueTypeEnum, PositionInstance, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 
 
@@ -19,7 +19,7 @@ export class StockTradingPositionsComponent {
     @Input()
     positions: PositionInstance[]
     @Input()
-    orders: BrokerageOrder[];
+    orders: BrokerageStockOrder[];
     @Output()
     brokerageOrdersChanged = new EventEmitter<string>()
     @Output()

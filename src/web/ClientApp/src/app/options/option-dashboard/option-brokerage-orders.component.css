@@ -1,0 +1,31 @@
+.brokerage-orders .order-card {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.brokerage-orders .order-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.brokerage-orders .badge {
+    font-size: 0.8rem;
+    padding: 0.35em 0.65em;
+}
+
+.brokerage-orders .list-group-item {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.brokerage-orders .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .brokerage-orders .card-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .brokerage-orders .card-header .badge {
+        margin-top: 0.5rem;
+    }
+}

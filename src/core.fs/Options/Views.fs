@@ -102,7 +102,7 @@ type OwnedOptionStats(summaries:seq<OwnedOptionView>) =
     member this.AverageDaysHeld = optionTrades |> List.map (fun s -> decimal s.DaysHeld) |> List.average
     member this.AverageDaysHeldPercentage = this.AverageDaysHeld / this.AverageDays
     
-type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OwnedOptionView>, brokeragePositions:seq<OptionPosition>, orders:seq<Order>) =
+type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OwnedOptionView>, brokeragePositions:seq<OptionPosition>, orders:seq<OptionOrder>) =
     
     member this.Closed = closed
     member this.Open = ``open``

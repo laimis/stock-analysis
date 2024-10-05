@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOrder, stocktransactioncommand} from 'src/app/services/stocks.service';
+import {BrokerageStockOrder, stocktransactioncommand} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
@@ -7,7 +7,7 @@ import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../shared/stocks/stock-link-and-tradingview-link.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 
-let orderBy = (a: BrokerageOrder, b: BrokerageOrder) => {
+let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
     let tickerComparison = a.ticker.localeCompare(b.ticker)
     if (tickerComparison === 0) {
         return a.executionTime > b.executionTime ? -1 : 1
@@ -30,7 +30,7 @@ let orderBy = (a: BrokerageOrder, b: BrokerageOrder) => {
     standalone: true
 })
 export class BrokerageOrdersComponent {
-    groupedOrders: BrokerageOrder[][];
+    groupedOrders: BrokerageStockOrder[][];
     isEmpty: boolean = false;
     errors: string[];
     @Input()
@@ -43,10 +43,10 @@ export class BrokerageOrdersComponent {
     constructor(private brokerage: BrokerageService, private stocks: StockPositionsService) {
     }
 
-    private _orders: BrokerageOrder[] = [];
+    private _orders: BrokerageStockOrder[] = [];
 
     @Input()
-    set orders(value: BrokerageOrder[]) {
+    set orders(value: BrokerageStockOrder[]) {
         this._orders = value
         this.groupAndRenderOrders()
     }
@@ -91,7 +91,7 @@ export class BrokerageOrdersComponent {
             )
     }
 
-    recordOrder(order: BrokerageOrder) {
+    recordOrder(order: BrokerageStockOrder) {
         const obj: stocktransactioncommand = {
             positionId: this.positionId,
             numberOfShares: order.quantity,
@@ -114,7 +114,7 @@ export class BrokerageOrdersComponent {
         }
     }
 
-    getTotal(orders: BrokerageOrder[]) {
+    getTotal(orders: BrokerageStockOrder[]) {
         return orders
             .filter(o => o.status !== 'CANCELED')
             .reduce((total, order) => total + order.price * order.quantity, 0)

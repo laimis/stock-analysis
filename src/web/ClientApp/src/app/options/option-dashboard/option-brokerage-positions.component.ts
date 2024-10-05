@@ -10,8 +10,20 @@ import {GetErrors} from 'src/app/services/utils';
 
 export class OptionBrokeragePositionsComponent {
     errors: string[];
+    private _positions: BrokerageOptionPosition[];
+    totalMarketValue: number;
+    totalCost: number;
     @Input()
-    positions: BrokerageOptionPosition[]
+    set positions(val: BrokerageOptionPosition[])
+    {
+        this._positions = val
+        this.totalMarketValue = this._positions.reduce((acc, pos) => acc + pos.marketValue, 0)
+        this.totalCost = this._positions.reduce((acc, pos) => acc + pos.averageCost * pos.quantity, 0) * 100
+    }
+    get positions() {
+        return this._positions
+    }
+    
     @Output()
     positionsUpdated = new EventEmitter()
     protected readonly Date = Date;

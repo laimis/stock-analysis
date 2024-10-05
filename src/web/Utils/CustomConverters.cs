@@ -201,17 +201,33 @@ public class OrderStatusConverter : GenericConverterWithToString<OrderStatus>
     }
 }
 
-public class OrderTypeConverter : GenericConverterWithToString<OrderType>
+public class OptionOrderTypeConverter : GenericConverterWithToString<OptionOrderType>
 {
-    public override OrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override OptionOrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         throw new NotImplementedException("OrderType is not deserializable");
     }
 }
 
-public class OrderInstructionConverter : GenericConverterWithToString<OrderInstruction>
+public class StockOrderTypeConverter : GenericConverterWithToString<StockOrderType>
 {
-    public override OrderInstruction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override StockOrderType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException("OrderType is not deserializable");
+    }
+}
+
+public class StockOrderInstructionConverter : GenericConverterWithToString<StockOrderInstruction>
+{
+    public override StockOrderInstruction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        throw new NotImplementedException("OrderInstruction is not deserializable");
+    }
+}
+
+public class OptionOrderInstructionConverter : GenericConverterWithToString<OptionOrderInstruction>
+{
+    public override OptionOrderInstruction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         throw new NotImplementedException("OrderInstruction is not deserializable");
     }

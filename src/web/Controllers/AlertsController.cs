@@ -59,7 +59,7 @@ public class AlertsController(Handler handler) : ControllerBase
     [Authorize("admin")]
     public Task TriggerDaily([FromServices] MonitoringServices.PatternMonitoringService dailyAlerts)
     {
-        dailyAlerts.Execute();
+        dailyAlerts.RunPatternMonitoring();
         return Task.CompletedTask;
     }
         

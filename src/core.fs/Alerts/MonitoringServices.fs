@@ -125,7 +125,7 @@ type StopLossMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, c
 
     interface IApplicationService
 
-    member _.Execute() = task {
+    member _.RunStopLossMonitoring() = task {
 
         match checks.Count with
         | 0 ->
@@ -323,7 +323,7 @@ type PatternMonitoringService(
 
     interface IApplicationService
 
-    member _.Execute() = task {
+    member _.RunPatternMonitoring() = task {
 
         try
             do! runThroughMonitoringChecks logger

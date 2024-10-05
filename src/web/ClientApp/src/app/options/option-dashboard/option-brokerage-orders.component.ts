@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOrder} from 'src/app/services/stocks.service';
+import {BrokerageOptionOrder, BrokerageStockOrder} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
 
@@ -12,7 +12,7 @@ import {BrokerageService} from "../../services/brokerage.service";
 export class OptionBrokerageOrdersComponent {
     errors: string[];
     @Input()
-    orders: BrokerageOrder[]
+    orders: BrokerageOptionOrder[]
     @Output()
     ordersUpdated = new EventEmitter()
 
@@ -21,7 +21,7 @@ export class OptionBrokerageOrdersComponent {
     ) {
     }
 
-    cancelOrder(order: BrokerageOrder) {
+    cancelOrder(order: BrokerageOptionOrder) {
 
         this.service.cancelOrder(order.orderId).subscribe(r => {
             this.ordersUpdated.emit()

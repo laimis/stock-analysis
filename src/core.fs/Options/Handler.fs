@@ -10,29 +10,6 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.CSV
 open core.fs.Adapters.Storage
 open core.fs.Services
-
-type OptionType =
-    | Call
-    | Put
-    
-    with
-        override this.ToString() =
-            match this with
-            | Call -> nameof Call
-            | Put -> nameof Put
-            
-        member this.ToEnum() =
-            match this with
-            | Call -> core.Options.OptionType.CALL
-            | Put -> core.Options.OptionType.PUT
-            
-        static member FromString(value:string) =
-            match value with
-            | nameof Call -> Call
-            | nameof Put -> Put
-            | "CALL" -> Call
-            | "PUT" -> Put
-            | _ -> failwithf $"Invalid option type: %s{value}"
             
 type OptionTransaction =
     {
@@ -122,13 +99,20 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                 let brokeragePositions, brokerageOrders =
                     brokerageAccount
                     |> Result.map (fun a ->
-                        a.OptionPositions |> Seq.filter (fun p ->
-                            openOptions
-                            |> Seq.exists (fun o ->
-                                o.Ticker.Value = p.Ticker.Value.Value
-                                && o.StrikePrice = p.StrikePrice
-                                && o.OptionType = p.OptionType)
-                            |> not), [||])
+                        
+                        let positions =
+                            a.OptionPositions |> Seq.filter (fun p ->
+                                openOptions
+                                |> Seq.exists (fun o ->
+                                    o.Ticker.Value = p.Ticker.Value.Value
+                                    && o.StrikePrice = p.StrikePrice
+                                    && o.OptionType = p.OptionType)
+                                |> not)
+                            
+                        let orders = a.OptionOrders
+                                
+                        positions, orders
+                    )
                     |> Result.defaultValue (Seq.empty, Array.empty)
 
                 return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok

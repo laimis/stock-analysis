@@ -84,21 +84,81 @@ type StockQuote =
 
 type OrderStatus =
     | Filled | Working | PendingActivation | Expired | Canceled | Rejected | Accepted | Replaced
-type OrderInstruction =
-    | Buy | Sell | BuyToCover | SellShort | BuyToOpen | BuyToClose | SellToOpen | SellToClose
-type OrderType =
-    | Market | Limit | StopMarket | NetDebit | NetCredit
+type StockOrderInstruction =
+    | Buy | Sell | BuyToCover | SellShort
+type OptionOrderInstruction =
+    | BuyToOpen | BuyToClose | SellToOpen | SellToClose
+type StockOrderType =
+    | Market | Limit | StopMarket
+    
+type OptionOrderType =
+    | Market | Limit | NetDebit | NetCredit
+
+type OptionType =
+    | Call
+    | Put
+    
+    with
+        override this.ToString() =
+            match this with
+            | Call -> nameof Call
+            | Put -> nameof Put
+            
+        member this.ToEnum() =
+            match this with
+            | Call -> core.Options.OptionType.CALL
+            | Put -> core.Options.OptionType.PUT
+            
+        static member FromString(value:string) =
+            match value with
+            | nameof Call -> Call
+            | nameof Put -> Put
+            | "CALL" -> Call
+            | "PUT" -> Put
+            | _ -> failwithf $"Invalid option type: %s{value}"
+            
+[<CLIMutable>]
+type OptionLeg = {
+    LegId : string
+    Cusip : string
+    Ticker : Ticker
+    Description: string
+    OptionType: OptionType
+    UnderlyingTicker : Ticker
+    Instruction: OptionOrderInstruction
+    Quantity: decimal
+}
 
 [<CLIMutable>]
-type Order = {
+type OptionOrder = {
+    OrderId : string
+    Price : decimal
+    Quantity : decimal
+    Status : OrderStatus
+    Type : OptionOrderType
+    ExecutionTime : DateTimeOffset option
+    EnteredTime: DateTimeOffset
+    ExpirationTime: DateTimeOffset option
+    CanBeCancelled : bool
+    Legs : OptionLeg []
+} with
+        
+    member this.IsActive : bool =
+        match this.Status with
+        | Working -> true
+        | PendingActivation -> true
+        | _ -> false
+    member this.CanBeRecorded : bool = match this.Status with | Filled -> true | _ -> false
+
+[<CLIMutable>]
+type StockOrder = {
     OrderId : string
     Price : decimal
     Quantity : decimal
     Status : OrderStatus
     Ticker : Ticker
-    Type : OrderType
-    Instruction : OrderInstruction
-    AssetType : AssetType
+    Type : StockOrderType
+    Instruction : StockOrderInstruction
     ExecutionTime : DateTimeOffset option
     EnteredTime: DateTimeOffset
     ExpirationTime: DateTimeOffset option
@@ -113,7 +173,6 @@ type Order = {
     member this.CanBeRecorded : bool = match this.Status with | Filled -> true | _ -> false
     member this.IsSellOrder : bool = match this.Instruction with | Sell -> true | SellShort -> true | _ -> false
     member this.IsBuyOrder : bool = match this.Instruction with | Buy -> true | BuyToCover -> true | _ -> false
-    member this.IsOption : bool = this.AssetType = AssetType.Option
     member this.IsShort : bool = this.Instruction = SellShort
 
 type AccountTransactionType =
@@ -154,7 +213,8 @@ type BrokerageAccount() =
     
     member val StockPositions : StockPosition [] = [||] with get, set
     member val OptionPositions : OptionPosition [] = [||] with get, set
-    member val Orders : Order [] = [||] with get, set
+    member val StockOrders : StockOrder [] = [||] with get, set
+    member val OptionOrders : OptionOrder [] = [||] with get, set
     member val CashBalance : decimal option = None with get, set
     member val Equity : decimal option = None with get, set
     member val LongMarketValue : decimal option = None with get, set

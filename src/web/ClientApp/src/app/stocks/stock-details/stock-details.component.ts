@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {
-    BrokerageOrder,
+    BrokerageStockOrder,
     OwnedOption,
     PositionChartInformation,
     PositionInstance,
@@ -32,7 +32,7 @@ export class StockDetailsComponent implements OnInit {
     currentPositionChartInfo: PositionChartInformation
     options: OwnedOption[]
     prices: Prices
-    orders: BrokerageOrder[]
+    orders: BrokerageStockOrder[]
     activeTab: string = ''
     startDate: string
     endDate: string

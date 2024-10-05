@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOrder, PositionChartInformation, PositionInstance, StockQuote} from '../../services/stocks.service';
+import {BrokerageStockOrder, PositionChartInformation, PositionInstance, StockQuote} from '../../services/stocks.service';
 
 @Component({
     selector: 'app-stock-ownership',
@@ -15,7 +15,7 @@ export class StockOwnershipComponent {
     quote: StockQuote
 
     @Input()
-    orders: BrokerageOrder[]
+    orders: BrokerageStockOrder[]
 
     @Input()
     positionChartInformation: PositionChartInformation

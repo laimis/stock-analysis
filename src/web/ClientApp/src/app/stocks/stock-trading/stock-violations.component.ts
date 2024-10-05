@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOrder, openpositioncommand, StockViolation} from 'src/app/services/stocks.service';
+import {BrokerageStockOrder, openpositioncommand, StockViolation} from 'src/app/services/stocks.service';
 import {showElement, toggleVisuallyHidden} from "../../services/utils";
 
 @Component({
@@ -11,7 +11,7 @@ export class StockViolationsComponent {
 
     tickersInViolations: string[] = []
     @Input()
-    orders: BrokerageOrder[] = []
+    orders: BrokerageStockOrder[] = []
     @Output()
     refreshRequested = new EventEmitter<string>()
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;

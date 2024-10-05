@@ -20,6 +20,7 @@ open Nito.AsyncEx
 open Polly
 open Polly.RateLimit
 open core.fs.Adapters.Stocks
+open core.fs.Options
     
 type ErrorResponse = {
     message: string option
@@ -53,12 +54,14 @@ type Instrument = {
     symbol: string
     description: string
     underlyingSymbol: string
+    putCall: string
 }
 
 [<CLIMutable>]
 type OrderLeg = {
     orderLegType: string
     legId: int64
+    cusip: string
     instrument: Instrument
     instruction: string
     positionEffect: string
@@ -424,26 +427,38 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "REPLACED" -> OrderStatus.Replaced
         | _ -> failwith $"Unknown order status: {status}"
         
-    let parseOrderType orderType =
+    let parseStockOrderType orderType =
         match orderType with
-        | "LIMIT" -> OrderType.Limit
-        | "MARKET" -> OrderType.Market
-        | "STOP" -> OrderType.StopMarket
-        | "NET_DEBIT" -> OrderType.NetDebit
-        | "NET_CREDIT" -> OrderType.NetCredit
-        | _ -> failwith $"Unknown order type: {orderType}"
+        | "LIMIT" -> StockOrderType.Limit
+        | "MARKET" -> StockOrderType.Market
+        | "STOP" -> StockOrderType.StopMarket
+        | _ -> failwith $"Unknown stock order type: {orderType}"
+    
+    let parseOptionOrderType orderType =
+        match orderType with
+        | "LIMIT" -> OptionOrderType.Limit
+        | "MARKET" -> OptionOrderType.Market
+        | "NET_DEBIT" -> OptionOrderType.NetDebit
+        | "NET_CREDIT" -> OptionOrderType.NetCredit
+        | _ -> failwith $"Unknown option order type: {orderType}"
         
-    let parseOrderInstruction instruction =
+        
+    let parseStockOrderInstruction instruction =
         match instruction with
-        | "BUY" -> OrderInstruction.Buy
-        | "SELL" -> OrderInstruction.Sell
-        | "SELL_SHORT" -> OrderInstruction.SellShort
-        | "BUY_TO_COVER" -> OrderInstruction.BuyToCover
-        | "BUY_TO_OPEN" -> OrderInstruction.BuyToOpen
-        | "BUY_TO_CLOSE" -> OrderInstruction.BuyToClose
-        | "SELL_TO_OPEN" -> OrderInstruction.SellToOpen
-        | "SELL_TO_CLOSE" -> OrderInstruction.SellToClose
-        | _ -> failwith $"Unknown order instruction: {instruction}"
+        | "BUY" -> StockOrderInstruction.Buy
+        | "SELL" -> StockOrderInstruction.Sell
+        | "SELL_SHORT" -> StockOrderInstruction.SellShort
+        | "BUY_TO_COVER" -> StockOrderInstruction.BuyToCover
+        | _ -> failwith $"Unknown stock order instruction: {instruction}"
+        
+    let parseOptionOrderInstruction instruction =
+        match instruction with
+        | "BUY_TO_OPEN" -> OptionOrderInstruction.BuyToOpen
+        | "BUY_TO_CLOSE" -> OptionOrderInstruction.BuyToClose
+        | "SELL_TO_OPEN" -> OptionOrderInstruction.SellToOpen
+        | "SELL_TO_CLOSE" -> OptionOrderInstruction.SellToClose
+        | _ -> failwith $"Unknown option order instruction: {instruction}"
+        
         
     let parseAssetType assetType =
         match assetType with
@@ -470,6 +485,45 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             regularMarketLastPrice = schwabResponse.regular.regularMarketLastPrice
         }
         
+    let mapStockOrder (o: OrderStrategy, l: OrderLeg) =
+        {
+            Price = o.ResolvePrice()
+            Quantity = l.quantity
+            Status = o.status |> parseOrderStatus
+            Type = o.orderType |> parseStockOrderType
+            Instruction = l.instruction |> parseStockOrderInstruction
+            Ticker = Ticker l.instrument.symbol
+            ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
+            EnteredTime = o.enteredTime |> DateTimeOffset.Parse
+            ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
+            OrderId = o.orderId.ToString()
+            CanBeCancelled = o.cancelable
+        }
+        
+    let mapOptionOrder (o:OrderStrategy) : OptionOrder =
+        {
+            Price = o.ResolvePrice()
+            Quantity = o.quantity |> decimal
+            Status = o.status |> parseOrderStatus
+            Type = o.orderType |> parseOptionOrderType
+            EnteredTime = o.enteredTime |> DateTimeOffset.Parse
+            ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
+            ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
+            OrderId = o.orderId.ToString()
+            CanBeCancelled = o.cancelable
+            Legs = o.orderLegCollection.Value |> Array.map(fun l ->
+                {
+                    LegId = l.legId.ToString()
+                    Cusip = l.cusip
+                    Description = l.instrument.description
+                    OptionType = if l.instrument.putCall = "PUT" then OptionType.Put else OptionType.Call  
+                    UnderlyingTicker = l.instrument.underlyingSymbol |> Ticker 
+                    Ticker = l.instrument.symbol |> Ticker
+                    Quantity = l.quantity |> decimal
+                    Instruction = l.instruction |> parseOptionOrderInstruction
+                }
+            ) 
+        }
         
     let getAccessToken (user:UserState) = task {
         if not user.ConnectedToBrokerage then
@@ -816,31 +870,21 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     let toEnteredTime = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
                     
                     let ordersResource = $"/accounts/{accountId}/orders?fromEnteredTime={fromEnteredTime}&toEnteredTime={toEnteredTime}" |> TraderApiUrl
-                    let! orders = this.CallApi<OrderStrategy []> state ordersResource None
+                    let! orders = this.CallApi<OrderStrategy []> state ordersResource (Some true)
                     match orders with
                     | Error error -> return Error error
                     | Ok orders ->
                         
-                        let brokerageOrders =
+                        let brokerageStockOrders =
                             orders
+                            |> Array.filter (fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.exists(fun l -> l.instrument.assetType |> isStockType))
                             |> Array.collect(fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.map(fun l -> o, l))
-                            |> Array.map(fun (o, l) ->
-                                    let order = {
-                                        Price = o.ResolvePrice()
-                                        Quantity = l.quantity
-                                        Status = o.status |> parseOrderStatus
-                                        Type = o.orderType |> parseOrderType
-                                        Instruction = l.instruction |> parseOrderInstruction
-                                        Ticker = Ticker l.instrument.symbol
-                                        AssetType = l.instrument.assetType |> parseAssetType
-                                        ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
-                                        EnteredTime = o.enteredTime |> DateTimeOffset.Parse
-                                        ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
-                                        OrderId = o.orderId.ToString()
-                                        CanBeCancelled = o.cancelable
-                                    }
-                                    order
-                                )
+                            |> Array.map(mapStockOrder)
+                            
+                        let brokergeOptionOrders =
+                            orders
+                            |> Array.filter (fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.exists(fun l -> l.instrument.assetType |> isStockType |> not))
+                            |> Array.map(mapOptionOrder)
 
                         let resource = $"/accounts/{accountId}?fields=positions" |> TraderApiUrl
                         let! response = this.CallApi<AccountsResponse> state resource None
@@ -875,6 +919,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                             let ticker = p.instrument.Value.underlyingSymbol
                                             
                                             let optionPosition = OptionPosition()
+                                            
                                             optionPosition.Ticker <- Some(Ticker ticker)
                                             optionPosition.Quantity <- if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
                                             optionPosition.AverageCost <- p.averagePrice
@@ -887,9 +932,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                     )
 
                                 let account = BrokerageAccount()
-                                account.Orders <- brokerageOrders
+                                account.StockOrders <- brokerageStockOrders
                                 account.StockPositions <- stockPositions
                                 account.OptionPositions <- optionPositions
+                                account.OptionOrders <- brokergeOptionOrders
                                 account.CashBalance <- Some accounts.securitiesAccount.Value.currentBalances.Value.cashBalance
                                 account.Equity <- Some accounts.securitiesAccount.Value.currentBalances.Value.equity
                                 account.LongMarketValue <- Some accounts.securitiesAccount.Value.currentBalances.Value.longMarketValue

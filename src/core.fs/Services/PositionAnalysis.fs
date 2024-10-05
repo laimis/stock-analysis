@@ -83,7 +83,7 @@ module PositionAnalysis =
         
         let hasSellOrderInOrders = 
             orders
-            |> Array.exists (fun (o:Order) -> o.IsSellOrder && o.Ticker = position.Ticker)
+            |> Array.exists (fun (o:StockOrder) -> o.IsSellOrder && o.Ticker = position.Ticker)
             
         let unrealizedProfit =  position.Profit + position.NumberOfShares * (bars.Last.Close - position.AverageCostPerShare)
         let unrealizedGainPct = (bars.Last.Close - position.AverageCostPerShare) / position.AverageCostPerShare
@@ -133,20 +133,13 @@ module PositionAnalysis =
             AnalysisOutcome(PositionAnalysisKeys.SMA50Above200Bars, OutcomeType.Neutral, sma50overSMA200, ValueFormat.Number, $"SMA50 over SMA200 bars: {sma50overSMA200}")
         ]
         
-    let evaluate (userState:UserState) (tickerOutcomes:seq<TickerOutcomes>) =
+    let evaluate (_:UserState) (tickerOutcomes:seq<TickerOutcomes>) =
         
         // NOTE: would be nice to have these come from user configuration
         let percentToStopThreshold = -0.02m
         let recentlyOpenThreshold = TimeSpan.FromDays(5)
         let withinTwoWeeksThreshold = TimeSpan.FromDays(14)
         let gainPctThreshold = 0.07m
-        let minimumRiskAmount = 40m
-        let maximumRiskAmount = 80m
-        
-        let withRiskAmountFilters = [
-            (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
-            (fun o -> o.Key = PositionAnalysisKeys.RiskAmount && o.Value > 0m)
-        ]
         
         let shortsInUptrendFilter = [
             (fun (o:AnalysisOutcome) -> o.Key = PositionAnalysisKeys.EMA20AboveSMA50Bars && o.Value > 0.0m)

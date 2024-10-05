@@ -147,51 +147,45 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 _ => throw new Exception($"Unknown order status: {status}")
             };
 
-        private static string GetOrderTypeString(OrderType orderType) =>
+        private static string GetOrderTypeString(StockOrderType orderType) =>
             orderType.Tag switch
             {
-                OrderType.Tags.Limit => "Limit",
-                OrderType.Tags.Market => "Market",
-                OrderType.Tags.StopMarket => "Stop",
-                OrderType.Tags.NetCredit => "NetCredit",
-                OrderType.Tags.NetDebit => "NetDebit",
+                StockOrderType.Tags.Limit => "Limit",
+                StockOrderType.Tags.Market => "Market",
+                StockOrderType.Tags.StopMarket => "Stop",
                 _ => throw new Exception($"Unknown order type: {orderType}")
             };
-        private static OrderType GetOrderTypeFromString(string orderType) =>
+        private static StockOrderType GetOrderTypeFromString(string orderType) =>
             orderType switch
             {
-                "Limit" => OrderType.Limit,
-                "Market" => OrderType.Market,
-                "Stop" => OrderType.StopMarket,
-                "NetCredit" => OrderType.NetCredit,
-                "NetDebit" => OrderType.NetDebit,
+                "Limit" => StockOrderType.Limit,
+                "Market" => StockOrderType.Market,
+                "Stop" => StockOrderType.StopMarket,
+                "NetCredit" => StockOrderType.Limit,
+                "NetDebit" => StockOrderType.Limit,
                 _ => throw new Exception($"Unknown order type: {orderType}")
             };
         
-        private static string GetOrderInstructionString(OrderInstruction instruction) =>
+        private static string GetOrderInstructionString(StockOrderInstruction instruction) =>
             instruction.Tag switch
             {
-                OrderInstruction.Tags.Buy => "Buy",
-                OrderInstruction.Tags.Sell => "Sell",
-                OrderInstruction.Tags.BuyToCover => "BuyToCover",
-                OrderInstruction.Tags.SellShort => "SellShort",
-                OrderInstruction.Tags.BuyToOpen => "BuyToOpen",
-                OrderInstruction.Tags.BuyToClose => "BuyToClose",
-                OrderInstruction.Tags.SellToOpen => "SellToOpen",
-                OrderInstruction.Tags.SellToClose => "SellToClose",
+                StockOrderInstruction.Tags.Buy => "Buy",
+                StockOrderInstruction.Tags.Sell => "Sell",
+                StockOrderInstruction.Tags.BuyToCover => "BuyToCover",
+                StockOrderInstruction.Tags.SellShort => "SellShort",
                 _ => throw new Exception($"Unknown order instruction: {instruction}")
             };
-        private static OrderInstruction GetOrderInstructionFromString(string instruction) =>
+        private static StockOrderInstruction GetOrderInstructionFromString(string instruction) =>
             instruction switch
             {
-                "Buy" => OrderInstruction.Buy,
-                "Sell" => OrderInstruction.Sell,
-                "BuyToCover" => OrderInstruction.BuyToCover,
-                "SellShort" => OrderInstruction.SellShort,
-                "BuyToOpen" => OrderInstruction.BuyToOpen,
-                "BuyToClose" => OrderInstruction.BuyToClose,
-                "SellToOpen" => OrderInstruction.SellToOpen,
-                "SellToClose" => OrderInstruction.SellToClose,
+                "Buy" => StockOrderInstruction.Buy,
+                "Sell" => StockOrderInstruction.Sell,
+                "BuyToCover" => StockOrderInstruction.BuyToCover,
+                "SellShort" => StockOrderInstruction.SellShort,
+                "BuyToOpen" => StockOrderInstruction.Buy,
+                "BuyToClose" => StockOrderInstruction.Buy,
+                "SellToOpen" => StockOrderInstruction.Sell,
+                "SellToClose" => StockOrderInstruction.Sell,
                 _ => throw new Exception($"Unknown order instruction: {instruction}")
             };
 
@@ -212,7 +206,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 _ => throw new Exception($"Unknown asset type: {assetType}")
             };
 
-        public async Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<Order> orders)
+        public async Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<StockOrder> orders)
         {
             using var db = GetConnection();
             
@@ -233,7 +227,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                     ticker = order.Ticker.Value,
                     ordertype = GetOrderTypeString(order.Type),
                     instruction = GetOrderInstructionString(order.Instruction),
-                    assettype = GetAssetTypeString(order.AssetType),
+                    assettype = GetAssetTypeString(AssetType.Equity),
                     executiontime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExecutionTime) ? null : order.ExecutionTime.Value.ToString("u"),
                     enteredtime = order.EnteredTime.ToString("u"),
                     expirationtime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExpirationTime) ? null : order.ExpirationTime.Value.ToString("u"),
@@ -245,7 +239,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
             tx.Commit();
         }
         
-        public async Task<IEnumerable<Order>> GetAccountBrokerageOrders(UserId userId)
+        public async Task<IEnumerable<StockOrder>> GetAccountBrokerageOrders(UserId userId)
         {
             using var db = GetConnection();
             
@@ -259,10 +253,9 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                 });
             
             return result.Select(r =>
-                new Order
+                new StockOrder
                 {
                     OrderId = r.orderid,
-                    AssetType = GetAssetTypeFromString(r.assettype),
                     Instruction = GetOrderInstructionFromString(r.instruction),
                     Price = r.price,
                     Quantity = r.quantity,

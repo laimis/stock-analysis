@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {BrokerageOrder, PendingStockPosition, StocksService} from 'src/app/services/stocks.service';
+import {BrokerageStockOrder, PendingStockPosition, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {stockPendingPositionExportLink} from "../../services/links.service";
 import {BrokerageService} from "../../services/brokerage.service";
@@ -28,7 +28,7 @@ import {FormsModule} from "@angular/forms";
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
     errors: string[];
-    orders: BrokerageOrder[];
+    orders: BrokerageStockOrder[];
     positions: PendingStockPosition[] = [];
     loading = {
         positions: true,

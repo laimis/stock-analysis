@@ -12,7 +12,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, List<AccountBalancesSnapshot>> _snapshots = new();
     private static readonly Dictionary<UserId, List<AccountTransaction>> _transactions = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
-    private static readonly Dictionary<UserId, List<Order>> _orders = new();
+    private static readonly Dictionary<UserId, List<StockOrder>> _orders = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -112,13 +112,13 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Order>> GetAccountBrokerageOrders(UserId userId)
+    public Task<IEnumerable<StockOrder>> GetAccountBrokerageOrders(UserId userId)
     {
         _orders.TryGetValue(userId, out var orders);
-        return Task.FromResult<IEnumerable<Order>>(orders ?? new List<Order>());
+        return Task.FromResult<IEnumerable<StockOrder>>(orders ?? new List<StockOrder>());
     }
     
-    public Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<Order> order)
+    public Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<StockOrder> order)
     {
         if (_orders.ContainsKey(userId) == false)
         {

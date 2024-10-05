@@ -44,6 +44,14 @@
                     </tr>
                 }
             </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3"></td>
+                <td>{{ totalCost | currency }}</td>
+                <td></td>
+                <td>{{ totalMarketValue | currency }}</td>
+                <td colspan="3"></td>
+            </tfoot>
         </table>
     }
 </section>

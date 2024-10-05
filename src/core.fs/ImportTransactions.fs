@@ -4,6 +4,7 @@ open System
 open System.Text.RegularExpressions
 open core.Shared
 open core.fs.Accounts
+open core.fs.Adapters.Brokerage
 open core.fs.Adapters.CSV
 open core.fs.Adapters.Email
 open core.fs.Adapters.Storage

@@ -3,6 +3,7 @@ namespace core.fs.Options
 open System
 open core.fs
 open core.fs.Accounts
+open core.fs.Adapters.Brokerage
 open core.fs.Adapters.CSV
 
 module Import =

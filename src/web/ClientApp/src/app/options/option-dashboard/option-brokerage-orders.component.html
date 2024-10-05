@@ -1,39 +1,55 @@
-<section>
-    <h3>Brokerage Orders</h3>
-    @if (orders && orders.length === 0) {
-        <div>
+<section class="brokerage-orders">
+    <h3 class="mb-4">Brokerage Orders</h3>
+    @for(order of orders; track order) {
+        <div class="card mb-4 order-card">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <app-trading-view-link [ticker]="order.legs[0].underlyingTicker" class="me-2"></app-trading-view-link>
+                        <app-stock-link [ticker]="order.legs[0].underlyingTicker"></app-stock-link>
+                    </div>
+                    <span class="badge" [ngClass]="{
+            'bg-success': order.status === 'Filled',
+            'bg-warning': order.status === 'PendingActivation' || order.status === 'Active',
+            'bg-danger': order.status === 'Cancelled' || order.status === 'Expired'
+          }">{{ order.status }}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <small class="text-muted">Entered on</small>
+                        <p class="mb-0">{{ order.enteredTime | parsedDate }}</p>
+                    </div>
+                    <div class="col-md-6" *ngIf="order.executionTime">
+                        <small class="text-muted">Executed on</small>
+                        <p class="mb-0">{{ order.executionTime | parsedDate }}</p>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end justify-content-end">
+                        <button *ngIf="order.canBeCancelled" class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order)">Cancel Order</button>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Price</small>
+                        <p class="mb-0 fw-bold">{{ order.price * 100 | currency }}</p>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="mb-3">Option Legs</h6>
+                <ul class="list-group list-group-flush">
+                    @for (leg of order.legs; track leg) {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                <span class="fw-bold">{{ leg.quantity | number }}</span> contract: {{ leg.description }}
+              </span>
+                            <span class="badge bg-secondary">{{ leg.instruction }}</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    } @empty {
+        <div class="alert alert-info" role="alert">
             No option orders present in brokerage account
         </div>
-    }
-    @if (orders && orders.length > 0) {
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>Ticker</th>
-                <th>Description</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (order of orders; track order) {
-                    <tr>
-                        <td>
-                            <app-trading-view-link [ticker]="order.ticker"></app-trading-view-link>
-                            <app-stock-link [ticker]="order.ticker"></app-stock-link>
-                        </td>
-                        <td>{{ order.description }}</td>
-                        <td>{{ order.quantity | number }}</td>
-                        <td>{{ order.price | currency }}</td>
-                        <td>{{ order.status }}</td>
-                        <td>@if (order.canBeCancelled) {
-                            <button class="btn btn-sm btn-warning" (click)="cancelOrder(order)">Cancel</button>
-                        }</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     }
 </section>

@@ -562,7 +562,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     
                     // let's look if we can find the orders for this position in the brokerage account
                     let firstOrder =
-                        brokerageAccount.Orders
+                        brokerageAccount.StockOrders
                         |> Array.filter (fun o -> o.Ticker = brokeragePosition.Ticker && o.ExecutionTime.IsSome)
                         |> Array.sortBy (fun o -> o.ExecutionTime.Value)
                         |> Array.tryHead
@@ -602,7 +602,7 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     | Ok prices ->
                         
                         try    
-                            let outcomes = PositionAnalysis.generate calculations prices brokerageAccount.Orders
+                            let outcomes = PositionAnalysis.generate calculations prices brokerageAccount.StockOrders
                             let tickerOutcome:TickerOutcomes = {outcomes = outcomes; ticker = position.Ticker}
                             let tickerPatterns = {patterns = PatternDetection.generate prices; ticker = position.Ticker}
                             

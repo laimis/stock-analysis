@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-    BrokerageOrder, KeyValuePair,
+    BrokerageStockOrder, KeyValuePair,
     PositionEvent,
     PositionInstance,
     StockQuote,
@@ -20,8 +20,8 @@ export class StockTradingPositionComponent {
     candidateStopPrice: number = 0
     numberOfProfitPoints: number = 4
     positionStrategy: string = null
-    positionOrders: BrokerageOrder[] = [];
-    allOrders: BrokerageOrder[] = [];
+    positionOrders: BrokerageStockOrder[] = [];
+    allOrders: BrokerageStockOrder[] = [];
     strategies: { key: string; value: string; }[];
     showOrderForm: boolean = false;
     
@@ -56,7 +56,7 @@ export class StockTradingPositionComponent {
     }
 
     @Input()
-    set orders(value: BrokerageOrder[]) {
+    set orders(value: BrokerageStockOrder[]) {
         this.allOrders = value;
         this.updatePositionOrders();
     }

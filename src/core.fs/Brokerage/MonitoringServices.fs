@@ -285,7 +285,7 @@ type AccountMonitoringService(
                     let recipient = Recipient(user.State.Email, user.State.Name)
                     let sender = Sender.Support
 
-                    let! _ = emailService.SendWithTemplate recipient sender (EmailTemplate.BrokerageTransactions) payload |> Async.AwaitTask
+                    let! _ = emailService.SendWithTemplate recipient sender EmailTemplate.BrokerageTransactions payload |> Async.AwaitTask
                     ()
                     
             })
@@ -325,7 +325,7 @@ type AccountMonitoringService(
                     do! snapshot |> accounts.SaveAccountBalancesSnapshot (user.State.Id |> UserId) |> Async.AwaitTask
                     
                     // save orders
-                    do! account.Orders |> accounts.SaveAccountBrokerageOrders (user.State.Id |> UserId) |> Async.AwaitTask
+                    do! account.StockOrders |> accounts.SaveAccountBrokerageOrders (user.State.Id |> UserId) |> Async.AwaitTask
                     
                     logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
                     

@@ -762,7 +762,7 @@ export interface OptionsContainer {
     open: OwnedOption[]
     closed: OwnedOption[]
     brokeragePositions: BrokerageOptionPosition[]
-    orders: BrokerageOrder[]
+    orders: BrokerageOptionOrder[]
     overallStats: OptionStats
     buyStats: OptionStats
     sellStats: OptionStats
@@ -1039,11 +1039,10 @@ export interface StockTradingPerformanceCollection {
     trends: DataPointContainer[][]
 }
 
-export interface BrokerageOrder {
+export interface BrokerageStockOrder {
     orderId: string
     price: number
     type: string
-    assetType: string
     quantity: number
     status: string
     instruction: string
@@ -1058,6 +1057,33 @@ export interface BrokerageOrder {
     isSellOrder: boolean
 }
 
+export interface OptionOrderLeg {
+    legId : string
+    cusip : string
+    ticker : string
+    description: string
+    optionType: string
+    underlyingTicker : string
+    instruction: string
+    quantity: number
+}
+
+export interface BrokerageOptionOrder {
+    orderId: string
+    price: number
+    type: string
+    quantity: number
+    status: string
+    instruction: string
+    description: string
+    executionTime: string
+    enteredTime: string
+    canBeCancelled: boolean
+    canBeRecorded: boolean
+    isActive: boolean
+    legs: OptionOrderLeg[]
+}
+
 export interface BrokerageStockPositionInstance {
     ticker: string
     quantity: number
@@ -1066,7 +1092,7 @@ export interface BrokerageStockPositionInstance {
 
 export interface BrokerageAccount {
     stockPositions: BrokerageStockPositionInstance[]
-    orders: BrokerageOrder[]
+    orders: BrokerageStockOrder[]
     cashBalance: number
     equity: number
     longMarketValue: number

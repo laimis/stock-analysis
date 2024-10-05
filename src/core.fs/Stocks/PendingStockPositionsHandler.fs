@@ -136,7 +136,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 | Ok account ->
                     
                     let! _ =
-                        account.Orders
+                        account.StockOrders
                         |> Seq.filter (fun x -> x.Ticker = position.State.Ticker && x.CanBeCancelled)
                         |> Seq.map (fun x -> brokerage.CancelOrder user.State x.OrderId |> Async.AwaitTask)
                         |> Async.Sequential
