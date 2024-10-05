@@ -123,15 +123,14 @@ namespace storagetests
             
             var userId = UserId.NewUserId(Guid.NewGuid());
 
-            var order = new Order
+            var order = new StockOrder
             {
-                Instruction = OrderInstruction.Sell,
+                Instruction = StockOrderInstruction.Sell,
                 Price = 10m,
                 Quantity = 1,
                 Status = OrderStatus.Working,
                 Ticker = new Ticker("AAPL"),
-                Type = OrderType.Limit,
-                AssetType = AssetType.Equity,
+                Type = StockOrderType.Limit,
                 EnteredTime = DateTimeOffset.UtcNow,
                 ExpirationTime = DateTimeOffset.UtcNow,
                 ExecutionTime = FSharpOption<DateTimeOffset>.None,
@@ -153,7 +152,6 @@ namespace storagetests
             Assert.Equal(order.Status, fromDbOrder.Status);
             Assert.Equal(order.Ticker.Value, fromDbOrder.Ticker.Value);
             Assert.Equal(order.Type, fromDbOrder.Type);
-            Assert.Equal(order.AssetType, fromDbOrder.AssetType);
             Assert.Equal(order.EnteredTime, fromDbOrder.EnteredTime, TimeSpan.FromSeconds(1));
             Assert.Equal(order.ExpirationTime.Value, fromDbOrder.ExpirationTime.Value, TimeSpan.FromSeconds(1));
             Assert.Equal(order.ExecutionTime, fromDbOrder.ExecutionTime);
