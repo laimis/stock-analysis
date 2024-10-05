@@ -875,7 +875,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     let toEnteredTime = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
                     
                     let ordersResource = $"/accounts/{accountId}/orders?fromEnteredTime={fromEnteredTime}&toEnteredTime={toEnteredTime}" |> TraderApiUrl
-                    let! orders = this.CallApi<OrderStrategy []> state ordersResource (Some true)
+                    let! orders = this.CallApi<OrderStrategy []> state ordersResource None
                     match orders with
                     | Error error -> return Error error
                     | Ok orders ->
