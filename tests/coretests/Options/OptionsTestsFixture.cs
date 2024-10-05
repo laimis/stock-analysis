@@ -5,6 +5,7 @@ using core.fs.Accounts;
 using core.Options;
 using core.Shared;
 using Moq;
+using OptionType = core.fs.Adapters.Brokerage.OptionType;
 
 namespace coretests.Options
 {
@@ -48,7 +49,7 @@ namespace coretests.Options
         {
             var cmd = new OptionTransaction(
                 strikePrice: 20,
-                optionType: core.fs.Options.OptionType.Put,
+                optionType: OptionType.Call,
                 expirationDate: DateTimeOffset.UtcNow.AddDays(10),
                 ticker: _ticker,
                 numberOfContracts: 1,

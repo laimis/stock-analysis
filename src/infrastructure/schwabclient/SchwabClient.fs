@@ -106,7 +106,7 @@ type OrderStrategy = {
     with
     
         
-        member this.ResolvePrice() =
+        member this.ResolveStockPrice() =
             match this.orderActivityCollection with
             | Some activities ->
                 let executionPrices =
@@ -134,6 +134,11 @@ type OrderStrategy = {
                     match this.stopPrice with
                     | Some sp -> sp
                     | None -> 0m
+                    
+        member this.ResolveOptionPrice() =
+            match this.price with
+            | Some p -> p
+            | None -> 0m
 
 type BrokerageBalances = {
     cashBalance: decimal
@@ -487,7 +492,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         
     let mapStockOrder (o: OrderStrategy, l: OrderLeg) =
         {
-            Price = o.ResolvePrice()
+            Price = o.ResolveStockPrice()
             Quantity = l.quantity
             Status = o.status |> parseOrderStatus
             Type = o.orderType |> parseStockOrderType
@@ -502,7 +507,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         
     let mapOptionOrder (o:OrderStrategy) : OptionOrder =
         {
-            Price = o.ResolvePrice()
+            Price = o.ResolveOptionPrice()
             Quantity = o.quantity |> decimal
             Status = o.status |> parseOrderStatus
             Type = o.orderType |> parseOptionOrderType
