@@ -127,7 +127,7 @@ let ``With position not fully sold, is open``() = task {
         closeIfOpenAtTheEnd=false)
 
     result.Results
-    |> Seq.take 1
+    |> Seq.filter (fun r -> r.StrategyName = "Close after 120 days")
     |> Seq.iter (fun r ->
         r.Position.IsClosed |> should equal false
     )
