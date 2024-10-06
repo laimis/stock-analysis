@@ -739,7 +739,6 @@ module TradingStrategyFactory =
             costPerShare * multiplier
             
         [
-            createBuyAndHold
             createProfitPointsBasedOnPctGainTrade 0.07m 3
             createProfitPointsBasedOnPctGainTrade 0.10m 3
             createProfitPointsBasedOnPctGainTrade 0.20m 3
