@@ -2,6 +2,7 @@
     <app-loading></app-loading>
 }
 @if (loaded) {
+    <app-error-display [errors]="errors"></app-error-display>
     <section class="container">
         <header class="row justify-content-between align-items-center mb-4">
             <div class="col-auto">

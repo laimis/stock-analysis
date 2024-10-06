@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {StocksService, TransactionsView} from '../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {Title} from '@angular/platform-browser';
+import {GetErrors} from "../services/utils";
 
 @Component({
     selector: 'app-transactions',
@@ -16,6 +17,7 @@ export class TransactionsComponent implements OnInit {
     txType: string = "tx"
     loading: boolean = true
     showDetails: string = ''
+    errors: string[] = []
 
     constructor(
         private stockService: StocksService,
@@ -38,7 +40,8 @@ export class TransactionsComponent implements OnInit {
             this.response = r
             this.loading = false
             this.title.setTitle("Transactions - Nightingale Trading")
-        }, _ => {
+        }, error => {
+            this.errors = GetErrors(error)
             this.loading = false
         })
     }

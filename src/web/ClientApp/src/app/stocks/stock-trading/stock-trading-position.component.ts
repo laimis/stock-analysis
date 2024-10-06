@@ -86,6 +86,9 @@ export class StockTradingPositionComponent {
             this.numberOfProfitPoints).subscribe(
             (profitPoints) => {
                 this.positionProfitPoints = profitPoints
+            }, (err) => {
+                let errors = GetErrors(err)
+                alert("Error fetching profit points: " + errors.join(", "))
             }
         )
     }
@@ -121,6 +124,10 @@ export class StockTradingPositionComponent {
                 (_) => {
                     this._position.stopPrice = null
                     this._position.riskedAmount = null
+                },
+                error => {
+                    let errors = GetErrors(error)
+                    alert("Error deleting stop price: " + errors.join(", "))
                 }
             )
         }
@@ -134,6 +141,10 @@ export class StockTradingPositionComponent {
                 (_) => {
                     this._position.riskedAmount = this.candidateRiskAmount
                     elementVisibilityToToggle.forEach(this.toggleVisibility)
+                },
+                error => {
+                    let errors = GetErrors(error)
+                    alert('Unable to set risk: ' + errors.join(", "))
                 }
             )
         }
@@ -255,7 +266,7 @@ export class StockTradingPositionComponent {
                     _ => {
                         // refresh UI somehow here, tbd
                     }, (err) => {
-                        var errors = GetErrors(err)
+                        const errors = GetErrors(err);
                         alert("Error deleting transaction: " + errors.join(", "))
                     })
         }

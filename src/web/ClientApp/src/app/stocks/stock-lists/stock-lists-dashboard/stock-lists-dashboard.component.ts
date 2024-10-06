@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {StockList, StocksService} from 'src/app/services/stocks.service';
-import {toggleVisuallyHidden} from 'src/app/services/utils';
+import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 
 @Component({
     selector: 'app-stock-lists-dashboard',
@@ -13,6 +13,7 @@ export class StockListsDashboardComponent implements OnInit {
     newDescription: string
     lists: StockList[]
     filteredLists: StockList[] = []
+    errors: string[] = []
 
     constructor(
         private stockService: StocksService
@@ -36,7 +37,7 @@ export class StockListsDashboardComponent implements OnInit {
                 this.loadLists()
             },
             e => {
-                console.error(e)
+                this.errors = GetErrors(e)
             }
         )
     }
@@ -48,19 +49,18 @@ export class StockListsDashboardComponent implements OnInit {
                     this.loadLists()
                 },
                 e => {
-                    console.error(e)
+                    this.errors = GetErrors(e)
                 }
             )
         }
     }
 
     filterListByTicker(ticker: string) {
-        var filteredList = this.lists.filter(
+        this.filteredLists = this.lists.filter(
             l => l.tickers.some(
                 t => t.ticker.toLowerCase() === ticker.toLowerCase() || ticker === ''
             )
         ).sort((a, b) => a.name.localeCompare(b.name))
-        this.filteredLists = filteredList
     }
 
     getAnalysisLink(list: StockList) {
@@ -71,7 +71,7 @@ export class StockListsDashboardComponent implements OnInit {
         return stockLists_getExportLink(list)
     }
 
-    toggleVisibility(elem) {
+    toggleVisibility(elem: HTMLElement) {
         toggleVisuallyHidden(elem)
     }
 
@@ -82,7 +82,7 @@ export class StockListsDashboardComponent implements OnInit {
                 this.filteredLists = s;
             },
             e => {
-                console.error(e);
+                this.errors = GetErrors(e)
             }
         );
     }

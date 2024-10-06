@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {StockGaps, StocksService} from '../../services/stocks.service';
+import {GetErrors} from "../../services/utils";
 
 @Component({
     selector: 'app-gaps-report',
@@ -9,7 +10,7 @@ import {StockGaps, StocksService} from '../../services/stocks.service';
 })
 export class GapsReportComponent implements OnInit {
 
-    error: string = null;
+    errors: string[] = null;
     gaps: StockGaps;
 
     constructor(
@@ -23,9 +24,11 @@ export class GapsReportComponent implements OnInit {
             if (tickerParam) {
                 this.stocksService.reportTickerGaps(tickerParam).subscribe(data => {
                     this.gaps = data
+                }, error => {
+                    this.errors = GetErrors(error);
                 });
             } else {
-                this.error = "ticker query param missing";
+                this.errors = ["ticker query param missing"];
             }
         })
     }

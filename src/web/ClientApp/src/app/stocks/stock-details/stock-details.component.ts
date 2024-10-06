@@ -76,6 +76,8 @@ export class StockDetailsComponent implements OnInit {
             }
 
             this.activeTab = param['tab'] || 'stocks'
+        }, error => {
+            this.errors.stock = GetErrors(error)
         })
     }
 

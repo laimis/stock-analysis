@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {openpositioncommand, PositionInstance} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {GetErrors} from "../../services/utils";
 
 class StockTransaction {
     numberOfShares: number
@@ -17,6 +18,8 @@ class StockTransaction {
 
 export class StockTradingSimulatorComponent implements OnInit {
 
+    errors: string[] = []
+    
     stopPrice: number | null = null
     transactions: StockTransaction[] = []
     currentCost: number | null = null
@@ -117,13 +120,13 @@ export class StockTradingSimulatorComponent implements OnInit {
 
     update() {
 
-        var data = {
+        const data = {
             stopPrice: this.stopPrice,
             transactions: this.transactions,
             currentCost: this.currentCost,
             ticker: this.ticker,
             riskedAmount: this.riskedAmount
-        }
+        };
 
         localStorage.setItem('simulations', JSON.stringify(data))
 
@@ -131,7 +134,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     }
 
     calculateRiskedAmount() {
-        var r = this.averageCostPerShare - this.stopPrice
+        const r = this.averageCostPerShare - this.stopPrice;
         this.riskedAmount = Math.round(r * this.numberOfShares * 100) / 100
 
         this.updateRiskParameters()
@@ -140,7 +143,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     }
 
     updateRiskParameters() {
-        var r = this.averageCostPerShare - this.stopPrice
+        const r = this.averageCostPerShare - this.stopPrice;
         this.r1 = this.averageCostPerShare + r
         this.r2 = this.averageCostPerShare + r * 2
         this.r4 = this.averageCostPerShare + r * 4
@@ -156,6 +159,8 @@ export class StockTradingSimulatorComponent implements OnInit {
             this.positions = entries.current;
             this.filteredPositions = entries.current;
             this.showExisting = true
+        }, error => {
+            this.errors = GetErrors(error)
         })
     }
 

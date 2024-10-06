@@ -14,6 +14,7 @@ export class OptionsComponent implements OnInit {
     loaded: boolean = false;
 
     activeTab: string = 'open'
+    errors: string[] = null
 
     constructor(
         private service: StocksService,
@@ -30,6 +31,8 @@ export class OptionsComponent implements OnInit {
         this.service.getOptions().subscribe(result => {
             this.optionsContainer = result
             this.loaded = true
+        }, error => {
+            this.errors = error
         })
     }
 

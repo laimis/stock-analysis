@@ -1,5 +1,6 @@
 <nav class="navbar navbar-light navbar-color navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
+        <app-error-display [errors]="errors"></app-error-display>
         @if (isLoggedIn) {
             <a
                 class="nav-link"

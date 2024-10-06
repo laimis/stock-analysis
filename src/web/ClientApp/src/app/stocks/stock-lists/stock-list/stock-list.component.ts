@@ -30,6 +30,8 @@ export class StockListComponent implements OnInit {
             const id = params['id']
             this.loadList(id);
             this.loadMonitors()
+        }, error => {
+            this.errors = GetErrors(error);
         })
     }
 
@@ -37,13 +39,13 @@ export class StockListComponent implements OnInit {
         this.stockService.removeFromStockList(this.list.id, ticker.ticker).subscribe(list => {
                 this.list = list
             }, e => {
-                console.error(e);
+                this.errors = GetErrors(e);
             }
         );
     }
 
     add(tickers: string, controlToHide: HTMLElement) {
-        var separator = '\n';
+        let separator = '\n';
         if (tickers.includes(',')) {
             separator = ',';
         }
@@ -79,7 +81,7 @@ export class StockListComponent implements OnInit {
         this.stockService.clearStockList(this.list.id).subscribe(_ => {
             this.loadList(this.list.id)
         }, e => {
-            console.error(e);
+            this.errors = GetErrors(e);
         });
     }
 
@@ -87,7 +89,7 @@ export class StockListComponent implements OnInit {
         this.stockService.assignTagToStockList(this.list.id, tag).subscribe(_ => {
             this.loadList(this.list.id)
         }, e => {
-            console.error(e);
+            this.errors = GetErrors(e);
         });
     }
 
@@ -99,7 +101,7 @@ export class StockListComponent implements OnInit {
         this.stockService.removeTagFromStockList(this.list.id, tag).subscribe(_ => {
             this.loadList(this.list.id)
         }, e => {
-            console.error(e);
+            this.errors = GetErrors(e);
         });
     }
 
@@ -107,7 +109,7 @@ export class StockListComponent implements OnInit {
         this.stockService.updateStockList(this.list.id, name, description).subscribe(_ => {
             this.loadList(this.list.id)
         }, e => {
-            console.error(e);
+            this.errors = GetErrors(e);
         });
     }
 
@@ -118,7 +120,7 @@ export class StockListComponent implements OnInit {
             this.exportLink = this.getExportLink(list, false)
             this.exportLinkJustTickers = this.getExportLink(list, true)
         }, e => {
-            console.error(e);
+            this.errors = GetErrors(e);
         });
     }
 
@@ -153,7 +155,7 @@ export class StockListComponent implements OnInit {
                     this.addTickersToList(tickerArray.slice(1))
                 },
                 e => {
-                    console.error(e);
+                    this.errors = GetErrors(e);
                     this.addTickersToList(tickerArray.slice(1))
                 }
             );

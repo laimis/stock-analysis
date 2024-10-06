@@ -19,7 +19,7 @@
                 Initiate Position
                 <span class="float-end fs-6">max loss: {{ maxLoss | currency }}</span>    
             </h5>
-            
+        <app-error-display [errors]="errors"></app-error-display>    
         @if (!presetTicker) {
             <div class="row mb-3">
                 <div class="col">

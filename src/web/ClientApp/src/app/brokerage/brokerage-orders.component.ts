@@ -80,9 +80,7 @@ export class BrokerageOrdersComponent {
             .subscribe(
                 () => {
                     this.brokerage.brokerageAccount().subscribe(
-                        a => {
-                            this.orders = a.orders
-                        },
+                        a => { this.orders = a.orders },
                         err => this.errors = GetErrors(err)
                     )
                     this.ordersChanged.emit()

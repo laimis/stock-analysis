@@ -1,10 +1,8 @@
-@if (!loaded) {
-    <div>
-        Loading...
-    </div>
-}
-@if (loaded) {
-    <div class="tab-container mt-2">
+<div class="container">
+    <app-loading *ngIf="!loaded"></app-loading>
+    <app-error-display [errors]="errors"></app-error-display>
+    
+    <div *ngIf="loaded" class="tab-container mt-2">
         <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
             Open Positions
         </a>
@@ -25,7 +23,7 @@
             Performance
         </a>
     </div>
-}
+
 @if (loaded && isActive('open')) {
     <app-option-open [openOptions]=optionsContainer.open></app-option-open>
 }
@@ -47,3 +45,4 @@
         [sellStats]="optionsContainer.sellStats">
     </app-option-performance>
 }
+</div>

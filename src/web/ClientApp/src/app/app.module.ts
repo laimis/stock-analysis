@@ -193,6 +193,7 @@ let routes: Routes = [
         AdminEmailComponent,
         AdminWeeklyComponent,
         AdminUsersComponent,
+        AdminDashboardComponent,
         AppComponent,
         ContactComponent,
         DashboardComponent,

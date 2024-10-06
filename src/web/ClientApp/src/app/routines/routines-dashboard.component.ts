@@ -49,6 +49,9 @@ export class RoutineDashboardComponent implements OnInit {
         this.service.getRoutines().subscribe(
             data => {
                 this.routines = data;
+            },
+            err => {
+                this.errors = GetErrors(err)
             }
         );
     }

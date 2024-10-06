@@ -29,6 +29,7 @@ import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.co
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
 import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
 import {GapsComponent} from "../../shared/reports/gaps.component";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-stock-trading-new-position',
@@ -46,7 +47,8 @@ import {GapsComponent} from "../../shared/reports/gaps.component";
         LineChartComponent,
         NgIf,
         CandlestickChartComponent,
-        GapsComponent
+        GapsComponent,
+        ErrorDisplayComponent
     ],
     standalone: true
 })
@@ -100,6 +102,7 @@ export class StockTradingNewPositionComponent {
     chartStop: number = null;
     gaps: StockGaps
     atr: number
+    errors: string[] = []
     protected readonly atrMultiplier = 2;
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
@@ -114,6 +117,8 @@ export class StockTradingNewPositionComponent {
             if (value.maxLoss) {
                 this.maxLoss = value.maxLoss
             }
+        }, error => {
+            this.errors = GetErrors(error)
         })
     }
 
@@ -142,7 +147,7 @@ export class StockTradingNewPositionComponent {
                     this.fetchAndRenderPriceRelatedInformation(ticker)
                     this.lookupPendingPosition(ticker)
                 }, error => {
-                    console.error(error)
+                    this.errors = GetErrors(error)
                 }
             );
 
@@ -157,7 +162,7 @@ export class StockTradingNewPositionComponent {
                     }
                     
                 }, error => {
-                    console.error(error)
+                    this.errors = GetErrors(error)
                 }
             );
     }
@@ -377,6 +382,9 @@ export class StockTradingNewPositionComponent {
                     this.strategy = position.strategy
                     this.updateBuyingValuesPositionStopPrice()
                 }
+            },
+            errors => {
+                this.errors = GetErrors(errors)
             }
         )
     }

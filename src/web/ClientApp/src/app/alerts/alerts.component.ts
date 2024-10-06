@@ -1,7 +1,7 @@
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
 import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService} from 'src/app/services/stocks.service';
-import {toggleVisuallyHidden} from '../services/utils';
+import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 
 
 type StockAlertGroup = {
@@ -27,6 +27,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     selectedSourceList = 'All'
     recentlyTriggeredExpanded = false;
     sourceLists: string[] = []
+    errors: string[] = null
 
     @Input()
     hideRecentTriggered: boolean = false;
@@ -75,6 +76,8 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
             container.alerts.forEach(a => a.sourceLists.forEach(s => uniqueSourceLists.add(s)))
             this.sourceLists = Array.from(uniqueSourceLists)
             this.createGroups();
+        }, error => {
+            this.errors = GetErrors(error)
         });
     }
     createGroups() {
@@ -118,6 +121,9 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
                 console.log("scheduled")
                 this.scheduled = true
             },
+            error => {
+                this.errors = GetErrors(error)
+            }
         );
     }
 

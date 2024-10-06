@@ -1,4 +1,5 @@
 <div>
+    <app-error-display [errors]="errors"></app-error-display>
     <div class="row">
         <div class="col">
             <select (ngModelChange)="breakdownSelected($event)" [(ngModel)]="groupBy" class="form-select filterDropdown" id="breakdownFilter"

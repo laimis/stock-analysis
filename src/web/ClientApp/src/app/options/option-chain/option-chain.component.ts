@@ -64,7 +64,6 @@ export class OptionChainComponent implements OnInit {
         }, error => {
             this.errors = GetErrors(error)
             this.loading = false
-            console.log("failed: " + error);
         })
     }
 

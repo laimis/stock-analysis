@@ -45,6 +45,8 @@ export class StockTradingSimulationsComponent implements OnInit {
                 this.numberOfTrades = parseInt(n);
             }
 
+        }, error => {
+            this.errors = GetErrors(error);
         });
     }
     
@@ -117,7 +119,7 @@ export class StockTradingSimulationsComponent implements OnInit {
             },
             error => {
                 // Handle any errors that occurred
-                console.error('Error fetching benchmark prices:', error);
+                this.errors = GetErrors(error);
             }
         );
     }

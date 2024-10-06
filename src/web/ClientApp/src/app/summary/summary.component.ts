@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {PositionInstance, ReviewList, StocksService} from '../services/stocks.service';
+import {GetErrors} from "../services/utils";
 
 @Component({
     selector: 'app-review',
@@ -11,6 +12,7 @@ export class SummaryComponent implements OnInit {
     result: ReviewList
     loaded: boolean = false
     timePeriod: string = 'thisweek'
+    errors: string[] = []
 
     constructor(
         private stockService: StocksService,
@@ -47,7 +49,8 @@ export class SummaryComponent implements OnInit {
         this.stockService.getTransactionSummary(this.timePeriod).subscribe((r: ReviewList) => {
             this.loaded = true
             this.result = r
-        }, _ => {
+        }, error => {
+            this.errors = GetErrors(error)
             this.loaded = true
         })
     }

@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {GlobalService} from '../services/global.service';
+import {GetErrors} from "../services/utils";
 
 @Component({
     selector: 'app-nav-menu',
@@ -9,6 +10,7 @@ import {GlobalService} from '../services/global.service';
 })
 export class NavMenuComponent {
     isLoggedIn = false
+    errors: string[] = null
 
     links = [
         {path: '/trading', label: 'Positions'},
@@ -27,14 +29,21 @@ export class NavMenuComponent {
         public globalService: GlobalService,
         private router: Router
     ) {
-        this.globalService.accountStatusFeed.subscribe((value) => {
-            this.isLoggedIn = value.loggedIn;
-        });
+        this.globalService.accountStatusFeed.subscribe(
+            (value) => {
+                this.isLoggedIn = value.loggedIn;
+            },
+            (error) => {
+                this.errors = GetErrors(error);
+            }
+        );
 
         this.router.events.subscribe((val) => {
             if (val instanceof NavigationEnd) {
                 this.currentPath = val.url;
             }
+        }, (error) => {
+            this.errors = GetErrors(error);
         })
     }
 

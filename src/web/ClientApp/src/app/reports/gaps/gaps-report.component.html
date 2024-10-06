@@ -1,11 +1,5 @@
 <div>
-    @if (error) {
-        <div>
-            <div class="alert alert-danger" role="alert">
-                <p>{{ error }}</p>
-            </div>
-        </div>
-    }
+    <app-error-display [errors]="errors"></app-error-display>
     @if (gaps) {
         <h5>Gaps for {{ gaps.ticker }}</h5>
         <app-gaps [gaps]="gaps"></app-gaps>

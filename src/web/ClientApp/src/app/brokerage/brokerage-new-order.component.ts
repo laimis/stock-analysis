@@ -171,7 +171,6 @@ export class BrokerageNewOrderComponent {
                 this.submittingOrder = false
                 this.submittedOrder = true
                 this.errors = GetErrors(err)
-                console.error(err)
             }
         )
     }

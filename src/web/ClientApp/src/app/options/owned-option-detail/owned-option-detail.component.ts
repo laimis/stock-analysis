@@ -45,6 +45,8 @@ export class OwnedOptionComponent implements OnInit {
             this.positionType = this.option.boughtOrSold == 'Bought' ? 'sell' : 'buy'
             this.numberOfContracts = this.option.numberOfContracts
             this.title.setTitle(this.option.ticker + " " + this.option.strikePrice + " " + this.option.optionType + " - Nightingale Trading")
+        }, error => {
+            this.errors = GetErrors(error)
         })
     }
 

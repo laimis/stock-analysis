@@ -171,6 +171,8 @@ export class TrendsReportComponent implements OnInit {
                 let tickers = params['tickers'].split(',');
                 this.loadSummary(tickers)
             }
+        }, error => {
+            this.errors = GetErrors(error);
         });
     }
     
