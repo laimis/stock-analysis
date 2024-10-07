@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {CurrencyPipe, DecimalPipe, NgForOf, NgIf, PercentPipe} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {OptionChain, OptionDefinition, StocksService} from "../../services/stocks.service";
 import {ActivatedRoute} from "@angular/router";
@@ -25,7 +25,8 @@ interface OptionLeg {
         NgIf,
         PercentPipe,
         LoadingComponent,
-        ErrorDisplayComponent
+        ErrorDisplayComponent,
+        NgClass
     ],
   templateUrl: './option-spread-builder.component.html',
   styleUrl: './option-spread-builder.component.css'

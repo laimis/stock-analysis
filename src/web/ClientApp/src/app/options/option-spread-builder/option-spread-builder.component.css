@@ -1,11 +1,12 @@
-.container {
-    margin-top: 20px;
+.sortable {
+    cursor: pointer;
 }
 
-.table {
-    font-size: 0.9rem;
+.sortable:hover {
+    background-color: #f8f9fa;
 }
 
-.list-group-item {
-    font-size: 0.9rem;
+.table-responsive {
+    max-height: 600px;
+    overflow-y: auto;
 }
