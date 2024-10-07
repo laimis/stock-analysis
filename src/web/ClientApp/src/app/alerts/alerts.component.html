@@ -1,6 +1,7 @@
  <div>
      <app-error-display [errors]="errors"></app-error-display>
-    <section>
+     @if (container) {
+    <section *ngIf="container">
         @if (!hideScheduling) {
             <button class="btn btn-primary me-2" (click)="scheduleRun()">
                 Schedule Check
@@ -29,7 +30,7 @@
         }
     </section>
     <section #messagesSection class="visually-hidden">
-        <table class="table table-hover">
+        <table class="table table-hover" *ngIf="container && container.messages">
             <thead>
             <tr>
                 <th>Message</th>
@@ -176,4 +177,5 @@ class="stat-label">Triggered value of</span> {{ getValue(alert.triggeredValue, a
             No recent triggers
         </div>
     }
+     }
 </div>
