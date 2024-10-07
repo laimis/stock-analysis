@@ -167,9 +167,6 @@ type PatternMonitoringService(
     portfolio:IPortfolioStorage,
     logger:ILogger) =
 
-    let listOfChecks = List<PatternCheck>()
-    let priceCache = Dictionary<Ticker, PriceBars>()
-
     let generateAlertListForUser (emailIdPair:EmailIdPair) = async {
         let! user = emailIdPair.Id |> accounts.GetUser |> Async.AwaitTask
 
@@ -216,8 +213,6 @@ type PatternMonitoringService(
     }
 
     let generatePatternMonitoringChecks() = task {
-        listOfChecks.Clear()
-
         let! users = accounts.GetUserEmailIdPairs()
 
         let! alertListOps =
@@ -228,33 +223,26 @@ type PatternMonitoringService(
 
         let allAlerts = alertListOps |> Seq.concat
 
-        listOfChecks.AddRange(allAlerts)
-
-        container.AddNotice($"Pattern check generator added {listOfChecks.Count}")
+        return allAlerts
     }
 
     let getPrices (logger:ILogger) (user:UserState) ticker = task {
 
-        match priceCache.TryGetValue(ticker) with
-        | true, prices ->
-            return prices |> Ok
-        | _ ->
-            let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365)) |> Some
-            let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow) |> Some
+        let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays(-365)) |> Some
+        let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow) |> Some
 
-            let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
+        let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
 
-            match prices with
-            | Error err ->
-                logger.LogError($"Pattern monitor could not get price history for {ticker}: {err.Message}")
-            | Ok response ->
-                // see how many bars did we get, I suspect we get only one bar from time to time
-                match response.Length with
-                | x when x <= 1 -> logger.LogWarning($"Pattern monitor got only {response.Length} bars for {ticker}")
-                | _ -> ()
-                priceCache.Add(ticker, response)
-
-            return prices
+        match prices with
+        | Error err ->
+            logger.LogError($"Pattern monitor could not get price history for {ticker}: {err.Message}")
+        | Ok response ->
+            // see how many bars did we get, I suspect we get only one bar from time to time
+            match response.Length with
+            | x when x <= 1 -> logger.LogWarning($"Pattern monitor got only {response.Length} bars for {ticker}")
+            | _ -> ()
+    
+        return prices
     }
 
     let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
@@ -288,18 +276,16 @@ type PatternMonitoringService(
                     return Some (alertCheck,patterns.Length)
     }
 
-    let runThroughMonitoringChecks logger = task {
-        let startingNumberOfChecks = listOfChecks.Count
+    let runThroughMonitoringChecks (logger:ILogger) = task {
         
-        match startingNumberOfChecks with
-        | 0 ->
-            container.AddNotice("Pattern monitoring checks starting")
-            do! generatePatternMonitoringChecks()
-        | _ ->
-            container.AddNotice("Pattern monitoring checks continuing with " + startingNumberOfChecks.ToString())
+        logger.LogInformation("Running pattern monitoring checks")
+        
+        let! alertsToCheck = generatePatternMonitoringChecks()
+        
+        logger.LogInformation($"Generated {alertsToCheck |> Seq.length} pattern monitoring checks")
         
         let! checks =
-            listOfChecks
+            alertsToCheck
             |> Seq.map (runCheck logger)
             |> Async.Sequential
             |> Async.StartAsTask
@@ -308,17 +294,15 @@ type PatternMonitoringService(
 
         let completedChecks = completedChecksWithCounts |> Seq.map fst
 
-        completedChecks |> Seq.iter (fun kp -> listOfChecks.Remove(kp) |> ignore)
-
         let totalPatternsFoundCount = completedChecksWithCounts |> Seq.map snd |> Seq.sum
 
-        match listOfChecks.Count with
-        | 0 ->
-            priceCache.Clear()
-            if startingNumberOfChecks > 0 then
-                container.AddNotice($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
-        | _ ->
-            container.AddNotice($"{completedChecks |> Seq.length} pattern monitoring checks completed, {listOfChecks.Count} remaining")
+        logger.LogInformation($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
+        
+        container.AddNotice($"Pattern monitoring checks completed with {totalPatternsFoundCount} patterns found")
+        
+        logger.LogInformation($"{completedChecks |> Seq.length} pattern monitoring checks completed")
+        
+        container.AddNotice($"{completedChecks |> Seq.length} pattern monitoring checks completed")
     }
 
     interface IApplicationService
