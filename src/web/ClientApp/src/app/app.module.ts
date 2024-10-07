@@ -131,8 +131,8 @@ let routes: Routes = [
     {path: 'options', component: OptionsComponent, canActivate: [AuthGuard]},
     {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
     {path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard]},
-    {path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard]},
-    {path: 'options/chain2/:ticker', component: OptionSpreadBuilderComponent, canActivate: [AuthGuard]},
+    {path: 'options/chainold/:ticker', component: OptionChainComponent, canActivate: [AuthGuard]},
+    {path: 'options/chain/:ticker', component: OptionSpreadBuilderComponent, canActivate: [AuthGuard]},
     {path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
 
     {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
