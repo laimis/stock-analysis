@@ -1,12 +1,37 @@
 <div class="container-fluid mt-4">
     <app-error-display [errors]="errors"></app-error-display>
 
-    <h2 class="mb-4">Option Trade Builder - {{ ticker }}
-        <span *ngIf="optionChain" class="badge bg-secondary">{{optionChain.stockPrice | currency}}</span>
-    </h2>
-
+    <h2 class="mb-4">Option Trade Builder</h2>
     <app-loading *ngIf="!optionChain"></app-loading>
 
+    <div class="row" *ngIf="optionChain">
+        <div class="col">
+            <table class="table border">
+                <thead class="thead-light">
+                <tr>
+                    <th>Stock Price</th>
+                    <th>Put vs Call OI</th>
+                    <th>Put vs Call OI Ratio</th>
+                    <th>Put vs Call Vol</th>
+                    <th>Put vs Call Vol Ratio</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <app-stock-link-and-tradingview-link [ticker]="ticker"></app-stock-link-and-tradingview-link>
+                        <span class="ms-2">{{ optionChain.stockPrice | currency }}</span>
+                    </td>
+                    <td>{{ putOpenInterest() | number }} vs {{ callOpenInterest() | number }}</td>
+                    <td>{{ putOpenInterest() / callOpenInterest() | number }}</td>
+                    <td>{{ putVolume() | number }} vs {{ callVolume() | number }}</td>
+                    <td>{{ putVolume() / callVolume() | number }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
     <div class="row" *ngIf="optionChain">
         <div class="col-lg-8">
             <div class="card mb-4">

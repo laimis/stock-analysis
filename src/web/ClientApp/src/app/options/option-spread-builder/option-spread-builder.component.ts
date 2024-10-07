@@ -6,6 +6,7 @@ import {ActivatedRoute} from "@angular/router";
 import {GetErrors} from "../../services/utils";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 
 interface OptionLeg {
     option: OptionDefinition;
@@ -26,7 +27,8 @@ interface OptionLeg {
         PercentPipe,
         LoadingComponent,
         ErrorDisplayComponent,
-        NgClass
+        NgClass,
+        StockLinkAndTradingviewLinkComponent
     ],
   templateUrl: './option-spread-builder.component.html',
   styleUrl: './option-spread-builder.component.css'
@@ -65,6 +67,22 @@ export class OptionSpreadBuilderComponent implements OnInit {
     optionChain: OptionChain;
 
     errors: string[] = [];
+
+    putOpenInterest() {
+        return this.options.filter(x => x.optionType == "put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+    }
+
+    callOpenInterest() {
+        return this.options.filter(x => x.optionType == "call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+    }
+
+    putVolume() {
+        return this.options.filter(x => x.optionType == "put").map(x => x.volume).reduce((a, b) => a + b, 0)
+    }
+
+    callVolume() {
+        return this.options.filter(x => x.optionType == "call").map(x => x.volume).reduce((a, b) => a + b, 0)
+    }
 
     loadOptions(ticker:string): void {
         this.stockService.getOptionChain(ticker).subscribe(
