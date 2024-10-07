@@ -1,5 +1,6 @@
 <div>
-    <!-- <app-error-display [errors]="errors"></app-error-display>
+
+    <app-error-display [errors]="errors"></app-error-display>
 
     <button (click)="run()" class="btn btn-primary">Multiple API call demo</button>
 
@@ -43,101 +44,6 @@
             <app-loading *ngIf="loadingCombinedDailyChart"></app-loading>
             <app-daily-outcome-scores *ngIf="dailyReport" [report]="dailyReport"></app-daily-outcome-scores>
         </div>
-    </div> -->
-
-    <h2>Option Trade Builder - {{ ticker }} <span *ngIf="optionChain">{{optionChain.stockPrice}}</span></h2>
-  
-  <div class="row">
-    <div class="col-md-8">
-      <h3>Option Chain</h3>
-      <div class="mb-3">
-        <label for="expirationFilter" class="mr-2">Expiration:</label>
-        <select id="expirationFilter" [(ngModel)]="filterExpiration" (change)="applyFiltersAndSort()">
-          <option value="">All</option>
-          <option *ngFor="let exp of getUniqueExpirations()" [value]="exp">{{ exp }}</option>
-        </select>
-      
-        <label for="typeFilter" class="ml-3 mr-2">Type:</label>
-        <select id="typeFilter" [(ngModel)]="filterType" (change)="applyFiltersAndSort()">
-          <option value="all">All</option>
-          <option value="call">Call</option>
-          <option value="put">Put</option>
-        </select>
-      </div>
-
-      <table class="table table-striped table-sm">
-        <thead>
-          <tr>
-            <th (click)="setSort('strike')">Strike</th>
-            <th (click)="setSort('expiration')">Expiration</th>
-            <th>Type</th>
-            <th>Bid</th>
-            <th>Ask</th>
-            <th>Last</th>
-            <th>Volume</th>
-            <th>OI</th>
-            <th>IV</th>
-            <th>Delta</th>
-            <th>Gamma</th>
-            <th>Theta</th>
-            <th>Vega</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let option of filteredOptions">
-            <td>{{ option.strikePrice }}</td>
-            <td>{{ option.expirationDate }}</td>
-            <td>{{ option.side }}</td>
-            <td>{{ option.bid | currency }}</td>
-            <td>{{ option.ask | currency }}</td>
-            <td> Need Last </td>
-            <td>{{ option.volume | number }}</td>
-            <td>{{ option.openInterest | number }}</td>
-            <td>{{ option.volatility| percent:'.2' }}</td>
-            <td>{{ option.delta | number:'.2' }}</td>
-            <td>{{ option.gamma | number:'.2' }}</td>
-            <td>{{ option.theta | number:'.2' }}</td>
-            <td>{{ option.vega | number:'.2' }}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" (click)="addLeg(option)">Add</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
     
-    <div class="col-md-4">
-      <h3>Selected Legs</h3>
-      <ul class="list-group">
-        <li *ngFor="let leg of selectedLegs; let i = index" class="list-group-item">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <select [(ngModel)]="leg.action" (change)="updateLegAction(i, leg.action)">
-                <option value="buy">Buy</option>
-                <option value="sell">Sell</option>
-              </select>
-              <input type="number" [(ngModel)]="leg.quantity" (change)="updateLegQuantity(i, leg.quantity)" min="1" style="width: 60px;">
-              {{ leg.option.side }} {{ leg.option.strikePrice }} {{ leg.option.expirationDate }}
-            </div>
-            <button class="btn btn-sm btn-danger" (click)="removeLeg(i)">Remove</button>
-          </div>
-        </li>
-      </ul>
-      <div class="mt-3">
-        <h4>Trade Summary</h4>
-        <p>Total Cost: {{ calculateTotalCost() | currency }}</p>
-        <p>Max Profit: {{ calculateMaxProfit() === Infinity ? 'Unlimited' : (calculateMaxProfit() | currency) }}</p>
-        <p>Max Loss: {{ calculateMaxLoss() === Infinity ? 'Unlimited' : (calculateMaxLoss() | currency) }}</p>
-        <p>Break-even Point(s): {{ calculateBreakEven().join(', ') }}</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="row mt-3">
-    <div class="col-md-12">
-      <h4>Payoff Diagram</h4>
-      <!-- <app-payoff-diagram [selectedLegs]="selectedLegs"></app-payoff-diagram> -->
-    </div>
-  </div>
 </div>

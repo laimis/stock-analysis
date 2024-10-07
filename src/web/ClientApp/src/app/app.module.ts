@@ -107,6 +107,7 @@ import {StockTradingNewPositionComponent} from "./stocks/stock-trading/stock-tra
 import {StockTradingDashboardComponent} from "./stocks/stock-trading/stock-trading-dashboard.component";
 import {ParsedDatePipe} from "./services/parsedDate.filter";
 import {AccountTransactionsComponent} from "./profile/account-transactions.component";
+import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
 
 
 let routes: Routes = [
@@ -131,6 +132,7 @@ let routes: Routes = [
     {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
     {path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard]},
     {path: 'options/chain/:ticker', component: OptionChainComponent, canActivate: [AuthGuard]},
+    {path: 'options/chain2/:ticker', component: OptionSpreadBuilderComponent, canActivate: [AuthGuard]},
     {path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
 
     {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},

@@ -36,7 +36,7 @@ public static class Jobs
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PatternMonitoringService),
                 methodCall: service => service.RunPatternMonitoring(),
-                cronExpression: "45 6-13 * * 1-5"  // 6:45am to 1:45pm
+                cronExpression: "45 6-13 * * 1-5"  // 6:45am to 1:45pm Monday through Friday
             );
             BackgroundJob.Schedule<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 service => service.RunPatternMonitoring(),
