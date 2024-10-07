@@ -61,6 +61,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filterType: 'all' | 'call' | 'put' = 'all';
     filterVolumeOI: 'all' | 'notzero' = 'notzero';
     filterSide: 'all' | 'put' | 'call' = 'all';
+    filterMinimumStrike: number = 0;
     optionChain: OptionChain;
 
     errors: string[] = [];
@@ -82,8 +83,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
         this.filteredOptions = this.options.filter(option => {
             return (this.filterExpiration === '' || option.expirationDate === this.filterExpiration) &&
                 (this.filterType === 'all' || option.side === this.filterType) &&
-                (this.filterVolumeOI === 'all' || (option.volume > 0 && option.openInterest > 0)) &&
-                (this.filterSide === 'all' || option.side === this.filterSide);
+                (this.filterVolumeOI === 'all' || (option.volume > 0 || option.openInterest > 0)) &&
+                (this.filterSide === 'all' || option.side === this.filterSide) &&
+                option.strikePrice >= this.filterMinimumStrike;
         });
 
         this.filteredOptions.sort((a, b) => {

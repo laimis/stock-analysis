@@ -1092,7 +1092,8 @@ export interface BrokerageStockPositionInstance {
 
 export interface BrokerageAccount {
     stockPositions: BrokerageStockPositionInstance[]
-    orders: BrokerageStockOrder[]
+    stockOrders: BrokerageStockOrder[]
+    optionOrders: BrokerageOptionOrder[]
     cashBalance: number
     equity: number
     longMarketValue: number

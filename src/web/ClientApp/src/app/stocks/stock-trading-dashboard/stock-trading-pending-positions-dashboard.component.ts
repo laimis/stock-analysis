@@ -49,7 +49,7 @@ export class StockTradingPendingPositionsDashboardComponent implements OnInit {
 
     getOrders() {
         this.brokerage.brokerageAccount().subscribe(account => {
-            this.orders = account.orders
+            this.orders = account.stockOrders
         }, error => {
             this.feedbackMessage = GetErrors(error)[0]
         })

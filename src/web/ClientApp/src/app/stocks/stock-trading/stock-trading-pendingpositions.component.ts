@@ -61,7 +61,7 @@ export class StockTradingPendingPositionsComponent implements OnInit {
 
         this.brokerage.brokerageAccount().subscribe(
             (data) => {
-                this.orders = data.orders;
+                this.orders = data.stockOrders;
                 this.loading.orders = false;
             }, err => {
                 console.log(err)

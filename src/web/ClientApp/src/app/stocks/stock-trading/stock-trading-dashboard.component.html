@@ -79,18 +79,18 @@
     }
     @if (isActive('positions') && positions) {
         <app-stock-trading-positions [positions]=sortedPositions [metricFunc]="metricFunc" [metricType]="metricType"
-                                     [orders]="brokerageAccount.orders" [quotes]="quotes"
+                                     [orders]="brokerageAccount.stockOrders" [quotes]="quotes"
                                      (notesChanged)="refresh()"
                                      (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
     }
     @if (isActive('openreview')) {
-        <app-stock-trading-review [orders]="brokerageAccount.orders" [positions]=sortedPositions [quotes]="quotes"
+        <app-stock-trading-review [orders]="brokerageAccount.stockOrders" [positions]=sortedPositions [quotes]="quotes"
                                   (brokerageOrdersChanged)="refresh()"></app-stock-trading-review>
     }
     @if (isActive('violations')) {
         <app-stock-violations
             [violations]="violations"
-            [orders]="brokerageAccount.orders"
+            [orders]="brokerageAccount.stockOrders"
             (refreshRequested)="refresh()"
         ></app-stock-violations>
     }

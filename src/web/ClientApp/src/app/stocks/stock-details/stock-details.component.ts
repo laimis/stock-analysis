@@ -97,7 +97,7 @@ export class StockDetailsComponent implements OnInit {
         this.brokerage.brokerageAccount().subscribe(
             a => {
                 this.loading.orders = false
-                this.orders = a.orders
+                this.orders = a.stockOrders
             },
             e => {
                 this.loading.orders = false
@@ -106,12 +106,12 @@ export class StockDetailsComponent implements OnInit {
         )
     }
 
-    brokerageOrderEntered(ticker: string) {
+    brokerageOrderEntered(_: string) {
         this.loadStockOwnership()
         this.loadOrders()
     }
     
-    notesChanged(notes: string) {
+    notesChanged(_: string) {
         this.loadStockOwnership()
     }
 

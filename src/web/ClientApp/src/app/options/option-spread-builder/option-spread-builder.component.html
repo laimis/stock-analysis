@@ -11,7 +11,6 @@
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Filters</h5>
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label for="expirationFilter" class="form-label">Expiration:</label>
@@ -43,6 +42,10 @@
                                 <option value="call">Call</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="minimumStrike" class="form-label">Minimum Strike:</label>
+                        <input id="minimumStrike" type="number" class="form-control" [(ngModel)]="filterMinimumStrike" (change)="applyFiltersAndSort()">
                     </div>
                 </div>
             </div>
@@ -77,7 +80,7 @@
                         <td>{{ option.volume | number }}</td>
                         <td>{{ option.openInterest | number }}</td>
                         <td>{{ option.volatility | number:'.2' }}</td>
-                        <td>
+                        <td colspan="4">
                             <small>
                                 d: {{ option.delta | number:'.2' }}
                                 g: {{ option.gamma | number:'.2' }}
