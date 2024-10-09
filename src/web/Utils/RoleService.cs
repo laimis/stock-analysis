@@ -1,5 +1,6 @@
 using core.Account;
 using core.fs.Adapters.Authentication;
+using Hangfire.Dashboard;
 
 namespace web.Utils;
 
@@ -15,4 +16,14 @@ public class RoleService : IRoleService
     public bool IsAdmin(UserState user) => user.Email == _adminEmail;
 
     public string GetAdminEmail() => _adminEmail;
+}
+
+public class MyAuthorizationFilter : IDashboardAuthorizationFilter
+{
+    public bool Authorize(DashboardContext context)
+    {
+        var httpContext = context.GetHttpContext();
+
+        return httpContext.User.Identity?.IsAuthenticated ?? false;
+    }
 }

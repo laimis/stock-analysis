@@ -125,6 +125,7 @@ namespace web
             {
                 endpoints.MapHealthChecks("/health");
                 endpoints.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions{Authorization = new[] {new MyAuthorizationFilter()}});
                 endpoints.MapFallbackToFile("index.html");
             });
 

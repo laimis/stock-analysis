@@ -16,8 +16,6 @@ public static class Jobs
         
         if (BackendJobsEnabled(configuration))
         {
-            app.UseHangfireDashboard();
-         
             logger.LogInformation("Backend jobs turned on");
             
             var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
@@ -110,9 +108,10 @@ public static class Jobs
 
     public static void AddJobs(IConfiguration configuration, IServiceCollection services, ILogger logger)
     {
+        services.AddHangfire(config => { config.UseDashboardMetrics(); });
+
         if (BackendJobsEnabled(configuration))
         {
-            services.AddHangfire(config => { config.UseDashboardMetrics(); });
             services.AddHangfireServer();
         }
         else
