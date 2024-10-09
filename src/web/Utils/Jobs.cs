@@ -34,7 +34,8 @@ public static class Jobs
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PatternMonitoringService),
                 methodCall: service => service.RunPatternMonitoring(),
-                cronExpression: "45 6-13 * * 1-5"  // 6:45am to 1:45pm Monday through Friday
+                cronExpression: "45 6-13 * * 1-5",
+                options: rjo// 6:45am to 1:45pm Monday through Friday,
             );
             BackgroundJob.Schedule<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 service => service.RunPatternMonitoring(),
@@ -92,7 +93,8 @@ public static class Jobs
             RecurringJob.AddOrUpdate<MonitoringServices.PortfolioAnalysisService>(
                 recurringJobId: nameof(MonitoringServices.PortfolioAnalysisService.ReportOnMaxProfitBasedOnDaysHeld),
                 methodCall: service => service.ReportOnMaxProfitBasedOnDaysHeld(),
-                cronExpression: Cron.Weekly(DayOfWeek.Saturday, 8));
+                cronExpression: Cron.Weekly(DayOfWeek.Saturday, 8),
+                options: rjo);
         }
         else
         {
