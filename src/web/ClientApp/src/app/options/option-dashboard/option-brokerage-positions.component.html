@@ -1,11 +1,11 @@
 <section class="mt-4">
     <h3>Unresolved Brokerage Positions</h3>
-    @if (positions && positions.length === 0) {
+    @if (positionCollections && positionCollections.length === 0) {
         <div>
             No unresolved option positions found
         </div>
     }
-    @if (positions && positions.length > 0) {
+    @if (positionCollections && positionCollections.length > 0) {
         <table class="table table-hover">
             <thead>
             <tr>
@@ -21,26 +21,35 @@
             </tr>
             </thead>
             <tbody>
-                @for (option of positions; track option) {
+                @for (option of positionCollections; track option) {
+                    @for(position of option.positions; track position) {
+                        <tr>
+                            <td>
+                                <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+                                <app-stock-link [ticker]="position.ticker"></app-stock-link>
+                            </td>
+                            <td>{{ position.strikePrice | currency }}</td>
+                            <td>{{ position.optionType }}</td>
+                            <td>{{ position.averageCost | currency }}</td>
+                            <td>{{ position.quantity | number }}</td>
+                            <td>{{ option.marketValue | currency }}</td>
+                            <td>{{ position.expirationDate | date }}</td>
+                            <td>
+                                <input type="date" #purchaseDate class="form-control" [valueAsDate]="getTodaysDate()"/>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" (click)="turnIntoPosition(position, purchaseDate.value)">Turn
+                                    into Position
+                                </button>
+                            </td>
+                        </tr>
+                    }
                     <tr>
-                        <td>
-                            <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
-                            <app-stock-link [ticker]="option.ticker"></app-stock-link>
-                        </td>
-                        <td>{{ option.strikePrice | currency }}</td>
-                        <td>{{ option.optionType }}</td>
-                        <td>{{ option.averageCost | currency }}</td>
-                        <td>{{ option.quantity | number }}</td>
-                        <td>{{ option.marketValue | currency }}</td>
-                        <td>{{ option.expirationDate | date }}</td>
-                        <td>
-                            <input type="date" #purchaseDate class="form-control" [valueAsDate]="getTodaysDate()"/>
-                        </td>
-                        <td>
-                            <button class="btn btn-primary" (click)="turnIntoPosition(option, purchaseDate.value)">Turn
-                                into Position
-                            </button>
-                        </td>
+                        <td colspan="3"></td>
+                        <td class="small">{{ option.cost | currency }}</td>
+                        <td></td>
+                        <td class="small">{{ option.marketValue | currency }}</td>
+                        <td colspan="3"></td>
                     </tr>
                 }
             </tbody>
