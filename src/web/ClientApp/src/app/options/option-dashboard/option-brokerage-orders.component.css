@@ -19,6 +19,10 @@
     background-color: #f8f9fa;
 }
 
+.brokerage-orders .list-group-item .text-muted {
+    font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
     .brokerage-orders .card-header .d-flex {
         flex-direction: column;
@@ -27,5 +31,14 @@
 
     .brokerage-orders .card-header .badge {
         margin-top: 0.5rem;
+    }
+
+    .brokerage-orders .list-group-item .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .brokerage-orders .list-group-item .text-muted {
+        margin-top: 0.25rem;
     }
 }

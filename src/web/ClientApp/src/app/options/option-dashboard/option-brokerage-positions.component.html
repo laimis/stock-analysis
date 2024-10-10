@@ -32,7 +32,7 @@
                             <td>{{ position.optionType }}</td>
                             <td>{{ position.averageCost | currency }}</td>
                             <td>{{ position.quantity | number }}</td>
-                            <td>{{ option.marketValue | currency }}</td>
+                            <td>{{ position.marketValue | currency }}</td>
                             <td>{{ position.expirationDate | date }}</td>
                             <td>
                                 <input type="date" #purchaseDate class="form-control" [valueAsDate]="getTodaysDate()"/>

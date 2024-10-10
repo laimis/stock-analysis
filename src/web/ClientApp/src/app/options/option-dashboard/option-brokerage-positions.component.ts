@@ -23,7 +23,7 @@ export class OptionBrokeragePositionsComponent {
     @Input()
     set positions(val: BrokerageOptionPosition[])
     {
-        this._positions = val
+    this._positions = val
         this.totalMarketValue = this._positions.reduce((acc, pos) => acc + pos.marketValue, 0)
         this.totalCost = this._positions.reduce((acc, pos) => acc + pos.averageCost * pos.quantity, 0) * 100
         

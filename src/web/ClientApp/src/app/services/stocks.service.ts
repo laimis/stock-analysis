@@ -1066,6 +1066,7 @@ export interface OptionOrderLeg {
     underlyingTicker : string
     instruction: string
     quantity: number
+    price: number
 }
 
 export interface BrokerageOptionOrder {

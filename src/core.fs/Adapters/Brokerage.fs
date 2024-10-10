@@ -127,6 +127,7 @@ type OptionLeg = {
     UnderlyingTicker : Ticker
     Instruction: OptionOrderInstruction
     Quantity: decimal
+    Price: decimal option
 }
 
 [<CLIMutable>]

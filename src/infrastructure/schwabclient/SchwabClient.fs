@@ -139,6 +139,15 @@ type OrderStrategy = {
             match this.price with
             | Some p -> p
             | None -> 0m
+            
+        member this.ResolveOptionLegPrice(legId:int64) =
+            match this.orderActivityCollection with
+            | None -> None
+            | Some ac ->
+                let leg = ac |> Array.tryFind(fun a -> a.executionLegs |> Option.defaultValue [||] |> Array.exists(fun l -> l.legId = legId))
+                match leg with
+                | Some l -> l.executionLegs |> Option.defaultValue [||] |> Array.tryFind(fun l -> l.legId = legId) |> Option.map(_.price)
+                | None -> None
 
 type BrokerageBalances = {
     cashBalance: decimal
@@ -526,6 +535,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     Ticker = l.instrument.symbol |> Ticker
                     Quantity = l.quantity |> decimal
                     Instruction = l.instruction |> parseOptionOrderInstruction
+                    Price = o.ResolveOptionLegPrice(l.legId)
                 }
             ) 
         }

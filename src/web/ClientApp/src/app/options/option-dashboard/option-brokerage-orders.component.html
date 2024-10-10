@@ -10,8 +10,8 @@
                     </div>
                     <span class="badge" [ngClass]="{
             'bg-success': order.status === 'Filled',
-            'bg-warning': order.status === 'PendingActivation' || order.status === 'Active',
-            'bg-danger': order.status === 'Cancelled' || order.status === 'Expired'
+            'bg-warning': order.status === 'Pending' || order.status === 'Working',
+            'bg-danger': order.status === 'Cancelled' || order.status === 'Expired' || order.status === 'Replaced'
           }">{{ order.status }}</span>
                 </div>
             </div>
@@ -25,23 +25,28 @@
                         <small class="text-muted">Executed on</small>
                         <p class="mb-0">{{ order.executionTime | parsedDate }}</p>
                     </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Total Price</small>
+                        <p class="mb-0 fw-bold">{{ order.price | currency }}</p>
+                    </div>
                     <div class="col-md-6 d-flex align-items-end justify-content-end">
                         <button *ngIf="order.canBeCancelled" class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order)">Cancel Order</button>
-                    </div>
-                    <div class="col-md-6">
-                        <small class="text-muted">Price</small>
-                        <p class="mb-0 fw-bold">{{ order.price * 100 | currency }}</p>
                     </div>
                 </div>
                 <hr>
                 <h6 class="mb-3">Option Legs</h6>
                 <ul class="list-group list-group-flush">
                     @for (leg of order.legs; track leg) {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span>
-                <span class="fw-bold">{{ leg.quantity | number }}</span> contract: {{ leg.description }}
-              </span>
-                            <span class="badge bg-secondary">{{ leg.instruction }}</span>
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold">{{ leg.quantity | number }}</span> contract: {{ leg.description }}
+                                    <span class="badge bg-secondary ms-2">{{ leg.instruction }}</span>
+                                </div>
+                                <span *ngIf="leg.price" class="text-muted">
+                  {{ leg.price | currency }} per contract
+                </span>
+                            </div>
                         </li>
                     }
                 </ul>
