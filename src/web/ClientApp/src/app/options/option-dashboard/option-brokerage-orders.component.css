@@ -23,6 +23,10 @@
     font-size: 0.9rem;
 }
 
+.brokerage-orders .card-body .row > div {
+    margin-bottom: 0.5rem;
+}
+
 @media (max-width: 768px) {
     .brokerage-orders .card-header .d-flex {
         flex-direction: column;

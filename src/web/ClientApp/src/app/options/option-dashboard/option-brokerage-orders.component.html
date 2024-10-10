@@ -16,24 +16,23 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <small class="text-muted">Entered on</small>
-                        <p class="mb-0">{{ order.enteredTime | parsedDate }}</p>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block">Entered on</small>
+                        <span>{{ order.enteredTime | parsedDate }}</span>
                     </div>
-                    <div class="col-md-6" *ngIf="order.executionTime">
-                        <small class="text-muted">Executed on</small>
-                        <p class="mb-0">{{ order.executionTime | parsedDate }}</p>
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block">Executed on</small>
+                        <span>{{ order.executionTime ? (order.executionTime | parsedDate) : 'N/A' }}</span>
                     </div>
-                    <div class="col-md-6">
-                        <small class="text-muted">Total Price</small>
-                        <p class="mb-0 fw-bold">{{ order.price | currency }}</p>
+                    <div class="col-md-3 col-6">
+                        <small class="text-muted d-block">Total Price</small>
+                        <span class="fw-bold">{{ order.price | currency }}</span>
                     </div>
-                    <div class="col-md-6 d-flex align-items-end justify-content-end">
+                    <div class="col-md-3 col-6 d-flex align-items-end">
                         <button *ngIf="order.canBeCancelled" class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order)">Cancel Order</button>
                     </div>
                 </div>
-                <hr>
                 <h6 class="mb-3">Option Legs</h6>
                 <ul class="list-group list-group-flush">
                     @for (leg of order.legs; track leg) {
