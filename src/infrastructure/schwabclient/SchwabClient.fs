@@ -692,7 +692,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             logInfo "Request URI: {requestUri}" [|request.RequestUri|]
             logInfo "Request Headers:" [||]
             for header in request.Headers do
-                logInfo "  {key}: {value}" [|header.Key; header.Value|]
+                match header.Key with
+                | "Authorization" -> logInfo "  {key}: {value}" [|header.Key; "********"|]
+                | _ -> logInfo "  {key}: {value}" [|header.Key; header.Value|]
 
             logInfo "Sending request..." [||]
             let! response = _httpClient.SendAsync(request)
