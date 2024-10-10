@@ -346,9 +346,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | TraderApiUrl path -> $"https://api.schwabapi.com/trader/v1{path}"
         | MarketDataUrl path -> $"https://api.schwabapi.com/marketdata/v1{path}"
     
-    let logDebug message ([<ParamArray>]args: obj array) =
+    let logInfo message ([<ParamArray>]args: obj array) =
         match logger with
-        | Some logger -> logger.LogDebug(message, args)
+        | Some logger -> logger.LogInformation(message, args)
         | None -> ()
     
     let logError message ([<ParamArray>]args: obj array) =
@@ -561,23 +561,17 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 match secondCheck with
                 | Some t when t.IsExpired = false -> return t
                 | _ ->
-                    match logger with
-                    | Some logger -> logger.LogInformation("Refreshing access token")
-                    | None -> ()
+                    logInfo "Refreshing access token" [||]
                     
                     let! t = refreshAccessTokenInternal user false
                     t.created <- Some DateTimeOffset.UtcNow
 
                     match t.IsError with
                     | true ->
-                        match logger with
-                        | Some logger -> logger.LogError("Could not refresh access token: {error}", t.error)
-                        | None -> ()
+                        logError "Could not refresh access token: {error}" [|t.error|]
                         return raise (Exception("Could not refresh access token: " + t.error))
                     | false ->
-                        match logger with
-                        | Some logger -> logger.LogInformation("Saving access token to storage")
-                        | None -> ()
+                        logInfo "Saving access token to storage" [||]
                     
                         do! blobStorage.Save(storageKey, t)
                         return t
@@ -675,6 +669,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         member this.GetAccessToken(user: UserState) = getAccessToken user
         
         member _.ConnectCallback(code: string) = task {
+            logInfo "Starting ConnectCallback with code: {code}" [|code|]
+
             let postData =
                 dict [
                     "grant_type", "authorization_code"
@@ -683,26 +679,43 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     "redirect_uri", callbackUrl
                     "client_id", clientId
                 ]
-                
+            
+            logInfo "Post data prepared: {postData}" [|postData|]
+            
             let request = new HttpRequestMessage(HttpMethod.Post, "/oauth/token" |> AuthAUrl |> generateUrl)
             
             request.Content <- new FormUrlEncodedContent(postData)
             
             request.Headers.Authorization <- AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")))
 
+            logInfo "Request prepared: {request}" [|request|]
+            logInfo "Request URI: {requestUri}" [|request.RequestUri|]
+            logInfo "Request Headers:" [||]
+            for header in request.Headers do
+                logInfo "  {key}: {value}" [|header.Key; header.Value|]
+
+            logInfo "Sending request..." [||]
             let! response = _httpClient.SendAsync(request)
             
+            logInfo "Response received. Status code: {statusCode}" [|response.StatusCode|]
+
             match response.IsSuccessStatusCode with
             | false ->
+                logError "Request failed with status code: {statusCode}" [|response.StatusCode|]
                 do! logIfFailed response "connect callback"
                 return ServiceError "Failed to connect to brokerage" |> Error
             | true ->
-
+                logInfo "Request successful" [||]
                 let! responseString = response.Content.ReadAsStringAsync()
-
-                return JsonSerializer.Deserialize<OAuthResponse>(responseString) |> Ok
+                
+                try
+                    let result = JsonSerializer.Deserialize<OAuthResponse>(responseString)
+                    return Ok result
+                with
+                | ex ->
+                    logError "Failed to deserialize response: {message}" [|ex.Message|]
+                    return ServiceError "Failed to parse brokerage response" |> Error
         }
-
         member _.GetOAuthUrl() = task {
             let encodedClientId = Uri.EscapeDataString(clientId)
             let encodedCallbackUrl = Uri.EscapeDataString(callbackUrl)
