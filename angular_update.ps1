@@ -55,6 +55,7 @@ $updates | ForEach-Object {
 
     git add .
     git commit -m "Angular updates: $package"
+    git push
 }
 
 

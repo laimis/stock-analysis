@@ -5,7 +5,7 @@ using core.fs.Accounts;
 using core.Options;
 using core.Shared;
 using Moq;
-using OptionType = core.fs.Adapters.Brokerage.OptionType;
+using OptionType = core.fs.Options.OptionType;
 
 namespace coretests.Options
 {
@@ -28,7 +28,7 @@ namespace coretests.Options
             var opt = new OwnedOption(
                 cmd.Item1.Ticker,
                 cmd.Item1.StrikePrice.Value,
-                cmd.Item1.OptionType.ToEnum(),
+                core.Options.OptionType.CALL, // TODO: once this is migrated to use core.fs.Options, this should go back to being cmd.Item1.OptionType
                 cmd.Item1.ExpirationDate.Value,
                 cmd.Item2.Item);
 

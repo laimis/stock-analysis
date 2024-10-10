@@ -8,6 +8,7 @@ open core.Shared
 open core.fs
 open core.fs.Adapters.Options
 open core.fs.Adapters.Stocks
+open core.fs.Options
 
 type OAuthResponse() =
     
@@ -94,29 +95,7 @@ type StockOrderType =
 type OptionOrderType =
     | Market | Limit | NetDebit | NetCredit
 
-type OptionType =
-    | Call
-    | Put
-    
-    with
-        override this.ToString() =
-            match this with
-            | Call -> nameof Call
-            | Put -> nameof Put
-            
-        member this.ToEnum() =
-            match this with
-            | Call -> core.Options.OptionType.CALL
-            | Put -> core.Options.OptionType.PUT
-            
-        static member FromString(value:string) =
-            match value with
-            | nameof Call -> Call
-            | nameof Put -> Put
-            | "CALL" -> Call
-            | "PUT" -> Put
-            | _ -> failwithf $"Invalid option type: %s{value}"
-            
+
 [<CLIMutable>]
 type OptionLeg = {
     LegId : string

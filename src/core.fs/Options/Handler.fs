@@ -19,7 +19,7 @@ type OptionTransaction =
         [<Required>]
         ExpirationDate : Nullable<DateTimeOffset>
         [<Required>]
-        OptionType : OptionType        
+        OptionType : core.fs.Options.OptionType        
         [<Range(1, 10000, ErrorMessage = "Invalid number of contracts specified")>]
         NumberOfContracts : int
         [<Range(1, 100000)>]
@@ -217,7 +217,11 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | None -> return "User not found" |> ServiceError |> Error
             | _ ->
 
-                let optionType = data.OptionType.ToEnum()
+                let optionType =
+                    match data.OptionType with
+                    | Call -> core.Options.OptionType.CALL
+                    | Put -> core.Options.OptionType.PUT
+                    
 
                 let! options = storage.GetOwnedOptions(userId)
                 

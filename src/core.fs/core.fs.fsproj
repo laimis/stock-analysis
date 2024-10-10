@@ -11,6 +11,7 @@
         <Compile Include="Shared.fs" />
         <Compile Include="Accounts.fs" />
         <Compile Include="Stocks.fs" />
+        <Compile Include="Options.fs" />
         <Compile Include="Adapters\Stocks.fs" />
         <Compile Include="Adapters\Options.fs" />
         <Compile Include="Adapters\Brokerage.fs" />

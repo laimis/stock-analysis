@@ -13,6 +13,7 @@ using Microsoft.FSharp.Core;
 using Moq;
 using Xunit;
 using Handler = core.fs.Options.Handler;
+using OptionPosition = core.fs.Adapters.Brokerage.OptionPosition;
 
 namespace coretests.Options
 {

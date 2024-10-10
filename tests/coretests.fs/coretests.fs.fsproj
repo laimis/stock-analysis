@@ -27,6 +27,7 @@
     <Compile Include="Stocks\Services\Trading\ProfitPointTests.fs" />
     <Compile Include="Stocks\Services\TrendsTests.fs" />
     <Compile Include="Stocks\TradingPerformanceViewTests.fs" />
+    <Compile Include="Options\OptionPositionTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
