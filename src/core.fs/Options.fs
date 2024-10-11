@@ -165,6 +165,6 @@ module OptionPosition =
         if position.IsClosed then
             failwith "Position is closed"
         
-        let e = OptionLegPurchased(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
+        let e = OptionLegPurchasedToOpen(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
         
         apply e position
