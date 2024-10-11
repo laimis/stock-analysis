@@ -4,13 +4,26 @@ import {brokerageordercommand, KeyValuePair, StockQuote, StocksService} from 'sr
 import {GetErrors} from '../services/utils';
 import {BrokerageOrderDuration, BrokerageOrderType, BrokerageService} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
-import {FormControl, Validators} from "@angular/forms";
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {StockSearchComponent} from "../stocks/stock-search/stock-search.component";
+import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
+import {CurrencyPipe, NgClass, NgIf} from "@angular/common";
 
 
 @Component({
     selector: 'app-brokerage-new-order',
     templateUrl: './brokerage-new-order.component.html',
-    styleUrls: ['./brokerage-new-order.component.css']
+    styleUrls: ['./brokerage-new-order.component.css'],
+    imports: [
+        FormsModule,
+        StockSearchComponent,
+        ErrorDisplayComponent,
+        NgClass,
+        ReactiveFormsModule,
+        CurrencyPipe,
+        NgIf
+    ],
+    standalone: true
 })
 export class BrokerageNewOrderComponent {
 

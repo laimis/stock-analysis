@@ -10,6 +10,7 @@ import {NgClass, NgIf} from "@angular/common";
 import {
     StockTradingPendingpositionAnalysisComponent
 } from "../stock-trading/stock-trading-pendingposition-analysis.component";
+import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.component";
 
 @Component({
     selector: 'app-stock-trading-pending-positions-dashboard',
@@ -23,7 +24,8 @@ import {
         RouterLink,
         NgClass,
         NgIf,
-        StockTradingPendingpositionAnalysisComponent
+        StockTradingPendingpositionAnalysisComponent,
+        BrokerageNewOrderComponent
     ]
 })
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
