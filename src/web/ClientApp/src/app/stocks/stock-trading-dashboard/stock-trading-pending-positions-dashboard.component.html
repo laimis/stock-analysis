@@ -34,6 +34,8 @@
         (ordersChanged)="getOrders()"
         [orders]="orders"
     ></app-brokerage-orders>
+    <app-brokerage-new-order *ngIf="isActive('orders')"></app-brokerage-new-order>
+    
     <app-stock-trading-pendingposition-analysis
         *ngIf="isActive('analysis')"
     ></app-stock-trading-pendingposition-analysis>

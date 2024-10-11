@@ -239,7 +239,6 @@ let routes: Routes = [
         StockTradingSimulationsComponent,
         TradingPerformanceSummaryComponent,
         TradingActualVsSimulatedPositionComponent,
-        BrokerageNewOrderComponent,
         TransactionsComponent,
         TermsComponent,
         FailuresuccesschainComponent,
@@ -290,6 +289,7 @@ let routes: Routes = [
         ParsedDatePipe,
         OutcomesAnalysisReportComponent,
         OutcomesComponent,
+        BrokerageNewOrderComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},
