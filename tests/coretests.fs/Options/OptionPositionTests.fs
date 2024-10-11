@@ -20,12 +20,19 @@ let ``Opening works`` () =
     let expiration = "2024-11-15"
     let strike = 120m
     let optionType = OptionType.Put
-    let quantity = 1
+    let quantity = 1m
     let price = 6.05m
     
     // add a leg
-    let positionWithLeg =
-        position |>
-        OptionPosition.buyLeg expiration strike optionType quantity price
+    let positionWithLeg = position |> OptionPosition.buyToOpen expiration strike optionType quantity price DateTimeOffset.UtcNow
         
-    positionWithLeg.Legs |> should haveCount 1
+    positionWithLeg.Legs |> should haveLength 1
+    
+[<Fact>]
+let ``Buy to open using wrong date format, fails``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen "Nov 15 2024" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> ignore)
+    |> should throw typeof<Exception>
+    

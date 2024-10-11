@@ -39,11 +39,10 @@ type OptionType =
             
 
 type OptionLeg = {
-    LegId: int
     OptionType: OptionType
     StrikePrice: decimal
     ExpirationDate: DateTimeOffset
-    Quantity: int
+    Quantity: decimal
     Price: decimal
 }
 
@@ -73,7 +72,7 @@ type OptionPositionOpened(id, aggregateId, ``when``, underlyingTicker:string) =
     member this.PositionId = aggregateId |> OptionPositionId
     member this.UnderlyingTicker = underlyingTicker
     
-type OptionLegPurchased(id, aggregateId, ``when``, expiration, strike, optionType, quantity, price) =
+type OptionLegPurchased(id, aggregateId, ``when``, expiration:string, strike:decimal, optionType:string, quantity:decimal, price:decimal) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     
     member this.Expiration = expiration
@@ -81,8 +80,21 @@ type OptionLegPurchased(id, aggregateId, ``when``, expiration, strike, optionTyp
     member this.OptionType = optionType
     member this.Quantity = quantity
     member this.Price = price
+    
+type OptionLegPurchasedToOpen(id, aggregateId, ``when``, expiration:string, strike:decimal, optionType:string, quantity:decimal, price:decimal) =
+    inherit OptionLegPurchased(id, aggregateId, ``when``, expiration, strike, optionType, quantity, price)
+    
+type OptionLegPurchasedToClose(id, aggregateId, ``when``, expiration:string, strike:decimal, optionType:string, quantity:decimal, price:decimal) =
+    inherit OptionLegPurchased(id, aggregateId, ``when``, expiration, strike, optionType, quantity, price)
 
 module OptionPosition =
+    
+    // ensure that the option is stored as yyyy-MM-dd, and can be converted to datetime offset
+    let toOptionExpirationDate (date:string) =
+        match DateTimeOffset.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None) with 
+        | true, d -> d
+        | _ -> failwith "Invalid date format. Expected yyyy-MM-dd"
+        
         
     let createInitialState (event: OptionPositionOpened) : OptionPositionState=
         {
@@ -100,16 +112,18 @@ module OptionPosition =
         match event with
         
         | :? OptionPositionOpened as _ ->
-            
             p // pass through, this should be done by createInitialState
             
-        // | :? StockPositionStopSet as x ->
-        //     let newTransactions = p.Transactions @ [Stop { TransactionId = x.Id; StopPrice = Some x.StopPrice; Date = x.When }]
-        //     { p with Transactions = newTransactions; StopPrice = Some x.StopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
-        //
-        | :? OptionLegPurchased as x ->
-            let newLegs = p.Legs @ [{ LegId = p.Legs.Length + 1; OptionType = x.OptionType; StrikePrice = x.Strike; ExpirationDate = x.Expiration; Quantity = x.Quantity; Price = x.Price }]
+        | :? OptionLegPurchasedToOpen as x ->
+            let newLegs = p.Legs @ [{ OptionType = OptionType.FromString(x.OptionType); StrikePrice = x.Strike; ExpirationDate = x.Expiration |> toOptionExpirationDate; Quantity = x.Quantity; Price = x.Price }]
             { p with Legs = newLegs; Version = p.Version + 1; Events = p.Events @ [x] }
+            
+        // | :? OptionLegPurchasedToClose as x ->
+        //     
+        //     // first, find the leg to close
+        //     let legToClose = p.Legs |> List.find (fun l -> l.OptionType = OptionType.FromString(x.OptionType) && l.StrikePrice = x.Strike && l.ExpirationDate = x.Expiration |> toOptionExpirationDate)
+        //     
+            // create new leg but with closed timestamp?
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
 
@@ -131,26 +145,26 @@ module OptionPosition =
         OptionPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value)
         |> createInitialState
 
-    let buyLeg expiration strike optionType quantity price date (position:OptionPositionState) =
+    let buyToOpen (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:decimal) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         date |> failIfInvalidDate
-        expiration |> failIfInvalidDate
+        let expirationAsDate = expiration |> toOptionExpirationDate 
         
-        if expiration < date then
+        if expirationAsDate < date then
             failwith "Expiration date must be after transaction date"
             
-        if quantity <= 0 then
+        if quantity <= 0m then
             failwith "Quantity must be greater than zero"
             
-        if price <= 0 then
+        if price <= 0m then
             failwith "Price must be greater than zero"
             
-        if strike <= 0 then
+        if strike <= 0m then
             failwith "Strike price must be greater than zero"
             
         if position.IsClosed then
             failwith "Position is closed"
         
-        let e = OptionLegPurchased(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType, quantity, price)
+        let e = OptionLegPurchased(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
         
         apply e position
