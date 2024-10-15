@@ -9,7 +9,7 @@ open testutils
 let ticker = TestDataGenerator.NET
 
 [<Fact>]
-let ``Opening works`` () =
+let ``Basic operations work`` () =
     
     let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
     
@@ -17,16 +17,38 @@ let ``Opening works`` () =
     position.IsClosed |> should equal false
     position.IsOpen |> should equal true
     
-    let expiration = "2024-11-15"
-    let strike = 120m
     let optionType = OptionType.Put
     let quantity = 1m
-    let price = 6.05m
     
-    // add a leg
-    let positionWithLeg = position |> OptionPosition.buyToOpen expiration strike optionType quantity price DateTimeOffset.UtcNow
+    let positionWithContracts =
+        position
+        |> OptionPosition.buyToOpen "2024-11-15" 120m optionType quantity 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen "2024-11-15" 115m optionType quantity 4.20m DateTimeOffset.UtcNow
         
-    positionWithLeg.Legs |> should haveLength 1
+    positionWithContracts.TotalCost |> should equal 1.85m
+    positionWithContracts.Transactions |> should haveLength 2m
+    positionWithContracts.IsClosed |> should equal false
+    positionWithContracts.IsOpen |> should equal true
+    
+    let positionWithContractsClosed =
+        positionWithContracts
+        |> OptionPosition.sellToClose "2024-11-15" 120m optionType quantity 11.11m DateTimeOffset.UtcNow
+        |> OptionPosition.buyToClose "2024-11-15" 115m optionType quantity 8.11m DateTimeOffset.UtcNow
+        
+    positionWithContractsClosed.TotalCost |> should equal -1.15m
+    positionWithContractsClosed.Transactions |> should haveLength 4m
+    positionWithContractsClosed.IsClosed |> should equal true
+    positionWithContractsClosed.IsOpen |> should equal false
+    
+[<Fact>]
+let ``Expire works``() =
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.expire
+        
+    position.IsClosed |> should equal true
+    position.IsOpen |> should equal false
     
 [<Fact>]
 let ``Buy to open using wrong date format, fails``() =

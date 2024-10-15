@@ -11,7 +11,7 @@ open core.fs.Adapters.CSV
 open core.fs.Adapters.Storage
 open core.fs.Services
             
-type OptionTransaction =
+type OptionTransactionInput =
     {
         [<Range(1, 10000)>]
         [<Required>]
@@ -48,8 +48,8 @@ type ExpireViaLookupCommand =
 type DeleteCommand = { OptionId: Guid; UserId: UserId }
 
 type BuyOrSellCommand =
-    | Buy of OptionTransaction * UserId
-    | Sell of OptionTransaction * UserId
+    | Buy of OptionTransactionInput * UserId
+    | Sell of OptionTransactionInput * UserId
 
 type DetailsQuery = { OptionId: Guid; UserId: UserId }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
@@ -200,10 +200,10 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
     member this.Handle(cmd: BuyOrSellCommand) =
         task {
-            let buy (opt: OwnedOption) (data: OptionTransaction) =
+            let buy (opt: OwnedOption) (data: OptionTransactionInput) =
                 opt.Buy(data.NumberOfContracts, data.Premium.Value, data.Filled.Value, data.Notes)
 
-            let sell (opt: OwnedOption) (data: OptionTransaction) =
+            let sell (opt: OwnedOption) (data: OptionTransactionInput) =
                 opt.Sell(data.NumberOfContracts, data.Premium.Value, data.Filled.Value, data.Notes)
 
             let data, userId, func =
@@ -222,7 +222,6 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     | Call -> core.Options.OptionType.CALL
                     | Put -> core.Options.OptionType.PUT
                     
-
                 let! options = storage.GetOwnedOptions(userId)
                 
                 let option =

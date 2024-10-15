@@ -46,7 +46,7 @@ namespace web.Controllers
             );
 
         [HttpPost("sell")]
-        public Task<ActionResult> Sell([FromBody]OptionTransaction cmd)
+        public Task<ActionResult> Sell([FromBody]OptionTransactionInput cmd)
         {
             return this.OkOrError(
                 service.Handle(
@@ -56,7 +56,7 @@ namespace web.Controllers
         }
 
         [HttpPost("buy")]
-        public Task<ActionResult> Buy([FromBody]OptionTransaction cmd)
+        public Task<ActionResult> Buy([FromBody]OptionTransactionInput cmd)
         {
             return this.OkOrError(
                 service.Handle(

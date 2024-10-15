@@ -47,7 +47,7 @@ namespace coretests.Options
 
         public static BuyOrSellCommand CreateSellCommand()
         {
-            var cmd = new OptionTransaction(
+            var cmd = new OptionTransactionInput(
                 strikePrice: 20,
                 optionType: OptionType.Call,
                 expirationDate: DateTimeOffset.UtcNow.AddDays(10),
