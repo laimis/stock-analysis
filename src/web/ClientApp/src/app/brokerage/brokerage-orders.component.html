@@ -34,10 +34,10 @@
                             'table-secondary': !p.isActive
                         }">
                                 <td>
-                                <span class="badge" [ngClass]="{
-                                    'bg-success': p.status === 'Active',
-                                    'bg-secondary': p.status !== 'Active'
-                                }">{{ p.status }}</span>
+                                    <span title="{{p.statusDescription ?? p.status}}" class="badge" [ngClass]="{
+                                        'bg-success': p.status === 'Active',
+                                        'bg-secondary': p.status !== 'Active'
+                                    }">{{ p.status }}</span>
                                 </td>
                                 <td>
                                     <app-stock-link-and-tradingview-link [ticker]="p.ticker"></app-stock-link-and-tradingview-link>

@@ -157,6 +157,7 @@ type StockOrder = {
     Price : decimal
     Quantity : decimal
     Status : OrderStatus
+    StatusDescription : string option
     Ticker : Ticker
     Type : StockOrderType
     Instruction : StockOrderInstruction
