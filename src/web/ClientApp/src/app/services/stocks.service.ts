@@ -1045,6 +1045,7 @@ export interface BrokerageStockOrder {
     type: string
     quantity: number
     status: string
+    statusDescription: string
     instruction: string
     ticker: string
     description: string

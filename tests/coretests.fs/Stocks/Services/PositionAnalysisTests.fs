@@ -29,6 +29,7 @@ let createTestData() =
             Instruction = StockOrderInstruction.Buy
             Quantity = 1m
             Status = OrderStatus.Working
+            StatusDescription = None 
             Type = StockOrderType.Market
             ExecutionTime = None
             OrderId = "orderId"

@@ -97,6 +97,7 @@ type OrderStrategy = {
     cancelable: bool
     editable: bool
     status: string
+    statusDescription: string option
     enteredTime: string
     closeTime: string option
     tag: string
@@ -504,6 +505,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             Price = o.ResolveStockPrice()
             Quantity = l.quantity
             Status = o.status |> parseOrderStatus
+            StatusDescription = o.statusDescription
             Type = o.orderType |> parseStockOrderType
             Instruction = l.instruction |> parseStockOrderInstruction
             Ticker = Ticker l.instrument.symbol
