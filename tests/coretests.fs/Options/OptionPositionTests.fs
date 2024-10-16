@@ -45,10 +45,74 @@ let ``Expire works``() =
     let position =
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
         |> OptionPosition.sellToOpen "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
-        |> OptionPosition.expire
+        |> OptionPosition.expire "2024-11-15" 120m OptionType.Put
         
     position.IsClosed |> should equal true
     position.IsOpen |> should equal false
+    
+[<Fact>]
+let ``Assign works``() =
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.assign "2024-11-15" 120m OptionType.Put
+        
+    position.IsClosed |> should equal true
+    position.IsOpen |> should equal false
+
+[<Fact>]
+let ``Version and events work``() =
+    
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    position.Version |> should equal 1
+    position.Events |> should haveLength 1
+    
+    let optionAfterOperation =
+        position |> OptionPosition.buyToOpen "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        
+    optionAfterOperation.Version |> should equal 2
+    optionAfterOperation.Events |> should haveLength 2
+    
+    let optionAfterOperation2 =
+        optionAfterOperation |> OptionPosition.sellToClose "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        
+    optionAfterOperation2.Version |> should equal 4 // because it should include closed event
+    optionAfterOperation2.Events |> should haveLength 4
+
+[<Fact>]
+let ``This should throw invalid operation because you cannot sell top open and then sell to close``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.sellToClose "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> ignore)
+    |> should throw typedefof<InvalidOperationException>
+    
+[<Fact>]
+let ``Trying to buy to close a position that is not open, should throw``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.buyToClose "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> ignore)
+    |> should throw typedefof<InvalidOperationException>
+    
+[<Fact>]
+let ``Trying to assign contracts that are not owned should throw``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.assign "2024-11-15" 120m OptionType.Put
+        |> ignore)
+    |> should throw typedefof<InvalidOperationException>
+    
+[<Fact>]
+let ``Trying to assign contracts that are not sold should throw``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen "2024-11-15" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.assign "2024-11-15" 120m OptionType.Put
+        |> ignore)
+    |> should throw typedefof<InvalidOperationException>
     
 [<Fact>]
 let ``Buy to open using wrong date format, fails``() =
@@ -57,4 +121,20 @@ let ``Buy to open using wrong date format, fails``() =
         |> OptionPosition.buyToOpen "Nov 15 2024" 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
         |> ignore)
     |> should throw typeof<Exception>
+    
+[<Fact>]
+let ``Expire fails if there are no contracts to expire``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.expire "2024-11-15" 120m OptionType.Put
+        |> ignore)
+    |> should throw typeof<InvalidOperationException>
+    
+[<Fact>]
+let ``Assign fails if there are no contracts to assign``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.assign "2024-11-15" 120m OptionType.Put
+        |> ignore)
+    |> should throw typeof<InvalidOperationException>
     
