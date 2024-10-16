@@ -11,7 +11,7 @@
                     <span class="badge" [ngClass]="{
             'bg-success': order.status === 'Filled',
             'bg-warning': order.status === 'Pending' || order.status === 'Working',
-            'bg-danger': order.status === 'Cancelled' || order.status === 'Expired' || order.status === 'Replaced'
+            'bg-danger': order.status === 'Canceled' || order.status === 'Expired' || order.status === 'Replaced'
           }">{{ order.status }}</span>
                 </div>
             </div>
