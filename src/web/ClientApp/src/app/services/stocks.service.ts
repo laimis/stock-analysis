@@ -1245,6 +1245,8 @@ export class OptionDefinition {
     numberOfContracts: number
     bid: number
     ask: number
+    last: number
+    mark: number
     spread: number
     perDayPrice: number
     lastUpdated: string

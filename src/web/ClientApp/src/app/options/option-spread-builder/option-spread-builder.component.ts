@@ -62,11 +62,11 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filterExpiration: string = '';
     filterType: 'all' | 'call' | 'put' = 'all';
     filterVolumeOI: 'all' | 'notzero' = 'notzero';
-    filterSide: 'all' | 'put' | 'call' = 'all';
     filterMinimumStrike: number = 0;
     optionChain: OptionChain;
 
     errors: string[] = [];
+    loading: boolean = false;
 
     putOpenInterest() {
         return this.options.filter(x => x.optionType == "put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
@@ -85,14 +85,17 @@ export class OptionSpreadBuilderComponent implements OnInit {
     }
 
     loadOptions(ticker:string): void {
+        this.loading = true
         this.stockService.getOptionChain(ticker).subscribe(
             (data) => {
                 this.optionChain = data
                 this.options = this.optionChain.options
                 this.applyFiltersAndSort();
+                this.loading = false
             },
             (error) => {
                 this.errors = GetErrors(error);
+                this.loading = false
             }
         )
     }
@@ -102,7 +105,6 @@ export class OptionSpreadBuilderComponent implements OnInit {
             return (this.filterExpiration === '' || option.expirationDate === this.filterExpiration) &&
                 (this.filterType === 'all' || option.side === this.filterType) &&
                 (this.filterVolumeOI === 'all' || (option.volume > 0 || option.openInterest > 0)) &&
-                (this.filterSide === 'all' || option.side === this.filterSide) &&
                 option.strikePrice >= this.filterMinimumStrike;
         });
 
@@ -155,7 +157,6 @@ export class OptionSpreadBuilderComponent implements OnInit {
             return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
         }, 0);
     }
-    
     calculateMostFavorable(): number {
         return this.selectedLegs.reduce((total, leg) => {
             const price = leg.action === 'buy' ? leg.option.bid : leg.option.ask;
@@ -166,6 +167,22 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
     calculateMidOfFavorables(): number {
         return (this.calculateLeastFavorable() + this.calculateMostFavorable()) / 2;
+    }
+
+    calculateUsingLast(): number {
+        return this.selectedLegs.reduce((total, leg) => {
+            const price = leg.option.last;
+            const multiplier = leg.action === 'buy' ? -1 : 1;
+            return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
+        }, 0);
+    }
+    
+    calculateUsingMark(): number {
+        return this.selectedLegs.reduce((total, leg) => {
+            const price = leg.option.mark;
+            const multiplier = leg.action === 'buy' ? -1 : 1;
+            return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
+        }, 0);
     }
     
     abs(number: number) {

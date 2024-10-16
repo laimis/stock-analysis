@@ -1130,6 +1130,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             let detail = core.fs.Adapters.Options.OptionDetail(d.symbol.Value, d.putCall.Value.ToLower(), d.description.Value)
                             detail.Ask <- d.ask
                             detail.Bid <- d.bid
+                            detail.Last <- d.last
+                            detail.Mark <- d.mark
                             detail.StrikePrice <- d.strikePrice
                             detail.Volume <- d.totalVolume
                             detail.OpenInterest <- d.openInterest

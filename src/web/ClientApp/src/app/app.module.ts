@@ -145,7 +145,7 @@ let routes: Routes = [
 
     {path: 'privacy', component: PrivacyComponent},
     {path: 'trading', component: StockTradingDashboardComponent, canActivate: [AuthGuard]},
-    {path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard]},
+    {path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard], title: 'Stock Position Analysis'},
     {path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
     {path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
     {

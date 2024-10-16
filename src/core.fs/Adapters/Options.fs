@@ -15,6 +15,8 @@ type OptionDetail(symbol:string, side:string, description:string) =
     member val OpenInterest: int64 = 0L with get, set
     member val Bid: decimal = 0m with get, set
     member val Ask: decimal = 0m with get, set
+    member val Last: decimal = 0m with get, set
+    member val Mark: decimal = 0m with get, set
     member this.OptionType = this.Side
     member this.IsCall = this.Side = "call"
     member this.IsPut = this.Side = "put"
