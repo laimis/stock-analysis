@@ -4,7 +4,7 @@
     <h2 class="mb-4">Option Trade Builder</h2>
     <app-loading *ngIf="loading"></app-loading>
 
-    <div class="row" *ngIf="optionChain">
+    <div class="row" *ngIf="filteredOptions && optionChain">
         <div class="col">
             <table class="table border">
                 <thead class="thead-light">
@@ -61,11 +61,19 @@
                                 <option value="notzero">Not Zero</option>
                             </select>
                         </div>
+                        <div class="col-md-3">
+                            <label for="minimumStrike" class="form-label">Minimum Strike:</label>
+                            <input id="minimumStrike" type="number" class="form-control" [(ngModel)]="filterMinimumStrike" (change)="applyFiltersAndSort()">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bidFilter" class="form-label">Bid:</label>
+                            <select id="bidFilter" class="form-select" [(ngModel)]="filterBid" (change)="applyFiltersAndSort()">
+                                <option value="all">Any</option>
+                                <option value="notzero">Not Zero</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="minimumStrike" class="form-label">Minimum Strike:</label>
-                        <input id="minimumStrike" type="number" class="form-control" [(ngModel)]="filterMinimumStrike" (change)="applyFiltersAndSort()">
-                    </div>
+                   
                 </div>
             </div>
 
@@ -141,8 +149,8 @@
                     <div class="mt-3">
                         <h6 class="card-subtitle mb-2 text-muted">Bid/Ask Based Pricing</h6>
                         <p class="card-text">
-                            <span class="text-success">{{ calculateLeastFavorable() | currency }}</span> x
-                            <span class="text-danger">{{ calculateMostFavorable() | currency }}</span>
+                            <span class="text-primary">{{ calculateLeastFavorable() | currency }}</span> x
+                            <span class="text-primary">{{ calculateMostFavorable() | currency }}</span>
                             <br>
                             <small class="text-muted">Mid: {{ calculateMidOfFavorables() | currency}}</small>
                         </p>
@@ -150,13 +158,19 @@
                     <div class="mt-3">
                         <h6 class="card-subtitle mb-2 text-muted">Last Based Pricing</h6>
                         <p class="card-text">
-                            <span class="text-success">{{ calculateUsingLast() | currency }}</span> x
+                            <span class="text-primary">{{ calculateUsingLast() | currency }}</span>
                         </p>
                     </div>
                     <div class="mt-3">
                         <h6 class="card-subtitle mb-2 text-muted">Mark Based Pricing</h6>
                         <p class="card-text">
-                            <span class="text-success">{{ calculateUsingMark() | currency }}</span> x
+                            <span class="text-primary">{{ calculateUsingMark() | currency }}</span>
+                        </p>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="card-subtitle mb-2 text-muted">30-40% of Spread Based Pricing</h6>
+                        <p class="card-text">
+                            <span class="text-primary">{{ calculateUsingSpreadPercentage(0.3) | currency }}</span> x <span class="text-primary">{{ calculateUsingSpreadPercentage(0.4) | currency }}</span>
                         </p>
                     </div>
                     

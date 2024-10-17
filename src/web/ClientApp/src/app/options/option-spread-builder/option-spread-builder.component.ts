@@ -62,6 +62,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filterExpiration: string = '';
     filterType: 'all' | 'call' | 'put' = 'all';
     filterVolumeOI: 'all' | 'notzero' = 'notzero';
+    filterBid: 'all' | 'notzero' = 'all';
     filterMinimumStrike: number = 0;
     optionChain: OptionChain;
 
@@ -69,19 +70,19 @@ export class OptionSpreadBuilderComponent implements OnInit {
     loading: boolean = false;
 
     putOpenInterest() {
-        return this.options.filter(x => x.optionType == "put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
     }
 
     callOpenInterest() {
-        return this.options.filter(x => x.optionType == "call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
     }
 
     putVolume() {
-        return this.options.filter(x => x.optionType == "put").map(x => x.volume).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "put").map(x => x.volume).reduce((a, b) => a + b, 0)
     }
 
     callVolume() {
-        return this.options.filter(x => x.optionType == "call").map(x => x.volume).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "call").map(x => x.volume).reduce((a, b) => a + b, 0)
     }
 
     loadOptions(ticker:string): void {
@@ -91,6 +92,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 this.optionChain = data
                 this.options = this.optionChain.options
                 this.applyFiltersAndSort();
+                this.refreshLegsIfNeeded();
                 this.loading = false
             },
             (error) => {
@@ -100,11 +102,28 @@ export class OptionSpreadBuilderComponent implements OnInit {
         )
     }
 
+    refreshLegsIfNeeded(): void {
+        // see if we have legs added, if so, refresh them
+        // to refresh, create a new leg array and load the options from the
+        // option chain
+        if (this.selectedLegs.length > 0) {
+            let newLegs = []
+            for (let leg of this.selectedLegs) {
+                let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expirationDate == leg.option.expirationDate)
+                if (option) {
+                    newLegs.push({ option, action: leg.action, quantity: leg.quantity });
+                }
+            }
+            this.selectedLegs = newLegs;
+        }
+    }
+
     applyFiltersAndSort(): void {
         this.filteredOptions = this.options.filter(option => {
             return (this.filterExpiration === '' || option.expirationDate === this.filterExpiration) &&
                 (this.filterType === 'all' || option.side === this.filterType) &&
                 (this.filterVolumeOI === 'all' || (option.volume > 0 || option.openInterest > 0)) &&
+                (this.filterBid === 'all' || option.bid > 0) &&
                 option.strikePrice >= this.filterMinimumStrike;
         });
 
@@ -183,6 +202,21 @@ export class OptionSpreadBuilderComponent implements OnInit {
             const multiplier = leg.action === 'buy' ? -1 : 1;
             return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
         }, 0);
+    }
+    
+    calculateUsingSpreadPercentage(percentage:number) {
+        // can only do this if there are two legs
+        if (this.selectedLegs.length !== 2) {
+            return 0;
+        }
+        
+        const leg1 = this.selectedLegs[0];
+        const leg2 = this.selectedLegs[1];
+        
+        const price1 = leg1.option.strikePrice
+        const price2 = leg2.option.strikePrice
+        
+        return Math.abs(price1 - price2) * percentage;
     }
     
     abs(number: number) {
