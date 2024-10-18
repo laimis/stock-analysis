@@ -21,6 +21,10 @@ export class StockPositionsService {
     constructor(private http: HttpClient) {
     }
 
+    get(positionId: string): Observable<PositionInstance> {
+        return this.http.get<PositionInstance>(`/api/portfolio/stockpositions/${positionId}`)
+    }
+    
     getTradingEntries(): Observable<StockTradingPositions> {
         return this.http.get<StockTradingPositions>('/api/portfolio/stockpositions/tradingentries')
     }

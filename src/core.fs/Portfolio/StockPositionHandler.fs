@@ -23,6 +23,12 @@ type Query =
         UserId: UserId
     }
     
+type QueryPosition =
+    {
+        PositionId: StockPositionId
+        UserId: UserId
+    }
+    
 type ImportStocks =
     {
         UserId: UserId
@@ -847,6 +853,17 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 let filename = CSVExport.generateFilename $"simulated-trades-{command.NumberOfTrades}"
                 ExportResponse(filename, content)
             ) 
+    }
+    
+    member _.Handle (query:QueryPosition) = task {
+        let! user = accounts.GetUser query.UserId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | _ ->
+            let! position = storage.GetStockPosition query.PositionId query.UserId
+            match position with
+            | None -> return "Position not found" |> ServiceError |> Error
+            | Some position -> return position |> StockPositionWithCalculations |> Ok
     }
     
     member _.Handle (query:QueryTradingEntries) = task {

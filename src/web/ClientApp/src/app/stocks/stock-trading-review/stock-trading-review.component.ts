@@ -63,17 +63,15 @@ export class StockTradingReviewComponent {
     }
 
     updateCurrentPosition() {
-        this.currentPosition = this.positions[this._index]
+        const positionId = this._positions[this._index].positionId
+        this.currentPosition = null
         // get price data and pass it to chart
         this.gradingError = null
         this.gradingSuccess = null
-        this.assignedGrade = this.currentPosition.grade
-        this.assignedNote = this.currentPosition.gradeNote
         this.simulationResults = null
         this.dailyPositionReport = null
         this.positionChartInformation = null
-        this.setTitle();
-        this.loadPositionData(this.currentPosition);
+        this.loadPositionData(positionId);
     }
 
     getPrice(position: PositionInstance) {
@@ -139,12 +137,28 @@ export class StockTradingReviewComponent {
         );
     }
 
-    private setTitle() {
-        this.title.setTitle(`Trading Review - ${this.currentPosition.ticker} - Nightingale Trading`)
+    private setTitle(position: PositionInstance) {
+        this.title.setTitle(`Trading Review - ${position.ticker} - Nightingale Trading`)
     }
     
-    private loadPositionData(position: PositionInstance) {
-        const simulationPromise = this.stockPositionsService.simulatePosition(position.positionId, true)
+    private loadPositionData(positionId: string) {
+        const loadPositionPromise = this.stockPositionsService.get(positionId)
+            .pipe(
+                tap(p => {
+                    this.currentPosition = p
+                    this.assignedGrade = this.currentPosition.grade
+                    this.assignedNote = this.currentPosition.gradeNote
+                    this.setTitle(p)
+                    this.loadPrices(p)
+                }),
+                catchError(e => {
+                    this.gradingError = GetErrors(e).join(', ')
+                    return []
+                })
+            )
+        
+        
+        const simulationPromise = this.stockPositionsService.simulatePosition(positionId, true)
             .pipe(
                 tap(r => {
                     this.simulationErrors = null
@@ -156,7 +170,7 @@ export class StockTradingReviewComponent {
                 })
             )
         
-        const reportPromise = this.stockService.reportDailyPositionReport(position.positionId)
+        const reportPromise = this.stockService.reportDailyPositionReport(positionId)
             .pipe(
                 tap(r => {
                     this.scoresErrors = null
@@ -168,9 +182,13 @@ export class StockTradingReviewComponent {
                 })
             )
         
-        const pricesPromise = this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily)
-            .pipe(
-                tap(r => {
+        concat(loadPositionPromise, simulationPromise, reportPromise).subscribe()
+    }
+    
+    private loadPrices(position: PositionInstance) {
+        this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily)
+            .subscribe(
+                r => {
                     this.pricesErrors = null
                     this.positionChartInformation = {
                         averageBuyPrice: position.averageCostPerShare,
@@ -180,14 +198,12 @@ export class StockTradingReviewComponent {
                         ticker: position.ticker,
                         transactions: position.transactions
                     }
-                }),
-                catchError(e => {
+                },
+                e => {
                     this.pricesErrors = GetErrors(e)
                     return []
-                })
+                }
             )
-        
-        concat(simulationPromise, reportPromise, pricesPromise).subscribe()
     }
 
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;

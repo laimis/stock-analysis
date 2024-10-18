@@ -246,6 +246,17 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
             )
         );
     
+    [HttpGet("stockpositions/{positionId}")]
+    public Task<ActionResult> Position([FromRoute] string positionId) =>
+        this.OkOrError(
+            stockPositionHandler.Handle(
+                new QueryPosition(
+                    positionId: StockPositionId.NewStockPositionId(Guid.Parse(positionId)),
+                    userId: User.Identifier()
+                )
+            )
+        );
+    
     [HttpPost("stockpositions/{positionId}/close")]
     public Task<ActionResult> ClosePosition([FromBody] ClosePosition command) =>
         this.OkOrError(stockPositionHandler.Handle(User.Identifier(), command));
