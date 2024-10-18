@@ -55,11 +55,12 @@ type OptionDetail(symbol:string, side:string, description:string) =
         this.Bid / this.StrikePrice
 
 
-type OptionChain(symbol: string, volatility: decimal, numberOfContracts: decimal, options: OptionDetail[]) =
+type OptionChain(symbol: string, volatility: decimal, numberOfContracts: decimal, options: OptionDetail[], underlyingPrice: decimal option) =
     member this.Symbol = symbol
     member this.Volatility = volatility
     member this.NumberOfContracts = numberOfContracts
     member this.Options = options
+    member this.UnderlyingPrice = underlyingPrice
 
     member this.FindMatchingOption(strikePrice: decimal, expirationDate: string, optionType: OptionType) =
         options

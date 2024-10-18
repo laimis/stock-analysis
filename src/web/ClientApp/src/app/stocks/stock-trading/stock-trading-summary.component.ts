@@ -147,7 +147,7 @@ export class StockTradingSummaryComponent {
         const shortValueData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.shortValue }));
 
         const axisY = {
-            includeZero: true,
+            // includeZero: true,
                 gridThickness: 1,
                 gridColor: 'rgba(0, 0, 0, 0.1)'
         }

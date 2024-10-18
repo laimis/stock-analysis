@@ -1160,7 +1160,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         ]
                         |> Seq.toArray
                         
-                    core.fs.Adapters.Options.OptionChain(chain.symbol.Value, chain.volatility, chain.numberOfContracts, options)
+                    core.fs.Adapters.Options.OptionChain(chain.symbol.Value, chain.volatility, chain.numberOfContracts, options, chain.underlyingPrice)
                 )
             }
             

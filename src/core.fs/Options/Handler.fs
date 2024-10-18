@@ -75,14 +75,14 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                     |> Seq.sortByDescending (fun o -> o.FirstFill.Value)
                     |> Seq.map (fun o -> OwnedOptionView(o, None))
 
-                let openOptionsTasks =
+                let! openOptions =
                     options
                     |> Seq.filter (fun o -> o.State.Closed.HasValue |> not)
                     |> Seq.map _.State
                     |> Seq.sortBy (fun o -> o.Ticker.Value, o.Expiration)
                     |> Seq.map (fun o ->
-                        task {
-                            let! chain = brokerage.GetOptions user.State o.Ticker (Some o.Expiration) None None
+                        async {
+                            let! chain = brokerage.GetOptions user.State o.Ticker (Some o.Expiration) None None |> Async.AwaitTask
 
                             let detail =
                                 match chain with
@@ -91,8 +91,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
 
                             return OwnedOptionView(o, detail)
                         })
-
-                let! openOptions = System.Threading.Tasks.Task.WhenAll(openOptionsTasks)
+                    |> Async.Sequential
 
                 let! brokerageAccount = brokerage.GetAccount(user.State)
 
@@ -114,6 +113,8 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                         positions, orders
                     )
                     |> Result.defaultValue (Seq.empty, Array.empty)
+                    
+                let openBrokerageOrders = brokerageOrders |> Seq.filter (_.IsActive)
 
                 return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok
         }
@@ -271,14 +272,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
             | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
 
-                let! priceResult = brokerage.GetQuote user.State query.Ticker
-
-                let price =
-                    match priceResult with
-                    | Ok price -> Some price.Price
-                    | Error _ -> None
-
                 let! details = brokerage.GetOptions user.State query.Ticker None None None
                 
-                return details |> Result.map (fun d -> OptionDetailsViewModel(price, d))
+                return details |> Result.map OptionChainView
         }
