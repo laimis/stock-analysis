@@ -10,7 +10,7 @@
                     </div>
                     <span class="badge" [ngClass]="{
             'bg-success': order.status === 'Filled',
-            'bg-warning': order.status === 'Pending' || order.status === 'Working',
+            'bg-warning': order.status === 'Pending' || order.status === 'Working' || order.status === 'PendingActivation',
             'bg-danger': order.status === 'Canceled' || order.status === 'Expired' || order.status === 'Replaced'
           }">{{ order.status }}</span>
                 </div>
@@ -43,11 +43,21 @@
                                     <span class="badge bg-secondary ms-2">{{ leg.instruction }}</span>
                                 </div>
                                 <span *ngIf="leg.price" class="text-muted">
-                  {{ leg.price | currency }} per contract
+                  {{ leg.price | currency }}
                 </span>
                             </div>
                         </li>
                     }
+                    <li class="list-group-item bg-light" *ngIf="order.canBeCancelled">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold">Market Price</span>
+                            </div>
+                            <span class="fw-bold">
+                                {{ marketPrice(order.legs) | currency }}
+                            </span>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -41,7 +41,7 @@ namespace coretests.Options
                 ));
 
             var brokerage = new Mock<IBrokerage>();
-            brokerage.Setup(x => x.GetOptions(It.IsAny<UserState>(), It.IsAny<Ticker>(), null, null, null))
+            brokerage.Setup(x => x.GetOptionChain(It.IsAny<UserState>(), It.IsAny<Ticker>(), null, null, null))
                 .Returns(Task.FromResult(
                     FSharpResult<OptionChain,ServiceError>.NewOk(new OptionChain("TICKER", 0, 0, Array.Empty<OptionDetail>(), FSharpOption<decimal>.None))
                 ));

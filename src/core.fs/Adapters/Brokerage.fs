@@ -107,7 +107,14 @@ type OptionLeg = {
     Instruction: OptionOrderInstruction
     Quantity: decimal
     Price: decimal option
+    Expiration: string
+    StrikePrice: decimal
 }
+    with
+    
+        member this.ExpirationDate : DateTimeOffset =
+            let date = DateTimeOffset.ParseExact(this.Expiration, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture)
+            date
 
 [<CLIMutable>]
 type OptionOrder = {
@@ -277,6 +284,6 @@ type IBrokerage =
     abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<Result<Dictionary<Ticker, StockQuote>,ServiceError>>
     abstract member GetMarketHours : state:UserState -> start:DateTimeOffset -> Task<Result<MarketHours,ServiceError>>
     abstract member Search : state:UserState -> searchQueryType:SearchQueryType -> query:string -> limit:int -> Task<Result<SearchResult[],ServiceError>>
-    abstract member GetOptions : state:UserState -> ticker:Ticker -> expirationDate:DateTimeOffset option -> strikePrice:decimal option -> contractType:string option -> Task<Result<OptionChain,ServiceError>>
+    abstract member GetOptionChain : state:UserState -> ticker:Ticker -> Task<Result<OptionChain,ServiceError>>
     abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<Result<StockProfile,ServiceError>>
     abstract member GetTransactions : state:UserState -> types:AccountTransactionType array -> Task<Result<AccountTransaction[],ServiceError>>

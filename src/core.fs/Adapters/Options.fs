@@ -17,7 +17,11 @@ type OptionDetail(symbol:string, side:string, description:string) =
     member val Ask: decimal = 0m with get, set
     member val Last: decimal = 0m with get, set
     member val Mark: decimal = 0m with get, set
-    member this.OptionType = this.Side
+    member this.OptionType =
+        match this.Side with
+        | "call" -> core.fs.Options.OptionType.Call
+        | "put" -> core.fs.Options.OptionType.Put
+        | _ -> raise (ArgumentException("Invalid option type"))
     member this.IsCall = this.Side = "call"
     member this.IsPut = this.Side = "put"
     member this.Spread = this.Ask - this.Bid
@@ -62,6 +66,6 @@ type OptionChain(symbol: string, volatility: decimal, numberOfContracts: decimal
     member this.Options = options
     member this.UnderlyingPrice = underlyingPrice
 
-    member this.FindMatchingOption(strikePrice: decimal, expirationDate: string, optionType: OptionType) =
+    member this.FindMatchingOption(strikePrice: decimal, expirationDate: DateTimeOffset, optionType: core.fs.Options.OptionType) =
         options
-        |> Seq.tryFind(fun o -> o.StrikePrice = strikePrice && o.ExpirationDate = expirationDate && o.OptionType = optionType.ToString().ToLowerInvariant())
+        |> Seq.tryFind(fun o -> o.StrikePrice = strikePrice && o.ParsedExpirationDate |> Option.defaultValue DateTimeOffset.MinValue |> _.Date = expirationDate.Date && o.OptionType = optionType)

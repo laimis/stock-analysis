@@ -528,6 +528,15 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             OrderId = o.orderId.ToString()
             CanBeCancelled = o.cancelable
             Legs = o.orderLegCollection.Value |> Array.map(fun l ->
+                
+                // description is in the following format:
+                // FLOOR & DECOR HLDGS INC 11/15/2024 $115 Put
+                // so we need to extract the expiration date and the strike price using regex
+                let rm = System.Text.RegularExpressions.Regex.Match(l.instrument.description, @"(\d{1,2}/\d{1,2}/\d{4}) \$?(\d{1,3}\.?\d{0,2}) (Put|Call)")
+                
+                let expirationString = rm.Groups[1].Value
+                let strikePrice = rm.Groups[2].Value |> decimal
+                
                 {
                     LegId = l.legId.ToString()
                     Cusip = l.cusip
@@ -538,6 +547,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     Quantity = l.quantity |> decimal
                     Instruction = l.instruction |> parseOptionOrderInstruction
                     Price = o.ResolveOptionLegPrice(l.legId)
+                    Expiration = expirationString
+                    StrikePrice = strikePrice 
                 }
             ) 
         }
@@ -1098,21 +1109,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     | _ -> ServiceError "Could not find quote for ticker" |> Error
         }
 
-        member this.GetOptions (state: UserState) (ticker: Ticker) (expirationDate: DateTimeOffset option) (strikePrice: decimal option) (contractType: string option) = task {
+        member this.GetOptionChain (state: UserState) (ticker: Ticker) = task {
             
             let execFunc state = task {
-                let parameters =
-                    [
-                        $"symbol={ticker.Value}" |> Some
-                        match contractType with Some contractType -> $"contractType={contractType}" |> Some | None -> None
-                        match expirationDate with Some expirationDate -> $"fromDate=" + expirationDate.ToString("yyyy-MM-dd") |> Some | None -> None
-                        match expirationDate with Some expirationDate -> $"toDate=" + expirationDate.ToString("yyyy-MM-dd") |> Some | None -> None
-                        match strikePrice with Some strikePrice -> $"strike={strikePrice}" |> Some | None -> None
-                    ]
-                    |> List.choose id
-                    |> String.concat "&"
 
-                let resource = $"/chains?{parameters}" |> MarketDataUrl
+                let resource = $"/chains?symbol={ticker.Value}" |> MarketDataUrl
                 
                 let! chainResponse = this.CallApi<OptionChain> state resource None
                 

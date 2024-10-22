@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOptionOrder, BrokerageStockOrder} from 'src/app/services/stocks.service';
+import {BrokerageOptionOrder, BrokerageStockOrder, OptionOrderLeg} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
 
@@ -28,6 +28,22 @@ export class OptionBrokerageOrdersComponent {
         }, err => {
             this.errors = GetErrors(err)
         })
+    }
+    
+    marketPrice(legs:OptionOrderLeg[]) : number {
+        // go through each leg and add up the price of each leg to the total
+        // to determine what value to use, look at instruction property, if it says 
+        // BuyTo* then the positive price value should be used, if it says SellTo* then the negative price value should be used
+        
+        let total = 0
+        legs.forEach(leg => {
+            if (leg.instruction.startsWith("BuyTo")) {
+                total += leg.price
+            } else if (leg.instruction.startsWith("SellTo")) {
+                total -= leg.price
+            }
+        })
+        return total
     }
 
 }
