@@ -1,5 +1,6 @@
 using System;
 using core.fs.Adapters.Options;
+using core.fs.Options;
 using Xunit;
 
 namespace coretests.Adapters.Options
@@ -36,7 +37,7 @@ namespace coretests.Adapters.Options
             Assert.Equal(1, _call.Spread);
             Assert.Equal(1, _call.OpenInterest);
             Assert.Equal(2, _call.Volume);
-            Assert.Equal(_call.OptionType, _call.Side);
+            Assert.Equal(_call.OptionType, OptionType.Call);
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace coretests.Adapters.Options
             Assert.Equal(1, _put.Spread);
             Assert.Equal(1, _put.OpenInterest);
             Assert.Equal(2, _put.Volume);
-            Assert.Equal(_put.OptionType, _put.Side);
+            Assert.Equal(_put.OptionType, OptionType.Put);
         }
     }
 }
