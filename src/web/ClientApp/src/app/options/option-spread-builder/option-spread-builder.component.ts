@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {OptionChain, OptionDefinition, StocksService} from "../../services/stocks.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {GetErrors} from "../../services/utils";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
@@ -28,7 +28,8 @@ interface OptionLeg {
         LoadingComponent,
         ErrorDisplayComponent,
         NgClass,
-        StockLinkAndTradingviewLinkComponent
+        StockLinkAndTradingviewLinkComponent,
+        RouterLink
     ],
   templateUrl: './option-spread-builder.component.html',
   styleUrl: './option-spread-builder.component.css'
