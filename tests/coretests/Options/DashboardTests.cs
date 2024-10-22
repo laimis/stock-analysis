@@ -7,6 +7,7 @@ using core.fs.Options;
 using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.CSV;
 using core.fs.Accounts;
+using core.fs.Adapters.Logging;
 using core.fs.Adapters.Storage;
 using core.Shared;
 using Microsoft.FSharp.Core;
@@ -59,7 +60,7 @@ namespace coretests.Options
                     )
                 ));
             
-            var handler = new Handler(accounts.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>());
+            var handler = new Handler(accounts.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
 
             var result = await handler.Handle(query);
 
