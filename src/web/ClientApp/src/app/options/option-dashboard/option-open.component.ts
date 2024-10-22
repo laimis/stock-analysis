@@ -49,7 +49,12 @@ export class OptionOpenComponent {
     }
 
     onTickerSelected(ticker: string) {
-        this.router.navigateByUrl('/stocks/' + ticker)
+        this.router.navigateByUrl('/options/chain/' + ticker)
+            .then(fullfilled => {
+                if (!fullfilled) {
+                    console.error('Navigation to /options/chain/' + ticker + ' failed')
+                }
+            })
     }
 
     intrinsicValue(option: OwnedOption): number {

@@ -56,7 +56,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
     options: OptionDefinition[] = []; // Will be populated with stub data
     selectedLegs: OptionLeg[] = [];
     filteredOptions: OptionDefinition[] = [];
-    
+    uniqueExpirations: string[];
+
+
     sortColumn: string = 'strike';
     sortDirection: 'asc' | 'desc' = 'asc';
     filterExpiration: string = '';
@@ -70,19 +72,19 @@ export class OptionSpreadBuilderComponent implements OnInit {
     loading: boolean = false;
 
     putOpenInterest() {
-        return this.filteredOptions.filter(x => x.optionType == "put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "Put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
     }
 
     callOpenInterest() {
-        return this.filteredOptions.filter(x => x.optionType == "call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "Call").map(x => x.openInterest).reduce((a, b) => a + b, 0)
     }
 
     putVolume() {
-        return this.filteredOptions.filter(x => x.optionType == "put").map(x => x.volume).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "Put").map(x => x.volume).reduce((a, b) => a + b, 0)
     }
 
     callVolume() {
-        return this.filteredOptions.filter(x => x.optionType == "call").map(x => x.volume).reduce((a, b) => a + b, 0)
+        return this.filteredOptions.filter(x => x.optionType == "Call").map(x => x.volume).reduce((a, b) => a + b, 0)
     }
 
     loadOptions(ticker:string): void {
@@ -91,6 +93,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
             (data) => {
                 this.optionChain = data
                 this.options = this.optionChain.options
+                this.createOptionBasedFilters();
                 this.applyFiltersAndSort();
                 this.refreshLegsIfNeeded();
                 this.loading = false
@@ -100,6 +103,15 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 this.loading = false
             }
         )
+    }
+    
+    createOptionBasedFilters(): void {
+        this.uniqueExpirations = this.options.reduce((expirations, option) => {
+            if (!expirations.includes(option.expirationDate)) {
+                expirations.push(option.expirationDate);
+            }
+            return expirations;
+        }, []);
     }
 
     refreshLegsIfNeeded(): void {
@@ -114,7 +126,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                     newLegs.push({ option, action: leg.action, quantity: leg.quantity });
                 }
             }
-            this.selectedLegs = newLegs;
+            this.selectedLegs = newLegs; 
         }
     }
 
@@ -132,6 +144,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
             const bValue = b[this.sortColumn];
             return this.sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         });
+        
+        console.log("filteredOptions", this.filteredOptions)
     }
 
     setSort(column: string): void {
@@ -142,15 +156,6 @@ export class OptionSpreadBuilderComponent implements OnInit {
             this.sortDirection = 'asc';
         }
         this.applyFiltersAndSort();
-    }
-
-    getUniqueExpirations(): string[] {
-        return this.options.reduce((expirations, option) => {
-            if (!expirations.includes(option.expirationDate)) {
-                expirations.push(option.expirationDate);
-            }
-            return expirations;
-        }, []);
     }
 
     addBuy(option: OptionDefinition): void {
@@ -222,4 +227,47 @@ export class OptionSpreadBuilderComponent implements OnInit {
     abs(number: number) {
         return Math.abs(number);
     }
+    
+    
+    adjustExpiration(expirationIndex: number) {
+        // first, get the expiration date that is used for the current selected legs
+        if (this.selectedLegs.length === 0) {
+            return;
+        }
+        
+        const selectedLegExpiration = this.selectedLegs[0].option.expirationDate
+        const currentIndex = this.uniqueExpirations.indexOf(selectedLegExpiration);
+        let newIndex = currentIndex + expirationIndex;
+        
+        if (newIndex < 0) {
+            newIndex = this.uniqueExpirations.length - 1; 
+        } else if (newIndex >= this.uniqueExpirations.length) {
+            newIndex = 0;
+        }
+        
+        // now rebuild the legs by selecting the same strike price and option type
+        // but with the new expiration date
+        let newLegs = []
+        for (let leg of this.selectedLegs) {
+            let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expirationDate == this.uniqueExpirations[newIndex])
+            if (option) {
+                newLegs.push({ option, action: leg.action, quantity: leg.quantity });
+            }
+        }
+        this.selectedLegs = newLegs;
+    }
+    
+    adjustStrikes(strike: string) {
+        // this.filterMinimumStrike = strike;
+        // this.applyFiltersAndSort();
+    }
+
+    adjustWidth(width: string) {
+        // this.filterWidth = width;
+        // this.applyFiltersAndSort();
+    }
+
+    flipPosition() {}
+    mirrorStrikes() {}
+    rollToExpiration(input) {}
 }
