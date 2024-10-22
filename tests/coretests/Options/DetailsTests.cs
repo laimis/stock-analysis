@@ -8,6 +8,7 @@ using core.fs.Adapters.CSV;
 using core.fs.Adapters.Options;
 using core.fs.Adapters.Storage;
 using core.fs.Accounts;
+using core.fs.Adapters.Logging;
 using core.Shared;
 using Microsoft.FSharp.Core;
 using Moq;
@@ -41,12 +42,12 @@ namespace coretests.Options
                 ));
 
             var brokerage = new Mock<IBrokerage>();
-            brokerage.Setup(x => x.GetOptionChain(It.IsAny<UserState>(), It.IsAny<Ticker>(), null, null, null))
+            brokerage.Setup(x => x.GetOptionChain(It.IsAny<UserState>(), It.IsAny<Ticker>()))
                 .Returns(Task.FromResult(
                     FSharpResult<OptionChain,ServiceError>.NewOk(new OptionChain("TICKER", 0, 0, Array.Empty<OptionDetail>(), FSharpOption<decimal>.None))
                 ));
             
-            var handler = new Handler(accountMock.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>());
+            var handler = new Handler(accountMock.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
 
             var result = await handler.Handle(query);
 
