@@ -52,7 +52,9 @@
                         <td class="small">{{ option.cost | currency }}</td>
                         <td></td>
                         <td class="small">{{ option.marketValue | currency }}</td>
-                        <td colspan="3"></td>
+                        <td colspan="3">
+                            ({{ option.marketValue - option.cost | currency }})
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -62,7 +64,9 @@
                 <td>{{ totalCost | currency }}</td>
                 <td></td>
                 <td>{{ totalMarketValue | currency }}</td>
-                <td colspan="3"></td>
+                <td colspan="3">
+                    ({{ totalMarketValue - totalCost | currency }})
+                </td>
             </tfoot>
         </table>
     }

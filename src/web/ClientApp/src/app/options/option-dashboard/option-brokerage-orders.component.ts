@@ -10,9 +10,19 @@ import {BrokerageService} from "../../services/brokerage.service";
 })
 
 export class OptionBrokerageOrdersComponent {
+    activeFilter: string = ''
     errors: string[];
+    private _orders: BrokerageOptionOrder[];
+    groupedOrders: Map<string, BrokerageOptionOrder[]> = new Map<string, BrokerageOptionOrder[]>()
     @Input()
-    orders: BrokerageOptionOrder[]
+    set orders(value: BrokerageOptionOrder[]) {
+        this._orders = value
+        this.createGroupedOrders()
+    }
+    get orders() {
+        return this._orders
+    }
+    
     @Output()
     ordersUpdated = new EventEmitter()
 
@@ -22,12 +32,33 @@ export class OptionBrokerageOrdersComponent {
     }
 
     cancelOrder(order: BrokerageOptionOrder) {
-
+        if (!confirm('Are you sure you want to cancel this order?')) {
+            return
+        }
         this.service.cancelOrder(order.orderId).subscribe(r => {
             this.ordersUpdated.emit()
         }, err => {
             this.errors = GetErrors(err)
         })
+    }
+
+    filterOrders(status: string) {
+        this.activeFilter = this.activeFilter === status ? '' : status;
+        this.createGroupedOrders()
+    }
+    
+    createGroupedOrders() {
+        this.groupedOrders = this._orders
+            .filter(o => o.status === this.activeFilter || this.activeFilter === '')
+            .reduce((a, b) => {
+                const key = b.status;
+                if (!a.has(key)) {
+                    a.set(key, [])
+                }
+                let arr = a.get(key)
+                arr.push(b)
+                return a
+            }, new Map<string, BrokerageOptionOrder[]>())
     }
     
     marketPrice(legs:OptionOrderLeg[]) : number {
