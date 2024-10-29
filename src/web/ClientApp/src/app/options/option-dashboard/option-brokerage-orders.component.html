@@ -100,6 +100,11 @@
                     </div>
                 </div>
             </div>
+        } @empty {
+            <div class="alert alert-info d-flex align-items-center p-4" role="alert" *ngIf="activeFilter === groupKey">
+                <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                <span>No {{ groupKey }} option orders present in brokerage account</span>
+            </div>
         }
     }@empty {
         <div class="alert alert-info d-flex align-items-center p-4" role="alert">
