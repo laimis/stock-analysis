@@ -1,3 +1,99 @@
-.filterDropdown {
-    width: 200px;
+.filters-container {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.filter-select {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.group-header {
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #e9ecef;
+}
+
+.group-sum {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.group-sum.positive {
+    color: #198754;
+}
+
+.group-sum.negative {
+    color: #dc3545;
+}
+
+.transactions-table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.transactions-table thead {
+    background-color: #f8f9fa;
+}
+
+.transactions-table th {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #6c757d;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.toggle-btn {
+    color: #6c757d;
+    text-decoration: none;
+    font-family: monospace;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+.toggle-btn:hover {
+    background: #e9ecef;
+}
+
+.amount-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.amount-badge.positive {
+    background-color: #d4edda;
+    color: #0f5132;
+}
+
+.amount-badge.negative {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.transaction-type {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+}
+
+.transaction-type.positive {
+    background-color: #198754;
+}
+
+.transaction-type.negative {
+    background-color: #ffc107;
 }

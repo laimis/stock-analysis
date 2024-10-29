@@ -1,112 +1,140 @@
-<div>
+<div class="container-fluid">
+    <!-- Error Display -->
     <app-error-display [errors]="errors"></app-error-display>
-    <div class="row">
-        <div class="col">
-            <select (ngModelChange)="breakdownSelected($event)" [(ngModel)]="groupBy" class="form-select filterDropdown" id="breakdownFilter"
-                    name="breakdownFilter">
-                <option value="month">Breakdown by Month</option>
-                <option value="week">Breakdown by Week</option>
-                <option value="year">Breakdown by Year</option>
-                <option value="ticker">Breakdown by Symbol</option>
-            </select>
-        </div>
-        <div class="col">
-            <select (ngModelChange)="filterTypeSelected($event)" [(ngModel)]="filterType" class="form-select filterDropdown" id="showFilter"
-                    name="showFilter">
-                <option value="crypto">Crypto</option>
-                <option value="options">Options</option>
-                <option value="fees">Fees</option>
-                <option value="dividends">Dividends</option>
-                <option value="stocks">Stock Trades</option>
-                <option value="">All</option>
-            </select>
-        </div>
-        <div class="col">
-            <select (ngModelChange)="tickerSelected($event)" [(ngModel)]="ticker" class="form-select filterDropdown" id="symbolFilter"
-                    name="symbolFilter">
-                <option value="">All Symbols</option>
-                @if (response) {
-                    @for (t of response.tickers; track t) {
-                        <option value="{{t}}">{{ t }}</option>
+
+    <!-- Filters Section -->
+    <div class="filters-container">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-2">Breakdown By</label>
+                <select (ngModelChange)="breakdownSelected($event)"
+                        [(ngModel)]="groupBy"
+                        class="form-select filter-select"
+                        id="breakdownFilter"
+                        name="breakdownFilter">
+                    <option value="month">Breakdown by Month</option>
+                    <option value="week">Breakdown by Week</option>
+                    <option value="year">Breakdown by Year</option>
+                    <option value="ticker">Breakdown by Symbol</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-2">Type Filter</label>
+                <select (ngModelChange)="filterTypeSelected($event)"
+                        [(ngModel)]="filterType"
+                        class="form-select filter-select"
+                        id="showFilter"
+                        name="showFilter">
+                    <option value="crypto">Crypto</option>
+                    <option value="options">Options</option>
+                    <option value="fees">Fees</option>
+                    <option value="dividends">Dividends</option>
+                    <option value="stocks">Stock Trades</option>
+                    <option value="">All</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-2">Symbol Filter</label>
+                <select (ngModelChange)="tickerSelected($event)"
+                        [(ngModel)]="ticker"
+                        class="form-select filter-select"
+                        id="symbolFilter"
+                        name="symbolFilter">
+                    <option value="">All Symbols</option>
+                    @if (response) {
+                        @for (t of response.tickers; track t) {
+                            <option value="{{t}}">{{ t }}</option>
+                        }
                     }
-                }
-            </select>
-        </div>
-        <div class="col">
-            <select (ngModelChange)="txTypeSelected($event)" [(ngModel)]="txType" class="form-select filterDropdown" id="txType"
-                    name="txType">
-                <option value="pl">Realized Gain/Loss</option>
-                <option value="tx">All Transactions</option>
-            </select>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted mb-2">Transaction Type</label>
+                <select (ngModelChange)="txTypeSelected($event)"
+                        [(ngModel)]="txType"
+                        class="form-select filter-select"
+                        id="txType"
+                        name="txType">
+                    <option value="pl">Realized Gain/Loss</option>
+                    <option value="tx">All Transactions</option>
+                </select>
+            </div>
         </div>
     </div>
 
+    <!-- Loading State -->
     @if (loading) {
         <app-loading></app-loading>
     }
 
+    <!-- Transactions Groups -->
     @if (response) {
         @for (g of response.grouped; track g) {
-            <div class="mb-2 mt-3">
-                <div class="text-muted font-size-small row">
-                    <div class="col-4">
-                        @if (showDetails !== g.name) {
-                            <button class="btn btn-link" (click)="showDetails = g.name">[ + ]</button>
-                        }
-                        @if (showDetails === g.name) {
-                            <button class="btn btn-link" (click)="showDetails = ''">[ - ]</button>
-                        }
-                        {{ g.name }} ({{ g.transactions.length }})
-                    </div>
-                    <div class="col-8 font-weight-bold text-end">
-                        {{ g.sum | currency }}
+            <div class="mb-4">
+                <div class="group-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <button class="toggle-btn" (click)="showDetails = showDetails === g.name ? '' : g.name">
+                                {{ showDetails === g.name ? '[-]' : '[+]' }}
+                            </button>
+                            <span class="text-muted">{{ g.name }}</span>
+                            <span class="badge bg-secondary ms-2">{{ g.transactions.length }}</span>
+                        </div>
+                        <span class="group-sum" [class.positive]="g.sum >= 0" [class.negative]="g.sum < 0">
+                            {{ g.sum >= 0 ? '+' : '' }}{{ g.sum | currency }}
+                        </span>
                     </div>
                 </div>
+
                 @if (showDetails === g.name) {
-                    <table class="table table-hover border rounded">
-                        <thead class="thead-light">
-                        <tr>
-                            <th>Date</th>
-                            <th>Symbol</th>
-                            <th>Description</th>
-                            <th class="text-end">Amount</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @for (t of g.transactions; track t) {
-                                <tr
-                                >
-                                    <td>{{ t.date | date:'shortDate' }}</td>
-                                    <td>
-                                        @if (t.isOption) {
-                                            <a [routerLink]="[ '/optiondetails', t.aggregateId ]"
-                                               target="_blank">{{ t.ticker }}</a>
-                                        } @else {
-                                            <app-stock-link [ticker]="t.ticker" [openInNewTab]=true></app-stock-link>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (t.amount >= 0) {
-                                            <span class="badge bg-success">&nbsp;&nbsp;</span>
-                                        }
-                                        @if (t.amount < 0) {
-                                            <span class="badge bg-warning">&nbsp;&nbsp;</span>
-                                        }
-                                        {{ t.description }}
-                                    </td>
-                                    <td class="text-end">{{ t.amount | currency }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                    <div class="transactions-table">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                            <tr>
+                                <th class="ps-4">Date</th>
+                                <th>Symbol</th>
+                                <th>Description</th>
+                                <th class="text-end pe-4">Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                @for (t of g.transactions; track t) {
+                                    <tr>
+                                        <td class="ps-4">{{ t.date | date:'shortDate' }}</td>
+                                        <td>
+                                            @if (t.isOption) {
+                                                <a [routerLink]="[ '/optiondetails', t.aggregateId ]"
+                                                   class="text-decoration-none"
+                                                   target="_blank">{{ t.ticker }}</a>
+                                            } @else {
+                                                <app-stock-link [ticker]="t.ticker" [openInNewTab]=true></app-stock-link>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="transaction-type"
+                                                  [class.positive]="t.amount >= 0"
+                                                  [class.negative]="t.amount < 0">
+                                            </span>
+                                            {{ t.description }}
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <span class="amount-badge"
+                                                  [class.positive]="t.amount >= 0"
+                                                  [class.negative]="t.amount < 0">
+                                                {{ t.amount >= 0 ? '+' : '' }}{{ t.amount | currency }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             </div>
         } @empty {
-            <div class="mt-2">
-                <div class="alert alert-secondary">
-                    You have no transactions on record. Once you record buy or sells of shares or options, they will show up
-                    here.
-                </div>
+            <div class="alert alert-info d-flex align-items-center p-4" role="alert">
+                <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                <span>You have no transactions on record. Once you record buy or sells of shares or options, they will show up here.</span>
             </div>
         }
     }

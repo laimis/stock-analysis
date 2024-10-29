@@ -151,9 +151,16 @@
                                 <div>
                                     <span class="badge" [ngClass]="{'bg-success': leg.action === 'buy', 'bg-danger': leg.action === 'sell'}">{{leg.action}}</span>
                                     <input type="number" [(ngModel)]="leg.quantity" (change)="updateLegQuantity(i, leg.quantity)" min="1" class="form-control form-control-sm d-inline-block mx-2" style="width: 60px;">
-                                    {{ leg.option.side }} {{ leg.option.strikePrice | currency }} {{ leg.option.expirationDate }}
+                                    <small>{{ leg.option.side }} {{ leg.option.strikePrice | currency }} {{ leg.option.expirationDate }}</small>
                                     <small class="text-muted d-block">
                                         {{ leg.option.bid | currency }} x {{ leg.option.ask | currency }}
+                                    </small>
+                                    <small class="text-info d-block">
+                                        <!-- output greeks and use greek symbols for labels -->
+                                        δ: {{ leg.option.delta | number:'.2' }},
+                                        γ: {{ leg.option.gamma | number:'.2' }},
+                                        θ: {{ leg.option.theta | number:'.2' }},
+                                            v: {{ leg.option.vega | number:'.2' }}    
                                     </small>
                                 </div>
                                 <button class="btn btn-sm btn-outline-danger" (click)="removeLeg(i)">Remove</button>
