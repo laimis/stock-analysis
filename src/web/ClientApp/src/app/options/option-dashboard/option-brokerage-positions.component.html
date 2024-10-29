@@ -1,73 +1,99 @@
 <section class="mt-4">
-    <h3>Unresolved Brokerage Positions</h3>
+    <h3 class="mb-3">Unresolved Brokerage Positions</h3>
     @if (positionCollections && positionCollections.length === 0) {
-        <div>
+        <div class="alert alert-info">
             No unresolved option positions found
         </div>
     }
     @if (positionCollections && positionCollections.length > 0) {
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>Ticker</th>
-                <th>Strike</th>
-                <th>Type</th>
-                <th>Cost</th>
-                <th>Quantity</th>
-                <th>Market Price</th>
-                <th>Expiration</th>
-                <th>Purchase Date</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (option of positionCollections; track option) {
-                    @for(position of option.positions; track position) {
-                        <tr>
-                            <td>
-                                <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
-                                <app-stock-link [ticker]="position.ticker"></app-stock-link>
-                            </td>
-                            <td>{{ position.strikePrice | currency }}</td>
-                            <td>{{ position.optionType }}</td>
-                            <td>{{ position.averageCost | currency }}</td>
-                            <td>{{ position.quantity | number }}</td>
-                            <td>
-                                {{ position.marketValue | currency }}
-                                ({{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }})
-                            </td>
-                            <td>{{ position.expirationDate | date }}</td>
-                            <td>
-                                <input type="date" #purchaseDate class="form-control" [valueAsDate]="getTodaysDate()"/>
-                            </td>
-                            <td>
-                                <button class="btn btn-primary" (click)="turnIntoPosition(position, purchaseDate.value)">Turn
-                                    into Position
-                                </button>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th>Ticker</th>
+                    <th>Strike</th>
+                    <th>Type</th>
+                    <th>Cost</th>
+                    <th>Quantity</th>
+                    <th>Market Price</th>
+                    <th>P/L</th>
+                    <th>Expiration</th>
+                    <th>Purchase Date</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (option of positionCollections; track option) {
+                        @for(position of option.positions; track position) {
+                            <tr>
+                                <td>
+                                    <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+                                    <app-stock-link [ticker]="position.ticker"></app-stock-link>
+                                </td>
+                                <td>{{ position.strikePrice | currency }}</td>
+                                <td>{{ position.optionType }}</td>
+                                <td>{{ position.averageCost | currency }}</td>
+                                <td>{{ position.quantity | number }}</td>
+                                <td>{{ position.marketValue | currency }}</td>
+                                <td>
+                                    @if ((position.marketValue - position.averageCost * 100 * position.quantity) >= 0) {
+                                        <span class="profit-loss-badge profit-loss-positive">
+                                            +{{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
+                                        </span>
+                                    } @else {
+                                        <span class="profit-loss-badge profit-loss-negative">
+                                            {{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
+                                        </span>
+                                    }
+                                </td>
+                                <td>{{ position.expirationDate | date }}</td>
+                                <td>
+                                    <input type="date" #purchaseDate class="form-control form-control-sm" [valueAsDate]="getTodaysDate()"/>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" (click)="turnIntoPosition(position, purchaseDate.value)">
+                                        Turn into Position
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                        <!-- Subtotal row for each option group -->
+                        <tr class="subtotal-row">
+                            <td colspan="3"><small class="text-muted">Subtotal</small></td>
+                            <td><small>{{ option.cost | currency }}</small></td>
+                            <td></td>
+                            <td><small>{{ option.marketValue | currency }}</small></td>
+                            <td colspan="4">
+                                @if ((option.marketValue - option.cost) >= 0) {
+                                    <small class="profit">+{{ option.marketValue - option.cost | currency }}</small>
+                                } @else {
+                                    <small class="loss">{{ option.marketValue - option.cost | currency }}</small>
+                                }
                             </td>
                         </tr>
                     }
-                    <tr>
-                        <td colspan="3"></td>
-                        <td class="small">{{ option.cost | currency }}</td>
-                        <td></td>
-                        <td class="small">{{ option.marketValue | currency }}</td>
-                        <td colspan="3">
-                            ({{ option.marketValue - option.cost | currency }})
-                        </td>
-                    </tr>
-                }
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="3"></td>
-                <td>{{ totalCost | currency }}</td>
-                <td></td>
-                <td>{{ totalMarketValue | currency }}</td>
-                <td colspan="3">
-                    ({{ totalMarketValue - totalCost | currency }})
-                </td>
-            </tfoot>
-        </table>
+                </tbody>
+                <!-- Grand total row -->
+                <tfoot>
+                <tr class="grand-total-row">
+                    <td colspan="3"><strong>Total</strong></td>
+                    <td><strong>{{ totalCost | currency }}</strong></td>
+                    <td></td>
+                    <td><strong>{{ totalMarketValue | currency }}</strong></td>
+                    <td colspan="4">
+                        @if ((totalMarketValue - totalCost) >= 0) {
+                            <span class="profit-loss-badge profit-loss-positive">
+                                    +{{ totalMarketValue - totalCost | currency }}
+                                </span>
+                        } @else {
+                            <span class="profit-loss-badge profit-loss-negative">
+                                    {{ totalMarketValue - totalCost | currency }}
+                                </span>
+                        }
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
     }
 </section>

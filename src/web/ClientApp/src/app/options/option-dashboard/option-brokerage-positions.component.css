@@ -1,0 +1,24 @@
+.profit { color: #198754; }
+.loss { color: #dc3545; }
+.subtotal-row {
+    background-color: #f8f9fa;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #dee2e6;
+}
+.grand-total-row {
+    background-color: #e9ecef;
+    font-weight: 500;
+}
+.profit-loss-badge {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+.profit-loss-positive {
+    background-color: #d4edda;
+    color: #0f5132;
+}
+.profit-loss-negative {
+    background-color: #f8d7da;
+    color: #842029;
+}

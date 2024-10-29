@@ -10,7 +10,7 @@ import {BrokerageService} from "../../services/brokerage.service";
 })
 
 export class OptionBrokerageOrdersComponent {
-    activeFilter: string = ''
+    activeFilter: string = 'Working'
     errors: string[];
     private _orders: BrokerageOptionOrder[];
     groupedOrders: Map<string, BrokerageOptionOrder[]> = new Map<string, BrokerageOptionOrder[]>()
