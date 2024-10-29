@@ -158,6 +158,14 @@ export class OptionSpreadBuilderComponent implements OnInit {
         }
         this.applyFiltersAndSort();
     }
+    
+    isBuyLeg(option: OptionDefinition): boolean {
+        return this.selectedLegs.some(x => x.option === option && x.action === 'buy');
+    }
+    
+    isSellLeg(option: OptionDefinition): boolean {
+        return this.selectedLegs.some(x => x.option === option && x.action === 'sell');
+    }
 
     addBuy(option: OptionDefinition): void {
         this.selectedLegs.push({ option, action: 'buy', quantity: 1 });
@@ -202,6 +210,12 @@ export class OptionSpreadBuilderComponent implements OnInit {
         }, 0);
     }
     
+    currentSpread() : number {
+        const maxStrikePrice = Math.max(...this.selectedLegs.map(x => x.option.strikePrice));
+        const minStrikePrice = Math.min(...this.selectedLegs.map(x => x.option.strikePrice));
+        return maxStrikePrice - minStrikePrice;
+    }
+    
     calculateUsingMark(): number {
         return this.selectedLegs.reduce((total, leg) => {
             const price = leg.option.mark;
@@ -215,14 +229,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
         if (this.selectedLegs.length !== 2) {
             return 0;
         }
-        
-        const leg1 = this.selectedLegs[0];
-        const leg2 = this.selectedLegs[1];
-        
-        const price1 = leg1.option.strikePrice
-        const price2 = leg2.option.strikePrice
-        
-        return Math.abs(price1 - price2) * percentage;
+
+        return this.currentSpread() * percentage;
     }
     
     abs(number: number) {

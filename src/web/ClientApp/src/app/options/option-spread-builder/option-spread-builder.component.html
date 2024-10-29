@@ -107,7 +107,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let option of filteredOptions">
+                    <tr *ngFor="let option of filteredOptions" [ngClass]="{'table-success': isBuyLeg(option), 'table-danger': isSellLeg(option)}">
                         <td>{{ option.strikePrice | currency }}</td>
                         <td>{{ option.expirationDate }}</td>
                         <td>{{ option.side }}</td>
@@ -172,19 +172,25 @@
                     <div class="mt-3">
                         <h6 class="card-subtitle mb-2 text-muted">Last Based Pricing</h6>
                         <p class="card-text">
-                            <span class="text-primary">{{ calculateUsingLast() | currency }}</span>
+                            <span class="text-primary">
+                                {{ calculateUsingLast() | currency }}
+                                [ {{ calculateUsingLast() / currentSpread() | percent}}]
+                            </span>
                         </p>
                     </div>
                     <div class="mt-3">
                         <h6 class="card-subtitle mb-2 text-muted">Mark Based Pricing</h6>
                         <p class="card-text">
-                            <span class="text-primary">{{ calculateUsingMark() | currency }}</span>
+                            <span class="text-primary">
+                                {{ calculateUsingMark() | currency }}
+                                [ {{ calculateUsingMark() / currentSpread() | percent}}]
+                            </span>
                         </p>
                     </div>
                     <div class="mt-3">
-                        <h6 class="card-subtitle mb-2 text-muted">30-40% of Spread Based Pricing</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">25-40% of Spread Based Pricing</h6>
                         <p class="card-text">
-                            <span class="text-primary">{{ calculateUsingSpreadPercentage(0.3) | currency }}</span> x <span class="text-primary">{{ calculateUsingSpreadPercentage(0.4) | currency }}</span>
+                            <span class="text-primary">{{ calculateUsingSpreadPercentage(0.25) | currency }}</span> x <span class="text-primary">{{ calculateUsingSpreadPercentage(0.4) | currency }}</span>
                         </p>
                     </div>
                     
