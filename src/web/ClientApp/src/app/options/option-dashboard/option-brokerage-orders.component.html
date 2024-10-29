@@ -12,76 +12,87 @@
 
     @for(groupKey of ["Working", "PendingActivation", "Pending", "Filled", "Cancelled", "Expired", "Replaced"]; track groupKey) {
         @for(order of groupedOrders.get(groupKey); track order) {
-            <div class="card mb-3 shadow-sm">
-                <!-- Card Header -->
-                <div class="card-header py-2">
+            <div class="card order-card mb-3 shadow-sm status-{{ order.status.toLowerCase() }}">
+                <!-- Enhanced Card Header -->
+                <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                            <app-trading-view-link [ticker]="order.legs[0].underlyingTicker"></app-trading-view-link>
-                            <app-stock-link [ticker]="order.legs[0].underlyingTicker"></app-stock-link>
-                            <span class="badge rounded-pill" [ngClass]="{
-                            'bg-success': order.status === 'Filled',
-                            'bg-warning text-dark': order.status === 'Pending' || order.status === 'Working' || order.status === 'PendingActivation',
-                            'bg-danger': order.status === 'Canceled' || order.status === 'Expired' || order.status === 'Replaced'
-                        }">{{ order.status }}</span>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <app-trading-view-link [ticker]="order.legs[0].underlyingTicker"></app-trading-view-link>
+                                <app-stock-link [ticker]="order.legs[0].underlyingTicker"></app-stock-link>
+                            </div>
+                            <span class="status-badge badge rounded-pill" [ngClass]="{
+                                'bg-success': order.status === 'Filled',
+                                'bg-warning text-dark': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
+                                'bg-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
+                            }">{{ order.status }}</span>
                         </div>
-                        <div class="text-end">
-                            <span class="fw-bold text-primary">{{ order.price | currency }}</span>
+                        <div class="order-price">
+                            {{ order.price | currency }}
                         </div>
                     </div>
                 </div>
 
-                <!-- Card Body -->
-                <div class="card-body p-3">
-                    <!-- Order Details -->
-                    <div class="row g-3 mb-3 border-bottom pb-3">
+                <!-- Improved Card Body -->
+                <div class="card-body p-4">
+                    <!-- Timeline Information -->
+                    <div class="row g-4 mb-4">
                         <div class="col-md-4">
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">Entered:</small>
-                                <span>{{ order.enteredTime | parsedDate }}</span>
+                            <div class="d-flex flex-column">
+                                <span class="timestamp-label mb-1">Entered</span>
+                                <span class="timestamp">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ order.enteredTime | parsedDate }}
+                                </span>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">Executed:</small>
-                                <span>{{ order.executionTime ? (order.executionTime | parsedDate) : 'N/A' }}</span>
+                            <div class="d-flex flex-column">
+                                <span class="timestamp-label mb-1">Executed</span>
+                                <span class="timestamp">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    {{ order.executionTime ? (order.executionTime | parsedDate) : 'Pending' }}
+                                </span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <button *ngIf="order.canBeCancelled"
-                                        class="btn btn-danger btn-sm ms-auto"
-                                        (click)="cancelOrder(order)">
-                                    <i class="bi bi-x-circle me-1"></i>Cancel Order
+                        <div class="col-md-4 text-end">
+                            @if (order.canBeCancelled) {
+                                <button class="btn btn-outline-danger btn-sm cancel-btn" (click)="cancelOrder(order)">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel Order
                                 </button>
-                            </div>
+                            }
                         </div>
                     </div>
 
-                    <!-- Option Legs -->
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover mb-0">
-                            <thead class="table-light">
+                    <!-- Enhanced Legs Table -->
+                    <div class="table-responsive leg-table">
+                        <table class="table table-hover mb-0">
+                            <thead>
                             <tr>
-                                <th style="width: 100px">Quantity</th>
-                                <th style="width: 200px">Instruction</th>
+                                <th class="ps-4">Quantity</th>
+                                <th>Instruction</th>
                                 <th>Description</th>
-                                <th class="text-end">Price</th>
+                                <th class="text-end pe-4">Price</th>
                             </tr>
                             </thead>
                             <tbody>
                                 @for (leg of order.legs; track leg) {
                                     <tr>
-                                        <td>{{ leg.quantity | number }}</td>
-                                        <td><span>{{ leg.instruction }}</span></td>
+                                        <td class="ps-4">{{ leg.quantity | number }}</td>
+                                        <td>
+                                            <span class="badge" [ngClass]="{
+                                                'bg-success': leg.instruction === 'BuyToOpen' || leg.instruction === 'BuyToClose',
+                                                'bg-danger': leg.instruction === 'SellToOpen' || leg.instruction === 'SellToClose'
+                                            }">{{ leg.instruction }}</span>
+                                        </td>
                                         <td>{{ leg.description }}</td>
-                                        <td class="text-end">{{ leg.price | currency }}</td>
+                                        <td class="text-end pe-4">{{ leg.price | currency }}</td>
                                     </tr>
                                 }
                                 @if (order.canBeCancelled) {
-                                    <tr class="table-light fw-bold">
-                                        <td colspan="3">Market Price</td>
-                                        <td class="text-end">{{ marketPrice(order.legs) | currency }}</td>
+                                    <tr class="market-price-row">
+                                        <td colspan="3" class="ps-4">Current Market Price</td>
+                                        <td class="text-end pe-4">{{ marketPrice(order.legs) | currency }}</td>
                                     </tr>
                                 }
                             </tbody>
@@ -91,8 +102,8 @@
             </div>
         }
     }@empty {
-        <div class="alert alert-info d-flex align-items-center" role="alert">
-            <i class="bi bi-info-circle me-2"></i>
+        <div class="alert alert-info d-flex align-items-center p-4" role="alert">
+            <i class="bi bi-info-circle-fill me-3 fs-4"></i>
             <span>No option orders present in brokerage account</span>
         </div>
     }

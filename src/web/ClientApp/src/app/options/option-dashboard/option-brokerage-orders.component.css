@@ -1,48 +1,63 @@
-.brokerage-orders .order-card {
-    transition: box-shadow 0.3s ease-in-out;
+.order-card {
+    transition: transform 0.2s ease;
+    border: none;
+    border-left: 4px solid transparent;
 }
-
-.brokerage-orders .order-card:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+.order-card:hover {
+    transform: translateY(-2px);
 }
-
-.brokerage-orders .badge {
-    font-size: 0.8rem;
-    padding: 0.35em 0.65em;
+.order-card.status-filled {
+    border-left-color: #198754;
 }
-
-.brokerage-orders .list-group-item {
-    transition: background-color 0.2s ease-in-out;
+.order-card.status-working,
+.order-card.status-pending,
+.order-card.status-pendingactivation {
+    border-left-color: #ffc107;
 }
-
-.brokerage-orders .list-group-item:hover {
+.order-card.status-cancelled,
+.order-card.status-expired,
+.order-card.status-replaced {
+    border-left-color: #dc3545;
+}
+.order-price {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #0d6efd;
+}
+.leg-table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.leg-table thead th {
     background-color: #f8f9fa;
+    border-top: none;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
 }
-
-.brokerage-orders .list-group-item .text-muted {
-    font-size: 0.9rem;
+.market-price-row {
+    background-color: #f8f9fa;
+    font-weight: 600;
 }
-
-.brokerage-orders .card-body .row > div {
-    margin-bottom: 0.5rem;
+.timestamp {
+    font-size: 0.875rem;
+    color: #6c757d;
 }
-
-@media (max-width: 768px) {
-    .brokerage-orders .card-header .d-flex {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .brokerage-orders .card-header .badge {
-        margin-top: 0.5rem;
-    }
-
-    .brokerage-orders .list-group-item .d-flex {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .brokerage-orders .list-group-item .text-muted {
-        margin-top: 0.25rem;
-    }
+.timestamp-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+}
+.status-badge {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 0.35rem 0.75rem;
+}
+.cancel-btn {
+    transition: all 0.2s ease;
+}
+.cancel-btn:hover {
+    transform: scale(1.05);
 }
