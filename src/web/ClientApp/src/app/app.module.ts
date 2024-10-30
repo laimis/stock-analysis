@@ -144,10 +144,6 @@ let routes: Routes = [
     {path: 'playground/inflectionpoints', component: InflectionPointsComponent, canActivate: [AuthGuard]},
 
     {path: 'privacy', component: PrivacyComponent},
-    {path: 'trading', component: StockTradingDashboardComponent, canActivate: [AuthGuard]},
-    {path: 'trading/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard], title: 'Stock Position Analysis'},
-    {path: 'trading/simulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard]},
-    {path: 'trading/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard]},
     {
         path: 'trading/review',
         component: StockTradingReviewDashboardComponent,
@@ -160,8 +156,11 @@ let routes: Routes = [
         canActivate: [AuthGuard],
         title: 'Review'
     },
-    {path: 'trading/:tab', component: StockTradingDashboardComponent, canActivate: [AuthGuard]},
-
+    {path: 'stocks/tradingsimulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard], title: 'Trading Simulations'},
+    {path: 'stocks/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard], title : 'Simulator'},
+    {path: 'stocks/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard], title: 'Stock Position Analysis'},
+    {path: 'stocks/positions', component: StockTradingDashboardComponent, canActivate: [AuthGuard], title: 'Stock Positions'},
+    {path: 'stocks/positions/:tab', component: StockTradingDashboardComponent, canActivate: [AuthGuard], title: 'Stock Positions'},
     {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
     {path: 'stocks/lists/:id', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
     {path: 'stocks/newposition', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},

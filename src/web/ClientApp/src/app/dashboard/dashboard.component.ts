@@ -17,9 +17,10 @@ export class DashboardComponent implements OnInit {
     toolLinks = [
         {path: '/summary', label: 'Weekly Summary'},
         {path: '/trading/review', label: 'Trading Review'},
+        {path: '/stocks/analysis', label: 'Stock Position Analysis'},
+        {path: '/stocks/tradingsimulations', label: 'Simulations'},
+        {path: '/stocks/simulator', label: 'SimulatOR'},
         {path: '/stocks/lists', label: 'Stock Lists'},
-        {path: '/trading/simulations', label: 'Simulations'},
-        {path: '/trading/simulator', label: 'SimulatOR'},
         {path: '/reports/recentsells', label: 'Recent Sells'},
         {path: '/transactions', label: 'Transactions'},
         {path: '/reports/chain', label: 'Chain'},

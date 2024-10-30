@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
 import {
     BrokerageAccount, BrokerageAccountSnapshot,
@@ -60,7 +59,6 @@ export class StockTradingDashboardComponent implements OnInit {
 
     constructor(
         private stockService: StockPositionsService,
-        private title: Title,
         private route: ActivatedRoute
     ) {
     }
@@ -70,7 +68,6 @@ export class StockTradingDashboardComponent implements OnInit {
             this.activeTab = param['tab'] || 'positions'
         })
 
-        this.title.setTitle("Trading Dashboard - Nightingale Trading")
         this.loadEntries()
     }
 

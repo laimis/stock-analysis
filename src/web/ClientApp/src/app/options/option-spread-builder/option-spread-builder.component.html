@@ -162,6 +162,9 @@
                                         θ: {{ leg.option.theta | number:'.2' }},
                                             v: {{ leg.option.vega | number:'.2' }}    
                                     </small>
+                                    <small class="text-info d-block">
+                                        IV: {{ leg.option.volatility | number:'.2' }}
+                                    </small>
                                 </div>
                                 <button class="btn btn-sm btn-outline-danger" (click)="removeLeg(i)">Remove</button>
                             </div>

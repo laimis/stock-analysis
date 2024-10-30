@@ -13,9 +13,9 @@ export class NavMenuComponent {
     errors: string[] = null
 
     links = [
-        {path: '/trading', label: 'Positions'},
+        {path: '/stocks/positions', label: 'Stocks'},
+        {path: '/options', label: 'Options'},
         {path: '/stocks/newposition', label: 'Trade'},
-        {path: '/trading/analysis', label: 'Daily Analysis'},
         {path: '/routines', label: 'Routines'},
         {path: '/profile', label: 'Profile'}
     ];
