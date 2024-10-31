@@ -22,6 +22,9 @@
            (click)="activateTab('performance')">
             Performance
         </a>
+        <a class="tab" [routerLink]="['/options/chain']">
+            Trade Builder
+        </a>
     </div>
 
 @if (loaded && isActive('open')) {

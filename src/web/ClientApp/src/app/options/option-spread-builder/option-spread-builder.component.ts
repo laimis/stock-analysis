@@ -7,6 +7,7 @@ import {GetErrors} from "../../services/utils";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
+import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 
 interface OptionLeg {
     option: OptionDefinition;
@@ -29,7 +30,8 @@ interface OptionLeg {
         ErrorDisplayComponent,
         NgClass,
         StockLinkAndTradingviewLinkComponent,
-        RouterLink
+        RouterLink,
+        StockSearchComponent
     ],
   templateUrl: './option-spread-builder.component.html',
   styleUrl: './option-spread-builder.component.css'
@@ -40,20 +42,22 @@ export class OptionSpreadBuilderComponent implements OnInit {
     }
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
-            this.ticker = params.get('ticker');
-            if (this.ticker) {
-                this.loadOptions(this.ticker);
-            } else {
-                this.errors = ['No ticker provided'];
+            const ticker = params.get('ticker');
+            if (ticker) {
+                this.initTicker(ticker);
             }
         }, error => {
             this.errors = GetErrors(error);
         })
     }
-
+    
+    initTicker(value:string) {
+        this.ticker = value;
+        this.loadOptions(value);
+    }
 
     // option business
-    ticker: string = 'AAPL'; // Example ticker
+    ticker: string;
     options: OptionDefinition[] = []; // Will be populated with stub data
     selectedLegs: OptionLeg[] = [];
     filteredOptions: OptionDefinition[] = [];
@@ -95,6 +99,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 this.optionChain = data
                 this.options = this.optionChain.options
                 this.createOptionBasedFilters();
+                this.loadFiltersFromLocalStorage()
                 this.applyFiltersAndSort();
                 this.refreshLegsIfNeeded();
                 this.loading = false
@@ -132,6 +137,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
     }
 
     applyFiltersAndSort(): void {
+        
+        this.storeFiltersInLocalStorage();
+        
         this.filteredOptions = this.options.filter(option => {
             return (this.filterExpiration === '' || option.expirationDate === this.filterExpiration) &&
                 (this.filterType === 'all' || option.side === this.filterType) &&
@@ -147,6 +155,42 @@ export class OptionSpreadBuilderComponent implements OnInit {
         });
         
         console.log("filteredOptions", this.filteredOptions)
+    }
+    
+    storeFiltersInLocalStorage() {
+        // store the filters in local storage by ticker
+        const key = `optionSpreadBuilderFilters-${this.ticker}`;
+        const filters = {
+            filterExpiration: this.filterExpiration,
+            filterType: this.filterType,
+            filterVolumeOI: this.filterVolumeOI,
+            filterBid: this.filterBid,
+            filterMinimumStrike: this.filterMinimumStrike
+        }
+        
+        // store the filters in local storage
+        localStorage.setItem(key, JSON.stringify(filters));
+    }
+    
+    loadFiltersFromLocalStorage() {
+        const key = `optionSpreadBuilderFilters-${this.ticker}`;
+        const filters = JSON.parse(localStorage.getItem(key));
+        if (filters) {
+            this.filterExpiration = filters.filterExpiration;
+            this.filterType = filters.filterType;
+            this.filterVolumeOI = filters.filterVolumeOI;
+            this.filterBid = filters.filterBid;
+            this.filterMinimumStrike = filters.filterMinimumStrike;
+        }
+    }
+    
+    clearFilters(): void {
+        this.filterExpiration = '';
+        this.filterType = 'all';
+        this.filterVolumeOI = 'notzero';
+        this.filterBid = 'all';
+        this.filterMinimumStrike = 0;
+        this.applyFiltersAndSort();
     }
 
     setSort(column: string): void {
@@ -187,14 +231,14 @@ export class OptionSpreadBuilderComponent implements OnInit {
         return this.selectedLegs.reduce((total, leg) => {
             const price = leg.action === 'buy' ? leg.option.ask : leg.option.bid;
             const multiplier = leg.action === 'buy' ? -1 : 1;
-            return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
+            return total + (price * leg.quantity * multiplier);
         }, 0);
     }
     calculateMostFavorable(): number {
         return this.selectedLegs.reduce((total, leg) => {
             const price = leg.action === 'buy' ? leg.option.bid : leg.option.ask;
             const multiplier = leg.action === 'buy' ? -1 : 1;
-            return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
+            return total + (price * leg.quantity * multiplier);
         }, 0);
     }
 
@@ -206,7 +250,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
         return this.selectedLegs.reduce((total, leg) => {
             const price = leg.option.last;
             const multiplier = leg.action === 'buy' ? -1 : 1;
-            return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
+            return total + (price * leg.quantity * multiplier);
         }, 0);
     }
     
@@ -220,7 +264,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
         return this.selectedLegs.reduce((total, leg) => {
             const price = leg.option.mark;
             const multiplier = leg.action === 'buy' ? -1 : 1;
-            return total + (price * leg.quantity * multiplier); // Multiply by 100 for contract size
+            return total + (price * leg.quantity * multiplier);
         }, 0);
     }
     
@@ -236,7 +280,42 @@ export class OptionSpreadBuilderComponent implements OnInit {
     abs(number: number) {
         return Math.abs(number);
     }
+
+    clearLegs() {
+        this.selectedLegs = [];
+    }
     
+    netDelta() {
+        return this.selectedLegs.reduce((total, leg) => {
+            const delta = leg.option.delta;
+            const multiplier = leg.action === 'buy' ? 1 : -1;
+            return total + (delta * multiplier);
+        }, 0);
+    }
+    
+    netGamma() {
+        return this.selectedLegs.reduce((total, leg) => {
+            const gamma = leg.option.gamma;
+            const multiplier = leg.action === 'buy' ? 1 : -1;
+            return total + (gamma * multiplier);
+        }, 0);
+    }
+    
+    netTheta() {
+        return this.selectedLegs.reduce((total, leg) => {
+            const theta = leg.option.theta;
+            const multiplier = leg.action === 'buy' ? 1 : -1;
+            return total + (theta * multiplier);
+        }, 0);
+    }
+    
+    netVega() {
+        return this.selectedLegs.reduce((total, leg) => {
+            const vega = leg.option.vega;
+            const multiplier = leg.action === 'buy' ? 1 : -1;
+            return total + (vega * multiplier);
+        }, 0);
+    }
     
     adjustExpiration(expirationIndex: number) {
         // first, get the expiration date that is used for the current selected legs
