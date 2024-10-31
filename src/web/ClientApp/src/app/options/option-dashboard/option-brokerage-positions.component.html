@@ -37,13 +37,13 @@
                                 <td>{{ position.marketValue | currency }}</td>
                                 <td>
                                     @if ((position.marketValue - position.averageCost * 100 * position.quantity) >= 0) {
-                                        <span class="profit-loss-badge profit-loss-positive">
+                                        <small class="profit">
                                             +{{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
-                                        </span>
+                                        </small>
                                     } @else {
-                                        <span class="profit-loss-badge profit-loss-negative">
+                                        <small class="loss">
                                             {{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
-                                        </span>
+                                        </small>
                                     }
                                 </td>
                                 <td>{{ position.expirationDate | date }}</td>
@@ -65,9 +65,9 @@
                             <td><small>{{ option.marketValue | currency }}</small></td>
                             <td colspan="4">
                                 @if ((option.marketValue - option.cost) >= 0) {
-                                    <small class="profit">+{{ option.marketValue - option.cost | currency }}</small>
+                                    <span class="profit-loss-badge profit-loss-positive">+{{ option.marketValue - option.cost | currency }}</span>
                                 } @else {
-                                    <small class="loss">{{ option.marketValue - option.cost | currency }}</small>
+                                    <span class="profit-loss-badge profit-loss-negative">{{ option.marketValue - option.cost | currency }}</span>
                                 }
                             </td>
                         </tr>

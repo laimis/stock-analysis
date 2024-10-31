@@ -19,6 +19,13 @@
     </div>
 
     <app-loading *ngIf="loading"></app-loading>
+    
+    <div class="row mb-3">
+        <div class="col">
+            <button class="btn btn-primary me-2" (click)="this.manualSelection = true">Select Spreads Manually</button>
+            <button class="btn btn-primary" (click)="this.manualSelection = false; findBullCallSpreads()">Find Bull Call Spreads</button>
+        </div>
+    </div>
 
     <div class="row" *ngIf="filteredOptions && optionChain">
         <div class="col">
@@ -48,7 +55,70 @@
         </div>
     </div>
     
-    <div class="row" *ngIf="optionChain">
+    <div class="row" *ngIf="optionChain && builtSpreads && !manualSelection">
+        <div class="col">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Long</th>
+                        <th>Short</th>
+                        <th>Spread</th>
+                        <th>Cost</th>
+                        <th>Cost/Spread</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @for(spread of builtSpreads; track spread) {
+                    <tr>
+                        <td>
+                            <small>
+                                <!-- output option summary that is bid x ask (spread), volume/oi, delta -->
+                                {{ spread.longOption.strikePrice | currency }},
+                                {{ spread.longOption.bid | currency }} x {{ spread.longOption.ask | currency }} ({{ abs(spread.longOption.bid - spread.longOption.ask) | number }}), 
+                                {{ spread.longOption.volume | number }}/{{ spread.longOption.openInterest | number }}, {{ spread.longOption.delta | number:'.2' }}
+                            </small>
+                            <small>
+                                {{ spread.longOption.expirationDate }}
+                            </small>
+                        </td>
+                        <td>
+                            <small>
+                                {{ spread.shortOption.strikePrice | currency }}, 
+                                {{ spread.shortOption.bid | currency }} x {{ spread.shortOption.ask | currency }} ({{ abs(spread.shortOption.bid - spread.shortOption.ask) | number }}),
+                                {{ spread.shortOption.volume | number }}/{{ spread.shortOption.openInterest | number }}, {{ spread.shortOption.delta | number:'.2' }}
+                            </small>
+                            <small>
+                                {{ spread.shortOption.expirationDate }}
+                            </small>
+                        </td>
+                        <td>
+                            {{ abs(spread.longOption.strikePrice - spread.shortOption.strikePrice) * 100 | currency}}
+                        </td>
+                        <td>
+                            {{ spread.cost | currency }}
+                        </td>
+                        <td>
+                            {{ spread.cost / (abs(spread.longOption.strikePrice - spread.shortOption.strikePrice)) | percent }}
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    }
+                    @empty {
+                        <tr>
+                            <td colspan="6">No spreads found.</td>
+                        </tr>
+                    } 
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row" *ngIf="optionChain && manualSelection">
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-body">

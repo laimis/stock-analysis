@@ -63,7 +63,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filteredOptions: OptionDefinition[] = [];
     uniqueExpirations: string[];
 
-
+    // filtering business
     sortColumn: string = 'strike';
     sortDirection: 'asc' | 'desc' = 'asc';
     filterExpiration: string = '';
@@ -71,6 +71,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filterVolumeOI: 'all' | 'notzero' = 'notzero';
     filterBid: 'all' | 'notzero' = 'all';
     filterMinimumStrike: number = 0;
+    
+    manualSelection: boolean = false;
+    
     optionChain: OptionChain;
 
     errors: string[] = [];
@@ -358,4 +361,54 @@ export class OptionSpreadBuilderComponent implements OnInit {
     flipPosition() {}
     mirrorStrikes() {}
     rollToExpiration(input) {}
+
+    builtSpreads: {longOption:OptionDefinition, shortOption:OptionDefinition, cost:number}[] = null
+    findBullCallSpreads() {
+        let spreads : {longOption:OptionDefinition, shortOption:OptionDefinition, cost:number}[] = []
+        
+        // first filter out available options to a valid call option
+        // the filter should take options that are 30 to 90 days out
+        // spread should be 10% or less of the stock price
+        // some open interest, and some volume
+        let minExpirationDate = Date.now() + 30 * 24 * 60 * 60 * 1000
+        let maxExpirationDate = Date.now() + 90 * 24 * 60 * 60 * 1000
+        
+        let callOptions = this.options.filter(x => 
+            x.optionType == "Call" 
+            && x.openInterest > 0 
+            && x.volume > 0
+            && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
+            && Date.parse(x.expirationDate) > minExpirationDate
+            && Date.parse(x.expirationDate) < maxExpirationDate)
+        
+        for (let longOption of callOptions) {
+            const validLong = 
+                longOption.delta > 0.35
+                && longOption.delta < 0.8
+            if (validLong) {
+                for (let shortOption of callOptions) {
+                    const validShort = 
+                        shortOption.strikePrice > longOption.strikePrice
+                        && Date.parse(shortOption.expirationDate) == Date.parse(longOption.expirationDate)
+                        && shortOption.delta <= 0.35
+                    if (validShort) {
+                        let cost = longOption.mark - shortOption.mark
+                        spreads.push({ longOption, shortOption, cost })
+                    }
+                }
+            }
+        }
+        
+        // sort spreads, first by spread, then cost
+        this.builtSpreads = spreads.sort((a, b) => {
+            let aSpread = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice) - a.cost
+            let bSpread = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice) - a.cost
+            
+            if (aSpread == bSpread) {
+                return a.cost - b.cost
+            } else {
+                return aSpread - bSpread
+            }
+        })
+    }
 }
