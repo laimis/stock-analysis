@@ -220,7 +220,7 @@
             <div class="row mt-3">
                 <div class="col">
                     @if (positionOrders.length > 0) {
-                        <app-brokerage-orders [justOrders]="true" [orders]="positionOrders"
+                        <app-brokerage-orders [orders]="positionOrders"
                                               [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId"
                                               (ordersChanged)="brokerageOrdersChanged.emit($event)"></app-brokerage-orders>
                     } @else {

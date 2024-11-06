@@ -1056,6 +1056,7 @@ export interface BrokerageStockOrder {
     isActive: boolean
     isBuyOrder: boolean
     isSellOrder: boolean
+    isCancelledOrRejected: boolean
 }
 
 export interface OptionOrderLeg {

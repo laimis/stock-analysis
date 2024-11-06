@@ -69,8 +69,9 @@ export class BrokerageOrdersComponent {
         if (this._orders) {
             const buys = this._orders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
             const sells = this._orders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const filled = this._orders.filter(o => !o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            this.groupedOrders = [buys, sells, filled]
+            const filled = this._orders.filter(o => !o.isActive && !o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
+            const cancelled = this._orders.filter(o => o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
+            this.groupedOrders = [buys, sells, filled, cancelled]
             this.isEmpty = this.groupedOrders.every(o => o.length == 0)
         }
     }

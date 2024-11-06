@@ -108,33 +108,41 @@ type OrderStrategy = {
     
         
         member this.ResolveStockPrice() =
-            match this.orderActivityCollection with
-            | Some activities ->
-                let executionPrices =
-                    activities
-                    |> Array.choose (fun o ->
-                        match o.executionLegs with
-                        | Some legs -> Some(legs |> Array.map(_.price))
-                        | None -> None
-                    )
-                    |> Array.concat
-                
-                if not (Array.isEmpty executionPrices) then
-                    Array.average executionPrices
-                else
+            let firstPass =
+                match this.orderActivityCollection with
+                | Some activities ->
+                    let executionPrices =
+                        activities
+                        |> Array.choose (fun o ->
+                            match o.executionLegs with
+                            | Some legs -> Some(legs |> Array.map(_.price))
+                            | None -> None
+                        )
+                        |> Array.concat
+                    
+                    if not (Array.isEmpty executionPrices) then
+                        Array.average executionPrices
+                    else
+                        match this.price with
+                        | Some p -> p
+                        | None ->
+                            match this.stopPrice with
+                            | Some sp -> sp
+                            | None -> 0m
+                | None ->
                     match this.price with
                     | Some p -> p
                     | None ->
                         match this.stopPrice with
                         | Some sp -> sp
                         | None -> 0m
-            | None ->
-                match this.price with
-                | Some p -> p
-                | None ->
-                    match this.stopPrice with
-                    | Some sp -> sp
-                    | None -> 0m
+                        
+            // first pass will prefer order activity collection resolution
+            // but in case the order was cancelled, the activity collection has 0 as price
+            // while the order itself has the correct price, so fall back to that
+            match firstPass with
+            | 0m -> this.price |> Option.defaultValue 0m
+            | _ -> firstPass
                     
         member this.ResolveOptionPrice() =
             match this.price with
