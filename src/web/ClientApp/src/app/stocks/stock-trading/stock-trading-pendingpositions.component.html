@@ -82,7 +82,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
-                    <button type="button" class="btn btn-primary" (click)="closeButton.disabled = true; confirmClosePosition()" #closeButton>Close Position</button>
+                    <button type="button" class="btn btn-primary" (click)="confirmClosePosition(closeButton)" #closeButton>Close Position</button>
                 </div>
             </div>
         </div>

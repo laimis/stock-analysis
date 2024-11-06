@@ -80,16 +80,19 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     closeCloseModal() {
         this.closingPosition = null
     }
-    confirmClosePosition() {
+    confirmClosePosition(button: HTMLButtonElement) {
+        button.disabled = true
         this.stockService.closePendingPosition(this.closingPosition.id, this.closeReason).subscribe(
             (_) => {
                 this.pendingPositionClosed.emit(this.closingPosition);
                 this.closingPosition = null;
                 this.closeReason = null;
+                button.disabled = false
                 this.refreshPendingPositions()
             },
             (error) => {
                 this.closeErrors = GetErrors(error)
+                button.disabled = false
                 console.log(error)
             }
         )
