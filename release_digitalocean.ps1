@@ -26,7 +26,7 @@ function Ensure-DigitalOcean-Connectivity() {
     $account = invoke-expression 'doctl account get --format Status'
     $accountInfo = [System.String]::Join(" ", $account)
     
-    if ($accountInfo -eq $null || $accountInfo.Contains("Status active") -eq $false) {
+    if (($accountInfo -eq $null) -or ($accountInfo.Contains("Status active") -eq $false)) {
         write-host $accountInfo
         Exit-With-Error "Digital Ocean not available..."
     }
