@@ -446,7 +446,14 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                         match pendingPositionOption with
                         | Some pendingPosition ->
                             match pendingPosition.State.Notes with
-                            | _ when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) |> not -> pendingPosition.State.Notes |> Some
+                            | _ when String.IsNullOrWhiteSpace(pendingPosition.State.Notes) |> not ->
+                                // the note should have the following format if we find pending position:
+                                // "Pending position created on {date} ({days} ago) with the following notes: {notes}"
+                                let notes = pendingPosition.State.Notes
+                                let date = pendingPosition.State.Created.ToString("d")
+                                let days = (DateTimeOffset.UtcNow - pendingPosition.State.Created).Days |> int
+                                let template = $"Pending position created on {date} ({days} ago) with the following notes:\r\n\r\n{notes}"
+                                template |> Some
                             | _ -> None
                         | None -> None
                         
