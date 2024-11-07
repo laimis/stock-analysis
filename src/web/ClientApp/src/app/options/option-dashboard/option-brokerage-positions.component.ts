@@ -59,6 +59,11 @@ export class OptionBrokeragePositionsComponent {
     getTodaysDate() {
         return new Date()
     }
+    
+    getExpirationInDays(option: BrokerageOptionPositionCollection) {
+        let position = option.positions[0]
+        return Math.floor((new Date(position.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    }
 
     turnIntoPosition(position: BrokerageOptionPosition, purchased: string) {
         let opt = {

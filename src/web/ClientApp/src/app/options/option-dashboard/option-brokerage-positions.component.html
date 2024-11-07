@@ -63,13 +63,17 @@
                             <td><small>{{ option.cost | currency }}</small></td>
                             <td></td>
                             <td><small>{{ option.marketValue | currency }}</small></td>
-                            <td colspan="4">
+                            <td>
                                 @if ((option.marketValue - option.cost) >= 0) {
                                     <span class="profit-loss-badge profit-loss-positive">+{{ option.marketValue - option.cost | currency }}</span>
                                 } @else {
                                     <span class="profit-loss-badge profit-loss-negative">{{ option.marketValue - option.cost | currency }}</span>
                                 }
                             </td>
+                            <td>
+                               <small>{{ getExpirationInDays(option) }} days to expiration</small> 
+                            </td>
+                            <td colspan="2"></td>
                         </tr>
                     }
                 </tbody>
