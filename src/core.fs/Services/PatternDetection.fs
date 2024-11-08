@@ -86,12 +86,13 @@ let gap (gapType: GapType) (name: string) (sentimentType: SentimentType) (bars: 
         match gaps with
         | [|gap|] when gap.Type = gapType ->
             let relativeVolume = gap.RelativeVolume |> toVolumeMultiplierString
-            let gapPercentFormatted = System.Math.Round(gap.GapSizePct * 100m, 2)
+            let valueToUse = gap.PercentChange
+            let gapPercentFormatted = System.Math.Round(valueToUse * 100m, 2)
             {
                 date = bars.Last.Date
                 name = name
                 description = $"%s{name} {gapPercentFormatted}%%{relativeVolume}"
-                value = gap.GapSizePct
+                value = valueToUse
                 valueFormat = ValueFormat.Percentage
                 sentimentType = sentimentType
             } |> Some
