@@ -41,8 +41,8 @@ namespace coretests.Options
             option.Sell(1, 10, DateTimeOffset.UtcNow.AddDays(-3), "some notes");
             
             Assert.Equal(-1, option.State.NumberOfContracts);
-            Assert.Single(option.State.Transactions.Where(t => !t.IsPL));
-            Assert.Empty(option.State.Transactions.Where(t => t.IsPL));
+            Assert.Single(option.State.Transactions, t => !t.IsPL);
+            Assert.DoesNotContain(option.State.Transactions, t => t.IsPL);
             Assert.Equal(3, option.State.DaysHeld);
             // TODO: this one has timezone issue that needs to be looked at
             // Assert.Equal(12, option.State.Days);

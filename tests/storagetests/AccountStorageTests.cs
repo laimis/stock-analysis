@@ -53,7 +53,7 @@ namespace storagetests
             Assert.Equal(60, fromDbOption.Value.State.MaxLoss);
 
             var users = await storage.GetUserEmailIdPairs();
-            Assert.NotEmpty(users.Where(u => u.Email == email));
+            Assert.Contains(users, u => u.Email == email);
             
             // make sure you can fetch the events if needed
             if (storage is PostgresAggregateStorage postgresStorage)
@@ -73,7 +73,7 @@ namespace storagetests
             Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
             users = await storage.GetUserEmailIdPairs();
-            Assert.Empty(users.Where(u => u.Email == email));
+            Assert.Contains(users, u => u.Email == email);
         }
 
         [Fact]
