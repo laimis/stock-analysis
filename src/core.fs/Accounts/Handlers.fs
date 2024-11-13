@@ -391,7 +391,7 @@ namespace core.fs.Accounts
                 match user with
                 | None -> return "User account is no longer valid" |> ServiceError |> Error
                 | Some user ->
-                    match association.IsOlderThan(TimeSpan.FromMinutes(15)) with
+                    match association.IsOlderThan(TimeSpan.FromMinutes(15.0)) with
                     | true -> return "Password reset link is expired. Please request a new one." |> ServiceError |> Error
                     | false ->
                         let hashAndSalt = hashProvider.GenerateHashAndSalt reset.Password 32

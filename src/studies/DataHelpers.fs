@@ -185,14 +185,14 @@ let getPricesWithBrokerage (brokerage:IGetPriceHistory) studiesDirectory startDa
     | Ok _ -> return prices
 }
 
-let saveCsv (filename:string) content = async {
+let saveCsv (filename:string) (content:string) = async {
     let dir = System.IO.Path.GetDirectoryName(filename)
     if not (System.IO.Directory.Exists(dir)) then
         System.IO.Directory.CreateDirectory(dir) |> ignore
     do! System.IO.File.WriteAllTextAsync(filename, content) |> Async.AwaitTask
 }
 
-let appendCsv filename content = async {
+let appendCsv filename (content:string) = async {
     do! System.IO.File.AppendAllTextAsync(filename, content) |> Async.AwaitTask
 }
 

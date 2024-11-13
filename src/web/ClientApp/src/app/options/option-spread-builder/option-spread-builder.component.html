@@ -24,7 +24,10 @@
         <div class="row mb-3">
             <div class="col">
                 <button class="btn btn-primary me-2" (click)="this.manualSelection = true">Select Spreads Manually</button>
-                <button class="btn btn-primary" (click)="this.manualSelection = false; findBullCallSpreads()">Find Bull Call Spreads</button>
+                <button class="btn btn-primary me-2" (click)="this.manualSelection = false; findDebitCallSpreads()">Find Debit Call Spreads</button>
+                <button class="btn btn-primary me-2" (click)="this.manualSelection = false; findCreditCallSpreads()">Find Credit Call Spreads</button>
+                <button class="btn btn-primary me-2" (click)="this.manualSelection = false; findDebitPutSpreads()">Find Debit Put Spreads</button>
+                <button class="btn btn-primary" (click)="this.manualSelection = false; findCreditPutSpreads()">Find Credit Put Spreads</button>
             </div>
         </div>
         <div class="row" *ngIf="filteredOptions">
@@ -55,8 +58,8 @@
             </div>
         </div>
 
-        <div class="row" *ngIf="builtSpreads && !manualSelection">
-            <div class="col">
+        <div class="row">
+            <div class="col-lg-8" *ngIf="builtSpreads && !manualSelection">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-sm">
                         <thead class="table-light">
@@ -80,7 +83,7 @@
                                             {{ spread.longOption.volume | number }}/{{ spread.longOption.openInterest | number }}, {{ spread.longOption.delta | number:'.2' }}
                                         </small>
                                         <small>
-                                            {{ spread.longOption.expirationDate }}
+                                            {{ spread.longOption.expirationDate }} [{{ daysToExpiration(spread.longOption.expirationDate) }}]
                                         </small>
                                     </td>
                                     <td>
@@ -103,7 +106,7 @@
                                         {{ spread.cost / (abs(spread.longOption.strikePrice - spread.shortOption.strikePrice)) | percent }}
                                     </td>
                                     <td>
-
+                                        <button class="btn btn-sm btn-outline-primary" (click)="selectForTrade(spread)">Trade</button>
                                     </td>
                                 </tr>
                             }
@@ -116,9 +119,7 @@
                     </table>
                 </div>
             </div>
-        </div>
-        <div class="row" *ngIf="manualSelection">
-            <div class="col-lg-8">
+            <div class="col-lg-8" *ngIf="manualSelection">
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row g-3">
@@ -126,7 +127,7 @@
                                 <label for="expirationFilter" class="form-label">Expiration:</label>
                                 <select id="expirationFilter" class="form-select" [(ngModel)]="filterExpiration" (change)="applyFiltersAndSort()">
                                     <option value="">All</option>
-                                    <option *ngFor="let exp of uniqueExpirations" [value]="exp">{{ exp }}</option>
+                                    <option *ngFor="let exp of uniqueExpirations" [value]="exp">{{ exp }} [ {{ daysToExpiration(exp) }}]</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
