@@ -154,12 +154,16 @@ export class StockTradingSimulatorComponent implements OnInit {
         }
     }
 
+    showLoading: boolean = false
     showExistingPositions() {
+        this.showLoading = true
         this.stocks.getTradingEntries().subscribe(entries => {
             this.positions = entries.current;
             this.filteredPositions = entries.current;
+            this.showLoading = false
             this.showExisting = true
         }, error => {
+            this.showLoading = false
             this.errors = GetErrors(error)
         })
     }
