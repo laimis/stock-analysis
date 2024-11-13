@@ -178,7 +178,7 @@ namespace storagetests
                 InferredType = FSharpOption<AccountTransactionType>.Some(AccountTransactionType.Fee)
             };
             
-            await storage.SaveAccountBrokerageTransactions(userId, new [] { transaction });
+            await storage.SaveAccountBrokerageTransactions(userId, [transaction]);
             
             var fromDb = await storage.GetAccountBrokerageTransactions(userId);
             
