@@ -73,7 +73,7 @@ namespace storagetests
             Assert.True(FSharpOption<User>.get_IsNone(fromDbOption));
 
             users = await storage.GetUserEmailIdPairs();
-            Assert.Contains(users, u => u.Email == email);
+            Assert.DoesNotContain(users, u => u.Email == email);
         }
 
         [Fact]
