@@ -190,6 +190,19 @@ export class StockTradingReviewComponent {
             .subscribe(
                 r => {
                     this.pricesErrors = null
+                    
+                    // markers should include active orders if orders are present
+                    let markers = []
+                    
+                    if (this.orders) {
+                        this.orders.forEach(o => {
+                            if (o.isActive) {
+                                const label = o.isBuyOrder ? 'Buy' : 'Sell'
+                                markers.push({})
+                            }
+                        })
+                    }
+                    
                     this.positionChartInformation = {
                         averageBuyPrice: position.averageCostPerShare,
                         stopPrice: position.stopPrice,
