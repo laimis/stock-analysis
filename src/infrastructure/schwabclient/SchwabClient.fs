@@ -391,11 +391,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             
         let url = "/oauth/token" |> AuthAUrl |> generateUrl
 
-        let request = new HttpRequestMessage(HttpMethod.Post, url)
+        use request = new HttpRequestMessage(HttpMethod.Post, url)
         request.Headers.Authorization <- AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}")))
         request.Content <- new FormUrlEncodedContent(postData)
         
-        let! response = _httpClient.SendAsync(request)
+        use! response = _httpClient.SendAsync(request)
 
         do! logIfFailed response "refresh access token"
 
@@ -602,11 +602,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         let! oauth = getAccessToken user
         
         let makeCallAndGetResponse (ct:CancellationToken) = task {
-            let request = new HttpRequestMessage(method, resource |> generateUrl)
+            use request = new HttpRequestMessage(method, resource |> generateUrl)
             request.Headers.Authorization <- AuthenticationHeaderValue("Bearer", oauth.access_token)
             if jsonData.IsSome then
                 request.Content <- new StringContent(jsonData.Value, Encoding.UTF8, "application/json")
-            let! response = _httpClient.SendAsync(request, ct)
+            use! response = _httpClient.SendAsync(request, ct)
             let! content = response.Content.ReadAsStringAsync(ct)
             return response, content
         }
@@ -703,7 +703,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             
             logInfo "Post data prepared: {postData}" [|postData|]
             
-            let request = new HttpRequestMessage(HttpMethod.Post, "/oauth/token" |> AuthAUrl |> generateUrl)
+            use request = new HttpRequestMessage(HttpMethod.Post, "/oauth/token" |> AuthAUrl |> generateUrl)
             
             request.Content <- new FormUrlEncodedContent(postData)
             
@@ -718,7 +718,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 | _ -> logInfo "  {key}: {value}" [|header.Key; header.Value|]
 
             logInfo "Sending request..." [||]
-            let! response = _httpClient.SendAsync(request)
+            use! response = _httpClient.SendAsync(request)
             
             logInfo "Response received. Status code: {statusCode}" [|response.StatusCode|]
 
