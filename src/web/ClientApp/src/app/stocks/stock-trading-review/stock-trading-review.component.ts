@@ -191,17 +191,21 @@ export class StockTradingReviewComponent {
                 r => {
                     this.pricesErrors = null
                     
-                    // markers should include active orders if orders are present
-                    let markers = []
+                    let buyOrders = []
+                    let sellOrders = []
                     
-                    if (this.orders) {
-                        this.orders.forEach(o => {
-                            if (o.isActive) {
-                                const label = o.isBuyOrder ? 'Buy' : 'Sell'
-                                markers.push({})
-                            }
-                        })
+                    if (this.orders)
+                    {
+                        buyOrders =
+                            this.orders.filter(o => o.isBuyOrder && o.isActive && o.ticker === position.ticker)
+                                .map(o => o.price)
+
+                        sellOrders =
+                            this.orders.filter(o => !o.isBuyOrder && o.isActive && o.ticker === position.ticker)
+                                .map(o => o.price)
+
                     }
+                    // markers should include active orders if orders are present
                     
                     this.positionChartInformation = {
                         averageBuyPrice: position.averageCostPerShare,
@@ -209,7 +213,9 @@ export class StockTradingReviewComponent {
                         markers: [],
                         prices: r,
                         ticker: position.ticker,
-                        transactions: position.transactions
+                        transactions: position.transactions,
+                        buyOrders: buyOrders,
+                        sellOrders: sellOrders
                     }
                 },
                 e => {

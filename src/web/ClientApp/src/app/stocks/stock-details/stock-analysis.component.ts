@@ -56,7 +56,9 @@ export class StockAnalysisComponent {
             transactions: [],
             markers: [],
             averageBuyPrice: null,
-            stopPrice: null
+            stopPrice: null,
+            buyOrders: [],
+            sellOrders: []
         }
         this.loadData(this.ticker)
     }

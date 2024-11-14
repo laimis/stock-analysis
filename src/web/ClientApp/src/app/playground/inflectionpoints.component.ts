@@ -67,7 +67,9 @@ export class InflectionPointsComponent implements OnInit {
                     markers: inflectionPoints.map(toChartMarker),
                     transactions: [],
                     averageBuyPrice: null,
-                    stopPrice: null
+                    stopPrice: null,
+                    buyOrders: [],
+                    sellOrders: []
                 }
 
                 const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)

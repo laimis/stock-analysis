@@ -119,6 +119,22 @@ export class CandlestickChartComponent implements OnDestroy {
                 createPriceLine('stop', info.stopPrice, red)
             );
         }
+        
+        if (info.buyOrders) {
+            info.buyOrders.forEach((b) => {
+                barSeries.createPriceLine(
+                    createPriceLine('B', b, green)
+                );
+            });
+        }
+        
+        if (info.sellOrders) {
+            info.sellOrders.forEach((s) => {
+                barSeries.createPriceLine(
+                    createPriceLine('S', s, red)
+                );
+            });
+        }
 
         addLineSeries(this.chart, info.prices.movingAverages.ema20, red, info.prices.movingAverages.ema20.interval, priceBars);
         addLineSeries(this.chart, info.prices.movingAverages.sma50, green, info.prices.movingAverages.sma50.interval, priceBars);

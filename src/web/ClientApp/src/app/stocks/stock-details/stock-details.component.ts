@@ -171,7 +171,9 @@ export class StockDetailsComponent implements OnInit {
                         transactions: this.currentPosition.transactions,
                         markers: [],
                         prices: this.prices,
-                        ticker: this.currentPosition.ticker
+                        ticker: this.currentPosition.ticker,
+                        buyOrders: [],
+                        sellOrders: []
                     }
                 }
             }

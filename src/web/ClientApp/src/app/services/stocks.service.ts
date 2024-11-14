@@ -817,6 +817,8 @@ export interface PositionChartInformation {
     stopPrice: number | null
     transactions: StockTransaction[]
     markers: ChartMarker[]
+    buyOrders: number[]
+    sellOrders: number[]
 }
 
 export interface MovingAveragesContainer {

@@ -212,7 +212,9 @@ export class StockTradingNewPositionComponent {
             markers: [],
             transactions: [],
             averageBuyPrice: null,
-            stopPrice: this.chartStop
+            stopPrice: this.chartStop,
+            buyOrders: [],
+            sellOrders: []
         }
     }
 
