@@ -81,7 +81,7 @@ export class StockSearchComponent implements OnInit {
 
     clicked(ticker: string) {
         console.log("clicked: " + ticker)
-        this.selectedValue = ticker
+        this.selectedValue = "" // once the user clicks, we want to clear the input
         this.tickerSelected.emit(ticker)
     }
 

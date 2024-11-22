@@ -181,21 +181,8 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 |> Seq.map _.State
                 |> Seq.filter (fun x -> x.IsClosed |> not)
                 |> Seq.sortByDescending _.Created
-            
-            let tickers = data |> Seq.map(_.Ticker)
-            let! priceResponse = brokerage.GetQuotes user.State tickers
-            let prices = priceResponse |> Result.defaultValue (Dictionary<Ticker, StockQuote>())
-                
-            let dataWithPrices =
-                data
-                |> Seq.map (fun d ->
-                    match prices.TryGetValue(d.Ticker) with
-                    | false, _ -> d
-                    | true, price -> d.SetPrice(price.Price)
-                )
-                |> Seq.toArray
-            
-            return Ok dataWithPrices
+                        
+            return Ok data
     }
     
     

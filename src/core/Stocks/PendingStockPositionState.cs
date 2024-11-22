@@ -11,7 +11,7 @@ namespace core.Stocks
         public Guid UserId { get; private set; }
         public decimal Bid { get; private set; }
         public decimal? Price { get; private set;}
-        public decimal? PercentDiffBetweenBidAndPrice { get; private set; }
+        // public decimal? PercentDiffBetweenBidAndPrice { get; private set; }
         public decimal NumberOfShares { get; private set; }
         public FSharpOption<decimal> StopPrice { get; private set; }
         public string Notes { get; private set; }
@@ -32,12 +32,12 @@ namespace core.Stocks
 
         private void ApplyInternal(dynamic obj) => ApplyInternal(obj);
 
-        public PendingStockPositionState SetPrice(decimal price)
-        {
-            Price = price;
-            PercentDiffBetweenBidAndPrice = (price - Bid) / Bid;
-            return this;
-        }
+        // public PendingStockPositionState SetPrice(decimal price)
+        // {
+        //     Price = price;
+        //     PercentDiffBetweenBidAndPrice = (price - Bid) / Bid;
+        //     return this;
+        // }
 
         private void ApplyInternal(PendingStockPositionCreated created)
         {

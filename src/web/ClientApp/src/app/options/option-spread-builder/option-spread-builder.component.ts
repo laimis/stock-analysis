@@ -378,6 +378,11 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
     builtSpreads: SpreadCandidate[] = null
     
+    createOrder(totalCost:number) {
+        // create an order for the total cost
+        alert("Pending implementation")
+    }
+    
     findDebitCallSpreads() {
         let spreads : {longOption:OptionDefinition, shortOption:OptionDefinition, cost:number}[] = []
         

@@ -235,6 +235,9 @@
                                 θ: {{ netTheta() | number:'.2' }},
                                 v: {{ netVega() | number:'.2' }}
                             </small>
+                            <small class="text-muted">
+                                Spread: {{ currentSpread() | currency }}
+                            </small>
                         </div>
                         <ul class="list-group list-group-flush">
                             <li *ngFor="let leg of selectedLegs; let i = index" class="list-group-item">
@@ -263,6 +266,14 @@
                             <li class="list-group-item">
                                 <!-- just a button to clear all legs -->
                                 <button class="btn btn-sm btn-outline-danger" (click)="clearLegs()">Clear All</button>
+                                
+                                <!-- section to create order with input for total cost and button to submit it -->
+                                <div class="mt-3">
+                                    <label for="totalCost" class="form-label">Total Cost</label>
+                                    <input id="totalCost" type="number" class="form-control" #totalCost>
+                                    <button class="btn btn-primary mt-2" (click)="createOrder(totalCost.valueAsNumber)">Create Order</button>
+                                </div>
+                                
                             </li>
                         </ul>
                         <div class="mt-3">

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {
     BrokerageStockOrder,
-    OwnedOption,
+    OwnedOption, PendingStockPosition,
     PositionChartInformation,
     PositionInstance,
     PriceFrequency,
@@ -30,6 +30,7 @@ export class StockDetailsComponent implements OnInit {
     stockOwnership: StockOwnership
     currentPosition: PositionInstance
     currentPositionChartInfo: PositionChartInformation
+    pendingPosition: PendingStockPosition|null = null
     options: OwnedOption[]
     prices: Prices
     orders: BrokerageStockOrder[]
@@ -41,7 +42,8 @@ export class StockDetailsComponent implements OnInit {
         stock: false,
         ownership: false,
         options: false,
-        orders: false
+        orders: false,
+        pending: false
     }
 
     errors = {
@@ -49,7 +51,8 @@ export class StockDetailsComponent implements OnInit {
         ownership: null,
         options: null,
         notes: null,
-        orders: null
+        orders: null,
+        pending: null
     }
 
     constructor(
@@ -86,11 +89,13 @@ export class StockDetailsComponent implements OnInit {
         this.loading.ownership = true;
         this.loading.options = true;
         this.loading.orders = true;
+        this.loading.pending = true;
 
         this.loadStockDetails()
         this.loadStockOwnership()
         this.loadOptionOwnership()
         this.loadOrders()
+        this.loadPendingPosition()
     }
 
     loadOrders() {
@@ -113,6 +118,19 @@ export class StockDetailsComponent implements OnInit {
     
     notesChanged(_: string) {
         this.loadStockOwnership()
+    }
+    
+    loadPendingPosition() {
+        this.stocks.getPendingStockPositions().subscribe(result => {
+            let position = result.filter(p => p.ticker == this.ticker)[0]
+            if (position) {
+                this.pendingPosition = position
+            }
+            this.loading.pending = false
+        }, error => {
+            this.errors.pending = GetErrors(error)
+            this.loading.pending = false
+        })
     }
 
     loadStockDetails() {
@@ -186,5 +204,9 @@ export class StockDetailsComponent implements OnInit {
 
     activateTab(tabName: string) {
         this.activeTab = tabName
+    }
+    
+    showCloseModal(pendingPosition: PendingStockPosition) {
+        alert("not implemented")
     }
 }

@@ -1149,10 +1149,9 @@ export interface PendingStockPosition {
     id: string,
     ticker: string,
     bid: number,
-    price: number,
+    price: number|null,
     numberOfShares: number,
     stopPrice: number,
-    percentDiffBetweenBidAndPrice: number,
     created: string
     numberOfDaysActive: number
     stopLossAmount: number

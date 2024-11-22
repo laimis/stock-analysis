@@ -56,6 +56,47 @@
         (positionOpened)="loadOrders()"
         (pendingPositionCreated)="loadOrders()">
     </app-stock-trading-new-position>
+    
+    <!-- existing pending positions -->
+    <section class="card shadow-sm mb-4" *ngIf="pendingPosition">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div class="card-title">
+                    <app-stock-link-and-tradingview-link [ticker]="pendingPosition.ticker"
+                                                         [openInNewTab]="true"></app-stock-link-and-tradingview-link>
+                    <div class="d-flex align-items-center">
+                        <div class="pr-3">
+                            <span class="stat-label">Bid: </span> <span
+                            class="fw-bold">{{ pendingPosition.bid | currency }}</span>
+                        </div>
+                        <div class="px-3 border-left">
+                            <span class="stat-label">Shares: </span> <span
+                            class="fw-bold">{{ pendingPosition.numberOfShares }}</span>
+                        </div>
+                        <div class="px-3 border-left">
+                            <span class="stat-label">Created: </span><span
+                            class="fw-bold">{{ pendingPosition.created | date }} ({{ pendingPosition.numberOfDaysActive }} days ago)</span>
+                        </div>
+                        <div class="px-3 border-left">
+                            <span class="stat-label">Stop: </span> <span
+                            class="fw-bold">{{ pendingPosition.stopPrice | currency }} ({{pendingPosition.stopLossAmount | currency}})</span>
+                        </div>
+                        <div class="pl-3 border-left">
+                            <span class="stat-label">Strategy: </span><span
+                            class="fw-bold">{{ pendingPosition.strategy }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="card-text">
+                {{ pendingPosition.notes }}
+            </p>
+        </div>
+        <div class="card-footer no-border">
+            <button class="btn btn-warning btn-sm" (click)="showCloseModal(pendingPosition)">Close</button>
+        </div>
+    </section>
+
 
     <app-brokerage-new-order [ticker]="stock.ticker"
                              (brokerageOrderEntered)="brokerageOrderEntered($event)"></app-brokerage-new-order>

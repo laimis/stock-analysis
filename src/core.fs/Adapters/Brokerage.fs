@@ -161,7 +161,13 @@ type StockOrder = {
     member this.CanBeRecorded : bool = match this.Status with | Filled -> true | _ -> false
     member this.IsSellOrder : bool = match this.Instruction with | Sell -> true | SellShort -> true | _ -> false
     member this.IsBuyOrder : bool = match this.Instruction with | Buy -> true | BuyToCover -> true | _ -> false
-    member this.IsCancelledOrRejected : bool = match this.Status with | Canceled -> true | Rejected -> true | _ -> false
+    member this.IsCancelledOrRejected : bool =
+        match this.Status with
+        | Canceled -> true
+        | Rejected -> true
+        | Replaced -> true
+        | Expired -> true
+        | _ -> false 
     member this.IsShort : bool = this.Instruction = SellShort
 
 type AccountTransactionType =
