@@ -4,6 +4,9 @@ RUN apk add --no-cache -U \
     nodejs \
     npm
 
+# Install Angular CLI globally
+RUN npm install -g @angular/cli
+
 WORKDIR /app
 COPY . /app
 

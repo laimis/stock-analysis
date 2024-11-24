@@ -23,7 +23,7 @@
 
         <!-- First run npm install -->
         <Message Importance="high" Text="Installing NPM packages..." />
-        <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm ci" />
 
         <!-- Then build the Angular app -->
         <Message Importance="high" Text="Building Angular app..." />
