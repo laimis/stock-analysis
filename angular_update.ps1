@@ -2,7 +2,7 @@
 $scriptPath = $MyInvocation.MyCommand.Path | Split-Path
 
 # change directory to src/web/ClientApp
-Set-Location src/web/ClientApp
+Set-Location src/frontend
 
 # get list of packages that need updating
 $updates = ng update | Where-Object { $_.Contains("@angular")} 
