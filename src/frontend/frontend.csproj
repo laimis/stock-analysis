@@ -4,6 +4,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+      <IsPublishable>true</IsPublishable>
+      <!-- Optional: Specify where your Angular app's source files are relative to this .csproj -->
+      <SpaRoot>.\</SpaRoot>
   </PropertyGroup>
 
     <ItemGroup>
@@ -13,8 +16,26 @@
         <Content Include="*.js" />
         <Content Include="*.ts" />
     </ItemGroup>
-    
-    
-    
-    
+
+    <!-- Changed to use DependsOnTargets instead of BeforeTargets/AfterTargets -->
+    <Target Name="PublishAngularApp" BeforeTargets="Publish">
+        <Message Importance="high" Text="Starting Angular publish process..." />
+
+        <!-- First run npm install -->
+        <Message Importance="high" Text="Installing NPM packages..." />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+
+        <!-- Then build the Angular app -->
+        <Message Importance="high" Text="Building Angular app..." />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="ng build --configuration production" />
+
+        <ItemGroup>
+            <DistFiles Include="$(SpaRoot)dist\**" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="NpmClean" BeforeTargets="Clean">
+        <RemoveDir Directories="$(SpaRoot)node_modules" />
+        <RemoveDir Directories="$(SpaRoot)dist" />
+    </Target>
 </Project>
