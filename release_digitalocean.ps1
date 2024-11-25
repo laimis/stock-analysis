@@ -98,8 +98,7 @@ function Ensure-GarbageCollection-Inactive() {
 
 function Ensure-Angular-Builds() {
     # ensure that the project can build by invoking npm run build -- --configuration production
-    # in src/web/ClientApp directory
-    push-location "src/web/ClientApp"
+    push-location "src/frontend"
     invoke-expression "npm run build -- --configuration production"
     $exitCode = $LASTEXITCODE
     pop-location
@@ -110,7 +109,7 @@ function Ensure-Angular-Builds() {
 
 function Ensure-Angular-Lints() {
     # ensure that the web project lint is clean
-    push-location "src/web/ClientApp"
+    push-location "src/frontend"
     invoke-expression "ng lint"
     $exitCode = $LASTEXITCODE
     Pop-Location
