@@ -32,6 +32,8 @@
         <ItemGroup>
             <DistFiles Include="$(SpaRoot)dist\**" />
         </ItemGroup>
+        <Copy SourceFiles="@(DistFiles)"
+              DestinationFiles="@(DistFiles->'$(PublishDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')" />
     </Target>
 
     <Target Name="NpmClean" BeforeTargets="Clean">

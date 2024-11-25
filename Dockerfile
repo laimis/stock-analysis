@@ -11,9 +11,7 @@ WORKDIR /app
 COPY . /app
 
 RUN dotnet publish ./src/web --self-contained -r linux-musl-x64 -c Release -o /app/out
-RUN dotnet publish ./src/frontend --self-contained -r linux-musl-x64 -c Release
-
-COPY /src/frontend/dist/* /app/out/wwwroot/
+RUN dotnet publish ./src/frontend --self-contained -r linux-musl-x64 -c Release -o /app/out
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 
