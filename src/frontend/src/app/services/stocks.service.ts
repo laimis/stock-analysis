@@ -1326,6 +1326,7 @@ export class AccountStatus {
     brokerageRefreshTokenExpirationDate: string
     maxLoss: number
     interestReceived: number
+    cashTransferred: number
 }
 
 export interface TrackingPreview {

@@ -23,7 +23,13 @@
                         <a href="/api/account/logout" class="btn btn-primary card-link">Logout</a>
                     </div>
                     <div class="col text-end">
-                        <span class="text-muted">Interest Received: </span>{{ profile.interestReceived | currency }}
+                        <div>
+                            <span class="text-muted">Interest Received:</span>{{ profile.interestReceived | currency }}
+                        </div>
+                        <div>
+                            <span class="text-muted">Cash Transfered:</span>{{ profile.cashTransferred | currency }}
+                        </div>
+                        
                     </div>
                 </div>
             </div>

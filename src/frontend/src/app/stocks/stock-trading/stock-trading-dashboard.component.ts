@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
+    AccountStatus,
     BrokerageAccount, BrokerageAccountSnapshot,
     OutcomeValueTypeEnum,
     PositionInstance,
@@ -11,6 +12,7 @@ import {
 import {GetErrors, GetStrategies, isLongTermStrategy, toggleVisuallyHidden} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {stockOpenPositionExportLink} from "../../services/links.service";
+import {GlobalService} from "../../services/global.service";
 
 @Component({
     selector: 'app-stock-trading-dashboard',
@@ -19,6 +21,7 @@ import {stockOpenPositionExportLink} from "../../services/links.service";
 })
 export class StockTradingDashboardComponent implements OnInit {
     balances: BrokerageAccountSnapshot[]
+    userState: AccountStatus
     positions: PositionInstance[]
     sortedPositions: PositionInstance[]
     loaded: boolean = false
@@ -58,6 +61,7 @@ export class StockTradingDashboardComponent implements OnInit {
     ]
 
     constructor(
+        private globalService: GlobalService,
         private stockService: StockPositionsService,
         private route: ActivatedRoute
     ) {
@@ -66,6 +70,10 @@ export class StockTradingDashboardComponent implements OnInit {
     ngOnInit() {
         this.route.params.subscribe(param => {
             this.activeTab = param['tab'] || 'positions'
+        })
+        
+        this.globalService.accountStatusFeed.subscribe(s => {
+            this.userState = s
         })
 
         this.loadEntries()

@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {
+    AccountStatus,
     BrokerageAccount,
     BrokerageAccountSnapshot,
     PositionInstance,
@@ -36,6 +37,8 @@ export class StockTradingSummaryComponent {
     quotes: Map<string, StockQuote>
     @Input()
     brokerageAccount: BrokerageAccount
+    @Input()
+    userState: AccountStatus
     chartOptionsArray: any[];
 
     @Input()

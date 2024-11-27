@@ -135,5 +135,20 @@ namespace coretests.Account
             
             Assert.Equal(26.4m, u.State.InterestReceived);
         }
+
+        [Fact]
+        public void CashTransfered_Works()
+        {
+            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
+            
+            u.ApplyCashTransfer(DateTimeOffset.UtcNow, "transfer1", 13.2m);
+            u.ApplyCashTransfer(DateTimeOffset.UtcNow, "transfer2", -3.2m);
+            // reapplying again, ignores it
+            u.ApplyCashTransfer(DateTimeOffset.Now, "transfer1", 10.2m);
+            
+            Assert.Equal(10m, u.State.CashTransferred);
+            Assert.Equal(13.2m, u.State.CashAdded);
+            Assert.Equal(-3.2m, u.State.CashRemoved);
+        }
     }
 }

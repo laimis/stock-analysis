@@ -174,4 +174,16 @@ namespace core.Account
         public string ActivityId { get; }
         public decimal NetAmount { get; }
     }
+    
+    public class UserCashTransferApplied : AggregateEvent
+    {
+        public UserCashTransferApplied(Guid id, Guid aggregateId, DateTimeOffset when, string activityId, decimal netAmount) : base(id, aggregateId, when)
+        {
+            ActivityId = activityId;
+            NetAmount = netAmount;
+        }
+
+        public string ActivityId { get; }
+        public decimal NetAmount { get; }
+    }
 }

@@ -125,6 +125,17 @@ type AccountMonitoringService(
             return {t with Applied = DateTimeOffset.UtcNow |> Some } |> Ok
     }
     
+    let applyCashTransfer (user:User) (t:AccountTransaction) = async {
+        let! account = user.State.Id |> UserId |> accounts.GetUser |> Async.AwaitTask
+        
+        match account with
+        | None -> return t |> Error
+        | Some account ->
+            account.ApplyCashTransfer t.TradeDate t.TransactionId t.NetAmount
+            do! account |> accounts.Save |> Async.AwaitTask
+            return {t with Applied = DateTimeOffset.UtcNow |> Some } |> Ok
+    }
+    
     let processTransaction (user:UserState) (t:AccountTransaction) = async {
         let! stock = portfolio.GetStockPositions (user.Id |> UserId) |> Async.AwaitTask
         
@@ -205,6 +216,21 @@ type AccountMonitoringService(
                 let appliedInterest =
                     interestTransactions
                     |> Array.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
+                    
+                let! cashTransfers =
+                    unappliedWithTypesResolved
+                    |> Seq.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
+                    |> Seq.filter (fun t -> t.InferredType.IsSome && t.InferredType.Value = AccountTransactionType.Transfer)
+                    |> Seq.map(applyCashTransfer user)
+                    |> Async.Sequential
+                    
+                let failedToApplyCashTransfers =
+                    cashTransfers
+                    |> Seq.choose (fun t -> match t with | Ok _ -> None | Error e -> Some e)
+                    
+                let appliedCashTransfers =
+                    cashTransfers
+                    |> Array.choose (fun t -> match t with | Ok t -> Some t | Error _ -> None)
                 
                 // the brokerage transactions do not have tickers most of the time, so we need to resolve them
                 // if possible, using search approach or hardcoded mappings
@@ -242,6 +268,10 @@ type AccountMonitoringService(
                 logger.LogInformation $"Applied {appliedInterest.Length} interest transactions for {user.State.Id}"
                 do! appliedInterest |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
                 
+                // save applied cash transfers
+                logger.LogInformation $"Applied {appliedCashTransfers.Length} cash transfer transactions for {user.State.Id}"
+                do! appliedCashTransfers |> accounts.SaveAccountBrokerageTransactions (user.State.Id |> UserId) |> Async.AwaitTask
+                
                 let getTickerOrBlank (t:AccountTransaction) =
                     match t.InferredTicker with
                     | Some ticker -> ticker.Value
@@ -255,6 +285,11 @@ type AccountMonitoringService(
                     
                 let appliedInterestMapped =
                     appliedInterest
+                    |> Seq.map (fun t -> {|description = t.Description; netAmount = t.NetAmount|})
+                    |> Seq.toArray
+                    
+                let appliedCashTransfersMapped =
+                    appliedCashTransfers
                     |> Seq.map (fun t -> {|description = t.Description; netAmount = t.NetAmount|})
                     |> Seq.toArray
                     
@@ -274,13 +309,22 @@ type AccountMonitoringService(
                         (failedToApplyInterest
                         |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply interest: {t.Description}"|})
                         )
+                    |> Seq.append
+                        (failedToApplyCashTransfers
+                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply cash transfer: {t.Description}"|})
+                        )
                     |> Seq.toArray
                     
-                match appliedDividendsMapped, appliedInterestMapped, failedResults with
-                | [||], [||], [||] -> ()
+                match appliedDividendsMapped, appliedInterestMapped, appliedCashTransfersMapped, failedResults with
+                | [||], [||], [||], [||] -> ()
                 | _ ->
                     
-                    let payload = {|appliedDividends = appliedDividendsMapped; appliedInterest = appliedInterestMapped; failures = failedResults|}
+                    let payload = {|
+                                    appliedDividends = appliedDividendsMapped
+                                    appliedInterest = appliedInterestMapped
+                                    appliedCashTransfers = appliedCashTransfersMapped
+                                    failures = failedResults
+                                    |}
 
                     let recipient = Recipient(user.State.Email, user.State.Name)
                     let sender = Sender.Support
@@ -330,7 +374,10 @@ type AccountMonitoringService(
                     logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
                     
                     // let's do transactions
-                    let! transactions = brokerage.GetTransactions user.State [|AccountTransactionType.Dividend; AccountTransactionType.Interest; AccountTransactionType.Fee|] |> Async.AwaitTask
+                    let! transactions =
+                        [|AccountTransactionType.Dividend; AccountTransactionType.Interest; AccountTransactionType.Fee; AccountTransactionType.Transfer|]
+                        |> brokerage.GetTransactions user.State
+                        |> Async.AwaitTask
                     
                     match transactions with
                     | Error e ->

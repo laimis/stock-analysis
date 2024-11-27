@@ -116,7 +116,9 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage, portfolio:
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            return! brokerage.GetTransactions user.State [|AccountTransactionType.Dividend; AccountTransactionType.Interest; AccountTransactionType.Fee|]
+            return!
+                [|AccountTransactionType.Dividend; AccountTransactionType.Interest; AccountTransactionType.Fee; AccountTransactionType.Transfer|]
+                |> brokerage.GetTransactions user.State 
     }
         
     

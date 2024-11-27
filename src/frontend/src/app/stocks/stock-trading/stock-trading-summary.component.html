@@ -7,8 +7,8 @@
                 <div class="col-md mb-4 mt-2 text-center">
                     <div class="card h-100">
                         <div class="card-body">
-                            <h5 class="card-title text-muted">Equity</h5>
-                            <p class="card-text fs-4">{{ brokerageAccount.equity | currency }}</p>
+                            <h5 class="card-title text-muted">Adj Equity</h5>
+                            <p class="card-text fs-4">{{ brokerageAccount.equity + (-1 * userState.cashTransferred) | currency }}</p>
                         </div>
                     </div>
                 </div>

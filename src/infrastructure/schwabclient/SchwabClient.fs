@@ -870,7 +870,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     let format = "yyyy-MM-dd'T'HH:mm:ss.000Z"
                     let startDate = DateTimeOffset.UtcNow.AddMonths(-11).ToString(format)
                     let endDate = DateTimeOffset.UtcNow.AddDays(1).ToString(format)
-                    let types = types |> Array.map mapTransactionTypeToString |> String.concat(",")
+                    let types = types |> Array.map mapTransactionTypeToString |> Array.distinct |> String.concat(",")
                     
                     let ordersResource = $"/accounts/{accountId}/transactions?startDate={startDate}&endDate={endDate}&types={types}" |> TraderApiUrl
                     let! transactions = this.CallApi<TransactionItem []> state ordersResource None

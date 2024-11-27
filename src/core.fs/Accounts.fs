@@ -119,6 +119,14 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
         if String.IsNullOrWhiteSpace(activityId) then
             raise (ArgumentException(nameof(activityId)))
             
-        if (this.State.ContainsBrokerageInterest activityId) |> not then
+        if (this.State.ContainsBrokerageTransaction activityId) |> not then
             let event = UserBrokerageInterestApplied(Guid.NewGuid(), this.Id, tradeDate, activityId, netAmount)
+            this.Apply(event)
+
+    member this.ApplyCashTransfer transferDate activityId netAmount =
+        if String.IsNullOrWhiteSpace(activityId) then
+            raise (ArgumentException(nameof(activityId)))
+            
+        if (this.State.ContainsBrokerageTransaction activityId) |> not then
+            let event = UserCashTransferApplied(Guid.NewGuid(), this.Id, transferDate, activityId, netAmount)
             this.Apply(event)

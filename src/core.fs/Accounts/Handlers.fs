@@ -27,6 +27,7 @@ namespace core.fs.Accounts
             BrokerageRefreshTokenExpirationDate: DateTimeOffset
             MaxLoss: decimal option
             InterestReceived: decimal
+            CashTransferred: decimal
         }
 
         static member fromUserState (isAdmin:bool) (state:UserState) =
@@ -45,7 +46,8 @@ namespace core.fs.Accounts
                 BrokerageAccessTokenExpirationDate = state.BrokerageAccessTokenExpires
                 BrokerageRefreshTokenExpirationDate = state.BrokerageRefreshTokenExpires
                 MaxLoss = state.MaxLoss
-                InterestReceived = state.InterestReceived 
+                InterestReceived = state.InterestReceived
+                CashTransferred = state.CashTransferred
             }
             
         static member notFound() =
@@ -65,6 +67,7 @@ namespace core.fs.Accounts
                 BrokerageRefreshTokenExpirationDate = DateTimeOffset.MinValue
                 MaxLoss = None
                 InterestReceived = 0.0m
+                CashTransferred = 0.0m
             }    
     
     [<CLIMutable>]

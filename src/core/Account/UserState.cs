@@ -27,8 +27,11 @@ namespace core.Account
         public bool ConnectedToBrokerage { get; private set; }
         public bool BrokerageAccessTokenExpired => BrokerageAccessTokenExpires < DateTimeOffset.UtcNow;
         public FSharpOption<decimal> MaxLoss { get; private set; }
-        private readonly HashSet<string> _interestHashSet = [];
+        private readonly HashSet<string> _brokerageTransactionIdSet = [];
         public decimal InterestReceived { get; private set; }
+        public decimal CashTransferred { get; private set; }
+        public decimal CashAdded { get; private set; }
+        public decimal CashRemoved { get; private set; }
 
         internal void ApplyInternal(UserCreated c)
         {
@@ -97,13 +100,27 @@ namespace core.Account
 
         private void ApplyInternal(UserBrokerageInterestApplied e)
         {
-            _interestHashSet.Add(e.ActivityId);
+            _brokerageTransactionIdSet.Add(e.ActivityId);
             InterestReceived += e.NetAmount;
         }
 
-        public bool ContainsBrokerageInterest(string activityId)
+        private void ApplyInternal(UserCashTransferApplied e)
         {
-            return _interestHashSet.Contains(activityId);
+            _brokerageTransactionIdSet.Add(e.ActivityId);
+            CashTransferred += e.NetAmount;
+            if (e.NetAmount < 0)
+            {
+                CashRemoved += e.NetAmount;
+            }
+            else
+            {
+                CashAdded += e.NetAmount;
+            }
+        }
+
+        public bool ContainsBrokerageTransaction(string activityId)
+        {
+            return _brokerageTransactionIdSet.Contains(activityId);
         }
 
         internal void ApplyInternal(UserSettingSet e)

@@ -34,7 +34,7 @@
                                 <td>{{ position.optionType }}</td>
                                 <td>{{ position.averageCost | currency }}</td>
                                 <td>{{ position.quantity | number }}</td>
-                                <td>{{ position.marketValue | currency }}</td>
+                                <td>{{ position.marketValue / position.quantity | currency }}</td>
                                 <td>
                                     @if ((position.marketValue - position.averageCost * 100 * position.quantity) >= 0) {
                                         <small class="profit">
