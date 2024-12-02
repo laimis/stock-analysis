@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {StocksService, TransactionsView} from '../services/stocks.service';
+import {DataPointContainer, StocksService, TransactionsView} from '../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {Title} from '@angular/platform-browser';
 import {GetErrors} from "../services/utils";
@@ -14,7 +14,7 @@ export class TransactionsComponent implements OnInit {
     ticker: string = ""
     groupBy: string = "month"
     filterType: string = ""
-    txType: string = "tx"
+    txType: string = "pl"
     loading: boolean = true
     showDetails: string = ''
     errors: string[] = []
@@ -64,5 +64,16 @@ export class TransactionsComponent implements OnInit {
     txTypeSelected(txType: string) {
         this.txType = txType
         this.loadData()
+    }
+    
+    // pl breakdown chart toggling
+    showCharts = false;
+    selectedChartType = 'all';
+    filteredCharts: DataPointContainer[] = [];
+
+    onChartTypeChange(selectedLabel: string) {
+        // Assuming your DataPointContainer has some identifier in the label
+        // You might need to adjust this logic based on your actual data structure
+        this.filteredCharts = this.response.plBreakdowns.filter(chart => chart.label === selectedLabel);
     }
 }

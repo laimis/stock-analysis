@@ -609,6 +609,7 @@ export interface TransactionsView {
     tickers: string[]
     transactions: Transaction[]
     grouped: TransactionGroup[]
+    plBreakdowns: DataPointContainer[]
 }
 
 export interface TransactionGroup {

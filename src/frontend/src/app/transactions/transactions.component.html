@@ -1,95 +1,161 @@
-<div class="container-fluid">
+<div class="container-fluid py-4">
     <!-- Error Display -->
     <app-error-display [errors]="errors"></app-error-display>
 
-    <!-- Filters Section -->
-    <div class="filters-container">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-2">Breakdown By</label>
-                <select (ngModelChange)="breakdownSelected($event)"
-                        [(ngModel)]="groupBy"
-                        class="form-select filter-select"
-                        id="breakdownFilter"
-                        name="breakdownFilter">
-                    <option value="month">Breakdown by Month</option>
-                    <option value="week">Breakdown by Week</option>
-                    <option value="year">Breakdown by Year</option>
-                    <option value="ticker">Breakdown by Symbol</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-2">Type Filter</label>
-                <select (ngModelChange)="filterTypeSelected($event)"
-                        [(ngModel)]="filterType"
-                        class="form-select filter-select"
-                        id="showFilter"
-                        name="showFilter">
-                    <option value="crypto">Crypto</option>
-                    <option value="options">Options</option>
-                    <option value="fees">Fees</option>
-                    <option value="dividends">Dividends</option>
-                    <option value="stocks">Stock Trades</option>
-                    <option value="">All</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-2">Symbol Filter</label>
-                <select (ngModelChange)="tickerSelected($event)"
-                        [(ngModel)]="ticker"
-                        class="form-select filter-select"
-                        id="symbolFilter"
-                        name="symbolFilter">
-                    <option value="">All Symbols</option>
-                    @if (response) {
-                        @for (t of response.tickers; track t) {
-                            <option value="{{t}}">{{ t }}</option>
+    <!-- Filters Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body bg-light">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-2">
+                        <i class="bi bi-grid-3x3-gap-fill me-1"></i>
+                        Breakdown By
+                    </label>
+                    <select (ngModelChange)="breakdownSelected($event)"
+                            [(ngModel)]="groupBy"
+                            class="form-select shadow-sm"
+                            id="breakdownFilter"
+                            name="breakdownFilter">
+                        <option value="month">Breakdown by Month</option>
+                        <option value="week">Breakdown by Week</option>
+                        <option value="year">Breakdown by Year</option>
+                        <option value="ticker">Breakdown by Symbol</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-2">
+                        <i class="bi bi-funnel-fill me-1"></i>
+                        Type Filter
+                    </label>
+                    <select (ngModelChange)="filterTypeSelected($event)"
+                            [(ngModel)]="filterType"
+                            class="form-select shadow-sm"
+                            id="showFilter"
+                            name="showFilter">
+                        <option value="crypto">Crypto</option>
+                        <option value="options">Options</option>
+                        <option value="fees">Fees</option>
+                        <option value="dividends">Dividends</option>
+                        <option value="stocks">Stock Trades</option>
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-2">
+                        <i class="bi bi-tag-fill me-1"></i>
+                        Symbol Filter
+                    </label>
+                    <select (ngModelChange)="tickerSelected($event)"
+                            [(ngModel)]="ticker"
+                            class="form-select shadow-sm"
+                            id="symbolFilter"
+                            name="symbolFilter">
+                        <option value="">All Symbols</option>
+                        @if (response) {
+                            @for (t of response.tickers; track t) {
+                                <option value="{{t}}">{{ t }}</option>
+                            }
                         }
-                    }
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-2">Transaction Type</label>
-                <select (ngModelChange)="txTypeSelected($event)"
-                        [(ngModel)]="txType"
-                        class="form-select filter-select"
-                        id="txType"
-                        name="txType">
-                    <option value="pl">Realized Gain/Loss</option>
-                    <option value="tx">All Transactions</option>
-                </select>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-2">
+                        <i class="bi bi-arrow-left-right me-1"></i>
+                        Transaction Type
+                    </label>
+                    <select (ngModelChange)="txTypeSelected($event)"
+                            [(ngModel)]="txType"
+                            class="form-select shadow-sm"
+                            id="txType"
+                            name="txType">
+                        <option value="pl">Realized Gain/Loss</option>
+                        <option value="tx">All Transactions</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Loading State -->
     @if (loading) {
-        <app-loading></app-loading>
+        <div class="text-center py-5">
+            <app-loading></app-loading>
+        </div>
     }
 
     <!-- Transactions Groups -->
     @if (response) {
+
+        <!-- Charts Section Toggle -->
+        @if (response.plBreakdowns?.length) {
+            <div class="d-flex align-items-center mb-3">
+                <button class="btn btn-outline-secondary d-flex align-items-center"
+                        (click)="showCharts = !showCharts">
+                    <i class="bi" [class.bi-chevron-down]="showCharts"
+                       [class.bi-chevron-right]="!showCharts"></i>
+                    <i class="bi bi-graph-up ms-2 me-2"></i>
+                    Performance Charts
+                </button>
+                @if (showCharts) {
+                    <select [(ngModel)]="selectedChartType"
+                            class="form-select w-auto ms-3"
+                            (ngModelChange)="onChartTypeChange($event)">
+                        @for(dataContainer of response.plBreakdowns; track dataContainer) {
+                            <option value="{{ dataContainer.label }}">{{ dataContainer.label }}</option>
+                        }
+                    </select>
+                }
+            </div>
+
+            <!-- Charts Content -->
+            @if (showCharts) {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            @for (chart of filteredCharts; track chart) {
+                                <div class="col-12 mb-4">
+                                    <div class="chart-container p-3 border rounded bg-white">
+                                        <h6 class="text-muted mb-3">{{ chart.label }}</h6>
+                                        <app-line-chart [dataContainer]="chart"></app-line-chart>
+                                    </div>
+                                </div>
+                            } @empty {
+                                <div class="col-12">
+                                    <div class="alert alert-info d-flex align-items-center m-3" role="alert">
+                                        <i class="bi bi-info-circle-fill me-2"></i>
+                                        No chart data available for the selected type
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        
         @for (g of response.grouped; track g) {
-            <div class="mb-4">
-                <div class="group-header">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <button class="toggle-btn" (click)="showDetails = showDetails === g.name ? '' : g.name">
-                                {{ showDetails === g.name ? '[-]' : '[+]' }}
+                            <button class="btn btn-link text-decoration-none p-1 me-2"
+                                    (click)="showDetails = showDetails === g.name ? '' : g.name">
+                                <i class="bi" [class.bi-chevron-down]="showDetails === g.name"
+                                   [class.bi-chevron-right]="showDetails !== g.name"></i>
                             </button>
                             <span class="text-muted">{{ g.name }}</span>
                             <span class="badge bg-secondary ms-2">{{ g.transactions.length }}</span>
                         </div>
-                        <span class="group-sum" [class.positive]="g.sum >= 0" [class.negative]="g.sum < 0">
+                        <span class="fs-5 fw-semibold" [class.text-success]="g.sum >= 0" [class.text-danger]="g.sum < 0">
                             {{ g.sum >= 0 ? '+' : '' }}{{ g.sum | currency }}
                         </span>
                     </div>
                 </div>
 
                 @if (showDetails === g.name) {
-                    <div class="transactions-table">
+                    <div class="table-responsive">
                         <table class="table table-hover mb-0">
-                            <thead>
+                            <thead class="table-light">
                             <tr>
                                 <th class="ps-4">Date</th>
                                 <th>Symbol</th>
@@ -111,16 +177,17 @@
                                             }
                                         </td>
                                         <td>
-                                            <span class="transaction-type"
-                                                  [class.positive]="t.amount >= 0"
-                                                  [class.negative]="t.amount < 0">
-                                            </span>
-                                            {{ t.description }}
+                                            <i class="bi" [class.bi-arrow-up-circle-fill]="t.amount >= 0"
+                                               [class.bi-arrow-down-circle-fill]="t.amount < 0"
+                                               [class.text-success]="t.amount >= 0"
+                                               [class.text-warning]="t.amount < 0"></i>
+                                            <span class="ms-2">{{ t.description }}</span>
                                         </td>
                                         <td class="text-end pe-4">
-                                            <span class="amount-badge"
-                                                  [class.positive]="t.amount >= 0"
-                                                  [class.negative]="t.amount < 0">
+                                            <span class="badge" [class.bg-success-subtle]="t.amount >= 0"
+                                                  [class.text-success]="t.amount >= 0"
+                                                  [class.bg-danger-subtle]="t.amount < 0"
+                                                  [class.text-danger]="t.amount < 0">
                                                 {{ t.amount >= 0 ? '+' : '' }}{{ t.amount | currency }}
                                             </span>
                                         </td>
