@@ -30,8 +30,6 @@ namespace core.Account
         private readonly HashSet<string> _brokerageTransactionIdSet = [];
         public decimal InterestReceived { get; private set; }
         public decimal CashTransferred { get; private set; }
-        public decimal CashAdded { get; private set; }
-        public decimal CashRemoved { get; private set; }
 
         internal void ApplyInternal(UserCreated c)
         {
@@ -108,14 +106,6 @@ namespace core.Account
         {
             _brokerageTransactionIdSet.Add(e.ActivityId);
             CashTransferred += e.NetAmount;
-            if (e.NetAmount < 0)
-            {
-                CashRemoved += e.NetAmount;
-            }
-            else
-            {
-                CashAdded += e.NetAmount;
-            }
         }
 
         public bool ContainsBrokerageTransaction(string activityId)

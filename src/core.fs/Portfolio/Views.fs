@@ -366,10 +366,10 @@ type PastTradingPerformanceView =
     }
     
 type TransactionGroup(name:string,transactions:Transaction seq) =
+    let sum = transactions |> Seq.sumBy _.Amount
     member _.Name = name
     member _.Transactions = transactions
-    member _.Sum = transactions |> Seq.sumBy _.Amount
-    
+    member _.Sum = sum
 
 type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Ticker array) =
     
@@ -385,9 +385,33 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
         | "ticker" -> transactions |> Seq.sortBy _.Ticker
         | _ -> transactions |> Seq.sortByDescending _.DateAsDate
     
-    member _.Transactions = ordered groupBy transactions
-    member _.Tickers = tickers |> Array.map _.Value
-    member _.Grouped =
+    // build the P/L chart data where we go through each transaction and maintain a running total and
+    // the date at which this total was calculated
+    let plChartData title filter (txs:Transaction seq) =
+        let zeroLineAnnotation = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
+        let groupedByDate =
+            txs
+            |> Seq.filter filter
+            |> Seq.groupBy _.DateAsDate.Date
+            |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
+            |> Seq.sortBy fst
+            
+        let plData = groupedByDate |> Seq.scan (fun (total, _) (txDate,amount) -> total + amount, txDate) (0m, DateTime.MinValue)
+        let plDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, zeroLineAnnotation)
+        plData |> Seq.iter (fun (total, date) ->
+            // the first data point is invalid
+            if date <> DateTime.MinValue then
+                plDataContainer.Add(date, total)
+            )
+        plDataContainer
+        
+    let plBreakdowns =
+        [
+            plChartData "P/L 2024" (fun (t:Transaction)-> t.DateAsDate.Year = 2024) transactions
+            plChartData "P/L 2023" (fun (t:Transaction)-> t.DateAsDate.Year = 2023) transactions
+        ]
+        
+    let grouped =
         match groupBy with
         | null  -> Seq.empty<TransactionGroup>
         | _ -> 
@@ -395,14 +419,23 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
                 transactions
                 |> ordered groupBy
                 |> Seq.groupBy (groupByValue groupBy)
-                |> Seq.map (fun (key,transactions) -> TransactionGroup(key,transactions))
+                |> Seq.map TransactionGroup
             
             match groupBy with
-            | "ticker" -> grouped |> Seq.sortByDescending (fun g -> g.Transactions |> Seq.sumBy (fun t -> t.Amount))
+            | "ticker" -> grouped |> Seq.sortByDescending (fun g -> g.Transactions |> Seq.sumBy _.Amount)
             | _ -> grouped
+            
+    let tickerSymbols = tickers |> Array.map _.Value
+    let credit = transactions |> Seq.sumBy _.Amount
+    let debit = transactions |> Seq.sumBy _.Amount
     
-    member _.Credit = transactions |> Seq.sumBy (fun t -> t.Amount)
-    member _.Debit = transactions |> Seq.sumBy (fun t -> t.Amount)
+    member _.Transactions = ordered groupBy transactions
+    member _.Tickers = tickerSymbols
+    member _.Grouped = grouped
+    member _.Credit = credit
+    member _.Debit = debit
+    member _.PLBreakdowns = plBreakdowns
+    
     
 type TransactionSummaryView(
     start,

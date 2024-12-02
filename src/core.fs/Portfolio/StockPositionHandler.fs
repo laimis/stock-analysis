@@ -998,8 +998,15 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let toSharedTransactionForFee (stock:StockPositionWithCalculations) (fee:StockPositionFeeTransaction) : Transaction =
             Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Fee", fee.NetAmount, fee.NetAmount, fee.Date, false)
             
-        let toTransactionsView (stocks:StockPositionWithCalculations seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
-            let tickers = stocks |> Seq.map (_.Ticker) |> Seq.append (options |> Seq.map (_.State.Ticker)) |> Seq.distinct |> Seq.sort |> Seq.toArray
+        let toTransactionsView (stockPositions:StockPositionState seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
+            let stocks = stockPositions |> Seq.map StockPositionWithCalculations |> Seq.toArray
+            let tickers =
+                stocks
+                |> Seq.map _.Ticker
+                |> Seq.append (options |> Seq.map _.State.Ticker)
+                |> Seq.distinct
+                |> Seq.sort
+                |> Seq.toArray
             
             let stockTransactions =
                 match query.Show = "stocks" || query.Show = null with
@@ -1052,7 +1059,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let! options = storage.GetOwnedOptions(query.UserId)
         let! cryptos = storage.GetCryptos(query.UserId)
         
-        let transactionsView = toTransactionsView (stocks |> Seq.map StockPositionWithCalculations) options cryptos 
+        let transactionsView = toTransactionsView stocks options cryptos 
         
         return transactionsView |> Ok
     }

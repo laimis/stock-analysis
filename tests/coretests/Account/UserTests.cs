@@ -147,8 +147,6 @@ namespace coretests.Account
             u.ApplyCashTransfer(DateTimeOffset.Now, "transfer1", 10.2m);
             
             Assert.Equal(10m, u.State.CashTransferred);
-            Assert.Equal(13.2m, u.State.CashAdded);
-            Assert.Equal(-3.2m, u.State.CashRemoved);
         }
     }
 }
