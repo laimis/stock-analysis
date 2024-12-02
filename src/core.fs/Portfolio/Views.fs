@@ -389,26 +389,53 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
     // the date at which this total was calculated
     let plChartData title filter (txs:Transaction seq) =
         let zeroLineAnnotation = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
-        let groupedByDate =
+        let plDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, zeroLineAnnotation)
+        let _ =
             txs
             |> Seq.filter filter
             |> Seq.groupBy _.DateAsDate.Date
             |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
             |> Seq.sortBy fst
-            
-        let plData = groupedByDate |> Seq.scan (fun (total, _) (txDate,amount) -> total + amount, txDate) (0m, DateTime.MinValue)
-        let plDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, zeroLineAnnotation)
-        plData |> Seq.iter (fun (total, date) ->
-            // the first data point is invalid
-            if date <> DateTime.MinValue then
-                plDataContainer.Add(date, total)
-            )
+            |> Seq.fold (fun total (txDate,amount) ->
+                let newTotal = total + amount
+                plDataContainer.Add(txDate, newTotal)
+                newTotal
+            ) 0m
+        
         plDataContainer
+        
+    let drawdownChartData title filter (txs:Transaction seq) =
+        // go over txs after applying a filter on them and generate a running drawdown
+        // chart data. The drawdown is calculated as the difference between the current
+        // total and the maximum total so far
+        let drawdownDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, None)
+        let _ =
+            txs
+            |> Seq.filter filter
+            |> Seq.groupBy _.DateAsDate.Date
+            |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
+            |> Seq.sortBy fst
+            |> Seq.fold (fun total (txDate,amount) ->
+                // if new total is positive, keep total at 0, we are only interested in drawdowns, so to speak
+                let newTotal = 
+                    match total + amount with
+                    | x when x > 0m -> 0m
+                    | x -> x
+                
+                drawdownDataContainer.Add(txDate, total)
+                    
+                newTotal
+                
+            ) 0m
+        
+        drawdownDataContainer
         
     let plBreakdowns =
         [
             plChartData "P/L 2024" (fun (t:Transaction)-> t.DateAsDate.Year = 2024) transactions
+            drawdownChartData "Drawdown 2024" (fun (t:Transaction)-> t.DateAsDate.Year = 2024) transactions
             plChartData "P/L 2023" (fun (t:Transaction)-> t.DateAsDate.Year = 2023) transactions
+            drawdownChartData "Drawdown 2023" (fun (t:Transaction)-> t.DateAsDate.Year = 2023) transactions
         ]
         
     let grouped =
