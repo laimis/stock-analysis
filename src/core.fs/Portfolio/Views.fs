@@ -429,14 +429,17 @@ type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Tick
             ) 0m
         
         drawdownDataContainer
-        
+    
+    let availableYears = transactions |> Seq.map (fun t -> t.DateAsDate.Year) |> Seq.distinct |> Seq.sortDescending |> Seq.toArray
+    
     let plBreakdowns =
-        [
-            plChartData "P/L 2024" (fun (t:Transaction)-> t.DateAsDate.Year = 2024) transactions
-            drawdownChartData "Drawdown 2024" (fun (t:Transaction)-> t.DateAsDate.Year = 2024) transactions
-            plChartData "P/L 2023" (fun (t:Transaction)-> t.DateAsDate.Year = 2023) transactions
-            drawdownChartData "Drawdown 2023" (fun (t:Transaction)-> t.DateAsDate.Year = 2023) transactions
-        ]
+        availableYears
+        |> Array.collect (fun year ->
+            [|
+                plChartData $"P/L {year}" (fun (t:Transaction)-> t.DateAsDate.Year = year) transactions
+                drawdownChartData $"Drawdown {year}" (fun (t:Transaction)-> t.DateAsDate.Year = year) transactions
+            |]
+        )
         
     let grouped =
         match groupBy with
