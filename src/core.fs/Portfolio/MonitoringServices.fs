@@ -8,6 +8,7 @@ open core.fs.Adapters.Email
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
+open core.fs.Services.Trading
 open core.fs.Stocks
 
 type PortfolioAnalysisService(
@@ -18,6 +19,72 @@ type PortfolioAnalysisService(
     logger: ILogger) =
 
     interface IApplicationService
+    
+    member _.RecentlyClosedPositionUpdates() = task {
+        let! pairs = accounts.GetUserEmailIdPairs()
+        
+        let! _ =
+            pairs
+            |> Seq.map (fun pair -> async {
+                let! user = pair.Id |> accounts.GetUser |> Async.AwaitTask
+                match user with
+                | None -> ()
+                | Some user ->
+                    
+                    match user.State.ConnectedToBrokerage with
+                    | false -> ()
+                    | true ->
+                        let! positions = pair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
+                        
+                        // let positions that were closed in the last 7 days
+                        let daysToCheck = 365
+                        let maxPositions = 30
+                        let recentlyClosedWithoutMaeProcessing =
+                            positions
+                            |> Seq.filter (_.IsClosed)
+                            |> Seq.filter (fun p ->
+                                let age = DateTimeOffset.UtcNow.Subtract(p.Closed.Value).TotalDays
+                                age >= 0.0 && age <= daysToCheck
+                            )
+                            |> Seq.filter (fun p -> p.TryGetLabelValue "mae" |> Option.isNone)
+                            |> Seq.truncate maxPositions
+                            
+                        let! _ =
+                            recentlyClosedWithoutMaeProcessing
+                            |> Seq.map(fun p -> async {
+                                
+                                let actualTrade = TradingStrategyFactory.createActualTrade()
+                                
+                                let! bars = brokerage.GetPriceHistory user.State p.Ticker PriceFrequency.Daily (Some p.Opened) (Some p.Closed.Value) |> Async.AwaitTask
+                                match bars with
+                                | Error e ->
+                                    logger.LogError("Failed to get price history for {p.Ticker} for {p.Opened} to {p.Closed.Value}")
+                                | Ok bars ->
+                                    let result = actualTrade.Run bars true p
+                                    
+                                    let tsk =
+                                        p
+                                        |> StockPosition.setLabel "mae" (result.MaxDrawdownPct.ToString("N2")) DateTimeOffset.UtcNow
+                                        |> StockPosition.setLabel "mfe" (result.MaxGainPct.ToString("N2")) DateTimeOffset.UtcNow
+                                        |> StockPosition.setLabel "mae10" (result.MaxDrawdownFirst10Bars.ToString("N2")) DateTimeOffset.UtcNow
+                                        |> StockPosition.setLabel "mfe10" (result.MaxGainFirst10Bars.ToString("N2")) DateTimeOffset.UtcNow
+                                        |> portfolio.SaveStockPosition pair.Id (Some p)
+                                        
+                                    logger.LogInformation($"Saved MAE/MFE for {p.Ticker} for {p.Opened} to {p.Closed.Value}")
+                                    
+                                    do! tsk |> Async.AwaitTask
+                                
+                                ()
+                            })
+                            |> Async.Sequential
+                            
+                        ()
+                        
+            })
+            |> Async.Sequential
+        
+        return ()
+    }
 
     member _.ReportOnThirtyDayTransactions() = task {
         
@@ -57,7 +124,7 @@ type PortfolioAnalysisService(
                         do! emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.SellAlert {| sells = sellsOfInterest |} |> Async.AwaitTask
                         
             })
-            |> Async.Parallel
+            |> Async.Sequential
         
         return ()
     }

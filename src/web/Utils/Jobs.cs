@@ -95,6 +95,15 @@ public static class Jobs
                 methodCall: service => service.ReportOnMaxProfitBasedOnDaysHeld(),
                 cronExpression: Cron.Weekly(DayOfWeek.Saturday, 8),
                 options: rjo);
+            
+            // run every day at night a job in portfolio analysis service
+            // that will run recently closed positions updates
+            RecurringJob.AddOrUpdate<MonitoringServices.PortfolioAnalysisService>(
+                recurringJobId: nameof(MonitoringServices.PortfolioAnalysisService.RecentlyClosedPositionUpdates),
+                methodCall: service => service.RecentlyClosedPositionUpdates(),
+                cronExpression: Cron.Daily(20, 0),
+                options: rjo
+            );
         }
         else
         {

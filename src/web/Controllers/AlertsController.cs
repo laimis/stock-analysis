@@ -83,4 +83,10 @@ public class AlertsController(Handler handler) : ControllerBase
     public Task TriggerAccountTransactionProcessing(
         [FromServices] core.fs.Brokerage.MonitoringServices.AccountMonitoringService accountMonitoring)
         => accountMonitoring.RunTransactionProcessing();
+    
+    [HttpGet("triggerPortfolioProcessing")]
+    [Authorize("admin")]
+    public Task TriggerPortfolioProcessing(
+        [FromServices] core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService service)
+        => service.RecentlyClosedPositionUpdates();
 }

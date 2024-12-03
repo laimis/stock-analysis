@@ -211,7 +211,14 @@ module CSVExport =
         
         let rows =
             trades
-            |> Seq.map (mapToTradeRecord culture "Actual Trade" None None None None)
+            |> Seq.map (fun p ->
+                let mae = p.TryGetLabelValue("mae") |> Option.map decimal
+                let mfe = p.TryGetLabelValue("mfe") |> Option.map decimal
+                let maeFirst10Bars = p.TryGetLabelValue("mae10") |> Option.map decimal
+                let mfeFirst10Bars = p.TryGetLabelValue("mfe10") |> Option.map decimal
+                
+                mapToTradeRecord culture "Actual Trade" mae mfe maeFirst10Bars mfeFirst10Bars p
+            )
             
         writer.Generate(rows)
         
