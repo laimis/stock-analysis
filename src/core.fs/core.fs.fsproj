@@ -17,7 +17,6 @@
         <Compile Include="Adapters\Brokerage.fs" />
         <Compile Include="Adapters\IAccountStorage.fs" />
         <Compile Include="Adapters\IPortfolioStorage.fs" />
-        <Compile Include="Adapters\Subscriptions.fs" />
         <Compile Include="Adapters\Logging.fs" />
         <Compile Include="Adapters\Cryptos.fs" />
         <Compile Include="Adapters\CSV.fs" />

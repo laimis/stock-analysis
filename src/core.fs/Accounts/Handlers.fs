@@ -8,7 +8,6 @@ namespace core.fs.Accounts
     open core.fs.Adapters.Brokerage
     open core.fs.Adapters.Email
     open core.fs.Adapters.Storage
-    open core.fs.Adapters.Subscriptions
     
     type AccountStatusView =
         {
@@ -237,8 +236,7 @@ namespace core.fs.Accounts
         storage:IAccountStorage,
         hashProvider:IPasswordHashProvider,
         portfolioStorage:IPortfolioStorage,
-        roles:IRoleService,
-        subscriptions:ISubscriptions) =
+        roles:IRoleService) =
         let INVALID_EMAIL_PASSWORD = "Invalid email/password combination"
     
         let success (user:User) =
@@ -259,16 +257,6 @@ namespace core.fs.Accounts
             | false -> return INVALID_EMAIL_PASSWORD |> ServiceError |> Error
             | true -> return user |> success
         }
-        
-        let processPaymentInfo user paymentInfo =
-            let result = subscriptions.Create user paymentInfo.Token.Email paymentInfo.PlanId paymentInfo.Token.Id
-            
-            match result.CustomerId with
-            | null ->
-                $"Failed to process the payment, please try again or use a different payment form" |> ServiceError |> Error
-            | _ ->
-                user.SubscribeToPlan paymentInfo.PlanId result.CustomerId result.SubscriptionId
-                Ok ()
         
         interface IApplicationService
         
@@ -367,15 +355,10 @@ namespace core.fs.Accounts
                 let hashAndSalt = hashProvider.GenerateHashAndSalt command.UserInfo.Password 32
                 
                 u.SetPassword hashAndSalt.Hash hashAndSalt.Salt
-                
-                let paymentResponse = command.PaymentInfo |> processPaymentInfo u
-                
-                match paymentResponse with
-                | Error err ->
-                    return err.Message |> ServiceError |> Error
-                | _ ->
-                    do! storage.Save(u)
-                    return u |> success
+            
+                do! storage.Save(u)
+            
+                return u |> success
         }
         
         member this.Validate (userInfo:UserInfo) = task {

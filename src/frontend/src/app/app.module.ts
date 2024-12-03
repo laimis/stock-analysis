@@ -27,7 +27,6 @@ import {PrivacyComponent} from './privacy/privacy.component';
 import {PlaygroundComponent} from './playground/playground.component';
 import {AdminEmailComponent} from './admin/email/admin-email.component';
 import {AdminWeeklyComponent} from './admin/weekly/admin-weekly.component';
-import {PaymentsComponent} from './payments/payments.component';
 import {StockFundamentalsComponent} from './stocks/stock-details/stock-fundamentals.component';
 import {StockOwnershipComponent} from './stocks/stock-details/stock-ownership.component';
 import {StockOptionComponent} from './stocks/stock-details/stock-option.component';
@@ -139,8 +138,7 @@ let routes: Routes = [
     {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
 
     {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
-    {path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard]},
-
+    
     {path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
     {path: 'playground/inflectionpoints', component: InflectionPointsComponent, canActivate: [AuthGuard]},
 
@@ -210,7 +208,6 @@ let routes: Routes = [
         OptionOpenComponent,
         OptionPerformanceComponent,
         OptionClosedComponent,
-        PaymentsComponent,
         PrivacyComponent,
         ProfileComponent,
         ProfileCreateComponent,

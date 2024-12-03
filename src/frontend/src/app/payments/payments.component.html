@@ -1,8 +1,0 @@
-@if (success) {
-    <div class="alert alert-success">Thank you for your subscription!</div>
-}
-@if (errors) {
-    <app-error-display [errors]="errors"></app-error-display>
-}
-<button (click)="payStarter()" class="btn btn-primary me-3" type="button">Subscribe - Starter</button>
-<button (click)="payFull()" class="btn btn-primary" type="button">Subscribe - Full</button>

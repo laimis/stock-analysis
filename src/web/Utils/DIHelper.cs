@@ -8,7 +8,6 @@ using core.fs.Adapters.Email;
 using core.fs.Adapters.SEC;
 using core.fs.Adapters.SMS;
 using core.fs.Adapters.Storage;
-using core.fs.Adapters.Subscriptions;
 using core.fs.Alerts;
 using core.Shared;
 using csvparser;
@@ -69,12 +68,6 @@ namespace web.Utils
                     services.AddSingleton(type);
                 }
             }
-            
-            services.AddSingleton<ISubscriptions>(s => 
-                new stripe.Subscriptions(
-                    configuration.GetValue<string>("STRIPE_API_KEY")
-                )
-            );
 
             services.AddSingleton<IEmailService>(s => 
                 new sendgridclient.SendGridClientImpl(

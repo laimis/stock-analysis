@@ -314,11 +314,6 @@ export class StocksService {
         return this.http.post<AccountStatus>('/api/account/settings', obj)
     }
 
-    // ------------------- payments ------------------------
-    createSubsription(obj: any): Observable<object> {
-        return this.http.post('/api/account/subscribe', obj)
-    }
-
     // -------------------- reports -------------------------
     reportPortfolioCorrelations(days:number): Observable<TickerCorrelation[]> {
         return this.http.get<TickerCorrelation[]>('/api/reports/portfolio/correlations?days=' + days)
