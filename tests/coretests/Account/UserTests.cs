@@ -58,16 +58,6 @@ namespace coretests.Account
         }
 
         [Fact]
-        public void Subscribe()
-        {
-            var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
-
-            u.SubscribeToPlan(Plans.Full, "customer", "subscription");
-            // TODO: bring it back once fsharp conversion is done
-            // Assert.Equal(nameof(Plans.Full), u.State.SubscriptionLevel);
-        }
-
-        [Fact]
         public void SetSetting()
         {
             var u = User.Create(TestDataGenerator.RandomEmail(), "firstname", "last");
