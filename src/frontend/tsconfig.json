@@ -20,12 +20,10 @@
         "src/main.ts",
         "src/polyfills.ts"
     ],
+    "include": [
+        "src/environments/**/*.ts",
+    ],
   "angularCompilerOptions": {
     "strictTemplates": true
-  },
-    "parserOptions": {
-        "ignorePatterns": [
-            "/**/environment.prod.ts"
-        ],
-    }
+  }
 }
