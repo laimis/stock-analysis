@@ -18,7 +18,9 @@
   },
     "files": [
         "src/main.ts",
-        "src/polyfills.ts"
+        "src/polyfills.ts",
+        "src/src/environments/environment.ts",
+        "src/src/environments/environment.prod.ts"
     ],
   "angularCompilerOptions": {
     "strictTemplates": true
