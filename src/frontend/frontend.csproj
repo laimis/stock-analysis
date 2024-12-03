@@ -30,7 +30,7 @@
         <Exec WorkingDirectory="$(SpaRoot)" Command="ng build --configuration production" />
 
         <ItemGroup>
-            <DistFiles Include="$(SpaRoot)dist\**" />
+            <DistFiles Include="$(SpaRoot)dist\browser\**" />
         </ItemGroup>
         <Copy SourceFiles="@(DistFiles)"
               DestinationFiles="@(DistFiles->'$(PublishDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')" />
