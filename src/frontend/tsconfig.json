@@ -18,11 +18,14 @@
   },
     "files": [
         "src/main.ts",
-        "src/polyfills.ts",
-        "src/src/environments/environment.ts",
-        "src/src/environments/environment.prod.ts"
+        "src/polyfills.ts"
     ],
   "angularCompilerOptions": {
     "strictTemplates": true
-  }
+  },
+    "parserOptions": {
+        "ignorePatterns": [
+            "/**/environment.prod.ts"
+        ],
+    }
 }
