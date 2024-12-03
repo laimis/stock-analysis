@@ -9,6 +9,7 @@ import {
 import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {FormControl} from "@angular/forms";
+import {BrokerageService} from "../../services/brokerage.service";
 
 @Component({
     selector: 'app-stock-trading-position',
@@ -31,13 +32,14 @@ export class StockTradingPositionComponent {
     @Output()
     positionDeleted = new EventEmitter()
     @Output()
-    brokerageOrdersChanged = new EventEmitter<string>()
-    @Output()
     notesChanged = new EventEmitter<string>()
+    @Output()
+    positionClosed = new EventEmitter()
 
     // constructor that takes stock service
     constructor(
-        private stockService: StockPositionsService
+        private stockService: StockPositionsService,
+        private brokerageService: BrokerageService
     ) {
         this.strategies = GetStrategies()
     }
@@ -56,22 +58,21 @@ export class StockTradingPositionComponent {
         }
     }
 
-    @Input()
-    set orders(value: BrokerageStockOrder[]) {
-        this.allOrders = value;
-        this.updatePositionOrders();
-    }
-
     updatePositionOrders() {
         if (!this._position) {
             return
         }
 
-        if (!this.allOrders) {
-            return
-        }
-
-        this.positionOrders = this.allOrders.filter(o => o.ticker == this._position.ticker)
+        this.brokerageService.brokerageAccount().subscribe(
+            account => {
+                this.allOrders = account.stockOrders
+                this.positionOrders = this.allOrders.filter(o => o.ticker == this._position.ticker)
+            },
+            err => {
+                let errors = GetErrors(err)
+                alert("Error fetching orders: " + errors.join(", "))
+            }
+        )
     }
 
     positionProfitPoints: StrategyProfitPoint[] = []
@@ -175,7 +176,7 @@ export class StockTradingPositionComponent {
         this.stockService.closePosition(this._position.positionId, closeReason)
             .subscribe(
                 (_) => {
-                    this.brokerageOrdersChanged.emit()
+                    this.positionClosed.emit()
                 },
                 err => {
                     let errors = GetErrors(err)

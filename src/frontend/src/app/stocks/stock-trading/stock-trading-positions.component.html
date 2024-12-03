@@ -22,9 +22,10 @@
                         </div>
                     </div>
                     <div class="card-text visually-hidden" #detailDiv>
-                        <app-stock-trading-position [position]="position" [orders]="orders" [quote]="getQuote(position)"
-                                                    (brokerageOrdersChanged)="brokerageOrdersChanged.emit($event)"
-                                                    (notesChanged)="notesChanged.emit($event)"></app-stock-trading-position>
+                        <app-stock-trading-position
+                            [position]="position"
+                            [quote]="getQuote(position)"
+                            (notesChanged)="notesChanged.emit($event)"></app-stock-trading-position>
                     </div>
                 </div>
             </div>

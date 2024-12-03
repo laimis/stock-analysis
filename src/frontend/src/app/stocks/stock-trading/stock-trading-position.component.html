@@ -177,7 +177,7 @@
                 <div class="col">
                     <app-brokerage-new-order [ticker]="_position.ticker"
                                              [positionId]="_position.positionId"
-                                             (brokerageOrderEntered)="brokerageOrdersChanged.emit($event)"></app-brokerage-new-order>
+                                             (brokerageOrderEntered)="updatePositionOrders()"></app-brokerage-new-order>
                 </div>
             </div>
         }
@@ -221,8 +221,8 @@
                 <div class="col">
                     @if (positionOrders.length > 0) {
                         <app-brokerage-orders [orders]="positionOrders"
-                                              [filteredTickers]="[_position.ticker]" [positionId]="_position.positionId"
-                                              (ordersChanged)="brokerageOrdersChanged.emit($event)"></app-brokerage-orders>
+                                              [filteredTickers]="[_position.ticker]"
+                                              [positionId]="_position.positionId"></app-brokerage-orders>
                     } @else {
                         <span class="text-muted">No orders</span>
                     }

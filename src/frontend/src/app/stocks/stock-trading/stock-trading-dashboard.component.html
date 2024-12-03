@@ -78,10 +78,12 @@
         </div>
     }
     @if (isActive('positions') && positions) {
-        <app-stock-trading-positions [positions]=sortedPositions [metricFunc]="metricFunc" [metricType]="metricType"
-                                     [orders]="brokerageAccount.stockOrders" [quotes]="quotes"
-                                     (notesChanged)="refresh()"
-                                     (brokerageOrdersChanged)="refresh()"></app-stock-trading-positions>
+        <app-stock-trading-positions
+            [positions]=sortedPositions
+            [metricFunc]="metricFunc"
+            [metricType]="metricType"
+            [quotes]="quotes"
+            (notesChanged)="refresh()"></app-stock-trading-positions>
     }
     @if (isActive('openreview')) {
         <app-stock-trading-review [orders]="brokerageAccount.stockOrders" [positions]=sortedPositions [quotes]="quotes"

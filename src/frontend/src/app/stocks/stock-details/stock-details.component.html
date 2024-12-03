@@ -98,14 +98,12 @@
     </section>
 
 
-    <app-brokerage-new-order [ticker]="stock.ticker"
-                             (brokerageOrderEntered)="brokerageOrderEntered($event)"></app-brokerage-new-order>
+    <app-brokerage-new-order [ticker]="stock.ticker"></app-brokerage-new-order>
 
     <app-brokerage-orders
         [filteredTickers]="[stock.ticker]"
         [orders]="orders"
-        [positionId]="currentPosition?.positionId"
-        (ordersChanged)="brokerageOrderEntered($event)">
+        [positionId]="currentPosition?.positionId">
     </app-brokerage-orders>
 
     <section class="card shadow-sm mb-4">
@@ -124,9 +122,7 @@
     <app-stock-ownership
         [positions]=stockOwnership.positions
         [quote]="stock.quote"
-        [orders]="orders"
         [positionChartInformation]="currentPositionChartInfo"
-        (ordersChanged)="brokerageOrderEntered($event)"
         (notesChanged)="notesChanged($event)">
     </app-stock-ownership>
 }

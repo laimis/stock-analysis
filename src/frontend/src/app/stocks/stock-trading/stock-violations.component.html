@@ -54,8 +54,7 @@
                             [positionId]="violation.localPosition?.positionId"
                             [orders]="orders"
                             [filteredTickers]="[violation.ticker]"
-                            [justOrders]="true"
-                            (ordersChanged)="refreshRequested.emit($event)">
+                            [justOrders]="true">
                         </app-brokerage-orders>
                     </div>
                 }

@@ -36,8 +36,6 @@ export class StockTradingReviewComponent {
     quotes: object
     @Input()
     orders: BrokerageStockOrder[]
-    @Output()
-    brokerageOrdersChanged: EventEmitter<string> = new EventEmitter<string>()
     gradingError: string = null
     gradingSuccess: string = null
     assignedGrade: string = null

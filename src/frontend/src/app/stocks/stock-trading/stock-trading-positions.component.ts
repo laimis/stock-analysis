@@ -19,10 +19,6 @@ export class StockTradingPositionsComponent {
     metricType: OutcomeValueTypeEnum;
     @Input()
     positions: PositionInstance[]
-    @Input()
-    orders: BrokerageStockOrder[];
-    @Output()
-    brokerageOrdersChanged = new EventEmitter<string>()
     @Output()
     notesChanged = new EventEmitter<string>()
 

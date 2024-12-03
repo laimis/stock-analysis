@@ -16,13 +16,10 @@ export class StockOwnershipComponent {
     quote: StockQuote
 
     @Input()
-    orders: BrokerageStockOrder[]
-
-    @Input()
     positionChartInformation: PositionChartInformation
 
     @Output()
-    ordersChanged: EventEmitter<string> = new EventEmitter<string>();
+    positionClosed: EventEmitter<any> = new EventEmitter();
     
     @Output()
     notesChanged: EventEmitter<string> = new EventEmitter<string>();

@@ -36,8 +36,6 @@ export class BrokerageOrdersComponent {
     justOrders: boolean = false;
     @Input()
     positionId: string
-    @Output()
-    ordersChanged = new EventEmitter()
 
     constructor(private brokerage: BrokerageService, private stocks: StockPositionsService) {
     }
@@ -78,15 +76,16 @@ export class BrokerageOrdersComponent {
     cancelOrder(orderId: string) {
         this.brokerage.cancelOrder(orderId)
             .subscribe(
-                () => {
-                    this.brokerage.brokerageAccount().subscribe(
-                        a => { this.orders = a.stockOrders },
-                        err => this.errors = GetErrors(err)
-                    )
-                    this.ordersChanged.emit()
-                },
+                () => this.refreshOrders(),
                 err => this.errors = GetErrors(err)
             )
+    }
+    
+    refreshOrders() {
+        this.brokerage.brokerageAccount().subscribe(
+            a => { this.orders = a.stockOrders },
+            err => this.errors = GetErrors(err)
+        )
     }
 
     recordOrder(order: BrokerageStockOrder) {
@@ -101,12 +100,12 @@ export class BrokerageOrdersComponent {
 
         if (order.isBuyOrder) {
             this.stocks.purchase(obj).subscribe(
-                _ => this.ordersChanged.emit(),
+                _ => this.refreshOrders(),
                 err => this.errors = GetErrors(err)
             )
         } else if (order.isSellOrder) {
             this.stocks.sell(obj).subscribe(
-                _ => this.ordersChanged.emit(),
+                _ => this.refreshOrders(),
                 err => this.errors = GetErrors(err)
             )
         }
