@@ -1,49 +1,54 @@
-<body>
-<div id="bodyContainer">
-    <div class="container">
-        <app-nav-menu></app-nav-menu>
-    </div>
-    <div class="container">
-        <router-outlet></router-outlet>
-    </div>
-</div>
+<div class="app-wrapper d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <app-nav-menu></app-nav-menu>
+        </div>
+    </header>
 
-<footer class="footer bg-light" id="sticky">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
-                <ul class="list-inline mb-2">
-                    <li class="list-inline-item">&sdot;</li>
-                    <li class="list-inline-item">
-                        <a [routerLink]="[ '/contact' ]">Contact</a>
-                    </li>
-                    <li class="list-inline-item">&sdot;</li>
-                    <li class="list-inline-item">
-                        <a [routerLink]="[ '/terms' ]">Terms of Use</a>
-                    </li>
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        <div class="container py-4">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
 
-                    <li class="list-inline-item">&sdot;</li>
-                    <li class="list-inline-item">
-                        <a [routerLink]="[ '/privacy' ]">Privacy</a>
-                    </li>
-                </ul>
-                <p class="text-muted small mb-4 mb-lg-0">&copy; Nightingale Trading {{ year }}</p>
-            </div>
-            <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
-                <ul class="list-inline mb-0">
-                    <!-- <li class="list-inline-item me-3">
-                      <a target="_blank" href="https://twitter.com/NightingaleTra3">
-                        <i class="fab fa-twitter-square fa-2x fa-fw"></i>
-                      </a>
-                    </li> -->
-                    <!-- <li class="list-inline-item">
-                      <a href="#">
-                        <i class="fab fa-instagram fa-2x fa-fw"></i>
-                      </a>
-                    </li> -->
-                </ul>
+    <!-- Footer -->
+    <footer class="footer mt-auto py-4 bg-light border-top">
+        <div class="container">
+            <div class="row align-items-center gy-3">
+                <div class="col-md-6">
+                    <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3">
+                        <div class="footer-links d-flex gap-3 text-center text-sm-start">
+                            <a [routerLink]="['/contact']" class="text-decoration-none text-secondary">Contact</a>
+                            <a [routerLink]="['/terms']" class="text-decoration-none text-secondary">Terms</a>
+                            <a [routerLink]="['/privacy']" class="text-decoration-none text-secondary">Privacy</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-md-end align-items-center gap-3">
+                        <!-- Social Links (commented but styled) -->
+                        <!--
+                        <div class="social-links d-flex gap-3">
+                            <a href="#" class="text-secondary" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-twitter fs-5"></i>
+                            </a>
+                            <a href="#" class="text-secondary" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-linkedin fs-5"></i>
+                            </a>
+                            <a href="#" class="text-secondary" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-github fs-5"></i>
+                            </a>
+                        </div>
+                        -->
+                        <small class="text-muted">
+                            &copy; {{ year }} Nightingale Trading. All rights reserved.
+                        </small>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
-</body>
+    </footer>
+</div>

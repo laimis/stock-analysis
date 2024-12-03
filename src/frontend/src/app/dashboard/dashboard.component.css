@@ -1,22 +1,48 @@
-.invisible {
-    display: none
+.dashboard .card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
 }
 
-div.row {
-    margin-top: 10px;
-}
-
-.search-results div:hover {
-    font-weight: bold;
+.asset-card {
     cursor: pointer;
 }
 
+.asset-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.1);
+}
+
+.icon-wrapper {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn i {
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn:hover i {
+    transform: translateX(4px);
+}
+
+/* Keep any necessary profit/loss styling */
 .profits-positive {
-    /* font-weight: bold; */
-    color: lightseagreen;
+    color: var(--bs-success);
 }
 
 .profits-negative {
-    /* font-weight: bold; */
-    color: #f45531;
+    color: var(--bs-danger);
 }

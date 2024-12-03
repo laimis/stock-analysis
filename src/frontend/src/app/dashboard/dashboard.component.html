@@ -1,80 +1,147 @@
-@if (loaded) {
-    <div>
+<div class="dashboard py-4">
+    @if (loaded) {
         <div class="container-fluid">
-            <div class="row">
+            <!-- Asset Categories -->
+            <div class="row g-4 mb-4">
+                <!-- Stocks Card -->
                 <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="text-muted fas fa-certificate"></i>
-                                Stocks
-                            </h5>
-                            <p class="card-text">You have {{ dashboard.openStockCount === 0 ? 'no' : '' }} tickers on
-                                file</p>
-                            <a class="card-link" [routerLink]="[ '/stocks/positions' ]">Manage Stocks</a>
+                    <div class="card h-100 asset-card" [routerLink]="['/stocks/positions']">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-primary-subtle rounded-circle p-3 me-3">
+                                    <i class="bi bi-graph-up text-primary fs-4"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-1">Stocks</h5>
+                                    <p class="text-muted mb-0">
+                                        @if (dashboard.openStockCount === 0) {
+                                            No tickers on file
+                                        } @else {
+                                            {{ dashboard.openStockCount }} active positions
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <button class="btn btn-outline-primary w-100">
+                                    Manage Stocks
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Options Card -->
                 <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="text-muted fas fa-dice-five"></i>
-                                Options
-                            </h5>
-                            <p class="card-text">You have {{ dashboard.openOptionCount === 0 ? 'no' : '' }} open
-                                contracts</p>
-                            <a class="card-link" [routerLink]="[ '/options' ]">Manage Options</a>
+                    <div class="card h-100 asset-card" [routerLink]="['/options']">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-success-subtle rounded-circle p-3 me-3">
+                                    <i class="bi bi-dice-5 text-success fs-4"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-1">Options</h5>
+                                    <p class="text-muted mb-0">
+                                        @if (dashboard.openOptionCount === 0) {
+                                            No open contracts
+                                        } @else {
+                                            {{ dashboard.openOptionCount }} open contracts
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <button class="btn btn-outline-success w-100">
+                                    Manage Options
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Crypto Card -->
                 <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="text-muted fab fa-btc"></i>
-                                Crypto
-                            </h5>
-                            <p class="card-text">You have {{ dashboard.openCryptoCount === 0 ? 'no' : '' }} crypto
-                                tokens</p>
-                            <a class="card-link" [routerLink]="[ '/cryptos' ]">Manage Crypto</a>
+                    <div class="card h-100 asset-card" [routerLink]="['/cryptos']">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-warning-subtle rounded-circle p-3 me-3">
+                                    <i class="bi bi-currency-bitcoin text-warning fs-4"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-1">Crypto</h5>
+                                    <p class="text-muted mb-0">
+                                        @if (dashboard.openCryptoCount === 0) {
+                                            No crypto tokens
+                                        } @else {
+                                            {{ dashboard.openCryptoCount }} active tokens
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <button class="btn btn-outline-warning w-100">
+                                    Manage Crypto
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card mt-4">
+
+            <!-- Tools Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="text-muted fas fa-toolbox"></i>
-                                Tools
-                            </h5>
-                            @for (link of toolLinks; track link) {
-                                <a
-                                    class="card-link"
-                                    [routerLink]="[ link.path ]">{{ link.label }}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-secondary-subtle rounded-circle p-3 me-3">
+                                    <i class="bi bi-tools text-secondary fs-4"></i>
+                                </div>
+                                <h5 class="card-title mb-0">Quick Tools</h5>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @for (link of toolLinks; track link) {
+                                    <a [routerLink]="[link.path]"
+                                       class="btn btn-outline-secondary">
+                                        {{ link.label }}
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper bg-danger-subtle rounded-circle p-3 me-3">
+                                        <i class="bi bi-bell text-danger fs-4"></i>
+                                    </div>
+                                    <h5 class="card-title mb-0">Active Alerts</h5>
+                                </div>
+                                <a [routerLink]="['/alerts']"
+                                   class="btn btn-outline-danger">
+                                    Manage Alerts
+                                    <i class="bi bi-arrow-right ms-2"></i>
                                 </a>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div class="card mt-4">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="text-muted fas fa-bell me-1"></i>
-                                <a [routerLink]="[ '/alerts' ]">Alerts</a>
-                            </h5>
-                            <app-alerts [hideRecentTriggered]="true" [hideMessages]="true"
-                                        [hideScheduling]="true"></app-alerts>
+                            </div>
+                            <app-alerts
+                                [hideRecentTriggered]="true"
+                                [hideMessages]="true"
+                                [hideScheduling]="true">
+                            </app-alerts>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="mt-5">&nbsp;</div>
-    </div>
-}
+    }
+</div>

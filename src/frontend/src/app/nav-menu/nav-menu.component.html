@@ -1,49 +1,76 @@
-<nav class="navbar navbar-light navbar-color navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
+        <!-- Error Display -->
         <app-error-display [errors]="errors"></app-error-display>
-        @if (isLoggedIn) {
-            <a
-                class="nav-link"
-                (click)="collapseMenu()"
-                [ngClass]="{'nav-item': true, 'nav-item-active': '/dashboard' === currentPath}"
-                [routerLink]="[ '/dashboard' ]">Dashboard</a>
-        }
-        @if (!isLoggedIn) {
-            <a class="nav-link" [routerLink]="[ '/profile/login' ]">Login</a>
-        }
-        <button
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-            class="navbar-toggler"
-            data-bs-target="#navbarSupportedContent"
-            data-bs-toggle="collapse"
-            type="button">
-            <span class="navbar-toggler-icon"></span>
+
+        <!-- Brand/Logo -->
+        <a class="navbar-brand d-flex align-items-center" [routerLink]="['/']">
+            <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+            <span class="brand-text">Nightingale</span>
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler border-0 shadow-none"
+                type="button"
+                data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#' + navbarSupportedContentId"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <i class="bi bi-list fs-4"></i>
         </button>
+
+        <!-- Navbar Content -->
         <div [id]="navbarSupportedContentId" class="collapse navbar-collapse">
-            @if (isLoggedIn) {
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- Main Navigation -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                @if (isLoggedIn) {
+                    <!-- Dashboard Link -->
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                           (click)="collapseMenu()"
+                           [ngClass]="{'active': '/dashboard' === currentPath}"
+                           [routerLink]="['/dashboard']">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <!-- Other Navigation Links -->
                     @for (l of links; track l) {
-                        <li>
-                            <a
-                                (click)="collapseMenu()"
-                                [ngClass]="{'nav-item': true, 'nav-item-active': l.path === currentPath}"
-                                class="nav-link" [routerLink]="[ l.path]">{{ l.label }}
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center"
+                               (click)="collapseMenu()"
+                               [ngClass]="{'active': l.path === currentPath}"
+                               [routerLink]="[l.path]">
+                                {{ l.label }}
                             </a>
                         </li>
                     }
-                </ul>
-            }
-            @if (isLoggedIn) {
-                <app-stock-search
-                    [cssClass]="'d-flex ms-auto form-control'"
-                    [label]="''"
-                    [placeholder]="'Search stocks'"
-                    (tickerSelected)="navigateToTicker($event)"
-                    [justTickers]="true">
-                </app-stock-search>
-            }
+                }
+            </ul>
+
+            <!-- Right Side Content -->
+            <div class="d-flex align-items-center gap-3">
+                @if (isLoggedIn) {
+                    <!-- Stock Search -->
+                    <div class="search-wrapper">
+                        <app-stock-search
+                            [cssClass]="'form-control search-input'"
+                            [label]="''"
+                            [placeholder]="'Search stocks...'"
+                            (tickerSelected)="navigateToTicker($event)"
+                            [justTickers]="true">
+                        </app-stock-search>
+                    </div>
+                } @else {
+                    <!-- Login Button -->
+                    <a class="btn btn-primary" [routerLink]="['/profile/login']">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                        Login
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </nav>
