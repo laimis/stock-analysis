@@ -6,7 +6,8 @@ import {ActivatedRoute} from '@angular/router';
 @Component({
     selector: 'app-routine',
     templateUrl: './routines-routine.component.html',
-    styleUrls: ['./routines-routine.component.css']
+    styleUrls: ['./routines-routine.component.css'],
+    standalone: false
 })
 
 export class RoutineComponent implements OnInit {

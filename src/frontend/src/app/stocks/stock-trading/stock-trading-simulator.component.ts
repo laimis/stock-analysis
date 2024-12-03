@@ -13,7 +13,8 @@ class StockTransaction {
 @Component({
     selector: 'app-stock-trading-simulation',
     templateUrl: './stock-trading-simulator.component.html',
-    styleUrls: ['./stock-trading-simulator.component.css']
+    styleUrls: ['./stock-trading-simulator.component.css'],
+    standalone: false
 })
 
 export class StockTradingSimulatorComponent implements OnInit {

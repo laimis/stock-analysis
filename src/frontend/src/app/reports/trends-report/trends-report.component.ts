@@ -24,9 +24,7 @@ import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.co
 
 @Component({
     selector: 'app-trends-report',
-    standalone: true,
     imports: [
-        DatePipe,
         PercentPipe,
         NgClass,
         FormsModule,

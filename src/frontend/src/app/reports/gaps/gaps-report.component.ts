@@ -6,7 +6,8 @@ import {GetErrors} from "../../services/utils";
 @Component({
     selector: 'app-gaps-report',
     templateUrl: './gaps-report.component.html',
-    styleUrls: ['./gaps-report.component.css']
+    styleUrls: ['./gaps-report.component.css'],
+    standalone: false
 })
 export class GapsReportComponent implements OnInit {
 

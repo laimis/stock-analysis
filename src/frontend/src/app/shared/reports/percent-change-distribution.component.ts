@@ -4,7 +4,8 @@ import {ChartType, DataPointContainer, StockPercentChangeResponse} from '../../s
 @Component({
     selector: 'app-percent-change-distribution',
     templateUrl: './percent-change-distribution.component.html',
-    styleUrls: ['./percent-change-distribution.component.css']
+    styleUrls: ['./percent-change-distribution.component.css'],
+    standalone: false
 })
 export class PercentChangeDistributionComponent {
 

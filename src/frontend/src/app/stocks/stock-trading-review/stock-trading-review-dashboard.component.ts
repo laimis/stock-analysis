@@ -11,7 +11,8 @@ import {GetErrors} from "../../services/utils";
 @Component({
     selector: 'app-stock-trading-review-dashboard',
     templateUrl: './stock-trading-review-dashboard.component.html',
-    styleUrls: ['./stock-trading-review-dashboard.component.css']
+    styleUrls: ['./stock-trading-review-dashboard.component.css'],
+    standalone: false
 })
 export class StockTradingReviewDashboardComponent implements OnInit {
     activeTab: string = 'positions';

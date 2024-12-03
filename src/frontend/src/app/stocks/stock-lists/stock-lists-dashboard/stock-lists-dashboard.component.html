@@ -8,7 +8,7 @@
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="input-group">
-                <input #tickerFilter (keyup)="filterListByTicker(this.tickerFilter.value)" class="form-control" id="tickerFilter" name="tickerFilter" type="text" placeholder="Filter by ticker">
+                <input #tickerFilter (keyup)="filterListByTicker(tickerFilter.value)" class="form-control" id="tickerFilter" name="tickerFilter" type="text" placeholder="Filter by ticker">
                 <button class="btn btn-outline-secondary" type="button" (click)="toggleVisibility(addNewListSection)">Create New List</button>
             </div>
         </div>

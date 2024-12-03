@@ -15,7 +15,6 @@ import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.co
 @Component({
     selector: 'app-stock-trading-pending-positions-dashboard',
     templateUrl: './stock-trading-pending-positions-dashboard.component.html',
-    standalone: true,
     styleUrls: ['./stock-trading-pending-positions-dashboard.component.css'],
     imports: [
         StockTradingNewPositionComponent,

@@ -331,7 +331,8 @@ function selectFunctionsToUse(screenerId: string) {
 @Component({
     selector: 'app-trades-report',
     templateUrl: './trades-report.component.html',
-    styleUrl: './trades-report.component.css'
+    styleUrl: './trades-report.component.css',
+    standalone: false
 })
 export class TradesReportComponent implements OnInit {
     tickers: string[];

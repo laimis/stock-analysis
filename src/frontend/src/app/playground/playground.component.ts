@@ -57,7 +57,8 @@ function createProfitScatter(entries: PositionInstance[], quotes: Map<string, St
 @Component({
     selector: 'app-playground',
     templateUrl: './playground.component.html',
-    styleUrls: ['./playground.component.css']
+    styleUrls: ['./playground.component.css'],
+    standalone: false
 })
 export class PlaygroundComponent implements OnInit {
     tickers: string[];

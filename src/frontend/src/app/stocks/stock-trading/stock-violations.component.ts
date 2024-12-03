@@ -5,7 +5,8 @@ import {showElement, toggleVisuallyHidden} from "../../services/utils";
 @Component({
     selector: 'app-stock-violations',
     templateUrl: './stock-violations.component.html',
-    styleUrls: ['./stock-violations.component.css']
+    styleUrls: ['./stock-violations.component.css'],
+    standalone: false
 })
 export class StockViolationsComponent {
 

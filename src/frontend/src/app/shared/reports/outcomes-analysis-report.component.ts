@@ -24,8 +24,7 @@ import {OutcomesComponent} from "./outcomes.component";
         TradingViewLinkComponent,
         StockLinkComponent,
         OutcomesComponent
-    ],
-    standalone: true
+    ]
 })
 export class OutcomesAnalysisReportComponent {
     tickersForSummary: TickerCountPair[] = []

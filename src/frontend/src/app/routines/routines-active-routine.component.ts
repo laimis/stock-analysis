@@ -4,7 +4,8 @@ import {Routine} from "../services/stocks.service";
 @Component({
     selector: 'app-routines-active-routine',
     templateUrl: './routines-active-routine.component.html',
-    styleUrls: ['./routines-active-routine.component.css']
+    styleUrls: ['./routines-active-routine.component.css'],
+    standalone: false
 })
 export class RoutinesActiveRoutineComponent {
 

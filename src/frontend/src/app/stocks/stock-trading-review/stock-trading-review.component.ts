@@ -20,7 +20,8 @@ import {concat} from "rxjs";
 @Component({
     selector: 'app-stock-trading-review',
     templateUrl: './stock-trading-review.component.html',
-    styleUrls: ['./stock-trading-review.component.css']
+    styleUrls: ['./stock-trading-review.component.css'],
+    standalone: false
 })
 export class StockTradingReviewComponent {
 

@@ -18,7 +18,8 @@ import {concat} from "rxjs";
     selector: 'app-stock-analysis',
     templateUrl: './stock-analysis.component.html',
     styleUrls: ['./stock-analysis.component.css'],
-    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
+    providers: [PercentPipe, CurrencyPipe, DecimalPipe],
+    standalone: false
 })
 export class StockAnalysisComponent {
     multipleBarOutcomes: TickerOutcomes;

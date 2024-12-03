@@ -14,7 +14,8 @@ type StockAlertGroup = {
     selector: 'app-alerts',
     templateUrl: './alerts.component.html',
     styleUrls: ['./alerts.component.css'],
-    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
+    providers: [PercentPipe, CurrencyPipe, DecimalPipe],
+    standalone: false
 })
 export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     container: AlertsContainer;

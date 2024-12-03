@@ -9,7 +9,8 @@ import {GetErrors} from 'src/app/services/utils';
     selector: 'app-owned-option-detail',
     templateUrl: './owned-option-detail.component.html',
     styleUrls: ['./owned-option-detail.component.css'],
-    providers: [DatePipe]
+    providers: [DatePipe],
+    standalone: false
 })
 export class OwnedOptionComponent implements OnInit {
     public option: OwnedOption;

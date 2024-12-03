@@ -6,8 +6,7 @@ import {GetErrors} from "../services/utils";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 
 @Component({
-  selector: 'app-account-transactions',
-  standalone: true,
+    selector: 'app-account-transactions',
     imports: [
         ParsedDatePipe,
         CurrencyPipe,
@@ -16,8 +15,8 @@ import {ErrorDisplayComponent} from "../shared/error-display/error-display.compo
         ErrorDisplayComponent,
         NgClass
     ],
-  templateUrl: './account-transactions.component.html',
-  styleUrl: './account-transactions.component.css'
+    templateUrl: './account-transactions.component.html',
+    styleUrl: './account-transactions.component.css'
 })
 export class AccountTransactionsComponent implements OnInit {
     transactions: AccountTransaction[] = [];

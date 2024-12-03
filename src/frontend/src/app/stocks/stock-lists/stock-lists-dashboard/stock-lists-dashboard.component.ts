@@ -6,7 +6,8 @@ import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 @Component({
     selector: 'app-stock-lists-dashboard',
     templateUrl: './stock-lists-dashboard.component.html',
-    styleUrls: ['./stock-lists-dashboard.component.css']
+    styleUrls: ['./stock-lists-dashboard.component.css'],
+    standalone: false
 })
 export class StockListsDashboardComponent implements OnInit {
     newName: string

@@ -17,7 +17,8 @@ import {GlobalService} from "../../services/global.service";
 @Component({
     selector: 'app-stock-trading-dashboard',
     templateUrl: './stock-trading-dashboard.component.html',
-    styleUrls: ['./stock-trading-dashboard.component.css']
+    styleUrls: ['./stock-trading-dashboard.component.css'],
+    standalone: false
 })
 export class StockTradingDashboardComponent implements OnInit {
     balances: BrokerageAccountSnapshot[]

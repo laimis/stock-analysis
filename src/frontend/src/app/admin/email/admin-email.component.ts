@@ -4,7 +4,8 @@ import {StocksService} from 'src/app/services/stocks.service';
 @Component({
     selector: 'app-admin-email',
     templateUrl: './admin-email.component.html',
-    styleUrls: ['./admin-email.component.css']
+    styleUrls: ['./admin-email.component.css'],
+    standalone: false
 })
 export class AdminEmailComponent {
 

@@ -6,7 +6,8 @@ import {GetErrors} from "../services/utils";
 @Component({
     selector: 'app-events',
     templateUrl: './events.component.html',
-    styleUrls: ['./events.component.css']
+    styleUrls: ['./events.component.css'],
+    standalone: false
 })
 export class EventsComponent implements OnInit {
     events: any[]

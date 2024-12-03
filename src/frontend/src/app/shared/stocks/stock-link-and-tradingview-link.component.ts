@@ -8,8 +8,7 @@ import {StockLinkComponent} from "./stock-link.component";
     imports: [
         TradingViewLinkComponent,
         StockLinkComponent
-    ],
-    standalone: true
+    ]
 })
 export class StockLinkAndTradingviewLinkComponent {
 

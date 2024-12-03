@@ -134,7 +134,6 @@ function toChart(containers: DataPointContainer[]) {
 @Component({
     selector: 'app-line-chart',
     templateUrl: './line-chart.component.html',
-    standalone: true,
     imports: [
         CanvasJSAngularChartsModule
     ]

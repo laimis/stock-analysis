@@ -24,7 +24,8 @@ import {
 
 @Component({
     selector: 'app-inflection-points',
-    templateUrl: './inflectionpoints.component.html'
+    templateUrl: './inflectionpoints.component.html',
+    standalone: false
 })
 export class InflectionPointsComponent implements OnInit {
     tickers: string[];

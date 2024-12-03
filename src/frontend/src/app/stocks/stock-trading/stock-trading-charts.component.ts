@@ -490,8 +490,7 @@ function createPositionsByGainsChart(positions: PositionInstance[], quotes: Map<
     styleUrls: ['./stock-trading-charts.component.css'],
     imports: [
         CanvasJSAngularChartsModule
-    ],
-    standalone: true
+    ]
 })
 export class StockTradingChartsComponent {
 

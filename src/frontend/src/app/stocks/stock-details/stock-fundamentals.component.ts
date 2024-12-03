@@ -4,7 +4,8 @@ import {StockDetails, StockProfile} from '../../services/stocks.service';
 @Component({
     selector: 'app-stock-fundamentals',
     templateUrl: './stock-fundamentals.component.html',
-    styleUrls: ['./stock-fundamentals.component.css']
+    styleUrls: ['./stock-fundamentals.component.css'],
+    standalone: false
 })
 
 export class StockFundamentalsComponent {

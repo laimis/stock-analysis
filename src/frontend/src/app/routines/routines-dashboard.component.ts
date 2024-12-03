@@ -5,7 +5,8 @@ import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 @Component({
     selector: 'app-routines-dashboard',
     templateUrl: './routines-dashboard.component.html',
-    styleUrls: ['./routines-dashboard.component.css']
+    styleUrls: ['./routines-dashboard.component.css'],
+    standalone: false
 })
 
 export class RoutineDashboardComponent implements OnInit {

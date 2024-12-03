@@ -6,8 +6,7 @@ import {RouterLink} from "@angular/router";
     templateUrl: './stock-link.component.html',
     imports: [
         RouterLink
-    ],
-    standalone: true
+    ]
 })
 export class StockLinkComponent {
 

@@ -5,7 +5,8 @@ import {StocksService} from 'src/app/services/stocks.service';
 @Component({
     selector: 'app-admin-users',
     templateUrl: './admin-users.component.html',
-    styleUrls: ['./admin-users.component.css']
+    styleUrls: ['./admin-users.component.css'],
+    standalone: false
 })
 export class AdminUsersComponent implements OnInit {
 

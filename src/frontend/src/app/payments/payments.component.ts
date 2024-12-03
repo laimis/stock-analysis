@@ -5,7 +5,8 @@ import {GetErrors} from '../services/utils';
 @Component({
     selector: 'app-payments',
     templateUrl: './payments.component.html',
-    styleUrls: ['./payments.component.css']
+    styleUrls: ['./payments.component.css'],
+    standalone: false
 })
 export class PaymentsComponent {
 

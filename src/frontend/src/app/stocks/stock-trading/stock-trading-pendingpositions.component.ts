@@ -18,13 +18,11 @@ import {FormsModule} from "@angular/forms";
         ErrorDisplayComponent,
         LoadingComponent,
         StockLinkAndTradingviewLinkComponent,
-        PercentPipe,
         CurrencyPipe,
         DatePipe,
         BrokerageOrdersComponent,
         FormsModule
-    ],
-    standalone: true
+    ]
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
     errors: string[];

@@ -8,7 +8,8 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
     selector: 'app-stock-trading-positions',
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
-    providers: [PercentPipe, CurrencyPipe, DecimalPipe]
+    providers: [PercentPipe, CurrencyPipe, DecimalPipe],
+    standalone: false
 })
 export class StockTradingPositionsComponent {
 

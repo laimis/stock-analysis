@@ -15,7 +15,8 @@ import {concat, forkJoin} from "rxjs";
 @Component({
     selector: 'app-stock-trading-simulations',
     templateUrl: './stock-trading-simulations.component.html',
-    styleUrls: ['./stock-trading-simulations.component.css']
+    styleUrls: ['./stock-trading-simulations.component.css'],
+    standalone: false
 })
 
 export class StockTradingSimulationsComponent implements OnInit {

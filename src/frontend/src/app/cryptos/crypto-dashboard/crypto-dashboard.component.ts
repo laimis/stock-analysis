@@ -6,7 +6,8 @@ import {OwnedCrypto, StocksService} from '../../services/stocks.service';
 @Component({
     selector: 'app-crypto-dashboard',
     templateUrl: './crypto-dashboard.component.html',
-    styleUrls: ['./crypto-dashboard.component.css']
+    styleUrls: ['./crypto-dashboard.component.css'],
+    standalone: false
 })
 export class CryptoDashboardComponent implements OnInit {
 

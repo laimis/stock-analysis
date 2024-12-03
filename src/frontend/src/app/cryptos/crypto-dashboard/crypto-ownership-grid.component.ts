@@ -4,7 +4,8 @@ import {OwnedCrypto} from '../../services/stocks.service';
 @Component({
     selector: 'app-crypto-ownership-grid',
     templateUrl: './crypto-ownership-grid.component.html',
-    styleUrls: ['./crypto-ownership-grid.component.css']
+    styleUrls: ['./crypto-ownership-grid.component.css'],
+    standalone: false
 })
 export class CryptoOwnershipGridComponent {
 

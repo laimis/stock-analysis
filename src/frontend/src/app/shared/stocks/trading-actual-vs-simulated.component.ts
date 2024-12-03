@@ -5,7 +5,8 @@ import {TradingStrategyResult, TradingStrategyResults} from 'src/app/services/st
 @Component({
     selector: 'app-trading-actual-vs-simulated',
     templateUrl: './trading-actual-vs-simulated.component.html',
-    styleUrls: ['./trading-actual-vs-simulated.component.css']
+    styleUrls: ['./trading-actual-vs-simulated.component.css'],
+    standalone: false
 })
 export class TradingActualVsSimulatedPositionComponent {
 

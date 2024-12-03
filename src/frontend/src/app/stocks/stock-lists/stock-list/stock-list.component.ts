@@ -7,7 +7,8 @@ import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 @Component({
     selector: 'app-stock-list',
     templateUrl: './stock-list.component.html',
-    styleUrls: ['./stock-list.component.css']
+    styleUrls: ['./stock-list.component.css'],
+    standalone: false
 })
 export class StockListComponent implements OnInit {
     list: StockList;

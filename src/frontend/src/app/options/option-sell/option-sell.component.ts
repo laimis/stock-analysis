@@ -8,7 +8,8 @@ import {tick} from "@angular/core/testing";
 @Component({
     selector: 'app-option-sell',
     templateUrl: './option-sell.component.html',
-    providers: [DatePipe]
+    providers: [DatePipe],
+    standalone: false
 })
 export class OptionSellComponent implements OnInit {
 

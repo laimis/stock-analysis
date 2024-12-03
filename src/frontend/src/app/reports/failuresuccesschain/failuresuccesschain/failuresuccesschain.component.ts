@@ -4,7 +4,8 @@ import {Chain, StocksService} from 'src/app/services/stocks.service';
 @Component({
     selector: 'app-failuresuccesschain',
     templateUrl: './failuresuccesschain.component.html',
-    styleUrls: ['./failuresuccesschain.component.css']
+    styleUrls: ['./failuresuccesschain.component.css'],
+    standalone: false
 })
 export class FailuresuccesschainComponent implements OnInit {
     chain: Chain;

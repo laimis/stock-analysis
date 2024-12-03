@@ -8,7 +8,8 @@ import {GlobalService} from '../services/global.service';
 @Component({
     selector: 'app-profile-login',
     templateUrl: './profile-login.component.html',
-    styleUrls: ['./profile-login.component.css']
+    styleUrls: ['./profile-login.component.css'],
+    standalone: false
 })
 export class ProfileLoginComponent implements OnInit {
 

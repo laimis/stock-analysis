@@ -22,8 +22,7 @@ import {CurrencyPipe, NgClass, NgIf} from "@angular/common";
         ReactiveFormsModule,
         CurrencyPipe,
         NgIf
-    ],
-    standalone: true
+    ]
 })
 export class BrokerageNewOrderComponent {
 

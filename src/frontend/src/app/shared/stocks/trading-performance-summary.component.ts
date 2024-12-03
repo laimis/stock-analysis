@@ -5,6 +5,7 @@ import {LabelWithFrequency, StockTradingPerformance} from 'src/app/services/stoc
 @Component({
     selector: 'app-trading-performance-summary',
     templateUrl: './trading-performance-summary.component.html',
+    standalone: false
 })
 export class TradingPerformanceSummaryComponent {
 

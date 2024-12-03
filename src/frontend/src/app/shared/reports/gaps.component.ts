@@ -12,8 +12,7 @@ import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angula
         PercentPipe,
         CurrencyPipe,
         DecimalPipe
-    ],
-    standalone: true
+    ]
 })
 export class GapsComponent {
 

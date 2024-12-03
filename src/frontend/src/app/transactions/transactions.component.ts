@@ -7,7 +7,8 @@ import {GetErrors} from "../services/utils";
 @Component({
     selector: 'app-transactions',
     templateUrl: './transactions.component.html',
-    styleUrls: ['./transactions.component.css']
+    styleUrls: ['./transactions.component.css'],
+    standalone: false
 })
 export class TransactionsComponent implements OnInit {
     response: TransactionsView

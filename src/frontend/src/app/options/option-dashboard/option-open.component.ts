@@ -6,7 +6,8 @@ import {toggleVisuallyHidden} from "../../services/utils";
 @Component({
     selector: 'app-option-open',
     templateUrl: './option-open.component.html',
-    styleUrls: ['./option-open.component.css']
+    styleUrls: ['./option-open.component.css'],
+    standalone: false
 })
 
 export class OptionOpenComponent {

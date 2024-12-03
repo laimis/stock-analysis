@@ -14,7 +14,8 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 @Component({
     selector: 'app-stock-trading-outcomes-reports',
     templateUrl: './stock-trading-outcomes-reports.component.html',
-    styleUrls: ['./stock-trading-outcomes-reports.component.css']
+    styleUrls: ['./stock-trading-outcomes-reports.component.css'],
+    standalone: false
 })
 
 export class StockPositionReportsComponent {

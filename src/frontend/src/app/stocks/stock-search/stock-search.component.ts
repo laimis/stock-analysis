@@ -6,7 +6,6 @@ import {GetErrors} from "../../services/utils";
 import {FormsModule} from "@angular/forms";
 
 @Component({
-    standalone: true,
     selector: 'app-stock-search',
     templateUrl: './stock-search.component.html',
     imports: [

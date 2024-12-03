@@ -22,8 +22,7 @@ interface SpreadCandidate {
 }
 
 @Component({
-  selector: 'app-option-spread-builder',
-  standalone: true,
+    selector: 'app-option-spread-builder',
     imports: [
         CurrencyPipe,
         DecimalPipe,
@@ -38,8 +37,8 @@ interface SpreadCandidate {
         RouterLink,
         StockSearchComponent
     ],
-  templateUrl: './option-spread-builder.component.html',
-  styleUrl: './option-spread-builder.component.css'
+    templateUrl: './option-spread-builder.component.html',
+    styleUrl: './option-spread-builder.component.css'
 })
 export class OptionSpreadBuilderComponent implements OnInit {
     

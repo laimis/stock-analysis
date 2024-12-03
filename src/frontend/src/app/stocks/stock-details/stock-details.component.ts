@@ -21,7 +21,8 @@ import {concat} from "rxjs";
 @Component({
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
-    styleUrls: ['./stock-details.component.css']
+    styleUrls: ['./stock-details.component.css'],
+    standalone: false
 })
 export class StockDetailsComponent implements OnInit {
 

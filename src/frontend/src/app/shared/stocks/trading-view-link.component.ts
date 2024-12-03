@@ -8,8 +8,7 @@ import {NgOptimizedImage} from "@angular/common";
     templateUrl: './trading-view-link.component.html',
     imports: [
         NgOptimizedImage
-    ],
-    standalone: true
+    ]
 })
 export class TradingViewLinkComponent {
 

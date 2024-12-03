@@ -8,7 +8,8 @@ import {concat} from "rxjs";
 @Component({
     selector: 'app-outcomes-report',
     templateUrl: './outcomes-report.component.html',
-    styleUrls: ['./outcomes-report.component.css']
+    styleUrls: ['./outcomes-report.component.css'],
+    standalone: false
 })
 export class OutcomesReportComponent implements OnInit {
     errors: string[] = null;

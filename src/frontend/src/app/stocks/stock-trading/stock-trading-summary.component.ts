@@ -20,7 +20,8 @@ interface PositionGroup {
 @Component({
     selector: 'app-stock-trading-summary',
     templateUrl: './stock-trading-summary.component.html',
-    styleUrls: ['./stock-trading-summary.component.css']
+    styleUrls: ['./stock-trading-summary.component.css'],
+    standalone: false
 })
 export class StockTradingSummaryComponent {
 

@@ -9,7 +9,8 @@ import {
 @Component({
     selector: 'app-stock-trading-performance',
     templateUrl: './stock-trading-performance.component.html',
-    styleUrls: ['./stock-trading-performance.component.css']
+    styleUrls: ['./stock-trading-performance.component.css'],
+    standalone: false
 })
 export class StockTradingPerformanceComponent {
 

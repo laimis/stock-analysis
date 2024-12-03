@@ -49,8 +49,7 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
         CandlestickChartComponent,
         GapsComponent,
         ErrorDisplayComponent
-    ],
-    standalone: true
+    ]
 })
 export class StockTradingNewPositionComponent {
     strategies: { key: string; value: string; }[];

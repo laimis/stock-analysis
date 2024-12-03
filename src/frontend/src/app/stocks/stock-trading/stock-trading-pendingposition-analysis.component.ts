@@ -8,17 +8,16 @@ import {GetErrors} from "../../services/utils";
 import { OutcomesComponent } from "../../shared/reports/outcomes.component";
 
 @Component({
-  selector: 'app-stock-trading-pendingposition-analysis',
-  standalone: true,
+    selector: 'app-stock-trading-pendingposition-analysis',
     imports: [
-    LoadingComponent,
-    ErrorDisplayComponent,
-    NgIf,
-    OutcomesAnalysisReportComponent,
-    OutcomesComponent
-],
-  templateUrl: './stock-trading-pendingposition-analysis.component.html',
-  styleUrl: './stock-trading-pendingposition-analysis.component.css'
+        LoadingComponent,
+        ErrorDisplayComponent,
+        NgIf,
+        OutcomesAnalysisReportComponent,
+        OutcomesComponent
+    ],
+    templateUrl: './stock-trading-pendingposition-analysis.component.html',
+    styleUrl: './stock-trading-pendingposition-analysis.component.css'
 })
 export class StockTradingPendingpositionAnalysisComponent implements OnInit {
     report: OutcomesReport;

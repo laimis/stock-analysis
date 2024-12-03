@@ -6,7 +6,8 @@ import {GetErrors} from '../services/utils';
 @Component({
     selector: 'app-profile-passwordreset',
     templateUrl: './profile-passwordreset.component.html',
-    styleUrls: ['./profile-passwordreset.component.css']
+    styleUrls: ['./profile-passwordreset.component.css'],
+    standalone: false
 })
 export class ProfilePasswordResetComponent implements OnInit {
 

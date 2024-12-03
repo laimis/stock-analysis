@@ -6,7 +6,8 @@ import {GetErrors} from "../services/utils";
 @Component({
     selector: 'app-review',
     templateUrl: './summary.component.html',
-    styleUrls: ['./summary.component.css']
+    styleUrls: ['./summary.component.css'],
+    standalone: false
 })
 export class SummaryComponent implements OnInit {
     result: ReviewList

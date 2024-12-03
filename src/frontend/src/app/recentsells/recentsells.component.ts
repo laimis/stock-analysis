@@ -4,7 +4,8 @@ import {StocksService} from 'src/app/services/stocks.service';
 @Component({
     selector: 'app-recentsells',
     templateUrl: './recentsells.component.html',
-    styleUrls: ['./recentsells.component.css']
+    styleUrls: ['./recentsells.component.css'],
+    standalone: false
 })
 export class RecentSellsComponent implements OnInit {
     sells: any;

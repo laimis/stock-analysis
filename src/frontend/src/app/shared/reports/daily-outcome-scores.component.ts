@@ -40,7 +40,8 @@ function createCombinedDailyChart(report:DailyPositionReport) {
 @Component({
     selector: 'app-daily-outcome-scores',
     templateUrl: './daily-outcome-scores.component.html',
-    styleUrls: ['./daily-outcome-scores.component.css']
+    styleUrls: ['./daily-outcome-scores.component.css'],
+    standalone: false
 })
 export class DailyOutcomeScoresComponent {
 

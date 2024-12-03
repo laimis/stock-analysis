@@ -5,7 +5,8 @@ import {OptionsContainer, StocksService} from '../../services/stocks.service';
 @Component({
     selector: 'app-options',
     templateUrl: './option-dashboard.component.html',
-    styleUrls: ['./option-dashboard.component.css']
+    styleUrls: ['./option-dashboard.component.css'],
+    standalone: false
 })
 export class OptionsComponent implements OnInit {
 

@@ -6,7 +6,8 @@ import {GetErrors} from '../services/utils';
 @Component({
     selector: 'app-profile-verify',
     templateUrl: './profile-verify.component.html',
-    styleUrls: ['./profile-verify.component.css']
+    styleUrls: ['./profile-verify.component.css'],
+    standalone: false
 })
 export class ProfileVerifyComponent implements OnInit {
 

@@ -6,7 +6,8 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 @Component({
     selector: 'app-stock-trading-analysis-dashboard',
     templateUrl: './stock-trading-analysis-dashboard.component.html',
-    styleUrls: ['./stock-trading-analysis-dashboard.component.css']
+    styleUrls: ['./stock-trading-analysis-dashboard.component.css'],
+    standalone: false
 })
 export class StockTradingAnalysisDashboardComponent implements OnInit {
 

@@ -7,7 +7,8 @@ import {GetStrategies} from "../../services/utils";
 @Component({
     selector: 'app-stock-trading-closed-positions',
     templateUrl: './stock-trading-closed-positions.component.html',
-    styleUrls: ['./stock-trading-closed-positions.component.css']
+    styleUrls: ['./stock-trading-closed-positions.component.css'],
+    standalone: false
 })
 export class StockTradingClosedPositionsComponent {
     tickers: string[];

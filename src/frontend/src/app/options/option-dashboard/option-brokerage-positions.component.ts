@@ -12,7 +12,8 @@ export interface BrokerageOptionPositionCollection {
 @Component({
     selector: 'app-option-brokerage-positions',
     templateUrl: './option-brokerage-positions.component.html',
-    styleUrls: ['./option-brokerage-positions.component.css']
+    styleUrls: ['./option-brokerage-positions.component.css'],
+    standalone: false
 })
 export class OptionBrokeragePositionsComponent {
     errors: string[];

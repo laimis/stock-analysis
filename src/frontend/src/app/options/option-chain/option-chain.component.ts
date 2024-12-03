@@ -7,7 +7,8 @@ import {GetErrors} from 'src/app/services/utils';
 @Component({
     selector: 'app-option-chain',
     templateUrl: './option-chain.component.html',
-    styleUrls: ['./option-chain.component.css']
+    styleUrls: ['./option-chain.component.css'],
+    standalone: false
 })
 export class OptionChainComponent implements OnInit {
     ticker: string;

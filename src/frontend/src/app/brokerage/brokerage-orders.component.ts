@@ -26,8 +26,7 @@ let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
         DatePipe,
         ErrorDisplayComponent,
         NgIf
-    ],
-    standalone: true
+    ]
 })
 export class BrokerageOrdersComponent {
     groupedOrders: BrokerageStockOrder[][];

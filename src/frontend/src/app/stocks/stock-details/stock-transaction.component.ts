@@ -8,7 +8,8 @@ import {StockPositionsService} from "../../services/stockpositions.service";
     selector: 'app-stock-transaction',
     templateUrl: './stock-transaction.component.html',
     styleUrls: ['./stock-transaction.component.css'],
-    providers: [DatePipe]
+    providers: [DatePipe],
+    standalone: false
 })
 export class StockTransactionComponent implements OnInit {
 

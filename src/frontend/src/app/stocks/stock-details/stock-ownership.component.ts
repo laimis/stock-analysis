@@ -5,6 +5,7 @@ import {BrokerageStockOrder, PositionChartInformation, PositionInstance, StockQu
     selector: 'app-stock-ownership',
     templateUrl: './stock-ownership.component.html',
     styleUrls: ['./stock-ownership.component.css'],
+    standalone: false
 })
 export class StockOwnershipComponent {
 

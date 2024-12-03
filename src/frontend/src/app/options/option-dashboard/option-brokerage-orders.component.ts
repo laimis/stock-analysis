@@ -6,7 +6,8 @@ import {BrokerageService} from "../../services/brokerage.service";
 @Component({
     selector: 'app-option-brokerage-orders',
     templateUrl: './option-brokerage-orders.component.html',
-    styleUrls: ['./option-brokerage-orders.component.css']
+    styleUrls: ['./option-brokerage-orders.component.css'],
+    standalone: false
 })
 
 export class OptionBrokerageOrdersComponent {

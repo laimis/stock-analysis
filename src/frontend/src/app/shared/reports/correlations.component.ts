@@ -10,12 +10,10 @@ import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tra
     styleUrls: ['./correlations.component.css'],
     imports: [
         DecimalPipe,
-        LoadingComponent,
         NgIf,
         NgClass,
         StockLinkAndTradingviewLinkComponent
-    ],
-    standalone: true
+    ]
 })
 export class CorrelationsComponent {
     private _correlations: TickerCorrelation[];

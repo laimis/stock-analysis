@@ -13,7 +13,8 @@ import {FormControl} from "@angular/forms";
 @Component({
     selector: 'app-stock-trading-position',
     templateUrl: './stock-trading-position.component.html',
-    styleUrls: ['./stock-trading-position.component.css']
+    styleUrls: ['./stock-trading-position.component.css'],
+    standalone: false
 })
 export class StockTradingPositionComponent {
     candidateRiskAmount: number = 0

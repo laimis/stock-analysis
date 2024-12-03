@@ -6,7 +6,8 @@ import {GetErrors} from 'src/app/services/utils';
 @Component({
     selector: 'app-stock-option',
     templateUrl: './stock-option.component.html',
-    providers: [DatePipe]
+    providers: [DatePipe],
+    standalone: false
 })
 export class StockOptionComponent implements OnInit {
 

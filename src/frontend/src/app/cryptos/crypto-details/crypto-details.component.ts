@@ -6,7 +6,8 @@ import {Title} from '@angular/platform-browser';
 @Component({
     selector: 'app-crypto-details',
     templateUrl: './crypto-details.component.html',
-    styleUrls: ['./crypto-details.component.css']
+    styleUrls: ['./crypto-details.component.css'],
+    standalone: false
 })
 export class CryptoDetailsComponent implements OnInit {
 

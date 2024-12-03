@@ -4,7 +4,8 @@ import {StocksService} from 'src/app/services/stocks.service';
 @Component({
     selector: 'app-admin-weekly',
     templateUrl: './admin-weekly.component.html',
-    styleUrls: ['./admin-weekly.component.css']
+    styleUrls: ['./admin-weekly.component.css'],
+    standalone: false
 })
 export class AdminWeeklyComponent {
 

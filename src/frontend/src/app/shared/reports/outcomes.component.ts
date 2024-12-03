@@ -19,8 +19,7 @@ import {StockLinkComponent} from "../stocks/stock-link.component";
         TradingViewLinkComponent,
         StockLinkComponent,
         NgIf
-    ],
-    standalone: true
+    ]
 })
 export class OutcomesComponent {
 
