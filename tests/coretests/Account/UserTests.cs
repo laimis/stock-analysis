@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using core.fs.Accounts;
-using core.fs.Adapters.Subscriptions;
 using testutils;
 using Xunit;
 
