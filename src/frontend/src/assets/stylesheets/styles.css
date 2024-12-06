@@ -1,4 +1,45 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles */
+:root {
+    --nt-background: #f8f9fa;
+    --nt-card-shadow: rgba(0, 0, 0, 0.05);
+    --nt-accent: #f1f3f5;
+    --nt-link: #495057;
+    --nt-link-hover: #228be6;
+}
+
+body {
+    background-color: var(--nt-background);
+    color: #495057;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    background-color: var(--nt-background);
+    min-height: calc(100vh - 200px); /* Adjust based on your header/footer height */
+}
+
+
+/* Content Card */
+.content-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px var(--nt-card-shadow);
+    transition: box-shadow 0.3s ease;
+}
+
+.content-card:hover {
+    box-shadow: 0 4px 16px var(--nt-card-shadow);
+}
+
+/* Footer Styles */
+.footer-link {
+    color: var(--nt-link);
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--nt-link-hover);
+}
+
 a {
     color: #004289;
 }

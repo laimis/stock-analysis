@@ -1,43 +1,19 @@
-.app-wrapper {
-    position: relative;
-    background-color: var(--bs-body-bg);
+.content-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px var(--nt-card-shadow);
+    transition: box-shadow 0.3s ease;
 }
 
-.footer {
-   background-color: var(--bs-light);
-
-   a {
-       transition: color 0.2s ease-in-out;
-
-       &:hover {
-           color: var(--bs-primary) !important;
-       }
-   }
-
-   .social-links {
-       a {
-           display: inline-flex;
-           align-items: center;
-           justify-content: center;
-           width: 32px;
-           height: 32px;
-           border-radius: 6px;
-           transition: all 0.2s ease-in-out;
-
-           &:hover {
-               background-color: var(--bs-primary-bg-subtle);
-               transform: translateY(-2px);
-           }
-       }
-   }
+.content-card:hover {
+    box-shadow: 0 4px 16px var(--nt-card-shadow);
 }
 
-@media (max-width: 767.98px) {
-    .footer {
-        text-align: center;
+/* Footer Styles */
+.footer-link {
+    color: var(--nt-link);
+    transition: color 0.2s ease;
+}
 
-        .footer-links {
-            justify-content: center;
-        }
-    }
+.footer-link:hover {
+    color: var(--nt-link-hover);
 }
