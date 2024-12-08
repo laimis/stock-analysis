@@ -2,3 +2,62 @@
     max-width: 70%;
     overflow-x: auto;
 }
+.note-timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.note-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e9ecef;
+}
+
+.note-item {
+    position: relative;
+    padding: 0.5rem 0 1rem 1rem;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.note-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 12px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #6c757d;
+}
+
+.note-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.latest-note {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+.card {
+    border: 1px solid rgba(0,0,0,.125);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.btn-link {
+    color: var(--bs-body-color);
+}
+
+.btn-link:hover {
+    color: var(--bs-primary);
+}
