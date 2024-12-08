@@ -383,6 +383,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                     "Fee" => AccountTransactionType.Fee,
                     "Interest" => AccountTransactionType.Interest,
                     "Other" => AccountTransactionType.Other,
+                    "Transfer" => AccountTransactionType.Transfer,
                     _ => throw new Exception($"Unknown transaction type: {type}")
                 };
             }
