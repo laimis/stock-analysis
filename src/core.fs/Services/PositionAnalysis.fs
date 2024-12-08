@@ -226,7 +226,7 @@ module PositionAnalysis =
                 ]
             )
             AnalysisOutcomeEvaluation(
-                "Longs in Downtrend",
+                "EMA20 < SMA50",
                 OutcomeType.Negative,
                 PositionAnalysisKeys.EMA20AboveSMA50Bars,
                 tickerOutcomes |> TickerOutcomes.filter [
@@ -249,16 +249,6 @@ module PositionAnalysis =
                 tickerOutcomes |> TickerOutcomes.filter [
                     (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value <= decimal withinTwoWeeksThreshold.TotalDays)
                     (fun o -> o.Key = PositionAnalysisKeys.UnrealizedProfit && o.Value < 0m)
-                ]
-            )
-            AnalysisOutcomeEvaluation(
-                "Consider moving stop to cost",
-                OutcomeType.Positive,
-                PositionAnalysisKeys.StopLoss,
-                tickerOutcomes |> TickerOutcomes.filter [
-                    (fun o -> o.Key = PositionAnalysisKeys.StopLoss && o.Value > 0m)
-                    (fun o -> o.Key = PositionAnalysisKeys.UnrealizedGain && o.Value > gainPctThreshold)
-                    (fun o -> o.Key = PositionAnalysisKeys.StopDiffToCost && o.Value < 0.0m)
                 ]
             )
             AnalysisOutcomeEvaluation(
