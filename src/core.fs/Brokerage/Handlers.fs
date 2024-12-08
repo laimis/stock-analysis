@@ -31,6 +31,11 @@ type BrokerageTransaction =
     | Sell of BuyOrSellData * UserId
     | SellShort of BuyOrSellData * UserId
     
+type OptionOrderCommand = {
+    UserId:UserId
+    Payload:string
+}
+    
 type CancelOrder =
     {
         UserId:UserId
@@ -59,6 +64,21 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage, portfolio:
         brokerage.SellShortOrder user data.Ticker data.NumberOfShares data.Price data.Type data.Duration
     
     interface IApplicationService
+    
+    member _.Handle (command:OptionOrderCommand) = task {
+        let! user = accounts.GetUser(command.UserId)
+        
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            Console.WriteLine(command.Payload)
+            let! result = brokerage.OptionOrder user.State command.Payload
+            match result with
+            | Error error ->
+                Console.WriteLine(error.Message)
+                return Error error
+            | Ok _ -> return Ok ()
+    }
     
     member _.Handle (command:BrokerageTransaction) = task {
         

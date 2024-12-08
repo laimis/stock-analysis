@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable, of} from "rxjs";
 import {tap} from "rxjs/operators";
-import {BrokerageAccount, brokerageordercommand} from "./stocks.service";
+import {BrokerageAccount} from "./stocks.service";
 import { HttpClient } from "@angular/common/http";
 
 export enum BrokerageOrderType {
@@ -13,9 +13,55 @@ export enum BrokerageOrderType {
 
 export enum BrokerageOrderDuration {
     Day = 'Day',
-    Gtc = 'Gtc',
+    GTC = 'GTC',
     DayPlus = 'DayPlus',
     GtcPlus = 'GtcPlus'
+}
+
+export class BrokerageOrderCommand {
+    ticker: string
+    numberOfShares: number
+    price: number
+    type: string
+    duration: string
+    positionId: string
+    notes: string
+}
+
+// types for orders:
+// Enum for order types
+export enum OrderType {
+    NET_DEBIT = "NET_DEBIT",
+    NET_CREDIT = "NET_CREDIT"
+}
+
+// Enum for order instructions
+export enum OrderInstruction {
+    BUY_TO_OPEN = "BUY_TO_OPEN",
+    SELL_TO_OPEN = "SELL_TO_OPEN"
+}
+
+// Interface for instrument
+export interface Instrument {
+    symbol: string;
+    assetType: string;
+}
+
+// Interface for order leg
+export interface OrderLeg {
+    instruction: OrderInstruction;
+    quantity: number;
+    instrument: Instrument;
+}
+
+// Main order interface
+export interface OptionOrderCommand {
+    orderType: OrderType;
+    session: string;
+    price: number;
+    duration: string
+    orderStrategyType: string;
+    orderLegCollection: OrderLeg[];
 }
 
 @Injectable({providedIn: 'root'})
@@ -27,28 +73,30 @@ export class BrokerageService {
     constructor(private http: HttpClient) {
     }
 
-    buy(obj: brokerageordercommand): Observable<any> {
+    buy(obj: BrokerageOrderCommand): Observable<any> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/buy', obj)
     }
 
-    sell(obj: brokerageordercommand): Observable<any> {
+    sell(obj: BrokerageOrderCommand): Observable<any> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/sell', obj)
     }
 
-    sellShort(obj: brokerageordercommand): Observable<any> {
+    sellShort(obj: BrokerageOrderCommand): Observable<any> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/sellshort', obj)
     }
 
-    buyToCover(obj: brokerageordercommand): Observable<any> {
+    buyToCover(obj: BrokerageOrderCommand): Observable<any> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/buytocover', obj)
     }
-
-    // TODO: remove this caching approach once we figure out how
-    // orders component can get orders passed to it instead of
+    
+    issueOptionOrder(obj: OptionOrderCommand): Observable<any> {
+        this.brokerageAccountData = null
+        return this.http.post('/api/brokerage/optionsorder', obj)
+    }
 
     cancelOrder(orderId: string): Observable<any> {
         this.brokerageAccountData = null

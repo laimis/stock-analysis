@@ -427,14 +427,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     let getBuyOrderDuration(brokerageOrderDuration: BrokerageOrderDuration) =
         match brokerageOrderDuration with
         | Day -> "DAY"
-        | Gtc -> "GOOD_TILL_CANCEL"
+        | GTC -> "GOOD_TILL_CANCEL"
         | DayPlus -> "DAY"
         | GtcPlus -> "GOOD_TILL_CANCEL"
 
     let getSession(brokerageOrderDuration: BrokerageOrderDuration) =
         match brokerageOrderDuration with
         | Day -> "NORMAL"
-        | Gtc -> "NORMAL"
+        | GTC -> "NORMAL"
         | DayPlus -> "SEAMLESS"
         | GtcPlus -> "SEAMLESS"
         
@@ -672,7 +672,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
                 let resource = $"/accounts/{accountId}/orders" |> TraderApiUrl
 
-                let data = JsonSerializer.Serialize(postData)
+                let data =
+                    match postData with
+                    | :? string as data -> data
+                    | _ -> JsonSerializer.Serialize(postData)
 
                 let! enterResponse, content = this.CallApiWithoutSerialization user resource HttpMethod.Post (Some data)
 
@@ -1102,7 +1105,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 |}
 
             this.EnterOrder user postData
-
+            
+        member this.OptionOrder (user: UserState) (payload:string) = 
+            this.EnterOrder user payload
+            
         member this.GetQuotes (user: UserState) (tickers: Ticker seq) = execIfConnectedToBrokerage user (this.GetQuote tickers)
         
         member this.GetQuote (user: UserState) (ticker: Ticker) = task {

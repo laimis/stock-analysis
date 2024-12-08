@@ -33,6 +33,11 @@ public class DummyBrokerageClient : IBrokerage
         throw new NotImplementedException();
     }
 
+    public Task<FSharpResult<Unit, ServiceError>> OptionOrder(UserState state, string payload)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<FSharpResult<BrokerageAccount,ServiceError>> GetAccount(UserState user)
     {
         throw new NotImplementedException();

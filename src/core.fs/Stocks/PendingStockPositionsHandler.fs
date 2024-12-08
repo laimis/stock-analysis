@@ -95,7 +95,7 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                 let duration =
                     match orderType with
                     | Limit -> GtcPlus
-                    | _ -> Gtc
+                    | _ -> GTC
                     
                 let orderTask =
                     match command.NumberOfShares with

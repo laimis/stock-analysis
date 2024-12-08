@@ -8,6 +8,12 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
+import {
+    BrokerageOrderDuration,
+    BrokerageService,
+    OptionOrderCommand, OrderInstruction,
+    OrderType
+} from "../../services/brokerage.service";
 
 interface OptionLeg {
     option: OptionDefinition;
@@ -42,7 +48,7 @@ interface SpreadCandidate {
 })
 export class OptionSpreadBuilderComponent implements OnInit {
     
-    constructor(private stockService: StocksService, private route: ActivatedRoute) {
+    constructor(private stockService: StocksService, private brokerageService:BrokerageService, private route: ActivatedRoute) {
     }
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -378,8 +384,41 @@ export class OptionSpreadBuilderComponent implements OnInit {
     builtSpreads: SpreadCandidate[] = null
     
     createOrder(totalCost:number) {
-        // create an order for the total cost
-        alert("Pending implementation")
+        
+        let orderType = totalCost < 0 ? OrderType.NET_DEBIT : OrderType.NET_CREDIT
+        let session = "NORMAL"
+        let price = totalCost
+        let duration = "GOOD_TILL_CANCEL"
+        let orderStrategyType = "SINGLE"
+        
+        let collections = this.selectedLegs.map(x => {
+            return {
+                instruction: x.action === "buy" ? OrderInstruction.BUY_TO_OPEN : OrderInstruction.SELL_TO_OPEN,
+                quantity: x.quantity,
+                instrument: {
+                    symbol: x.option.symbol,
+                    assetType: "OPTION"
+                }
+            }
+        })
+        
+        let order : OptionOrderCommand = {
+            orderType,
+            session,
+            price,
+            duration,
+            orderStrategyType,
+            orderLegCollection: collections
+        }
+        
+        this.brokerageService.issueOptionOrder(order).subscribe(
+            (data) => {
+                console.log("Order created", data)
+            },
+            (error) => {
+                console.log("Error creating order", error)
+            }
+        )
     }
     
     findDebitCallSpreads() {

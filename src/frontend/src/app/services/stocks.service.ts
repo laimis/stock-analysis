@@ -1381,17 +1381,6 @@ export class pendingstockpositioncommand {
     strategy: string | null
     useLimitOrder: boolean
 }
-
-export class brokerageordercommand {
-    ticker: string
-    numberOfShares: number
-    price: number
-    type: string
-    duration: string
-    positionId: string
-    notes: string
-}
-
 export enum TrendDirection {
     Up = 'Up',
     Down = 'Down',

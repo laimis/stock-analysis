@@ -91,10 +91,8 @@ type OptionOrderInstruction =
     | BuyToOpen | BuyToClose | SellToOpen | SellToClose
 type StockOrderType =
     | Market | Limit | StopMarket
-    
 type OptionOrderType =
     | Market | Limit | NetDebit | NetCredit
-
 
 [<CLIMutable>]
 type OptionLeg = {
@@ -224,7 +222,7 @@ type BrokerageAccount() =
     
 type BrokerageOrderDuration =
     | Day
-    | Gtc
+    | GTC
     | DayPlus
     | GtcPlus
     
@@ -232,17 +230,17 @@ type BrokerageOrderDuration =
         static member FromString (value:string) =
             match value with
             | nameof(Day) -> Day
-            | nameof(Gtc) -> Gtc
+            | nameof(GTC) -> GTC
             | nameof(DayPlus) -> DayPlus
             | nameof(GtcPlus) -> GtcPlus
             | _ -> failwithf $"Invalid order duration: %s{value}"
             
         override this.ToString() =
             match this with
-            | Day -> "Day"
-            | Gtc -> "Gtc"
-            | DayPlus -> "DayPlus"
-            | GtcPlus -> "GtcPlus"
+            | Day -> nameof(Day)
+            | GTC -> nameof(GTC)
+            | DayPlus -> nameof(DayPlus)
+            | GtcPlus -> nameof(GtcPlus)
   
 type BrokerageOrderType =
     | Limit
@@ -294,3 +292,4 @@ type IBrokerage =
     abstract member GetOptionChain : state:UserState -> ticker:Ticker -> Task<Result<OptionChain,ServiceError>>
     abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<Result<StockProfile,ServiceError>>
     abstract member GetTransactions : state:UserState -> types:AccountTransactionType array -> Task<Result<AccountTransaction[],ServiceError>>
+    abstract member OptionOrder : state:UserState -> payload:string -> Task<Result<unit,ServiceError>>

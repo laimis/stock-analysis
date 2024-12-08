@@ -1,3 +1,5 @@
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using core.fs.Brokerage;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +42,18 @@ namespace web.Controllers
             this.OkOrError(
                 brokerageHandler.Handle(BrokerageTransaction.NewSell(data, User.Identifier()))
             );
+
+        [HttpPost("optionsorder")]
+        public async Task<ActionResult> OptionsOrder()
+        {
+            var reader = new StreamReader(Request.Body, Encoding.UTF8);
+
+            var json = await reader.ReadToEndAsync();
+
+            var result = brokerageHandler.Handle(new OptionOrderCommand(User.Identifier(), json));
+            
+            return await this.OkOrError(result);
+        }
 
         [HttpDelete("orders/{orderId}")]
         public Task<ActionResult> Delete([FromRoute] string orderId) =>

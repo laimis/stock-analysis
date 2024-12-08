@@ -1,8 +1,13 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Observable} from 'rxjs';
-import {brokerageordercommand, KeyValuePair, StockQuote, StocksService} from 'src/app/services/stocks.service';
+import {KeyValuePair, StockQuote, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
-import {BrokerageOrderDuration, BrokerageOrderType, BrokerageService} from "../services/brokerage.service";
+import {
+    BrokerageOrderCommand,
+    BrokerageOrderDuration,
+    BrokerageOrderType,
+    BrokerageService
+} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {StockSearchComponent} from "../stocks/stock-search/stock-search.component";
@@ -42,11 +47,11 @@ export class BrokerageNewOrderComponent {
     brokerageOrderEntered: EventEmitter<string> = new EventEmitter<string>()
     private marketOrderTypes: KeyValuePair[] = [
         {key: BrokerageOrderDuration.Day, value: 'Day'},
-        {key: BrokerageOrderDuration.Gtc, value: 'GTC'}
+        {key: BrokerageOrderDuration.GTC, value: 'GTC'}
     ]
     private nonMarketOrderTypes: KeyValuePair[] = [
         {key: BrokerageOrderDuration.Day, value: 'Day'},
-        {key: BrokerageOrderDuration.Gtc, value: 'GTC'},
+        {key: BrokerageOrderDuration.GTC, value: 'GTC'},
         {key: BrokerageOrderDuration.DayPlus, value: 'Day+AH'},
         {key: BrokerageOrderDuration.GtcPlus, value: 'GTC+AH'}
     ]
@@ -93,7 +98,7 @@ export class BrokerageNewOrderComponent {
     brokerageOrderTypeChanged() {
         if (this.brokerageOrderType === BrokerageOrderType.Market) {
             this.orderDurations = this.marketOrderTypes
-            this.brokerageOrderDuration = BrokerageOrderDuration.Gtc
+            this.brokerageOrderDuration = BrokerageOrderDuration.GTC
         } else {
             this.orderDurations = this.nonMarketOrderTypes
             this.brokerageOrderDuration = BrokerageOrderDuration.GtcPlus
@@ -149,7 +154,7 @@ export class BrokerageNewOrderComponent {
         this.execute(cmd => this.brokerage.sellShort(cmd))
     }
 
-    execute(fn: (cmd: brokerageordercommand) => Observable<string>) {
+    execute(fn: (cmd: BrokerageOrderCommand) => Observable<string>) {
         this.errors = null
         
         if (this.notesControl.invalid) {
@@ -162,7 +167,7 @@ export class BrokerageNewOrderComponent {
         }
         
         this.submittingOrder = true
-        const cmd: brokerageordercommand = {
+        const cmd: BrokerageOrderCommand = {
             ticker: this.selectedTicker,
             numberOfShares: this.numberOfShares,
             price: this.price,
