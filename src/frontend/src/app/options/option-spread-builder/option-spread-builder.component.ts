@@ -413,7 +413,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
         
         this.brokerageService.issueOptionOrder(order).subscribe(
             (data) => {
-                console.log("Order created", data)
+                alert("Order created")
             },
             (error) => {
                 console.log("Error creating order", error)
