@@ -71,13 +71,12 @@ type BrokerageHandler(accounts:IAccountStorage, brokerage:IBrokerage, portfolio:
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            Console.WriteLine(command.Payload)
+            
             let! result = brokerage.OptionOrder user.State command.Payload
-            match result with
-            | Error error ->
-                Console.WriteLine(error.Message)
-                return Error error
-            | Ok _ -> return Ok ()
+            return
+                match result with
+                | Error error -> Error error
+                | Ok _ -> Ok ()
     }
     
     member _.Handle (command:BrokerageTransaction) = task {

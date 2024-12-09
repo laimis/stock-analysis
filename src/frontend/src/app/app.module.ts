@@ -1,5 +1,4 @@
 import {AppComponent} from './app.component';
-import {AuthGuard, AuthGuardAdminOnly, AuthGuardUnverifiedAllowed, WithLoginStatus} from './auth/auth.guard';
 import {BrowserModule, Title} from '@angular/platform-browser';
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {ErrorDisplayComponent} from './shared/error-display/error-display.component';
@@ -15,7 +14,7 @@ import {ProfileComponent} from './profile/profile.component';
 import {ProfileCreateComponent} from './profile/profile-create.component';
 import {ProfileLoginComponent} from './profile/profile-login.component';
 import {SummaryComponent} from './summary/summary.component';
-import {RouterModule, Routes} from '@angular/router';
+import {RouterModule} from '@angular/router';
 import {OwnedOptionComponent} from './options/owned-option-detail/owned-option-detail.component';
 import {StockDetailsComponent} from './stocks/stock-details/stock-details.component';
 import {TransactionsComponent} from './transactions/transactions.component';
@@ -65,7 +64,6 @@ import {OutcomesReportComponent} from './reports/outcomes-report/outcomes-report
 import {GapsReportComponent} from './reports/gaps/gaps-report.component';
 import {GapsComponent} from './shared/reports/gaps.component';
 import {PercentChangeDistributionComponent} from './shared/reports/percent-change-distribution.component';
-import {StockTradingPendingPositionsDashboardComponent} from './stocks/stock-trading-dashboard/stock-trading-pending-positions-dashboard.component';
 import {TradingPerformanceSummaryComponent} from './shared/stocks/trading-performance-summary.component';
 import {TradingActualVsSimulatedPositionComponent} from './shared/stocks/trading-actual-vs-simulated.component';
 import {StockListsDashboardComponent} from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
@@ -95,98 +93,17 @@ import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-
 import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-and-tradingview-link.component";
 import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
-import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
-import {TrendsReportComponent} from "./reports/trends-report/trends-report.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
 import {StockTradingChartsComponent} from "./stocks/stock-trading/stock-trading-charts.component";
 import {CorrelationsComponent} from "./shared/reports/correlations.component";
 import {StockTradingNewPositionComponent} from "./stocks/stock-trading/stock-trading-new-position.component";
 import {StockTradingDashboardComponent} from "./stocks/stock-trading/stock-trading-dashboard.component";
 import {ParsedDatePipe} from "./services/parsedDate.filter";
-import {AccountTransactionsComponent} from "./profile/account-transactions.component";
 import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
+import {routes} from "./app.routes";
 
-
-let routes: Routes = [
-    {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
-    {path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuardAdminOnly]},
-    {path: 'admin/email', component: AdminEmailComponent, canActivate: [AuthGuardAdminOnly]},
-    {path: 'admin/users', component: AdminUsersComponent, canActivate: [AuthGuardAdminOnly]},
-    {path: 'admin/weekly', component: AdminWeeklyComponent, canActivate: [AuthGuardAdminOnly]},
-    {path: 'contact', component: ContactComponent},
-    {path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
-    {path: 'events', component: EventsComponent, canActivate: [AuthGuard]},
-    {path: 'landing', component: LandingComponent},
-    {path: 'profile', component: ProfileComponent, canActivate: [AuthGuardUnverifiedAllowed]},
-    {path: 'profile/create', component: ProfileCreateComponent},
-    {path: 'profile/create/:plan', component: ProfileCreateComponent},
-    {path: 'profile/login', component: ProfileLoginComponent},
-    {path: 'profile/verify', component: ProfileVerifyComponent},
-    {path: 'profile/passwordreset/:id', component: ProfilePasswordResetComponent},
-    {path: 'profile/transactions', component: AccountTransactionsComponent, canActivate: [AuthGuard]},
-    
-    {path: 'options', component: OptionsComponent, canActivate: [AuthGuard]},
-    {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
-    {path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard]},
-    {path: 'options/chainold/:ticker', component: OptionChainComponent, canActivate: [AuthGuard]},
-    {path: 'options/chain/:ticker', component: OptionSpreadBuilderComponent, canActivate: [AuthGuard]},
-    {path: 'options/chain', component: OptionSpreadBuilderComponent, canActivate: [AuthGuard]},
-    {path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
-
-    {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
-
-    {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
-    
-    {path: 'playground', component: PlaygroundComponent, canActivate: [AuthGuard]},
-    {path: 'playground/inflectionpoints', component: InflectionPointsComponent, canActivate: [AuthGuard]},
-
-    {path: 'privacy', component: PrivacyComponent},
-    {
-        path: 'trading/review',
-        component: StockTradingReviewDashboardComponent,
-        canActivate: [AuthGuard],
-        title: 'Review'
-    },
-    {
-        path: 'trading/review/:tab',
-        component: StockTradingReviewDashboardComponent,
-        canActivate: [AuthGuard],
-        title: 'Review'
-    },
-    {path: 'stocks/tradingsimulations', component: StockTradingSimulationsComponent, canActivate: [AuthGuard], title: 'Trading Simulations'},
-    {path: 'stocks/simulator', component: StockTradingSimulatorComponent, canActivate: [AuthGuard], title : 'Simulator'},
-    {path: 'stocks/analysis', component: StockTradingAnalysisDashboardComponent, canActivate: [AuthGuard], title: 'Stock Position Analysis'},
-    {path: 'stocks/positions', component: StockTradingDashboardComponent, canActivate: [AuthGuard], title: 'Stock Positions'},
-    {path: 'stocks/positions/:tab', component: StockTradingDashboardComponent, canActivate: [AuthGuard], title: 'Stock Positions'},
-    {path: 'stocks/lists', component: StockListsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
-    {path: 'stocks/lists/:id', component: StockListComponent, canActivate: [AuthGuard], title: 'Stock Lists'},
-    {path: 'stocks/newposition', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
-    {path: 'stocks/newposition/:tab', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
-    {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
-    {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
-
-    {path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard]},
-    {path: 'terms', component: TermsComponent},
-    {path: 'test', component: StockSearchComponent, canActivate: [AuthGuard]},
-
-    {path: 'reports/chain', component: FailuresuccesschainComponent, canActivate: [AuthGuard], title: 'Chain Report'},
-    {path: 'reports/recentsells', component: RecentSellsComponent, canActivate: [AuthGuard], title: 'Recent Sells'},
-    {path: 'reports/outcomes', component: OutcomesReportComponent, canActivate: [AuthGuard], title: 'Outcomes Report'},
-    {path: 'reports/gaps', component: GapsReportComponent, canActivate: [AuthGuard], title: 'Gaps Report'},
-    {path: 'reports/trades', component: TradesReportComponent, canActivate: [AuthGuard], title: 'Trades Report'},
-    {path: 'reports/trends', component: TrendsReportComponent, canActivate: [AuthGuard], title: 'Trends Report'},
-
-    {path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard], title: 'Routines'},
-    {path: 'routines/:id/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
-    {path: 'routines/:id', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
-
-    {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
-    {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
-
-    {path: '**', pathMatch: 'full', component: PageNotFoundComponent, canActivate: [WithLoginStatus]},
-];
 
 @NgModule({
     declarations: [
@@ -286,7 +203,8 @@ let routes: Routes = [
         ParsedDatePipe,
         OutcomesAnalysisReportComponent,
         OutcomesComponent,
-        BrokerageNewOrderComponent
+        BrokerageNewOrderComponent,
+        OptionSpreadBuilderComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

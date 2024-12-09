@@ -1,17 +1,5 @@
 <div class="container-fluid mt-4">
 
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a [routerLink]="['/options']" class="text-decoration-none">Options Dashboard</a></li>
-            <li class="breadcrumb-item active" *ngIf="ticker">
-                Trade Builder: {{ ticker }}
-                <button class="btn btn-sm btn-link ms-2 p-0" (click)="loadOptions(ticker)">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </button>
-            </li>
-        </ol>
-    </nav>
-
     <app-error-display [errors]="errors"></app-error-display>
     
     <div *ngIf="!ticker">

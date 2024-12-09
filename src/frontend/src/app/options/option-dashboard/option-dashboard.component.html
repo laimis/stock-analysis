@@ -22,8 +22,9 @@
            (click)="activateTab('performance')">
             Performance
         </a>
-        <a class="tab" [routerLink]="['/options/chain']">
-            Trade Builder
+        <a class="tab" [ngClass]="{'is-active': isActive('spreadbuilder')}" [routerLink]=""
+           (click)="activateTab('spreadbuilder')">
+            Spread Builder
         </a>
     </div>
 
@@ -48,4 +49,7 @@
         [sellStats]="optionsContainer.sellStats">
     </app-option-performance>
 }
+    @if(loaded && isActive('spreadbuilder')) {
+        <app-option-spread-builder></app-option-spread-builder>
+    }
 </div>
