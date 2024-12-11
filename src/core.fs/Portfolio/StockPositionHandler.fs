@@ -1009,7 +1009,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.toArray
             
             let stockTransactions =
-                match query.Show = "stocks" || query.Show = null with
+                match query.Show = "stocks" || query.Show = "stocksandoptions" || query.Show = null with
                 | true ->
                     stocks
                     |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
@@ -1033,7 +1033,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 | false -> Seq.empty
             
             let optionTransactions =
-                match query.Show = "options" || query.Show = null with
+                match query.Show = "options" || query.Show = "stocksandoptions" || query.Show = null with
                 | true ->
                     options
                     |> Seq.filter (fun o -> query.Ticker.IsNone || o.State.Ticker = query.Ticker.Value)
