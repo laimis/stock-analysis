@@ -959,7 +959,10 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let past =
                 stocks
-                |> Seq.filter _.IsClosed
+                |> Seq.filter (fun state ->
+                    let strategyNotLongTermInterest = state.HasLabel "strategy" "longterminterest" |> not
+                    state.IsClosed  && strategyNotLongTermInterest
+                )
                 |> Seq.sortByDescending _.Closed.Value
                 |> Seq.map StockPositionWithCalculations
                 |> Seq.toArray

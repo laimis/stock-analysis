@@ -99,13 +99,13 @@ module TradingPerformance =
         
         let mapByDateOpened = 
             closedPositions
-            |> Seq.groupBy (fun x -> x.Opened.Date)
+            |> Seq.groupBy _.Opened.Date
             |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
             |> Map.ofSeq
             
         let mapByDateClosed = 
             closedPositions
-            |> Seq.groupBy (fun x -> x.Closed.Value.Date)
+            |> Seq.groupBy _.Closed.Value.Date
             |> Seq.map (fun (date, positions) -> date, positions |> Seq.map (fun x -> x.Cost))
             |> Map.ofSeq
             
@@ -404,7 +404,7 @@ type TradingStrategyPerformance =
     with
         member this.NumberOfOpenPositions =
             this.results
-            |> Array.filter (_.Position.IsOpen)
+            |> Array.filter _.Position.IsOpen
             |> Array.length
             
 [<AbstractClass>]
@@ -752,15 +752,24 @@ module TradingStrategyFactory =
             if actualTrade.IsSome then
                 createLastSellStrategy actualTrade.Value
                 createCloseAfterFixedNumberOfDaysWithStop "size based" 30 (actualTrade.Value |> firstStop)
-                createCloseAfterFixedNumberOfDaysWithStop "5% stop" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
-                createCloseAfterFixedNumberOfDaysWithStop "10% stop" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
-                createCloseAfterFixedNumberOfDaysWithStop "20% stop" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
+                createCloseAfterFixedNumberOfDaysWithStop "5%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
+                createCloseAfterFixedNumberOfDaysWithStop "10%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
+                createCloseAfterFixedNumberOfDaysWithStop "20%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
                 createTrailingStop "5% w/ initial stop" 0.05m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "10% w/ initial stop" 0.10m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "20% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
                 
+                // calculate a stop that is more risk based, and not first stop
+                let riskAmount = actualTrade.Value.RiskAmount |> Option.defaultValue 40m // default to 40 if no risk amount is set
+                let calcs = actualTrade.Value |> StockPositionWithCalculations
+                let riskPerShare = riskAmount / calcs.CompletedPositionShares
+                let stop = calcs.PositionOpenPrice - riskPerShare
+                createTrailingStop "5% w/ risk based stop" 0.05m (Some stop)
+                createTrailingStop "10% w/ risk based stop" 0.10m (Some stop)
+                createTrailingStop "20% w/ risk based stop" 0.20m (Some stop)
+                
             // createCloseAfterFixedNumberOfDays 15 - retired, consistently underperforms
-            // createProfitPointsTrade 3 - returned, consistently underperforms            
+            // createProfitPointsTrade 3 - retired, consistently underperforms            
         ]
     
 type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHours, logger:ILogger) =
@@ -806,6 +815,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             
             match prices with
             | Error err -> results.MarkAsFailed($"Failed to get price history for {ticker}: {err.Message}")
+            | Ok bars when bars.Bars.Length = 0 -> results.MarkAsFailed($"No price history for {ticker}")
             | Ok bars ->
                 
                 // purchase price can be very different from the bar price because
@@ -827,21 +837,16 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                     |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
                     |> setLabelsFromActualTradeIfSet actualTrade ``when``
                     
-                match bars.Bars with
-                | [||] -> results.MarkAsFailed($"No price history found for {ticker}")
-                | _ ->
-                    
-                    TradingStrategyFactory.getStrategies actualTrade
+                TradingStrategyFactory.getStrategies actualTrade
                     |> Seq.iter ( fun strategy ->
                         stockPosition |> strategy.Run bars closeIfOpenAtTheEnd |> results.Add
                     )
                     
-                    match actualTrade with
-                    | Some actualTrade ->
-                        let actualResult = TradingStrategyFactory.createActualTrade().Run bars closeIfOpenAtTheEnd actualTrade
-                        results.Insert(0, actualResult)
-                    | None -> ()
-            
+                match actualTrade with
+                | Some actualTrade ->
+                    let actualResult = TradingStrategyFactory.createActualTrade().Run bars closeIfOpenAtTheEnd actualTrade
+                    results.Insert(0, actualResult)
+                | None -> ()
             
             return results
         }

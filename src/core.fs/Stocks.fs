@@ -363,8 +363,10 @@ module StockPosition =
         
         // if stop price is set, we should set risked amount if it's not set
         match withStop.StopPrice with
-        | None -> withStop
-        | Some _ when withStop.RiskAmount.IsSome -> withStop
+        | None ->
+            withStop
+        | Some _ when withStop.RiskAmount.IsSome ->
+            withStop
         | Some stopPrice ->
             let riskAmount = 
                 withStop.ShareTransactions
