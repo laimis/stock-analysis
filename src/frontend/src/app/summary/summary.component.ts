@@ -14,6 +14,9 @@ export class SummaryComponent implements OnInit {
     loaded: boolean = false
     timePeriod: string = 'thisweek'
     errors: string[] = []
+    stockProfits: number;
+    optionProfits: number;
+    dividendProfits: number;
 
     constructor(
         private stockService: StocksService,
@@ -50,6 +53,9 @@ export class SummaryComponent implements OnInit {
         this.stockService.getTransactionSummary(this.timePeriod).subscribe((r: ReviewList) => {
             this.loaded = true
             this.result = r
+            this.stockProfits = r.plStockTransactions.reduce((acc, cur) => acc + cur.profit, 0)
+            this.optionProfits = r.plOptionTransactions.reduce((acc, cur) => acc + cur.amount, 0)
+            this.dividendProfits = r.dividends.reduce((acc, cur) => acc + cur.netAmount, 0)
         }, error => {
             this.errors = GetErrors(error)
             this.loaded = true

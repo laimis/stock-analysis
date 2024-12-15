@@ -4,46 +4,92 @@
 @if (loaded) {
     <app-error-display [errors]="errors"></app-error-display>
     <section class="container">
-        <header class="row justify-content-between align-items-center mb-4">
-            <div class="col-auto">
-                <h2>Week of {{ result.start | date }} Review</h2>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="m-0">Week of {{ result.start | date }} Review</h2>
+                    <select class="form-select w-auto" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
+                        <option value="thisweek" selected>This week</option>
+                        <option value="last7days">Last 7 days</option>
+                    </select>
+                </div>
             </div>
-            <div class="col-auto">
-                <select class="form-select" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
-                    <option value="thisweek" selected>This week</option>
-                    <option value="last7days">Last 7 days</option>
-                </select>
-            </div>
-        </header>
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4 class="card-title">Profit Summary</h4>
-                <div class="d-flex justify-content-between align-items-center flex-column flex-md-row">
-                    <div class="mb-3 mb-md-0">
-                        <h4 class="display-6 mb-0">{{ result.totalProfit | currency }}</h4>
-                        <p class="text-muted mb-0">Total Profit</p>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Performance Summary</h4>
                     </div>
-                    <div class="d-flex">
-                        <div class="me-4">
-                            <h4 class="mb-0">{{ result.closedPositions.length }}</h4>
-                            <p class="text-muted mb-0">Closed Positions</p>
-                        </div>
-                        <div>
-                            <h4 class="mb-0">{{ result.openPositions.length }}</h4>
-                            <p class="text-muted mb-0">Open Positions</p>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="bg-light p-3 rounded">
+                                    <h5 class="text-muted mb-2">Total Profit</h5>
+                                    <h3 class="display-6 mb-0 
+                                        {{ result.totalProfit >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ result.totalProfit | currency }}
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <h5 class="text-muted">Closed Positions</h5>
+                                        <h4>{{ result.closedPositions.length }}</h4>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 class="text-muted">Open Positions</h5>
+                                        <h4>{{ result.openPositions.length }}</h4>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 class="text-muted">Risk/Reward</h5>
+                                        <h4>{{ closedPositionRR() | number:'1.0-2' }}</h4>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
-                @if (result.closedPositions.length > 0) {
-                    <div class="row mt-4">
-                        <div class="col">Closed Position Totals</div>
-                        <div class="col">{{ closedPositionProfit() | currency }}</div>
-                        <div class="col">{{ closedPositionRR() | number:'1.0-2' }}</div>
-                        <div class="col">R: {{ (closedPositionProfit() / closedPositionRR()) | currency}}</div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h4 class="mb-0">Detailed Profit & Loss Breakdown</h4>
                     </div>
-                }
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="bg-light p-3 rounded">
+                                    <h5 class="text-muted">Stock P&L</h5>
+                                    <h4 class="{{ stockProfits ? 'text-success' : 'text-danger' }}">
+                                        {{ stockProfits | currency }}
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <div class="bg-light p-3 rounded">
+                                    <h5 class="text-muted">Options P&L</h5>
+                                    <h4 class="{{ optionProfits >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ optionProfits | currency }}
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="bg-light p-3 rounded">
+                                    <h5 class="text-muted">Dividends</h5>
+                                    <h4 class="{{ dividendProfits >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ dividendProfits | currency }}
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="card mb-4">
@@ -89,7 +135,7 @@
             <div class="card-body">
                 <h4 class="card-title">Opened Positions</h4>
                 <table class="table">
-                    <thead>
+                    <thead *ngIf="result.openPositions.length > 0">
                     <tr>
                         <th style="width: 140px">Symbol</th>
                         <th style="width: 140px">Type</th>
