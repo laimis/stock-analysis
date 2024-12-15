@@ -7,7 +7,7 @@
     }
     @if (positionCollections && positionCollections.length > 0) {
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover border">
                 <thead class="table-light">
                 <tr>
                     <th>Ticker</th>
@@ -15,8 +15,18 @@
                     <th>Type</th>
                     <th>Cost</th>
                     <th>Quantity</th>
-                    <th>Market Price</th>
-                    <th>P/L</th>
+                    <th>
+                        Market Price
+                        <i class="bi bi-info-circle ms-1"
+                           data-bs-toggle="tooltip"
+                           title="Market price is hidden by default. Click 'Show P/L' for each group to view."></i>
+                    </th>
+                    <th class="position-relative">
+                        P/L
+                        <i class="bi bi-info-circle ms-1"
+                           data-bs-toggle="tooltip"
+                           title="P/L values are hidden by default. Click 'Show P/L' for each group to view."></i>
+                    </th>
                     <th>Expiration</th>
                     <th>Purchase Date</th>
                     <th>Action</th>
@@ -34,17 +44,23 @@
                                 <td>{{ position.optionType }}</td>
                                 <td>{{ position.averageCost | currency }}</td>
                                 <td>{{ position.quantity | number }}</td>
-                                <td>{{ position.marketValue / position.quantity | currency }}</td>
                                 <td>
-                                    @if ((position.marketValue - position.averageCost * 100 * position.quantity) >= 0) {
-                                        <small class="profit">
-                                            +{{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
-                                        </small>
-                                    } @else {
-                                        <small class="loss">
-                                            {{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
-                                        </small>
-                                    }
+                                    <div [class]="'pl-value blur-content ' + (option.showPL ? 'visible' : '')">
+                                        {{ position.marketValue / position.quantity | currency }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div [class]="'pl-value blur-content ' + (option.showPL ? 'visible' : '')">
+                                        @if ((position.marketValue - position.averageCost * 100 * position.quantity) >= 0) {
+                                            <small class="profit">
+                                                +{{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
+                                            </small>
+                                        } @else {
+                                            <small class="loss">
+                                                {{ (position.marketValue - position.averageCost * 100 * position.quantity) | currency }}
+                                            </small>
+                                        }
+                                    </div>
                                 </td>
                                 <td>{{ position.expirationDate | date }}</td>
                                 <td>
@@ -58,20 +74,40 @@
                             </tr>
                         }
                         <!-- Subtotal row for each option group -->
-                        <tr class="subtotal-row">
-                            <td colspan="3"><small class="text-muted">Subtotal</small></td>
+                        <tr class="subtotal-row bg-light">
+                            <td colspan="3">
+                                <div class="d-flex align-items-center">
+                                    <small class="text-muted me-2">Subtotal</small>
+                                    <button class="btn btn-outline-secondary btn-sm"
+                                            (click)="togglePL(option)"
+                                            [attr.aria-label]="option.showPL ? 'Hide P/L' : 'Show P/L'">
+                                        <i class="bi" [class.bi-eye]="!option.showPL" [class.bi-eye-slash]="option.showPL"></i>
+                                        {{ option.showPL ? 'Hide P/L' : 'Show P/L' }}
+                                    </button>
+                                </div>
+                            </td>
                             <td><small>{{ option.cost | currency }}</small></td>
                             <td></td>
-                            <td><small>{{ option.marketValue | currency }}</small></td>
                             <td>
-                                @if ((option.marketValue - option.cost) >= 0) {
-                                    <span class="profit-loss-badge profit-loss-positive">+{{ option.marketValue - option.cost | currency }}</span>
-                                } @else {
-                                    <span class="profit-loss-badge profit-loss-negative">{{ option.marketValue - option.cost | currency }}</span>
-                                }
+                                <div [class]="'pl-value blur-content ' + (option.showPL ? 'visible' : '')">
+                                    <small>{{ option.marketValue | currency }}</small>
+                                </div>
                             </td>
                             <td>
-                               <small>{{ getExpirationInDays(option) }} days to expiration</small> 
+                                <div [class]="'pl-value blur-content ' + (option.showPL ? 'visible' : '')">
+                                    @if ((option.marketValue - option.cost) >= 0) {
+                                        <span class="profit-loss-badge profit-loss-positive">
+                                            +{{ option.marketValue - option.cost | currency }}
+                                        </span>
+                                    } @else {
+                                        <span class="profit-loss-badge profit-loss-negative">
+                                            {{ option.marketValue - option.cost | currency }}
+                                        </span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <small>{{ getExpirationInDays(option) }} days to expiration</small>
                             </td>
                             <td colspan="2"></td>
                         </tr>
@@ -79,21 +115,37 @@
                 </tbody>
                 <!-- Grand total row -->
                 <tfoot>
-                <tr class="grand-total-row">
-                    <td colspan="3"><strong>Total</strong></td>
+                <tr class="grand-total-row bg-light border-top">
+                    <td colspan="3">
+                        <div class="d-flex align-items-center">
+                            <strong class="me-2">Total</strong>
+                            <button class="btn btn-outline-secondary btn-sm"
+                                    (click)="toggleAllPL()"
+                                    [attr.aria-label]="showAllPL ? 'Hide All P/L' : 'Show All P/L'">
+                                <i class="bi" [class.bi-eye]="!showAllPL" [class.bi-eye-slash]="showAllPL"></i>
+                                {{ showAllPL ? 'Hide All P/L' : 'Show All P/L' }}
+                            </button>
+                        </div>
+                    </td>
                     <td><strong>{{ totalCost | currency }}</strong></td>
                     <td></td>
-                    <td><strong>{{ totalMarketValue | currency }}</strong></td>
+                    <td>
+                        <div [class]="'pl-value blur-content ' + (showAllPL ? 'visible' : '')">
+                            <strong>{{ totalMarketValue | currency }}</strong>
+                        </div>
+                    </td>
                     <td colspan="4">
-                        @if ((totalMarketValue - totalCost) >= 0) {
-                            <span class="profit-loss-badge profit-loss-positive">
+                        <div [class]="'pl-value blur-content ' + (showAllPL ? 'visible' : '')">
+                            @if ((totalMarketValue - totalCost) >= 0) {
+                                <span class="profit-loss-badge profit-loss-positive">
                                     +{{ totalMarketValue - totalCost | currency }}
                                 </span>
-                        } @else {
-                            <span class="profit-loss-badge profit-loss-negative">
+                            } @else {
+                                <span class="profit-loss-badge profit-loss-negative">
                                     {{ totalMarketValue - totalCost | currency }}
                                 </span>
-                        }
+                            }
+                        </div>
                     </td>
                 </tr>
                 </tfoot>

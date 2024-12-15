@@ -22,3 +22,20 @@
     background-color: #f8d7da;
     color: #842029;
 }
+
+
+.blur-content {
+    filter: blur(4px);
+    opacity: 0.3;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.blur-content.visible {
+    filter: blur(0);
+    opacity: 1;
+}
+
+.table > :not(caption) > * > * {
+    padding: 1rem 0.75rem;
+}

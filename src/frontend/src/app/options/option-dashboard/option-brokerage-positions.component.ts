@@ -7,6 +7,7 @@ export interface BrokerageOptionPositionCollection {
     positions: BrokerageOptionPosition[]
     cost: number
     marketValue: number
+    showPL: boolean
 }
 
 @Component({
@@ -21,6 +22,8 @@ export class OptionBrokeragePositionsComponent {
     totalMarketValue: number;
     totalCost: number;
     positionCollections: BrokerageOptionPositionCollection[]
+    showAllPL: boolean = false;
+    
     @Input()
     set positions(val: BrokerageOptionPosition[])
     {
@@ -41,7 +44,7 @@ export class OptionBrokeragePositionsComponent {
             let positions = grouped[key]
             let cost = positions.reduce((acc, pos) => acc + pos.averageCost * pos.quantity, 0) * 100
             let marketValue = positions.reduce((acc, pos) => acc + pos.marketValue, 0)
-            this.positionCollections.push({positions, cost, marketValue})
+            this.positionCollections.push({positions, cost, marketValue, showPL: false})
         }
     }
     get positions() {
@@ -55,6 +58,15 @@ export class OptionBrokeragePositionsComponent {
     constructor(
         private service: StocksService
     ) {
+    }
+
+    togglePL(option: BrokerageOptionPositionCollection) {
+        option.showPL = !option.showPL;
+    }
+
+    toggleAllPL() {
+        this.showAllPL = !this.showAllPL;
+        this.positionCollections.forEach(option => option.showPL = this.showAllPL);
     }
 
     getTodaysDate() {
