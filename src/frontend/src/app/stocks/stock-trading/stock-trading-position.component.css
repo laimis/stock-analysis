@@ -61,3 +61,24 @@
 .btn-link:hover {
     color: var(--bs-primary);
 }
+
+.cursor-pointer {
+    cursor: pointer;
+    user-select: none;
+}
+
+.hover-lighten {
+    transition: background-color 0.2s ease;
+}
+
+.hover-lighten:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.transition-transform {
+    transition: transform 0.2s ease;
+}
+
+.hover-lighten:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
