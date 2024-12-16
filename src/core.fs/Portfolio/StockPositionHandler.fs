@@ -275,6 +275,9 @@ type TransactionSummary =
     
 type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser,logger:ILogger) =
     
+    let isNotLongTermInterest (s:StockPositionState) = s.HasLabel "strategy" "longterminterest" |> not
+    let isNotLongTerm (s:StockPositionState) = s.HasLabel "strategy" "longterm" |> not
+    
     interface IApplicationService
     
     member _.Handle (query:OwnershipQuery) = task {
@@ -761,8 +764,9 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         // and either open or were closed today
         let filterFunc =
             fun (p:StockPositionState) ->
-                (p.HasLabel "strategy" "longterm" |> not) && (p.HasLabel "strategy" "longterminterest" |> not)
-                && (p.IsOpen || (p.IsClosed && p.Closed.Value.Date = latestMarketDate))
+                (p |> isNotLongTerm) &&
+                (p |> isNotLongTermInterest) &&
+                (p.IsOpen || (p.IsClosed && p.Closed.Value.Date = latestMarketDate))
         
         let candidatePositions =
             positions
@@ -840,7 +844,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             return
                 simulations
                 |> Seq.concat
-                |> Seq.groupBy (_.StrategyName)
+                |> Seq.groupBy _.StrategyName
                 |> Seq.map mapToStrategyPerformance
                 |> Seq.toArray
                 |> Ok
@@ -887,7 +891,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.toArray
                 
             let! pendingPositions = storage.GetPendingStockPositions query.UserId
-            let pendingPositions = pendingPositions |> Seq.map (_.State) |> Seq.filter _.IsOpen |> Seq.toArray
+            let pendingPositions = pendingPositions |> Seq.map _.State |> Seq.filter _.IsOpen |> Seq.toArray
                 
             let! accountResponse = brokerage.GetAccount(user.State)
             let account =
@@ -899,8 +903,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
             let tickers =
                 positions
-                |> Seq.map (_.Ticker)
-                |> Seq.append (account.StockPositions |> Seq.map (_.Ticker))
+                |> Seq.map _.Ticker
+                |> Seq.append (account.StockPositions |> Seq.map _.Ticker)
                 |> Seq.distinct
                 
             let! pricesResponse = brokerage.GetQuotes user.State tickers
@@ -936,7 +940,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let past =
                 stocks
-                |> Seq.filter _.IsClosed
+                |> Seq.filter (fun p -> p.IsClosed && p |> isNotLongTermInterest) 
                 |> Seq.sortByDescending _.Closed.Value
                 |> Seq.map StockPositionWithCalculations
                 |> Seq.toArray
@@ -960,8 +964,8 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             let past =
                 stocks
                 |> Seq.filter (fun state ->
-                    let strategyNotLongTermInterest = state.HasLabel "strategy" "longterminterest" |> not
-                    state.IsClosed  && strategyNotLongTermInterest
+                    state.IsClosed &&
+                    state |> isNotLongTermInterest
                 )
                 |> Seq.sortByDescending _.Closed.Value
                 |> Seq.map StockPositionWithCalculations
