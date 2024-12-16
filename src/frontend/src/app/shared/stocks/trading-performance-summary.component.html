@@ -118,12 +118,12 @@
             <div>{{ performance.gainPctStdDev | percent: '1.2-2'}}</div>
         </div>
         <div class="col">
-            <div class="stat-label"></div>
-            <div></div>
+            <div class="stat-label">Max Capital</div>
+            <div>{{ performance.maxCashNeeded | currency }}</div>
         </div>
         <div class="col">
-            <div class="stat-label"></div>
-            <div></div>
+            <div class="stat-label">Risk Adjusted Returns</div>
+            <div>{{ performance.riskAdjustedReturn | percent: '1.2-2'}}</div>
         </div>
     </div>
 </div>

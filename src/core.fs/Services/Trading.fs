@@ -257,6 +257,11 @@ type TradingPerformance =
                 | 0m -> 0m
                 | _ -> this.AvgReturnPct / this.GainPctStdDev
                 
+            member this.RiskAdjustedReturn =
+                match this.MaxCashNeeded with
+                | 0m -> 0m
+                | _ -> this.Profit / this.MaxCashNeeded
+                
             static member Create name (closedPositions:seq<StockPositionWithCalculations>) =
                 
                 let maxCashNeeded = TradingPerformance.calculateMaxCashNeeded closedPositions
@@ -426,16 +431,19 @@ type TradingStrategy(name:string) =
         let difference = context |> TradingStrategy.GetPercentDiffFromReferencePrice bar
         Math.Max(context.MaxGain, difference)
     
-    static member ClosePosition price date (position:StockPositionState) =
+    static member ClosePosition price date reason (position:StockPositionState) =
         match position.IsOpen with
-        | true -> position |> StockPosition.close price date
+        | true ->
+            position
+            |> StockPosition.addNotes (Some reason) date
+            |> StockPosition.close price date
         | false -> position
         
     static member ForceCloseIfNecessary closeIfOpen (context:SimulationContext) =
         match closeIfOpen && context.Position.IsOpen with
         | true ->
             (context.Position.GetPositionState()
-            |> TradingStrategy.ClosePosition context.LastBar.Close context.LastBar.Date
+            |> TradingStrategy.ClosePosition context.LastBar.Close context.LastBar.Date "Force Close"
             |> StockPositionWithCalculations, true)
         | false -> (context.Position, false)
     
@@ -513,7 +521,7 @@ type TradingStrategyCloseOnCondition(name:string,exitCondition) =
             | None -> context.Position.GetPositionState()
             
         if doExit then
-            positionAfterStopAdjustment |> TradingStrategy.ClosePosition bar.Close bar.Date
+            positionAfterStopAdjustment |> TradingStrategy.ClosePosition bar.Close bar.Date "Exit triggered"
         else
             positionAfterStopAdjustment
 
@@ -616,7 +624,7 @@ type TradingStrategyWithProfitPoints(name:string,numberOfProfitPoints,profitPoin
         
         let closeIfNecessary (position:StockPositionState) =
             match stopReached bar.Close position with
-            | true -> TradingStrategy.ClosePosition bar.Close bar.Date position
+            | true -> TradingStrategy.ClosePosition bar.Close bar.Date "Stop loss" position
             | _ -> position
         
         context.Position
@@ -672,7 +680,7 @@ module TradingStrategyFactory =
         let exitCondition = fun (context:SimulationContext) (bar:PriceBar) ->
             let doExit = daysHeldReached context bar || stopReached context bar
             (doExit, Some stopPrice)
-        TradingStrategyCloseOnCondition($"Close after {numberOfDays} days with {stopDescription} stop", exitCondition)
+        TradingStrategyCloseOnCondition($"Close after {numberOfDays} days with {stopDescription}", exitCondition)
         
     let createTrailingStop (stopDescription:string) (trailingPercentage:decimal) (initialStop:decimal option)  : ITradingStrategy =
         if trailingPercentage <= 0m then
@@ -696,8 +704,8 @@ module TradingStrategyFactory =
             match stopReached with
             | true ->
                 true, Some latestStop.Value
-            | false ->
                 
+            | false ->
                 match context.Position.IsShort with
                 | true ->
                     let newStopPriceCandidate = bar.Close * (1m + trailingPercentage)
@@ -751,13 +759,13 @@ module TradingStrategyFactory =
             createTrailingStop "20%" 0.20m None
             if actualTrade.IsSome then
                 createLastSellStrategy actualTrade.Value
-                createCloseAfterFixedNumberOfDaysWithStop "size based" 30 (actualTrade.Value |> firstStop)
+                createCloseAfterFixedNumberOfDaysWithStop "first stop" 30 (actualTrade.Value |> firstStop)
                 createCloseAfterFixedNumberOfDaysWithStop "5%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
                 createCloseAfterFixedNumberOfDaysWithStop "10%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
                 createCloseAfterFixedNumberOfDaysWithStop "20%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
-                createTrailingStop "5% w/ initial stop" 0.05m (actualTrade.Value |> firstStop |> Some)
-                createTrailingStop "10% w/ initial stop" 0.10m (actualTrade.Value |> firstStop |> Some)
-                createTrailingStop "20% w/ initial stop" 0.20m (actualTrade.Value |> firstStop |> Some)
+                createTrailingStop "5% w/ first stop" 0.05m (actualTrade.Value |> firstStop |> Some)
+                createTrailingStop "10% w/ first stop" 0.10m (actualTrade.Value |> firstStop |> Some)
+                createTrailingStop "20% w/ first stop" 0.20m (actualTrade.Value |> firstStop |> Some)
                 
                 // calculate a stop that is more risk based, and not first stop
                 let riskAmount = actualTrade.Value.RiskAmount |> Option.defaultValue 40m // default to 40 if no risk amount is set

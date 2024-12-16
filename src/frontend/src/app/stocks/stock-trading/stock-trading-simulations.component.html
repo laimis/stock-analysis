@@ -58,7 +58,7 @@
                 <thead>
                     <tr>
                         <th>Ticker</th>
-                        <th>Opened - Closed </th>
+                        <th>Opened - Closed</th>
                         <th>Opened - Closed Alt</th>
                         <th>Profit</th>
                         <th>Profit Alt</th>
@@ -74,17 +74,20 @@
                             <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
                             <td>
                                 {{ result.position.opened | parsedDate }} - {{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }})
+                                <div class="small">stop: {{result.position.stopPrice | currency}}</div>
                             </td>
                             <td>
-                                {{ findTrade(result.position).position.opened | parsedDate }} - {{ findTrade((result.position)).forcedClosed ? 'open' : findTrade(result.position).position.closed | parsedDate }}
-                                ({{ findTrade(result.position).position.daysHeld }})
+                                @let trade = findTrade(result.position);
+                                {{ trade.position.opened | parsedDate }} - {{ trade.forcedClosed ? 'open' : trade.position.closed | parsedDate }}
+                                ({{ trade.position.daysHeld }})
+                                <div class="small">stop: {{trade.position.stopPrice | currency}}</div>
                             </td>
                             <td>{{ result.position.profit | currency }}</td>
-                            <td>{{ findTrade(result.position).position.profit | currency }}</td>
-                            <td>{{ result.position.profit - findTrade(result.position).position.profit | currency }}</td>
+                            <td>{{ trade.position.profit | currency }}</td>
+                            <td>{{ result.position.profit - trade.position.profit | currency }}</td>
                             <td>{{ result.position.gainPct | percent }}</td>
-                            <td>{{ findTrade(result.position).position.gainPct | percent }}</td>
-                            <td>{{ result.position.gainPct - findTrade(result.position).position.gainPct | percent }}</td>
+                            <td>{{ trade.position.gainPct | percent }}</td>
+                            <td>{{ result.position.gainPct - trade.position.gainPct | percent }}</td>
                         </tr>
                     }
                 </tbody>
