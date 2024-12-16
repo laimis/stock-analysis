@@ -828,7 +828,11 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let positions =
                 stocks
-                |> Seq.filter (fun s -> s.StopPrice.IsSome && s.IsClosed && s.HasLabel "strategy" "longterm" |> not)
+                |> Seq.filter (fun s ->
+                    s.StopPrice.IsSome &&
+                    s.IsClosed &&
+                    isNotLongTerm s &&
+                    isNotLongTermInterest s)
                 |> Seq.sortByDescending _.Closed.Value
                 |> Seq.truncate command.NumberOfTrades
                 |> Seq.toList
