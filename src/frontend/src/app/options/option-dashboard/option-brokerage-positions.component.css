@@ -27,7 +27,7 @@
 .blur-content {
     filter: blur(4px);
     opacity: 0.3;
-    transition: all 0.3s ease;
+    /*transition: all 0.3s ease;*/
     user-select: none;
 }
 

@@ -74,8 +74,19 @@ export class OptionBrokeragePositionsComponent {
     }
     
     getExpirationInDays(option: BrokerageOptionPositionCollection) {
-        let position = option.positions[0]
-        return Math.floor((new Date(position.expirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+        let numberOfDaysFromNow = (date: number) => {
+            let millisPerDay = 1000 * 60 * 60 * 24
+            return Math.floor((new Date(date).getTime() - new Date().getTime()) / (millisPerDay))
+        }
+        
+        // all the expiration dates in number of days, sorted and deduped
+        let expirations =
+            option.positions.map(p => numberOfDaysFromNow(p.expirationDate))
+                .sort((a, b) => a - b)
+                .filter((val, idx, arr) => arr.indexOf(val) === idx)
+        
+        // concat them all together with a / separator
+        return expirations.join(' / ')
     }
 
     turnIntoPosition(position: BrokerageOptionPosition, purchased: string) {
