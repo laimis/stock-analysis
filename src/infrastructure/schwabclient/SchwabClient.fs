@@ -380,6 +380,25 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             return! connectedStateFunc state
     }
     
+    // I am most definitely not handling this right, but essentially schwab returns adjusted prices
+    // and my position price tracking is based on non-adjusted prices, so when I do historical simulations
+    // it's all out of whack. I need to figure out how to handle this properly
+    // what I am doing right now is returning an adjustment that changes values if date condition is met
+    // I don't even know where I would get these adjustments. For futu for example, this is not
+    // a stock split, I just see $1.95 divident bubble on trading view and sure enough, before that date
+    // all the prices are off by 1.95 when comparing to adjusted vs unadjusted. Still not sure what is happening here
+    // but all the brokerages etc are handling this
+    let getAdjustments ticker =
+        match ticker with
+        | "FUTU" ->
+            let thresholdDate = DateTimeOffset.Parse("2024-12-06")
+            (fun (dt:DateTimeOffset) (value:decimal) ->
+                match dt.Date <= thresholdDate.Date with
+                | true -> value + 1.95m
+                | false -> value
+            )
+        | _ -> (fun _ value -> value)
+    
     let refreshAccessTokenInternal (user: UserState) (fullRefresh: bool) = task {
         let postData =
             dict [
@@ -1229,11 +1248,19 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 | Error error -> return Error error
                 | Ok prices ->
                     let candles = defaultArg prices.candles [||]
-
+                    let adjustments = getAdjustments ticker.Value
                     let payload =
                         candles
                         |> Array.map (
-                            fun c -> PriceBar(DateTimeOffset.FromUnixTimeMilliseconds(c.datetime), c.``open``, c.high, c.low, c.close,c.volume)
+                            fun c ->
+                                let date = DateTimeOffset.FromUnixTimeMilliseconds(c.datetime)
+                                PriceBar(
+                                    date,
+                                    c.``open`` |> adjustments date,
+                                    c.high |> adjustments date,
+                                    c.low |> adjustments date,
+                                    c.close |> adjustments date,c.volume
+                                )
                         )
 
                     if Array.isEmpty payload then
