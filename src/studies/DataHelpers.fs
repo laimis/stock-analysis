@@ -14,7 +14,11 @@ type ISignal =
     abstract member Ticker : string
     abstract member Date : string
     abstract member Screenerid : int option
-    
+   
+            
+let callLogFuncIfSetup func =
+    if ServiceHelper.logger <> null then func(ServiceHelper.logger)
+     
 let verifySignals (records:ISignal seq) minimumRecordsExpected =
         
         // make sure there is at least some records in here, ideally in thousands
@@ -58,12 +62,12 @@ let describeSignals (records:ISignal seq) =
             let minimumDate = records |> Seq.minBy (_.Date) |> _.Date
             let maximumDate = records |> Seq.maxBy (_.Date) |> _.Date
 
-            printfn $"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}"
-            printfn $"Minimum date: %A{minimumDate}"
-            printfn $"Maximum date: %A{maximumDate}"
-            printfn ""
+            callLogFuncIfSetup _.LogInformation($"Records: %d{numberOfRecords}, dates: %d{dates}, tickers: %d{tickers}, screenerIds: %d{screenerIds}")
+            callLogFuncIfSetup _.LogInformation($"Minimum date: %A{minimumDate}")
+            callLogFuncIfSetup _.LogInformation($"Maximum date: %A{maximumDate}")
+            callLogFuncIfSetup _.LogInformation("")
         | _ ->
-            printfn $"No records found in the input"
+            callLogFuncIfSetup _.LogInformation("No records found in the input")
     
 type PriceNotAvailableError =
     | NotAvailableForever of string
@@ -126,12 +130,7 @@ let private readPricesFromFileSystem path = async {
                 let! prices = path |> readPricesFromCsv
                 return Ok prices
 }
-                
-let callLogFuncIfSetup func =
-    if ServiceHelper.logger <> null then func(ServiceHelper.logger)
     
-    
-
 let getTickersWithPriceHistory studiesDirectory =
     $"{studiesDirectory}/prices"
     |> System.IO.Directory.GetFiles

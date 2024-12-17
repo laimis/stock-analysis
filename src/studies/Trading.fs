@@ -2,11 +2,11 @@ module studies.Trading
 
     open System
     open System.Collections.Generic
+    open Microsoft.Extensions.Logging
     open core.fs.Adapters.Stocks
     open core.fs.Services.Analysis
     open core.fs.Stocks
     open studies.DataHelpers
-    open FSharp.Data
     
     // type TradeOutcomeOutput =
     //     CsvProvider<
@@ -52,7 +52,7 @@ module studies.Trading
         Trades:TradeOutcome seq
     }
         with
-            member this.Gains = this.Trades |> Seq.map (_.PercentGain)
+            member this.Gains = this.Trades |> Seq.map _.PercentGain
             member this.GainDistribution = this.Gains |> DistributionStatistics.calculate 
 
 
@@ -68,17 +68,17 @@ module studies.Trading
             let avg_win =
                 match numberOfWinners with
                 | 0 -> 0m
-                | _ -> winners |> Seq.averageBy (_.PercentGain)
+                | _ -> winners |> Seq.averageBy _.PercentGain
             let avg_loss =
                 match numberOfLosers with
                 | 0 -> 0m
-                | _ -> losers |> Seq.averageBy (_.PercentGain)
+                | _ -> losers |> Seq.averageBy _.PercentGain
             let avg_gain_loss =
                 match avg_loss with
                 | 0m -> 0m
                 | _ -> avg_win / avg_loss |> Math.Abs
             let ev = win_pct * avg_win - (1m - win_pct) * (avg_loss |> Math.Abs)
-            let totalGain = outcomes |> Seq.sumBy (_.PercentGain)
+            let totalGain = outcomes |> Seq.sumBy _.PercentGain
 
             // return trade summary
             {
@@ -114,7 +114,7 @@ module studies.Trading
     let strategyWithGenericStopLoss verbose name positionType stopLossReachedFunc (signal:ISignal,prices:PriceBars) =
         let openBar, openDayIndex = findNextDayBarAndIndex signal prices
         
-        if verbose then printfn $"Open bar for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} @ %A{openBar.Open}"
+        if verbose then callLogFuncIfSetup _.LogInformation($"Open bar for %s{signal.Ticker} on %A{signal.Date} is %A{openBar.Date} @ %A{openBar.Open}")
                 
         // find the close day
         let closeBar =
@@ -132,7 +132,7 @@ module studies.Trading
                 failwith $"Could not find close bar for %s{signal.Ticker} on %A{signal.Date}"
             | Some (_, closeBar:PriceBar, stopLossReached, _) ->
                 let reason = if stopLossReached then "stop loss reached" else "close day reached"
-                if verbose then printfn $"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{closeBar.Date} because {reason}"
+                if verbose then callLogFuncIfSetup _.LogInformation($"Close bar for %s{signal.Ticker} on %A{signal.Date} is %A{closeBar.Date} because {reason}")
                 closeBar
         
         TradeOutcome.Create signal openBar closeBar name positionType
@@ -329,7 +329,7 @@ module studies.Trading
             |> Seq.sortBy (fun (r,_) -> r.Date)
             |> Seq.toList
         
-        printfn "Ensured that data has prices"
+        callLogFuncIfSetup _.LogInformation("Ensured that data has prices")
         
         signalsWithPriceBars |> Seq.map fst |> describeSignals
         
@@ -342,7 +342,7 @@ module studies.Trading
             signals
             |> prepareSignalsForTradeSimulations getPricesFunc
         
-        printfn "Executing trades..."
+        callLogFuncIfSetup _.LogInformation("Executing trades...")
         
         let allOutcomes =
             strategies
@@ -351,7 +351,7 @@ module studies.Trading
                 // track outcomes by ticker and open/close dates
                 let map = Dictionary<string, List<TradeOutcome>>()
                 
-                printfn $"  Executing strategy {i+1}..."
+                callLogFuncIfSetup _.LogInformation($"  Executing strategy {i+1}...")
                 
                 signalsWithPriceBars
                 |> List.map strategy

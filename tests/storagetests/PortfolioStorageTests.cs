@@ -306,6 +306,7 @@ namespace storagetests
                 numberOfShares: 10,
                 price: 2.1m,
                 stopPrice: 2m,
+                sizeStopPrice: 1.9m,
                 strategy: "strategy",
                 ticker: TestDataGenerator.AMD,
                 userId: _userId.Item

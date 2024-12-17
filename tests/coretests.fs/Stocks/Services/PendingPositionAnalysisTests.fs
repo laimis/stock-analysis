@@ -12,7 +12,7 @@ let ticker = Ticker("SHEL")
 
 let bars = ticker |> TestDataGenerator.PriceBars
 
-let position = PendingStockPosition("some note", 10m, 100m, 90m, "channelbottom", ticker, Guid.NewGuid())
+let position = PendingStockPosition("some note", 10m, 100m, 90m, 80m, "channelbottom", ticker, Guid.NewGuid())
 
 let outcomes = generate position.State bars
 

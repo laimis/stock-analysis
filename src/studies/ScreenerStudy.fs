@@ -98,7 +98,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
     let tickerDatePairs = signals |> getEarliestDateByTicker
     
     // output how many records are left
-    printfn $"Unique tickers: %d{tickerDatePairs |> Seq.length}"
+    callLogFuncIfSetup _.LogInformation($"Unique tickers: %d{tickerDatePairs |> Seq.length}")
     
     // when ready, for each ticker, get historical prices from price provider
     // starting with 365 days before the earliest date through today
@@ -116,8 +116,8 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
         )
         |> Map.ofArray
     
-    printfn $"Failed: %d{failed.Length}"
-    printfn $"Succeeded: %d{prices.Count}"
+    callLogFuncIfSetup _.LogInformation($"Failed: %d{failed.Length}")
+    callLogFuncIfSetup _.LogInformation($"Succeeded: %d{prices.Count}")
     
     let signalsWithPrices =
         signals
@@ -139,7 +139,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
                 | None -> false
         )
         
-    printfn $"Records with prices: %d{signalsWithPrices |> Seq.length}"
+    callLogFuncIfSetup _.LogInformation($"Records with prices: %d{signalsWithPrices |> Seq.length}")
     
     // now we are interested in gap ups
     let gapIndex =
@@ -157,7 +157,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
         |> Map.ofSeq
         
         
-    printfn $"Gap up index: %d{gapIndex.Count}"
+    callLogFuncIfSetup _.LogInformation($"Gap up index: %d{gapIndex.Count}")
     
     // go through the signals and add gap information if found
     let transformed =
@@ -171,7 +171,7 @@ let transformSignals (brokerage:IGetPriceHistory) studiesDirectory signals = asy
             (r, gapSize)
         )
     
-    printfn $"Updated records: %d{transformed |> Seq.length}"
+    callLogFuncIfSetup _.LogInformation($"Updated records: %d{transformed |> Seq.length}")
     
     let getValueAtIndex index values =
         match values |> Array.tryItem index with
