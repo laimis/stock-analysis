@@ -3,7 +3,8 @@
     <tr>
         <th (click)="sort('strategyName')" class="sort-header">Strategy</th>
         <th (click)="sort('profit')" class="sort-header">P/L</th>
-        <th (click)="sort('maxCashNeeded')" class="sort-header">Max Cash Needed</th>
+        <th (click)="sort('maxCashNeeded')" class="sort-header">Max Cash</th>
+        <th (click)="sort('maxDrawdown')" class="sort-header">Max DD</th>
         <th (click)="sort('riskAdjustedReturn')" class="sort-header">Risk Adjusted Return</th>
         <th (click)="sort('rrSum')" class="sort-header">R/R Sum</th>
         <th (click)="sort('winPct')" class="sort-header">Win %</th>
@@ -25,6 +26,7 @@
                 <td>{{ r.strategyName }}</td>
                 <td>{{ r.performance.profit | currency }}</td>
                 <td>{{ r.performance.maxCashNeeded | currency }}</td>
+                <td>{{ r.performance.maxDrawdown | currency }}</td>
                 <td>{{ r.performance.riskAdjustedReturn | percent }}</td>
                 <td>{{ r.performance.rrSum | number:'1.0-2' }}</td>
                 <td>{{ r.performance.winPct | percent:'1.2-2' }}</td>

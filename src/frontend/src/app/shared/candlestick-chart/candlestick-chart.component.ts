@@ -68,7 +68,6 @@ export function toSeriesMarker(marker: ChartMarker): SeriesMarker<Time> {
 @Component({
     selector: 'app-candlestick-chart',
     templateUrl: './candlestick-chart.component.html',
-    standalone: true
 })
 export class CandlestickChartComponent implements OnDestroy {
     chart: IChartApi;

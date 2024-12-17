@@ -1009,6 +1009,7 @@ export interface StockTradingPerformance {
     earliestDate: string,
     latestDate: string,
     maxCashNeeded: number,
+    maxDrawdown: number,
     riskAdjustedReturn: number,
     gradeDistribution: LabelWithFrequency[]
 }

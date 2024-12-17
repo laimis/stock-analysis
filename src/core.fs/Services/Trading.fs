@@ -87,6 +87,19 @@ module ProfitPoints =
         |> List.map (fun level -> func level)
         
 module TradingPerformance =
+    let calculateMaxDrawdown (closedPositions:StockPositionWithCalculations seq) =
+        
+        closedPositions
+        |> Seq.fold (fun (maxDrawdown, currentDrawdown) position ->
+            let newDrawdown = 
+                match currentDrawdown + position.Profit with
+                | x when x < 0m -> x
+                | _ -> 0m
+            let newMaxDrawdown = Math.Min(maxDrawdown, newDrawdown)
+            (newMaxDrawdown, newDrawdown)
+        ) (0m, 0m)
+        |> fst
+        
     let calculateMaxCashNeeded (closedPositions:StockPositionWithCalculations seq) =
         match closedPositions |> Seq.isEmpty with
         | true -> 0m
@@ -162,6 +175,7 @@ type TradingPerformance =
         EarliestDate:DateTimeOffset
         LatestDate:DateTimeOffset
         MaxCashNeeded:decimal
+        MaxDrawdown:decimal
         GradeDistribution:LabelWithFrequency[]
     }
         with
@@ -265,6 +279,7 @@ type TradingPerformance =
             static member Create name (closedPositions:seq<StockPositionWithCalculations>) =
                 
                 let maxCashNeeded = TradingPerformance.calculateMaxCashNeeded closedPositions
+                let maxDrawdown = TradingPerformance.calculateMaxDrawdown closedPositions
                     
                 let gainStats = MathNet.Numerics.Statistics.RunningStatistics()
                 
@@ -289,7 +304,8 @@ type TradingPerformance =
                         CostSum = perf.CostSum + position.CompletedPositionCostPerShare * decimal(position.CompletedPositionShares)
                         EarliestDate = if position.Opened < perf.EarliestDate then position.Opened else perf.EarliestDate
                         LatestDate = if position.Closed.IsSome && position.Closed.Value > perf.LatestDate then position.Closed.Value else perf.LatestDate
-                        MaxCashNeeded = maxCashNeeded 
+                        MaxCashNeeded = maxCashNeeded
+                        MaxDrawdown = maxDrawdown
                         GradeDistribution = 
                             match position.Grade with
                             | Some grade ->
@@ -396,7 +412,8 @@ type TradingPerformance =
                     WinRRTotal = 0m
                     LossRRTotal = 0m
                     Name = name
-                    MaxCashNeeded = 0m 
+                    MaxCashNeeded = 0m
+                    MaxDrawdown = 0m
                 }
 
 type TradingStrategyPerformance =
@@ -750,6 +767,7 @@ module TradingStrategyFactory =
             createProfitPointsBasedOnPctGainTrade 0.07m 3
             createProfitPointsBasedOnPctGainTrade 0.10m 3
             createProfitPointsBasedOnPctGainTrade 0.20m 3
+            createCloseAfterFixedNumberOfDays 15
             createCloseAfterFixedNumberOfDays 30
             createCloseAfterFixedNumberOfDays 60
             createCloseAfterFixedNumberOfDays 90
@@ -766,15 +784,6 @@ module TradingStrategyFactory =
                 createTrailingStop "5% w/ first stop" 0.05m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "10% w/ first stop" 0.10m (actualTrade.Value |> firstStop |> Some)
                 createTrailingStop "20% w/ first stop" 0.20m (actualTrade.Value |> firstStop |> Some)
-                
-                // calculate a stop that is more risk based, and not first stop
-                let riskAmount = actualTrade.Value.RiskAmount |> Option.defaultValue 40m // default to 40 if no risk amount is set
-                let calcs = actualTrade.Value |> StockPositionWithCalculations
-                let riskPerShare = riskAmount / calcs.CompletedPositionShares
-                let stop = calcs.PositionOpenPrice - riskPerShare
-                createTrailingStop "5% w/ risk based stop" 0.05m (Some stop)
-                createTrailingStop "10% w/ risk based stop" 0.10m (Some stop)
-                createTrailingStop "20% w/ risk based stop" 0.20m (Some stop)
                 
             // createCloseAfterFixedNumberOfDays 15 - retired, consistently underperforms
             // createProfitPointsTrade 3 - retired, consistently underperforms            
@@ -878,19 +887,32 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             closeIfOpenAtTheEnd,
             actualTrade = None)
         
-    member this.Run(user:UserState, position:StockPositionState,closeIfOpenAtTheEnd) =
+    member this.Run(user:UserState, position:StockPositionState,adjustSizeBasedOnRisk:bool,closeIfOpenAtTheEnd) =
         
         let calculations = position |> StockPositionWithCalculations
         
         let stopPrice =
             match calculations.FirstStop() with
             | None -> Some (calculations.CompletedPositionCostPerShare * TradingStrategyConstants.DefaultStopPriceMultiplier)
-            | _ -> calculations.FirstStop()
+            | Some _ -> calculations.FirstStop()
             
         let numberOfShares =
             match position.StockPositionType with
             | Short -> calculations.CompletedPositionShares * -1m
-            | Long -> calculations.CompletedPositionShares
+            | Long ->
+                let initialRisk =
+                    match calculations.InitialRiskedAmount |> Option.defaultValue 0m with
+                    | x when x <= 1m -> 80m
+                    | x -> x
+                    
+                let risk = calculations.RiskedAmount |> Option.defaultValue initialRisk
+                
+                let adjustment = 
+                    match adjustSizeBasedOnRisk with
+                    | true -> risk / initialRisk
+                    | false -> 1m
+                    
+                Math.Floor(calculations.CompletedPositionShares * adjustment)
                 
         this.Run(
             user=user,
@@ -902,4 +924,3 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             closeIfOpenAtTheEnd=closeIfOpenAtTheEnd,
             actualTrade = Some position
         )
-    

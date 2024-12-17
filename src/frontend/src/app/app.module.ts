@@ -69,7 +69,6 @@ import {TradingActualVsSimulatedPositionComponent} from './shared/stocks/trading
 import {StockListsDashboardComponent} from './stocks/stock-lists/stock-lists-dashboard/stock-lists-dashboard.component';
 import {StockListComponent} from './stocks/stock-lists/stock-list/stock-list.component';
 import {StockTradingSimulationsComponent} from './stocks/stock-trading/stock-trading-simulations.component';
-import {DailyOutcomeScoresComponent} from './shared/reports/daily-outcome-scores.component';
 import {
     StockTradingReviewDashboardComponent
 } from './stocks/stock-trading-review/stock-trading-review-dashboard.component';
@@ -103,6 +102,7 @@ import {StockTradingDashboardComponent} from "./stocks/stock-trading/stock-tradi
 import {ParsedDatePipe} from "./services/parsedDate.filter";
 import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
 import {routes} from "./app.routes";
+import {DailyOutcomeScoresComponent} from "./shared/reports/daily-outcome-scores.component";
 
 
 @NgModule({
@@ -160,11 +160,8 @@ import {routes} from "./app.routes";
         CryptoDashboardComponent,
         CryptoOwnershipGridComponent,
         CryptoDetailsComponent,
-        StockAnalysisComponent,
         OutcomesReportComponent,
         GapsReportComponent,
-        PercentChangeDistributionComponent,
-        DailyOutcomeScoresComponent,
         TradesReportComponent,
         AlertsComponent,
         StockListsDashboardComponent,
@@ -204,7 +201,10 @@ import {routes} from "./app.routes";
         OutcomesAnalysisReportComponent,
         OutcomesComponent,
         BrokerageNewOrderComponent,
-        OptionSpreadBuilderComponent
+        OptionSpreadBuilderComponent,
+        StockAnalysisComponent,
+        PercentChangeDistributionComponent,
+        DailyOutcomeScoresComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

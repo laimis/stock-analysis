@@ -1,4 +1,4 @@
-import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
     DailyPositionReport, OutcomesReport,
@@ -13,13 +13,29 @@ import {
 } from 'src/app/services/stocks.service';
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
+import {GapsComponent} from "../../shared/reports/gaps.component";
+import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
+import {OutcomesAnalysisReportComponent} from "../../shared/reports/outcomes-analysis-report.component";
+import {PercentChangeDistributionComponent} from "../../shared/reports/percent-change-distribution.component";
+import {DailyOutcomeScoresComponent} from "../../shared/reports/daily-outcome-scores.component";
+import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
 
 @Component({
     selector: 'app-stock-analysis',
     templateUrl: './stock-analysis.component.html',
     styleUrls: ['./stock-analysis.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    standalone: false
+    imports: [
+        NgIf,
+        NgClass,
+        DatePipe,
+        GapsComponent,
+        LineChartComponent,
+        OutcomesAnalysisReportComponent,
+        PercentChangeDistributionComponent,
+        DailyOutcomeScoresComponent,
+        CandlestickChartComponent
+    ]
 })
 export class StockAnalysisComponent {
     multipleBarOutcomes: TickerOutcomes;
@@ -32,9 +48,7 @@ export class StockAnalysisComponent {
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
-    @Input()
-    ticker: string
-
+    
     constructor(
         private stockService: StocksService,
         private percentPipe: PercentPipe,
@@ -48,6 +62,9 @@ export class StockAnalysisComponent {
     
     @Input()
     endDate: string
+
+    @Input()
+    ticker: string
 
     @Input()
     set prices(prices: Prices) {

@@ -704,7 +704,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 let runner = TradingStrategyRunner(brokerage, marketHours, logger)
-                let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=command.CloseIfOpenAtTheEnd)
+                let! simulation = runner.Run(user.State, position=stock, adjustSizeBasedOnRisk=false, closeIfOpenAtTheEnd=command.CloseIfOpenAtTheEnd)
                 return simulation |> Ok
     }
     
@@ -734,6 +734,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 runner.Run(
                     user,
                     position=position,
+                    adjustSizeBasedOnRisk=false,
                     closeIfOpenAtTheEnd=false
                 ) |> Async.AwaitTask
             
@@ -786,7 +787,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         
         return 
             resultsWithTransactionsFromToday
-            |> Seq.groupBy (fun r -> r.Position.Ticker)
+            |> Seq.groupBy _.Position.Ticker
             |> Seq.map (fun (ticker, results) ->
                 let descriptions =
                     results
@@ -809,6 +810,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 runner.Run(
                     user,
                     position=position,
+                    adjustSizeBasedOnRisk=true,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             

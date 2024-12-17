@@ -1,5 +1,8 @@
 import {Component, Input} from '@angular/core';
 import {DailyPositionReport, DataPointContainer} from '../../services/stocks.service';
+import {LineChartComponent} from "../line-chart/line-chart.component";
+import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
+import {NgIf} from "@angular/common";
 
 function createData(container: DataPointContainer, useY2: boolean) {
     return {
@@ -41,7 +44,11 @@ function createCombinedDailyChart(report:DailyPositionReport) {
     selector: 'app-daily-outcome-scores',
     templateUrl: './daily-outcome-scores.component.html',
     styleUrls: ['./daily-outcome-scores.component.css'],
-    standalone: false
+    imports: [
+        LineChartComponent,
+        NgIf,
+        CanvasJSAngularChartsModule
+    ]
 })
 export class DailyOutcomeScoresComponent {
 

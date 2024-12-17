@@ -106,17 +106,12 @@
                         <div class="card-body">
                             <h5 class="card-title">Position Details</h5>
                             <p class="card-text">
-                <span class="me-2 visually-hidden" #sizeSpan
-                      (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
-                                <span class="me-2" #sizeSpanAlt
-                                      (click)="toggleVisibility(sizeSpan); toggleVisibility(sizeSpanAlt)">Size: Click to view</span>
-                                <span class="me-2 visually-hidden" #lossSpan
-                                      (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
-                                <span class="me-2" #lossSpanAlt
-                                      (click)="toggleVisibility(lossSpan); toggleVisibility(lossSpanAlt)">Loss: Click to view</span>
+                                <span class="me-2">Size: <strong>{{ positionSizeCalculated | currency }}</strong></span>
+                                <span class="me-2">Loss: <strong>{{ potentialLoss | currency }}</strong></span>
                                 <span class="me-2">Stop %: <strong>{{ stopPct | percent:'1.2-2' }}</strong></span>
                                 <span
-                                    class="me-2">std: <strong *ngIf="prices">{{ prices.percentChanges.stdDev / 100 | percent:'1.2-2' }}</strong> </span>
+                                    class="me-2">std: <strong *ngIf="prices">{{ prices.percentChanges.stdDev / 100 | percent:'1.2-2' }}</strong>
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -188,72 +183,16 @@
                 </div>
             </div>
         }
-        @if (chartInfo && showChart) {
+        @if (showAnalysis && ticker && prices) {
             <div class="row mb-3">
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
+                            <app-stock-analysis [ticker]="ticker" [prices]="prices"></app-stock-analysis>
                         </div>
                     </div>
                 </div>
             </div>
-        }
-        @if (showAnalysis && resistanceContainer && supportContainer) {
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select class="form-select" id="priceFrequency" [(ngModel)]="priceFrequency"
-                                (ngModelChange)="priceFrequencyChanged()">
-                            <option value="Daily">Daily</option>
-                            <option value="Weekly">Weekly</option>
-                        </select>
-                        <label for="priceFrequency">Price Frequency</label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-floating">
-                        <select id="ageValueToUse" class="form-select" [(ngModel)]="ageValueToUse"
-                                (ngModelChange)="ageValueChanged()">
-                            <option [value]="twoMonths">2 months</option>
-                            <option [value]="sixMonths">6 months</option>
-                        </select>
-                        <label for="ageValueToUse">Support/Resistance Age</label>
-                    </div>
-                </div>
-            </div>
-            @if (resistanceContainer && supportContainer) {
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <app-line-chart [dataContainer]="supportContainer"></app-line-chart>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <app-line-chart [dataContainer]="resistanceContainer"></app-line-chart>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-            @if (gaps) {
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-title">
-                                Gaps for {{ gaps.ticker }}
-                            </div>
-                            <div class="card-body">
-                                <app-gaps [gaps]="gaps"></app-gaps>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
         }
         </div>
     </section>

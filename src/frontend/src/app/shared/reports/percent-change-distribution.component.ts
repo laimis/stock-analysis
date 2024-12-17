@@ -1,11 +1,14 @@
 import {Component, Input} from '@angular/core';
 import {ChartType, DataPointContainer, StockPercentChangeResponse} from '../../services/stocks.service';
+import {LineChartComponent} from "../line-chart/line-chart.component";
 
 @Component({
     selector: 'app-percent-change-distribution',
     templateUrl: './percent-change-distribution.component.html',
     styleUrls: ['./percent-change-distribution.component.css'],
-    standalone: false
+    imports: [
+        LineChartComponent
+    ]
 })
 export class PercentChangeDistributionComponent {
 

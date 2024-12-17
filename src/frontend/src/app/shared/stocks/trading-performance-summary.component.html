@@ -110,10 +110,6 @@
             <div>{{ performance.sharpeRatio | number:'1.2-2' }}</div>
         </div>
         <div class="col">
-            <div class="stat-label"># of Trades</div>
-            <div>{{ performance.numberOfTrades }}</div>
-        </div>
-        <div class="col">
             <div class="stat-label">Gain % Std</div>
             <div>{{ performance.gainPctStdDev | percent: '1.2-2'}}</div>
         </div>
@@ -124,6 +120,10 @@
         <div class="col">
             <div class="stat-label">Risk Adjusted Returns</div>
             <div>{{ performance.riskAdjustedReturn | percent: '1.2-2'}}</div>
+        </div>
+        <div class="col">
+            <div class="stat-label">Max Drawdown</div>
+            <div>{{ performance.maxDrawdown | currency }}</div>
         </div>
     </div>
 </div>

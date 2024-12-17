@@ -1,35 +1,22 @@
-import {CurrencyPipe, DatePipe, NgClass, PercentPipe, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, NgIf, PercentPipe} from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
-    DataPointContainer,
     MovingAverages,
     openpositioncommand,
-    OutcomeKeys,
     pendingstockpositioncommand,
-    PositionChartInformation,
     PriceFrequency,
     Prices,
-    StockGaps,
     StocksService
 } from 'src/app/services/stocks.service';
-import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
+import {GetErrors, GetStrategies} from 'src/app/services/utils';
 import {GlobalService} from "../../services/global.service";
-import {
-    age,
-    calculateInflectionPoints,
-    histogramToDataPointContainer,
-    InfectionPointType,
-    toHistogram
-} from "../../services/prices.service";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {StockSearchComponent} from "../stock-search/stock-search.component";
 import {FormsModule} from "@angular/forms";
 import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
-import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
-import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
-import {GapsComponent} from "../../shared/reports/gaps.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {StockAnalysisComponent} from "../stock-details/stock-analysis.component";
 
 @Component({
     selector: 'app-stock-trading-new-position',
@@ -44,24 +31,15 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
         StockLinkComponent,
         TradingViewLinkComponent,
         NgClass,
-        LineChartComponent,
         NgIf,
-        CandlestickChartComponent,
-        GapsComponent,
+        StockAnalysisComponent,
         ErrorDisplayComponent
     ]
 })
 export class StockTradingNewPositionComponent {
     strategies: { key: string; value: string; }[];
-    chartInfo: PositionChartInformation;
-    resistanceContainer: DataPointContainer
-    supportContainer: DataPointContainer
     prices: Prices;
     maxLoss = 60;
-    ageValueToUse: number;
-    priceFrequency: PriceFrequency = PriceFrequency.Daily;
-    @Input()
-    showChart: boolean = true
     @Input()
     showAnalysis: boolean = true
     @Input()
@@ -99,19 +77,15 @@ export class StockTradingNewPositionComponent {
     notes: string | null = null
     strategy: string = ""
     chartStop: number = null;
-    gaps: StockGaps
     atr: number
     errors: string[] = []
     protected readonly atrMultiplier = 2;
-    protected readonly twoMonths = 365 / 6;
-    protected readonly sixMonths = 365 / 2;
 
     constructor(
         private stockService: StocksService,
         private stockPositionsService: StockPositionsService,
         globalService: GlobalService) {
         this.strategies = GetStrategies()
-        this.ageValueToUse = this.twoMonths
         globalService.accountStatusFeed.subscribe(value => {
             if (value.maxLoss) {
                 this.maxLoss = value.maxLoss
@@ -143,23 +117,8 @@ export class StockTradingNewPositionComponent {
                     }
                     this.ask = quote.askPrice
                     this.bid = quote.bidPrice
-                    this.fetchAndRenderPriceRelatedInformation(ticker)
+                    this.fetchPrices(ticker)
                     this.lookupPendingPosition(ticker)
-                }, error => {
-                    this.errors = GetErrors(error)
-                }
-            );
-
-        this.stockService.reportOutcomesAllBars([ticker])
-            .subscribe(data => {
-                    this.gaps = data.gaps[0]
-                    if (this.gaps) {
-                        this.gaps.gaps.sort((a, b) => b.bar.dateStr.localeCompare(a.bar.dateStr)) // we want reverse order than what backend provides
-                    }
-                    if (data.outcomes[0]) {
-                        this.atr = data.outcomes[0].outcomes.filter(o => o.key === OutcomeKeys.AverageTrueRange)[0].value    
-                    }
-                    
                 }, error => {
                     this.errors = GetErrors(error)
                 }
@@ -173,48 +132,17 @@ export class StockTradingNewPositionComponent {
         this.sizeStopPrice = null
         this.ticker = null
         this.prices = null
-        this.chartInfo = null
-        this.resistanceContainer = null
-        this.supportContainer = null
         this.notes = null
         this.strategy = ""
         this.workflowStarted = false
     }
 
-    fetchAndRenderPriceRelatedInformation(ticker: string) {
-        this.stockService.getStockPrices(ticker, 365, this.priceFrequency).subscribe(
+    fetchPrices(ticker: string) {
+        this.stockService.getStockPrices(ticker, 365, PriceFrequency.Daily).subscribe(
             prices => {
                 this.prices = prices
-                this.updateChart(ticker, prices)
-                this.updateSupportResistance(prices)
             }
         )
-    }
-
-    updateSupportResistance(prices: Prices) {
-        const inflectionPoints = calculateInflectionPoints(prices.prices);
-        const filteredByAge = inflectionPoints.filter(p => age(p) < this.ageValueToUse)
-        const peaks = filteredByAge.filter(p => p.type === InfectionPointType.Peak)
-        const valleys = filteredByAge.filter(p => p.type === InfectionPointType.Valley)
-
-        const resistanceHistogram = toHistogram(peaks)
-        this.resistanceContainer = histogramToDataPointContainer('resistance histogram', resistanceHistogram)
-
-        const supportHistogram = toHistogram(valleys)
-        this.supportContainer = histogramToDataPointContainer('support histogram', supportHistogram)
-    }
-
-    updateChart(ticker: string, prices: Prices) {
-        this.chartInfo = {
-            ticker: ticker,
-            prices: prices,
-            markers: [],
-            transactions: [],
-            averageBuyPrice: null,
-            stopPrice: this.chartStop,
-            buyOrders: [],
-            sellOrders: []
-        }
     }
 
     get20sma(): number {
@@ -351,8 +279,6 @@ export class StockTradingNewPositionComponent {
             _ => {
                 this.ticker = null
                 this.prices = null
-                this.chartInfo = null
-                this.gaps = null
                 this.flashPendingPositionCreated()
                 this.pendingPositionCreated.emit(cmd)
                 this.reset()
@@ -389,11 +315,7 @@ export class StockTradingNewPositionComponent {
             }
         )
     }
-
-    toggleVisibility(elem: HTMLElement) {
-        toggleVisuallyHidden(elem)
-    }
-
+    
     calculateAtrBasedStop() {
         if (!this.atr) {
             return
@@ -412,14 +334,6 @@ export class StockTradingNewPositionComponent {
             this.positionStopPrice = value
         }
         this.updateBuyingValuesSizeStopPrice()
-    }
-
-    priceFrequencyChanged() {
-        this.fetchAndRenderPriceRelatedInformation(this.ticker)
-    }
-
-    ageValueChanged() {
-        this.fetchAndRenderPriceRelatedInformation(this.ticker)
     }
 
     private createPendingPositionCommand(useLimitOrder: boolean) {
