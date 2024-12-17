@@ -470,12 +470,18 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                             | _ when String.IsNullOrWhiteSpace(pendingPosition.State.Strategy) |> not -> pendingPosition.State.Strategy |> Some
                             | _ -> None
                         | None -> None
+                        
+                let sizeStopLabel =
+                    match pendingPositionOption with
+                    | Some pendingPosition -> pendingPosition.State.SizeStopPrice |> Option.map (fun x -> $"{x}")
+                    | None -> None
                 
                 let newPosition =
                     StockPosition.``open`` cmd.Ticker cmd.NumberOfShares cmd.Price cmd.Date.Value
                     |> StockPosition.addNotes notes cmd.Date.Value
                     |> StockPosition.setStop stop cmd.Date.Value
                     |> StockPosition.setLabelIfValueNotNone "strategy" strategy cmd.Date.Value
+                    |> StockPosition.setLabelIfValueNotNone "sizeStopPrice" sizeStopLabel cmd.Date.Value
                 
                 do! newPosition |> storage.SaveStockPosition userId openPosition
                 

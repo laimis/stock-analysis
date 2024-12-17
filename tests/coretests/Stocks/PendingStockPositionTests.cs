@@ -17,6 +17,7 @@ namespace coretests.Stocks
             Assert.Equal(100, pending.State.NumberOfShares);
             Assert.Equal(10, pending.State.Bid);
             Assert.Equal(5, pending.State.StopPrice);
+            Assert.Equal(2, pending.State.SizeStopPrice);
             Assert.Equal("alltimehigh", pending.State.Strategy);
             Assert.Equal(TestDataGenerator.AMD, pending.State.Ticker);
             Assert.Equal(-500, pending.State.StopLossAmount);
@@ -30,6 +31,7 @@ namespace coretests.Stocks
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid());
@@ -44,6 +46,7 @@ namespace coretests.Stocks
                 numberOfShares: 100,
                 price: 0,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
@@ -57,6 +60,7 @@ namespace coretests.Stocks
                 numberOfShares: 0,
                 price: 10,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
@@ -70,6 +74,7 @@ namespace coretests.Stocks
                 numberOfShares: -10,
                 price: 10,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid());
@@ -85,6 +90,21 @@ namespace coretests.Stocks
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: -1,
+                sizeStopPrice: 2,
+                strategy: "alltimehigh",
+                ticker: TestDataGenerator.AMD,
+                userId: Guid.NewGuid()));
+        }
+
+        [Fact]
+        public void Create_WithInvalidSizeStopPrice_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => new PendingStockPosition(
+                notes: "this is a note",
+                numberOfShares: 100,
+                price: 10,
+                stopPrice: 15,
+                sizeStopPrice: -2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
@@ -98,6 +118,7 @@ namespace coretests.Stocks
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));
@@ -111,6 +132,7 @@ namespace coretests.Stocks
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "alltimehigh",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.Empty));
@@ -124,6 +146,7 @@ namespace coretests.Stocks
                 numberOfShares: 100,
                 price: 10,
                 stopPrice: 5,
+                sizeStopPrice: 2,
                 strategy: "",
                 ticker: TestDataGenerator.AMD,
                 userId: Guid.NewGuid()));

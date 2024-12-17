@@ -14,6 +14,7 @@ namespace core.Stocks
         // public decimal? PercentDiffBetweenBidAndPrice { get; private set; }
         public decimal NumberOfShares { get; private set; }
         public FSharpOption<decimal> StopPrice { get; private set; }
+        public FSharpOption<decimal> SizeStopPrice { get; private set; }
         public string Notes { get; private set; }
         public string Strategy { get; private set; }
         public DateTimeOffset Created { get; private set; }
@@ -31,13 +32,6 @@ namespace core.Stocks
         public void Apply(AggregateEvent e) => ApplyInternal(e);
 
         private void ApplyInternal(dynamic obj) => ApplyInternal(obj);
-
-        // public PendingStockPositionState SetPrice(decimal price)
-        // {
-        //     Price = price;
-        //     PercentDiffBetweenBidAndPrice = (price - Bid) / Bid;
-        //     return this;
-        // }
 
         private void ApplyInternal(PendingStockPositionCreated created)
         {
@@ -59,12 +53,32 @@ namespace core.Stocks
 
         private void ApplyInternal(PendingStockPositionCreatedWithStrategy created)
         {
+            ApplyInternal(
+                new PendingStockPositionCreatedWithStrategyAndSizeStop(
+                    id: created.Id,
+                    aggregateId: created.AggregateId,
+                    when: created.When,
+                    notes: created.Notes,
+                    numberOfShares: created.NumberOfShares,
+                    price: created.Price,
+                    stopPrice: created.StopPrice,
+                    sizeStopPrice: null,
+                    strategy: created.Strategy,
+                    ticker: created.Ticker,
+                    userId: created.UserId
+                )
+            );
+        }
+
+        private void ApplyInternal(PendingStockPositionCreatedWithStrategyAndSizeStop created)
+        {
             Created = created.When;
             Id = created.AggregateId;
             Notes = created.Notes;
             NumberOfShares = created.NumberOfShares;
             Bid = created.Price;
             StopPrice = created.StopPrice;
+            SizeStopPrice = created.SizeStopPrice;
             Strategy = created.Strategy;
             Ticker = new Ticker(created.Ticker);
             UserId = created.UserId;

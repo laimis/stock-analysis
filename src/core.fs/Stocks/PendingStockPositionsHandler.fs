@@ -1,7 +1,6 @@
 namespace core.fs.Stocks.PendingPositions
 
 open System
-open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open core.Shared
 open core.Stocks
@@ -24,8 +23,12 @@ type Create =
         [<Required>]
         [<Range(0.01, 100000.0)>]
         Price: decimal
+        [<Required>]
         [<Range(0, 100000)>]
         StopPrice: Nullable<decimal>
+        [<Required>]
+        [<Range(0, 100000)>]
+        SizeStopPrice: Nullable<decimal>
         [<Required>]
         Ticker: Ticker
         [<Required(AllowEmptyStrings = false)>]
@@ -78,7 +81,8 @@ type PendingStockPositionsHandler(accounts:IAccountStorage,brokerage:IBrokerage,
                     notes=command.Notes,
                     numberOfShares=command.NumberOfShares,
                     price=command.Price,
-                    stopPrice=command.StopPrice,
+                    stopPrice=command.StopPrice.Value, // we have this as required attribute, so it should always have a value
+                    sizeStopPrice=command.SizeStopPrice.Value,  // we have this as required attribute, so it should always have a value
                     strategy=command.Strategy,
                     ticker=command.Ticker,
                     userId=(userId |> IdentifierHelper.getUserId)

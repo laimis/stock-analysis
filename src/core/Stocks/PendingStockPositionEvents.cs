@@ -66,6 +66,42 @@ namespace core.Stocks
         public string Strategy { get; }
     }
     
+    internal class PendingStockPositionCreatedWithStrategyAndSizeStop : AggregateEvent
+    {
+        public PendingStockPositionCreatedWithStrategyAndSizeStop(
+            Guid id,
+            Guid aggregateId,
+            DateTimeOffset when,
+            string notes,
+            decimal numberOfShares,
+            decimal price,
+            decimal? stopPrice,
+            decimal? sizeStopPrice,
+            string strategy,
+            string ticker,
+            Guid userId)
+            : base(id, aggregateId, when)
+        {
+            Notes = notes;
+            NumberOfShares = numberOfShares;
+            Price = price;
+            StopPrice = stopPrice;
+            SizeStopPrice = sizeStopPrice;
+            Strategy = strategy;
+            Ticker = ticker;
+            UserId = userId;
+        }
+
+        public Guid UserId { get; }
+        public string Ticker { get; }
+        public decimal Price { get; }
+        public decimal NumberOfShares { get; }
+        public decimal? StopPrice { get; }
+        public decimal? SizeStopPrice { get; }
+        public string Notes { get; }
+        public string Strategy { get; }
+    }
+    
     public class PendingStockPositionRealized : AggregateEvent
     {
         public PendingStockPositionRealized(Guid id, Guid aggregateId, DateTimeOffset when, decimal price)

@@ -14,7 +14,8 @@ namespace core.Stocks
             string notes,
             decimal numberOfShares,
             decimal price,
-            decimal? stopPrice,
+            decimal stopPrice,
+            decimal sizeStopPrice,
             string strategy,
             Ticker ticker,
             Guid userId)
@@ -34,9 +35,14 @@ namespace core.Stocks
                 throw new InvalidOperationException("Number of shares cannot be zero");
             }
 
-            if (stopPrice.HasValue && stopPrice.Value < 0)
+            if (stopPrice < 0)
             {
                 throw new InvalidOperationException("Stop price cannot be negative or zero");
+            }
+            
+            if (sizeStopPrice < 0)
+            {
+                throw new InvalidOperationException("Size stop price cannot be negative or zero");
             }
 
             if (string.IsNullOrWhiteSpace(notes))
@@ -49,7 +55,7 @@ namespace core.Stocks
                 throw new InvalidOperationException("Strategy cannot be blank");
             }
 
-            Apply(new PendingStockPositionCreatedWithStrategy(
+            Apply(new PendingStockPositionCreatedWithStrategyAndSizeStop(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 when: DateTimeOffset.UtcNow,
@@ -58,6 +64,7 @@ namespace core.Stocks
                 price: price,
                 numberOfShares: numberOfShares,
                 stopPrice: stopPrice,
+                sizeStopPrice: sizeStopPrice,
                 notes: notes,
                 strategy: strategy)
             );
