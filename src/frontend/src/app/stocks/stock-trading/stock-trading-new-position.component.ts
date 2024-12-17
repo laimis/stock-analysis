@@ -77,7 +77,6 @@ export class StockTradingNewPositionComponent {
     notes: string | null = null
     strategy: string = ""
     chartStop: number = null;
-    atr: number
     errors: string[] = []
     protected readonly atrMultiplier = 2;
 
@@ -217,6 +216,11 @@ export class StockTradingNewPositionComponent {
         }
         let singleShareLoss = this.price - this.positionStopPrice
         this.updateBuyingValues(singleShareLoss)
+        
+        // updte number of shares one more time, this time making sure that the loss from the
+        // selected stop price is less than the max loss
+        let numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
+        this.numberOfShares = this.positionStopPrice > this.price ? -numberOfShares : numberOfShares
     }
 
     updateBuyingValuesWithCostToBuy() {
@@ -317,10 +321,10 @@ export class StockTradingNewPositionComponent {
     }
     
     calculateAtrBasedStop() {
-        if (!this.atr) {
+        if (!this.prices) {
             return
         }
-        return this.price - this.atr * this.atrMultiplier
+        return this.price - this.prices.atr.data[this.prices.atr.data.length-1].value * this.atrMultiplier
     }
 
     assignSizeStopPrice(value: number) {
