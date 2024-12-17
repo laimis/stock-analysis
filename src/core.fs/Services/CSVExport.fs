@@ -116,6 +116,7 @@ module CSVExport =
             MaxGainFirst10Bars:string
             Strategy:string
             Grade:string
+            EntryNote:string
             GradeNote:string
         }
         
@@ -159,6 +160,7 @@ module CSVExport =
             Strategy = t.TryGetLabelValue("strategy") |> Option.defaultValue ""
             Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
             GradeNote = t.GradeNote |> Option.defaultValue ""
+            EntryNote = t.Notes |> List.tryHead |> Option.map(_.content) |> Option.defaultValue ""
         }
         
     let strategyPerformance (culture:IFormatProvider) (writer:ICSVWriter) (strategies:seq<TradingStrategyPerformance>) =

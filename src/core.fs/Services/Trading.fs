@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open core.Account
 open core.Shared
+open core.Stocks
 open core.fs
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Logging
@@ -804,6 +805,22 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
         | None -> stockPosition
         | Some actualTrade ->
             actualTrade.Labels |> Seq.fold (fun position label -> position |> StockPosition.setLabel label.Key label.Value date) stockPosition
+            
+    let assignInitialNoteFromActualTradeIfSet (actualTrade:StockPositionState option) (stockPosition:StockPositionState) =
+        match actualTrade with
+        | None -> stockPosition
+        | Some actualTrade ->
+            match actualTrade.Notes with
+            | [] -> stockPosition
+            | _ -> stockPosition |> StockPosition.addNotes (Some (actualTrade.Notes[0].content)) actualTrade.Notes[0].created
+            
+    let assignGradeFromActualTradeIfSet (actualTrade:StockPositionState option) (stockPosition:StockPositionState) =
+        match actualTrade with
+        | None -> stockPosition
+        | Some actualTrade ->
+            match actualTrade.Grade with
+            | Some grade -> stockPosition |> StockPosition.assignGrade grade actualTrade.GradeNote (actualTrade.Notes |> List.last |> _.created)
+            | None -> stockPosition
     
     member this.Run(
             user:UserState,
@@ -853,10 +870,19 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
                     |> StockPosition.setStop stopPrice ``when``
                     |> setRiskAmountFromActualTradeIfSet actualTrade ``when``
                     |> setLabelsFromActualTradeIfSet actualTrade ``when``
+                    |> assignInitialNoteFromActualTradeIfSet actualTrade
                     
                 TradingStrategyFactory.getStrategies actualTrade
                     |> Seq.iter ( fun strategy ->
-                        stockPosition |> strategy.Run bars closeIfOpenAtTheEnd |> results.Add
+                        let result = stockPosition |> strategy.Run bars closeIfOpenAtTheEnd
+                        
+                        // dog and pony show to make sure we have the grade
+                        let withGrade =
+                            result.Position.GetPositionState()
+                            |> assignGradeFromActualTradeIfSet actualTrade
+                            |> StockPositionWithCalculations
+                        
+                        {result with Position = withGrade} |> results.Add
                     )
                     
                 match actualTrade with
