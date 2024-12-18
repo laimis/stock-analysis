@@ -50,8 +50,8 @@ let determineTrend (slope: float) (threshold: float) =
     elif slope < -threshold then Falling
     else Sideways
     
-let findDivergences (report:DailyPositionBreakdown) shortPeriod longPeriod =
-    System.Console.WriteLine("findDivergences")
+let findDivergences (report:DailyPositionBreakdown) period =
+    callLogFuncIfSetup _.LogInformation("findDivergences")
     
     let detectDivergence period points =
         points
@@ -69,20 +69,20 @@ let findDivergences (report:DailyPositionBreakdown) shortPeriod longPeriod =
             match determineTrend priceSlope threshold, determineTrend obvSlope threshold with
             | Rising, Falling ->
                 Some {
-                    StartDate = window.[0].Date
-                    EndDate = window.[period-1].Date
+                    StartDate = window[0].Date
+                    EndDate = window[period-1].Date
                     DivergenceType = "Bearish"
-                    PriceDelta = window.[period-1].Price - window.[0].Price
-                    ObvDelta = window.[period-1].Obv - window.[0].Obv
+                    PriceDelta = window[period-1].Price - window[0].Price
+                    ObvDelta = window[period-1].Obv - window[0].Obv
                     Strength = decimal divergenceStrength
                 }
             | Falling, Rising ->
                 Some {
-                    StartDate = window.[0].Date
-                    EndDate = window.[period-1].Date
+                    StartDate = window[0].Date
+                    EndDate = window[period-1].Date
                     DivergenceType = "Bullish"
-                    PriceDelta = window.[period-1].Price - window.[0].Price
-                    ObvDelta = window.[period-1].Obv - window.[0].Obv
+                    PriceDelta = window[period-1].Price - window[0].Price
+                    ObvDelta = window[period-1].Obv - window[0].Obv
                     Strength = decimal divergenceStrength
                 }
             | _ -> None
@@ -98,16 +98,15 @@ let findDivergences (report:DailyPositionBreakdown) shortPeriod longPeriod =
         })
         |> List.ofSeq
         
-    let shortTermDivergences = detectDivergence shortPeriod obvPoints
-    let longTermDivergences = detectDivergence longPeriod obvPoints
+    let shortTermDivergences = detectDivergence period obvPoints
     
-    shortTermDivergences @ longTermDivergences
+    shortTermDivergences
 
-let analyzeDivergences (report:DailyPositionBreakdown) =
+let analyzeDivergences period (report:DailyPositionBreakdown) =
     
     // Detect divergences for both 30-day and 100-day periods
     let allDivergences = 
-        findDivergences report 30 100
+        findDivergences report period
         |> filterSignificantDivergences <| 0.02M  // Adjust threshold as needed
     
     // Group divergences by type and sort by strength
@@ -130,10 +129,16 @@ let runStudy (context:EnvironmentContext) (state:UserState) = async {
     let handler = context.Host.Services.GetService(typeof<core.fs.Reports.Handler>) :?> core.fs.Reports.Handler
     
     callLogFuncIfSetup _.LogInformation("was able to get it to work: " + handler.GetType().ToString())
+    let startDate = "2024-03-28" |> Some
+    let endDate = System.DateTimeOffset.Now.ToString("yyyy-MM-dd") |> Some
+    let ticker = "-t" |> context.GetArgumentValue |> Ticker
+    let period = "-p" |> context.GetArgumentValue |> int
+    
+    callLogFuncIfSetup _.LogInformation($"Running OBV study for {ticker} from {startDate.Value} to {endDate.Value}...")
 
     let userId = state.Id |> UserId
     
-    let request = {DailyTickerReportQuery.Ticker = new Ticker("SEZL"); UserId = userId; StartDate = Some "2024-03-28"; EndDate = Some "2024-08-04"}
+    let request = {DailyTickerReportQuery.Ticker = ticker; UserId = userId; StartDate = startDate; EndDate = endDate}
 
     let! report = handler.Handle(request) |> Async.AwaitTask
     
@@ -141,10 +146,10 @@ let runStudy (context:EnvironmentContext) (state:UserState) = async {
     | Error er -> failwith er.Message
     | Ok report -> 
         
-        let analysis = analyzeDivergences report
+        let analysis = analyzeDivergences period report
     
         // let's print all the divergences
-        analysis.Divergences |> List.iter (fun d ->
+        analysis.Divergences |> List.sortBy _.EndDate |> List.iter (fun d ->
             System.Console.WriteLine($"Divergence: {d.DivergenceType} from {d.StartDate} to {d.EndDate}")
             System.Console.WriteLine($"Price Delta: {d.PriceDelta}, Obv Delta: {d.ObvDelta}, Strength: {d.Strength}")
             System.Console.WriteLine()
