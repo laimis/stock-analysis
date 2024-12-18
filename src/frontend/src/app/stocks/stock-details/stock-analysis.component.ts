@@ -108,12 +108,22 @@ export class StockAnalysisComponent {
     }
 
     onStartDateChange($event) {
-        this.selectedStartDate = new Date($event);
+        if ($event) {
+            this.selectedStartDate = new Date($event);
+        } else {
+            this.selectedStartDate = null;
+        }
+        
         this.refreshDailyBreakdowns();
     }
     
     onEndDateChange($event) {
-        this.selectedEndDate = new Date($event);
+        if ($event) {
+            this.selectedEndDate = new Date($event);
+        } else {
+            this.selectedEndDate = null;
+        }
+        
         this.refreshDailyBreakdowns();
     }
     

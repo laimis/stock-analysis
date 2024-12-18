@@ -16,7 +16,7 @@
     </section>
 
     <!-- Daily Outcome Scores -->
-    <section *ngIf="dailyBreakdowns" class="card shadow-sm mb-4 daily-scores-card">
+    <section class="card shadow-sm mb-4 daily-scores-card">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="d-flex align-items-center">
@@ -60,7 +60,7 @@
 
                 </div>
             </div>
-            <app-daily-outcome-scores [report]="dailyBreakdowns"></app-daily-outcome-scores>
+            <app-daily-outcome-scores *ngIf="dailyBreakdowns" [report]="dailyBreakdowns"></app-daily-outcome-scores>
         </div>
     </section>
 
