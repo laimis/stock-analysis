@@ -1,0 +1,33 @@
+.daily-scores-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.daily-scores-card:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important;
+}
+
+.date-control {
+    width: 200px;
+}
+
+.date-control input[type="date"] {
+    cursor: pointer;
+}
+
+.date-control input[type="date"]::-webkit-calendar-picker-indicator {
+    margin-left: 0;
+    cursor: pointer;
+}
+
+.input-group-text {
+    color: #6c757d;
+}
+
+.date-summary {
+    border: 1px solid rgba(0,0,0,.1);
+    transition: background-color 0.2s ease;
+}
+
+.date-summary:hover {
+    background-color: #e9ecef;
+}

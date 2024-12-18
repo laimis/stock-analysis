@@ -16,9 +16,50 @@
     </section>
 
     <!-- Daily Outcome Scores -->
-    <section *ngIf="dailyBreakdowns" class="card shadow-sm mb-4">
+    <section *ngIf="dailyBreakdowns" class="card shadow-sm mb-4 daily-scores-card">
         <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-calendar-check me-2"></i>Daily Outcome Scores</h5>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-calendar-check fs-4 me-2 text-primary"></i>
+                    <h5 class="card-title mb-0">Daily Outcome Scores</h5>
+                </div>
+                <div class="date-controls d-flex align-items-center gap-3">
+                    <!-- Start Date -->
+                    <div class="date-control">
+                        <label class="form-label small text-muted mb-1">Start Date</label>
+                        <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-calendar3"></i>
+                        </span>
+                            <input
+                                type="date"
+                                class="form-control border-start-0 ps-0"
+                                [ngModel]="selectedStartDate | date:'yyyy-MM-dd'"
+                                (ngModelChange)="onStartDateChange($event)"
+                                [max]="endDate | date:'yyyy-MM-dd'"
+                                aria-label="Select start date">
+                        </div>
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="date-control">
+                        <label class="form-label small text-muted mb-1">End Date</label>
+                        <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-calendar3"></i>
+                        </span>
+                            <input
+                                type="date"
+                                class="form-control border-start-0 ps-0"
+                                [ngModel]="selectedEndDate | date:'yyyy-MM-dd'"
+                                (ngModelChange)="onEndDateChange($event)"
+                                [min]="startDate | date:'yyyy-MM-dd'"
+                                aria-label="Select end date">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
             <app-daily-outcome-scores [report]="dailyBreakdowns"></app-daily-outcome-scores>
         </div>
     </section>

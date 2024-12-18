@@ -132,6 +132,6 @@
 @if (isActive('fundamentals')) {
     <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
 }
-@if (isActive('analysis')) {
+@if (isActive('analysis') && stock) {
     <app-stock-analysis [ticker]=stock.ticker [prices]="prices" [startDate]="startDate" [endDate]="endDate"></app-stock-analysis>
 }

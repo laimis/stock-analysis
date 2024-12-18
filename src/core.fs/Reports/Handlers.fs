@@ -3,6 +3,7 @@ namespace core.fs.Reports
 open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
+open System.Globalization
 open System.Threading.Tasks
 open core.Shared
 open core.fs
@@ -51,8 +52,9 @@ type DailyTickerReportQuery =
     {
         UserId: UserId
         Ticker: Ticker
+        StartDate: string option
+        EndDate: string option
     }
-    
     
 type GapReportQuery =
     {
@@ -370,8 +372,17 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
     
     member _.Handle (query:DailyTickerReportQuery) = task {
         
-        let start = DateTimeOffset.UtcNow.AddDays(-30) |> Some
-        let end' = DateTimeOffset.UtcNow |> Some
+        let start =
+            match query.StartDate with
+            | None -> DateTimeOffset.UtcNow.AddDays(-30) |> Some
+            | Some date when String.IsNullOrEmpty(date) -> DateTimeOffset.UtcNow.AddDays(-30) |> Some
+            | Some date -> DateTimeOffset.Parse(date, CultureInfo.InvariantCulture) |> Some
+            
+        let end' =
+            match query.EndDate with
+            | None -> DateTimeOffset.UtcNow |> Some
+            | Some date when String.IsNullOrEmpty(date) -> DateTimeOffset.UtcNow |> Some
+            | Some date -> DateTimeOffset.Parse(date, CultureInfo.InvariantCulture) |> Some
         
         let! user = accounts.GetUser query.UserId
         let ticker = query.Ticker

@@ -19,6 +19,7 @@ import {OutcomesAnalysisReportComponent} from "../../shared/reports/outcomes-ana
 import {PercentChangeDistributionComponent} from "../../shared/reports/percent-change-distribution.component";
 import {DailyOutcomeScoresComponent} from "../../shared/reports/daily-outcome-scores.component";
 import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
+import {FormsModule} from "@angular/forms";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -34,7 +35,8 @@ import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlest
         OutcomesAnalysisReportComponent,
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
-        CandlestickChartComponent
+        CandlestickChartComponent,
+        FormsModule
     ]
 })
 export class StockAnalysisComponent {
@@ -49,12 +51,18 @@ export class StockAnalysisComponent {
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
     
+    selectedStartDate: Date = null;
+    selectedEndDate: Date = null;
+    
     constructor(
         private stockService: StocksService,
         private percentPipe: PercentPipe,
         private currencyPipe: CurrencyPipe,
         private decimalPipe: DecimalPipe
     ) {
+        this.selectedStartDate = new Date();
+        this.selectedEndDate = new Date();
+        this.selectedStartDate.setDate(this.selectedStartDate.getDate() - 30);
     }
     
     @Input()
@@ -97,6 +105,33 @@ export class StockAnalysisComponent {
 
     negativeCount(outcomes: TickerOutcomes) {
         return outcomes.outcomes.filter(r => r.outcomeType === 'Negative').length;
+    }
+
+    onStartDateChange($event) {
+        this.selectedStartDate = new Date($event);
+        this.refreshDailyBreakdowns();
+    }
+    
+    onEndDateChange($event) {
+        this.selectedEndDate = new Date($event);
+        this.refreshDailyBreakdowns();
+    }
+    
+    refreshDailyBreakdowns() {
+        if (this.selectedStartDate && this.selectedEndDate) {
+            this.dailyBreakdowns = null;
+            const startStr = this.selectedStartDate.toISOString().split('T')[0];
+            const endStr = this.selectedEndDate.toISOString().split('T')[0];
+            const dailyReport = this.stockService.reportDailyTickerReport(this.ticker, startStr, endStr)
+                .pipe(
+                    tap(report => {this.dailyBreakdowns = report}),
+                    catchError(err => {
+                        console.error(err);
+                        return [];
+                    })
+                );
+            dailyReport.subscribe();
+        }
     }
     
     private loadData(ticker:string) {

@@ -395,8 +395,14 @@ export class StocksService {
         return this.http.get<DailyPositionReport>(endpoint)
     }
     
-    reportDailyTickerReport(ticker: string) {
-        var endpoint = '/api/reports/dailytickerreport/' + ticker
+    reportDailyTickerReport(ticker: string, startDate: string|null = null, endDate: string|null = null): Observable<DailyPositionReport> {
+        let endpoint = '/api/reports/dailytickerreport/' + ticker + '?1=1';
+        if (startDate) {
+            endpoint += '&startDate=' + startDate
+        }
+        if (endDate) {
+            endpoint += '&endDate=' + endDate
+        }
         return this.http.get<DailyPositionReport>(endpoint)
     }
 

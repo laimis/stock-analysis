@@ -101,12 +101,14 @@ namespace web.Controllers
             );
         
         [HttpGet("DailyTickerReport/{ticker}")]
-        public Task<ActionResult> DailyTickerReport(string ticker) =>
+        public Task<ActionResult> DailyTickerReport(string ticker, [FromQuery]string startDate, [FromQuery]string endDate) =>
             this.OkOrError(
                 service.Handle(
                     new DailyTickerReportQuery(
                         User.Identifier(),
-                        new Ticker(ticker)
+                        new Ticker(ticker),
+                        startDate,
+                        endDate
                     )
                 )
             );
