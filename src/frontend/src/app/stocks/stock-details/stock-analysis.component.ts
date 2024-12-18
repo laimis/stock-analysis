@@ -20,6 +20,7 @@ import {PercentChangeDistributionComponent} from "../../shared/reports/percent-c
 import {DailyOutcomeScoresComponent} from "../../shared/reports/daily-outcome-scores.component";
 import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
 import {FormsModule} from "@angular/forms";
+import {LoadingComponent} from "../../shared/loading/loading.component";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -36,7 +37,8 @@ import {FormsModule} from "@angular/forms";
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
         CandlestickChartComponent,
-        FormsModule
+        FormsModule,
+        LoadingComponent
     ]
 })
 export class StockAnalysisComponent {
@@ -46,6 +48,7 @@ export class StockAnalysisComponent {
     dailyOutcomes: TickerOutcomes;
 
     dailyBreakdowns: DailyPositionReport
+    dailyBreakdownsLoading: boolean = true;
     
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
@@ -127,32 +130,33 @@ export class StockAnalysisComponent {
         this.refreshDailyBreakdowns();
     }
     
-    refreshDailyBreakdowns() {
-        if (this.selectedStartDate && this.selectedEndDate) {
-            this.dailyBreakdowns = null;
-            const startStr = this.selectedStartDate.toISOString().split('T')[0];
-            const endStr = this.selectedEndDate.toISOString().split('T')[0];
-            const dailyReport = this.stockService.reportDailyTickerReport(this.ticker, startStr, endStr)
-                .pipe(
-                    tap(report => {this.dailyBreakdowns = report}),
-                    catchError(err => {
-                        console.error(err);
-                        return [];
-                    })
-                );
-            dailyReport.subscribe();
-        }
-    }
-    
-    private loadData(ticker:string) {
-        const dailyReport = this.stockService.reportDailyTickerReport(ticker)
+    private dailyReportFetch() {
+        this.dailyBreakdowns = null;
+        this.dailyBreakdownsLoading = true;
+        const startStr = this.selectedStartDate.toISOString().split('T')[0];
+        const endStr = this.selectedEndDate.toISOString().split('T')[0];
+        return this.stockService.reportDailyTickerReport(this.ticker, startStr, endStr)
             .pipe(
-                tap(report => {this.dailyBreakdowns = report}),
+                tap(report => {
+                    this.dailyBreakdowns = report
+                    this.dailyBreakdownsLoading = false;
+                }),
                 catchError(err => {
                     console.error(err);
                     return [];
                 })
             );
+    }
+    
+    refreshDailyBreakdowns() {
+        if (this.selectedStartDate && this.selectedEndDate) {
+            const dailyReport = this.dailyReportFetch()
+            dailyReport.subscribe();
+        }
+    }
+    
+    private loadData(ticker:string) {
+        const dailyReport = this.dailyReportFetch()
         
         const multipleBarOutcomesPromise = this.stockService.reportOutcomesAllBars([ticker])
             .pipe(

@@ -29,6 +29,7 @@
     "@typescript-eslint/parser": "^7.11.0",
     "bootstrap": "^5.3.1",
     "bootstrap-icons": "^1.9.1",
+    "date-fns": "^4.1.0",
     "lightweight-charts": "^4.0.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",

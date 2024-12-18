@@ -2,13 +2,14 @@ import {Component, Input} from '@angular/core';
 import {ChartAnnotationLine, ChartType, DataPoint, DataPointContainer} from "../../services/stocks.service";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
+import {parse} from "date-fns";
 
 function toChartJSPoint(p: DataPoint) {
     let toolTipContent = p.ticker ? p.ticker + ": {y}" : undefined
-    
     if (p.isDate) {
+        let parsedDate = parse(p.label, 'yyyy-MM-dd', new Date())
         return {
-            x: new Date(Date.parse(p.label)),
+            x: parsedDate,
             y: p.value,
             format: "MMM DD, YYYY",
             toolTipContent: toolTipContent

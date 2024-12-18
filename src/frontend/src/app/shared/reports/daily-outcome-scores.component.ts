@@ -3,12 +3,14 @@ import {DailyPositionReport, DataPointContainer} from '../../services/stocks.ser
 import {LineChartComponent} from "../line-chart/line-chart.component";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {NgIf} from "@angular/common";
+import {parse} from "date-fns";
 
 function createData(container: DataPointContainer, useY2: boolean) {
     return {
         type: "line",
         dataPoints: container.data.map(d => {
-            return {x: new Date(Date.parse(d.label)), y: d.value}
+            let parsedDate = parse(d.label, 'yyyy-MM-dd', new Date())
+            return {x: parsedDate, y: d.value}
         }),
         showInLegend: true,
         name: container.label,
