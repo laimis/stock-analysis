@@ -22,7 +22,8 @@ import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlest
 import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
-import {GetErrors} from "../../services/utils";
+import {GetErrors, parseDate} from "../../services/utils";
+import {parse} from "date-fns";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -116,7 +117,7 @@ export class StockAnalysisComponent {
 
     onStartDateChange($event) {
         if ($event) {
-            this.selectedStartDate = new Date($event);
+            this.selectedStartDate = parseDate($event);
         } else {
             this.selectedStartDate = null;
         }
@@ -126,7 +127,7 @@ export class StockAnalysisComponent {
     
     onEndDateChange($event) {
         if ($event) {
-            this.selectedEndDate = new Date($event);
+            this.selectedEndDate = parseDate($event);
         } else {
             this.selectedEndDate = null;
         }

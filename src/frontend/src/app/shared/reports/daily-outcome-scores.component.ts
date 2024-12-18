@@ -4,12 +4,13 @@ import {LineChartComponent} from "../line-chart/line-chart.component";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {NgIf} from "@angular/common";
 import {parse} from "date-fns";
+import {parseDate} from "../../services/utils";
 
 function createData(container: DataPointContainer, useY2: boolean) {
     return {
         type: "line",
         dataPoints: container.data.map(d => {
-            let parsedDate = parse(d.label, 'yyyy-MM-dd', new Date())
+            let parsedDate = parseDate(d.label)
             return {x: parsedDate, y: d.value}
         }),
         showInLegend: true,

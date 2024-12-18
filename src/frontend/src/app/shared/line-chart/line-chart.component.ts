@@ -3,11 +3,12 @@ import {ChartAnnotationLine, ChartType, DataPoint, DataPointContainer} from "../
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
 import {parse} from "date-fns";
+import {parseDate} from "../../services/utils";
 
 function toChartJSPoint(p: DataPoint) {
     let toolTipContent = p.ticker ? p.ticker + ": {y}" : undefined
     if (p.isDate) {
-        let parsedDate = parse(p.label, 'yyyy-MM-dd', new Date())
+        let parsedDate = parseDate(p.label)
         return {
             x: parsedDate,
             y: p.value,

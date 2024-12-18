@@ -6,7 +6,7 @@ import {
     PositionInstance,
     StockQuote
 } from 'src/app/services/stocks.service';
-import {isLongTermStrategy} from 'src/app/services/utils';
+import {isLongTermStrategy, parseDate} from 'src/app/services/utils';
 
 interface PositionGroup {
     strategy: string;
@@ -145,10 +145,10 @@ export class StockTradingSummaryComponent {
     }
 
     private updateChartOptions(value: BrokerageAccountSnapshot[]) {
-        const cashData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.cash }));
-        const equityData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.equity }));
-        const longValueData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.longValue }));
-        const shortValueData = value.map(snapshot => ({ x: new Date(snapshot.date), y: snapshot.shortValue }));
+        const cashData = value.map(snapshot => ({ x: parseDate(snapshot.date), y: snapshot.cash }));
+        const equityData = value.map(snapshot => ({ x: parseDate(snapshot.date), y: snapshot.equity }));
+        const longValueData = value.map(snapshot => ({ x: parseDate(snapshot.date), y: snapshot.longValue }));
+        const shortValueData = value.map(snapshot => ({ x: parseDate(snapshot.date), y: snapshot.shortValue }));
 
         const axisY = {
             // includeZero: true,

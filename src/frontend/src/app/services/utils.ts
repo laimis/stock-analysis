@@ -1,3 +1,5 @@
+import {parse} from "date-fns";
+
 export function GetErrors(err: any): string[] {
     try {
 
@@ -78,4 +80,10 @@ export function GetStrategies(): { key: string, value: string }[] {
 
 export function isLongTermStrategy(strategy: string) {
     return strategy === "longterm" || strategy === "longterminterest"
+}
+
+export function parseDate(date: string) {
+    // parses in a way where it does not assume that date string like 2024-10-01 is in UTC
+    // it will assume that the date string is in the local timezone and return date object in local timezone
+    return parse(date, 'yyyy-MM-dd', new Date())
 }
