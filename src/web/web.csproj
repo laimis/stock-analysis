@@ -26,6 +26,7 @@
         <ProjectReference Include="..\infrastructure\securityutils\securityutils.csproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\schwabclient\schwabclient.fsproj" />
+        <ProjectReference Include="..\infrastructure\di\di.csproj" />
     </ItemGroup>
 
     <ItemGroup>

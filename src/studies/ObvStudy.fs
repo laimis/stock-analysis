@@ -1,5 +1,6 @@
 module studies.ObvStudy
 
+open System
 open MathNet.Numerics
 open Microsoft.Extensions.Logging
 open core.Account
@@ -150,9 +151,15 @@ let runStudy (context:EnvironmentContext) (state:UserState) = async {
     
         // let's print all the divergences
         analysis.Divergences |> List.sortBy _.EndDate |> List.iter (fun d ->
-            System.Console.WriteLine($"Divergence: {d.DivergenceType} from {d.StartDate} to {d.EndDate}")
+            // set the background color based on divergence type
+            let color = if d.DivergenceType = "Bullish" then ConsoleColor.Green else ConsoleColor.Red
+            Console.BackgroundColor <- color
+            
+            System.Console.WriteLine($"Divergence: {d.DivergenceType} {d.EndDate}")
             System.Console.WriteLine($"Price Delta: {d.PriceDelta}, Obv Delta: {d.ObvDelta}, Strength: {d.Strength}")
             System.Console.WriteLine()
+            
+            Console.ResetColor()
         )
         
         return ()

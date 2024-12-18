@@ -10,6 +10,6 @@ namespace storage.shared
 {
     public interface IOutbox
     {
-        Task<FSharpResult<Unit,ServiceError>> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
+        Task<FSharpResult<Unit?,ServiceError>> AddEvents(List<AggregateEvent> e, IDbTransaction? tx);
     }
 }

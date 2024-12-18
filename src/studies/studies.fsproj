@@ -21,7 +21,7 @@
     <ProjectReference Include="..\infrastructure\csvparser\csvparser.csproj" />
     <ProjectReference Include="..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\core\core.csproj" />
-    <ProjectReference Include="..\web\web.csproj" />
+    <ProjectReference Include="..\infrastructure\di\di.csproj" />
   </ItemGroup>
 
   <ItemGroup>

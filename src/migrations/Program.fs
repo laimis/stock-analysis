@@ -5,9 +5,8 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Hosting
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
+open di
 open storage.shared
-open web
-open web.Utils
 
 let loggerFactory = LoggerFactory.Create(fun builder ->
     builder.AddConsole() |> ignore

@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\infrastructure\di\di.csproj" />
     <ProjectReference Include="..\infrastructure\storage.shared\storage.shared.csproj" />
-    <ProjectReference Include="..\web\web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

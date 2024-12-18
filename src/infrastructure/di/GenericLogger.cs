@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using ILogger = core.fs.Adapters.Logging.ILogger;
 
-namespace web.Utils;
+namespace di;
 
 public class GenericLogger : ILogger
 {

@@ -1,4 +1,3 @@
-using System;
 using core.fs;
 using core.fs.Adapters.Authentication;
 using core.fs.Adapters.Brokerage;
@@ -11,8 +10,6 @@ using core.fs.Adapters.Storage;
 using core.fs.Alerts;
 using core.Shared;
 using csvparser;
-using Hangfire;
-using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,7 +18,7 @@ using secedgar;
 using securityutils;
 using storage.shared;
 
-namespace web.Utils
+namespace di
 {
     public static class DIHelper
     {
@@ -34,19 +31,23 @@ namespace web.Utils
                 configuration.GetValue<string>("ADMINEmail")
             ));
             services.AddSingleton<core.fs.Adapters.Logging.ILogger, GenericLogger>();
-            services.AddSingleton(s =>
-                new coinmarketcap.CoinMarketCapClient(
-                    s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
-                    configuration.GetValue<string>("COINMARKETCAPToken")
-                )
-            );
 
-            services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>());
+            var marketCapToken = configuration.GetValue<string>("COINMARKETCAPToken");
+            if (!string.IsNullOrEmpty(marketCapToken))
+            {
+                services.AddSingleton(s =>
+                    new coinmarketcap.CoinMarketCapClient(
+                        s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
+                        marketCapToken
+                    )
+                );
+                services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>()!);
+            }
+
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
             services.AddSingleton<IMarketHours, timezonesupport.MarketHours>();
             services.AddSingleton<StockAlertContainer>();
-            services.AddSingleton<CookieEvents>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
             services.AddSingleton<ISECFilings, EdgarClient>();
@@ -81,7 +82,7 @@ namespace web.Utils
                     configuration.GetValue<string>("TWILIO_ACCOUNT_SID"),
                     configuration.GetValue<string>("TWILIO_AUTH_TOKEN"),
                     configuration.GetValue<string>("TWILIO_FROM_NUMBER"),
-                    s.GetService<ILogger<twilioclient.TwilioClientWrapper>>(),
+                    s.GetService<ILogger<twilioclient.TwilioClientWrapper>>()!,
                     configuration.GetValue<string>("TWILIO_TO_NUMBER")));
 
             var schwabCallbackUrl = configuration.GetValue<string>("SCHWAB_CALLBACK_URL");
@@ -94,14 +95,14 @@ namespace web.Utils
                         schwabCallbackUrl,
                         configuration.GetValue<string>("SCHWAB_CLIENT_ID"),
                         configuration.GetValue<string>("SCHWAB_CLIENT_SECRET"),
-                        new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>())
+                        new FSharpOption<ILogger<SchwabClient.SchwabClient>>(s.GetService<ILogger<SchwabClient.SchwabClient>>()!)
                     ));
             }
             else
             {
                 logger.LogWarning("Dummy brokerage client registered, no brokerage callback url provided");
                 // dummy brokerage client
-                services.AddSingleton<IBrokerage>(s => new DummyBrokerageClient());
+                services.AddSingleton<IBrokerage>(_ => new DummyBrokerageClient());
             }
             
             StorageRegistrations(configuration, services, logger);
@@ -117,7 +118,7 @@ namespace web.Utils
             
             if (storage == "postgres")
             {
-                RegisterPostgresImplemenations(configuration, services);
+                RegisterPostgresImplementations(configuration, services);
             }
             else if (storage == "memory")
             {
@@ -148,13 +149,16 @@ namespace web.Utils
             );
         }
 
-        private static void RegisterPostgresImplemenations(IConfiguration configuration, IServiceCollection services)
+        private static void RegisterPostgresImplementations(IConfiguration configuration, IServiceCollection services)
         {
             var cnn = configuration.GetValue<string>("DB_CNN");
+            if (string.IsNullOrEmpty(cnn))
+            {
+                throw new InvalidOperationException("DB_CNN configuration is required for postgres storage");
+            }
             services.AddSingleton<IAccountStorage>(s => new storage.postgres.AccountStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IBlobStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IAggregateStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
-            GlobalConfiguration.Configuration.UsePostgreSqlStorage(opt => opt.UseNpgsqlConnection(cnn));
         }
     }
 }

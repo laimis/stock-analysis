@@ -9,7 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using static System.Net.Mime.MediaTypeNames;
 using System.Text.Json.Serialization;
+using di;
 using Hangfire;
+using Hangfire.PostgreSql;
 using web.Utils;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.StaticFiles;
@@ -70,6 +72,14 @@ namespace web
                 .AddCheck<HealthCheck>("storage based health check");
 
             DIHelper.RegisterServices(Configuration, services, Logger);
+            services.AddSingleton<CookieEvents>();
+            
+            // configure hangfire
+            var cnn = Configuration.GetValue<string>("DB_CNN");
+            if (!string.IsNullOrEmpty(cnn))
+            {
+                GlobalConfiguration.Configuration.UsePostgreSqlStorage(opt => opt.UseNpgsqlConnection(cnn));
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -128,7 +138,7 @@ namespace web
                 endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions{Authorization = new[] {new MyAuthorizationFilter()}});
                 endpoints.MapFallbackToFile("index.html");
             });
-
+            
             Jobs.ConfigureJobs(app, logger);
         }
     }

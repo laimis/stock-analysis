@@ -15,11 +15,11 @@ public class TwilioClientWrapper : ISMSClient
     public bool IsOn { get; private set; }
 
     public TwilioClientWrapper(
-        string accountSid,
-        string authToken,
-        string fromPhoneNumber,
+        string? accountSid,
+        string? authToken,
+        string? fromPhoneNumber,
         ILogger<TwilioClientWrapper> logger,
-        string toPhoneNumber)
+        string? toPhoneNumber)
     {
         _logger = logger;
         

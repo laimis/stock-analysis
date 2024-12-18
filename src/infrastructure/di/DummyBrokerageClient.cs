@@ -9,7 +9,7 @@ using core.Shared;
 using Microsoft.FSharp.Core;
 using OptionChain = core.fs.Adapters.Options.OptionChain;
 
-namespace web.Utils;
+namespace di;
 
 public class DummyBrokerageClient : IBrokerage
 {

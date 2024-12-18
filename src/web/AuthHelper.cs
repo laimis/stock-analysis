@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -56,6 +57,17 @@ namespace web
             services.AddAuthorization(opt => 
                 opt.AddPolicy("admin", p => p.RequireClaim(ClaimTypes.Email, adminEmail))
             );
+        }
+    }
+    
+    // needed for hangfire
+    public class MyAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize(DashboardContext context)
+        {
+            var httpContext = context.GetHttpContext();
+
+            return httpContext.User.Identity?.IsAuthenticated ?? false;
         }
     }
 }
