@@ -61,6 +61,7 @@
                 </div>
             </div>
             <app-loading *ngIf="dailyBreakdownsLoading"></app-loading>
+            <app-error-display *ngIf="dailyBreakdownErrors" [errors]="dailyBreakdownErrors"></app-error-display>
             <app-daily-outcome-scores *ngIf="dailyBreakdowns" [report]="dailyBreakdowns"></app-daily-outcome-scores>
         </div>
     </section>

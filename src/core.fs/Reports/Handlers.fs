@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open System.Globalization
-open System.Threading.Tasks
 open core.Shared
 open core.fs
 open core.fs.Accounts
@@ -14,7 +13,6 @@ open core.fs.Adapters.Storage
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
-open core.fs.Services.Trading
 open core.fs.Services.Trends
 open core.fs.Stocks
 

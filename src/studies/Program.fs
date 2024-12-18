@@ -3,5 +3,5 @@ open studies
 
 Environment.GetCommandLineArgs()
 |> ServiceHelper.init None
-|> BreakoutStudy.run
+|> ObvStudy.run
 |> Async.RunSynchronously

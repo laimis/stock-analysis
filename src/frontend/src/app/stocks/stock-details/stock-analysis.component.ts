@@ -21,6 +21,8 @@ import {DailyOutcomeScoresComponent} from "../../shared/reports/daily-outcome-sc
 import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
 import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {GetErrors} from "../../services/utils";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -38,7 +40,8 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
         DailyOutcomeScoresComponent,
         CandlestickChartComponent,
         FormsModule,
-        LoadingComponent
+        LoadingComponent,
+        ErrorDisplayComponent
     ]
 })
 export class StockAnalysisComponent {
@@ -49,6 +52,7 @@ export class StockAnalysisComponent {
 
     dailyBreakdowns: DailyPositionReport
     dailyBreakdownsLoading: boolean = true;
+    dailyBreakdownErrors: string[] = [];
     
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
@@ -133,6 +137,7 @@ export class StockAnalysisComponent {
     private dailyReportFetch() {
         this.dailyBreakdowns = null;
         this.dailyBreakdownsLoading = true;
+        this.dailyBreakdownErrors = [];
         const startStr = this.selectedStartDate.toISOString().split('T')[0];
         const endStr = this.selectedEndDate.toISOString().split('T')[0];
         return this.stockService.reportDailyTickerReport(this.ticker, startStr, endStr)
@@ -142,7 +147,8 @@ export class StockAnalysisComponent {
                     this.dailyBreakdownsLoading = false;
                 }),
                 catchError(err => {
-                    console.error(err);
+                    this.dailyBreakdownErrors = GetErrors(err);
+                    this.dailyBreakdownsLoading = false;
                     return [];
                 })
             );
