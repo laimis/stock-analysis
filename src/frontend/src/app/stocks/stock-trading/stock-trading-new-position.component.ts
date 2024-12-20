@@ -345,7 +345,7 @@ export class StockTradingNewPositionComponent {
         cmd.ticker = this.ticker;
         cmd.numberOfShares = this.numberOfShares;
         cmd.price = this.price;
-        cmd.sizeStop = this.sizeStopPrice;
+        cmd.sizeStopPrice = this.sizeStopPrice;
         cmd.stopPrice = this.positionStopPrice;
         cmd.notes = this.notes;
         cmd.date = this.date;

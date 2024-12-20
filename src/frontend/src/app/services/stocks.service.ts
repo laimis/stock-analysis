@@ -1383,7 +1383,7 @@ export class pendingstockpositioncommand {
     ticker: string
     numberOfShares: number
     price: number
-    sizeStop: number
+    sizeStopPrice: number
     date: string
     notes: string
     stopPrice: number | null
