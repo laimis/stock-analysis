@@ -212,7 +212,16 @@ export class StockDetailsComponent implements OnInit {
         this.activeTab = tabName
     }
     
-    showCloseModal(pendingPosition: PendingStockPosition) {
-        alert("not implemented")
+    closePendingPosition(pendingPosition: PendingStockPosition) {
+        this.stocks.closePendingPosition(pendingPosition.id, "cancelled").subscribe(
+            {
+                next: () => {
+                    this.loadPendingPosition()
+                    this.loadOrders()
+                },
+                error: err => {
+                    this.errors.pending = GetErrors(err)
+            }
+        })
     }
 }
