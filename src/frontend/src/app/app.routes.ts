@@ -54,6 +54,7 @@ import {RoutineComponent} from "./routines/routines-routine.component";
 import {CryptoDashboardComponent} from "./cryptos/crypto-dashboard/crypto-dashboard.component";
 import {CryptoDetailsComponent} from "./cryptos/crypto-details/crypto-details.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
+import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
 
 export const routes: Routes = [
     {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -77,6 +78,7 @@ export const routes: Routes = [
     {path: 'options/sell', component: OptionSellComponent, canActivate: [AuthGuard]},
     {path: 'options/sell/:ticker', component: OptionSellComponent, canActivate: [AuthGuard]},
     {path: 'options/chainold/:ticker', component: OptionChainComponent, canActivate: [AuthGuard]},
+    {path: 'options/spreadbuilder/:ticker', component: OptionSpreadBuilderComponent, canActivate: [AuthGuard]},
     {path: 'options/:tab', component: OptionsComponent, canActivate: [AuthGuard]},
     {path: 'options/:tab/:ticker', component: OptionsComponent, canActivate: [AuthGuard]},
     {path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
