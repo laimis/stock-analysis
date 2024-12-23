@@ -209,6 +209,7 @@ type SimulateUserTrades =
         UserId: UserId
         NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
+        AdjustSizeBasedOnRisk: bool
     }
     
 type SimulateOpenTrades =
@@ -221,6 +222,7 @@ type ExportUserSimulatedTrades =
         UserId: UserId
         NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
+        AdjustSizeBasedOnRisk: bool
     }
 
 type QueryTradingEntries =
@@ -811,12 +813,12 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
     
     member _.Handle (command:SimulateUserTrades) = task {
         
-        let runSimulation (runner:TradingStrategyRunner) user closeIfOpenAtEnd (position:StockPositionState) = async {
+        let runSimulation (runner:TradingStrategyRunner) user closeIfOpenAtEnd adjustSizeBasedOnRisk (position:StockPositionState) = async {
             let! results =
                 runner.Run(
                     user,
                     position=position,
-                    adjustSizeBasedOnRisk=true,
+                    adjustSizeBasedOnRisk=adjustSizeBasedOnRisk,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             
@@ -849,7 +851,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let! simulations =
                 positions
-                |> List.map (runSimulation runner user.State command.ClosePositionIfOpenAtTheEnd)
+                |> List.map (runSimulation runner user.State command.ClosePositionIfOpenAtTheEnd command.AdjustSizeBasedOnRisk)
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
@@ -866,6 +868,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let (simulateCommand:SimulateUserTrades) = {
             UserId = command.UserId
             NumberOfTrades = command.NumberOfTrades
+            AdjustSizeBasedOnRisk = command.AdjustSizeBasedOnRisk
             ClosePositionIfOpenAtTheEnd = command.ClosePositionIfOpenAtTheEnd}
         let! results = this.Handle(simulateCommand)
         

@@ -111,6 +111,11 @@ export class StockDetailsComponent implements OnInit {
             }
         )
     }
+    
+    pendingPositionCreated() {
+        this.loadPendingPosition()
+        this.loadOrders()
+    }
 
     brokerageOrderEntered(_: string) {
         this.loadStockOwnership()

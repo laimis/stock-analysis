@@ -54,7 +54,7 @@
         [isPendingPositionMode]="true"
         [presetTicker]="stock.ticker"
         (positionOpened)="loadOrders()"
-        (pendingPositionCreated)="loadOrders()">
+        (pendingPositionCreated)="pendingPositionCreated()">
     </app-stock-trading-new-position>
     
     <!-- existing pending positions -->

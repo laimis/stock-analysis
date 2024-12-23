@@ -24,6 +24,7 @@ export class StockTradingSimulationsComponent implements OnInit {
     errors: string[];
     numberOfTrades: number = 40;
     closePositions: boolean = true;
+    adjustSizes: boolean = false;
     loading: boolean = false;
     benchmarks: {ticker: string, prices: PriceBar[] }[] = [];
 
@@ -55,7 +56,7 @@ export class StockTradingSimulationsComponent implements OnInit {
         this.loading = true
         this.errors = [];
         this.benchmarks = [];
-        this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
+        this.stockPositions.simulatePositions(this.closePositions, this.adjustSizes, this.numberOfTrades).subscribe(results => {
             this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
             this.loading = false;
             this.fetchBenchmarks();

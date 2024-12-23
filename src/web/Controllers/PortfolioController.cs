@@ -67,6 +67,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
     [HttpGet("stockpositions/simulate/trades")]
     public Task<ActionResult> Trade(
         [FromQuery] bool closePositionIfOpenAtTheEnd,
+        [FromQuery] bool adjustSizeBasedOnRisk,
         [FromQuery] int numberOfTrades) =>
 
         this.OkOrError(
@@ -74,6 +75,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
                 new SimulateUserTrades(
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
                     numberOfTrades: numberOfTrades,
+                    adjustSizeBasedOnRisk: adjustSizeBasedOnRisk,
                     userId: User.Identifier()
                 )
             )
@@ -92,6 +94,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
     [HttpGet("stockpositions/simulate/trades/export")]
     public Task<ActionResult> SimulateTradesExport(
         [FromQuery] bool closePositionIfOpenAtTheEnd,
+        [FromQuery] bool adjustSizeBasedOnRisk,
         [FromQuery] int numberOfTrades) =>
 
         this.GenerateExport(
@@ -99,6 +102,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
                 new ExportUserSimulatedTrades(
                     userId: User.Identifier(),
                     closePositionIfOpenAtTheEnd: closePositionIfOpenAtTheEnd,
+                    adjustSizeBasedOnRisk: adjustSizeBasedOnRisk,
                     numberOfTrades: numberOfTrades
                 )
             )
