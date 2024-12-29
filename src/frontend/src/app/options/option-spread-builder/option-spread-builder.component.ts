@@ -79,6 +79,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filterVolumeOI: 'all' | 'notzero' = 'notzero';
     filterBid: 'all' | 'notzero' = 'all';
     filterMinimumStrike: number = 0;
+    filterMaximumSpread: number = 0;
     
     manualSelection: boolean = false;
     
@@ -156,7 +157,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 (this.filterType === 'all' || option.side === this.filterType) &&
                 (this.filterVolumeOI === 'all' || (option.volume > 0 || option.openInterest > 0)) &&
                 (this.filterBid === 'all' || option.bid > 0) &&
-                option.strikePrice >= this.filterMinimumStrike;
+                option.strikePrice >= this.filterMinimumStrike &&
+                (this.filterMaximumSpread === 0 || option.spread <= this.filterMaximumSpread);
         });
 
         this.filteredOptions.sort((a, b) => {

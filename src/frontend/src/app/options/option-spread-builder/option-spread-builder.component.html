@@ -145,6 +145,10 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
+                                <label for="spreadFilter" class="form-label">Maximum Spread:</label>
+                                <input id="spreadFilter" type="number" class="form-control" [(ngModel)]="filterMaximumSpread" (change)="applyFiltersAndSort()">
+                            </div>
+                            <div class="col-md-3">
                                 <!-- ui to clear all filters -->
                                 <label class="form-label">&nbsp;</label>
                                 <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">Clear Filters</button>

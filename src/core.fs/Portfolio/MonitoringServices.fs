@@ -232,8 +232,11 @@ type PortfolioAnalysisService(
                 let profitData =
                     profitsByPeriod
                     |> List.map (fun (days, profit) ->
-                        let percentage = Math.Round((profit / maxProfit) * 100m, 0)
-                        {| days = days; profit = profit; percentage = percentage |}
+                        let percentage = Math.Round((profit / maxProfit) * 100m, 0) |> Math.Abs
+                        // negative profit needs a flag so that the email template can use simple if boolean check
+                        // to render different style
+                        let isNegative = profit < 0m
+                        {| days = days; profit = profit; percentage = percentage; isNegative=isNegative |}
                     )
                     
                 let actualProfitPercentOfMax = Math.Round((actualProfit / maxProfit) * 100m, 0)
