@@ -216,11 +216,6 @@ export class StockTradingNewPositionComponent {
         }
         let singleShareLoss = this.price - this.positionStopPrice
         this.updateBuyingValues(singleShareLoss)
-        
-        // updte number of shares one more time, this time making sure that the loss from the
-        // selected stop price is less than the max loss
-        let numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
-        this.numberOfShares = this.positionStopPrice > this.price ? -numberOfShares : numberOfShares
     }
 
     updateBuyingValuesWithCostToBuy() {
