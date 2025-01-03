@@ -13,7 +13,6 @@ using core.Shared;
 using Microsoft.FSharp.Core;
 using Moq;
 using Xunit;
-using Handler = core.fs.Options.Handler;
 
 namespace coretests.Options
 {
@@ -47,7 +46,7 @@ namespace coretests.Options
                     FSharpResult<OptionChain,ServiceError>.NewOk(new OptionChain("TICKER", 0, 0, Array.Empty<OptionDetail>(), FSharpOption<decimal>.None))
                 ));
             
-            var handler = new Handler(accountMock.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
+            var handler = new OptionsHandler(accountMock.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
 
             var result = await handler.Handle(query);
 

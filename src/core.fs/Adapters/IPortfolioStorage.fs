@@ -7,6 +7,7 @@ open core.Options
 open core.Routines
 open core.Stocks
 open core.fs.Accounts
+open core.fs.Options
 open core.fs.Stocks
 
 type IPortfolioStorage =
@@ -35,6 +36,8 @@ type IPortfolioStorage =
     abstract member GetOwnedOptions : userId:UserId -> Task<IEnumerable<OwnedOption>>
     abstract member GetOwnedOption : optionId:System.Guid -> userId:UserId -> Task<OwnedOption>
     abstract member SaveOwnedOption : option:OwnedOption -> userId:UserId -> Task
+    
+    abstract member SaveOptionPosition : userId:UserId -> previousState:OptionPositionState option -> newState:OptionPositionState -> Task
     
     abstract member GetCrypto : token:string -> userId:UserId -> Task<OwnedCrypto>
     abstract member GetCryptoByCryptoId : id:System.Guid -> userId:UserId -> Task<OwnedCrypto>

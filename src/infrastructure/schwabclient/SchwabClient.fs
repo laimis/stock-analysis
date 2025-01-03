@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Generic
+open System.Globalization
 open System.Net.Http
 open System.Net.Http.Headers
 open System.Text
@@ -387,7 +388,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     // I don't even know where I would get these adjustments. For futu for example, this is not
     // a stock split, I just see $1.95 divident bubble on trading view and sure enough, before that date
     // all the prices are off by 1.95 when comparing to adjusted vs unadjusted. Still not sure what is happening here
-    // but all the brokerages etc are handling this
+    // but all the brokerages etc. are handling this
     let getAdjustments ticker =
         match ticker with
         | "FUTU" ->
@@ -988,18 +989,30 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                         | x when x.Length > 3 ->
                                             let optionType = split[split.Length - 1].ToUpperInvariant()
                                             let strike = Decimal.Parse(split[split.Length - 2].TrimStart('$'))
+                                            
+                                            // expiration date right now comes through as 09/20/2024, generically as MM/dd/yyyy
+                                            // I want to convert it to yyyy-MM-dd
                                             let expirationDate = split[split.Length - 3]
+                                            let dateParts = expirationDate.Split("/")
+                                            let day, month, year = dateParts[1], dateParts[0], dateParts[2]
+                                            // validate that the date is correct
+                                            let expirationDateAsString = $"{year}-{month}-{day}"
+                                            // make sure we can parse with exact format
+                                            match DateTimeOffset.TryParseExact(expirationDateAsString, "yyyy-MM-dd", null, DateTimeStyles.None) with
+                                            | true, _ -> ()
+                                            | false, _ -> failwith $"Could not parse expiration date: {expirationDateAsString}"
+                                            
                                             let ticker = p.instrument.Value.underlyingSymbol
                                             
-                                            let optionPosition = OptionPosition()
-                                            
-                                            optionPosition.Ticker <- Some(Ticker ticker)
-                                            optionPosition.Quantity <- if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
-                                            optionPosition.AverageCost <- p.averagePrice
-                                            optionPosition.StrikePrice <-  strike
-                                            optionPosition.ExpirationDate <- expirationDate
-                                            optionPosition.MarketValue <- p.marketValue
-                                            optionPosition.OptionType <- optionType.ToUpperInvariant()
+                                            let optionPosition = {
+                                                OptionPosition.Ticker = Ticker ticker
+                                                Quantity = if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
+                                                AverageCost = p.averagePrice
+                                                StrikePrice = strike
+                                                ExpirationDate = expirationDateAsString
+                                                MarketValue = p.marketValue
+                                                OptionType = optionType.ToUpperInvariant()
+                                            }
                                             optionPosition
                                         | _ -> failwith $"Could not parse option description: {description}"
                                     )

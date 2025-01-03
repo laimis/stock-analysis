@@ -757,7 +757,7 @@ export interface BrokerageOptionPosition {
     optionType: string
     strikePrice: number
     marketValue: number
-    expirationDate: number
+    expirationDate: string
 }
 
 export interface OptionsContainer {
@@ -1174,6 +1174,20 @@ export interface Note {
     created: string
 }
 
+export interface OptionPositionLeg {
+    ticker: string
+    quantity: number
+    cost: number
+    filled: string
+    expiration: string
+}
+export interface OptionPosition {
+    id: string
+    underlyingTicker: string
+    legs: OptionPositionLeg[]
+    isOpen: boolean
+}
+
 export interface PositionInstance {
     positionId: string,
     isOpen: boolean,
@@ -1377,6 +1391,9 @@ export class openpositioncommand {
     notes: string
     stopPrice: number | null
     strategy: string | null
+}
+
+export class openoptionpositioncommand {
 }
 
 export class pendingstockpositioncommand {

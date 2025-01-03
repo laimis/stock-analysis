@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using core.fs.Options;
 using core.fs.Portfolio;
 using core.fs.Stocks;
 using core.Shared;
@@ -9,13 +10,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.FSharp.Core;
 using web.Utils;
+using OwnershipQuery = core.fs.Portfolio.OwnershipQuery;
 
 namespace web.Controllers;
 
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class PortfolioController(StockPositionHandler stockPositionHandler) : ControllerBase
+public class PortfolioController(
+    StockPositionHandler stockPositionHandler,
+    OptionsHandler optionsHandler) : ControllerBase
 {
     [HttpGet]
     public Task<ActionResult> Index() =>
@@ -231,7 +235,7 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
         );
     
     [HttpPost("stockpositions")]
-    public Task<ActionResult> OpenLongPosition([FromBody]OpenStockPosition command) =>
+    public Task<ActionResult> OpenPosition([FromBody]OpenStockPosition command) =>
         this.OkOrError(
             stockPositionHandler.Handle(
                 User.Identifier(), command
@@ -311,4 +315,12 @@ public class PortfolioController(StockPositionHandler stockPositionHandler) : Co
     [HttpDelete("stockpositions/{positionId}/stop")]
     public async Task<ActionResult> DeleteStop([FromRoute] string positionId) =>
         this.OkOrError(await stockPositionHandler.Handle(User.Identifier(), new DeleteStop(StockPositionId.NewStockPositionId(Guid.Parse(positionId)))));
+    
+    [HttpPost("optionpositions")]
+    public Task<ActionResult> OpenOptionPosition([FromBody]OpenOptionPositionCommand command) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                User.Identifier(), command
+            )
+        );
 }

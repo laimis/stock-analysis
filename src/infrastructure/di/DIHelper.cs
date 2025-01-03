@@ -55,7 +55,7 @@ namespace di
             // go over all types in core.fs assembly, find any inner classes and register any type that implements IApplicationService
             // interface as a singleton
             var markerInterface = typeof(IApplicationService);
-            var assembly = typeof(core.fs.Options.Handler).Assembly;
+            var assembly = typeof(core.fs.Options.OptionsHandler).Assembly;
             
             foreach (var type in assembly.GetTypes())
             {

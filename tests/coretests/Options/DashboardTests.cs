@@ -13,7 +13,6 @@ using core.Shared;
 using Microsoft.FSharp.Core;
 using Moq;
 using Xunit;
-using Handler = core.fs.Options.Handler;
 using OptionPosition = core.fs.Adapters.Brokerage.OptionPosition;
 
 namespace coretests.Options
@@ -60,7 +59,7 @@ namespace coretests.Options
                     )
                 ));
             
-            var handler = new Handler(accounts.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
+            var handler = new OptionsHandler(accounts.Object, brokerage.Object, storage, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
 
             var result = await handler.Handle(query);
 

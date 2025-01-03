@@ -58,7 +58,24 @@ type DetailsQuery = { OptionId: Guid; UserId: UserId }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
 type OwnershipQuery = { UserId: UserId; Ticker: Ticker }
 
-type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
+type OptionLegInput = {
+    StrikePrice: decimal
+    OptionType: core.fs.Options.OptionType
+    ExpirationDate: string
+    Filled: DateTimeOffset
+    Quantity: int
+    Cost: decimal
+}
+type OpenOptionPositionCommand = {
+    [<Required>]
+    UnderlyingTicker: Ticker option
+    [<Required>]
+    Legs: OptionLegInput[]
+    [<Required>]
+    Filled: DateTimeOffset option
+}
+
+type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
 
     let fsOptionTypeConvert oldType =
         match oldType with
@@ -68,6 +85,35 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
         
     interface IApplicationService
 
+    member this.Handle(userId:UserId, command: OpenOptionPositionCommand) = task {
+        Console.WriteLine("Opening option position")
+        
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+        
+            Console.WriteLine("Inside open, let's go!")
+            
+            let openPosition = OptionPosition.``open`` command.UnderlyingTicker.Value DateTimeOffset.UtcNow
+            
+            let withLegs =
+                command.Legs
+                |> Array.fold (fun position (leg:OptionLegInput) ->
+                    match leg.Quantity with
+                    | x when x > 0 -> position |> OptionPosition.buyToOpen leg.ExpirationDate leg.StrikePrice leg.OptionType x leg.Cost leg.Filled
+                    | x when x < 0 -> position |> OptionPosition.sellToOpen leg.ExpirationDate leg.StrikePrice leg.OptionType -x leg.Cost leg.Filled
+                    | _ -> position
+                    ) openPosition
+                
+            match withLegs.Transactions with
+            | [] ->
+                return "No transactions found" |> ServiceError |> Error
+            | _ ->
+                do! storage.SaveOptionPosition userId None withLegs
+                return withLegs |> Ok
+    }
+        
     member this.Handle(request: DashboardQuery) =
         task {
             let! user = request.UserId |> accounts.GetUser
@@ -114,7 +160,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                             a.OptionPositions |> Seq.filter (fun p ->
                                 openOptions
                                 |> Seq.exists (fun o ->
-                                    o.Ticker.Value = p.Ticker.Value.Value
+                                    o.Ticker.Value = p.Ticker.Value
                                     && o.StrikePrice = p.StrikePrice
                                     && o.OptionType = p.OptionType)
                                 |> not)
@@ -129,7 +175,7 @@ type Handler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfol
                                  
                 let! openBrokerageOrders =
                     brokerageOrders
-                    |> Seq.filter (_.IsActive)
+                    |> Seq.filter _.IsActive
                     |> Seq.map (fun o -> o.Legs)
                     |> Seq.concat
                     |> Seq.map(fun l -> async {

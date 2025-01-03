@@ -35,7 +35,7 @@
         <Compile Include="Services\Trends.fs" />
         <Compile Include="Services\PendingPositionAnalysis.fs" />
         <Compile Include="Options\Views.fs"/>
-        <Compile Include="Options\Handler.fs"/>
+        <Compile Include="Options\OptionsHandler.fs" />
         <Compile Include="Options\Import.fs"/>
         <Compile Include="Accounts\Handlers.fs"/>
         <Compile Include="Accounts\RefreshBrokerageConnectionService.fs" />

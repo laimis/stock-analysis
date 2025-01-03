@@ -19,14 +19,15 @@ let ``Basic operations work`` () =
     position.IsOpen |> should equal true
     
     let optionType = OptionType.Put
-    let quantity = 1m
+    let quantity = 1
     
     let positionWithContracts =
         position
         |> OptionPosition.buyToOpen expiration 120m optionType quantity 6.05m DateTimeOffset.UtcNow
         |> OptionPosition.sellToOpen expiration 115m optionType quantity 4.20m DateTimeOffset.UtcNow
         
-    positionWithContracts.TotalCost |> should equal 1.85m
+    positionWithContracts.Cost |> should equal 1.85m
+    positionWithContracts.Profit |> should equal 0m
     positionWithContracts.Transactions |> should haveLength 2m
     positionWithContracts.IsClosed |> should equal false
     positionWithContracts.IsOpen |> should equal true
@@ -36,7 +37,8 @@ let ``Basic operations work`` () =
         |> OptionPosition.sellToClose expiration 120m optionType quantity 11.11m DateTimeOffset.UtcNow
         |> OptionPosition.buyToClose expiration 115m optionType quantity 8.11m DateTimeOffset.UtcNow
         
-    positionWithContractsClosed.TotalCost |> should equal -1.15m
+    positionWithContractsClosed.Cost |> should equal 1.85m
+    positionWithContractsClosed.Profit |> should equal 1.15m
     positionWithContractsClosed.Transactions |> should haveLength 4m
     positionWithContractsClosed.IsClosed |> should equal true
     positionWithContractsClosed.IsOpen |> should equal false
@@ -45,7 +47,7 @@ let ``Basic operations work`` () =
 let ``Expire works``() =
     let position =
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
-        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> OptionPosition.expire expiration 120m OptionType.Put
         
     position.IsClosed |> should equal true
@@ -55,7 +57,7 @@ let ``Expire works``() =
 let ``Assign works``() =
     let position =
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
-        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> OptionPosition.assign expiration 120m OptionType.Put
         
     position.IsClosed |> should equal true
@@ -70,13 +72,13 @@ let ``Version and events work``() =
     position.Events |> should haveLength 1
     
     let optionAfterOperation =
-        position |> OptionPosition.buyToOpen expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        position |> OptionPosition.buyToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         
     optionAfterOperation.Version |> should equal 2
     optionAfterOperation.Events |> should haveLength 2
     
     let optionAfterOperation2 =
-        optionAfterOperation |> OptionPosition.sellToClose expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        optionAfterOperation |> OptionPosition.sellToClose expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         
     optionAfterOperation2.Version |> should equal 4 // because it should include closed event
     optionAfterOperation2.Events |> should haveLength 4
@@ -85,8 +87,8 @@ let ``Version and events work``() =
 let ``This should throw invalid operation because you cannot sell top open and then sell to close``() =
     (fun () ->
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
-        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
-        |> OptionPosition.sellToClose expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.sellToClose expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> ignore)
     |> should throw typedefof<InvalidOperationException>
     
@@ -94,7 +96,7 @@ let ``This should throw invalid operation because you cannot sell top open and t
 let ``Trying to buy to close a position that is not open, should throw``() =
     (fun () ->
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
-        |> OptionPosition.buyToClose expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.buyToClose expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> ignore)
     |> should throw typedefof<InvalidOperationException>
     
@@ -110,7 +112,7 @@ let ``Trying to assign contracts that are not owned should throw``() =
 let ``Trying to assign contracts that are not sold should throw``() =
     (fun () ->
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
-        |> OptionPosition.buyToOpen expiration 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> OptionPosition.assign expiration 120m OptionType.Put
         |> ignore)
     |> should throw typedefof<InvalidOperationException>
@@ -122,7 +124,7 @@ let ``Buy to open using wrong date format, fails``() =
     
     (fun () ->
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
-        |> OptionPosition.buyToOpen wrongDate 120m OptionType.Put 1m 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen wrongDate 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> ignore)
     |> should throw typeof<Exception>
     

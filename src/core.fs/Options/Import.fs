@@ -24,7 +24,7 @@ module Import =
         member _.UserId = userId
         member _.Content = content
 
-    type Handler(csvParser:ICSVParser, optionHandler:core.fs.Options.Handler) =
+    type Handler(csvParser:ICSVParser, optionHandler:core.fs.Options.OptionsHandler) =
         
         let processCommand record (command:Object) _ _ =
             match command with
