@@ -93,14 +93,5 @@ namespace web.Controllers
                 )
             );
         }
-
-        [HttpGet]
-        public Task<ActionResult> Dashboard()
-            => this.OkOrError(
-                handler.Handle(
-                    new DashboardQuery(
-                        User.Identifier()
-                    )
-                ));
     }
 }

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
-import {OptionsContainer, StocksService} from '../../services/stocks.service';
-import {ActivatedRoute, Route} from "@angular/router";
+import {ActivatedRoute} from "@angular/router";
+import {OptionsContainer, OptionService} from "../../services/option.service";
 
 @Component({
     selector: 'app-options',
@@ -19,7 +19,7 @@ export class OptionsComponent implements OnInit {
     errors: string[] = null
 
     constructor(
-        private service: StocksService,
+        private service: OptionService,
         private title: Title,
         private route: ActivatedRoute
     ) {
@@ -40,12 +40,15 @@ export class OptionsComponent implements OnInit {
     }
 
     getOptions() {
-        this.service.getOptions().subscribe(result => {
-            this.optionsContainer = result
-            this.loaded = true
-        }, error => {
-            this.errors = error
-        })
+        this.service.getDashboard()
+            .subscribe(
+                result => {
+                    this.optionsContainer = result
+                    this.loaded = true
+                }, error => {
+                    this.errors = error
+                    this.loaded = true
+                })
     }
 
     isActive(tabName: string) {

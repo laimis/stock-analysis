@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOptionPosition, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
-import {OptionService} from "../../services/option.service";
+import {BrokerageOptionPosition, OptionService} from "../../services/option.service";
 
 
 export interface BrokerageOptionPositionCollection {
@@ -57,8 +56,7 @@ export class OptionBrokeragePositionsComponent {
     protected readonly Date = Date;
 
     constructor(
-        private service: StocksService,
-        private optionPositionsService: OptionService
+        private optionService: OptionService
     ) {
     }
 
@@ -108,7 +106,7 @@ export class OptionBrokeragePositionsComponent {
             }))
         }
         
-        this.optionPositionsService.open(command).subscribe({
+        this.optionService.open(command).subscribe({
                 next: (position) => {
                     console.log('next', position)
                 },
@@ -124,7 +122,7 @@ export class OptionBrokeragePositionsComponent {
     }
 
     recordBuy(opt: object) {
-        this.service.buyOption(opt).subscribe(r => {
+        this.optionService.buyOption(opt).subscribe(r => {
             this.positionsUpdated.emit()
         }, err => {
             this.errors = GetErrors(err)
@@ -132,7 +130,7 @@ export class OptionBrokeragePositionsComponent {
     }
 
     recordSell(opt: object) {
-        this.service.sellOption(opt).subscribe(r => {
+        this.optionService.sellOption(opt).subscribe(r => {
             this.positionsUpdated.emit()
         }, err => {
             this.errors = GetErrors(err)

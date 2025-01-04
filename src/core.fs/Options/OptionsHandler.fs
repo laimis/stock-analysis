@@ -111,7 +111,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 return "No transactions found" |> ServiceError |> Error
             | _ ->
                 do! storage.SaveOptionPosition userId None withLegs
-                return withLegs |> Ok
+                return OptionPositionView(withLegs, None) |> Ok
     }
         
     member this.Handle(request: DashboardQuery) =
@@ -121,32 +121,32 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             match user with
             | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
-                let! options = storage.GetOwnedOptions(UserId user.Id)
+                
+                let userId = user.Id |> UserId
+                let! optionPositions = storage.GetOptionPositions userId
+                let! ownedOptions = storage.GetOwnedOptions(userId)
 
                 let closedOptions =
-                    options
+                    ownedOptions
                     |> Seq.filter (fun o -> o.State.Closed.HasValue)
                     |> Seq.map (fun o -> o.State)
                     |> Seq.sortByDescending (fun o -> o.FirstFill.Value)
                     |> Seq.map (fun o -> OwnedOptionView(o, None))
 
                 let! openOptions =
-                    options
-                    |> Seq.filter (fun o -> o.State.Closed.HasValue |> not)
-                    |> Seq.map _.State
-                    |> Seq.sortBy (fun o -> o.Ticker.Value, o.Expiration)
+                    optionPositions
+                    |> Seq.filter (fun o -> o.IsOpen)
+                    |> Seq.sortBy (fun o -> o.UnderlyingTicker)
                     |> Seq.map (fun o ->
                         async {
-                            let! chain = brokerage.GetOptionChain user.State o.Ticker |> Async.AwaitTask
+                            let! chain = brokerage.GetOptionChain user.State o.UnderlyingTicker |> Async.AwaitTask
 
-                            let fsOptionType = fsOptionTypeConvert o.OptionType
-                                
-                            let detail =
+                            let chain =
                                 match chain with
-                                | Ok chain -> chain.FindMatchingOption(o.StrikePrice, o.Expiration, fsOptionType)
                                 | Error _ -> None
+                                | Ok chain -> chain |> Some
 
-                            return OwnedOptionView(o, detail)
+                            return OptionPositionView(o, chain)
                         })
                     |> Async.Sequential
 
@@ -159,10 +159,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                         let positions =
                             a.OptionPositions |> Seq.filter (fun p ->
                                 openOptions
-                                |> Seq.exists (fun o ->
-                                    o.Ticker.Value = p.Ticker.Value
-                                    && o.StrikePrice = p.StrikePrice
-                                    && o.OptionType = p.OptionType)
+                                |> Seq.exists (fun o -> o.UnderlyingTicker = p.Ticker)
                                 |> not)
                             
                         let orders = a.OptionOrders

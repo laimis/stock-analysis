@@ -243,7 +243,7 @@ public class PortfolioController(
         );
 
     [HttpDelete("stockpositions/{positionId}")]
-    public Task<ActionResult> DeletePosition(
+    public Task<ActionResult> DeleteStockPosition(
         [FromRoute] string positionId) =>
         this.OkOrError(
             stockPositionHandler.Handle(
@@ -344,11 +344,19 @@ public class PortfolioController(
         );
     
     [HttpDelete("optionpositions/{id:guid}")]
-    public Task<ActionResult> Delete([FromRoute] Guid id)
+    public Task<ActionResult> DeleteOptionPosition([FromRoute] Guid id)
         => this.OkOrError(
             optionsHandler.Handle(
                 new DeleteOptionPositionCommand(OptionPositionId.NewOptionPositionId(id), User.Identifier())
             )
         );
 
+    [HttpGet("options")]
+    public Task<ActionResult> OptionsDashboar()
+        => this.OkOrError(
+            optionsHandler.Handle(
+                new DashboardQuery(
+                    User.Identifier()
+                )
+            ));
 }

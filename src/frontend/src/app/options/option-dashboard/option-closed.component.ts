@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {OwnedOption} from 'src/app/services/stocks.service';
+import {OwnedOption} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-closed',

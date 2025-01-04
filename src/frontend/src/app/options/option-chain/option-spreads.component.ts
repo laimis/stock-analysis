@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {OptionSpread} from 'src/app/services/stocks.service';
+import {OptionSpread} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-spreads',

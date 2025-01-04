@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {StocksService} from '../../services/stocks.service';
 import {DatePipe, Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from 'src/app/services/utils';
 import {tick} from "@angular/core/testing";
+import { OptionService } from 'src/app/services/option.service';
 
 @Component({
     selector: 'app-option-sell',
@@ -29,7 +29,7 @@ export class OptionSellComponent implements OnInit {
     protected readonly tick = tick;
 
     constructor(
-        private service: StocksService,
+        private service: OptionService,
         private route: ActivatedRoute,
         private router: Router,
         private datePipe: DatePipe,

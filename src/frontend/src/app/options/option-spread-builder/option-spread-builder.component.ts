@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
-import {OptionChain, OptionDefinition, StocksService} from "../../services/stocks.service";
 import {ActivatedRoute} from "@angular/router";
 import {GetErrors} from "../../services/utils";
 import {LoadingComponent} from "../../shared/loading/loading.component";
@@ -13,6 +12,7 @@ import {
     OptionOrderCommand, OrderInstruction,
     OrderType
 } from "../../services/brokerage.service";
+import {OptionChain, OptionDefinition, OptionService} from "../../services/option.service";
 
 interface OptionLeg {
     option: OptionDefinition;
@@ -46,7 +46,7 @@ interface SpreadCandidate {
 })
 export class OptionSpreadBuilderComponent implements OnInit {
     
-    constructor(private stockService: StocksService, private brokerageService:BrokerageService, private route: ActivatedRoute) {
+    constructor(private optionService: OptionService, private brokerageService:BrokerageService, private route: ActivatedRoute) {
     }
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
@@ -106,7 +106,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
     loadOptions(ticker:string): void {
         this.loading = true
-        this.stockService.getOptionChain(ticker).subscribe(
+        this.optionService.getOptionChain(ticker).subscribe(
             (data) => {
                 this.optionChain = data
                 this.options = this.optionChain.options
