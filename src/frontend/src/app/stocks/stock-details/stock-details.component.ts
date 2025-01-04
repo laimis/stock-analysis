@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {
-    BrokerageStockOrder,
+    BrokerageStockOrder, OptionPosition,
     OwnedOption, PendingStockPosition,
     PositionChartInformation,
     PositionInstance,
@@ -17,6 +17,7 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
+import {OptionService} from "../../services/option.service";
 
 @Component({
     selector: 'app-stock-details',
@@ -32,7 +33,7 @@ export class StockDetailsComponent implements OnInit {
     currentPosition: PositionInstance
     currentPositionChartInfo: PositionChartInformation
     pendingPosition: PendingStockPosition|null = null
-    options: OwnedOption[]
+    options: OptionPosition[]
     prices: Prices
     orders: BrokerageStockOrder[]
     activeTab: string = ''
@@ -58,6 +59,7 @@ export class StockDetailsComponent implements OnInit {
 
     constructor(
         private stocks: StocksService,
+        private optionService: OptionService,
         private stockPositions: StockPositionsService,
         private brokerage: BrokerageService,
         private route: ActivatedRoute,
@@ -152,7 +154,7 @@ export class StockDetailsComponent implements OnInit {
 
 
     loadOptionOwnership() {
-        this.stocks.getOwnedOptions(this.ticker).subscribe(result => {
+        this.optionService.getOptionPositionsForTicker(this.ticker).subscribe(result => {
             this.loading.options = false;
             this.options = result
         }, err => {

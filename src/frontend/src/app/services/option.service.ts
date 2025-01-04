@@ -1,5 +1,7 @@
 import {Injectable} from '@angular/core';
-import {OptionDefinition, OptionSpread} from './stocks.service';
+import {OptionDefinition, OptionPosition, OptionSpread, OwnedOption} from './stocks.service';
+import {HttpClient} from "@angular/common/http";
+import {Observable} from "rxjs";
 
 function toBuyLeg(option: OptionDefinition) {
     return {option: option, action: 'BUY'}
@@ -27,6 +29,13 @@ function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDef
     providedIn: 'root'
 })
 export class OptionService {
+    
+    constructor(private http : HttpClient) {
+    }
+    
+    getOptionPositionsForTicker(ticker: string): Observable<OptionPosition[]> {
+        return this.http.get<OptionPosition[]>(`/api/options/ownership/${ticker}`)
+    }
 
     findBullPutSpreads(options: OptionDefinition[]): OptionSpread[] {
         let expirationMap = createExpirationMap(options)

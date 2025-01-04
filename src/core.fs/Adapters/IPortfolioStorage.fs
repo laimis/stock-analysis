@@ -37,6 +37,7 @@ type IPortfolioStorage =
     abstract member GetOwnedOption : optionId:System.Guid -> userId:UserId -> Task<OwnedOption>
     abstract member SaveOwnedOption : option:OwnedOption -> userId:UserId -> Task
     
+    abstract member GetOptionPositions : userId:UserId -> Task<IEnumerable<OptionPositionState>>
     abstract member SaveOptionPosition : userId:UserId -> previousState:OptionPositionState option -> newState:OptionPositionState -> Task
     
     abstract member GetCrypto : token:string -> userId:UserId -> Task<OwnedCrypto>

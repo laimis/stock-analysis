@@ -245,10 +245,6 @@ export class StocksService {
         return this.http.post('/api/options/close', obj)
     }
 
-    getOwnedOptions(ticker: string): Observable<OwnedOption[]> {
-        return this.http.get<OwnedOption[]>(`/api/options/ownership/${ticker}`)
-    }
-
     getOptionChain(ticker: string): Observable<OptionChain> {
         return this.http.get<OptionChain>(`/api/options/chain/${ticker}`)
     }
@@ -1174,18 +1170,21 @@ export interface Note {
     created: string
 }
 
-export interface OptionPositionLeg {
-    ticker: string
+export interface OptionContract {
+    optionType: string
+    strikePrice: number
+    expiration: string
     quantity: number
     cost: number
-    filled: string
-    expiration: string
 }
 export interface OptionPosition {
-    id: string
+    positionId: string
     underlyingTicker: string
-    legs: OptionPositionLeg[]
+    contracts: OptionContract[]
+    cost: number
     isOpen: boolean
+    isClosed: boolean
+    opened: string
 }
 
 export interface PositionInstance {

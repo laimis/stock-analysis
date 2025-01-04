@@ -5,6 +5,24 @@ open core.Options
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Options
     
+type OptionPositionView(state:OptionPositionState) =
+    
+    member this.PositionId = state.PositionId
+    member this.UnderlyingTicker = state.UnderlyingTicker
+    member this.Opened = state.Opened
+    member this.IsClosed = state.IsClosed
+    member this.IsOpen = state.IsOpen
+    member this.Cost = state.Cost
+    member this.Profit = state.Profit
+    member this.Transactions = state.Transactions
+    member this.Contracts =
+        state.Contracts.Keys
+        |> Seq.map (fun k ->
+            let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
+            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost;|}
+        )
+    
+    
 type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail option) =
     
     let getItmOtmLabel (currentPrice:decimal) (optionType:string) (strikePrice:decimal) =

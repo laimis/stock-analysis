@@ -31,6 +31,8 @@ let ``Basic operations work`` () =
     positionWithContracts.Transactions |> should haveLength 2m
     positionWithContracts.IsClosed |> should equal false
     positionWithContracts.IsOpen |> should equal true
+    positionWithContracts.Contracts.Count |> should equal 2
+    positionWithContracts.Contracts.Values |> Seq.iter (fun quantity -> quantity |> abs |> should equal 1)
     
     let positionWithContractsClosed =
         positionWithContracts
@@ -42,6 +44,8 @@ let ``Basic operations work`` () =
     positionWithContractsClosed.Transactions |> should haveLength 4m
     positionWithContractsClosed.IsClosed |> should equal true
     positionWithContractsClosed.IsOpen |> should equal false
+    positionWithContracts.Contracts.Count |> should equal 2
+    positionWithContracts.Contracts.Values |> Seq.iter (fun quantity -> quantity |> abs |> should equal 1)
     
 [<Fact>]
 let ``Expire works``() =

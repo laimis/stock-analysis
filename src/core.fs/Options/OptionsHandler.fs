@@ -216,25 +216,26 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok
         }
         
-    member _.Handle(ownership:OwnershipQuery) : System.Threading.Tasks.Task<Result<OwnedOptionState seq, ServiceError>> = task {
-        let! options = ownership.UserId |> storage.GetOwnedOptions
+    member _.Handle(ownership:OwnershipQuery) : System.Threading.Tasks.Task<Result<OptionPositionView seq, ServiceError>> = task {
+        let! options =
+            ownership.UserId
+            |> storage.GetOptionPositions
         
         let filteredOptions =
             options
-            |> Seq.filter (fun o -> o.State.Ticker = ownership.Ticker && o.State.Active)
-            |> Seq.map _.State
+            |> Seq.filter (fun o -> o.UnderlyingTicker = ownership.Ticker && o.IsOpen)
+            |> Seq.map OptionPositionView
             
         return filteredOptions |> Ok
     }
 
-    member _.Handle(request: ExportQuery) =
-        task {
-            let! options = request.UserId |> storage.GetOwnedOptions
+    member _.Handle(request: ExportQuery) = task {
+        let! options = request.UserId |> storage.GetOwnedOptions
 
-            let csv = options |> CSVExport.options csvWriter
+        let csv = options |> CSVExport.options csvWriter
 
-            return ExportResponse("options" |> CSVExport.generateFilename, csv)
-        }
+        return ExportResponse("options" |> CSVExport.generateFilename, csv)
+    }
 
     member this.Handle(command: ExpireCommand) =
         task {

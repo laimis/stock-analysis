@@ -102,6 +102,13 @@ namespace storage.shared
             return Save(option, _option_entity, userId);
         }
 
+        public Task<IEnumerable<OptionPositionState>> GetOptionPositions(UserId userId)
+        {
+            return _aggregateStorage.GetEventsAsync(_option_position_entity, userId)
+                .ContinueWith(t => t.Result.GroupBy(e => e.AggregateId)
+                    .Select(OptionPosition.createFromEvents));
+        }
+
         public Task SaveOptionPosition(UserId userId, FSharpOption<OptionPositionState> previousState, OptionPositionState newState) =>
             SaveEntityInternal(userId, previousState, newState, _option_position_entity);
 

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {OwnedOption, StocksService} from '../../services/stocks.service';
+import {OptionPosition, OwnedOption, StocksService} from '../../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
 
@@ -12,7 +12,7 @@ import {GetErrors} from 'src/app/services/utils';
 export class StockOptionComponent implements OnInit {
 
     @Input()
-    options: OwnedOption[]
+    options: OptionPosition[]
 
     @Input()
     ticker: string
