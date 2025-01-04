@@ -210,7 +210,7 @@ module OptionPosition =
             let transaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit; Credited = 0m; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
-            let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost - debit)
+            let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost - debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             { p with Transactions = p.Transactions @ [transaction]; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
@@ -219,7 +219,7 @@ module OptionPosition =
             let transaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit; Debited = 0m; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
-            let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost - credit)
+            let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost - credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             { p with Transactions = p.Transactions @ [transaction]; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
