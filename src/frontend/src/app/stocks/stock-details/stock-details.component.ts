@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {
-    BrokerageStockOrder, OptionPosition,
-    OwnedOption, PendingStockPosition,
+    BrokerageStockOrder,
+    PendingStockPosition,
     PositionChartInformation,
     PositionInstance,
     PriceFrequency,
@@ -17,7 +17,7 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
-import {OptionService} from "../../services/option.service";
+import {OptionPosition, OptionService} from "../../services/option.service";
 
 @Component({
     selector: 'app-stock-details',

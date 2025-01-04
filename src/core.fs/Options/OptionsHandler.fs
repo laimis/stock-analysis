@@ -48,15 +48,15 @@ type ExpireViaLookupCommand =
     | ExpireViaLookup of LookupData
     | AssignViaLookup of LookupData
 
-type DeleteCommand = { OptionId: Guid; UserId: UserId }
+type DeleteOptionPositionCommand = { PositionId: OptionPositionId; UserId: UserId }
 
 type BuyOrSellCommand =
     | Buy of OptionTransactionInput * UserId
     | Sell of OptionTransactionInput * UserId
 
-type DetailsQuery = { OptionId: Guid; UserId: UserId }
+type OptionPositionQuery = { PositionId: OptionPositionId; UserId: UserId }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
-type OwnershipQuery = { UserId: UserId; Ticker: Ticker }
+type OptionOwnershipQuery = { UserId: UserId; Ticker: Ticker }
 
 type OptionLegInput = {
     StrikePrice: decimal
@@ -216,7 +216,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok
         }
         
-    member _.Handle(ownership:OwnershipQuery) : System.Threading.Tasks.Task<Result<OptionPositionView seq, ServiceError>> = task {
+    member _.Handle(ownership:OptionOwnershipQuery) : System.Threading.Tasks.Task<Result<OptionPositionView seq, ServiceError>> = task {
         let! options =
             ownership.UserId
             |> storage.GetOptionPositions
@@ -224,7 +224,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
         let filteredOptions =
             options
             |> Seq.filter (fun o -> o.UnderlyingTicker = ownership.Ticker && o.IsOpen)
-            |> Seq.map OptionPositionView
+            |> Seq.map (fun o -> OptionPositionView(o, None))
             
         return filteredOptions |> Ok
     }
@@ -285,16 +285,15 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     |> ServiceError |> Error
         }
 
-    member this.Handle(command: DeleteCommand) =
+    member this.Handle(command: DeleteOptionPositionCommand) =
         task {
-            let! opt = storage.GetOwnedOption command.OptionId command.UserId
+            let! opt = storage.GetOptionPosition command.PositionId command.UserId
 
             match opt with
-            | null -> return "Unable to find option do delete" |> ServiceError |> Error
-            | _ ->
-                opt.Delete()
-                do! storage.SaveOwnedOption opt command.UserId
-                return Ok ()
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some opt ->
+                do! opt |> OptionPosition.delete |> storage.DeleteOptionPosition command.UserId (Some opt)
+                return true |> Ok
         }
 
     member this.Handle(cmd: BuyOrSellCommand) =
@@ -337,7 +336,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 return option |> Ok
         }
 
-    member this.Handle(query: DetailsQuery) =
+    member this.Handle(query: OptionPositionQuery) =
         task {
             let! user = accounts.GetUser(query.UserId)
 
@@ -345,21 +344,18 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
 
-                let! option = storage.GetOwnedOption query.OptionId query.UserId
-                let! chain = brokerage.GetOptionChain user.State option.State.Ticker
-                
-                let detail =
-                        chain
-                        |> Result.map (fun c ->
-                            c.FindMatchingOption(
-                                strikePrice = option.State.StrikePrice,
-                                expirationDate = option.State.Expiration,
-                                optionType = fsOptionTypeConvert option.State.OptionType
-                            )
-                        )
-                        |> Result.defaultValue None
-                        
-                return OwnedOptionView(option.State, optionDetail = detail) |> Ok
+                let! option = storage.GetOptionPosition query.PositionId query.UserId
+                match option with
+                | None -> return "Option not found" |> ServiceError |> Error
+                | Some option ->
+                    let! chain = brokerage.GetOptionChain user.State option.UnderlyingTicker
+                    return
+                        match chain with
+                        | Error e ->
+                            logger.LogError($"Unable to get option chain for position {query.PositionId}, {option.UnderlyingTicker}: {e}")
+                            OptionPositionView(option, None) |> Ok
+                        | Ok chain ->
+                            OptionPositionView(option, chain |> Some) |> Ok
         }
 
     member this.Handle(query: ChainQuery) =

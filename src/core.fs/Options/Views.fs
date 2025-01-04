@@ -5,11 +5,13 @@ open core.Options
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Options
     
-type OptionPositionView(state:OptionPositionState) =
+type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     
     member this.PositionId = state.PositionId
     member this.UnderlyingTicker = state.UnderlyingTicker
     member this.Opened = state.Opened
+    member this.DaysHeld = state.DaysHeld
+    member this.Closed = state.Closed
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen
     member this.Cost = state.Cost
@@ -18,8 +20,9 @@ type OptionPositionView(state:OptionPositionState) =
     member this.Contracts =
         state.Contracts.Keys
         |> Seq.map (fun k ->
+            let chainDetail = chain |> Option.map(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
-            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost;|}
+            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail|}
         )
     
     

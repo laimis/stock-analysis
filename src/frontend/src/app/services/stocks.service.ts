@@ -225,20 +225,13 @@ export class StocksService {
 
     // ------- options ----------------
 
-    deleteOption(id: string) {
-        return this.http.delete('/api/options/' + id)
-    }
-
+    
     buyOption(obj: object): Observable<any> {
         return this.http.post<string>('/api/options/buy', obj)
     }
 
     sellOption(obj: object): Observable<any> {
         return this.http.post<string>('/api/options/sell', obj)
-    }
-
-    getOption(id: string): Observable<OwnedOption> {
-        return this.http.get<OwnedOption>('/api/options/' + id)
     }
 
     closeOption(obj: object): Observable<any> {
@@ -1170,23 +1163,6 @@ export interface Note {
     created: string
 }
 
-export interface OptionContract {
-    optionType: string
-    strikePrice: number
-    expiration: string
-    quantity: number
-    cost: number
-}
-export interface OptionPosition {
-    positionId: string
-    underlyingTicker: string
-    contracts: OptionContract[]
-    cost: number
-    isOpen: boolean
-    isClosed: boolean
-    opened: string
-}
-
 export interface PositionInstance {
     positionId: string,
     isOpen: boolean,
@@ -1391,10 +1367,6 @@ export class openpositioncommand {
     stopPrice: number | null
     strategy: string | null
 }
-
-export class openoptionpositioncommand {
-}
-
 export class pendingstockpositioncommand {
     ticker: string
     numberOfShares: number

@@ -343,7 +343,7 @@ module StockPosition =
             |> applyNotesIfApplicable gradeNote date
         
     let delete stockPosition =
-        let e = StockPositionDeleted(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow)
+        let e = StockPositionDeleted(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, DateTimeOffset.UtcNow)
         apply e stockPosition
     
     let setRiskAmount riskAmount date stockPosition =

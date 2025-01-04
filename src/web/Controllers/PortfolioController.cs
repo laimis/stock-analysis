@@ -323,4 +323,32 @@ public class PortfolioController(
                 User.Identifier(), command
             )
         );
+    
+    [HttpGet("optionpositions/ownership/{ticker}")]
+    public Task<ActionResult> OptionOwnership([FromRoute] string ticker) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                new OptionOwnershipQuery(
+                    ticker: new Ticker(ticker), userId: User.Identifier()
+                )
+            )
+        );
+        
+    [HttpGet("optionpositions/{optionId:guid}")]
+    public Task<ActionResult> Get([FromRoute] Guid optionId) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                new OptionPositionQuery(positionId: OptionPositionId.NewOptionPositionId(optionId), userId: User.Identifier()
+                )
+            )
+        );
+    
+    [HttpDelete("optionpositions/{id:guid}")]
+    public Task<ActionResult> Delete([FromRoute] Guid id)
+        => this.OkOrError(
+            optionsHandler.Handle(
+                new DeleteOptionPositionCommand(OptionPositionId.NewOptionPositionId(id), User.Identifier())
+            )
+        );
+
 }

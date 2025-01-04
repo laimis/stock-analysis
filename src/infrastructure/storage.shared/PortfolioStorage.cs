@@ -102,6 +102,15 @@ namespace storage.shared
             return Save(option, _option_entity, userId);
         }
 
+        public async Task<FSharpOption<OptionPositionState>> GetOptionPosition(OptionPositionId positionId, UserId userId)
+        {
+            var positions = await _aggregateStorage.GetEventsAsync(_option_position_entity, positionId.Item, userId);
+            
+            var list = positions.ToList();
+            
+            return list.Count == 0 ? FSharpOption<OptionPositionState>.None : FSharpOption<OptionPositionState>.Some(OptionPosition.createFromEvents(list));
+        }
+
         public Task<IEnumerable<OptionPositionState>> GetOptionPositions(UserId userId)
         {
             return _aggregateStorage.GetEventsAsync(_option_position_entity, userId)
@@ -111,6 +120,14 @@ namespace storage.shared
 
         public Task SaveOptionPosition(UserId userId, FSharpOption<OptionPositionState> previousState, OptionPositionState newState) =>
             SaveEntityInternal(userId, previousState, newState, _option_position_entity);
+
+        public async Task DeleteOptionPosition(UserId userId, FSharpOption<OptionPositionState> previousState, OptionPositionState newState)
+        {
+            // first save so that we persist deleted event
+            await SaveOptionPosition(userId, previousState, newState);
+            
+            await _aggregateStorage.DeleteAggregate(_option_position_entity, newState.PositionId.Item, userId);
+        }
 
         private Task Save(IAggregate agg, string entityName, UserId userId)
         {

@@ -26,24 +26,6 @@ namespace web.Controllers
                 )
             );
         
-        [HttpGet("ownership/{ticker}")]
-        public Task<ActionResult> Ownership([FromRoute] string ticker) =>
-            this.OkOrError(
-                handler.Handle(
-                    new OwnershipQuery(
-                        ticker: new Ticker(ticker), userId: User.Identifier()
-                    )
-                )
-            );
-        
-        [HttpGet("{optionId:guid}")]
-        public Task<ActionResult> Get([FromRoute] Guid optionId) =>
-            this.OkOrError(
-                handler.Handle(
-                    new DetailsQuery(optionId: optionId, userId: User.Identifier()
-                    )
-                )
-            );
 
         [HttpPost("sell")]
         public Task<ActionResult> Sell([FromBody]OptionTransactionInput cmd)
@@ -64,14 +46,6 @@ namespace web.Controllers
                 )
             );
         }
-
-        [HttpDelete("{id}")]
-        public Task<ActionResult> Delete([FromRoute] Guid id)
-            => this.OkOrError(
-                handler.Handle(
-                    new DeleteCommand(id, User.Identifier())
-                )
-            );
 
         [HttpPost("{optionId}/expire")]
         public Task<ActionResult> Expire([FromRoute] Guid optionId)

@@ -1,7 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {OptionPosition, OwnedOption, StocksService} from '../../services/stocks.service';
+import {StocksService} from '../../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
+import {OptionPosition} from "../../services/option.service";
 
 @Component({
     selector: 'app-stock-option',

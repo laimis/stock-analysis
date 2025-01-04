@@ -282,3 +282,16 @@ public class OptionPositionIdConverter : JsonConverter<OptionPositionId>
         writer.WriteStringValue(value.Item.ToString());
     }
 }
+
+public class OptionExpirationConverter : JsonConverter<OptionExpiration>
+{
+    public override OptionExpiration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OptionExpiration.create(reader.GetString());
+    }
+    
+    public override void Write(Utf8JsonWriter writer, OptionExpiration value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}

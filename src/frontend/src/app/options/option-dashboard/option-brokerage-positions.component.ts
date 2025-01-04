@@ -2,7 +2,6 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {BrokerageOptionPosition, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {OptionService} from "../../services/option.service";
-import {OptionPositionsService} from "../../services/stockpositions.service";
 
 
 export interface BrokerageOptionPositionCollection {
@@ -59,7 +58,7 @@ export class OptionBrokeragePositionsComponent {
 
     constructor(
         private service: StocksService,
-        private optionPositionsService: OptionPositionsService
+        private optionPositionsService: OptionService
     ) {
     }
 

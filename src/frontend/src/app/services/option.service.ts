@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OptionDefinition, OptionPosition, OptionSpread, OwnedOption} from './stocks.service';
+import {OptionDefinition, OptionSpread } from './stocks.service';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 
@@ -25,6 +25,28 @@ function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDef
     return expirationMap
 }
 
+export interface OptionContract {
+    optionType: string
+    strikePrice: number
+    expiration: string
+    quantity: number
+    cost: number
+}
+export interface OptionPosition {
+    positionId: string
+    underlyingTicker: string
+    contracts: OptionContract[]
+    cost: number
+    profit: number
+    daysHeld: number
+    isOpen: boolean
+    isClosed: boolean
+    opened: string
+}
+
+export class openoptionpositioncommand {
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -32,9 +54,21 @@ export class OptionService {
     
     constructor(private http : HttpClient) {
     }
-    
+
+    open(command: openoptionpositioncommand): Observable<OptionPosition> {
+        return this.http.post<OptionPosition>('/api/portfolio/optionpositions', command)
+    }
+
+    get(positionId: string): Observable<OptionPosition> {
+        return this.http.get<OptionPosition>('/api/portfolio/optionpositions/' + positionId)
+    }
+
     getOptionPositionsForTicker(ticker: string): Observable<OptionPosition[]> {
-        return this.http.get<OptionPosition[]>(`/api/options/ownership/${ticker}`)
+        return this.http.get<OptionPosition[]>(`/api/portfolio/optionpositions/ownership/${ticker}`)
+    }
+
+    delete(id: string) {
+        return this.http.delete('/api/portfolio/optionpositions/' + id)
     }
 
     findBullPutSpreads(options: OptionDefinition[]): OptionSpread[] {
