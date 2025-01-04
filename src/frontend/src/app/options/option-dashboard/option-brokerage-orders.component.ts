@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOptionOrder, BrokerageStockOrder, OptionOrderLeg} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
+import {BrokerageOptionOrder, OptionOrderLeg} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-brokerage-orders',

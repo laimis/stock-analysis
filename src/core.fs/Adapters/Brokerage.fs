@@ -190,17 +190,17 @@ type StockPosition(ticker:Ticker, averageCost:decimal, quantity:decimal) =
     member val AverageCost = averageCost
     member val Quantity = quantity
     
-type OptionPosition() =
-    
-    member val Ticker : Ticker option = None with get, set
-    member val OptionType : string = "" with get, set
-    member val StrikePrice : decimal = 0m with get, set
-    member val Quantity : decimal = 0m with get, set
-    member val AverageCost : decimal = 0m with get, set
-    member val MarketValue : decimal option = None with get, set
-    member val ExpirationDate : string = "" with get, set
-    
-    member this.IsCall = if this.OptionType = "CALL" then "true" else "false"
+type OptionPosition =
+    {
+        Ticker: Ticker
+        OptionType: string
+        StrikePrice: decimal
+        Quantity: int
+        AverageCost: decimal
+        MarketValue: decimal option
+        ExpirationDate: string
+    }
+        member this.IsCall = if this.OptionType = "CALL" then "true" else "false"
     
 type BrokerageAccount() =
     

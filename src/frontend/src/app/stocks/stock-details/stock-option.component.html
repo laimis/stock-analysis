@@ -2,10 +2,18 @@
     @if (options) {
         <div>
             @for (option of options; track option) {
-                <div>
-                    {{ option.optionType }} &#64; {{ option.strikePrice | currency }}
-                    expires {{ option.expirationDate | date }}
-                    (<a [routerLink]="[ '/optiondetails', option.id ]">more info</a>)
+                <div class="card">
+                    <div class="card-header">
+                        <a [routerLink]="[ '/optiondetails', option.positionId ]">View Details</a>
+                    </div>
+                    <div class="card-body">
+                        @for (contract of option.contracts; track contract) {
+                            <div>
+                                {{ contract.optionType }} {{ contract.strikePrice }} {{ contract.expiration }}
+                                {{ contract.quantity }} contracts
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         </div>

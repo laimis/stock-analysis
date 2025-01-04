@@ -5,6 +5,7 @@
             No unresolved option positions found
         </div>
     }
+    <app-error-display [errors]="errors"></app-error-display>
     @if (positionCollections && positionCollections.length > 0) {
         <div class="table-responsive">
             <table class="table table-hover border">
@@ -28,8 +29,7 @@
                            title="P/L values are hidden by default. Click 'Show P/L' for each group to view."></i>
                     </th>
                     <th>Expiration</th>
-                    <th>Purchase Date</th>
-                    <th>Action</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -64,12 +64,6 @@
                                 </td>
                                 <td>{{ position.expirationDate | date }}</td>
                                 <td>
-                                    <input type="date" #purchaseDate class="form-control form-control-sm" [valueAsDate]="getTodaysDate()"/>
-                                </td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" (click)="turnIntoPosition(position, purchaseDate.value)">
-                                        Turn into Position
-                                    </button>
                                 </td>
                             </tr>
                         }
@@ -109,7 +103,13 @@
                             <td>
                                 <small>{{ getExpirationInDays(option) }} days to expiration</small>
                             </td>
-                            <td colspan="2"></td>
+                            <td>
+                                <label for="filledDate" class="form-label">Purchase Date</label>
+                                <input type="date" id="filledDate" #filledDate class="form-control form-control-sm" [valueAsDate]="getTodaysDate()"/>
+                                <button class="btn btn-primary btn-sm mt-1" (click)="turnIntoPosition(option, filledDate.value)">
+                                    Turn into Position
+                                </button>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -134,7 +134,7 @@
                             <strong>{{ totalMarketValue | currency }}</strong>
                         </div>
                     </td>
-                    <td colspan="4">
+                    <td colspan="3">
                         <div [class]="'pl-value blur-content ' + (showAllPL ? 'visible' : '')">
                             @if ((totalMarketValue - totalCost) >= 0) {
                                 <span class="profit-loss-badge profit-loss-positive">

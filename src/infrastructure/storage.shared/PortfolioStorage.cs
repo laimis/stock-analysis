@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Cryptos;
 using core.fs.Accounts;
 using core.fs.Adapters.Storage;
+using core.fs.Options;
 using core.fs.Stocks;
 using core.Options;
 using core.Routines;
@@ -23,6 +24,7 @@ namespace storage.shared
         public const string _routine_entity = "routine";
         public const string _pending_stock_position_entity = "pendingstockposition";
         public const string _stock_position_entity = "stockposition";
+        public const string _option_position_entity = "optionposition";
         
         public const string _note_entity = "note3"; // used to be used for stocks but it was modeled "weirdly" and ditched with of the software
 
@@ -79,10 +81,13 @@ namespace storage.shared
             return FSharpOption<StockPositionState>.Some(StockPosition.createFromEvents(list));
         }
 
-        public Task SaveStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, StockPositionState newState)
+        private Task SaveEntityInternal<T>(UserId userId, FSharpOption<T> previousState, T newState, string entityType) where T : IAggregate
         {
-            return _aggregateStorage.SaveEventsAsync(FSharpOption<StockPositionState>.get_IsNone(previousState) ? null : previousState.Value , newState, _stock_position_entity, userId);
+            return _aggregateStorage.SaveEventsAsync(FSharpOption<T>.get_IsNone(previousState) ? null : previousState.Value , newState, entityType, userId);
         }
+
+        public Task SaveStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, StockPositionState newState) =>
+            SaveEntityInternal(userId, previousState, newState, _stock_position_entity);
         
         public async Task DeleteStockPosition(UserId userId, FSharpOption<StockPositionState> previousState, StockPositionState state)
         {
@@ -95,6 +100,33 @@ namespace storage.shared
         public Task SaveOwnedOption(OwnedOption option, UserId userId)
         {
             return Save(option, _option_entity, userId);
+        }
+
+        public async Task<FSharpOption<OptionPositionState>> GetOptionPosition(OptionPositionId positionId, UserId userId)
+        {
+            var positions = await _aggregateStorage.GetEventsAsync(_option_position_entity, positionId.Item, userId);
+            
+            var list = positions.ToList();
+            
+            return list.Count == 0 ? FSharpOption<OptionPositionState>.None : FSharpOption<OptionPositionState>.Some(OptionPosition.createFromEvents(list));
+        }
+
+        public Task<IEnumerable<OptionPositionState>> GetOptionPositions(UserId userId)
+        {
+            return _aggregateStorage.GetEventsAsync(_option_position_entity, userId)
+                .ContinueWith(t => t.Result.GroupBy(e => e.AggregateId)
+                    .Select(OptionPosition.createFromEvents));
+        }
+
+        public Task SaveOptionPosition(UserId userId, FSharpOption<OptionPositionState> previousState, OptionPositionState newState) =>
+            SaveEntityInternal(userId, previousState, newState, _option_position_entity);
+
+        public async Task DeleteOptionPosition(UserId userId, FSharpOption<OptionPositionState> previousState, OptionPositionState newState)
+        {
+            // first save so that we persist deleted event
+            await SaveOptionPosition(userId, previousState, newState);
+            
+            await _aggregateStorage.DeleteAggregate(_option_position_entity, newState.PositionId.Item, userId);
         }
 
         private Task Save(IAggregate agg, string entityName, UserId userId)

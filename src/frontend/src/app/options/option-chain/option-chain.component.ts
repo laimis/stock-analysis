@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {OptionDefinition, OptionSpread, StocksService} from '../../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
-import {OptionService} from 'src/app/services/option.service';
+import {OptionDefinition, OptionService, OptionSpread} from 'src/app/services/option.service';
 import {GetErrors} from 'src/app/services/utils';
 
 @Component({
@@ -42,7 +41,6 @@ export class OptionChainComponent implements OnInit {
 
     constructor(
         private optionService: OptionService,
-        private service: StocksService,
         private route: ActivatedRoute) {
     }
 
@@ -52,7 +50,7 @@ export class OptionChainComponent implements OnInit {
             this.ticker = ticker;
         }
 
-        this.service.getOptionChain(this.ticker).subscribe(result => {
+        this.optionService.getOptionChain(this.ticker).subscribe(result => {
             this.volatility = result.volatility
             this.numberOfContracts = result.numberOfContracts
             this.options = result.options

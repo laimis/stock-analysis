@@ -5,6 +5,27 @@ open core.Options
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Options
     
+type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
+    
+    member this.PositionId = state.PositionId
+    member this.UnderlyingTicker = state.UnderlyingTicker
+    member this.Opened = state.Opened
+    member this.DaysHeld = state.DaysHeld
+    member this.Closed = state.Closed
+    member this.IsClosed = state.IsClosed
+    member this.IsOpen = state.IsOpen
+    member this.Cost = state.Cost
+    member this.Profit = state.Profit
+    member this.Transactions = state.Transactions
+    member this.Contracts =
+        state.Contracts.Keys
+        |> Seq.map (fun k ->
+            let chainDetail = chain |> Option.map(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
+            let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
+            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail|}
+        )
+    
+    
 type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail option) =
     
     let getItmOtmLabel (currentPrice:decimal) (optionType:string) (strikePrice:decimal) =
@@ -101,7 +122,7 @@ type OwnedOptionStats(summaries:seq<OwnedOptionView>) =
     member this.AverageDaysHeld = optionTrades |> List.map (fun s -> decimal s.DaysHeld) |> List.average
     member this.AverageDaysHeldPercentage = this.AverageDaysHeld / this.AverageDays
     
-type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OwnedOptionView>, brokeragePositions:seq<OptionPosition>, orders:seq<OptionOrder>) =
+type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<OptionPosition>, orders:seq<OptionOrder>) =
     
     member this.Closed = closed
     member this.Open = ``open``

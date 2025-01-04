@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {OwnedOption} from 'src/app/services/stocks.service';
 import {toggleVisuallyHidden} from "../../services/utils";
+import {OptionContract, OptionPosition} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-open',
@@ -12,41 +12,37 @@ import {toggleVisuallyHidden} from "../../services/utils";
 
 export class OptionOpenComponent {
 
-    premiumSum: number;
-    premiumCloseValueMin: number;
-    premiumCloseValueMax: number;
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
-
+    
+    cost : number = 0;
+    currentCost : number = 0;
+    
     constructor(private router: Router) {
     }
 
-    private _openOptions: OwnedOption[] = []
+    private _openOptions: OptionPosition[] = []
 
-    get openOptions(): OwnedOption[] {
+    get openOptions(): OptionPosition[] {
         return this._openOptions
     }
 
     @Input()
-    set openOptions(value: OwnedOption[]) {
+    set openOptions(value: OptionPosition[]) {
         if (value == null) {
             value = []
         }
         this._openOptions = value
-        this.premiumSum = value.reduce((a, b) => a - b.premiumPaid + b.premiumReceived, 0)
-        this.premiumCloseValueMin = value.reduce((a, b) => {
-            if (b.boughtOrSold == 'Bought') {
-                return a + b.detail?.bid
-            } else {
-                return a - b.detail?.ask
-            }
-        }, 0) * 100
-        this.premiumCloseValueMax = value.reduce((a, b) => {
-            if (b.boughtOrSold == 'Bought') {
-                return a + b.detail?.ask
-            } else {
-                return a - b.detail?.bid
-            }
-        }, 0) * 100
+        
+        this.cost = 
+            this.openOptions
+                .map(op => op.cost)
+                .reduce((acc, cost) => acc + cost, 0)
+        
+        this.currentCost =
+            this.openOptions
+                .map(op => op.contracts)
+                .flat()
+                .reduce((acc, contract) => acc + contract.quantity * contract.details.mark, 0)
     }
 
     onTickerSelected(ticker: string) {
@@ -58,18 +54,18 @@ export class OptionOpenComponent {
             })
     }
 
-    intrinsicValue(option: OwnedOption): number {
+    intrinsicValue(option: OptionContract): number {
         if (option.optionType == 'CALL') {
-            if (option.currentPrice > option.strikePrice) {
-                return option.currentPrice - option.strikePrice
+            if (option.details.currentPrice > option.strikePrice) {
+                return option.details.currentPrice - option.strikePrice
             } else {
                 return 0
             }
         }
 
         if (option.optionType == 'PUT') {
-            if (option.currentPrice < option.strikePrice) {
-                return option.strikePrice - option.currentPrice
+            if (option.details.currentPrice < option.strikePrice) {
+                return option.strikePrice - option.details.currentPrice
             } else {
                 return 0
             }
@@ -79,7 +75,9 @@ export class OptionOpenComponent {
         return 0
     }
 
-    extrinsicValue(option: OwnedOption): number {
-        return (option.detail?.ask + option.detail?.bid) / 2 - this.intrinsicValue(option)
+    positionCurrentCost(option: OptionPosition) {
+        return option.contracts
+            .map(contract => contract.quantity * contract.details.mark)
+            .reduce((acc, cost) => acc + cost, 0)
     }
 }

@@ -256,3 +256,42 @@ public class StockTransactionTypeConverter : GenericConverterWithToString<StockT
         throw new NotImplementedException();
     }
 }
+
+public class OptionTypeTypeConverter : JsonConverter<OptionType>
+{
+public override OptionType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+{
+    return OptionType.FromString(reader.GetString());
+}
+    
+public override void Write(Utf8JsonWriter writer, OptionType value, JsonSerializerOptions options)
+{
+    writer.WriteStringValue(value.ToString());
+}
+}
+
+public class OptionPositionIdConverter : JsonConverter<OptionPositionId>
+{
+    public override OptionPositionId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OptionPositionId.NewOptionPositionId(Guid.Parse(reader.GetString()));
+    }
+    
+    public override void Write(Utf8JsonWriter writer, OptionPositionId value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Item.ToString());
+    }
+}
+
+public class OptionExpirationConverter : JsonConverter<OptionExpiration>
+{
+    public override OptionExpiration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OptionExpiration.create(reader.GetString());
+    }
+    
+    public override void Write(Utf8JsonWriter writer, OptionExpiration value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}

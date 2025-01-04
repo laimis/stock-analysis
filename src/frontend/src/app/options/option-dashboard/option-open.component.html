@@ -18,102 +18,34 @@
         <div class="container mb-4">
             <div class="row">
                 <div class="col">
-                    Premium @if (premiumSum < 0) {
-                    <span>paid</span>
-                }
-                    @if (premiumSum >= 0) {
-                        <span>received</span>
-                    }: <span class="fw-bold">{{ premiumSum | currency }}</span>
+                    Cost: {{ cost | currency }}
                 </div>
                 <div class="col text-center">
-                    Premium value to close: <span class="fw-bold">{{ premiumCloseValueMin | currency }} - {{ premiumCloseValueMax | currency }}</span>
+                    Value Now: {{ currentCost | currency }}
                 </div>
                 <div class="col text-end">
-                    Net value: <span class="fw-bold">{{ premiumSum + premiumCloseValueMin | currency }}</span>
+                    Net value: <span class="fw-bold">{{ currentCost - cost | currency }}</span>
                 </div>
             </div>
         </div>
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th></th>
-                <th>Option</th>
-                <th>Expiration</th>
-                <th>Days Left</th>
-                <th>Price</th>
-                <th>OTM/ITM</th>
-                <th>Premium</th>
-                <th>Bid/Ask</th>
-                <th><small>Intrinsic/Extrinsic</small></th>
-                <th><small>Brokerage Intrinsic/Extrinsic</small></th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (option of openOptions; track option) {
-                    <tr>
-                        <td>
-              <span
-                  class="badge bg-primary"
-                  [ngClass]="{'bg-info': option.boughtOrSold === 'Bought', 'bg-secondary': option.boughtOrSold !== 'Bought'}">
-                {{ option.boughtOrSold }}
-              </span>
-                        </td>
-                        <td>
-                            <a [routerLink]="[ '/optiondetails', option.id ]">
-                <span class="font-weight-bold">
-                  {{ option.ticker }} {{ option.strikePrice | currency }} {{ option.optionType }}
-                </span>
-                            </a>
-                        </td>
-                        <td>{{ option.expirationDate | date:'MM/dd' }}</td>
-                        <td>
-                            {{ (option.days - option.daysHeld) | number }}
-                            @if (option.expiresSoon) {
-                                <span class="ml-1 badge bg-warning">expires soon</span>
-                            }
-                            @if (option.isExpired) {
-                                <span class="ml-1 badge bg-danger">expired</span>
-                            }
-                        </td>
-                        <td>
-                            <app-trading-view-link [ticker]="option.ticker"></app-trading-view-link>
-                            {{ option.currentPrice | currency }}
-                        </td>
-                        <td class="text-start">
-                            <span class="badge bg-primary"
-                                  [ngClass]="{'bg-warning': !option.isFavorable, 'bg-success': option.isFavorable}">{{ option.itmOtmLabel }}</span>
-                            {{ option.strikePriceDiff | percent }}
-                        </td>
-                        <td>
-                            {{ option.profit | currency }}
-                        </td>
-                        <td>
-                            {{ option.detail?.bid | currency }} / {{ option.detail?.ask | currency }}
-                        </td>
-                        <td>
-                            {{ intrinsicValue(option) | currency }} / {{ extrinsicValue(option) | currency }}
-                        </td>
-                        <td>
-                            <div #valueDiv>
-                                <!-- this is from the API vs our own calculated intrinsic / extrinsic value, rendering for comparisons -->
-                                {{ option.detail?.intrinsicValue | currency }}
-                                / {{ option.detail?.timeValue | currency }}
-                                <span class="btn btn-link btn-sm float-end"
-                                      (click)="toggleVisuallyHidden(greeksDiv); toggleVisuallyHidden(valueDiv)"
-                                      role="button">Show Greeks</span>
+        @for(position of openOptions; track position) {
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">{{position.underlyingTicker}}</div>
+                </div>
+                <div class="card-body">
+                    @for(contract of position.contracts; track contract) {
+                        <div class="row">
+                            <div class="col">
+                                {{contract.expiration}} {{contract.strikePrice | currency}} {{contract.optionType}}
                             </div>
-                            <div #greeksDiv class="visually-hidden">
-                                <span class="small">greeks: delta {{ option.detail?.delta }}
-                                    , gamma {{ option.detail?.gamma }}, theta {{ option.detail?.theta }}
-                                    , vega {{ option.detail?.vega }}, rho {{ option.detail?.rho }}</span>
-                                <span class="btn btn-link btn-sm float-end"
-                                      (click)="toggleVisuallyHidden(greeksDiv); toggleVisuallyHidden(valueDiv)"
-                                      role="button">Hide Greeks</span>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    Cost: {{position.cost | currency}} vs Value Now: {{positionCurrentCost(position) | currency}}
+                </div>
+            </div>
+        }
     </div>
 }

@@ -1,9 +1,7 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-    DailyPositionReport, DataPointContainer,
-    OptionChain,
-    OptionDefinition,
+    DailyPositionReport,
     PositionInstance,
     StockQuote,
     StocksService,
@@ -13,11 +11,6 @@ import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
-import { Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CanvasJS } from '@canvasjs/angular-charts';
-
-
-   
 
 function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares

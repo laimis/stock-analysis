@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOptionPosition, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
+import {BrokerageOptionPosition, OptionService} from "../../services/option.service";
 
 
 export interface BrokerageOptionPositionCollection {
@@ -56,7 +56,7 @@ export class OptionBrokeragePositionsComponent {
     protected readonly Date = Date;
 
     constructor(
-        private service: StocksService
+        private optionService: OptionService
     ) {
     }
 
@@ -74,9 +74,9 @@ export class OptionBrokeragePositionsComponent {
     }
     
     getExpirationInDays(option: BrokerageOptionPositionCollection) {
-        let numberOfDaysFromNow = (date: number) => {
+        let numberOfDaysFromNow = (date: string) => {
             let millisPerDay = 1000 * 60 * 60 * 24
-            return Math.floor((new Date(date).getTime() - new Date().getTime()) / (millisPerDay))
+            return Math.floor((new Date(Date.parse(date)).getTime() - new Date().getTime()) / (millisPerDay))
         }
         
         // all the expiration dates in number of days, sorted and deduped
@@ -89,24 +89,40 @@ export class OptionBrokeragePositionsComponent {
         return expirations.join(' / ')
     }
 
-    turnIntoPosition(position: BrokerageOptionPosition, purchased: string) {
-        let opt = {
-            ticker: position.ticker,
-            strikePrice: position.strikePrice,
-            optionType: position.optionType,
-            expirationDate: new Date(position.expirationDate),
-            numberOfContracts: Math.abs(position.quantity),
-            premium: position.averageCost * 100,
-            filled: purchased,
-            notes: null
+    turnIntoPosition(position: BrokerageOptionPositionCollection, filledDate: string) {
+        console.log('mapping', position, filledDate)
+        
+        // this will need to be completely rewritten
+        let command = {
+            underlyingTicker: position.positions[0].ticker,
+            filled: filledDate,
+            legs: position.positions.map(l => ({
+                quantity: l.quantity,
+                strikePrice: l.strikePrice,
+                expirationDate: l.expirationDate,
+                optionType: l.optionType,
+                cost: l.averageCost,
+                filled: filledDate
+            }))
         }
-
-        if (position.quantity > 0) this.recordBuy(opt)
-        if (position.quantity < 0) this.recordSell(opt)
+        
+        this.optionService.open(command).subscribe({
+                next: (position) => {
+                    console.log('next', position)
+                },
+                error: (err) => {
+                    console.log('error', err)
+                    this.errors = GetErrors(err)
+                },
+                complete: () => {
+                    console.log('complete')
+                }
+            }
+        )
     }
 
     recordBuy(opt: object) {
-        this.service.buyOption(opt).subscribe(r => {
+        this.optionService.buyOption(opt).subscribe(r => {
             this.positionsUpdated.emit()
         }, err => {
             this.errors = GetErrors(err)
@@ -114,7 +130,7 @@ export class OptionBrokeragePositionsComponent {
     }
 
     recordSell(opt: object) {
-        this.service.sellOption(opt).subscribe(r => {
+        this.optionService.sellOption(opt).subscribe(r => {
             this.positionsUpdated.emit()
         }, err => {
             this.errors = GetErrors(err)

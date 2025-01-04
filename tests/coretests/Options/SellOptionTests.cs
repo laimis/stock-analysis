@@ -8,7 +8,6 @@ using core.fs.Adapters.Logging;
 using core.Options;
 using Moq;
 using Xunit;
-using Handler = core.fs.Options.Handler;
 
 namespace coretests.Options
 {
@@ -34,7 +33,7 @@ namespace coretests.Options
 
             var account = _fixture.CreateAccountStorageWithUserAsync();
 
-            var handler = new Handler(account, Mock.Of<IBrokerage>(), mock.Object, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
+            var handler = new OptionsHandler(account, Mock.Of<IBrokerage>(), mock.Object, Mock.Of<ICSVWriter>(), Mock.Of<ILogger>());
 
             await handler.Handle(
                 OptionsTestsFixture.CreateSellCommand());

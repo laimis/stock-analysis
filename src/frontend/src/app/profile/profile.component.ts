@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {GetErrors} from '../services/utils';
 import {GlobalService} from "../services/global.service";
 import {max} from "rxjs/operators";
+import {OptionService} from "../services/option.service";
 
 @Component({
     selector: 'app-profile',
@@ -29,6 +30,7 @@ export class ProfileComponent implements OnInit {
     constructor(
         private global: GlobalService,
         private service: StocksService,
+        private optionService: OptionService,
         private router: Router) {
     }
 
@@ -102,7 +104,7 @@ export class ProfileComponent implements OnInit {
 
         let formData: FormData = this.getFormData($event);
 
-        this.service.importOptions(formData).subscribe(
+        this.optionService.importOptions(formData).subscribe(
             _ => this.markSuccess('Options imported'),
             e => this.markError(e)
         )

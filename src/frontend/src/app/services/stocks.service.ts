@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
+import {BrokerageOptionOrder} from "./option.service";
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -217,52 +218,6 @@ export class StocksService {
 
     importStocks(file: any): Observable<any> {
         return this.http.post('/api/portfolio/stockpositions/import', file)
-    }
-
-    getOptions(): Observable<OptionsContainer> {
-        return this.http.get<OptionsContainer>('/api/options')
-    }
-
-    // ------- options ----------------
-
-    deleteOption(id: string) {
-        return this.http.delete('/api/options/' + id)
-    }
-
-    buyOption(obj: object): Observable<any> {
-        return this.http.post<string>('/api/options/buy', obj)
-    }
-
-    sellOption(obj: object): Observable<any> {
-        return this.http.post<string>('/api/options/sell', obj)
-    }
-
-    getOption(id: string): Observable<OwnedOption> {
-        return this.http.get<OwnedOption>('/api/options/' + id)
-    }
-
-    closeOption(obj: object): Observable<any> {
-        return this.http.post('/api/options/close', obj)
-    }
-
-    getOwnedOptions(ticker: string): Observable<OwnedOption[]> {
-        return this.http.get<OwnedOption[]>(`/api/options/ownership/${ticker}`)
-    }
-
-    getOptionChain(ticker: string): Observable<OptionChain> {
-        return this.http.get<OptionChain>(`/api/options/chain/${ticker}`)
-    }
-
-    importOptions(formData: FormData) {
-        return this.http.post('/api/options/import', formData)
-    }
-
-    expireOption(optionId: string): Observable<any> {
-        return this.http.post('/api/options/' + optionId + '/expire', {})
-    }
-
-    assignOption(optionId: string): Observable<any> {
-        return this.http.post('/api/options/' + optionId + '/assign', {})
     }
 
     // ---------- accounts ---------
@@ -704,72 +659,6 @@ export class Dashboard {
     openCryptoCount: number
 }
 
-export class OwnedOption {
-    id: string
-    currentPrice: number
-    ticker: string
-    optionType: string
-    expirationDate: string
-    strikePrice: number
-    numberOfContracts: number
-    boughtOrSold: string
-    premiumReceived: number
-    profit: number
-    transactions: Transaction[]
-    isFavorable: boolean
-    itmOtmLabel: string
-    strikePriceDiff: number
-    days: number
-    daysHeld: number
-    isExpired: boolean
-    expiresSoon: boolean
-    assigned: boolean
-    closed: string
-    premiumPaid: number
-    premiumCapture: number
-    detail: OptionDefinition
-}
-
-export class OptionStats {
-    count: number
-    wins: number
-    assigned: number
-    averagePremiumCapture: number
-
-    avgWinAmount: number
-    losses: number
-    averageLossAmount: number
-    maxWinAmount: number
-    maxLossAmount: number
-
-    ev: number
-    averageProfitPerDay: number
-    averageDays: number
-    averageDaysHeld: number
-    averageDaysHeldPercentage: number
-}
-
-export interface BrokerageOptionPosition {
-    ticker: string
-    averageCost: number
-    quantity: number
-    description: string
-    optionType: string
-    strikePrice: number
-    marketValue: number
-    expirationDate: number
-}
-
-export interface OptionsContainer {
-    open: OwnedOption[]
-    closed: OwnedOption[]
-    brokeragePositions: BrokerageOptionPosition[]
-    orders: BrokerageOptionOrder[]
-    overallStats: OptionStats
-    buyStats: OptionStats
-    sellStats: OptionStats
-}
-
 export interface PriceBar {
     dateStr: string
     close: number
@@ -1065,34 +954,6 @@ export interface BrokerageStockOrder {
     isCancelledOrRejected: boolean
 }
 
-export interface OptionOrderLeg {
-    legId : string
-    cusip : string
-    ticker : string
-    description: string
-    optionType: string
-    underlyingTicker : string
-    instruction: string
-    quantity: number
-    price: number
-}
-
-export interface BrokerageOptionOrder {
-    orderId: string
-    price: number
-    type: string
-    quantity: number
-    status: string
-    instruction: string
-    description: string
-    executionTime: string
-    enteredTime: string
-    canBeCancelled: boolean
-    canBeRecorded: boolean
-    isActive: boolean
-    legs: OptionOrderLeg[]
-}
-
 export interface BrokerageStockPositionInstance {
     ticker: string
     quantity: number
@@ -1237,85 +1098,6 @@ export interface TradingStrategyPerformance {
     strategyName: string
     numberOfOpenPositions: number
 }
-
-export class OptionDefinition {
-    id: string
-    description: string
-    symbol: string
-    ticker: string
-    side: string
-    openInterest: number
-    strikePrice: number
-    expirationDate: string
-    optionType: string
-    numberOfContracts: number
-    bid: number
-    ask: number
-    last: number
-    mark: number
-    spread: number
-    perDayPrice: number
-    lastUpdated: string
-    premium: number
-    filled: string
-    closed: string
-    breakEven: number
-    risk: number
-    volume: number
-    boughtOrSold: string
-    expiresSoon: boolean
-    isExpired: boolean
-    profit: number
-    strikePriceDiff: number
-    currentPrice: number
-    isFavorable: boolean
-    itmOtmLabel: string
-    days: number
-    daysToExpiration: number
-    daysHeld: number
-    transactions: Transaction[]
-    volatility: number
-    delta: number
-    gamma: number
-    theta: number
-    vega: number
-    rho: number
-    timeValue: number
-    intrinsicValue: number
-}
-
-export class OptionSpread {
-    name: string
-    premiumReceived?: number
-    premiumPaid?: number
-    risk: number
-    maxGain: number
-    legs: OptionLeg[]
-}
-
-export class OptionLeg {
-    action: string
-    option: OptionDefinition
-}
-
-export class OptionBreakdown {
-    callVolume: number
-    putVolume: number
-    callSpend: number
-    putSpend: number
-    priceBasedOnCalls: number
-    priceBasedOnPuts: number
-}
-
-export interface OptionChain {
-    stockPrice: number
-    volatility: number
-    numberOfContracts: number
-    expirations: string[]
-    breakdown: OptionBreakdown
-    options: OptionDefinition[]
-}
-
 export class AccountStatus {
     username: string
     email: string
@@ -1378,7 +1160,6 @@ export class openpositioncommand {
     stopPrice: number | null
     strategy: string | null
 }
-
 export class pendingstockpositioncommand {
     ticker: string
     numberOfShares: number
