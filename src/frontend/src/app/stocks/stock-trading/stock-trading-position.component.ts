@@ -54,6 +54,15 @@ export class StockTradingPositionComponent {
             this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
             this.positionProfitPoints = []
             this.setCandidateValues()
+            if (v.isOpen) {
+                this.updatePositionOrders()
+            }
+        }
+    }
+    
+    toggleOrders() {
+        this.showOrderForm = !this.showOrderForm
+        if (this.showOrderForm) {
             this.updatePositionOrders()
         }
     }

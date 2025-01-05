@@ -139,7 +139,7 @@
                     <label class="form-label stat-label" for="candidateRiskAmount"></label>
                     <div>
                         <button class="btn btn-outline-secondary btn-sm" (click)="fetchProfitPoints()">Profit Points</button>
-                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="showOrderForm = !showOrderForm">Order Form</button>
+                        <button class="btn btn-outline-secondary btn-sm ms-2" (click)="toggleOrders()">Order Form</button>
                         <button class="btn btn-sm btn-outline-secondary ms-2" (click)="openCloseModal()" *ngIf="_position.isOpen">Close</button>
 
                     </div>
