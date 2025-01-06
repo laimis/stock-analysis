@@ -177,3 +177,25 @@ let ``Setting notes works``() =
     let note = positionWithNotes.Notes |> Seq.head |> _.content
     
     note |> should equal notes.Value
+
+[<Fact>]
+let ``Labels work``() =
+    
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    position.Labels |> should be Empty
+    
+    let testKey = "TestKey"
+    let testValue = "TestValue"
+    
+    let positionWithLabel = position |> OptionPosition.setLabel testKey testValue DateTimeOffset.UtcNow
+    
+    positionWithLabel.Labels |> should haveCount 1
+    
+    let label = positionWithLabel.Labels[testKey]
+    
+    label |> should equal testValue
+    
+    let positionWithLabelRemoved = positionWithLabel |> OptionPosition.deleteLabel testKey DateTimeOffset.UtcNow
+    
+    positionWithLabelRemoved.Labels |> should be Empty

@@ -1,6 +1,7 @@
 namespace core.fs.Options
 
 open System
+open System.Collections.Generic
 open core.Shared
 
 type OptionPositionId = OptionPositionId of Guid
@@ -86,6 +87,7 @@ type OptionPositionState =
         Transactions: OptionTransaction list
         Contracts: Map<OptionContract, QuantityAndCost>
         Notes: core.fs.Note list
+        Labels: Dictionary<string, string>
         Version: int
         Events: AggregateEvent list
     }
@@ -161,8 +163,16 @@ type OptionPositionDeleted(id, aggregateId, ``when``) =
     
 type OptionPositionNotesAdded(id, aggregateId, ``when``, content:string) =
     inherit AggregateEvent(id, aggregateId, ``when``)
-    
     member this.Content = content
+    
+type OptionPositionLabelSet(id, aggregateId, ``when``, key:string, value:string) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Key = key
+    member this.Value = value
+    
+type OptionPositionLabelDeleted(id, aggregateId, ``when``, key:string) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Key = key
 
 module OptionPosition =
     
@@ -182,6 +192,7 @@ module OptionPosition =
             Cost = 0m
             Version = 1
             Notes = []
+            Labels = Dictionary<string, string>()
             Transactions = []
             Contracts = Map.empty
             Events = [event]
@@ -252,6 +263,14 @@ module OptionPosition =
             { p with Transactions = p.Transactions @ [exerciseTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionPositionDeleted as x ->
+            { p with Version = p.Version + 1; Events = p.Events @ [x] }
+            
+        | :? OptionPositionLabelSet as x ->
+            p.Labels[x.Key] <- x.Value
+            { p with Version = p.Version + 1; Events = p.Events @ [x] }
+            
+        | :? OptionPositionLabelDeleted as x ->
+            p.Labels.Remove(x.Key) |> ignore
             { p with Version = p.Version + 1; Events = p.Events @ [x] }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
@@ -432,6 +451,27 @@ module OptionPosition =
         
     let addNotes = applyNotesIfApplicable
     
-    
+    let setLabel key value date position =
+        
+        match key with
+        | x when String.IsNullOrWhiteSpace(x) -> failwith "Key cannot be empty"
+        | x when position.Labels.ContainsKey(x) && position.Labels[x] = value -> position
+        | _ when String.IsNullOrWhiteSpace(value) -> failwith "Value cannot be empty"
+        | _ ->
+            let e = OptionPositionLabelSet(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, key, value)
+            apply e position
+            
+    let setLabelIfValueNotNone key value date position =
+        match value with
+        | None -> position
+        | Some value -> setLabel key value date position
+        
+    let deleteLabel key date position =
+        match key with
+        | x when String.IsNullOrWhiteSpace(x) -> failwith "Key cannot be empty"
+        | x when position.Labels.ContainsKey(x) |> not -> position
+        | _ ->
+            let e = OptionPositionLabelDeleted(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, key)
+            apply e position
         
             
