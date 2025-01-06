@@ -169,7 +169,7 @@ export class OptionStats {
     averageDaysHeldPercentage: number
 }
 
-export interface BrokerageOptionPosition {
+export interface BrokerageOptionContract {
     ticker: string
     averageCost: number
     quantity: number
@@ -213,7 +213,7 @@ export interface BrokerageOptionOrder {
 export interface OptionsContainer {
     open: OptionPosition[]
     closed: OwnedOption[]
-    brokeragePositions: BrokerageOptionPosition[]
+    brokeragePositions: BrokerageOptionContract[]
     orders: BrokerageOptionOrder[]
     overallStats: OptionStats
     buyStats: OptionStats

@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
-import {BrokerageOptionPosition, OptionService} from "../../services/option.service";
+import {BrokerageOptionContract, OptionService} from "../../services/option.service";
 
 
-export interface BrokerageOptionPositionCollection {
-    positions: BrokerageOptionPosition[]
+export interface BrokerageOptionPosition {
+    brokerageContracts: BrokerageOptionContract[]
     cost: number
     marketValue: number
     showPL: boolean
@@ -18,14 +18,14 @@ export interface BrokerageOptionPositionCollection {
 })
 export class OptionBrokeragePositionsComponent {
     errors: string[];
-    private _positions: BrokerageOptionPosition[];
+    private _positions: BrokerageOptionContract[];
     totalMarketValue: number;
     totalCost: number;
-    positionCollections: BrokerageOptionPositionCollection[]
+    positionCollections: BrokerageOptionPosition[]
     showAllPL: boolean = false;
     
     @Input()
-    set positions(val: BrokerageOptionPosition[])
+    set positions(val: BrokerageOptionContract[])
     {
     this._positions = val
         this.totalMarketValue = this._positions.reduce((acc, pos) => acc + pos.marketValue, 0)
@@ -38,13 +38,13 @@ export class OptionBrokeragePositionsComponent {
             if (!acc[key]) acc[key] = []
             acc[key].push(pos)
             return acc
-        }, {} as {[key: string]: BrokerageOptionPosition[]})
+        }, {} as {[key: string]: BrokerageOptionContract[]})
         
         for (let key in grouped) {
             let positions = grouped[key]
             let cost = positions.reduce((acc, pos) => acc + pos.averageCost * pos.quantity, 0) * 100
             let marketValue = positions.reduce((acc, pos) => acc + pos.marketValue, 0)
-            this.positionCollections.push({positions, cost, marketValue, showPL: false})
+            this.positionCollections.push({brokerageContracts: positions, cost, marketValue, showPL: false})
         }
     }
     get positions() {
@@ -60,7 +60,7 @@ export class OptionBrokeragePositionsComponent {
     ) {
     }
 
-    togglePL(option: BrokerageOptionPositionCollection) {
+    togglePL(option: BrokerageOptionPosition) {
         option.showPL = !option.showPL;
     }
 
@@ -73,7 +73,7 @@ export class OptionBrokeragePositionsComponent {
         return new Date()
     }
     
-    getExpirationInDays(option: BrokerageOptionPositionCollection) {
+    getExpirationInDays(option: BrokerageOptionPosition) {
         let numberOfDaysFromNow = (date: string) => {
             let millisPerDay = 1000 * 60 * 60 * 24
             return Math.floor((new Date(Date.parse(date)).getTime() - new Date().getTime()) / (millisPerDay))
@@ -81,7 +81,7 @@ export class OptionBrokeragePositionsComponent {
         
         // all the expiration dates in number of days, sorted and deduped
         let expirations =
-            option.positions.map(p => numberOfDaysFromNow(p.expirationDate))
+            option.brokerageContracts.map(p => numberOfDaysFromNow(p.expirationDate))
                 .sort((a, b) => a - b)
                 .filter((val, idx, arr) => arr.indexOf(val) === idx)
         
@@ -89,14 +89,14 @@ export class OptionBrokeragePositionsComponent {
         return expirations.join(' / ')
     }
 
-    turnIntoPosition(position: BrokerageOptionPositionCollection, filledDate: string) {
+    turnIntoPosition(position: BrokerageOptionPosition, filledDate: string) {
         console.log('mapping', position, filledDate)
         
         // this will need to be completely rewritten
         let command = {
-            underlyingTicker: position.positions[0].ticker,
+            underlyingTicker: position.brokerageContracts[0].ticker,
             filled: filledDate,
-            legs: position.positions.map(l => ({
+            legs: position.brokerageContracts.map(l => ({
                 quantity: l.quantity,
                 strikePrice: l.strikePrice,
                 expirationDate: l.expirationDate,

@@ -34,7 +34,7 @@
                 </thead>
                 <tbody>
                     @for (option of positionCollections; track option) {
-                        @for(position of option.positions; track position) {
+                        @for(position of option.brokerageContracts; track position) {
                             <tr>
                                 <td>
                                     <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
@@ -104,7 +104,7 @@
                                 <small>{{ getExpirationInDays(option) }} days to expiration</small>
                             </td>
                             <td>
-                                <label for="filledDate" class="form-label">Purchase Date</label>
+                                <label for="filledDate" class="form-label">Filled Date</label>
                                 <input type="date" id="filledDate" #filledDate class="form-control form-control-sm" [valueAsDate]="getTodaysDate()"/>
                                 <button class="btn btn-primary btn-sm mt-1" (click)="turnIntoPosition(option, filledDate.value)">
                                     Turn into Position
