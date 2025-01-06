@@ -96,7 +96,7 @@ module SingleBarPriceAnalysis =
                 yield AnalysisOutcome (SingleBarOutcomeKeys.DollarChange, percentChangeOutcomeType, dollarChange, ValueFormat.Currency, $"Dollar change from close is {currentBar.Close - yesterday.Close}.")
                 
                 // generate percent change statistical data for NumberOfDaysForRecentAnalysis days
-                let descriptor = Constants.NumberOfDaysForRecentAnalysis |> previousBars.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
+                let descriptor = Constants.NumberOfDaysForRecentAnalysis |> previousBars.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars true
                 
                 // for some price feeds, price has finished changing, so mean and
                 // standard deviation will be 0, we need to check for that so that we don't divide by 0

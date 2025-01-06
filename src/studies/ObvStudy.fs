@@ -127,7 +127,7 @@ let analyzeDivergences period (report:DailyPositionBreakdown) =
     |}
     
 let runStudy (context:EnvironmentContext) (state:UserState) = async {
-    let handler = context.Host.Services.GetService(typeof<core.fs.Reports.Handler>) :?> core.fs.Reports.Handler
+    let handler = context.Host.Services.GetService(typeof<core.fs.Reports.ReportsHandler>) :?> core.fs.Reports.ReportsHandler
     
     callLogFuncIfSetup _.LogInformation("was able to get it to work: " + handler.GetType().ToString())
     let startDate = "2024-03-28" |> Some

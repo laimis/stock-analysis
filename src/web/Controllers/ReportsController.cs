@@ -13,7 +13,7 @@ namespace web.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class ReportsController(Handler service) : ControllerBase
+    public class ReportsController(ReportsHandler service) : ControllerBase
     {
         [HttpGet("chain")]
         public Task<ChainView> Chain() =>

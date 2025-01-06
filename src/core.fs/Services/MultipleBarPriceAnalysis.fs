@@ -369,7 +369,7 @@ module MultipleBarPriceAnalysis =
             
         let private generatePercentChangeAverageOutcome (prices: PriceBars) =
             
-            let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
+            let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars false
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.PercentChangeAverage,
@@ -381,13 +381,13 @@ module MultipleBarPriceAnalysis =
             
         let private generatePercentChangeStandardDeviationOutcome (prices: PriceBars) =
             
-            let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars
+            let descriptor = prices |> recentBars |> PercentChangeAnalysis.calculateForPriceBars false
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.PercentChangeStandardDeviation,
                 outcomeType = OutcomeType.Neutral,
                 value = descriptor.stdDev,
-                valueType = ValueFormat.Number,
+                valueType = ValueFormat.Percentage,
                 message = $"%% Change StD: {descriptor.stdDev}"
             )
             

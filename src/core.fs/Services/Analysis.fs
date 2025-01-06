@@ -302,5 +302,5 @@ module PercentChangeAnalysis =
 
         DistributionStatistics.calculate percentChanges
         
-    let calculateForPriceBars (priceBars:PriceBars) =
-        priceBars.ClosingPrices() |> calculate true
+    let calculateForPriceBars multipleByHundred (priceBars:PriceBars) =
+        priceBars.ClosingPrices() |> calculate multipleByHundred

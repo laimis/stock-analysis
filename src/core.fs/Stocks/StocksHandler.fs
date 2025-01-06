@@ -54,7 +54,7 @@ type PricesQuery =
     
 type PricesView(prices:PriceBars) =
     member _.MovingAverages = prices |> MovingAveragesContainer.Generate
-    member _.PercentChanges = prices |> PercentChangeAnalysis.calculateForPriceBars
+    member _.PercentChanges = prices |> PercentChangeAnalysis.calculateForPriceBars true
     member _.Prices = prices.Bars
     member _.ATR =
         let atrContainer = prices|> MultipleBarPriceAnalysis.Indicators.averageTrueRage

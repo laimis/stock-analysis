@@ -242,7 +242,7 @@ type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote
         })
         
     
-type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHours,storage:IPortfolioStorage) =
+type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHours,storage:IPortfolioStorage) =
     
     let getLevel (position:StockPositionWithCalculations) =
         match position.Profit |> abs with
@@ -655,8 +655,8 @@ type Handler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHo
                     None
             
             return pricesResponse |> Result.map (fun prices ->
-                let recent = 30 |> prices.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars
-                let allTime = prices |> PercentChangeAnalysis.calculateForPriceBars
+                let recent = 30 |> prices.LatestOrAll |> PercentChangeAnalysis.calculateForPriceBars true
+                let allTime = prices |> PercentChangeAnalysis.calculateForPriceBars true
                 {Ticker=query.Ticker.Value; Recent=recent; AllTime=allTime}
             )
     }
