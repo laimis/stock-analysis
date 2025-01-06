@@ -85,6 +85,7 @@ type OptionPositionState =
         Profit: decimal
         Transactions: OptionTransaction list
         Contracts: Map<OptionContract, QuantityAndCost>
+        Notes: core.fs.Note list
         Version: int
         Events: AggregateEvent list
     }
@@ -157,16 +158,21 @@ type OptionContractsExercised(id, aggregateId, ``when``, expiration:string, stri
     
 type OptionPositionDeleted(id, aggregateId, ``when``) =
     inherit AggregateEvent(id, aggregateId, ``when``)
+    
+type OptionPositionNotesAdded(id, aggregateId, ``when``, content:string) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    
+    member this.Content = content
 
 module OptionPosition =
     
     // ensure that the option is stored as yyyy-MM-dd, and can be converted to datetime offset
-    let toOptionExpirationDate (date:string) =
+    let private toOptionExpirationDate (date:string) =
         match DateTimeOffset.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None) with 
         | true, d -> d
         | _ -> failwith "Invalid date format. Expected yyyy-MM-dd"
         
-    let createInitialState (event: OptionPositionOpened) : OptionPositionState=
+    let private createInitialState (event: OptionPositionOpened) : OptionPositionState=
         {
             PositionId = event.PositionId
             Closed = None
@@ -175,6 +181,7 @@ module OptionPosition =
             Profit = 0m
             Cost = 0m
             Version = 1
+            Notes = []
             Transactions = []
             Contracts = Map.empty
             Events = [event]
@@ -186,6 +193,9 @@ module OptionPosition =
         
         | :? OptionPositionOpened as _ ->
             p // pass through, this should be done by createInitialState
+            
+        | :? OptionPositionNotesAdded as x ->
+            { p with Notes = p.Notes @ [{created = x.When; content = x.Content; id = x.Id }]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractBoughtToOpen as x ->
             let debit = decimal x.Quantity * x.Price
@@ -251,12 +261,21 @@ module OptionPosition =
         let state = events |> Seq.head :?> OptionPositionOpened |> createInitialState
         events |> Seq.skip 1 |> Seq.fold (fun acc e -> apply e acc) state
 
-    let failIfInvalidDate date =
+    let private failIfInvalidDate date =
         if date < DateTimeOffset.UnixEpoch then
             failwith ("Date after " + DateTimeOffset.UnixEpoch.ToString() + " is required")
             
         if date.Subtract(DateTimeOffset.UtcNow).TotalHours >= 12 then
             failwith "Date cannot be in the future"
+            
+    let private applyNotesIfApplicable notes date position =
+        match notes with
+            | None -> position
+            | Some notes when String.IsNullOrWhiteSpace(notes) -> position
+            | Some notes when position.Notes |> List.exists (fun n -> n.content = notes) -> position
+            | Some notes ->
+                let e = OptionPositionNotesAdded(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, notes)
+                apply e position
             
     let ``open`` (ticker:Ticker) date =
         date |> failIfInvalidDate
@@ -297,7 +316,7 @@ module OptionPosition =
     let private findMatchingTransactions (expiration:string) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
         position.Transactions
         |> List.filter (fun x -> x.Expiration = expiration && x.OptionType = optionType.ToString() && x.Strike = strike)
-        
+    
     let buyToOpen (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         verifyOptionTransactionParams expiration strike quantity price date position
@@ -410,5 +429,9 @@ module OptionPosition =
     let delete position =
         let e = OptionPositionDeleted(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow)
         apply e position
+        
+    let addNotes = applyNotesIfApplicable
+    
+    
         
             

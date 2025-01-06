@@ -48,7 +48,7 @@ module PercentChangesTests =
     
 module RealBarsTests =
     
-    let percentChanges = TestDataGenerator.PriceBars(TestDataGenerator.NET) |> PercentChangeAnalysis.calculateForPriceBars
+    let percentChanges = TestDataGenerator.PriceBars(TestDataGenerator.NET) |> PercentChangeAnalysis.calculateForPriceBars true
 
     [<Fact>]
     let ``Mean is correct``() = Assert.Equal(0.05m, percentChanges.mean, 2)

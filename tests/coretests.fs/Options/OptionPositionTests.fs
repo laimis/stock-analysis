@@ -160,3 +160,20 @@ let ``Assign fails if there are no contracts to assign``() =
         |> ignore)
     |> should throw typeof<InvalidOperationException>
     
+    
+[<Fact>]
+let ``Setting notes works``() =
+    
+    let notes = "This is a test" |> Some
+    
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    position.Notes |> should be Empty
+    
+    let positionWithNotes = position |> OptionPosition.addNotes notes DateTimeOffset.UtcNow
+    
+    positionWithNotes.Notes.Length |> should equal 1
+    
+    let note = positionWithNotes.Notes |> Seq.head |> _.content
+    
+    note |> should equal notes.Value
