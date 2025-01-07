@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {PositionInstance} from 'src/app/services/stocks.service';
 import {stockClosedPositionExportLink} from "../../services/links.service";
-import {GetStrategies} from "../../services/utils";
+import {GetStockStrategies} from "../../services/utils";
 
 
 @Component({
@@ -79,7 +79,7 @@ export class StockTradingClosedPositionsComponent {
             .filter((v, i, a) => v !== null && a.indexOf(v) === i) // unique
             .forEach(s => this.strategies.push(s))
 
-        GetStrategies().forEach(
+        GetStockStrategies().forEach(
             s => {
                 if (this.strategies.indexOf(s.key) === -1) {
                     this.strategies.push(s.key)

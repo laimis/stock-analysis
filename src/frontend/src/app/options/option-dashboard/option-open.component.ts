@@ -80,4 +80,6 @@ export class OptionOpenComponent {
             .map(contract => contract.quantity * contract.details.mark)
             .reduce((acc, cost) => acc + cost, 0)
     }
+
+    protected readonly open = open;
 }

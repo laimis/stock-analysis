@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {GetErrors} from 'src/app/services/utils';
+import {GetErrors, GetOptionStrategies} from 'src/app/services/utils';
 import {BrokerageOptionContract, OptionService} from "../../services/option.service";
 
 
@@ -58,6 +58,7 @@ export class OptionBrokeragePositionsComponent {
     constructor(
         private optionService: OptionService
     ) {
+        this.optionStrategies = GetOptionStrategies()
     }
 
     togglePL(option: BrokerageOptionPosition) {
@@ -88,6 +89,20 @@ export class OptionBrokeragePositionsComponent {
         // concat them all together with a / separator
         return expirations.join(' / ')
     }
+    
+    selectedOption: BrokerageOptionPosition;
+    positionNotes: string;
+    positionStrategy: string;
+    optionStrategies: { key: string, value: string }[] = []
+    isPaperPosition: boolean;
+    
+    openPositionDialog(position:BrokerageOptionPosition) {
+        this.selectedOption = position
+    }
+    
+    createPosition(filledDate:string) {
+        this.turnIntoPosition(this.selectedOption, filledDate)
+    }
 
     turnIntoPosition(position: BrokerageOptionPosition, filledDate: string) {
         console.log('mapping', position, filledDate)
@@ -96,7 +111,10 @@ export class OptionBrokeragePositionsComponent {
         let command = {
             underlyingTicker: position.brokerageContracts[0].ticker,
             filled: filledDate,
-            legs: position.brokerageContracts.map(l => ({
+            notes: this.positionNotes,
+            strategy: this.positionStrategy,
+            isPaperPosition: this.isPaperPosition,
+            contracts: position.brokerageContracts.map(l => ({
                 quantity: l.quantity,
                 strikePrice: l.strikePrice,
                 expirationDate: l.expirationDate,
@@ -109,6 +127,7 @@ export class OptionBrokeragePositionsComponent {
         this.optionService.open(command).subscribe({
                 next: (position) => {
                     console.log('next', position)
+                    this.positionsUpdated.emit()
                 },
                 error: (err) => {
                     console.log('error', err)

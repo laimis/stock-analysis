@@ -6,7 +6,7 @@ import {
     StockQuote,
     StrategyProfitPoint
 } from '../../services/stocks.service';
-import {GetErrors, GetStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
+import {GetErrors, GetStockStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {FormControl} from "@angular/forms";
 import {BrokerageService} from "../../services/brokerage.service";
@@ -41,7 +41,7 @@ export class StockTradingPositionComponent {
         private stockService: StockPositionsService,
         private brokerageService: BrokerageService
     ) {
-        this.strategies = GetStrategies()
+        this.strategies = GetStockStrategies()
     }
 
     _position: PositionInstance;

@@ -7,23 +7,35 @@ open core.fs.Adapters.Options
     
 type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     
-    member this.PositionId = state.PositionId
-    member this.UnderlyingTicker = state.UnderlyingTicker
-    member this.Opened = state.Opened
-    member this.DaysHeld = state.DaysHeld
-    member this.Closed = state.Closed
-    member this.IsClosed = state.IsClosed
-    member this.IsOpen = state.IsOpen
-    member this.Cost = state.Cost
-    member this.Profit = state.Profit
-    member this.Transactions = state.Transactions
-    member this.Contracts =
+    let labels = state.Labels |> Seq.map id |> Seq.toArray
+    let contracts =
         state.Contracts.Keys
         |> Seq.map (fun k ->
             let chainDetail = chain |> Option.map(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
             {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail|}
         )
+    
+    member this.PositionId = state.PositionId
+    member this.UnderlyingTicker = state.UnderlyingTicker
+    member this.Opened = state.Opened
+    member this.DaysHeld = state.DaysHeld
+    member this.DaysToExpiration =
+        contracts
+        |> Seq.map (fun c -> c.expiration.ToDateTimeOffset() - DateTimeOffset.Now)
+        |> Seq.map (fun ts -> ts.TotalDays |> int)
+        |> Seq.distinct
+        |> Seq.sort
+        
+    member this.Closed = state.Closed
+    member this.IsClosed = state.IsClosed
+    member this.IsOpen = state.IsOpen
+    member this.Cost = state.Cost
+    member this.Profit = state.Profit
+    member this.Transactions = state.Transactions
+    member this.Notes = state.Notes
+    member this.Labels = labels
+    member this.Contracts = contracts
     
     
 type OwnedOptionView(state:OwnedOptionState, optionDetail:OptionDetail option) =

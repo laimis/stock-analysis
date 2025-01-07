@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Transaction} from './stocks.service';
+import {KeyValuePair, Note, Transaction} from './stocks.service';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 
@@ -40,9 +40,12 @@ export interface OptionPosition {
     cost: number
     profit: number
     daysHeld: number
+    daysToExpiration: number[]
     isOpen: boolean
     isClosed: boolean
     opened: string
+    notes: Note[]
+    labels: KeyValuePair[]
 }
 
 export class OptionDefinition {

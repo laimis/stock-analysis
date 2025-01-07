@@ -1,51 +1,29 @@
-@if (openOptions && openOptions.length === 0) {
-    <div class="mt-4">
-        You have no option options contracts on record. To record a position, select the ticker below to get started:
+<div class="mt-4" *ngIf="openOptions && openOptions.length === 0">
+    You have no option options contracts on record. To record a position, select the ticker below to get started:
+    <div class="row">
+        <div class="col">
+            <app-stock-search
+                label="{{null}}"
+                placeholder="Search for securities using ticker or name"
+                (tickerSelected)="onTickerSelected($event)"
+                cssClass="form-control">
+            </app-stock-search>
+        </div>
+    </div>
+</div>
+<div class="mt-4" *ngIf="openOptions.length > 0">
+    <div class="container mb-4">
         <div class="row">
             <div class="col">
-                <app-stock-search
-                    label="{{null}}"
-                    placeholder="Search for securities using ticker or name"
-                    (tickerSelected)="onTickerSelected($event)"
-                    cssClass="form-control">
-                </app-stock-search>
+                Cost: {{ cost | currency }}
+            </div>
+            <div class="col text-center">
+                Value Now: {{ currentCost | currency }}
+            </div>
+            <div class="col text-end">
+                Net value: <span class="fw-bold">{{ currentCost - cost | currency }}</span>
             </div>
         </div>
     </div>
-}
-@if (openOptions.length > 0) {
-    <div class="mt-4">
-        <div class="container mb-4">
-            <div class="row">
-                <div class="col">
-                    Cost: {{ cost | currency }}
-                </div>
-                <div class="col text-center">
-                    Value Now: {{ currentCost | currency }}
-                </div>
-                <div class="col text-end">
-                    Net value: <span class="fw-bold">{{ currentCost - cost | currency }}</span>
-                </div>
-            </div>
-        </div>
-        @for(position of openOptions; track position) {
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">{{position.underlyingTicker}}</div>
-                </div>
-                <div class="card-body">
-                    @for(contract of position.contracts; track contract) {
-                        <div class="row">
-                            <div class="col">
-                                {{contract.expiration}} {{contract.strikePrice | currency}} {{contract.optionType}}
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="card-footer">
-                    Cost: {{position.cost | currency}} vs Value Now: {{positionCurrentCost(position) | currency}}
-                </div>
-            </div>
-        }
-    </div>
-}
+    <app-option-position [position]="position" *ngFor="let position of openOptions"></app-option-position>
+</div>

@@ -54,7 +54,7 @@ export function showElement(element: HTMLElement) {
 }
 
 // export an array of key value pairs representing strategies
-export function GetStrategies(): { key: string, value: string }[] {
+export function GetStockStrategies(): { key: string, value: string }[] {
     return [
         {key: "10x", value: "10x"},
         {key: "descendingchannelbreakthrough", value: "Descending Channel Breakthrough"},
@@ -75,6 +75,19 @@ export function GetStrategies(): { key: string, value: string }[] {
         {key: "shortweakness", value: "Short, Weakness"},
         {key: "weeklypullbreak", value: "Weekly Pull/Break"},
         {key: "weeklypullbreakdelayed", value: "Weekly Pull/Break Delayed"},
+    ]
+}
+
+export function GetOptionStrategies() : { key: string, value: string }[] {
+    return [
+        {key: "short", value: "Short"},
+        {key: "long", value: "Long"},
+        {key: "channelbottombearish", value: "Channel Bottom Bearish"},
+        {key: "channelbottombullish", value: "Channel Bottom Bullish"},
+        {key: "insanelyovervalued", value: "Insanely Overvalued"},
+        {key: "hugerunup", value: "Huge Runup"},
+        {key: "priceRunUpVsObv", value: "Price Run Up Vs OBV"},
+        {key: "speculatingonrecovery", value: "Speculating On Recovery"},
     ]
 }
 

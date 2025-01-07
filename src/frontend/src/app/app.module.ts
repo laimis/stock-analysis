@@ -103,6 +103,7 @@ import {ParsedDatePipe} from "./services/parsedDate.filter";
 import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
 import {routes} from "./app.routes";
 import {DailyOutcomeScoresComponent} from "./shared/reports/daily-outcome-scores.component";
+import {OptionPositionComponent} from "./options/option-position/option-position.component";
 
 
 @NgModule({
@@ -204,7 +205,8 @@ import {DailyOutcomeScoresComponent} from "./shared/reports/daily-outcome-scores
         OptionSpreadBuilderComponent,
         StockAnalysisComponent,
         PercentChangeDistributionComponent,
-        DailyOutcomeScoresComponent
+        DailyOutcomeScoresComponent,
+        OptionPositionComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

@@ -58,7 +58,7 @@ type OptionPositionQuery = { PositionId: OptionPositionId; UserId: UserId }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
 type OptionOwnershipQuery = { UserId: UserId; Ticker: Ticker }
 
-type OptionLegInput = {
+type OptionContractInput = {
     StrikePrice: decimal
     OptionType: core.fs.Options.OptionType
     ExpirationDate: string
@@ -70,9 +70,15 @@ type OpenOptionPositionCommand = {
     [<Required>]
     UnderlyingTicker: Ticker option
     [<Required>]
-    Legs: OptionLegInput[]
+    Contracts: OptionContractInput[]
     [<Required>]
     Filled: DateTimeOffset option
+    [<Required>]
+    Notes: string option
+    [<Required>]
+    Strategy: string option
+    [<Required>]
+    IsPaperPosition: bool option
 }
 
 type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
@@ -97,21 +103,24 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             
             let openPosition = OptionPosition.``open`` command.UnderlyingTicker.Value DateTimeOffset.UtcNow
             
-            let withLegs =
-                command.Legs
-                |> Array.fold (fun position (leg:OptionLegInput) ->
+            let withAttribute =
+                command.Contracts
+                |> Array.fold (fun position (leg:OptionContractInput) ->
                     match leg.Quantity with
                     | x when x > 0 -> position |> OptionPosition.buyToOpen leg.ExpirationDate leg.StrikePrice leg.OptionType x leg.Cost leg.Filled
                     | x when x < 0 -> position |> OptionPosition.sellToOpen leg.ExpirationDate leg.StrikePrice leg.OptionType -x leg.Cost leg.Filled
                     | _ -> position
                     ) openPosition
+                |> OptionPosition.addNotes command.Notes DateTimeOffset.UtcNow
+                |> OptionPosition.setLabelIfValueNotNone "strategy" command.Strategy DateTimeOffset.UtcNow
+                |> OptionPosition.setLabelIfValueNotNone "isPaperPosition" (command.IsPaperPosition |> Option.map _.ToString()) DateTimeOffset.UtcNow
                 
-            match withLegs.Transactions with
+            match withAttribute.Transactions with
             | [] ->
                 return "No transactions found" |> ServiceError |> Error
             | _ ->
-                do! storage.SaveOptionPosition userId None withLegs
-                return OptionPositionView(withLegs, None) |> Ok
+                do! storage.SaveOptionPosition userId None withAttribute
+                return OptionPositionView(withAttribute, None) |> Ok
     }
         
     member this.Handle(request: DashboardQuery) =

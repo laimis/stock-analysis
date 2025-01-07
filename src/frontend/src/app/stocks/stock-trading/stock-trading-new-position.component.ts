@@ -8,7 +8,7 @@ import {
     Prices,
     StocksService
 } from 'src/app/services/stocks.service';
-import {GetErrors, GetStrategies} from 'src/app/services/utils';
+import {GetErrors, GetStockStrategies} from 'src/app/services/utils';
 import {GlobalService} from "../../services/global.service";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {StockSearchComponent} from "../stock-search/stock-search.component";
@@ -84,7 +84,7 @@ export class StockTradingNewPositionComponent {
         private stockService: StocksService,
         private stockPositionsService: StockPositionsService,
         globalService: GlobalService) {
-        this.strategies = GetStrategies()
+        this.strategies = GetStockStrategies()
         globalService.accountStatusFeed.subscribe(value => {
             if (value.maxLoss) {
                 this.maxLoss = value.maxLoss

@@ -9,7 +9,7 @@ import {
     StockTradingPositions,
     StockViolation
 } from '../../services/stocks.service';
-import {GetErrors, GetStrategies, isLongTermStrategy, toggleVisuallyHidden} from "../../services/utils";
+import {GetErrors, GetStockStrategies, isLongTermStrategy, toggleVisuallyHidden} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {stockOpenPositionExportLink} from "../../services/links.service";
 import {GlobalService} from "../../services/global.service";
@@ -236,7 +236,7 @@ export class StockTradingDashboardComponent implements OnInit {
 
             // create an array of strategies where value is the stratey name and count of positions that match
 
-            let stratsWithCounts = GetStrategies().map(
+            let stratsWithCounts = GetStockStrategies().map(
                 (s) => {
                     const count = this.positions.filter(i => this.matchesStrategyCheck(i, s.key)).length;
                     return {key: s.key, value: s.value + " - " + count}

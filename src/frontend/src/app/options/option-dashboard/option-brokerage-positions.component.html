@@ -104,10 +104,12 @@
                                 <small>{{ getExpirationInDays(option) }} days to expiration</small>
                             </td>
                             <td>
-                                <label for="filledDate" class="form-label">Filled Date</label>
-                                <input type="date" id="filledDate" #filledDate class="form-control form-control-sm" [valueAsDate]="getTodaysDate()"/>
-                                <button class="btn btn-primary btn-sm mt-1" (click)="turnIntoPosition(option, filledDate.value)">
-                                    Turn into Position
+                                <button class="btn btn-primary btn-sm"
+                                        (click)="openPositionDialog(option)"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#positionModal">
+                                    <i class="bi bi-plus-circle me-1"></i>
+                                    Create Position
                                 </button>
                             </td>
                         </tr>
@@ -152,4 +154,91 @@
             </table>
         </div>
     }
+
+    <!-- Position Creation Modal -->
+    <div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="positionModalLabel">Create Position</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <span>{{selectedOption?.brokerageContracts[0]?.ticker}}</span>,
+                        {{ selectedOption?.cost | currency }} cost basis,
+                        {{ selectedOption?.marketValue | currency }} market value
+                    </div>
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Position Details</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row g-3" *ngFor="let contract of selectedOption?.brokerageContracts;">
+                                    <div class="col-4">
+                                        <label class="small text-muted">Option Type</label>
+                                        <p class="mb-0">{{ contract.optionType }}</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="small text-muted">Strike Price</label>
+                                        <p class="mb-0">{{ contract.strikePrice | currency }}</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="small text-muted">Quantity</label>
+                                        <p class="mb-0">{{ contract.quantity }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="filledDate" class="form-label">Fill Date</label>
+                        <input type="date"
+                               class="form-control"
+                               id="filledDate"
+                               #selectedFillDate>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control"
+                                  id="notes"
+                                  rows="3"
+                                  [(ngModel)]="positionNotes"
+                                  placeholder="Add any relevant notes about this position..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="strategyInput" class="form-label">Strategy</label>
+                        <select class="form-select" id="strategyInput" [(ngModel)]="positionStrategy">
+                            @for (s of optionStrategies; track s) {
+                                <option
+                                    value="{{s.key}}">{{ s.value }}
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3"> 
+                        <input class="form-check" type="checkbox" id="paperPosition" [(ngModel)]="isPaperPosition">
+                        <label class="form-check-label" for="paperPosition">
+                            This is a paper position
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button"
+                            class="btn btn-primary"
+                            (click)="createPosition(selectedFillDate.value)"
+                            data-bs-dismiss="modal">
+                        <i class="bi bi-check2 me-1"></i>
+                        Create Position
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
