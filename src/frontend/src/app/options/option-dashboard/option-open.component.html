@@ -17,13 +17,13 @@
             <div class="col">
                 Cost: {{ cost | currency }}
             </div>
-            <div class="col text-center">
-                Value Now: {{ currentCost | currency }}
-            </div>
             <div class="col text-end">
-                Net value: <span class="fw-bold">{{ currentCost - cost | currency }}</span>
+                Profit: <span class="fw-bold">{{ currentCost - cost | currency }}</span>
             </div>
         </div>
     </div>
-    <app-option-position [position]="position" *ngFor="let position of openOptions" (positionDeleted)="positionsChanged.emit()"></app-option-position>
+    <app-option-position [position]="position" *ngFor="let position of openOptions"
+                         (positionDeleted)="positionsChanged.emit()"
+                         (positionChanged)="positionsChanged.emit()"
+                         (errorOccurred)="errorOccurred.emit($event)"></app-option-position>
 </div>

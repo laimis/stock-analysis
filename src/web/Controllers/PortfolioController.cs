@@ -359,4 +359,24 @@ public class PortfolioController(
                     User.Identifier()
                 )
             ));
+    
+    [HttpDelete("optionpositions/{positionId}/labels/{label}")]
+    public Task RemoveOptionLabel(
+        [FromRoute] string positionId,
+        [FromRoute] string label) => 
+        this.OkOrError(
+            optionsHandler.Handle(
+                new RemoveOptionPositionLabelCommand(
+                    positionId: OptionPositionId.NewOptionPositionId(Guid.Parse(positionId)),
+                    key: label,
+                    userId: User.Identifier()
+                )
+            )
+        );
+    
+    [HttpPost("optionpositions/{positionId}/labels")]
+    public Task SetOptionLabel([FromBody]SetOptionPositionLabel command) =>
+        this.OkOrError(
+            optionsHandler.Handle(User.Identifier(), command)
+        );
 }

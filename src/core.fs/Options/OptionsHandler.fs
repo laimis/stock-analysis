@@ -55,6 +55,8 @@ type BuyOrSellCommand =
     | Sell of OptionTransactionInput * UserId
 
 type OptionPositionQuery = { PositionId: OptionPositionId; UserId: UserId }
+type RemoveOptionPositionLabelCommand = { Key: string; PositionId: OptionPositionId; UserId: UserId }
+type SetOptionPositionLabel = { Key: string; Value: string; PositionId: OptionPositionId; }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
 type OptionOwnershipQuery = { UserId: UserId; Ticker: Ticker }
 
@@ -118,6 +120,42 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | _ ->
                 do! storage.SaveOptionPosition userId None withAttribute
                 return OptionPositionView(withAttribute, None) |> Ok
+    }
+    
+    member this.Handle(command: RemoveOptionPositionLabelCommand) = task {
+        let! user = command.UserId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! option = storage.GetOptionPosition command.PositionId command.UserId
+            match option with
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some option ->
+                
+                do!
+                    option
+                    |> OptionPosition.deleteLabel command.Key DateTimeOffset.UtcNow
+                    |> storage.SaveOptionPosition command.UserId (Some option)
+                    
+                return true |> Ok
+    }
+    
+    member this.Handle(userId: UserId, command: SetOptionPositionLabel) = task {
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! option = storage.GetOptionPosition command.PositionId userId
+            match option with
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some option ->
+                
+                do!
+                    option
+                    |> OptionPosition.setLabel command.Key command.Value DateTimeOffset.UtcNow
+                    |> storage.SaveOptionPosition userId (Some option)
+                    
+                return true |> Ok
     }
         
     member this.Handle(request: DashboardQuery) =

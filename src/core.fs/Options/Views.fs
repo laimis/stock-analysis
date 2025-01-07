@@ -13,7 +13,17 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         |> Seq.map (fun k ->
             let chainDetail = chain |> Option.bind(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
-            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail|}
+            let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
+            let pctItm =
+                match underlyingPrice with
+                | Some(price) -> 
+                    let itmPrice = 
+                        match k.OptionType with
+                        | Call -> price - k.Strike
+                        | Put -> k.Strike - price
+                    itmPrice / price |> Some
+                | None -> None
+            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail; pctInTheMoney = pctItm|}
         )
     
     member this.PositionId = state.PositionId

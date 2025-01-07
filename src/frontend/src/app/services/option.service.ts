@@ -31,6 +31,7 @@ export interface OptionContract {
     expiration: string
     quantity: number
     cost: number
+    pctInTheMoney: number | undefined
     details: OptionDefinition
 }
 export interface OptionPosition {
@@ -93,6 +94,7 @@ export class OptionDefinition {
     rho: number
     timeValue: number
     intrinsicValue: number
+    underlyingPrice: number
 }
 
 export class OptionSpread {
@@ -257,6 +259,14 @@ export class OptionService {
 
     delete(id: string) {
         return this.http.delete('/api/portfolio/optionpositions/' + id)
+    }
+    
+    deleteLabel(id: string, key: string) {
+        return this.http.delete('/api/portfolio/optionpositions/' + id + '/labels/' + key)
+    }
+    
+    setLabel(id: string, key: string, value: string) {
+        return this.http.post('/api/portfolio/optionpositions/' + id + '/labels/', {key: key, value: value, positionId: id})
     }
 
     buyOption(obj: object): Observable<any> {

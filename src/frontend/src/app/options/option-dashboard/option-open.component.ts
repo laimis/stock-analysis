@@ -18,6 +18,7 @@ export class OptionOpenComponent {
     currentCost : number = 0;
     
     @Output() positionsChanged = new EventEmitter();
+    @Output() errorOccurred = new EventEmitter<string[]>();
     
     constructor(private router: Router) {
     }

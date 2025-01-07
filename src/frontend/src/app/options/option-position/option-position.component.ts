@@ -1,9 +1,10 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
-import {CurrencyPipe, DatePipe, DecimalPipe, NgClass} from "@angular/common";
+import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {KeyValuePair} from "../../services/stocks.service";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
+import {GetErrors} from "../../services/utils";
 
 @Component({
   selector: 'app-option-position',
@@ -14,7 +15,8 @@ import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-li
         ReactiveFormsModule,
         FormsModule,
         DecimalPipe,
-        StockLinkAndTradingviewLinkComponent
+        StockLinkAndTradingviewLinkComponent,
+        PercentPipe
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
@@ -37,6 +39,8 @@ export class OptionPositionComponent {
     @Input() position: OptionPosition;
     
     @Output() positionDeleted = new EventEmitter();
+    @Output() positionChanged = new EventEmitter();
+    @Output() errorOccurred = new EventEmitter<string[]>();
 
     showContractDetails(contract:OptionContract) {
         this.showDetailsModal = true;
@@ -49,9 +53,37 @@ export class OptionPositionComponent {
     }
     
     removeLabel(label:KeyValuePair) {
+        
+        this.optionService.deleteLabel(this.position.positionId, label.key).subscribe({
+            next: (result) => {
+                this.position.labels = this.position.labels.filter(l => l.key != label.key);
+                this.positionChanged.emit();
+            },
+            error: (error) => {
+                let errors = GetErrors(error);
+                this.errorOccurred.emit(errors);
+            },
+            complete: () => {
+                console.log("Delete label complete");
+            }
+        });
     }
     
-    addLabel() {}
+    addLabel() {
+        this.optionService.setLabel(this.position.positionId, this.newLabelKey, this.newLabelValue).subscribe({
+            next: (result) => {
+                this.position.labels.push({key: this.newLabelKey, value: this.newLabelValue});
+                this.positionChanged.emit();
+            },
+            error: (error) => {
+                let errors = GetErrors(error);
+                this.errorOccurred.emit(errors);
+            },
+            complete: () => {
+                console.log("Add label complete");
+            }
+        });
+    }
 
     closeDetailsModal() {
         this.showDetailsModal = false
