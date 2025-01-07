@@ -92,16 +92,13 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
     interface IApplicationService
 
     member this.Handle(userId:UserId, command: OpenOptionPositionCommand) = task {
-        Console.WriteLine("Opening option position")
         
         let! user = userId |> accounts.GetUser
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some _ ->
         
-            Console.WriteLine("Inside open, let's go!")
-            
-            let openPosition = OptionPosition.``open`` command.UnderlyingTicker.Value DateTimeOffset.UtcNow
+            let openPosition = OptionPosition.``open`` command.UnderlyingTicker.Value command.Filled.Value
             
             let withAttribute =
                 command.Contracts
@@ -145,7 +142,6 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 let! openOptions =
                     optionPositions
                     |> Seq.filter (fun o -> o.IsOpen)
-                    |> Seq.sortBy (fun o -> o.UnderlyingTicker)
                     |> Seq.map (fun o ->
                         async {
                             let! chain = brokerage.GetOptionChain user.State o.UnderlyingTicker |> Async.AwaitTask

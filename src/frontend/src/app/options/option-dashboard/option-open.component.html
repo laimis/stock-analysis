@@ -25,5 +25,5 @@
             </div>
         </div>
     </div>
-    <app-option-position [position]="position" *ngFor="let position of openOptions"></app-option-position>
+    <app-option-position [position]="position" *ngFor="let position of openOptions" (positionDeleted)="positionsChanged.emit()"></app-option-position>
 </div>

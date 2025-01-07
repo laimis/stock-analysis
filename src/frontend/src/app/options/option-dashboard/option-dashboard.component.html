@@ -23,13 +23,19 @@
             Performance
         </a>
         <a class="tab" [ngClass]="{'is-active': isActive('spreadbuilder')}" [routerLink]=""
-           (click)="activateTab('spreadbuilder')">
+       (click)="activateTab('spreadbuilder')">
             Spread Builder
+        </a>
+        <a class="tab" [routerLink]="" (click)="refreshOptions()">
+            <div class="spinner-border text-info spinner-border-sm" role="status" *ngIf="loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <i class="fas fa-sync-alt" *ngIf="!loading"></i>
         </a>
     </div>
 
 @if (loaded && isActive('open')) {
-    <app-option-open [openOptions]=optionsContainer.open></app-option-open>
+    <app-option-open [openOptions]=optionsContainer.open (positionsChanged)="refreshOptions()" ></app-option-open>
 }
 @if (loaded && isActive('brokerage')) {
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"

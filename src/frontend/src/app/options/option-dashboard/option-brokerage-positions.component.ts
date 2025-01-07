@@ -94,7 +94,7 @@ export class OptionBrokeragePositionsComponent {
     positionNotes: string;
     positionStrategy: string;
     optionStrategies: { key: string, value: string }[] = []
-    isPaperPosition: boolean;
+    isPaperPosition: boolean | undefined;
     
     openPositionDialog(position:BrokerageOptionPosition) {
         this.selectedOption = position
@@ -106,14 +106,15 @@ export class OptionBrokeragePositionsComponent {
 
     turnIntoPosition(position: BrokerageOptionPosition, filledDate: string) {
         console.log('mapping', position, filledDate)
-        
+        let isPaperPosition = this.isPaperPosition === undefined ? false : this.isPaperPosition
         // this will need to be completely rewritten
         let command = {
+            
             underlyingTicker: position.brokerageContracts[0].ticker,
             filled: filledDate,
             notes: this.positionNotes,
             strategy: this.positionStrategy,
-            isPaperPosition: this.isPaperPosition,
+            isPaperPosition: isPaperPosition,
             contracts: position.brokerageContracts.map(l => ({
                 quantity: l.quantity,
                 strikePrice: l.strikePrice,

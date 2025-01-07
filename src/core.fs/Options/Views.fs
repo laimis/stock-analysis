@@ -11,7 +11,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     let contracts =
         state.Contracts.Keys
         |> Seq.map (fun k ->
-            let chainDetail = chain |> Option.map(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
+            let chainDetail = chain |> Option.bind(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
             {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail|}
         )
@@ -31,7 +31,11 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen
     member this.Cost = state.Cost
-    member this.Profit = state.Profit
+    member this.Market = contracts |> Seq.sumBy (fun c -> c.details |> Option.map(fun o -> o.Mark * decimal c.quantity) |> Option.defaultValue 0m)
+    member this.Profit =
+        match this.IsClosed with
+        | true -> state.Profit
+        | false -> this.Market - this.Cost
     member this.Transactions = state.Transactions
     member this.Notes = state.Notes
     member this.Labels = labels

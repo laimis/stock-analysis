@@ -6,7 +6,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <h5 class="mb-0">
                             <i class="bi bi-diagram-2 me-2 text-primary"></i>
-                            {{ position.underlyingTicker }} Options
+                            <app-stock-link-and-tradingview-link [ticker]="position.underlyingTicker"></app-stock-link-and-tradingview-link>
                         </h5>
                         <span class="badge" [ngClass]="{
                             'bg-success-subtle text-success': position.isOpen,
@@ -71,6 +71,19 @@
                         <div class="stat-group">
                             <div class="stat-label text-muted mb-1">Cost</div>
                             <div class="h5 mb-0">{{ position.cost | currency }}</div>
+                            <!-- show profit in small text, green if positive, red if negative -->
+                            <small class="text-muted" [ngClass]="{
+                                'text-success': position.profit > 0,
+                                'text-danger': position.profit < 0
+                            }">
+                                {{ position.profit | currency }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-group">
+                            <div class="stat-label text-muted mb-1">Market</div>
+                            <div class="h5 mb-0">{{ position.market | currency }}</div>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -99,6 +112,7 @@
                                 <th>Expiration</th>
                                 <th>Quantity</th>
                                 <th>Cost</th>
+                                <th>Market</th>
                                 <th>Details</th>
                             </tr>
                             </thead>
@@ -117,6 +131,7 @@
                                         <td>{{ contract.expiration | date:'shortDate' }}</td>
                                         <td>{{ contract.quantity }}</td>
                                         <td>{{ contract.cost | currency }}</td>
+                                        <td>{{ contract.details?.mark | currency}}</td>
                                         <td>
                                             <button class="btn btn-sm btn-outline-secondary"
                                                     (click)="showContractDetails(contract)">
@@ -204,6 +219,10 @@
                             <button class="btn btn-outline-secondary" (click)="openCloseModal()">
                                 <i class="bi bi-box-arrow-right me-1"></i>
                                 Close Position
+                            </button>
+                            <button class="btn btn-outline-danger" (click)="deletePosition()">
+                                <i class="bi bi-trash me-1"></i>
+                                Delete Position
                             </button>
                         </div>
                     </div>

@@ -1,8 +1,9 @@
-import {Component, Input} from '@angular/core';
-import {OptionContract, OptionPosition} from "../../services/option.service";
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass} from "@angular/common";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {KeyValuePair} from "../../services/stocks.service";
+import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 
 @Component({
   selector: 'app-option-position',
@@ -12,13 +13,18 @@ import {KeyValuePair} from "../../services/stocks.service";
         DatePipe,
         ReactiveFormsModule,
         FormsModule,
-        DecimalPipe
+        DecimalPipe,
+        StockLinkAndTradingviewLinkComponent
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
 })
 export class OptionPositionComponent {
 
+    constructor(
+        private optionService: OptionService
+    ) {
+    }
     showDetailsModal: boolean = false;
     showAddLabelForm: boolean = false;
     newLabelKey: string;
@@ -29,6 +35,8 @@ export class OptionPositionComponent {
     selectedContract: OptionContract;
     
     @Input() position: OptionPosition;
+    
+    @Output() positionDeleted = new EventEmitter();
 
     showContractDetails(contract:OptionContract) {
         this.showDetailsModal = true;
@@ -56,4 +64,20 @@ export class OptionPositionComponent {
     addNote() {
     }
     
+    deletePosition() {
+        if (confirm("Are you sure you want to delete this position?")) {
+            this.optionService.delete(this.position.positionId).subscribe({
+                next: (result) => {
+                    console.log("Deleted position: " + this.position.positionId);
+                    this.positionDeleted.emit();
+                },
+                error: (error) => {
+                    console.error("Error deleting position: " + this.position.positionId);
+                },
+                complete: () => {
+                    console.log("Delete position complete");
+                }
+            });
+        }
+    }
 }

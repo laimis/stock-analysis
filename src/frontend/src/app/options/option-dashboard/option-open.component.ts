@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
 import {OptionContract, OptionPosition} from "../../services/option.service";
@@ -17,6 +17,8 @@ export class OptionOpenComponent {
     cost : number = 0;
     currentCost : number = 0;
     
+    @Output() positionsChanged = new EventEmitter();
+    
     constructor(private router: Router) {
     }
 
@@ -31,7 +33,8 @@ export class OptionOpenComponent {
         if (value == null) {
             value = []
         }
-        this._openOptions = value
+        this._openOptions = 
+            value.sort((a, b) => b.profit - a.profit)
         
         this.cost = 
             this.openOptions

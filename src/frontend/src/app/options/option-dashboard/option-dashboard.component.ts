@@ -13,10 +13,12 @@ export class OptionsComponent implements OnInit {
 
     optionsContainer: OptionsContainer
 
+    loading: boolean = false;
     loaded: boolean = false;
 
     activeTab: string = 'open'
     errors: string[] = null
+    
 
     constructor(
         private service: OptionService,
@@ -40,14 +42,17 @@ export class OptionsComponent implements OnInit {
     }
 
     getOptions() {
+        this.loading = true;
         this.service.getDashboard()
             .subscribe(
                 result => {
                     this.optionsContainer = result
                     this.loaded = true
+                    this.loading = false
                 }, error => {
                     this.errors = error
                     this.loaded = true
+                    this.loading = false
                 })
     }
 
