@@ -41,7 +41,7 @@
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"
                                     (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
     <div class="mt-5">
-        <app-option-brokerage-orders [orders]="optionsContainer.orders"
+        <app-option-brokerage-orders [orders]="groupedOrders"
                                      (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
     </div>
 }

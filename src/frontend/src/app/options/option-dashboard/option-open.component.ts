@@ -25,10 +25,6 @@ export class OptionOpenComponent {
 
     private _openOptions: OptionPosition[] = []
 
-    get openOptions(): OptionPosition[] {
-        return this._openOptions
-    }
-
     @Input()
     set openOptions(value: OptionPosition[]) {
         if (value == null) {
@@ -47,6 +43,9 @@ export class OptionOpenComponent {
                 .map(op => op.contracts)
                 .flat()
                 .reduce((acc, contract) => acc + contract.quantity * contract.details?.mark, 0)
+    }
+    get openOptions(): OptionPosition[] {
+        return this._openOptions
     }
 
     onTickerSelected(ticker: string) {

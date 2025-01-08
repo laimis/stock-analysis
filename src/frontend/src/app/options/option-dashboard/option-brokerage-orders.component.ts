@@ -18,12 +18,12 @@ import {
 export class OptionBrokerageOrdersComponent {
     activeFilter: string = 'Working'
     errors: string[];
-    private _orders: BrokerageOptionOrder[];
-    groupedOrders: Map<string, BrokerageOptionOrder[]> = new Map<string, BrokerageOptionOrder[]>()
+    private _orders: Map<string, BrokerageOptionOrder[]>;
+    
     @Input()
-    set orders(value: BrokerageOptionOrder[]) {
+    set orders(value : Map<string, BrokerageOptionOrder[]>) {
         this._orders = value
-        this.createGroupedOrders()
+        this.filterOrders(this.activeFilter)
     }
     get orders() {
         return this._orders
@@ -34,6 +34,7 @@ export class OptionBrokerageOrdersComponent {
     
     @Output()
     ordersUpdated = new EventEmitter()
+    selectedOrders: BrokerageOptionOrder[];
 
     constructor(
         private service: BrokerageService
@@ -44,7 +45,7 @@ export class OptionBrokerageOrdersComponent {
         if (!confirm('Are you sure you want to cancel this order?')) {
             return
         }
-        this.service.cancelOrder(order.orderId).subscribe(r => {
+        this.service.cancelOrder(order.orderId).subscribe(_ => {
             this.ordersUpdated.emit()
         }, err => {
             this.errors = GetErrors(err)
@@ -53,7 +54,7 @@ export class OptionBrokerageOrdersComponent {
 
     filterOrders(status: string) {
         this.activeFilter = this.activeFilter === status ? '' : status;
-        this.createGroupedOrders()
+        this.selectedOrders = this.orders.get(status)
     }
 
     applyOrderToPosition(order: BrokerageOptionOrder) {
@@ -81,20 +82,6 @@ export class OptionBrokerageOrdersComponent {
             })
         }
         this.isModalVisible = true
-    }
-    
-    createGroupedOrders() {
-        this.groupedOrders = this._orders
-            .filter(o => o.status === this.activeFilter || this.activeFilter === '')
-            .reduce((a, b) => {
-                const key = b.status;
-                if (!a.has(key)) {
-                    a.set(key, [])
-                }
-                let arr = a.get(key)
-                arr.push(b)
-                return a
-            }, new Map<string, BrokerageOptionOrder[]>())
     }
     
     marketPrice(legs:OptionOrderLeg[]) : number {
