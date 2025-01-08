@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {GetErrors, GetOptionStrategies} from 'src/app/services/utils';
 import {BrokerageOptionContract, BrokerageOptionPosition, OptionService} from "../../services/option.service";
 
 @Component({
