@@ -16,7 +16,7 @@ import {
 })
 
 export class OptionBrokerageOrdersComponent {
-    activeFilter: string = 'Working'
+    activeFilter: string;
     errors: string[];
     private _orders: Map<string, BrokerageOptionOrder[]>;
     
@@ -32,7 +32,7 @@ export class OptionBrokerageOrdersComponent {
                 arr.push(b);
                 return a
             }, new Map<string, BrokerageOptionOrder[]>())
-        this.filterOrders(this.activeFilter)
+        this.filterOrders('Working')
     }
     
     @Input()
