@@ -11,7 +11,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     let contracts =
         state.Contracts.Keys
         |> Seq.map (fun k ->
-            let chainDetail = chain |> Option.bind(_.FindMatchingOption(k.Strike, k.Expiration.ToDateTimeOffset(), k.OptionType))
+            let chainDetail = chain |> Option.bind(_.FindMatchingOption(k.Strike, k.Expiration, k.OptionType))
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
             let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
             let pctItm =
@@ -162,6 +162,6 @@ type OptionChainView(chain:OptionChain) =
     
     member this.StockPrice = chain.UnderlyingPrice
     member this.Options = chain.Options
-    member this.Expirations = chain.Options |> Seq.map _.ExpirationDate |> Seq.distinct |> Seq.toArray
+    member this.Expirations = chain.Options |> Seq.map _.Expiration |> Seq.distinct |> Seq.toArray
     member this.Volatility = chain.Volatility
     member this.NumberOfContracts = chain.NumberOfContracts

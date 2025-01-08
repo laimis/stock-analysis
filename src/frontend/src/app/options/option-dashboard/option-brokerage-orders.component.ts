@@ -1,7 +1,12 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
-import {BrokerageOptionOrder, OptionOrderLeg} from "../../services/option.service";
+import {
+    BrokerageOptionOrder,
+    BrokerageOptionPosition,
+    OptionOrderLeg,
+    OptionPosition
+} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-brokerage-orders',
@@ -23,6 +28,9 @@ export class OptionBrokerageOrdersComponent {
     get orders() {
         return this._orders
     }
+    
+    @Input()
+    position: OptionPosition
     
     @Output()
     ordersUpdated = new EventEmitter()
@@ -46,6 +54,33 @@ export class OptionBrokerageOrdersComponent {
     filterOrders(status: string) {
         this.activeFilter = this.activeFilter === status ? '' : status;
         this.createGroupedOrders()
+    }
+
+    applyOrderToPosition(order: BrokerageOptionOrder) {
+        
+    }
+    
+    selectedOption : BrokerageOptionPosition
+    isModalVisible: boolean = false
+    createPosition(order:BrokerageOptionOrder) {
+        this.selectedOption = {
+            cost: order.price,
+            showPL: false,
+            marketValue: undefined,
+            brokerageContracts: order.legs.map(leg => {
+                return {
+                    ticker: leg.underlyingTicker,
+                    averageCost: leg.price,
+                    quantity: leg.quantity,
+                    description: leg.description,
+                    optionType: leg.optionType,
+                    strikePrice: leg.strikePrice,
+                    marketValue: undefined,
+                    expirationDate: leg.expiration
+                }
+            })
+        }
+        this.isModalVisible = true
     }
     
     createGroupedOrders() {

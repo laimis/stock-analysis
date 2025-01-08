@@ -1,0 +1,89 @@
+<div *ngIf="isVisible" class="modal-backdrop" (click)="onOverlayClick($event)">
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Position</h5>
+                    <button type="button" class="btn-close" (click)="close()"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <span>{{selectedOption?.brokerageContracts[0]?.ticker}}</span>,
+                        {{ selectedOption?.cost | currency }} cost basis,
+                        {{ selectedOption?.marketValue | currency }} market value
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Position Details</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row g-3" *ngFor="let contract of selectedOption?.brokerageContracts;">
+                                    <div class="col-4">
+                                        <label class="small text-muted">Option Type</label>
+                                        <p class="mb-0">{{ contract.optionType }}</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="small text-muted">Strike Price</label>
+                                        <p class="mb-0">{{ contract.strikePrice | currency }}</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="small text-muted">Quantity</label>
+                                        <p class="mb-0">{{ contract.quantity }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="filledDate" class="form-label">Fill Date</label>
+                        <input type="date"
+                               class="form-control"
+                               id="filledDate"
+                               #selectedFillDate>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea
+                            class="form-control"
+                            id="notes"
+                            rows="3"
+                            [(ngModel)]="positionNotes"
+                            placeholder="Add any relevant notes about this position..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="strategyInput" class="form-label">Strategy</label>
+                        <select class="form-select" id="strategyInput" [(ngModel)]="positionStrategy">
+                            @for (s of optionStrategies; track s) {
+                                <option value="{{s.key}}">{{ s.value }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="paperPosition"
+                               [(ngModel)]="isPaperPosition">
+                        <label class="form-check-label" for="paperPosition">
+                            This is a paper position
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="close()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" (click)="createPosition(selectedFillDate.value)">
+                        <i class="bi bi-check2"></i>
+                        Create Position
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

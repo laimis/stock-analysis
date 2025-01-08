@@ -186,6 +186,12 @@ export interface BrokerageOptionContract {
     expirationDate: string
 }
 
+export interface BrokerageOptionPosition {
+    brokerageContracts: BrokerageOptionContract[]
+    cost: number
+    marketValue: number
+    showPL: boolean
+}
 
 export interface OptionOrderLeg {
     legId : string
@@ -197,6 +203,8 @@ export interface OptionOrderLeg {
     instruction: string
     quantity: number
     price: number
+    expiration: string
+    strikePrice: number
 }
 
 export interface BrokerageOptionOrder {

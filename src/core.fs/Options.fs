@@ -20,6 +20,7 @@ type OptionExpiration =
                 | OptionExpiration date -> date
                 
             static member create(date:string) = OptionExpiration date
+            static member createFromDateTimeOffset(date:DateTimeOffset) = date.ToString("yyyy-MM-dd") |> OptionExpiration 
 
 
 type OptionTicker = OptionTicker of string

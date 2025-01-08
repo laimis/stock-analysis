@@ -104,6 +104,9 @@ import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/opti
 import {routes} from "./app.routes";
 import {DailyOutcomeScoresComponent} from "./shared/reports/daily-outcome-scores.component";
 import {OptionPositionComponent} from "./options/option-position/option-position.component";
+import {
+    OptionPositionCreateModalComponent
+} from "./options/option-dashboard/option-position-create-modal/option-position-create-modal.component";
 
 
 @NgModule({
@@ -206,7 +209,8 @@ import {OptionPositionComponent} from "./options/option-position/option-position
         StockAnalysisComponent,
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
-        OptionPositionComponent
+        OptionPositionComponent,
+        OptionPositionCreateModalComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

@@ -1,14 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GetErrors, GetOptionStrategies} from 'src/app/services/utils';
-import {BrokerageOptionContract, OptionService} from "../../services/option.service";
-
-
-export interface BrokerageOptionPosition {
-    brokerageContracts: BrokerageOptionContract[]
-    cost: number
-    marketValue: number
-    showPL: boolean
-}
+import {BrokerageOptionContract, BrokerageOptionPosition, OptionService} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-brokerage-positions',
@@ -55,12 +47,6 @@ export class OptionBrokeragePositionsComponent {
     positionsUpdated = new EventEmitter()
     protected readonly Date = Date;
 
-    constructor(
-        private optionService: OptionService
-    ) {
-        this.optionStrategies = GetOptionStrategies()
-    }
-
     togglePL(option: BrokerageOptionPosition) {
         option.showPL = !option.showPL;
     }
@@ -91,69 +77,8 @@ export class OptionBrokeragePositionsComponent {
     }
     
     selectedOption: BrokerageOptionPosition;
-    positionNotes: string;
-    positionStrategy: string;
-    optionStrategies: { key: string, value: string }[] = []
-    isPaperPosition: boolean | undefined;
     
     openPositionDialog(position:BrokerageOptionPosition) {
         this.selectedOption = position
-    }
-    
-    createPosition(filledDate:string) {
-        this.turnIntoPosition(this.selectedOption, filledDate)
-    }
-
-    turnIntoPosition(position: BrokerageOptionPosition, filledDate: string) {
-        console.log('mapping', position, filledDate)
-        let isPaperPosition = this.isPaperPosition === undefined ? false : this.isPaperPosition
-        // this will need to be completely rewritten
-        let command = {
-            
-            underlyingTicker: position.brokerageContracts[0].ticker,
-            filled: filledDate,
-            notes: this.positionNotes,
-            strategy: this.positionStrategy,
-            isPaperPosition: isPaperPosition,
-            contracts: position.brokerageContracts.map(l => ({
-                quantity: l.quantity,
-                strikePrice: l.strikePrice,
-                expirationDate: l.expirationDate,
-                optionType: l.optionType,
-                cost: l.averageCost,
-                filled: filledDate
-            }))
-        }
-        
-        this.optionService.open(command).subscribe({
-                next: (position) => {
-                    console.log('next', position)
-                    this.positionsUpdated.emit()
-                },
-                error: (err) => {
-                    console.log('error', err)
-                    this.errors = GetErrors(err)
-                },
-                complete: () => {
-                    console.log('complete')
-                }
-            }
-        )
-    }
-
-    recordBuy(opt: object) {
-        this.optionService.buyOption(opt).subscribe(r => {
-            this.positionsUpdated.emit()
-        }, err => {
-            this.errors = GetErrors(err)
-        })
-    }
-
-    recordSell(opt: object) {
-        this.optionService.sellOption(opt).subscribe(r => {
-            this.positionsUpdated.emit()
-        }, err => {
-            this.errors = GetErrors(err)
-        })
     }
 }

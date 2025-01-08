@@ -105,14 +105,9 @@ type OptionLeg = {
     Instruction: OptionOrderInstruction
     Quantity: decimal
     Price: decimal option
-    Expiration: string
+    Expiration: OptionExpiration
     StrikePrice: decimal
 }
-    with
-    
-        member this.ExpirationDate : DateTimeOffset =
-            let date = DateTimeOffset.ParseExact(this.Expiration, "MM/dd/yyyy", System.Globalization.CultureInfo.InvariantCulture)
-            date
 
 [<CLIMutable>]
 type OptionOrder = {

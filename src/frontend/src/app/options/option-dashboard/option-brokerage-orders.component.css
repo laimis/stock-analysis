@@ -65,3 +65,11 @@
 .cancel-btn:hover {
     transform: scale(1.05);
 }
+.apply-order-btn {
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    letter-spacing: 0.25px;
+}
+.apply-order-btn:hover {
+    transform: scale(1.05);
+}

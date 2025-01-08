@@ -221,13 +221,13 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     |> Seq.map(fun l -> async {
                         // let's see if we can get the chain
                         if chainLookupMap.ContainsKey(l.UnderlyingTicker) then
-                            return chainLookupMap[l.UnderlyingTicker].FindMatchingOption(l.StrikePrice, l.ExpirationDate, l.OptionType)
+                            return chainLookupMap[l.UnderlyingTicker].FindMatchingOption(l.StrikePrice, l.Expiration, l.OptionType)
                         else
                             let! chain = brokerage.GetOptionChain user.State l.UnderlyingTicker |> Async.AwaitTask
                             match chain with
                             | Ok chain ->
                                 chainLookupMap.Add(l.UnderlyingTicker, chain)
-                                return chain.FindMatchingOption(l.StrikePrice, l.ExpirationDate, l.OptionType)
+                                return chain.FindMatchingOption(l.StrikePrice, l.Expiration, l.OptionType)
                             | Error _ -> return None
                     })
                     |> Async.Sequential
@@ -242,7 +242,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                         match o.IsActive with
                         | true -> {
                                 o with Legs = o.Legs |> Seq.map (fun l ->
-                                    let found = matchingChainDetails |> Seq.tryFind (fun d -> d.StrikePrice = l.StrikePrice && d.ParsedExpirationDate |> Option.defaultValue DateTimeOffset.MinValue |> _.Date = l.ExpirationDate.Date && d.OptionType = l.OptionType)
+                                    let found = matchingChainDetails |> Seq.tryFind (fun d -> d.StrikePrice = l.StrikePrice && d.Expiration = l.Expiration && d.OptionType = l.OptionType)
                                     match found with
                                     | Some d -> { l with Price = d.Mark |> Some }
                                     | None ->

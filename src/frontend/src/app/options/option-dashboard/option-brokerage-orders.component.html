@@ -13,7 +13,7 @@
     @for(groupKey of ["Working", "PendingActivation", "Pending", "Filled", "Cancelled", "Expired", "Replaced"]; track groupKey) {
         @for(order of groupedOrders.get(groupKey); track order) {
             <div class="card order-card mb-3 shadow-sm status-{{ order.status.toLowerCase() }}">
-                <!-- Enhanced Card Header -->
+                <!-- Card Header -->
                 <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center gap-3">
@@ -22,18 +22,26 @@
                                 <app-stock-link [ticker]="order.legs[0].underlyingTicker"></app-stock-link>
                             </div>
                             <span class="status-badge badge rounded-pill" [ngClass]="{
-                                'bg-success': order.status === 'Filled',
-                                'bg-warning text-dark': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
-                                'bg-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
-                            }">{{ order.status }}</span>
+                'bg-success': order.status === 'Filled',
+                'bg-warning text-dark': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
+                'bg-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
+            }">{{ order.status }}</span>
                         </div>
-                        <div class="order-price">
-                            {{ order.price | currency }}
+                        <div class="d-flex align-items-center gap-3">
+                            <button *ngIf="order.status === 'Filled' && position" class="btn btn-outline-success btn-sm apply-order-btn" (click)="applyOrderToPosition(order)">
+                                <i class="bi bi-check2-square me-2"></i>Apply to Position
+                            </button>
+                            <button *ngIf="order.status === 'Filled' && !position" class="btn btn-outline-success btn-sm apply-order-btn" (click)="createPosition(order)">
+                                <i class="bi bi-plus-square me-2"></i>Create Position
+                            </button>
+                            <div class="order-price">
+                                {{ order.price | currency }}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Improved Card Body -->
+                <!-- Card Body -->
                 <div class="card-body p-4">
                     <!-- Timeline Information -->
                     <div class="row g-4 mb-4">
@@ -47,7 +55,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="d-flex flex-column">
+                            <div class="d-flex flex-column" *ngIf="order.executionTime">
                                 <span class="timestamp-label mb-1">Executed</span>
                                 <span class="timestamp">
                                     <i class="bi bi-clock-history me-1"></i>
@@ -112,4 +120,11 @@
             <span>No option orders present in brokerage account</span>
         </div>
     }
+    
+    <app-option-position-create-modal
+        [isVisible]="isModalVisible"
+        [selectedOption]="selectedOption"
+        (isVisibleChange)="isModalVisible = $event"
+        (positionCreated)="ordersUpdated.emit()"
+        (errorsOccurred)="errors = $event"></app-option-position-create-modal>
 </section>

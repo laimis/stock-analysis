@@ -563,7 +563,15 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 let rm = System.Text.RegularExpressions.Regex.Match(l.instrument.description, @"(\d{1,2}/\d{1,2}/\d{4}) \$?(\d{1,3}\.?\d{0,2}) (Put|Call)")
                 
                 let expirationString = rm.Groups[1].Value
+                let expiration = DateTimeOffset.ParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture) |> OptionExpiration.createFromDateTimeOffset
                 let strikePrice = rm.Groups[2].Value |> decimal
+                let instruction = l.instruction |> parseOptionOrderInstruction
+                let quantityFactor =
+                    match instruction with
+                    | OptionOrderInstruction.BuyToOpen -> 1m
+                    | OptionOrderInstruction.BuyToClose -> 1m
+                    | OptionOrderInstruction.SellToOpen -> -1m
+                    | OptionOrderInstruction.SellToClose -> -1m
                 
                 {
                     LegId = l.legId.ToString()
@@ -572,10 +580,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     OptionType = if l.instrument.putCall = "PUT" then OptionType.Put else OptionType.Call  
                     UnderlyingTicker = l.instrument.underlyingSymbol |> Ticker 
                     Ticker = l.instrument.symbol |> Ticker
-                    Quantity = l.quantity |> decimal
-                    Instruction = l.instruction |> parseOptionOrderInstruction
+                    Quantity = l.quantity * quantityFactor
+                    Instruction = instruction
                     Price = o.ResolveOptionLegPrice(l.legId)
-                    Expiration = expirationString
+                    Expiration = expiration
                     StrikePrice = strikePrice 
                 }
             ) 
@@ -1172,9 +1180,15 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             let expirationDate =
                                 match DateTimeOffset.TryParse(d.expirationDate) with
                                 | false, _ -> failwith $"Could not parse expiration date: {d.expirationDate}"
-                                | true, dt -> dt |> Some
+                                | true, dt -> dt |> OptionExpiration.createFromDateTimeOffset
+                                
+                            let optionType =
+                                match d.putCall.Value.ToLower() with
+                                | "put" -> OptionType.Put
+                                | "call" -> OptionType.Call
+                                | _ -> failwith $"Unknown option type: {d.putCall.Value}"
                             
-                            let detail = core.fs.Adapters.Options.OptionDetail(d.symbol.Value, d.putCall.Value.ToLower(), d.description.Value)
+                            let detail = core.fs.Adapters.Options.OptionDetail(d.symbol.Value, optionType, d.description.Value, expirationDate)
                             detail.Ask <- d.ask
                             detail.Bid <- d.bid
                             detail.Last <- d.last
@@ -1182,7 +1196,6 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             detail.StrikePrice <- d.strikePrice
                             detail.Volume <- d.totalVolume
                             detail.OpenInterest <- d.openInterest
-                            detail.ParsedExpirationDate <- expirationDate
                             detail.DaysToExpiration <- d.daysToExpiration
                             detail.Delta <- d.delta
                             detail.Gamma <- d.gamma

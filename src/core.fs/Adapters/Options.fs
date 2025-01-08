@@ -1,29 +1,23 @@
 namespace core.fs.Adapters.Options
 
 open System
-open core.Options
+open core.fs.Options
 
-type OptionDetail(symbol:string, side:string, description:string) =
+type OptionDetail(symbol:string, optionType:OptionType, description:string, expirationDate:OptionExpiration) =
     
     member this.Symbol = symbol
     member this.Description = description
-    member val ParsedExpirationDate: DateTimeOffset option = None with get, set
-    member this.ExpirationDate = this.ParsedExpirationDate.Value.ToString("yyyy-MM-dd")
+    member this.Expiration: OptionExpiration = expirationDate
     member val StrikePrice: decimal = 0m with get, set
-    member this.Side = side
     member val Volume: int64 = 0L with get, set
     member val OpenInterest: int64 = 0L with get, set
     member val Bid: decimal = 0m with get, set
     member val Ask: decimal = 0m with get, set
     member val Last: decimal = 0m with get, set
     member val Mark: decimal = 0m with get, set
-    member this.OptionType =
-        match this.Side with
-        | "call" -> core.fs.Options.OptionType.Call
-        | "put" -> core.fs.Options.OptionType.Put
-        | _ -> raise (ArgumentException("Invalid option type"))
-    member this.IsCall = this.Side = "call"
-    member this.IsPut = this.Side = "put"
+    member this.OptionType = optionType
+    member this.IsCall = match optionType with | Call -> true | _ -> false
+    member this.IsPut = match optionType with | Put -> true | _ -> false
     member this.Spread = this.Ask - this.Bid
     member val Volatility: decimal = 0m with get, set
     member val Delta: decimal = 0m with get, set
@@ -42,7 +36,7 @@ type OptionDetail(symbol:string, side:string, description:string) =
     
     member this.PerDayPrice =
         
-        let date = this.ParsedExpirationDate.Value.Date
+        let date = this.Expiration.ToDateTimeOffset().Date
         let today = DateTimeOffset.UtcNow.Date
         let diff = Math.Max(int(date.Subtract(today).TotalDays), 1)
         this.Bid * 100m / decimal(diff)
@@ -66,6 +60,6 @@ type OptionChain(symbol: string, volatility: decimal, numberOfContracts: decimal
     member this.Options = options
     member this.UnderlyingPrice = underlyingPrice
 
-    member this.FindMatchingOption(strikePrice: decimal, expirationDate: DateTimeOffset, optionType: core.fs.Options.OptionType) =
+    member this.FindMatchingOption(strikePrice: decimal, expirationDate: OptionExpiration, optionType: OptionType) =
         options
-        |> Seq.tryFind(fun o -> o.StrikePrice = strikePrice && o.ParsedExpirationDate |> Option.defaultValue DateTimeOffset.MinValue |> _.Date = expirationDate.Date && o.OptionType = optionType)
+        |> Seq.tryFind(fun o -> o.StrikePrice = strikePrice && o.Expiration = expirationDate && o.OptionType = optionType)
