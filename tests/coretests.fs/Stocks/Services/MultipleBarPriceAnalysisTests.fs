@@ -33,11 +33,11 @@ let ``Percent below high outcome correct``() =
 
 [<Fact>]
 let ``Percent change average outcome correct``() =
-    Assert.Equal(-0.16m, firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeAverage, 2)
+    Assert.Equal(-0.0016m, firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeAverage, 4)
 
 [<Fact>]
 let ``Percent change standard deviation outcome correct``() =
-    Assert.Equal(6.62m, firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeStandardDeviation, 2)
+    Assert.Equal(0.0662m, firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.PercentChangeStandardDeviation, 4)
 
 [<Fact>]
 let ``Lowest price outcome correct``() =
