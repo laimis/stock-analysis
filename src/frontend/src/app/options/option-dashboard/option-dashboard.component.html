@@ -35,13 +35,13 @@
     </div>
 
 @if (loaded && isActive('open')) {
-    <app-option-open [openOptions]=optionsContainer.open (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
+    <app-option-open [openOptions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
 }
 @if (loaded && isActive('brokerage')) {
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"
                                     (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
     <div class="mt-5">
-        <app-option-brokerage-orders [orders]="groupedOrders"
+        <app-option-brokerage-orders [orders]="optionsContainer.orders"
                                      (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
     </div>
 }

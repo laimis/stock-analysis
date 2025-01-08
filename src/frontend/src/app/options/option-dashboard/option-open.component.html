@@ -23,6 +23,7 @@
         </div>
     </div>
     <app-option-position [position]="position" *ngFor="let position of openOptions"
+                         [orders]="orders"
                          (positionDeleted)="positionsChanged.emit()"
                          (positionChanged)="positionsChanged.emit()"
                          (errorOccurred)="errorOccurred.emit($event)"></app-option-position>

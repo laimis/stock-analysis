@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
-import {OptionContract, OptionPosition} from "../../services/option.service";
+import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../services/option.service";
 
 @Component({
     selector: 'app-option-open',
@@ -47,6 +47,9 @@ export class OptionOpenComponent {
     get openOptions(): OptionPosition[] {
         return this._openOptions
     }
+    
+    @Input()
+    orders : BrokerageOptionOrder[]
 
     onTickerSelected(ticker: string) {
         this.router.navigateByUrl('/options/chain/' + ticker)

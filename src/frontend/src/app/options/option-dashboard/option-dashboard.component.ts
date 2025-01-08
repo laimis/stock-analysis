@@ -18,7 +18,6 @@ export class OptionsComponent implements OnInit {
 
     activeTab: string = 'open'
     errors: string[] = null
-    groupedOrders: Map<string, BrokerageOptionOrder[]>;
     
 
     constructor(
@@ -48,16 +47,6 @@ export class OptionsComponent implements OnInit {
             .subscribe(
                 result => {
                     this.optionsContainer = result
-                    this.groupedOrders = result.orders
-                        .reduce((a, b) => {
-                            const key = b.status;
-                            if (!a.has(key)) {
-                                a.set(key, [])
-                            }
-                            let arr = a.get(key)
-                            arr.push(b)
-                            return a
-                        }, new Map<string, BrokerageOptionOrder[]>())
                     this.loaded = true
                     this.loading = false
                 }, error => {

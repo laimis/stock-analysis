@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
+import {BrokerageOptionOrder, OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from "@angular/common";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {KeyValuePair} from "../../services/stocks.service";
@@ -23,7 +23,6 @@ import {GetErrors} from "../../services/utils";
   styleUrl: './option-position.component.css'
 })
 export class OptionPositionComponent {
-
     constructor(
         private optionService: OptionService
     ) {
@@ -34,10 +33,15 @@ export class OptionPositionComponent {
     newLabelValue: string;
     showNotesForm: boolean = false;
     notesExpanded: boolean = false;
-    notesControl = new FormControl(); 
-    selectedContract: OptionContract;
+    notesControl = new FormControl();
     
     @Input() position: OptionPosition;
+    @Input()
+    set orders(value : BrokerageOptionOrder[]) {
+        if (this.position == null) {
+            return;
+        }
+    }
     
     @Output() positionDeleted = new EventEmitter();
     @Output() positionChanged = new EventEmitter();

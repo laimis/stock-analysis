@@ -21,12 +21,18 @@ export class OptionBrokerageOrdersComponent {
     private _orders: Map<string, BrokerageOptionOrder[]>;
     
     @Input()
-    set orders(value : Map<string, BrokerageOptionOrder[]>) {
-        this._orders = value
+    set orders(value : BrokerageOptionOrder[]) {
+        this._orders = 
+            value.reduce((a, b) => {
+                const key = b.status;
+                if (!a.has(key)) {
+                    a.set(key, [])
+                }
+                let arr = a.get(key)
+                arr.push(b);
+                return a
+            }, new Map<string, BrokerageOptionOrder[]>())
         this.filterOrders(this.activeFilter)
-    }
-    get orders() {
-        return this._orders
     }
     
     @Input()
@@ -54,7 +60,7 @@ export class OptionBrokerageOrdersComponent {
 
     filterOrders(status: string) {
         this.activeFilter = this.activeFilter === status ? '' : status;
-        this.selectedOrders = this.orders.get(status)
+        this.selectedOrders = this._orders.get(status)
     }
 
     applyOrderToPosition(order: BrokerageOptionOrder) {
