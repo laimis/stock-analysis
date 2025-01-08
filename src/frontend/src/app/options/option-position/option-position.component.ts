@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
-import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
+import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from "@angular/common";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {KeyValuePair} from "../../services/stocks.service";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
@@ -16,7 +16,8 @@ import {GetErrors} from "../../services/utils";
         FormsModule,
         DecimalPipe,
         StockLinkAndTradingviewLinkComponent,
-        PercentPipe
+        PercentPipe,
+        NgIf
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'

@@ -32,7 +32,7 @@ export interface OptionContract {
     quantity: number
     cost: number
     pctInTheMoney: number | undefined
-    details: OptionDefinition
+    details: OptionDefinition | undefined
 }
 export interface OptionPosition {
     positionId: string

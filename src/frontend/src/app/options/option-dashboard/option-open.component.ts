@@ -46,7 +46,7 @@ export class OptionOpenComponent {
             this.openOptions
                 .map(op => op.contracts)
                 .flat()
-                .reduce((acc, contract) => acc + contract.quantity * contract.details.mark, 0)
+                .reduce((acc, contract) => acc + contract.quantity * contract.details?.mark, 0)
     }
 
     onTickerSelected(ticker: string) {
