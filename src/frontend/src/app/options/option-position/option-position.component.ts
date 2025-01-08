@@ -113,4 +113,6 @@ export class OptionPositionComponent {
             });
         }
     }
+
+    protected readonly Math = Math;
 }

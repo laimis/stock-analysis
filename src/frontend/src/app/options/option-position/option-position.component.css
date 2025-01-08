@@ -20,6 +20,16 @@
     font-size: 0.875rem;
 }
 
+.table td .badge i {
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+}
+
+.table td .badge {
+    font-size: 0.875rem;
+    padding: 0.35rem 0.65rem;
+}
+
 .modal-backdrop {
     opacity: 0.5;
 }
