@@ -1,4 +1,4 @@
-<div class="mt-4" *ngIf="openOptions && openOptions.length === 0">
+<div class="mt-4" *ngIf="positions && positions.length === 0">
     You have no option options contracts on record. To record a position, select the ticker below to get started:
     <div class="row">
         <div class="col">
@@ -11,7 +11,7 @@
         </div>
     </div>
 </div>
-<div class="mt-4" *ngIf="openOptions.length > 0">
+<div class="mt-4" *ngIf="positions.length > 0">
     <div class="container mb-4">
         <div class="row">
             <div class="col">
@@ -22,7 +22,7 @@
             </div>
         </div>
     </div>
-    <app-option-position [position]="position" *ngFor="let position of openOptions"
+    <app-option-position [position]="position" *ngFor="let position of positions"
                          [orders]="orders"
                          (positionDeleted)="positionsChanged.emit()"
                          (positionChanged)="positionsChanged.emit()"

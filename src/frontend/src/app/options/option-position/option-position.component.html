@@ -163,6 +163,10 @@
                         </table>
                     </div>
                 </div>
+                
+                <div class="mt-4">
+                    <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
+                </div>
 
                 <!-- Notes Section -->
                 <div class="mt-4">

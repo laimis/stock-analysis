@@ -35,7 +35,7 @@
     </div>
 
 @if (loaded && isActive('open')) {
-    <app-option-open [openOptions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
+    <app-option-open [positions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
 }
 @if (loaded && isActive('brokerage')) {
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"

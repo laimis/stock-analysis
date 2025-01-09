@@ -33,7 +33,6 @@ import {StockPositionReportsComponent} from './stocks/stock-trading/stock-tradin
 import {AdminUsersComponent} from './admin/users/admin-users.component';
 import {OptionsComponent} from './options/option-dashboard/option-dashboard.component';
 import {OptionStatsComponent} from './options/option-dashboard/option-stats.component';
-import {OptionOpenComponent} from './options/option-dashboard/option-open.component';
 import {OptionPerformanceComponent} from './options/option-dashboard/option-performance.component';
 import {OptionClosedComponent} from './options/option-dashboard/option-closed.component';
 import {
@@ -84,7 +83,6 @@ import {OptionBrokeragePositionsComponent} from './options/option-dashboard/opti
 import {StockLinkComponent} from './shared/stocks/stock-link.component';
 import {RoutineComponent} from './routines/routines-routine.component';
 import {OptionSpreadsComponent} from './options/option-chain/option-spreads.component';
-import {OptionBrokerageOrdersComponent} from './options/option-dashboard/option-brokerage-orders.component';
 import {RoutinesActiveRoutineComponent} from './routines/routines-active-routine.component';
 import {LineChartComponent} from './shared/line-chart/line-chart.component';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
@@ -107,6 +105,7 @@ import {OptionPositionComponent} from "./options/option-position/option-position
 import {
     OptionPositionCreateModalComponent
 } from "./options/option-dashboard/option-position-create-modal/option-position-create-modal.component";
+import {OptionOpenComponent} from "./options/option-dashboard/option-open.component";
 
 
 @NgModule({
@@ -126,7 +125,6 @@ import {
         OptionChainComponent,
         OptionSpreadsComponent,
         OptionSellComponent,
-        OptionOpenComponent,
         OptionPerformanceComponent,
         OptionClosedComponent,
         PrivacyComponent,
@@ -175,7 +173,6 @@ import {
         StockTradingAnalysisDashboardComponent,
         StockTradingStrategiesComponent,
         OptionBrokeragePositionsComponent,
-        OptionBrokerageOrdersComponent,
         RoutineDashboardComponent,
         RoutineComponent,
         RoutinesActiveRoutineComponent,
@@ -210,7 +207,8 @@ import {
         PercentChangeDistributionComponent,
         DailyOutcomeScoresComponent,
         OptionPositionComponent,
-        OptionPositionCreateModalComponent
+        OptionPositionCreateModalComponent,
+        OptionOpenComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

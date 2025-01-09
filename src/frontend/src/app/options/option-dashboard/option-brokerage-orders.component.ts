@@ -7,12 +7,27 @@ import {
     OptionOrderLeg,
     OptionPosition
 } from "../../services/option.service";
+import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
+import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
+import {CurrencyPipe, DecimalPipe, NgClass} from "@angular/common";
+import {ParsedDatePipe} from "../../services/parsedDate.filter";
+import {
+    OptionPositionCreateModalComponent
+} from "./option-position-create-modal/option-position-create-modal.component";
 
 @Component({
     selector: 'app-option-brokerage-orders',
     templateUrl: './option-brokerage-orders.component.html',
     styleUrls: ['./option-brokerage-orders.component.css'],
-    standalone: false
+    imports: [
+        TradingViewLinkComponent,
+        StockLinkComponent,
+        NgClass,
+        CurrencyPipe,
+        ParsedDatePipe,
+        DecimalPipe,
+        OptionPositionCreateModalComponent
+    ]
 })
 
 export class OptionBrokerageOrdersComponent {

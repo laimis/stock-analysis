@@ -5,6 +5,7 @@ import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {KeyValuePair} from "../../services/stocks.service";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 import {GetErrors} from "../../services/utils";
+import {OptionBrokerageOrdersComponent} from "../option-dashboard/option-brokerage-orders.component";
 
 @Component({
   selector: 'app-option-position',
@@ -17,7 +18,8 @@ import {GetErrors} from "../../services/utils";
         DecimalPipe,
         StockLinkAndTradingviewLinkComponent,
         PercentPipe,
-        NgIf
+        NgIf,
+        OptionBrokerageOrdersComponent
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
@@ -41,7 +43,12 @@ export class OptionPositionComponent {
         if (this.position == null) {
             return;
         }
+        this.positionOrders = value.filter(o => o.legs[0].underlyingTicker === this.position.underlyingTicker);
     }
+    get orders() : BrokerageOptionOrder[] {
+        return this.positionOrders;
+    }
+    positionOrders: BrokerageOptionOrder[] = [];
     
     @Output() positionDeleted = new EventEmitter();
     @Output() positionChanged = new EventEmitter();

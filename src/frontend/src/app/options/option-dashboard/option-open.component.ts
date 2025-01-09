@@ -2,12 +2,21 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
 import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../services/option.service";
+import {OptionPositionComponent} from "../option-position/option-position.component";
+import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
+import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 
 @Component({
     selector: 'app-option-open',
     templateUrl: './option-open.component.html',
-    styleUrls: ['./option-open.component.css'],
-    standalone: false
+    imports: [
+        OptionPositionComponent,
+        CurrencyPipe,
+        StockSearchComponent,
+        NgIf,
+        NgForOf
+    ],
+    styleUrls: ['./option-open.component.css']
 })
 
 export class OptionOpenComponent {
@@ -23,29 +32,29 @@ export class OptionOpenComponent {
     constructor(private router: Router) {
     }
 
-    private _openOptions: OptionPosition[] = []
+    private _positions: OptionPosition[] = []
 
     @Input()
-    set openOptions(value: OptionPosition[]) {
+    set positions(value: OptionPosition[]) {
         if (value == null) {
             value = []
         }
-        this._openOptions = 
+        this._positions = 
             value.sort((a, b) => b.profit - a.profit)
         
         this.cost = 
-            this.openOptions
+            this.positions
                 .map(op => op.cost)
                 .reduce((acc, cost) => acc + cost, 0)
         
         this.currentCost =
-            this.openOptions
+            this.positions
                 .map(op => op.contracts)
                 .flat()
                 .reduce((acc, contract) => acc + contract.quantity * contract.details?.mark, 0)
     }
-    get openOptions(): OptionPosition[] {
-        return this._openOptions
+    get positions(): OptionPosition[] {
+        return this._positions
     }
     
     @Input()
