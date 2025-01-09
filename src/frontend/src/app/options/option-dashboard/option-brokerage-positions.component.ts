@@ -1,11 +1,26 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageOptionContract, BrokerageOptionPosition, OptionService} from "../../services/option.service";
+import {BrokerageOptionContract, BrokerageOptionPosition} from "../../services/option.service";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
+import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
+import {CurrencyPipe, DatePipe, DecimalPipe} from "@angular/common";
+import {
+    OptionPositionCreateModalComponent
+} from "./option-position-create-modal/option-position-create-modal.component";
 
 @Component({
     selector: 'app-option-brokerage-positions',
     templateUrl: './option-brokerage-positions.component.html',
-    styleUrls: ['./option-brokerage-positions.component.css'],
-    standalone: false
+    imports: [
+        ErrorDisplayComponent,
+        TradingViewLinkComponent,
+        StockLinkComponent,
+        CurrencyPipe,
+        DecimalPipe,
+        DatePipe,
+        OptionPositionCreateModalComponent
+    ],
+    styleUrls: ['./option-brokerage-positions.component.css']
 })
 export class OptionBrokeragePositionsComponent {
     errors: string[];

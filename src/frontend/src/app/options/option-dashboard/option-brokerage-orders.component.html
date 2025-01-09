@@ -9,9 +9,13 @@
             }
         </div>
     </div>
-    
+
     @for(order of selectedOrders; track order) {
-        <div class="card order-card mb-3 shadow-sm status-{{ order.status.toLowerCase() }}">
+        <div class="card mb-3" [ngClass]="{
+            'border-success': order.status === 'Filled',
+            'border-warning': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
+            'border-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
+        }">
             <!-- Card Header -->
             <div class="card-header bg-white py-3">
                 <div class="d-flex justify-content-between align-items-center">
@@ -20,20 +24,20 @@
                             <app-trading-view-link [ticker]="order.legs[0].underlyingTicker"></app-trading-view-link>
                             <app-stock-link [ticker]="order.legs[0].underlyingTicker"></app-stock-link>
                         </div>
-                        <span class="status-badge badge rounded-pill" [ngClass]="{
-            'bg-success': order.status === 'Filled',
-            'bg-warning text-dark': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
-            'bg-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
-        }">{{ order.status }}</span>
+                        <span class="badge rounded-pill" [ngClass]="{
+                            'bg-success': order.status === 'Filled',
+                            'bg-warning text-dark': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
+                            'bg-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
+                        }">{{ order.status }}</span>
                     </div>
                     <div class="d-flex align-items-center gap-3">
-                        <button *ngIf="order.status === 'Filled' && position" class="btn btn-outline-success btn-sm apply-order-btn" (click)="applyOrderToPosition(order)">
+                        <button *ngIf="order.status === 'Filled' && position" class="btn btn-outline-success btn-sm" (click)="applyOrderToPosition(order)">
                             <i class="bi bi-check2-square me-2"></i>Apply to Position
                         </button>
-                        <button *ngIf="order.status === 'Filled' && !position" class="btn btn-outline-success btn-sm apply-order-btn" (click)="createPosition(order)">
+                        <button *ngIf="order.status === 'Filled' && !position" class="btn btn-outline-success btn-sm" (click)="createPosition(order)">
                             <i class="bi bi-plus-square me-2"></i>Create Position
                         </button>
-                        <div class="order-price">
+                        <div class="fw-bold text-primary fs-5">
                             {{ order.price | currency }}
                         </div>
                     </div>
@@ -46,8 +50,8 @@
                 <div class="row g-4 mb-4">
                     <div class="col-md-4">
                         <div class="d-flex flex-column">
-                            <span class="timestamp-label mb-1">Entered</span>
-                            <span class="timestamp">
+                            <small class="text-uppercase text-muted fw-bold mb-1">Entered</small>
+                            <span class="text-secondary">
                                 <i class="bi bi-clock me-1"></i>
                                 {{ order.enteredTime | parsedDate }}
                             </span>
@@ -55,8 +59,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="d-flex flex-column" *ngIf="order.executionTime">
-                            <span class="timestamp-label mb-1">Executed</span>
-                            <span class="timestamp">
+                            <small class="text-uppercase text-muted fw-bold mb-1">Executed</small>
+                            <span class="text-secondary">
                                 <i class="bi bi-clock-history me-1"></i>
                                 {{ order.executionTime ? (order.executionTime | parsedDate) : 'Pending' }}
                             </span>
@@ -64,7 +68,7 @@
                     </div>
                     <div class="col-md-4 text-end">
                         @if (order.canBeCancelled) {
-                            <button class="btn btn-outline-danger btn-sm cancel-btn" (click)="cancelOrder(order)">
+                            <button class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order)">
                                 <i class="bi bi-x-circle me-2"></i>Cancel Order
                             </button>
                         }
@@ -72,33 +76,37 @@
                 </div>
 
                 <!-- Enhanced Legs Table -->
-                <div class="table-responsive leg-table">
+                <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead>
+                        <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">Quantity</th>
-                            <th>Instruction</th>
-                            <th>Description</th>
-                            <th class="text-end pe-4">Price</th>
+                            <th><small class="text-uppercase">Instruction</small></th>
+                            <th><small class="text-uppercase">Type</small></th>
+                            <th><small class="text-uppercase">Strike</small></th>
+                            <th><small class="text-uppercase">Expiration</small></th>
+                            <th class="ps-4"><small class="text-uppercase">Quantity</small></th>
+                            <th class="text-end pe-4"><small class="text-uppercase">Price</small></th>
                         </tr>
                         </thead>
                         <tbody>
                             @for (leg of order.legs; track leg) {
                                 <tr>
-                                    <td class="ps-4">{{ leg.quantity | number }}</td>
                                     <td>
                                         <span class="badge" [ngClass]="{
                                             'bg-success': leg.instruction === 'BuyToOpen' || leg.instruction === 'BuyToClose',
                                             'bg-danger': leg.instruction === 'SellToOpen' || leg.instruction === 'SellToClose'
                                         }">{{ leg.instruction }}</span>
                                     </td>
-                                    <td>{{ leg.description }}</td>
+                                    <td>{{leg.optionType}}</td>
+                                    <td>{{ leg.strikePrice | currency }}</td>
+                                    <td>{{ leg.expiration }}</td>
+                                    <td class="ps-4">{{ leg.quantity | number }}</td>
                                     <td class="text-end pe-4">{{ leg.price | currency }}</td>
                                 </tr>
                             }
                             @if (order.canBeCancelled) {
-                                <tr class="market-price-row">
-                                    <td colspan="3" class="ps-4">Current Market Price</td>
+                                <tr class="bg-light fw-bold">
+                                    <td colspan="5" class="ps-4">Current Market Price</td>
                                     <td class="text-end pe-4">{{ marketPrice(order.legs) | currency }}</td>
                                 </tr>
                             }
@@ -112,7 +120,7 @@
             <span>No {{ activeFilter }} option orders present in brokerage account</span>
         </div>
     }
-    
+
     <app-option-position-create-modal
         [isVisible]="isModalVisible"
         [selectedOption]="selectedOption"

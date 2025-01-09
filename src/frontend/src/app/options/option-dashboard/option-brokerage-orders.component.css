@@ -1,75 +1,10 @@
-.order-card {
-    transition: transform 0.2s ease;
-    border: none;
-    border-left: 4px solid transparent;
-    border-top: 4px solid transparent;
-}
-.order-card:hover {
-    transform: translateY(-2px);
-}
-.order-card.status-filled {
-    border-left-color: #198754;
-    border-top-color: #198754;
-}
-.order-card.status-working,
-.order-card.status-pending,
-.order-card.status-pendingactivation {
-    border-left-color: #ffc107;
-    border-top-color: #ffc107;
-}
-.order-card.status-cancelled,
-.order-card.status-expired,
-.order-card.status-replaced {
-    border-left-color: #dc3545;
-    border-top-color: #dc3545;
-}
-.order-price {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #0d6efd;
-}
-.leg-table {
-    border-radius: 0.5rem;
-    overflow: hidden;
-}
-.leg-table thead th {
-    background-color: #f8f9fa;
-    border-top: none;
+.badge {
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-}
-.market-price-row {
-    background-color: #f8f9fa;
-    font-weight: 600;
-}
-.timestamp {
-    font-size: 0.875rem;
-    color: #6c757d;
-}
-.timestamp-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #6c757d;
-}
-.status-badge {
-    text-transform: uppercase;
-    font-size: 0.75rem;
     letter-spacing: 0.5px;
     padding: 0.35rem 0.75rem;
 }
-.cancel-btn {
-    transition: all 0.2s ease;
-}
-.cancel-btn:hover {
-    transform: scale(1.05);
-}
-.apply-order-btn {
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
-    letter-spacing: 0.25px;
-}
-.apply-order-btn:hover {
-    transform: scale(1.05);
+
+.table th small {
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
 }

@@ -9,7 +9,7 @@ import {
 } from "../../services/option.service";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
-import {CurrencyPipe, DecimalPipe, NgClass} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgClass, NgIf} from "@angular/common";
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {
     OptionPositionCreateModalComponent
@@ -26,7 +26,8 @@ import {
         CurrencyPipe,
         ParsedDatePipe,
         DecimalPipe,
-        OptionPositionCreateModalComponent
+        OptionPositionCreateModalComponent,
+        NgIf
     ]
 })
 

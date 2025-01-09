@@ -1,10 +1,13 @@
 import {Component, Input} from '@angular/core';
+import {OptionStatsComponent} from "./option-stats.component";
 
 @Component({
     selector: 'app-option-performance',
     templateUrl: './option-performance.component.html',
     styleUrls: ['./option-performance.component.css'],
-    standalone: false
+    imports: [
+        OptionStatsComponent
+    ]
 })
 
 export class OptionPerformanceComponent {

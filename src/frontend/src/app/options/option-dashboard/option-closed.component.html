@@ -15,7 +15,7 @@
         <tbody>
             @for (o of closedOptions; track o) {
                 <tr>
-                    <td width="100">
+                    <td style="width: 100px">
                         <div>
                             <app-stock-link [ticker]="o.ticker"></app-stock-link>
                             {{ o.strikePrice |currency }}

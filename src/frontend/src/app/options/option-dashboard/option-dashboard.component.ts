@@ -1,13 +1,34 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {BrokerageOptionOrder, OptionsContainer, OptionService} from "../../services/option.service";
+import {LoadingComponent} from "../../shared/loading/loading.component";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {NgClass, NgIf} from "@angular/common";
+import {OptionOpenComponent} from "./option-open.component";
+import {OptionBrokeragePositionsComponent} from "./option-brokerage-positions.component";
+import {OptionBrokerageOrdersComponent} from "./option-brokerage-orders.component";
+import {OptionClosedComponent} from "./option-closed.component";
+import {OptionPerformanceComponent} from "./option-performance.component";
+import {OptionSpreadBuilderComponent} from "../option-spread-builder/option-spread-builder.component";
 
 @Component({
     selector: 'app-options',
     templateUrl: './option-dashboard.component.html',
-    styleUrls: ['./option-dashboard.component.css'],
-    standalone: false
+    imports: [
+        LoadingComponent,
+        ErrorDisplayComponent,
+        NgIf,
+        NgClass,
+        RouterLink,
+        OptionOpenComponent,
+        OptionBrokeragePositionsComponent,
+        OptionBrokerageOrdersComponent,
+        OptionClosedComponent,
+        OptionPerformanceComponent,
+        OptionSpreadBuilderComponent
+    ],
+    styleUrls: ['./option-dashboard.component.css']
 })
 export class OptionsComponent implements OnInit {
 
