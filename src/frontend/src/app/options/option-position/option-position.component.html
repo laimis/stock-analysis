@@ -8,7 +8,10 @@
                             <app-stock-link-and-tradingview-link [ticker]="position.underlyingTicker"></app-stock-link-and-tradingview-link>
                         </h5>
                     </div>
-                    
+                    <div class="d-flex align-items-center">
+                        <span class="text-muted me-2">Stock price:</span>
+                        <span class="h5 mb-0">{{ position.contracts[0].details?.underlyingPrice | currency }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -153,13 +156,6 @@
                                     </tr>
                                 }
                             </tbody>
-                            <tfoot>
-                            <tr>
-                                <td colspan="10">
-                                    Stock price: {{ position.contracts[0].details?.underlyingPrice | currency }}
-                                </td>
-                            </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>

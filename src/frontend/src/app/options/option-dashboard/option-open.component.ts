@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
 import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../services/option.service";
 import {OptionPositionComponent} from "../option-position/option-position.component";
-import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
+import {CurrencyPipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 
 @Component({
@@ -14,7 +14,8 @@ import {StockSearchComponent} from "../../stocks/stock-search/stock-search.compo
         CurrencyPipe,
         StockSearchComponent,
         NgIf,
-        NgForOf
+        NgForOf,
+        NgClass
     ],
     styleUrls: ['./option-open.component.css']
 })

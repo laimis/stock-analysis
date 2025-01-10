@@ -18,13 +18,47 @@
                 Cost: {{ cost | currency }}
             </div>
             <div class="col text-end">
-                Profit: <span class="fw-bold">{{ currentCost - cost | currency }}</span>
+                Profit: <span [ngClass]="{'text-success': (currentCost - cost) > 0, 'text-danger': (currentCost - cost) < 0}" class="fw-bold">
+                    {{ currentCost - cost | currency }}
+                </span>
             </div>
         </div>
     </div>
-    <app-option-position [position]="position" *ngFor="let position of positions"
-                         [orders]="orders"
-                         (positionDeleted)="positionsChanged.emit()"
-                         (positionChanged)="positionsChanged.emit()"
-                         (errorOccurred)="errorOccurred.emit($event)"></app-option-position>
+
+    <div class="accordion" id="positionsAccordion">
+        <div class="accordion-item mb-3 position-card" *ngFor="let position of positions; let i = index">
+            <h2 class="accordion-header" [id]="'heading' + i">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse"
+                        [attr.data-bs-target]="'#collapse' + i"
+                        [attr.aria-expanded]="false"
+                        [attr.aria-controls]="'collapse' + i">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-bold me-2">{{position.underlyingTicker}}</span>
+                            <span class="badge bg-secondary">{{position.daysToExpiration[0]}} days to expiration</span>
+                        </div>
+                        <div class="position-summary">
+                            <span [ngClass]="{'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
+                                {{position.profit | currency}}
+                            </span>
+                        </div>
+                    </div>
+                </button>
+            </h2>
+            <div [id]="'collapse' + i" class="accordion-collapse collapse"
+                 [attr.aria-labelledby]="'heading' + i"
+                 data-bs-parent="#positionsAccordion">
+                <div class="accordion-body">
+                    <app-option-position
+                        [position]="position"
+                        [orders]="orders"
+                        (positionDeleted)="positionsChanged.emit()"
+                        (positionChanged)="positionsChanged.emit()"
+                        (errorOccurred)="errorOccurred.emit($event)">
+                    </app-option-position>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
