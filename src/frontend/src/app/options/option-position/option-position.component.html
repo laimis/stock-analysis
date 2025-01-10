@@ -230,6 +230,114 @@
                     </div>
                 </div>
 
+                <!-- Transactions -->
+                <div class="mt-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 cursor-pointer"
+                             (click)="toggleTransactions()">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-clock-history me-2 text-primary"></i>
+                                <h6 class="mb-0">Transactions
+                                    <span class="badge bg-secondary ms-2">
+                        {{ position.transactions.length }}
+                    </span>
+                                </h6>
+                            </div>
+                            <div class="d-flex align-items-center">
+                <span class="me-3" [ngClass]="{
+                    'text-success': (getTotalCredited() - getTotalDebited()) > 0,
+                    'text-danger': (getTotalCredited() - getTotalDebited()) < 0
+                }">
+                    {{ (getTotalCredited() - getTotalDebited()) | currency }}
+                </span>
+                                <i class="bi" [class.bi-chevron-down]="!transactionsExpanded"
+                                   [class.bi-chevron-up]="transactionsExpanded"></i>
+                            </div>
+                        </div>
+
+                        @if (transactionsExpanded) {
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Type</th>
+                                            <th>Strike</th>
+                                            <th>Expiration</th>
+                                            <th>Quantity</th>
+                                            <th>Debit</th>
+                                            <th>Credit</th>
+                                            <th>Net</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (transaction of position.transactions; track transaction) {
+                                                <tr>
+                                                    <td>{{ transaction.when | date:'MMM d, y HH:mm' }}</td>
+                                                    <td>
+                                        <span class="badge p-1 m-1" [ngClass]="{
+                                            'bg-success-subtle text-success': transaction.optionType.toLowerCase() === 'call',
+                                            'bg-danger-subtle text-danger': transaction.optionType.toLowerCase() === 'put'
+                                        }">
+                                            {{ transaction.optionType }}
+                                        </span>
+                                                    </td>
+                                                    <td>{{ transaction.strike | currency }}</td>
+                                                    <td>{{ transaction.expiration | date:'shortDate' }}</td>
+                                                    <td>
+                                        <span [ngClass]="{
+                                            'text-success': transaction.quantity > 0,
+                                            'text-danger': transaction.quantity < 0
+                                        }">
+                                            {{ transaction.quantity > 0 ? '+' : '' }}{{ transaction.quantity }}
+                                        </span>
+                                                    </td>
+                                                    <td>
+                                        <span class="text-danger" *ngIf="transaction.debited">
+                                            -{{ transaction.debited | currency }}
+                                        </span>
+                                                    </td>
+                                                    <td>
+                                        <span class="text-success" *ngIf="transaction.credited">
+                                            +{{ transaction.credited | currency }}
+                                        </span>
+                                                    </td>
+                                                    <td>
+                                        <span [ngClass]="{
+                                            'text-success': (transaction.credited - transaction.debited) > 0,
+                                            'text-danger': (transaction.credited - transaction.debited) < 0
+                                        }">
+                                            {{ (transaction.credited - transaction.debited) | currency }}
+                                        </span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                        <tr>
+                                            <td colspan="5" class="text-end fw-bold">Total:</td>
+                                            <td class="text-danger">
+                                                -{{ getTotalDebited() | currency }}
+                                            </td>
+                                            <td class="text-success">
+                                                +{{ getTotalCredited() | currency }}
+                                            </td>
+                                            <td [ngClass]="{
+                                    'text-success': (getTotalCredited() - getTotalDebited()) > 0,
+                                    'text-danger': (getTotalCredited() - getTotalDebited()) < 0
+                                }" class="fw-bold">
+                                                {{ (getTotalCredited() - getTotalDebited()) | currency }}
+                                            </td>
+                                        </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="mt-4">
                     <div class="d-flex gap-2 justify-content-end">

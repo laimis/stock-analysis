@@ -129,5 +129,18 @@ export class OptionPositionComponent {
         }
     }
 
+    transactionsExpanded = false;
+
+    getTotalDebited(): number {
+        return this.position.transactions.reduce((sum, t) => sum + t.debited, 0);
+    }
+    getTotalCredited(): number {
+        return this.position.transactions.reduce((sum, t) => sum + t.credited, 0);
+    }
+    toggleTransactions(): void {
+        this.transactionsExpanded = !this.transactionsExpanded;
+    }
+
+
     protected readonly Math = Math;
 }

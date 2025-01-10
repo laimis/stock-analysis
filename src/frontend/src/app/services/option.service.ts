@@ -38,6 +38,7 @@ export interface OptionPosition {
     positionId: string
     underlyingTicker: string
     contracts: OptionContract[]
+    transactions: OptionPositionTransaction[]
     cost: number
     market: number
     profit: number
@@ -48,6 +49,15 @@ export interface OptionPosition {
     opened: string
     notes: Note[]
     labels: KeyValuePair[]
+}
+export class OptionPositionTransaction {
+    expiration: string
+    strike: number
+    optionType: string
+    quantity: number
+    debited: number
+    credited: number
+    when: string
 }
 
 export class OptionDefinition {
