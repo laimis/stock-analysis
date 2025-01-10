@@ -368,6 +368,9 @@ module OptionPosition =
             |> findMatchingTransactions expiration strike optionType
             |> List.map (fun x -> x.Quantity)
             |> List.sum
+        
+        if contractsAvailable > 0 then
+            raise (InvalidOperationException($"Cannot buy back contracts that were not sold, have {contractsAvailable} and trying to buy {quantity}"))
             
         if abs(contractsAvailable) < quantity then
             raise (InvalidOperationException($"Not enough contracts available to close, have {contractsAvailable} and trying to close {quantity}"))
@@ -387,7 +390,7 @@ module OptionPosition =
             |> List.map _.Quantity
             |> List.sum
             
-        if abs(contractsAvailable) < quantity then
+        if contractsAvailable < quantity then
             raise (InvalidOperationException($"Not enough contracts available to close, have {contractsAvailable} and trying to close {quantity}"))
         
         let e = OptionContractSoldToClose(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)

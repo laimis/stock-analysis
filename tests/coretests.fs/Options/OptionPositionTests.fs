@@ -117,6 +117,14 @@ let ``Trying to buy to close a position that is not open, should throw``() =
     |> should throw typedefof<InvalidOperationException>
     
 [<Fact>]
+let ``Trying to sell to close a contract that is not owned should throw``() =
+    (fun () ->
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToClose expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
+        |> ignore)
+    |> should throw typedefof<InvalidOperationException>
+    
+[<Fact>]
 let ``Trying to assign contracts that are not owned should throw``() =
     (fun () ->
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
