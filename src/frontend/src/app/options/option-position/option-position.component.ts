@@ -108,6 +108,10 @@ export class OptionPositionComponent {
     addNote() {
     }
     
+    closePositionWithMarketOrder() {
+        
+    }
+    
     deletePosition() {
         if (confirm("Are you sure you want to delete this position?")) {
             this.optionService.delete(this.position.positionId).subscribe({

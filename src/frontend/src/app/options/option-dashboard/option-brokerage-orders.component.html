@@ -2,13 +2,15 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="m-0">Brokerage Orders</h3>
         <div class="btn-group btn-group-sm">
-            @for(status of ["Working", "PendingActivation", "Pending", "Filled", "Cancelled", "Expired", "Replaced"]; track status) {
+            @for(status of availableOrderStatuses; track status) {
                 <button class="btn btn-outline-secondary" [class.active]="activeFilter === status" (click)="filterOrders(status)">
                     {{ status }}
                 </button>
             }
         </div>
     </div>
+    
+    <app-error-display [errors]="errors"></app-error-display>
 
     @for(order of selectedOrders; track order) {
         <div class="card mb-3" [ngClass]="{

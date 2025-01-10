@@ -84,6 +84,7 @@ export function GetOptionStrategies() : { key: string, value: string }[] {
         {key: "long", value: "Long"},
         {key: "channelbottombearish", value: "Channel Bottom Bearish"},
         {key: "channelbottombullish", value: "Channel Bottom Bullish"},
+        {key: "descendingchannelbreakout", value: "Descending Channel Breakout"},
         {key: "insanelyovervalued", value: "Insanely Overvalued"},
         {key: "hugerunup", value: "Huge Runup"},
         {key: "priceRunUpVsObv", value: "Price Run Up Vs OBV"},

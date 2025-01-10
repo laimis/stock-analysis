@@ -5,7 +5,7 @@ import {
     BrokerageOptionOrder,
     BrokerageOptionPosition,
     OptionOrderLeg,
-    OptionPosition
+    OptionPosition, OptionService
 } from "../../services/option.service";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
@@ -14,6 +14,7 @@ import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {
     OptionPositionCreateModalComponent
 } from "./option-position-create-modal/option-position-create-modal.component";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-option-brokerage-orders',
@@ -27,7 +28,8 @@ import {
         ParsedDatePipe,
         DecimalPipe,
         OptionPositionCreateModalComponent,
-        NgIf
+        NgIf,
+        ErrorDisplayComponent
     ]
 })
 
@@ -35,6 +37,7 @@ export class OptionBrokerageOrdersComponent {
     activeFilter: string;
     errors: string[];
     private _orders: Map<string, BrokerageOptionOrder[]>;
+    availableOrderStatuses = ["Working", "PendingActivation", "Pending", "Filled", "Cancelled", "Expired", "Replaced"]
     
     @Input()
     set orders(value : BrokerageOptionOrder[]) {
@@ -48,7 +51,11 @@ export class OptionBrokerageOrdersComponent {
                 arr.push(b);
                 return a
             }, new Map<string, BrokerageOptionOrder[]>())
-        this.filterOrders('Working')
+        
+        // find the first status that has orders and set it as the active filter
+        let status = this.availableOrderStatuses.find(status => this._orders.has(status))
+        
+        this.filterOrders(status)
     }
     
     @Input()
@@ -59,7 +66,8 @@ export class OptionBrokerageOrdersComponent {
     selectedOrders: BrokerageOptionOrder[];
 
     constructor(
-        private service: BrokerageService
+        private service: BrokerageService,
+        private optionService: OptionService
     ) {
     }
 
@@ -80,7 +88,48 @@ export class OptionBrokerageOrdersComponent {
     }
 
     applyOrderToPosition(order: BrokerageOptionOrder) {
+        let isOpen = order.legs.filter(leg => leg.instruction.endsWith('ToOpen'))
+        let isClose = order.legs.filter(leg => leg.instruction.endsWith('ToClose'))
         
+        if (isOpen.length > 0 && isClose.length > 0) {
+            this.errors = ['Cannot have both open and close legs in the same order']
+            return
+        }
+        
+        if (isOpen.length === 0 && isClose.length === 0) {
+            this.errors = ['Order must have at least one open or close leg']
+            return
+        }
+
+        let contracts =
+            order.legs.map(leg =>
+                {
+                    return {
+                        optionType: leg.optionType,
+                        strikePrice: leg.strikePrice,
+                        expirationDate: leg.expiration,
+                        quantity: leg.quantity,
+                        cost: leg.price,
+                        filled: order.executionTime
+                    }
+                }
+            )
+        
+        let promise = isOpen.length > 0 ? this.optionService.openContracts(this.position.positionId, contracts) : this.optionService.closeContracts(this.position.positionId, contracts) 
+        
+        promise.subscribe(
+            {
+                next: _ => {
+                    this.ordersUpdated.emit()
+                },
+                error: err => {
+                    this.errors = GetErrors(err)
+                },
+                complete: () => {
+                    console.log('complete close contracts')
+                }
+            }
+        );
     }
     
     selectedOption : BrokerageOptionPosition

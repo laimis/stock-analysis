@@ -276,6 +276,14 @@ export class OptionService {
     setLabel(id: string, key: string, value: string) {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/labels/', {key: key, value: value, positionId: id})
     }
+    
+    closeContracts(id: string, contracts: any[]) {
+        return this.http.post('/api/portfolio/optionpositions/' + id + '/closecontracts', contracts)
+    }
+
+    openContracts(id: string, contracts: any[]) {
+        return this.http.post('/api/portfolio/optionpositions/' + id + '/opencontracts', contracts)
+    }
 
     buyOption(obj: object): Observable<any> {
         return this.http.post<string>('/api/options/buy', obj)

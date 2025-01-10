@@ -91,8 +91,9 @@ export class OptionBrokeragePositionsComponent {
     }
     
     selectedOption: BrokerageOptionPosition;
-    
+    isModalVisible: boolean = false;
     openPositionDialog(position:BrokerageOptionPosition) {
+        this.isModalVisible = true
         this.selectedOption = position
     }
 }

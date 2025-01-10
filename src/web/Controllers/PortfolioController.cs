@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using core.fs.Accounts;
 using core.fs.Options;
 using core.fs.Portfolio;
 using core.fs.Stocks;
@@ -379,4 +380,28 @@ public class PortfolioController(
         this.OkOrError(
             optionsHandler.Handle(User.Identifier(), command)
         );
+    
+    [HttpPost("optionpositions/{positionId}/closecontracts")]
+    public Task CloseContracts([FromRoute]Guid positionId, [FromBody]OptionContractInput[] contracts) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                new CloseContractsCommand(
+                    positionId:OptionPositionId.NewOptionPositionId(positionId),
+                    userId: User.Identifier(),
+                    contracts: contracts
+                    )
+                )
+        );
+    
+    [HttpPost("optionpositions/{positionId}/opencontracts")]
+    public Task OpenContracts([FromRoute]Guid positionId, [FromBody]OptionContractInput[] contracts) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                new OpenContractsCommand(
+                    positionId:OptionPositionId.NewOptionPositionId(positionId),
+                    userId: User.Identifier(),
+                    contracts: contracts
+                    )
+                )
+            );
 }

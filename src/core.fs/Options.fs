@@ -335,7 +335,12 @@ module OptionPosition =
             
     let private findMatchingTransactions (expiration:string) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
         position.Transactions
-        |> List.filter (fun x -> x.Expiration = expiration && x.OptionType = optionType.ToString() && x.Strike = strike)
+        |> List.filter (
+            fun x ->
+                x.Expiration = expiration &&
+                x.OptionType = optionType.ToString() &&
+                x.Strike = strike
+        )
     
     let buyToOpen (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
@@ -379,10 +384,10 @@ module OptionPosition =
         let contractsAvailable =
             position
             |> findMatchingTransactions expiration strike optionType
-            |> List.map (fun x -> x.Quantity)
+            |> List.map _.Quantity
             |> List.sum
             
-        if contractsAvailable < quantity then
+        if abs(contractsAvailable) < quantity then
             raise (InvalidOperationException($"Not enough contracts available to close, have {contractsAvailable} and trying to close {quantity}"))
         
         let e = OptionContractSoldToClose(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)

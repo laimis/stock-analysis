@@ -105,9 +105,7 @@
                             </td>
                             <td>
                                 <button class="btn btn-primary btn-sm"
-                                        (click)="openPositionDialog(option)"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#positionModal">
+                                        (click)="openPositionDialog(option)">
                                     <i class="bi bi-plus-circle me-1"></i>
                                     Create Position
                                 </button>
@@ -155,5 +153,10 @@
         </div>
     }
 
-    <app-option-position-create-modal [selectedOption]="selectedOption"></app-option-position-create-modal>
+    <app-option-position-create-modal
+        [isVisible]="isModalVisible"
+        [selectedOption]="selectedOption"
+        (isVisibleChange)="isModalVisible = $event"
+        (positionCreated)="positionsUpdated.emit()"
+        (errorsOccurred)="errors = $event"></app-option-position-create-modal>
 </section>

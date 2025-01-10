@@ -82,6 +82,17 @@ type OpenOptionPositionCommand = {
     [<Required>]
     IsPaperPosition: bool option
 }
+type CloseContractsCommand = {
+    PositionId: OptionPositionId
+    UserId: UserId
+    Contracts: OptionContractInput[]
+}
+
+type OpenContractsCommand = {
+    PositionId: OptionPositionId
+    UserId: UserId
+    Contracts: OptionContractInput[]
+}
 
 type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
 
@@ -120,6 +131,56 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | _ ->
                 do! storage.SaveOptionPosition userId None withAttribute
                 return OptionPositionView(withAttribute, None) |> Ok
+    }
+    
+    member this.Handle(command: CloseContractsCommand) = task {
+        let! user = command.UserId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! openPosition = storage.GetOptionPosition command.PositionId command.UserId
+            match openPosition with
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some op when op.IsClosed -> return "Option is closed, contracts can't be modified" |> ServiceError |> Error
+            | Some op ->
+                
+                let withClosedContracts =
+                    command.Contracts
+                    |> Array.fold (fun position (contract:OptionContractInput) ->
+                        match contract.Quantity with
+                        | x when x > 0 -> position |> OptionPosition.sellToClose contract.ExpirationDate contract.StrikePrice contract.OptionType x contract.Cost contract.Filled
+                        | x when x < 0 -> position |> OptionPosition.buyToClose contract.ExpirationDate contract.StrikePrice contract.OptionType -x contract.Cost contract.Filled
+                        | _ -> position
+                        ) op
+                
+                do! storage.SaveOptionPosition command.UserId openPosition withClosedContracts
+                
+                return OptionPositionView(withClosedContracts, None) |> Ok 
+    }
+    
+    member this.Handle(command: OpenContractsCommand) = task {
+        let! user = command.UserId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! openPosition = storage.GetOptionPosition command.PositionId command.UserId
+            match openPosition with
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some op when op.IsClosed -> return "Option is closed, contracts can't be modified" |> ServiceError |> Error
+            | Some op ->
+                
+                let withOpenedContracts =
+                    command.Contracts
+                    |> Array.fold (fun position (contract:OptionContractInput) ->
+                        match contract.Quantity with
+                        | x when x > 0 -> position |> OptionPosition.buyToOpen contract.ExpirationDate contract.StrikePrice contract.OptionType x contract.Cost contract.Filled
+                        | x when x < 0 -> position |> OptionPosition.sellToOpen contract.ExpirationDate contract.StrikePrice contract.OptionType -x contract.Cost contract.Filled
+                        | _ -> position
+                        ) op
+                
+                do! storage.SaveOptionPosition command.UserId openPosition withOpenedContracts
+                
+                return OptionPositionView(withOpenedContracts, None) |> Ok
     }
     
     member this.Handle(command: RemoveOptionPositionLabelCommand) = task {
