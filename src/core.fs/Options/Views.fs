@@ -150,15 +150,15 @@ type OwnedOptionStats(summaries:seq<OwnedOptionView>) =
     member this.AverageDaysHeld = optionTrades |> List.map (fun s -> decimal s.DaysHeld) |> List.average
     member this.AverageDaysHeldPercentage = this.AverageDaysHeld / this.AverageDays
     
-type OptionDashboardView(closed:seq<OwnedOptionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<OptionPosition>, orders:seq<OptionOrder>) =
+type OptionDashboardView(closed:seq<OptionPositionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrder>) =
     
     member this.Closed = closed
     member this.Open = ``open``
     member this.Orders = orders
     member this.BrokeragePositions = brokeragePositions
-    member this.OverallStats = OwnedOptionStats(closed)
-    member this.BuyStats = OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Bought"))
-    member this.SellStats = OwnedOptionStats(closed |> Seq.filter (fun s -> s.BoughtOrSold = "Sold"))
+    member this.OverallStats = OwnedOptionStats([]) // TODO make stats to incorporate the new option position structure
+    member this.BuyStats = OwnedOptionStats([])
+    member this.SellStats = OwnedOptionStats([])
 
 type OptionChainView(chain:OptionChain) =
     

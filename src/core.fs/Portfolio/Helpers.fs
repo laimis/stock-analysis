@@ -15,7 +15,7 @@ module Helpers =
         | true ->
         let brokerageSideViolations =
             account.StockPositions
-            |> Seq.map( fun (brokeragePosition:StockPosition) ->
+            |> Seq.map( fun (brokeragePosition:BrokerageStockPosition) ->
                 
                 let currentPrice =
                     match prices.TryGetValue(brokeragePosition.Ticker) with

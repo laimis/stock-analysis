@@ -13,7 +13,6 @@ using core.Shared;
 using Microsoft.FSharp.Core;
 using Moq;
 using Xunit;
-using OptionPosition = core.fs.Adapters.Brokerage.OptionPosition;
 
 namespace coretests.Options
 {
@@ -53,8 +52,8 @@ namespace coretests.Options
                 .Returns(Task.FromResult(
                     FSharpResult<BrokerageAccount,ServiceError>.NewOk(
                         new BrokerageAccount {
-                            OptionPositions = Array.Empty<OptionPosition>(),
-                            StockPositions = Array.Empty<StockPosition>(),
+                            OptionPositions = Array.Empty<BrokerageOptionPosition>(),
+                            StockPositions = Array.Empty<BrokerageStockPosition>(),
                         }
                     )
                 ));

@@ -981,7 +981,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                     |> Array.filter (fun p -> p.instrument.Value.assetType |> isStockType)
                                     |> Array.map (fun p ->
                                         let qty = if p.longQuantity > 0m then p.longQuantity else -p.shortQuantity
-                                        StockPosition(Ticker p.instrument.Value.symbol, p.averagePrice, qty)
+                                        BrokerageStockPosition(Ticker p.instrument.Value.symbol, p.averagePrice, qty)
                                     )
 
                                 let optionPositions =
@@ -1013,7 +1013,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                                             let ticker = p.instrument.Value.underlyingSymbol
                                             
                                             let optionPosition = {
-                                                OptionPosition.Ticker = Ticker ticker
+                                                BrokerageOptionPosition.Ticker = Ticker ticker
                                                 Quantity = if p.longQuantity > 0m then int p.longQuantity else int -p.shortQuantity
                                                 AverageCost = p.averagePrice
                                                 StrikePrice = strike

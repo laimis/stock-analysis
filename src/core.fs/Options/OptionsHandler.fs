@@ -229,14 +229,12 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 
                 let userId = user.Id |> UserId
                 let! optionPositions = storage.GetOptionPositions userId
-                let! ownedOptions = storage.GetOwnedOptions(userId)
-
+                
                 let closedOptions =
-                    ownedOptions
-                    |> Seq.filter (fun o -> o.State.Closed.HasValue)
-                    |> Seq.map (fun o -> o.State)
-                    |> Seq.sortByDescending (fun o -> o.FirstFill.Value)
-                    |> Seq.map (fun o -> OwnedOptionView(o, None))
+                    optionPositions
+                    |> Seq.filter _.IsClosed
+                    |> Seq.sortByDescending _.Closed.Value
+                    |> Seq.map (fun o -> OptionPositionView(o, None))
 
                 let! openOptions =
                     optionPositions

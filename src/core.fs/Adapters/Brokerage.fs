@@ -180,12 +180,12 @@ type AccountTransaction = {
     Applied: DateTimeOffset option
 }
     
-type StockPosition(ticker:Ticker, averageCost:decimal, quantity:decimal) =
+type BrokerageStockPosition(ticker:Ticker, averageCost:decimal, quantity:decimal) =
     member val Ticker = ticker
     member val AverageCost = averageCost
     member val Quantity = quantity
     
-type OptionPosition =
+type BrokerageOptionPosition =
     {
         Ticker: Ticker
         OptionType: string
@@ -199,8 +199,8 @@ type OptionPosition =
     
 type BrokerageAccount() =
     
-    member val StockPositions : StockPosition [] = [||] with get, set
-    member val OptionPositions : OptionPosition [] = [||] with get, set
+    member val StockPositions : BrokerageStockPosition [] = [||] with get, set
+    member val OptionPositions : BrokerageOptionPosition [] = [||] with get, set
     member val StockOrders : StockOrder [] = [||] with get, set
     member val OptionOrders : OptionOrder [] = [||] with get, set
     member val CashBalance : decimal option = None with get, set
