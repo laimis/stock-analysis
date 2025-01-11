@@ -7,7 +7,7 @@ namespace coretests.Adapters.Options
 {
     public class OptionDetailTests
     {
-        private readonly OptionDetail _put = new(symbol: "TICKER", optionType: OptionType.Put, description: "desc", expirationDate: OptionExpiration.createFromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(20)))
+        private readonly OptionDetail _put = new(symbol: "TICKER", optionType: OptionType.Put, description: "desc", expiration: OptionExpiration.createFromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(20)))
         {
             Bid = 1,
             Ask = 2,
@@ -15,7 +15,7 @@ namespace coretests.Adapters.Options
             OpenInterest = 1,
             Volume = 2
         };
-        private readonly OptionDetail _call = new(symbol: "TICKER", optionType: OptionType.Call, description: "desc", expirationDate: OptionExpiration.createFromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(20)))
+        private readonly OptionDetail _call = new(symbol: "TICKER", optionType: OptionType.Call, description: "desc", expiration: OptionExpiration.createFromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(20)))
         {
             Bid = 1,
             Ask = 2,
