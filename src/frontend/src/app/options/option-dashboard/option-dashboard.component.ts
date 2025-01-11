@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute, RouterLink} from "@angular/router";
-import {BrokerageOptionOrder, OptionsContainer, OptionService} from "../../services/option.service";
+import {OptionsContainer, OptionService} from "../../services/option.service";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {NgClass, NgIf} from "@angular/common";

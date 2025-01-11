@@ -113,42 +113,58 @@ type OwnedOptionStats(summaries:seq<OwnedOptionView>) =
     
     member this.Count = optionTrades |> List.length
     member this.Assigned = optionTrades |> List.filter (fun s -> s.Assigned) |> List.length
-    member this.AveragePremiumCapture = optionTrades |> List.averageBy (fun s -> s.PremiumCapture)
+    member this.AveragePremiumCapture =
+        match optionTrades with
+        | [] -> 0m
+        | _ -> optionTrades |> List.averageBy _.PremiumCapture
     
     member this.Wins = wins |> List.length
     member this.AvgWinAmount =
         match wins with
-        | [] -> Nullable<decimal>()
-        | _ -> wins |> List.averageBy (fun s -> s.Profit) |> Nullable<decimal>
+        | [] -> None
+        | _ -> wins |> List.averageBy (fun s -> s.Profit) |> Some
         
     member this.MaxWinAmount =
         match wins with
-        | [] -> Nullable<decimal>()
-        | _ -> wins |> List.map (fun s -> s.Profit) |> List.max |> Nullable<decimal>
+        | [] -> None
+        | _ -> wins |> List.map (fun s -> s.Profit) |> List.max |> Some
         
     member this.Losses = losses |> List.length
     member this.AverageLossAmount =
         match losses with
-        | [] -> Nullable<decimal>()
-        | _ -> losses |> List.averageBy (fun s -> s.Profit) |> abs |> Nullable<decimal>
+        | [] -> None
+        | _ -> losses |> List.averageBy (fun s -> s.Profit) |> abs |> Some
         
     member this.MaxLossAmount =
         match losses with
-        | [] -> Nullable<decimal>()
-        | _ -> losses |> List.map (fun s -> s.Profit) |> List.min |> abs |> Nullable<decimal>
+        | [] -> None
+        | _ -> losses |> List.map (fun s -> s.Profit) |> List.min |> abs |> Some
     
     member this.EV =
-        match (this.AvgWinAmount.HasValue, this.AverageLossAmount.HasValue) with
-        | true, true ->
-            let winPart = (this.AvgWinAmount.Value * decimal this.Wins / decimal this.Count)
-            let lossPart = (this.AverageLossAmount.Value * decimal this.Losses / decimal this.Count)
-            Nullable<decimal>(winPart - lossPart)
-        | _ -> Nullable<decimal>()
+        match (this.AvgWinAmount, this.AverageLossAmount) with
+        | Some avgWinAmount, Some avgLossAmount ->
+            let winPart = (avgWinAmount * decimal this.Wins / decimal this.Count)
+            let lossPart = (avgLossAmount * decimal this.Losses / decimal this.Count)
+            winPart - lossPart |> Some
+        | _ -> None
             
-    member this.AverageProfitPerDay = optionTrades |> List.map (fun s -> s.Profit / decimal s.DaysHeld) |> List.average
-    member this.AverageDays = optionTrades |> List.map (fun s -> decimal s.Days) |> List.average
-    member this.AverageDaysHeld = optionTrades |> List.map (fun s -> decimal s.DaysHeld) |> List.average
-    member this.AverageDaysHeldPercentage = this.AverageDaysHeld / this.AverageDays
+    member this.AverageProfitPerDay =
+        match optionTrades with
+        | [] -> 0m
+        | _ -> optionTrades |> List.map (fun s -> s.Profit / decimal s.DaysHeld) |> List.average
+        
+    member this.AverageDays =
+        match optionTrades with
+        | [] -> 0m
+        | _ -> optionTrades |> List.map (fun s -> decimal s.Days) |> List.average
+    member this.AverageDaysHeld =
+        match optionTrades with
+        | [] -> 0m
+        | _ -> optionTrades |> List.map (fun s -> decimal s.DaysHeld) |> List.average
+    member this.AverageDaysHeldPercentage =
+        match this.AverageDaysHeld with
+        | 0m -> 0m
+        | _ -> this.AverageDaysHeld / this.AverageDays
     
 type OptionDashboardView(closed:seq<OptionPositionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrder>) =
     

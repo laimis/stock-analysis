@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {OwnedOption} from "../../services/option.service";
+import {OptionPosition} from "../../services/option.service";
 import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
 import {CurrencyPipe, DatePipe, PercentPipe} from "@angular/common";
 import {RouterLink} from "@angular/router";
@@ -20,7 +20,7 @@ import {RouterLink} from "@angular/router";
 export class OptionClosedComponent {
 
     @Input()
-    closedOptions: OwnedOption[]
+    closedOptions: OptionPosition[]
 
     constructor() {
     }

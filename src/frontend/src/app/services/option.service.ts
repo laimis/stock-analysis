@@ -237,7 +237,7 @@ export interface BrokerageOptionOrder {
 
 export interface OptionsContainer {
     open: OptionPosition[]
-    closed: OwnedOption[]
+    closed: OptionPosition[]
     brokeragePositions: BrokerageOptionContract[]
     orders: BrokerageOptionOrder[]
     overallStats: OptionStats
