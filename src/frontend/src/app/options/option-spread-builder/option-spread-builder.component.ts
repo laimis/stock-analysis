@@ -125,8 +125,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
     
     createOptionBasedFilters(): void {
         this.uniqueExpirations = this.options.reduce((expirations, option) => {
-            if (!expirations.includes(option.expirationDate)) {
-                expirations.push(option.expirationDate);
+            if (!expirations.includes(option.expiration)) {
+                expirations.push(option.expiration);
             }
             return expirations;
         }, []);
@@ -139,7 +139,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
         if (this.selectedLegs.length > 0) {
             let newLegs = []
             for (let leg of this.selectedLegs) {
-                let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expirationDate == leg.option.expirationDate)
+                let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expiration == leg.option.expiration)
                 if (option) {
                     newLegs.push({ option, action: leg.action, quantity: leg.quantity });
                 }
@@ -153,8 +153,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
         this.storeFiltersInLocalStorage();
         
         this.filteredOptions = this.options.filter(option => {
-            return (this.filterExpiration === '' || option.expirationDate === this.filterExpiration) &&
-                (this.filterType === 'all' || option.side === this.filterType) &&
+            return (this.filterExpiration === '' || option.expiration === this.filterExpiration) &&
+                (this.filterType === 'all' || option.optionType.toLowerCase() === this.filterType) &&
                 (this.filterVolumeOI === 'all' || (option.volume > 0 || option.openInterest > 0)) &&
                 (this.filterBid === 'all' || option.bid > 0) &&
                 option.strikePrice >= this.filterMinimumStrike &&
@@ -345,7 +345,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
             return;
         }
         
-        const selectedLegExpiration = this.selectedLegs[0].option.expirationDate
+        const selectedLegExpiration = this.selectedLegs[0].option.expiration
         const currentIndex = this.uniqueExpirations.indexOf(selectedLegExpiration);
         let newIndex = currentIndex + expirationIndex;
         
@@ -359,7 +359,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
         // but with the new expiration date
         let newLegs = []
         for (let leg of this.selectedLegs) {
-            let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expirationDate == this.uniqueExpirations[newIndex])
+            let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expiration == this.uniqueExpirations[newIndex])
             if (option) {
                 newLegs.push({ option, action: leg.action, quantity: leg.quantity });
             }
@@ -436,8 +436,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
             && x.openInterest > 0 
             && x.volume > 0
             && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expirationDate) > minExpirationDate
-            && Date.parse(x.expirationDate) < maxExpirationDate)
+            && Date.parse(x.expiration) > minExpirationDate
+            && Date.parse(x.expiration) < maxExpirationDate)
         
         for (let longOption of callOptions) {
             const validLong = 
@@ -447,7 +447,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 for (let shortOption of callOptions) {
                     const validShort = 
                         shortOption.strikePrice > longOption.strikePrice
-                        && Date.parse(shortOption.expirationDate) == Date.parse(longOption.expirationDate)
+                        && Date.parse(shortOption.expiration) == Date.parse(longOption.expiration)
                         && shortOption.delta <= 0.35
                     if (validShort) {
                         let cost = longOption.mark - shortOption.mark
@@ -484,8 +484,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
             && x.openInterest > 0
             && x.volume > 0
             && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expirationDate) > minExpirationDate
-            && Date.parse(x.expirationDate) < maxExpirationDate)
+            && Date.parse(x.expiration) > minExpirationDate
+            && Date.parse(x.expiration) < maxExpirationDate)
 
         // For credit spreads, we sell the lower strike and buy the higher strike
         for (let shortOption of callOptions) {
@@ -497,7 +497,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 for (let longOption of callOptions) {
                     const validLong =
                         longOption.strikePrice > shortOption.strikePrice  // Higher strike for protection
-                        && Date.parse(longOption.expirationDate) == Date.parse(shortOption.expirationDate)
+                        && Date.parse(longOption.expiration) == Date.parse(shortOption.expiration)
                         && longOption.delta <= 0.35  // Further OTM for protection
 
                     if (validLong) {
@@ -540,8 +540,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
             && x.openInterest > 0
             && x.volume > 0
             && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expirationDate) > minExpirationDate
-            && Date.parse(x.expirationDate) < maxExpirationDate)
+            && Date.parse(x.expiration) > minExpirationDate
+            && Date.parse(x.expiration) < maxExpirationDate)
 
         // For put debit spreads, we buy the higher strike and sell the lower strike
         for (let longOption of putOptions) {
@@ -553,7 +553,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 for (let shortOption of putOptions) {
                     const validShort =
                         shortOption.strikePrice < longOption.strikePrice  // Lower strike for short put
-                        && Date.parse(shortOption.expirationDate) == Date.parse(longOption.expirationDate)
+                        && Date.parse(shortOption.expiration) == Date.parse(longOption.expiration)
                         && shortOption.delta >= -0.35  // Less aggressive delta for short put
 
                     if (validShort) {
@@ -601,8 +601,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
             && x.openInterest > 0
             && x.volume > 0
             && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expirationDate) > minExpirationDate
-            && Date.parse(x.expirationDate) < maxExpirationDate)
+            && Date.parse(x.expiration) > minExpirationDate
+            && Date.parse(x.expiration) < maxExpirationDate)
 
         // For put credit spreads, we sell the higher strike and buy the lower strike
         for (let shortOption of putOptions) {
@@ -614,7 +614,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 for (let longOption of putOptions) {
                     const validLong =
                         longOption.strikePrice < shortOption.strikePrice  // Lower strike for protection
-                        && Date.parse(longOption.expirationDate) == Date.parse(shortOption.expirationDate)
+                        && Date.parse(longOption.expiration) == Date.parse(shortOption.expiration)
                         && longOption.delta >= -0.35  // Further OTM for cheaper protection
 
                     if (validLong) {

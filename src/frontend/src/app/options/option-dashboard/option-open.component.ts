@@ -72,16 +72,16 @@ export class OptionOpenComponent {
 
     intrinsicValue(option: OptionContract): number {
         if (option.optionType == 'CALL') {
-            if (option.details.currentPrice > option.strikePrice) {
-                return option.details.currentPrice - option.strikePrice
+            if (option.details.underlyingPrice > option.strikePrice) {
+                return option.details.underlyingPrice - option.strikePrice
             } else {
                 return 0
             }
         }
 
         if (option.optionType == 'PUT') {
-            if (option.details.currentPrice < option.strikePrice) {
-                return option.strikePrice - option.details.currentPrice
+            if (option.details.underlyingPrice < option.strikePrice) {
+                return option.strikePrice - option.details.underlyingPrice
             } else {
                 return 0
             }

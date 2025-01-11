@@ -145,7 +145,7 @@
                     <section>
                         <h4>
                             <button class="btn btn-link fs-4"
-                                    (click)="onExpirationChange(expiration[0].expirationDate)">{{ expiration[0].expirationDate }}
+                                    (click)="onExpirationChange(expiration[0].expiration)">{{ expiration[0].expiration }}
                             </button>
                             <span class="float-end">Expires in {{ expiration[0].daysToExpiration }} day(s)</span>
                         </h4>
@@ -177,7 +177,7 @@
                             <tbody>
                                 @for (option of expiration; track option) {
                                     <tr [ngClass]="{'table-info': itm(option)}">
-                                        <td>{{ option.strikePrice | currency }} {{ option.side }}</td>
+                                        <td>{{ option.strikePrice | currency }} {{ option.optionType }}</td>
                                         <td>{{ option.openInterest }}</td>
                                         <td>{{ option.volume }}</td>
                                         <td>{{ option.bid | currency }} vs {{ option.ask | currency }}</td>
@@ -192,7 +192,6 @@
                                         </td>
                                         <td>{{ option.perDayPrice | currency }}</td>
                                         <td>{{ option.risk | percent }}</td>
-                                        <td>{{ option.lastUpdated | date }}</td>
                                     </tr>
                                 }
                             </tbody>

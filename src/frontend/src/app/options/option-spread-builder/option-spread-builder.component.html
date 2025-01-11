@@ -71,7 +71,7 @@
                                             {{ spread.longOption.volume | number }}/{{ spread.longOption.openInterest | number }}, {{ spread.longOption.delta | number:'.2' }}
                                         </small>
                                         <small>
-                                            {{ spread.longOption.expirationDate }} [{{ daysToExpiration(spread.longOption.expirationDate) }}]
+                                            {{ spread.longOption.expiration }} [{{ daysToExpiration(spread.longOption.expiration) }}]
                                         </small>
                                     </td>
                                     <td>
@@ -81,7 +81,7 @@
                                             {{ spread.shortOption.volume | number }}/{{ spread.shortOption.openInterest | number }}, {{ spread.shortOption.delta | number:'.2' }}
                                         </small>
                                         <small>
-                                            {{ spread.shortOption.expirationDate }}
+                                            {{ spread.shortOption.expiration }}
                                         </small>
                                     </td>
                                     <td>
@@ -180,8 +180,8 @@
                         <tbody>
                         <tr *ngFor="let option of filteredOptions" [ngClass]="{'table-success': isBuyLeg(option), 'table-danger': isSellLeg(option)}">
                             <td>{{ option.strikePrice | currency }}</td>
-                            <td>{{ option.expirationDate }}</td>
-                            <td>{{ option.side }}</td>
+                            <td>{{ option.expiration }}</td>
+                            <td>{{ option.optionType }}</td>
                             <td>{{ option.bid | currency }}</td>
                             <td>{{ option.ask | currency }}</td>
                             <td>{{ abs(option.bid - option.ask) | number }}</td>
@@ -237,7 +237,7 @@
                                     <div>
                                         <span class="badge" [ngClass]="{'bg-success': leg.action === 'buy', 'bg-danger': leg.action === 'sell'}">{{leg.action}}</span>
                                         <input type="number" [(ngModel)]="leg.quantity" (change)="updateLegQuantity(i, leg.quantity)" min="1" class="form-control form-control-sm d-inline-block mx-2" style="width: 60px;">
-                                        <small>{{ leg.option.side }} {{ leg.option.strikePrice | currency }} {{ leg.option.expirationDate }}</small>
+                                        <small>{{ leg.option.optionType }} {{ leg.option.strikePrice | currency }} {{ leg.option.expiration }}</small>
                                         <small class="text-muted d-block">
                                             {{ leg.option.bid | currency }} x {{ leg.option.ask | currency }}
                                         </small>

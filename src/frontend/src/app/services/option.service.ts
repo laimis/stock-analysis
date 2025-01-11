@@ -14,10 +14,10 @@ function toSellLeg(option: OptionDefinition) {
 function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDefinition[]> {
     let expirationMap = new Map<string, OptionDefinition[]>();
     options.forEach(function (value, index, arr) {
-        if (!expirationMap.has(value.expirationDate)) {
-            expirationMap.set(value.expirationDate, [value])
+        if (!expirationMap.has(value.expiration)) {
+            expirationMap.set(value.expiration, [value])
         } else {
-            var temp = expirationMap.get(value.expirationDate)
+            const temp = expirationMap.get(value.expiration);
             temp.push(value)
         }
     })
@@ -62,41 +62,23 @@ export class OptionPositionTransaction {
 }
 
 export class OptionDefinition {
-    id: string
     description: string
     symbol: string
     ticker: string
-    side: string
     openInterest: number
     strikePrice: number
-    expirationDate: string
+    expiration: string
     optionType: string
-    numberOfContracts: number
     bid: number
     ask: number
     last: number
     mark: number
     spread: number
     perDayPrice: number
-    lastUpdated: string
-    premium: number
-    filled: string
-    closed: string
     breakEven: number
     risk: number
     volume: number
-    boughtOrSold: string
-    expiresSoon: boolean
-    isExpired: boolean
-    profit: number
-    strikePriceDiff: number
-    currentPrice: number
-    isFavorable: boolean
-    itmOtmLabel: string
-    days: number
     daysToExpiration: number
-    daysHeld: number
-    transactions: Transaction[]
     volatility: number
     delta: number
     gamma: number

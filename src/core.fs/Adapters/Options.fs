@@ -3,11 +3,11 @@ namespace core.fs.Adapters.Options
 open System
 open core.fs.Options
 
-type OptionDetail(symbol:string, optionType:OptionType, description:string, expirationDate:OptionExpiration) =
+type OptionDetail(symbol:string, optionType:OptionType, description:string, expiration:OptionExpiration) =
     
     member this.Symbol = symbol
     member this.Description = description
-    member this.Expiration: OptionExpiration = expirationDate
+    member this.Expiration: OptionExpiration = expiration
     member val StrikePrice: decimal = 0m with get, set
     member val Volume: int64 = 0L with get, set
     member val OpenInterest: int64 = 0L with get, set

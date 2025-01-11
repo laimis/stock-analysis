@@ -97,10 +97,10 @@ export class OptionChainComponent implements OnInit {
 
         let expirationMap = new Map<string, OptionDefinition[]>();
         this.filteredOptions.forEach(function (value, index, arr) {
-            if (!expirationMap.has(value.expirationDate)) {
-                expirationMap.set(value.expirationDate, [value])
+            if (!expirationMap.has(value.expiration)) {
+                expirationMap.set(value.expiration, [value])
             } else {
-                var temp = expirationMap.get(value.expirationDate)
+                var temp = expirationMap.get(value.expiration)
                 temp.push(value)
             }
         })
@@ -117,8 +117,8 @@ export class OptionChainComponent implements OnInit {
 
     includeOption(element: OptionDefinition, includeSizeCheck: boolean) {
         if (this.expirationSelection !== "") {
-            if (element.expirationDate != this.expirationSelection) {
-                console.log("filterig out expiration " + element.expirationDate)
+            if (element.expiration != this.expirationSelection) {
+                console.log("filterig out expiration " + element.expiration)
                 return false
             }
         }
@@ -224,7 +224,7 @@ export class OptionChainComponent implements OnInit {
     }
 
     getOptionsForExpiration(expiration: string) {
-        return this.options.filter(x => x.expirationDate == expiration)
+        return this.options.filter(x => x.expiration == expiration)
     }
 
     isSpreadHealthy(option: OptionDefinition) {
