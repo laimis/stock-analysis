@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
-import {BrokerageOptionOrder} from "./option.service";
+import {BrokerageOptionOrder, OptionPosition} from "./option.service";
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -12,10 +12,6 @@ export class StocksService {
     // ----------------- misc ---------------------
     getEvents(type: string): Observable<object[]> {
         return this.http.get<object[]>('/api/events?entity=' + type)
-    }
-
-    getTransactionSummary(period: string): Observable<ReviewList> {
-        return this.http.get<ReviewList>('/api/portfolio/transactionsummary?period=' + period)
     }
 
     getTransactions(ticker: string, groupBy: string, filter: string, txType: string): Observable<TransactionsView> {
@@ -270,6 +266,10 @@ export class StocksService {
     }
 
     // -------------------- reports -------------------------
+    reportsWeeklySummary(period: string): Observable<WeeklyReport> {
+        return this.http.get<WeeklyReport>('/api/reports/weeklysummary?period=' + period)
+    }
+    
     reportPortfolioCorrelations(days:number): Observable<TickerCorrelation[]> {
         return this.http.get<TickerCorrelation[]>('/api/reports/portfolio/correlations?days=' + days)
     }
@@ -535,15 +535,16 @@ export interface StockSearchResult {
     assetType: string
 }
 
-export interface ReviewList {
+export interface WeeklyReport {
     start: string
     end: string
     stockProfit: number
     optionProfit: number
     totalProfit: number
-    openPositions: PositionInstance[]
-    closedPositions: PositionInstance[]
-    plOptionTransactions: Transaction[]
+    openedStocks: PositionInstance[]
+    closedStocks: PositionInstance[]
+    openedOptions: OptionPosition[]
+    closedOptions: OptionPosition[]
     plStockTransactions: StockPLTransaction[]
     stockTransactions: Transaction[]
     optionTransactions: Transaction[]

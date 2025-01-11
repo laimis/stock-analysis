@@ -35,13 +35,21 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="row text-center">
-                                    <div class="col-4">
-                                        <h5 class="text-muted">Closed Positions</h5>
-                                        <h4>{{ result.closedPositions.length }}</h4>
+                                    <div class="col-2">
+                                        <h5 class="text-muted">Stocks Opened</h5>
+                                        <h4>{{ result.openedStocks.length }}</h4>
                                     </div>
-                                    <div class="col-4">
-                                        <h5 class="text-muted">Open Positions</h5>
-                                        <h4>{{ result.openPositions.length }}</h4>
+                                    <div class="col-2">
+                                        <h5 class="text-muted">Stocks Closed</h5>
+                                        <h4>{{ result.closedStocks.length }}</h4>
+                                    </div>
+                                    <div class="col-2">
+                                        <h5 class="text-muted">Options Opened</h5>
+                                        <h4>{{ result.openedOptions.length }}</h4>
+                                    </div>
+                                    <div class="col-2">
+                                        <h5 class="text-muted">Options Closed</h5>
+                                        <h4>{{ result.closedOptions.length }}</h4>
                                     </div>
                                     <div class="col-4">
                                         <h5 class="text-muted">Risk/Reward</h5>
@@ -94,8 +102,8 @@
         </div>
         <div class="card mb-4">
             <div class="card-body">
-                <h4 class="card-title">Closed Positions</h4>
-                @for (p of result.closedPositions; track p) {
+                <h4 class="card-title">Closed Stock Positions</h4>
+                @for (p of result.closedStocks; track p) {
                     <div class="row align-items-center"
                          [ngClass]="{'bg-danger-subtle': p.profit < 0, 'bg-success-subtle': p.profit >= 0}">
                         <div class="col">
@@ -124,7 +132,7 @@
 
                     <app-stock-trading-position [position]="p"></app-stock-trading-position>
                 }
-                @if (result.closedPositions.length === 0) {
+                @if (result.closedStocks.length === 0) {
                     <div class="text-center py-4">
                         <p class="text-muted mb-0">No stock positions closed</p>
                     </div>
@@ -133,9 +141,9 @@
         </div>
         <div class="card mb-4">
             <div class="card-body">
-                <h4 class="card-title">Opened Positions</h4>
+                <h4 class="card-title">Opened Stocks</h4>
                 <table class="table">
-                    <thead *ngIf="result.openPositions.length > 0">
+                    <thead *ngIf="result.openedStocks.length > 0">
                     <tr>
                         <th style="width: 140px">Symbol</th>
                         <th style="width: 140px">Type</th>
@@ -145,7 +153,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                        @for (p of result.openPositions; track p) {
+                        @for (p of result.openedStocks; track p) {
                             <tr>
                                 <td>
                                     <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
@@ -157,7 +165,7 @@
                                 <td>{{ p.opened | date: 'MM/dd/yyyy' }}</td>
                             </tr>
                         }
-                        @if (result.openPositions.length === 0) {
+                        @empty {
                             <tr>
                                 <td colspan="6" class="text-center py-4">No stock positions opened</td>
                             </tr>
@@ -193,6 +201,70 @@
                         } @empty {
                             <tr>
                                 <td colspan="3" class="text-center py-4">No stock P&L transactions</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Opened Options</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px">Symbol</th>
+                            <th style="width: 140px">Opened</th>
+                            <th style="width: 140px">Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (g of result.openedOptions; track g) {
+                            <tr>
+                                <td>
+                                    <app-trading-view-link [ticker]="g.underlyingTicker"></app-trading-view-link>
+                                    <app-stock-link [ticker]="g.underlyingTicker" [openInNewTab]="true"></app-stock-link>
+                                </td>
+                                <td>{{ g.opened | date }}</td>
+                                <td>{{ g.cost | currency }}</td>
+                            </tr>
+                        }
+                        @empty {
+                            <tr>
+                                <td colspan="3" class="text-center py-4">No opened options</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Closed Options</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px">Symbol</th>
+                            <th style="width: 140px">Profit</th>
+                            <th style="width: 140px">Opened</th>
+                            <th style="width: 140px">Closed</th>
+                        </tr>`
+                    </thead>
+                    <tbody>
+                        @for (g of result.closedOptions; track g) {
+                            <tr>
+                                <td>
+                                    <app-trading-view-link [ticker]="g.underlyingTicker"></app-trading-view-link>
+                                    <app-stock-link [ticker]="g.underlyingTicker" [openInNewTab]="true"></app-stock-link>
+                                </td>
+                                <td>{{ g.profit | currency }}</td>
+                                <td>{{ g.opened | date }}</td>
+                                <td>{{ g.closed | date }}</td>
+                            </tr>
+                        }
+                        @empty {
+                            <tr>
+                                <td colspan="4" class="text-center py-4">No closed options</td>
                             </tr>
                         }
                     </tbody>
@@ -243,55 +315,6 @@
                         @empty {
                             <tr>
                                 <td colspan="4" class="text-center py-4">No dividends</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4 class="card-title">Options P&L</h4>
-                <table class="table">
-                    <tbody>
-                        @for (g of result.plOptionTransactions; track g) {
-                            <tr>
-                                <td style="width: 140px">
-                                    <app-trading-view-link [ticker]="g.ticker"></app-trading-view-link>
-                                    <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
-                                </td>
-                                <td style="width: 140px">{{ g.amount | currency }}</td>
-                                <td style="width: 140px">{{ g.date | date }}</td>
-                                <td>{{ g.description }}</td>
-                            </tr>
-                        }
-                        @if (result.plOptionTransactions.length === 0) {
-                            <tr>
-                                <td colspan="4" class="text-center py-4">No option P&L transactions</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Non-PL Breakdown</h4>
-                <table class="table">
-                    <tbody>
-                        @for (g of result.optionTransactions; track g) {
-                            <tr>
-                                <td style="width: 140px">
-                                    <app-stock-link [ticker]="g.ticker" [openInNewTab]="true"></app-stock-link>
-                                </td>
-                                <td style="width: 140px">{{ g.amount | currency }}</td>
-                                <td style="width: 140px">{{ g.date | date }}</td>
-                                <td>{{ g.description }}</td>
-                            </tr>
-                        }
-                        @if (result.optionTransactions.length === 0) {
-                            <tr>
-                                <td colspan="4" class="text-center py-4">No option transactions</td>
                             </tr>
                         }
                     </tbody>

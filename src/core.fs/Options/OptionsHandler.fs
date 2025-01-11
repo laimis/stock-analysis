@@ -148,8 +148,8 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     command.Contracts
                     |> Array.fold (fun position (contract:OptionContractInput) ->
                         match contract.Quantity with
-                        | x when x > 0 -> position |> OptionPosition.sellToClose contract.ExpirationDate contract.StrikePrice contract.OptionType x contract.Cost contract.Filled
-                        | x when x < 0 -> position |> OptionPosition.buyToClose contract.ExpirationDate contract.StrikePrice contract.OptionType -x contract.Cost contract.Filled
+                        | x when x > 0 -> position |> OptionPosition.buyToClose contract.ExpirationDate contract.StrikePrice contract.OptionType x contract.Cost contract.Filled
+                        | x when x < 0 -> position |> OptionPosition.sellToClose contract.ExpirationDate contract.StrikePrice contract.OptionType -x contract.Cost contract.Filled
                         | _ -> position
                         ) op
                 

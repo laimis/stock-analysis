@@ -47,6 +47,7 @@ export interface OptionPosition {
     isOpen: boolean
     isClosed: boolean
     opened: string
+    closed: string
     notes: Note[]
     labels: KeyValuePair[]
 }

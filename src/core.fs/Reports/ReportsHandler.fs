@@ -10,11 +10,13 @@ open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
+open core.fs.Options
 open core.fs.Services
 open core.fs.Services.Analysis
 open core.fs.Services.GapAnalysis
 open core.fs.Services.Trends
 open core.fs.Stocks
+open core.fs.Stocks.StockPosition
 
 type ChainQuery =
     {
@@ -241,7 +243,71 @@ type SellsView(stocks:StockPositionState seq,prices:Dictionary<Ticker,StockQuote
                 | false, _ -> None
         })
         
+type WeeklySummaryQuery =
+    {
+        Period: string
+        UserId: UserId
+    }
     
+    member this.GetDates() =
+        let start = DateTimeOffset.UtcNow.Date.AddDays(-7)
+        let ``end`` = DateTimeOffset.UtcNow.Date.AddDays(1);
+
+        match this.Period with
+        | "last7days" ->
+            (start, ``end``)
+        | _ ->
+            let date = DateTimeOffset.UtcNow.Date;
+            let offset = int date.DayOfWeek - 1;
+            let toSubtract =
+                match offset with
+                | x when x < 0 -> 6
+                | _ -> offset
+
+            let monday = date.AddDays(-1.0 * (toSubtract |> float));
+            let sunday = monday.AddDays(7)
+            
+            (monday, sunday)
+            
+type WeeklySummaryView(
+    start,
+    ``end``,
+    openedStocks:StockPositionWithCalculations list,
+    closedStocks:StockPositionWithCalculations list,
+    stockTransactions:PLTransaction list,
+    optionTransactions:Transaction list,
+    plStockTransactions:PLTransaction list,
+    openedOptions:OptionPositionState list,
+    closedOptions:OptionPositionState list,
+    dividends:StockPositionDividendTransaction list,
+    fees:StockPositionFeeTransaction list) =
+        
+        let optionMultipler= 100m
+        
+        member _.Start = start
+        member _.End = ``end``
+        member _.OpenedStocks = openedStocks
+        member _.ClosedStocks = closedStocks
+        member _.StockTransactions = stockTransactions
+        member _.OptionTransactions = optionTransactions
+        member _.PLStockTransactions = plStockTransactions
+        member _.OpenedOptions = openedOptions |> List.map (fun o -> OptionPositionView(o, None))
+        member _.ClosedOptions = closedOptions |> List.map (fun o -> OptionPositionView(o, None))
+        member _.Dividends = dividends
+        member _.Fees = fees
+        
+        member _.StockProfit =
+            plStockTransactions
+            |> Seq.sumBy (fun (t:PLTransaction) -> t.Profit)
+        member _.DividendProfit =
+            dividends
+            |> Seq.sumBy (fun (t:StockPositionDividendTransaction) -> t.NetAmount)
+        member _.FeeProfit =
+            fees
+            |> Seq.sumBy (fun (t:StockPositionFeeTransaction) -> t.NetAmount)
+        member this.OptionProfit = this.ClosedOptions |> Seq.sumBy _.Profit |> fun x -> x * optionMultipler
+        member this.TotalProfit = this.StockProfit + this.DividendProfit + this.FeeProfit + this.OptionProfit
+
 type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHours,storage:IPortfolioStorage) =
     
     let getLevel (position:StockPositionWithCalculations) =
@@ -313,8 +379,8 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             
         let tickers = 
             stocks
-            |> Seq.filter (_.IsOpen)
-            |> Seq.map (_.Ticker)
+            |> Seq.filter _.IsOpen
+            |> Seq.map _.Ticker
             
         return! runCorrelations request.UserId request.Days tickers
     }
@@ -583,8 +649,8 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
                     
                     let position =
                         StockPosition.``open`` pendingPosition.Ticker pendingPosition.NumberOfShares brokeragePosition.AverageCost openDate
-                        |> StockPosition.setStop pendingPosition.StopPrice openDate
-                        |> StockPosition.setLabel "strategy" pendingPosition.Strategy openDate
+                        |> setStop pendingPosition.StopPrice openDate
+                        |> setLabel "strategy" pendingPosition.Strategy openDate
                         
                     position
                 )
@@ -671,7 +737,7 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             let! priceResult =
                 brokerage.GetQuotes
                     user.State
-                    (stocks |> Seq.map (_.Ticker))
+                    (stocks |> Seq.map _.Ticker)
             
             let prices = priceResult |> Result.defaultValue (Dictionary<Ticker,StockQuote>())
                 
@@ -699,4 +765,91 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
                 let trends = TrendCalculator.generate query.Ticker query.TrendType prices
                 trends
             )
+    }
+    
+    member _.Handle (query:WeeklySummaryQuery) = task {
+        
+        let! stocks = storage.GetStockPositions query.UserId
+        let! options = storage.GetOptionPositions query.UserId
+        let start, ``end`` = query.GetDates()
+        
+        let stocks = stocks |> Seq.map StockPositionWithCalculations |> Seq.toArray
+             
+        let optionTransactions =
+            options
+            |> Seq.map (fun o ->
+                o.Transactions |> List.map (fun t -> o, t)
+            )
+            |> Seq.collect id
+            |> Seq.filter (fun (_,t) -> t.When >= DateTimeOffset(start))
+            |> Seq.map (fun (s,t) ->
+                
+                let aggregateId = OptionPositionId.guid s.PositionId
+                let amount =
+                    match t.Credited with
+                    | Some value -> value
+                    | None -> t.Debited |> Option.defaultValue 0m
+                
+                Transaction.NonPLTx(aggregateId, t.EventId, s.UnderlyingTicker, "tbd", amount, amount, t.When, true)
+            )
+            |> Seq.toList
+            
+        let plStockTransactions =
+            stocks
+            |> Seq.collect _.PLTransactions
+            |> Seq.filter (fun t -> t.Date >= DateTimeOffset(start))
+            |> Seq.sortBy _.Ticker
+            |> Seq.toList
+            
+        let dividends =
+            stocks
+            |> Seq.collect _.Dividends
+            |> Seq.filter (fun d -> d.Date >= DateTimeOffset(start))
+            |> Seq.sortBy _.Ticker
+            |> Seq.toList
+            
+        let fees =
+            stocks
+            |> Seq.collect _.Fees
+            |> Seq.filter (fun f -> f.Date >= DateTimeOffset(start))
+            |> Seq.sortBy _.Ticker
+            |> Seq.toList
+            
+        let closedOptions =
+            options
+            |> Seq.filter (fun s -> s.Closed.IsSome && s.Closed.Value >= DateTimeOffset(start) && s.Closed.Value <= DateTimeOffset(``end``))
+            |> Seq.sortBy _.UnderlyingTicker
+            |> Seq.toList
+            
+        let openedOptions =
+            options
+            |> Seq.filter (fun s -> s.Closed.IsNone && s.Opened >= DateTimeOffset(start) && s.Opened <= DateTimeOffset(``end``))
+            |> Seq.sortBy _.UnderlyingTicker
+            |> Seq.toList
+            
+        let closedStocks =
+            stocks
+            |> Seq.filter (fun p -> p.IsClosed && p.Closed.Value >= DateTimeOffset(start) && p.Closed.Value <= DateTimeOffset(``end``))
+            |> Seq.toList
+            
+        let openedStocks =
+            stocks
+            |> Seq.filter (fun p -> p.IsClosed = false && p.Opened >= DateTimeOffset(start) && p.Opened <= DateTimeOffset(``end``))
+            |> Seq.toList
+            
+        let view = WeeklySummaryView(
+            start=start,
+            ``end``=``end``,
+            openedStocks=openedStocks,
+            closedStocks=closedStocks,
+            stockTransactions=List.empty<PLTransaction>,
+            optionTransactions=optionTransactions,
+            plStockTransactions=plStockTransactions,
+            openedOptions=openedOptions,
+            closedOptions=closedOptions,
+            dividends=dividends,
+            fees=fees
+        )
+        
+        return view
     }

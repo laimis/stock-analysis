@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
-import {PositionInstance, ReviewList, StocksService} from '../services/stocks.service';
+import {PositionInstance, StocksService, WeeklyReport} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 
 @Component({
@@ -10,7 +10,7 @@ import {GetErrors} from "../services/utils";
     standalone: false
 })
 export class SummaryComponent implements OnInit {
-    result: ReviewList
+    result: WeeklyReport
     loaded: boolean = false
     timePeriod: string = 'thisweek'
     errors: string[] = []
@@ -42,19 +42,19 @@ export class SummaryComponent implements OnInit {
     }
 
     closedPositionProfit(): number {
-        return this.result.closedPositions.reduce((acc, cur) => acc + cur.profit, 0)
+        return this.result.closedStocks.reduce((acc, cur) => acc + cur.profit, 0)
     }
 
     closedPositionRR(): number {
-        return this.result.closedPositions.reduce((acc, cur) => acc + cur.rr, 0)
+        return this.result.closedStocks.reduce((acc, cur) => acc + cur.rr, 0)
     }
 
     private loadEntries() {
-        this.stockService.getTransactionSummary(this.timePeriod).subscribe((r: ReviewList) => {
+        this.stockService.reportsWeeklySummary(this.timePeriod).subscribe((r: WeeklyReport) => {
             this.loaded = true
             this.result = r
             this.stockProfits = r.plStockTransactions.reduce((acc, cur) => acc + cur.profit, 0)
-            this.optionProfits = r.plOptionTransactions.reduce((acc, cur) => acc + cur.amount, 0)
+            this.optionProfits = r.closedOptions.reduce((acc, cur) => acc + cur.profit, 0) * 100
             this.dividendProfits = r.dividends.reduce((acc, cur) => acc + cur.netAmount, 0)
         }, error => {
             this.errors = GetErrors(error)

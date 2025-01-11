@@ -60,12 +60,13 @@ type OptionLeg = {
 }
 
 type OptionTransaction = {
+    EventId: Guid
     Expiration: string
     Strike: decimal
     OptionType: string
     Quantity: int
-    Debited: decimal
-    Credited: decimal
+    Debited: decimal option
+    Credited: decimal option
     When: DateTimeOffset
 }
 
@@ -211,7 +212,7 @@ module OptionPosition =
             
         | :? OptionContractBoughtToOpen as x ->
             let debit = decimal x.Quantity * x.Price
-            let transaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit; Credited = 0m; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString; }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost + debit)
@@ -220,7 +221,7 @@ module OptionPosition =
             
         | :? OptionContractSoldToOpen as x ->
             let credit = decimal x.Quantity * x.Price
-            let transaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit; Debited = 0m; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost + credit)
@@ -229,7 +230,7 @@ module OptionPosition =
             
         | :? OptionContractBoughtToClose as x ->
             let debit = decimal x.Quantity * x.Price
-            let transaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit; Credited = 0m; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost - debit)
@@ -238,7 +239,7 @@ module OptionPosition =
             
         | :? OptionContractSoldToClose as x ->
             let credit = decimal x.Quantity * x.Price
-            let transaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit; Debited = 0m; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost - credit)
@@ -246,21 +247,21 @@ module OptionPosition =
             { p with Transactions = p.Transactions @ [transaction]; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
         | :? OptionPositionClosed as x ->
-            let debits = p.Transactions |> List.sumBy _.Debited
-            let credits = p.Transactions |> List.sumBy _.Credited
+            let debits = p.Transactions |> List.map _.Debited |> List.choose id |> List.sum
+            let credits = p.Transactions |> List.map _.Credited |> List.choose id |> List.sum
             let profit = credits - debits
             { p with Closed = Some x.When; Profit = profit; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractsExpired as x ->
-            let expirationTransaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = 0m; Credited = 0m; When = x.When }
+            let expirationTransaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             { p with Transactions = p.Transactions @ [expirationTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractsAssigned as x ->
-            let assignmentTransaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = 0m; Credited = 0m; When = x.When }
+            let assignmentTransaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             { p with Transactions = p.Transactions @ [assignmentTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractsExercised as x ->
-            let exerciseTransaction = { Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = 0m; Credited = 0m; When = x.When }
+            let exerciseTransaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             { p with Transactions = p.Transactions @ [exerciseTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionPositionDeleted as x ->
@@ -370,7 +371,7 @@ module OptionPosition =
             |> List.sum
         
         if contractsAvailable > 0 then
-            raise (InvalidOperationException($"Cannot buy back contracts that were not sold, have {contractsAvailable} and trying to buy {quantity}"))
+            raise (InvalidOperationException($"Cannot buy back contracts that were not sold, have {contractsAvailable} and trying to buy {quantity} {strike} {optionType}"))
             
         if abs(contractsAvailable) < quantity then
             raise (InvalidOperationException($"Not enough contracts available to close, have {contractsAvailable} and trying to close {quantity}"))

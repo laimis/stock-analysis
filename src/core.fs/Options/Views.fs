@@ -41,7 +41,9 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen
     member this.Cost = state.Cost
-    member this.Market = contracts |> Seq.sumBy (fun c -> c.details |> Option.map(fun o -> o.Mark * decimal c.quantity) |> Option.defaultValue 0m)
+    member this.Market =
+        contracts
+        |> Seq.sumBy (fun c -> c.details |> Option.map(fun o -> o.Mark * decimal c.quantity) |> Option.defaultValue 0m)
     member this.Profit =
         match this.IsClosed with
         | true -> state.Profit

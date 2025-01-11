@@ -18,7 +18,7 @@
                 Cost: {{ cost | currency }}
             </div>
             <div class="col text-end">
-                Profit: <span [ngClass]="{'text-success': (currentCost - cost) > 0, 'text-danger': (currentCost - cost) < 0}" class="fw-bold">
+                Profit: <span [ngClass]="{'text-success': (currentCost - cost) > 0, 'text-black': (currentCost - cost) < 0}" class="fw-bold">
                     {{ currentCost - cost | currency }}
                 </span>
             </div>
@@ -39,7 +39,7 @@
                             <span class="badge bg-secondary">{{position.daysToExpiration[0]}} days to expiration</span>
                         </div>
                         <div class="position-summary">
-                            <span [ngClass]="{'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
+                            <span [ngClass]="{'text-success': position.profit > 0, 'text-black': position.profit < 0}">
                                 {{position.profit | currency}}
                             </span>
                         </div>

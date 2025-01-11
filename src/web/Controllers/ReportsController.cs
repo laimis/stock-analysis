@@ -125,5 +125,13 @@ namespace web.Controllers
                     )
                 )
             );
+        
+        [HttpGet("weeklysummary")]
+        public Task<WeeklySummaryView> Review(string period) =>
+            service.Handle(
+                new WeeklySummaryQuery(period: period, userId: User.Identifier())
+            );
+
+
     }
 }

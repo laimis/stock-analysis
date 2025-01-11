@@ -249,32 +249,6 @@ type QueryTransactions =
         Ticker:Ticker option
     }
     
-type TransactionSummary =
-    {
-        Period: string
-        UserId: UserId
-    }
-    
-    member this.GetDates() =
-        let start = DateTimeOffset.UtcNow.Date.AddDays(-7)
-        let ``end`` = DateTimeOffset.UtcNow.Date.AddDays(1);
-
-        match this.Period with
-        | "last7days" ->
-            (start, ``end``)
-        | _ ->
-            let date = DateTimeOffset.UtcNow.Date;
-            let offset = int date.DayOfWeek - 1;
-            let toSubtract =
-                match offset with
-                | x when x < 0 -> 6
-                | _ -> offset
-
-            let monday = date.AddDays(-1.0 * (toSubtract |> float));
-            let sunday = monday.AddDays(7)
-            
-            (monday, sunday)
-    
 type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser,logger:ILogger) =
     
     let isNotLongTermInterest (s:StockPositionState) = s.HasLabel "strategy" "longterminterest" |> not
@@ -1084,77 +1058,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let transactionsView = toTransactionsView stocks options cryptos 
         
         return transactionsView |> Ok
-    }
-    
-    member _.Handle (query:TransactionSummary) = task {
-        
-        let! stocks = storage.GetStockPositions query.UserId
-        let! options = storage.GetOwnedOptions(query.UserId)
-        let start, ``end`` = query.GetDates()
-        
-        let stocks = stocks |> Seq.map StockPositionWithCalculations |> Seq.toArray
-             
-        let optionTransactions =
-            options
-            |> Seq.collect (fun o -> o.State.Transactions)
-            |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
-            |> Seq.filter (fun t -> t.IsPL |> not)
-            |> Seq.sortBy (fun t -> t.Ticker)
-            |> Seq.toList
-            
-        let plStockTransactions =
-            stocks
-            |> Seq.collect _.PLTransactions
-            |> Seq.filter (fun t -> t.Date >= DateTimeOffset(start))
-            |> Seq.sortBy _.Ticker
-            |> Seq.toList
-            
-        let dividends =
-            stocks
-            |> Seq.collect _.Dividends
-            |> Seq.filter (fun d -> d.Date >= DateTimeOffset(start))
-            |> Seq.sortBy _.Ticker
-            |> Seq.toList
-            
-        let fees =
-            stocks
-            |> Seq.collect _.Fees
-            |> Seq.filter (fun f -> f.Date >= DateTimeOffset(start))
-            |> Seq.sortBy _.Ticker
-            |> Seq.toList
-            
-        let plOptionTransactions =
-            options
-            |> Seq.collect _.State.Transactions
-            |> Seq.filter (fun t -> t.DateAsDate >= DateTimeOffset(start))
-            |> Seq.filter _.IsPL
-            |> Seq.sortBy _.Ticker
-            |> Seq.toList
-            
-        let closedPositions =
-            stocks
-            |> Seq.filter (fun p -> p.IsClosed && p.Closed.Value >= DateTimeOffset(start) && p.Closed.Value <= DateTimeOffset(``end``))
-            |> Seq.toList
-            
-        let openPositions =
-            stocks
-            |> Seq.filter (fun p -> p.IsClosed = false && p.Opened >= DateTimeOffset(start) && p.Opened <= DateTimeOffset(``end``))
-            |> Seq.toList
-            
-        let view = TransactionSummaryView(
-            start=start,
-            ``end``=``end``,
-            openPositions=openPositions,
-            closedPositions=closedPositions,
-            stockTransactions=List.empty<PLTransaction>,
-            optionTransactions=optionTransactions,
-            plStockTransactions=plStockTransactions,
-            plOptionTransactions=plOptionTransactions,
-            dividends=dividends,
-            fees=fees
-        )
-        
-        return view
     }
     
     member _.HandleStop(userId,cmd:SetStop) = task {

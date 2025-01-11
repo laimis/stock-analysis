@@ -39,12 +39,6 @@ public class PortfolioController(
             )
         );
 
-    [HttpGet("transactionsummary")]
-    public Task<TransactionSummaryView> Review(string period) =>
-        stockPositionHandler.Handle(
-            new TransactionSummary(period: period, userId: User.Identifier())
-        );
-
     [HttpGet("stockpositions/export/closed")]
     public Task<ActionResult> ExportClosed() =>
         this.GenerateExport(
