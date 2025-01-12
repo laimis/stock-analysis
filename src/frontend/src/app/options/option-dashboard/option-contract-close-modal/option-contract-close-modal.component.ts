@@ -8,14 +8,15 @@ import {
     BrokerageService,
 } from "../../../services/brokerage.service";
 import {GetErrors} from "../../../services/utils";
-import {CurrencyPipe, NgIf} from "@angular/common";
+import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-option-contract-close-modal',
     imports: [
         FormsModule,
         CurrencyPipe,
-        NgIf
+        NgIf,
+        NgForOf
     ],
   templateUrl: './option-contract-close-modal.component.html',
   styleUrl: './option-contract-close-modal.component.css'
@@ -30,6 +31,7 @@ export class OptionContractCloseModalComponent implements OnChanges {
 
     positionNotes: string;
     price: number;
+    costDrops: { [key: string]: number } = {};
     
     constructor(
         private optionService: OptionService,
@@ -41,7 +43,17 @@ export class OptionContractCloseModalComponent implements OnChanges {
         if (this.position && this.contract?.details) {
             console.log("setting price value", this.contract.details?.mark)
             this.price = this.contract.details.mark;
+            this.calculateCostDrops();
         }
+    }
+
+    calculateCostDrops() {
+        const price = this.contract.cost;
+        this.costDrops = {
+            '70%': price - price * 0.7,
+            '80%': price - price * 0.8,
+            '90%': price - price * 0.9,
+        };
     }
 
     @HostListener('document:keydown.escape')

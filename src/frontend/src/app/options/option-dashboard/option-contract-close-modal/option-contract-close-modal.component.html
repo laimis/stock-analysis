@@ -55,6 +55,15 @@
                             [(ngModel)]="positionNotes"
                             placeholder="Add any relevant notes about this contract..."></textarea>
                     </div>
+
+                    <div class="mb-3" *ngIf="costDrops">
+                        <h3>Pricing Help</h3>
+                        <ul>
+                            <li *ngFor="let key of ['90%', '80%', '70%']">
+                                {{ key }}: {{ costDrops[key] | currency }}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
