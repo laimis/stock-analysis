@@ -41,7 +41,7 @@ export class OptionPositionComponent {
     newLabelKey: string;
     newLabelValue: string;
     showNotesForm: boolean = false;
-    notesExpanded: boolean = false;
+    notesExpanded: boolean = true;
     notesControl = new FormControl();
     showCloseModal: boolean = false;
     showContractCloseModal: boolean
@@ -103,6 +103,18 @@ export class OptionPositionComponent {
     }
     
     addNote() {
+        this.optionService.addNotes(this.position.positionId, this.notesControl.value).subscribe({
+            next: (result) => {
+                this.positionChanged.emit();
+            },
+            error: (error) => {
+                let errors = GetErrors(error);
+                this.errorOccurred.emit(errors);
+            },
+            complete: () => {
+                console.log("Add note complete");
+            }
+        });
     }
     
     closePositionWithMarketOrder() {
