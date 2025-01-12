@@ -9,6 +9,9 @@ import {OptionBrokerageOrdersComponent} from "../option-dashboard/option-brokera
 import {
     OptionPositionCloseModalComponent
 } from "../option-dashboard/option-position-close-modal/option-position-close-modal.component";
+import {
+    OptionContractCloseModalComponent
+} from "../option-dashboard/option-contract-close-modal/option-contract-close-modal.component";
 
 @Component({
   selector: 'app-option-position',
@@ -23,7 +26,8 @@ import {
         PercentPipe,
         NgIf,
         OptionBrokerageOrdersComponent,
-        OptionPositionCloseModalComponent
+        OptionPositionCloseModalComponent,
+        OptionContractCloseModalComponent
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
@@ -40,6 +44,8 @@ export class OptionPositionComponent {
     notesExpanded: boolean = false;
     notesControl = new FormControl();
     showCloseModal: boolean = false;
+    showContractCloseModal: boolean
+    contractToClose: OptionContract;
     
     @Input() position: OptionPosition;
     
@@ -101,6 +107,11 @@ export class OptionPositionComponent {
     
     closePositionWithMarketOrder() {
         this.showCloseModal = true;
+    }
+    
+    closeContract(contract: OptionContract) {
+        this.contractToClose = contract;
+        this.showContractCloseModal = true;
     }
     
     deletePosition() {

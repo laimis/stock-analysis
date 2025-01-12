@@ -109,27 +109,28 @@
                                 <th>Market</th>
                                 <th>Delta</th>
                                 <th>IV</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
                                 @for (contract of position.contracts; track contract) {
                                     <tr>
                                         <td>
-                            <span class="badge p-1 m-1" [ngClass]="{
-                                'bg-success-subtle text-success': contract.pctInTheMoney > 0,
-                                'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
-                            }">
-                                {{ contract.pctInTheMoney > 0 ? 'ITM ' : 'OTM ' }}
-                                {{ contract.pctInTheMoney | percent }}
-                            </span>
+                                            <span class="badge p-1 m-1" [ngClass]="{
+                                                'bg-success-subtle text-success': contract.pctInTheMoney > 0,
+                                                'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
+                                            }">
+                                                {{ contract.pctInTheMoney > 0 ? 'ITM ' : 'OTM ' }}
+                                                {{ contract.pctInTheMoney | percent }}
+                                            </span>
                                         </td>
                                         <td>
-                            <span class="badge p-1 m-1" [ngClass]="{
-                                'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
-                                'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
-                            }">
-                                {{ contract.optionType }}
-                            </span>
+                                            <span class="badge p-1 m-1" [ngClass]="{
+                                                'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
+                                                'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
+                                            }">
+                                                {{ contract.optionType }}
+                                            </span>
                                         </td>
                                         <td>{{ contract.strikePrice | currency }}</td>
                                         <td>{{ contract.expiration | date:'shortDate' }}</td>
@@ -153,6 +154,11 @@
                                         
                                         <td>{{ contract.details?.delta | number }}</td>
                                         <td>{{ contract.details?.volatility | number}}</td>
+                                        <td>
+                                            <button class="btn btn-outline-secondary btn-sm" (click)="closeContract(contract)">
+                                                Close Contract
+                                            </button>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -355,4 +361,12 @@
         [isVisible]="showCloseModal"
         (isVisibleChange) = "showCloseModal = $event"
         (errorsOccurred)="errorOccurred.emit($event)" (positionOrderCreated)="positionChanged.emit()"></app-option-position-close-modal>
+    
+    <app-option-contract-close-modal
+        [position]="position"
+        [contract]="contractToClose"
+        [isVisible]="showContractCloseModal"
+        (isVisibleChange)="showContractCloseModal = $event"
+        (errorsOccurred)="errorOccurred.emit($event)"
+        (contractOrderCreated)="positionChanged.emit()"></app-option-contract-close-modal>
 }

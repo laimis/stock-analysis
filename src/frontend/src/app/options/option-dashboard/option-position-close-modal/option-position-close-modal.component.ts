@@ -3,7 +3,7 @@ import {CurrencyPipe, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {OptionPosition, OptionService} from "../../../services/option.service";
 import {GetErrors} from "../../../services/utils";
-import {BrokerageService, OptionOrderCommand, OrderInstruction, OrderType} from "../../../services/brokerage.service";
+import {BrokerageService, OptionOrderCommand, OptionOrderInstruction, OptionOrderType} from "../../../services/brokerage.service";
 
 @Component({
   selector: 'app-option-position-close-modal',
@@ -76,14 +76,14 @@ export class OptionPositionCloseModalComponent implements OnChanges {
     createClosePositionOrder(position: OptionPosition) {
         // this will need to be completely rewritten
         let price = this.price
-        let orderType = price < 0 ? OrderType.NET_DEBIT : OrderType.NET_CREDIT
+        let orderType = price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
         let session = "NORMAL"
         let duration = "GOOD_TILL_CANCEL"
         let orderStrategyType = "SINGLE"
 
         let collections = position.contracts.map(x => {
             return {
-                instruction: x.quantity < 0 ? OrderInstruction.BUY_TO_CLOSE : OrderInstruction.SELL_TO_CLOSE,
+                instruction: x.quantity < 0 ? OptionOrderInstruction.BUY_TO_CLOSE : OptionOrderInstruction.SELL_TO_CLOSE,
                 quantity: Math.abs(x.quantity),
                 instrument: {
                     symbol: x.details.symbol,

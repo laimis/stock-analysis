@@ -9,8 +9,8 @@ import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-li
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 import {
     BrokerageService,
-    OptionOrderCommand, OrderInstruction,
-    OrderType
+    OptionOrderCommand, OptionOrderInstruction,
+    OptionOrderType
 } from "../../services/brokerage.service";
 import {OptionChain, OptionDefinition, OptionService} from "../../services/option.service";
 
@@ -385,14 +385,14 @@ export class OptionSpreadBuilderComponent implements OnInit {
     
     createOrder(price:number) {
         
-        let orderType = price < 0 ? OrderType.NET_DEBIT : OrderType.NET_CREDIT
+        let orderType = price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
         let session = "NORMAL"
         let duration = "GOOD_TILL_CANCEL"
         let orderStrategyType = "SINGLE"
         
         let collections = this.selectedLegs.map(x => {
             return {
-                instruction: x.action === "buy" ? OrderInstruction.BUY_TO_OPEN : OrderInstruction.SELL_TO_OPEN,
+                instruction: x.action === "buy" ? OptionOrderInstruction.BUY_TO_OPEN : OptionOrderInstruction.SELL_TO_OPEN,
                 quantity: x.quantity,
                 instrument: {
                     symbol: x.option.symbol,

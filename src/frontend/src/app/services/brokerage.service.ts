@@ -30,17 +30,18 @@ export class BrokerageOrderCommand {
 
 // types for orders:
 // Enum for order types
-export enum OrderType {
+export enum OptionOrderType {
     NET_DEBIT = "NET_DEBIT",
-    NET_CREDIT = "NET_CREDIT"
+    NET_CREDIT = "NET_CREDIT",
+    LIMIT = "LIMIT",
 }
 
 // Enum for order instructions
-export enum OrderInstruction {
+export enum OptionOrderInstruction {
     BUY_TO_OPEN = "BUY_TO_OPEN",
     SELL_TO_OPEN = "SELL_TO_OPEN",
     BUY_TO_CLOSE = "BUY_TO_CLOSE",
-    SELL_TO_CLOSE = "SELL_TO_CLOSE"
+    SELL_TO_CLOSE = "SELL_TO_CLOSE",
 }
 
 // Interface for instrument
@@ -51,14 +52,14 @@ export interface Instrument {
 
 // Interface for order leg
 export interface OrderLeg {
-    instruction: OrderInstruction;
+    instruction: OptionOrderInstruction;
     quantity: number;
     instrument: Instrument;
 }
 
 // Main order interface
 export interface OptionOrderCommand {
-    orderType: OrderType;
+    orderType: OptionOrderType;
     session: string;
     price: number;
     duration: string
