@@ -339,7 +339,7 @@
                     <div class="d-flex gap-2 justify-content-end">
                         <button class="btn btn-outline-secondary" (click)="closePositionWithMarketOrder()">
                             <i class="bi bi-x-lg me-1"></i>
-                            Market Order Close
+                            Create Close Order
                         </button>
                         <button class="btn btn-outline-danger" (click)="deletePosition()" *ngIf="position.isOpen">
                             <i class="bi bi-trash me-1"></i>
@@ -350,4 +350,9 @@
             </div>
         </div>
     </div>
+    <app-option-position-close-modal
+        [position]="position"
+        [isVisible]="showCloseModal"
+        (isVisibleChange) = "showCloseModal = $event"
+        (errorsOccurred)="errorOccurred.emit($event)" (positionOrderCreated)="positionChanged.emit()"></app-option-position-close-modal>
 }

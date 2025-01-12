@@ -94,6 +94,12 @@ type OpenContractsCommand = {
     Contracts: OptionContractInput[]
 }
 
+type AddOptionNotesCommand = {
+    PositionId: OptionPositionId
+    UserId: UserId
+    Notes: string
+}
+
 type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
 
     let fsOptionTypeConvert oldType =
@@ -131,6 +137,24 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | _ ->
                 do! storage.SaveOptionPosition userId None withAttribute
                 return OptionPositionView(withAttribute, None) |> Ok
+    }
+    
+    member this.Handle(command: AddOptionNotesCommand) = task {
+        let! user = command.UserId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! previous = storage.GetOptionPosition command.PositionId command.UserId
+            match previous with
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some o ->
+                
+                do!
+                    o
+                    |> OptionPosition.addNotes (Some command.Notes) DateTimeOffset.UtcNow
+                    |> storage.SaveOptionPosition command.UserId previous
+                    
+                return true |> Ok
     }
     
     member this.Handle(command: CloseContractsCommand) = task {
@@ -236,9 +260,11 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     |> Seq.sortByDescending _.Closed.Value
                     |> Seq.map (fun o -> OptionPositionView(o, None))
 
+                let chainLookupMap = Dictionary<Ticker, OptionChain>()
+                
                 let! openOptions =
                     optionPositions
-                    |> Seq.filter (fun o -> o.IsOpen)
+                    |> Seq.filter _.IsOpen
                     |> Seq.map (fun o ->
                         async {
                             let! chain = brokerage.GetOptionChain user.State o.UnderlyingTicker |> Async.AwaitTask
@@ -246,7 +272,9 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                             let chain =
                                 match chain with
                                 | Error _ -> None
-                                | Ok chain -> chain |> Some
+                                | Ok chain ->
+                                    chainLookupMap.Add(o.UnderlyingTicker, chain)
+                                    chain |> Some
 
                             return OptionPositionView(o, chain)
                         })
@@ -270,8 +298,6 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     )
                     |> Result.defaultValue (Seq.empty, Array.empty)
                 
-                let chainLookupMap = Dictionary<Ticker, OptionChain>()
-                                 
                 let! openBrokerageOrders =
                     brokerageOrders
                     |> Seq.filter _.IsActive

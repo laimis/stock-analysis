@@ -398,4 +398,15 @@ public class PortfolioController(
                     )
                 )
             );
+    
+    [HttpPost("optionpositions/{positionId}/notes")]
+    public Task AddOptionNotes([FromRoute]Guid positionId, [FromBody]string content) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                new AddOptionNotesCommand(
+                    positionId: OptionPositionId.NewOptionPositionId(positionId),
+                    userId: User.Identifier(),
+                    notes: content)
+            )
+        );
 }

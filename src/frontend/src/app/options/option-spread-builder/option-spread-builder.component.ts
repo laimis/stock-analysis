@@ -383,11 +383,10 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
     builtSpreads: SpreadCandidate[] = null
     
-    createOrder(totalCost:number) {
+    createOrder(price:number) {
         
-        let orderType = totalCost < 0 ? OrderType.NET_DEBIT : OrderType.NET_CREDIT
+        let orderType = price < 0 ? OrderType.NET_DEBIT : OrderType.NET_CREDIT
         let session = "NORMAL"
-        let price = totalCost
         let duration = "GOOD_TILL_CANCEL"
         let orderStrategyType = "SINGLE"
         

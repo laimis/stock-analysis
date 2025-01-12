@@ -41,6 +41,7 @@ export interface OptionPosition {
     transactions: OptionPositionTransaction[]
     cost: number
     market: number
+    spread: number
     profit: number
     daysHeld: number
     daysToExpiration: number[]
@@ -268,6 +269,10 @@ export class OptionService {
     
     setLabel(id: string, key: string, value: string) {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/labels/', {key: key, value: value, positionId: id})
+    }
+    
+    addNotes(id: string, notes: string) {
+        return this.http.post('/api/portfolio/optionpositions/' + id + '/notes', notes)
     }
     
     closeContracts(id: string, contracts: any[]) {

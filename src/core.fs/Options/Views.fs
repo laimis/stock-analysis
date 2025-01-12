@@ -44,6 +44,11 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Market =
         contracts
         |> Seq.sumBy (fun c -> c.details |> Option.map(fun o -> o.Mark * decimal c.quantity) |> Option.defaultValue 0m)
+    member this.Spread =
+        // get min and max values of the contract strike prices
+        let minStrike = contracts |> Seq.map (fun c -> c.strikePrice) |> Seq.min
+        let maxStrike = contracts |> Seq.map (fun c -> c.strikePrice) |> Seq.max
+        maxStrike - minStrike
     member this.Profit =
         match this.IsClosed with
         | true -> state.Profit

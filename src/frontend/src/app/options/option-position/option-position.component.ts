@@ -6,6 +6,9 @@ import {KeyValuePair} from "../../services/stocks.service";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 import {GetErrors} from "../../services/utils";
 import {OptionBrokerageOrdersComponent} from "../option-dashboard/option-brokerage-orders.component";
+import {
+    OptionPositionCloseModalComponent
+} from "../option-dashboard/option-position-close-modal/option-position-close-modal.component";
 
 @Component({
   selector: 'app-option-position',
@@ -19,7 +22,8 @@ import {OptionBrokerageOrdersComponent} from "../option-dashboard/option-brokera
         StockLinkAndTradingviewLinkComponent,
         PercentPipe,
         NgIf,
-        OptionBrokerageOrdersComponent
+        OptionBrokerageOrdersComponent,
+        OptionPositionCloseModalComponent
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
@@ -29,15 +33,16 @@ export class OptionPositionComponent {
         private optionService: OptionService
     ) {
     }
-    showDetailsModal: boolean = false;
     showAddLabelForm: boolean = false;
     newLabelKey: string;
     newLabelValue: string;
     showNotesForm: boolean = false;
     notesExpanded: boolean = false;
     notesControl = new FormControl();
+    showCloseModal: boolean = false;
     
     @Input() position: OptionPosition;
+    
     @Input()
     set orders(value : BrokerageOptionOrder[]) {
         if (this.position == null) {
@@ -53,16 +58,6 @@ export class OptionPositionComponent {
     @Output() positionDeleted = new EventEmitter();
     @Output() positionChanged = new EventEmitter();
     @Output() errorOccurred = new EventEmitter<string[]>();
-
-    showContractDetails(contract:OptionContract) {
-        this.showDetailsModal = true;
-    }
-    
-    openTradeModal() {
-    }
-
-    openCloseModal() {
-    }
     
     removeLabel(label:KeyValuePair) {
         
@@ -96,10 +91,6 @@ export class OptionPositionComponent {
             }
         });
     }
-
-    closeDetailsModal() {
-        this.showDetailsModal = false
-    }
     
     toggleNotes() {
         this.notesExpanded = !this.notesExpanded;
@@ -109,7 +100,7 @@ export class OptionPositionComponent {
     }
     
     closePositionWithMarketOrder() {
-        
+        this.showCloseModal = true;
     }
     
     deletePosition() {
