@@ -1,5 +1,4 @@
 using System;
-using core.fs.Portfolio;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -24,8 +23,8 @@ public static class Jobs
                 TimeZone = tz
             };
 
-            RecurringJob.AddOrUpdate<MonitoringServices.PortfolioAnalysisService>(
-                recurringJobId: nameof(MonitoringServices.PortfolioAnalysisService.ReportOnThirtyDayTransactions),
+            RecurringJob.AddOrUpdate<core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService>(
+                recurringJobId: nameof(core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService.ReportOnThirtyDayTransactions),
                 methodCall: service => service.ReportOnThirtyDayTransactions(),
                 cronExpression: Cron.Daily(9, 0),
                 options: rjo
@@ -40,6 +39,13 @@ public static class Jobs
             BackgroundJob.Schedule<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 service => service.RunPatternMonitoring(),
                 TimeSpan.FromMinutes(1)
+            );
+            
+            RecurringJob.AddOrUpdate<core.fs.Options.MonitoringServices.PriceMonitoringService>(
+                recurringJobId: nameof(core.fs.Options.MonitoringServices.PriceMonitoringService),
+                methodCall: service => service.Run(),
+                cronExpression: "35 6-14 * * 1-5", // 6:35am to 2:35pm Monday through Friday
+                options: rjo
             );
             
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.StopLossMonitoringService>(
@@ -90,16 +96,16 @@ public static class Jobs
                 options: rjo
             );
 
-            RecurringJob.AddOrUpdate<MonitoringServices.PortfolioAnalysisService>(
-                recurringJobId: nameof(MonitoringServices.PortfolioAnalysisService.ReportOnMaxProfitBasedOnDaysHeld),
+            RecurringJob.AddOrUpdate<core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService>(
+                recurringJobId: nameof(core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService.ReportOnMaxProfitBasedOnDaysHeld),
                 methodCall: service => service.ReportOnMaxProfitBasedOnDaysHeld(),
                 cronExpression: Cron.Weekly(DayOfWeek.Saturday, 8),
                 options: rjo);
             
             // run every day at night a job in portfolio analysis service
             // that will run recently closed positions updates
-            RecurringJob.AddOrUpdate<MonitoringServices.PortfolioAnalysisService>(
-                recurringJobId: nameof(MonitoringServices.PortfolioAnalysisService.RecentlyClosedPositionUpdates),
+            RecurringJob.AddOrUpdate<core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService>(
+                recurringJobId: nameof(core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService.RecentlyClosedPositionUpdates),
                 methodCall: service => service.RecentlyClosedPositionUpdates(),
                 cronExpression: Cron.Daily(20, 0),
                 options: rjo

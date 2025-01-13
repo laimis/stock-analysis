@@ -1,6 +1,7 @@
 ﻿using core.fs.Accounts;
 using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.Storage;
+using core.fs.Options;
 using Microsoft.FSharp.Core;
 using storage.shared;
 
@@ -13,6 +14,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, List<AccountTransaction>> _transactions = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
     private static readonly Dictionary<UserId, List<StockOrder>> _orders = new();
+    private static readonly Dictionary<UserId, List<OptionPricing>> _optionPricings = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -96,6 +98,17 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         Task.FromResult(
             _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: u.Id.ToString()))
         );
+
+    public Task SaveOptionPricing(OptionPricing pricing, UserId userId)
+    {
+        if (_optionPricings.ContainsKey(userId) == false)
+        {
+            _optionPricings[userId] = [];
+        }
+        
+        _optionPricings[userId].Add(pricing);
+        return Task.CompletedTask;
+    }
 
     public async Task Save(User u)
     {

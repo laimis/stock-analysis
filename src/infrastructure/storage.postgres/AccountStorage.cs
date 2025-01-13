@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.Storage;
+using core.fs.Options;
 using core.Shared;
 using Dapper;
 using Microsoft.FSharp.Core;
@@ -421,6 +422,43 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
             );
             
             return users;
+        }
+
+        public async Task SaveOptionPricing(OptionPricing pricing, UserId userId)
+        {
+            using var db = GetConnection();
+
+            var query =
+                @"INSERT INTO optionpricings (userid, optionpositionid, underlyingticker, symbol, expiration, strikeprice, optiontype, volume, openinterest, bid, ask, last, mark, volatility, delta, gamma, theta, vega, rho, underlyingprice, timestamp)
+VALUES (:userid, :optionpositionid, :underlyingticker, :symbol, :expiration, :strikeprice, :optiontype, :volume, :openinterest, :bid, :ask, :last, :mark, :volatility, :delta, :gamma, :theta, :vega, :rho, :underlyingprice, :timestamp)
+            ";
+            
+            await db.ExecuteAsync(query, new
+            {
+                userId = userId.Item,
+                optionpositionid = pricing.OptionPositionId.Item,
+                underlyingticker = pricing.UnderlyingTicker.Value,
+                symbol = pricing.Symbol.Item,
+                expiration = pricing.Expiration.ToString(),
+                strikeprice = pricing.StrikePrice,
+                optiontype = pricing.OptionType.ToString(),
+                volume = pricing.Volume,
+                openinterest = pricing.OpenInterest,
+                bid = pricing.Bid,
+                ask = pricing.Ask,
+                last = pricing.Last,
+                mark = pricing.Mark,
+                volatility = pricing.Volatility,
+                delta = pricing.Delta,
+                gamma = pricing.Gamma,
+                theta = pricing.Theta,
+                vega = pricing.Vega,
+                rho = pricing.Rho,
+                underlyingprice = FSharpOption<decimal>.get_IsNone(pricing.UnderlyingPrice)
+                    ? null
+                    : (decimal?)pricing.UnderlyingPrice.Value,
+                timestamp = pricing.Timestamp
+            });
         }
     }
 }

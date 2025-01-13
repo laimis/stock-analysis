@@ -485,3 +485,28 @@ module OptionPosition =
             apply e position
         
             
+
+type OptionPricing =
+    {
+        UserId: core.fs.Accounts.UserId
+        OptionPositionId: OptionPositionId
+        UnderlyingTicker: Ticker
+        Symbol: OptionTicker
+        Expiration: OptionExpiration
+        StrikePrice: decimal
+        OptionType: OptionType
+        Volume: int64
+        OpenInterest: int64
+        Bid: decimal
+        Ask: decimal
+        Last: decimal
+        Mark: decimal
+        Volatility: decimal
+        Delta: decimal
+        Gamma: decimal
+        Theta: decimal
+        Vega: decimal
+        Rho: decimal
+        UnderlyingPrice: decimal option
+        Timestamp: DateTimeOffset
+    }

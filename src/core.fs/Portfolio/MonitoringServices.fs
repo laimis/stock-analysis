@@ -58,7 +58,7 @@ type PortfolioAnalysisService(
                                 let! bars = brokerage.GetPriceHistory user.State p.Ticker PriceFrequency.Daily (Some p.Opened) (Some p.Closed.Value) |> Async.AwaitTask
                                 match bars with
                                 | Error e ->
-                                    logger.LogError("Failed to get price history for {p.Ticker} for {p.Opened} to {p.Closed.Value}")
+                                    logger.LogError($"Failed to get price history for {p.Ticker} for {p.Opened} to {p.Closed.Value}")
                                 | Ok bars ->
                                     let result = actualTrade.Run bars true p
                                     

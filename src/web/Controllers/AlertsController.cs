@@ -89,4 +89,10 @@ public class AlertsController(Handler handler) : ControllerBase
     public Task TriggerPortfolioProcessing(
         [FromServices] core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService service)
         => service.RecentlyClosedPositionUpdates();
+    
+    [HttpGet("triggerOptionPricing")]
+    [Authorize("admin")]
+    public Task TriggerOptionPricing(
+        [FromServices] core.fs.Options.MonitoringServices.PriceMonitoringService optionPricing)
+        => optionPricing.Run();
 }

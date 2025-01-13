@@ -22,3 +22,4 @@ type IAccountStorage =
     abstract member GetAccountBrokerageTransactions: userId:UserId -> Task<AccountTransaction seq>
     abstract member GetUserAssociation: guid:Guid -> Task<ProcessIdToUserAssociation option>
     abstract member GetUserEmailIdPairs: unit -> Task<IEnumerable<EmailIdPair>>
+    abstract member SaveOptionPricing : pricing:core.fs.Options.OptionPricing -> userId:UserId -> Task

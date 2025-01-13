@@ -9,13 +9,13 @@ type OptionDetail(symbol:string, optionType:OptionType, description:string, expi
     member this.Description = description
     member this.Expiration: OptionExpiration = expiration
     member val StrikePrice: decimal = 0m with get, set
+    member this.OptionType = optionType
     member val Volume: int64 = 0L with get, set
     member val OpenInterest: int64 = 0L with get, set
     member val Bid: decimal = 0m with get, set
     member val Ask: decimal = 0m with get, set
     member val Last: decimal = 0m with get, set
     member val Mark: decimal = 0m with get, set
-    member this.OptionType = optionType
     member this.IsCall = match optionType with | Call -> true | _ -> false
     member this.IsPut = match optionType with | Put -> true | _ -> false
     member this.Spread = this.Ask - this.Bid

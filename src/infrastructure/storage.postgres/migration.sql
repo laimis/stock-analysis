@@ -128,17 +128,45 @@ CREATE TABLE accountbrokerageorders (
 ALTER TABLE accountbrokerageorders OWNER TO stocks;
 
 CREATE TABLE accountbrokeragetransactions (
-     transactionid text NOT NULL,
-     description text NOT NULL,
-     brokeragetype text NOT NULL,
-     tradedate text NOT NULL,
-     settlementdate text NOT NULL,
-     netamount decimal NOT NULL,
-     inferredticker text NULL,
-     inferredtype text NULL,
-     userid uuid NOT NULL,
-     inserted text NOT NULL,
-     applied text NULL,
-     PRIMARY KEY (userid, transactionid)
+    transactionid text NOT NULL,
+    description text NOT NULL,
+    brokeragetype text NOT NULL,
+    tradedate text NOT NULL,
+    settlementdate text NOT NULL,
+    netamount decimal NOT NULL,
+    inferredticker text NULL,
+    inferredtype text NULL,
+    userid uuid NOT NULL,
+    inserted text NOT NULL,
+    applied text NULL,
+    PRIMARY KEY (userid, transactionid)
 );
 ALTER TABLE accountbrokeragetransactions OWNER TO stocks;
+
+CREATE TABLE optionpricings (
+    id SERIAL PRIMARY KEY,
+    userid uuid NOT NULL,
+    optionpositionid uuid NOT NULL,
+    underlyingticker TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    expiration TEXT NOT NULL,
+    strikeprice DECIMAL NOT NULL,
+    optiontype TEXT NOT NULL,
+    volume BIGINT NOT NULL,
+    openinterest BIGINT NOT NULL,
+    bid DECIMAL NOT NULL,
+    ask DECIMAL NOT NULL,
+    last DECIMAL NOT NULL,
+    mark DECIMAL NOT NULL,
+    volatility DECIMAL NOT NULL,
+    delta DECIMAL NOT NULL,
+    gamma DECIMAL NOT NULL,
+    theta DECIMAL NOT NULL,
+    vega DECIMAL NOT NULL,
+    rho DECIMAL NOT NULL,
+    underlyingprice DECIMAL,
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX optionpricings_userid ON optionpricings(userid);
+CREATE INDEX optionpricings_optionpositionid ON optionpricings(optionpositionid);
+ALTER TABLE optionpricings OWNER TO stocks;

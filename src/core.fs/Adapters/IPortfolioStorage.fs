@@ -7,6 +7,7 @@ open core.Options
 open core.Routines
 open core.Stocks
 open core.fs.Accounts
+open core.fs.Adapters.Options
 open core.fs.Options
 open core.fs.Stocks
 
