@@ -38,7 +38,7 @@ public static class Jobs
             );
             BackgroundJob.Schedule<core.fs.Alerts.MonitoringServices.PatternMonitoringService>(
                 service => service.RunPatternMonitoring(),
-                TimeSpan.FromMinutes(1)
+                TimeSpan.FromMinutes(2)
             );
             
             RecurringJob.AddOrUpdate<core.fs.Options.MonitoringServices.PriceMonitoringService>(

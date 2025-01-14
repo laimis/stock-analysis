@@ -11,6 +11,13 @@ import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
+import {DailyOutcomeScoresComponent} from "../shared/reports/daily-outcome-scores.component";
+import {LoadingComponent} from "../shared/loading/loading.component";
+import {CorrelationsComponent} from "../shared/reports/correlations.component";
+import {FormsModule} from "@angular/forms";
+import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
+import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
+import {NgIf} from "@angular/common";
 
 function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
@@ -51,7 +58,15 @@ function createProfitScatter(entries: PositionInstance[], quotes: Map<string, St
     selector: 'app-playground',
     templateUrl: './playground.component.html',
     styleUrls: ['./playground.component.css'],
-    standalone: false
+    imports: [
+        DailyOutcomeScoresComponent,
+        LoadingComponent,
+        CorrelationsComponent,
+        FormsModule,
+        CanvasJSAngularChartsModule,
+        ErrorDisplayComponent,
+        NgIf
+    ]
 })
 export class PlaygroundComponent implements OnInit {
     tickers: string[];

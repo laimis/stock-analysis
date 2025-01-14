@@ -36,7 +36,7 @@ type PriceMonitoringService(
                 Some (p,c,detail)
         )
         
-    let saveOptionPricing (userId:UserId) (position:OptionPositionState) (contract:OptionContract) (pricing:OptionDetail) = async {
+    let saveOptionPricing (userId:UserId) timestamp (position:OptionPositionState) (contract:OptionContract) (pricing:OptionDetail) = async {
         let pricing = {
             OptionPricing.Ask = pricing.Ask
             Bid = pricing.Bid
@@ -58,7 +58,7 @@ type PriceMonitoringService(
             UnderlyingPrice = pricing.UnderlyingPrice
             UserId = userId
             OptionPositionId = position.PositionId
-            Timestamp = System.DateTimeOffset.UtcNow
+            Timestamp = timestamp
         }
             
         let! _ = accounts.SaveOptionPricing pricing userId |> Async.AwaitTask
@@ -81,6 +81,12 @@ type PriceMonitoringService(
                     match user.State.ConnectedToBrokerage with
                     | false -> ()
                     | true ->
+                        // I want that timestamp to represent the time of the pricing run and not change
+                        // between saves as we go through the loop
+                        // and also removing the milliseconds because it looks ridiculous in db, and doesn't really matter
+                        let timestamp = System.DateTimeOffset.UtcNow
+                        let timestamp = timestamp.AddMilliseconds(-timestamp.Millisecond)
+                        
                         let! positions = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
                         
                         let openPositions = positions |> Seq.filter _.IsOpen
@@ -96,7 +102,7 @@ type PriceMonitoringService(
                             |> Seq.choose id
                             |> Seq.collect matchDetailWithContract
                             |> Seq.choose id
-                            |> Seq.map (fun (p,c,d) -> saveOptionPricing pair.Id p c d)
+                            |> Seq.map (fun (position,contract,optionDetail) -> saveOptionPricing pair.Id timestamp position contract optionDetail)
                             |> Async.Sequential
                             
                         logger.LogInformation($"Updated {positionsWithContractPrices.Length} option pricing records for {pair.Email}")

@@ -23,7 +23,6 @@ import {ProfileVerifyComponent} from './profile/profile-verify.component';
 import {ContactComponent} from './contact/contact.component';
 import {TermsComponent} from './terms/terms.component';
 import {PrivacyComponent} from './privacy/privacy.component';
-import {PlaygroundComponent} from './playground/playground.component';
 import {AdminEmailComponent} from './admin/email/admin-email.component';
 import {AdminWeeklyComponent} from './admin/weekly/admin-weekly.component';
 import {StockFundamentalsComponent} from './stocks/stock-details/stock-fundamentals.component';
@@ -31,10 +30,6 @@ import {StockOwnershipComponent} from './stocks/stock-details/stock-ownership.co
 import {StockOptionComponent} from './stocks/stock-details/stock-option.component';
 import {StockPositionReportsComponent} from './stocks/stock-trading/stock-trading-outcomes-reports.component';
 import {AdminUsersComponent} from './admin/users/admin-users.component';
-import {OptionsComponent} from './options/option-dashboard/option-dashboard.component';
-import {OptionStatsComponent} from './options/option-dashboard/option-stats.component';
-import {OptionPerformanceComponent} from './options/option-dashboard/option-performance.component';
-import {OptionClosedComponent} from './options/option-dashboard/option-closed.component';
 import {
     FailuresuccesschainComponent
 } from './reports/failuresuccesschain/failuresuccesschain/failuresuccesschain.component';
@@ -79,7 +74,6 @@ import {RoutineDashboardComponent} from './routines/routines-dashboard.component
 import {StockTradingStrategiesComponent} from './shared/stocks/stock-trading-strategies.component';
 import {StockTradingSummaryComponent} from './stocks/stock-trading/stock-trading-summary.component';
 import {TradingViewLinkComponent} from './shared/stocks/trading-view-link.component';
-import {OptionBrokeragePositionsComponent} from './options/option-dashboard/option-brokerage-positions.component';
 import {StockLinkComponent} from './shared/stocks/stock-link.component';
 import {RoutineComponent} from './routines/routines-routine.component';
 import {OptionSpreadsComponent} from './options/option-chain/option-spreads.component';
@@ -131,7 +125,6 @@ import {OptionOpenComponent} from "./options/option-dashboard/option-open.compon
         ProfileVerifyComponent,
         SummaryComponent,
         OwnedOptionComponent,
-        PlaygroundComponent,
         InflectionPointsComponent,
         StockDetailsComponent,
         StockFundamentalsComponent,
