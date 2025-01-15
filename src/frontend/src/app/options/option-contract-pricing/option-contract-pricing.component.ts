@@ -4,13 +4,16 @@ import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
 import {ChartAnnotationLineType, ChartType, DataPointContainer} from "../../services/stocks.service";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
+import {LoadingComponent} from "../../shared/loading/loading.component";
 
 @Component({
   selector: 'app-option-contract-pricing',
     imports: [
         LineChartComponent,
-        NgForOf
+        NgForOf,
+        LoadingComponent,
+        NgIf
     ],
   templateUrl: './option-contract-pricing.component.html',
   styleUrl: './option-contract-pricing.component.css'
@@ -18,6 +21,7 @@ import {NgForOf} from "@angular/common";
 export class OptionContractPricingComponent {
     dataPointContainers: DataPointContainer[];
     private cost: number;
+    loading: boolean = false;
 
     constructor(private optionService: OptionService) { }
     
@@ -38,6 +42,7 @@ export class OptionContractPricingComponent {
             return date.toISOString()
         }
         
+        this.loading = true;
         let observables = value.map((contract) => this.optionService.getOptionPricing(contract.details.symbol))
 
         forkJoin(observables).subscribe({
@@ -91,10 +96,12 @@ export class OptionContractPricingComponent {
                 }
 
                 this.dataPointContainers = [costContainer, underlyingContainer];
+                this.loading = false
             },
             error: (error) => {
                 console.error('Error fetching option pricing:', error);
                 // Handle error appropriately
+                this.loading = false;
                 this.errorOccurred.emit(GetErrors(error));
             }
         });

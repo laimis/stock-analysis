@@ -1,3 +1,4 @@
 <div>
+    <app-loading *ngIf="loading"></app-loading>
     <app-line-chart [dataContainer]="container" *ngFor="let container of dataPointContainers"></app-line-chart>
 </div>
