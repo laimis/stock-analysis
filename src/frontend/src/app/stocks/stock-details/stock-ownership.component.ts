@@ -19,8 +19,5 @@ export class StockOwnershipComponent {
     positionChartInformation: PositionChartInformation
 
     @Output()
-    positionClosed: EventEmitter<any> = new EventEmitter();
-    
-    @Output()
-    notesChanged: EventEmitter<string> = new EventEmitter<string>();
+    positionChanged: EventEmitter<any> = new EventEmitter();
 }

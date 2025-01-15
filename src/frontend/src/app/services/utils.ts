@@ -101,3 +101,7 @@ export function parseDate(date: string) {
     // it will assume that the date string is in the local timezone and return date object in local timezone
     return parse(date, 'yyyy-MM-dd', new Date())
 }
+
+export function convertToLocalTime(date: Date) {
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+}

@@ -222,7 +222,9 @@
                     @if (positionOrders.length > 0) {
                         <app-brokerage-orders [orders]="positionOrders"
                                               [filteredTickers]="[_position.ticker]"
-                                              [positionId]="_position.positionId"></app-brokerage-orders>
+                                              [positionId]="_position.positionId"
+                                              (onRecordOrder)="positionChanged.emit()"
+                        ></app-brokerage-orders>
                     } @else {
                         <span class="text-muted">No orders</span>
                     }

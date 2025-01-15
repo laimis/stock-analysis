@@ -260,8 +260,8 @@ public class PortfolioController(
             )
         );
     
-    [HttpPost("stockpositions/{positionId}/close")]
-    public Task<ActionResult> ClosePosition([FromBody] ClosePosition command) =>
+    [HttpPost("stockpositions/{positionId}/issueclosingorders")]
+    public Task<ActionResult> IssuePositionClosingOrders([FromBody] IssuePositionClosingOrders command) =>
         this.OkOrError(stockPositionHandler.Handle(User.Identifier(), command));
 
     [HttpPost("stockpositions/{positionId}/labels")]

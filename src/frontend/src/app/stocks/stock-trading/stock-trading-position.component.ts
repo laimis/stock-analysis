@@ -30,11 +30,7 @@ export class StockTradingPositionComponent {
     @Input()
     quote: StockQuote
     @Output()
-    positionDeleted = new EventEmitter()
-    @Output()
-    notesChanged = new EventEmitter<string>()
-    @Output()
-    positionClosed = new EventEmitter()
+    positionChanged = new EventEmitter()
 
     // constructor that takes stock service
     constructor(
@@ -172,7 +168,7 @@ export class StockTradingPositionComponent {
                 .subscribe(
                     (_) => {
                         this._position = null
-                        this.positionDeleted.emit()
+                        this.positionChanged.emit()
                     },
                     err => {
                         let errors = GetErrors(err)
@@ -182,10 +178,10 @@ export class StockTradingPositionComponent {
     }
 
     closePosition(closeReason:string) {
-        this.stockService.closePosition(this._position.positionId, closeReason)
+        this.stockService.issueClosingOrders(this._position.positionId, closeReason)
             .subscribe(
                 (_) => {
-                    this.positionClosed.emit()
+                    this.updatePositionOrders()
                 },
                 err => {
                     let errors = GetErrors(err)
@@ -260,7 +256,7 @@ export class StockTradingPositionComponent {
                 (_) => {
                     this.notesControl.setValue('')
                     this.showNotesForm = false
-                    this.notesChanged.emit()
+                    this.positionChanged.emit()
                 },
                 err => {
                     let errors = GetErrors(err)

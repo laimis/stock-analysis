@@ -112,7 +112,7 @@ type OpenStockPosition = {
     Ticker: Ticker
 }
 
-type ClosePosition =
+type IssuePositionClosingOrders =
     {
         [<Required>]
         PositionId: StockPositionId
@@ -488,7 +488,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 return Ok ()
     }
     
-    member this.Handle (userId:UserId, command:ClosePosition) = task {
+    member this.Handle (userId:UserId, command:IssuePositionClosingOrders) = task {
         let! user = accounts.GetUser(userId)
         match user with
         | None -> return "User not found" |> ServiceError |> Error

@@ -2,12 +2,9 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
     BrokerageStockOrder,
-    ChartMarker,
-    DailyPositionReport, DataPointContainer,
-    PositionChartInformation,
+    DailyPositionReport, PositionChartInformation,
     PositionInstance,
     PriceFrequency,
-    Prices,
     StocksService,
     TradingStrategyResults
 } from 'src/app/services/stocks.service';
@@ -36,6 +33,8 @@ export class StockTradingReviewComponent {
     quotes: object
     @Input()
     orders: BrokerageStockOrder[]
+    @Output()
+    positionChanged: EventEmitter<any> = new EventEmitter()
     gradingError: string = null
     gradingSuccess: string = null
     assignedGrade: string = null

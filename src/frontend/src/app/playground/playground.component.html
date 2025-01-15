@@ -5,7 +5,54 @@
     <button (click)="run()" class="btn btn-primary">Multiple API call demo</button>
 
     {{ status }}
-
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Option Pricing Chart</h5>
+            <label for="optionSymbols" class="form-label">Option Symbols (comma separated)</label>
+            <input class="form-control" type="text" id="optionSymbols" [(ngModel)]="optionSymbols" [disabled]="loadingOptionPricing" />
+            <button (click)="fetchOptionPricing()" class="btn btn-primary" [disabled]="loadingOptionPricing">Fetch Option Pricing</button>
+            <app-loading *ngIf="loadingOptionPricing"></app-loading>
+            
+            <!-- show in table format -->
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Bid</th>
+                        <th>Ask</th>
+                        <th>Mark</th>
+                        <th>Spread</th>
+                        <th>Vol</th>
+                        <th>OI</th>
+                        <th>IV</th>
+                        <th>Delta</th>
+                        <th>Gamma</th>
+                        <th>Theta</th>
+                        <th>Vega</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let option of optionPricingData">
+                        <td>{{ option.timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+                        <td>{{ option.bid }}</td>
+                        <td>{{ option.ask }}</td>
+                        <td>{{ option.mark }}</td>
+                        <td>{{ option.ask - option.bid | number }}</td>
+                        <td>{{ option.volume }}</td>
+                        <td>{{ option.openInterest }}</td>
+                        <td>{{ option.volatility }}</td>
+                        <td>{{ option.delta }}</td>
+                        <td>{{ option.gamma }}</td>
+                        <td>{{ option.theta }}</td>
+                        <td>{{ option.vega }}</td>
+                </tbody>
+            </table>
+            
+            <app-line-chart [dataContainer]="container" *ngFor="let container of optionDataContainers; track container"></app-line-chart>
+            
+        </div>
+    </div>
+    
 
     <div class="card mt-4">
         <div class="card-body">

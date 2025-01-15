@@ -124,7 +124,7 @@ export class StockDetailsComponent implements OnInit {
         this.loadOrders()
     }
     
-    notesChanged(_: string) {
+    positionChanged() {
         this.loadStockOwnership()
     }
     

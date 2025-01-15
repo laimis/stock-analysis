@@ -103,7 +103,9 @@
     <app-brokerage-orders
         [filteredTickers]="[stock.ticker]"
         [orders]="orders"
-        [positionId]="currentPosition?.positionId">
+        [positionId]="currentPosition?.positionId"
+        (onRecordOrder)="positionChanged()"
+    >
     </app-brokerage-orders>
 
     <section class="card shadow-sm mb-4">
@@ -123,7 +125,7 @@
         [positions]=stockOwnership.positions
         [quote]="stock.quote"
         [positionChartInformation]="currentPositionChartInfo"
-        (notesChanged)="notesChanged($event)">
+        (positionChanged)="positionChanged()">
     </app-stock-ownership>
 }
 @if (isActive('options')) {

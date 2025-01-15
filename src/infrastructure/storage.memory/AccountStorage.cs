@@ -99,6 +99,13 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
             _users.Values.Where(u => u != null).Select(u => new EmailIdPair(email: u!.State.Email, id: u.Id.ToString()))
         );
 
+    public Task<IEnumerable<OptionPricing>> GetOptionPricing(UserId userId, OptionTicker symbol)
+    {
+        return Task.FromResult(
+            _optionPricings.GetValueOrDefault(userId, []).Where(p => p.Symbol.Equals(symbol))
+        );
+    }
+
     public Task SaveOptionPricing(OptionPricing pricing, UserId userId)
     {
         if (_optionPricings.ContainsKey(userId) == false)

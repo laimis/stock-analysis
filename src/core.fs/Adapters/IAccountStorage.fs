@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Threading.Tasks
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
+open core.fs.Options
 
 type IAccountStorage =
     
@@ -22,4 +23,5 @@ type IAccountStorage =
     abstract member GetAccountBrokerageTransactions: userId:UserId -> Task<AccountTransaction seq>
     abstract member GetUserAssociation: guid:Guid -> Task<ProcessIdToUserAssociation option>
     abstract member GetUserEmailIdPairs: unit -> Task<IEnumerable<EmailIdPair>>
-    abstract member SaveOptionPricing : pricing:core.fs.Options.OptionPricing -> userId:UserId -> Task
+    abstract member GetOptionPricing : userId:UserId -> symbol:OptionTicker -> Task<OptionPricing seq>
+    abstract member SaveOptionPricing : pricing:OptionPricing -> userId:UserId -> Task

@@ -83,11 +83,11 @@
             [metricFunc]="metricFunc"
             [metricType]="metricType"
             [quotes]="quotes"
-            (notesChanged)="refresh()"></app-stock-trading-positions>
+            (positionChanged)="refresh()"></app-stock-trading-positions>
     }
     @if (isActive('openreview')) {
         <app-stock-trading-review [orders]="brokerageAccount.stockOrders" [positions]=sortedPositions [quotes]="quotes"
-                                  (brokerageOrdersChanged)="refresh()"></app-stock-trading-review>
+                                  (positionChanged)="refresh()"></app-stock-trading-review>
     }
     @if (isActive('violations')) {
         <app-stock-violations

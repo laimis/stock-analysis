@@ -231,12 +231,43 @@ export interface OptionsContainer {
 export class openoptionpositioncommand {
 }
 
+export interface OptionPricing {
+        optionPositionId: string
+        underlyingTicker: string
+        Symbol: string
+        expiration: string
+        strikePrice: number
+        optionType: string
+        volume: number
+        openInterest: number
+        bid: number
+        ask: number
+        last: number
+        mark: number
+        volatility: number
+        delta: number
+        gamma: number
+        theta: number
+        vega: number
+        rho: number
+        underlyingPrice: number
+        timestamp: string
+    }
+
 @Injectable({
     providedIn: 'root'
 })
 export class OptionService {
     
     constructor(private http : HttpClient) {
+    }
+    
+    getOptionPricing(symbol: string): Observable<OptionPricing[]> {
+        // add symbols as part of query string, separated by commas
+        // but each symbol should be URL encoded
+        let url = '/api/options/pricing?symbol=' + encodeURIComponent(symbol)
+        
+        return this.http.get<OptionPricing[]>(url)
     }
 
     getOptionChain(ticker: string): Observable<OptionChain> {

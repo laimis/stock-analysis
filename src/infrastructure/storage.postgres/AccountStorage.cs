@@ -424,6 +424,52 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
             return users;
         }
 
+        public async Task<IEnumerable<OptionPricing>> GetOptionPricing(UserId userId, OptionTicker symbol)
+        {
+            using var db = GetConnection();
+
+            const string query = @"SELECT * FROM optionpricings WHERE userid = :userId AND symbol = :symbol ORDER BY timestamp ASC";
+            
+            Console.WriteLine($"Query: {query}");
+            Console.WriteLine($"UserId: {userId.Item}");
+            Console.WriteLine($"Symbol: {symbol.Item}");
+            
+            var reader = await db.ExecuteReaderAsync(query, new {userId = userId.Item, symbol = symbol.Item});
+            
+            var result = new List<OptionPricing>();
+            
+            while (reader.Read())
+            {
+                var pricing = new OptionPricing(
+                    userId: UserId.NewUserId(reader.GetGuid(reader.GetOrdinal("userId"))),
+                    optionPositionId: OptionPositionId.NewOptionPositionId(reader.GetGuid(reader.GetOrdinal("optionPositionId"))),
+                    underlyingTicker: new Ticker(reader.GetString(reader.GetOrdinal("underlyingTicker"))),
+                    symbol: OptionTicker.NewOptionTicker(reader.GetString(reader.GetOrdinal("symbol"))),
+                    expiration: OptionExpiration.create(reader.GetString(reader.GetOrdinal("expiration"))),
+                    strikePrice: reader.GetDecimal(reader.GetOrdinal("strikePrice")),
+                    optionType: OptionType.FromString(reader.GetString(reader.GetOrdinal("optionType"))),
+                    volume: reader.GetInt32(reader.GetOrdinal("volume")),
+                    openInterest: reader.GetInt32(reader.GetOrdinal("openInterest")),
+                    bid: reader.GetDecimal(reader.GetOrdinal("bid")),
+                    ask: reader.GetDecimal(reader.GetOrdinal("ask")),
+                    last: reader.GetDecimal(reader.GetOrdinal("last")),
+                    mark: reader.GetDecimal(reader.GetOrdinal("mark")),
+                    volatility: reader.GetDecimal(reader.GetOrdinal("volatility")),
+                    delta: reader.GetDecimal(reader.GetOrdinal("delta")),
+                    gamma: reader.GetDecimal(reader.GetOrdinal("gamma")),
+                    theta: reader.GetDecimal(reader.GetOrdinal("theta")),
+                    vega: reader.GetDecimal(reader.GetOrdinal("vega")),
+                    rho: reader.GetDecimal(reader.GetOrdinal("rho")),
+                    underlyingPrice: FSharpOption<decimal>.Some(reader.GetDecimal(reader.GetOrdinal("underlyingPrice"))),
+                    timestamp: new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("timestamp")))
+                );
+                
+                result.Add(pricing);
+            }
+
+            return result;
+        }
+
         public async Task SaveOptionPricing(OptionPricing pricing, UserId userId)
         {
             using var db = GetConnection();

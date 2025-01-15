@@ -59,6 +59,7 @@ type RemoveOptionPositionLabelCommand = { Key: string; PositionId: OptionPositio
 type SetOptionPositionLabel = { Key: string; Value: string; PositionId: OptionPositionId; }
 type ChainQuery = { Ticker: Ticker; UserId: UserId }
 type OptionOwnershipQuery = { UserId: UserId; Ticker: Ticker }
+type OptionPricingQuery = { UserId: UserId; Symbol: OptionTicker}
 
 type OptionContractInput = {
     StrikePrice: decimal
@@ -483,6 +484,18 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                             OptionPositionView(option, chain |> Some) |> Ok
         }
 
+    member this.Handle(query: OptionPricingQuery) =
+        task {
+            let! user = accounts.GetUser(query.UserId)
+            match user with
+            | None -> return "User not found" |> ServiceError |> Error
+            | Some _ ->
+                
+                let! optionPricings = accounts.GetOptionPricing query.UserId query.Symbol
+                
+                Console.WriteLine($"Got {optionPricings |> Seq.length} option pricings")
+                return optionPricings |> Ok
+        }
     member this.Handle(query: ChainQuery) =
         task {
             let! user = accounts.GetUser(userId = query.UserId)

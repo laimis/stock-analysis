@@ -37,6 +37,19 @@ public class TickerConverter : JsonConverter<Ticker>
     }
 }
 
+public class OptionTickerConverter : JsonConverter<OptionTicker>
+{
+    public override OptionTicker Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return OptionTicker.NewOptionTicker(reader.GetString());
+    }
+
+    public override void Write(Utf8JsonWriter writer, OptionTicker value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.Item);
+    }
+}
+
 public class UserIdConverter : JsonConverter<UserId>
 {
     public override UserId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

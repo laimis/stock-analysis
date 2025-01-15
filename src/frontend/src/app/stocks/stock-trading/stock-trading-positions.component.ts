@@ -20,7 +20,7 @@ export class StockTradingPositionsComponent {
     @Input()
     positions: PositionInstance[]
     @Output()
-    notesChanged = new EventEmitter<string>()
+    positionChanged = new EventEmitter()
 
     constructor(
         private percentPipe: PercentPipe,

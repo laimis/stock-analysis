@@ -25,7 +25,7 @@
                         <app-stock-trading-position
                             [position]="position"
                             [quote]="getQuote(position)"
-                            (notesChanged)="notesChanged.emit($event)"></app-stock-trading-position>
+                            (positionChanged)="positionChanged.emit()"></app-stock-trading-position>
                     </div>
                 </div>
             </div>

@@ -78,8 +78,8 @@ export class StockPositionsService {
         return this.http.delete(`/api/portfolio/stockpositions/${positionId}`)
     }
 
-    closePosition(positionId: string,closeReason: string): Observable<object> {
-        return this.http.post(`/api/portfolio/stockpositions/${positionId}/close`, {positionId, closeReason})
+    issueClosingOrders(positionId: string,closeReason: string): Observable<object> {
+        return this.http.post(`/api/portfolio/stockpositions/${positionId}/issueclosingorders`, {positionId, closeReason})
     }
 
     setLabel(positionId: string, label: KeyValuePair): Observable<object> {

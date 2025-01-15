@@ -16,6 +16,16 @@ namespace web.Controllers
     [Route("api/[controller]")]
     public class OptionsController(OptionsHandler handler) : ControllerBase
     {
+        [HttpGet("pricing")]
+        public Task<ActionResult> GetOptionPricing([FromQuery] string symbol) =>
+            this.OkOrError(
+                handler.Handle(
+                    new OptionPricingQuery(
+                        User.Identifier(), OptionTicker.NewOptionTicker(symbol)
+                    )
+                )
+            );
+        
         [HttpGet("chain/{ticker}")]
         public Task<ActionResult> Chain([FromRoute] string ticker) =>
             this.OkOrError(
