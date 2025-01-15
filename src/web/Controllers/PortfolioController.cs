@@ -23,8 +23,8 @@ public class PortfolioController(
     OptionsHandler optionsHandler) : ControllerBase
 {
     [HttpGet]
-    public Task<ActionResult> Index() =>
-        this.OkOrError(stockPositionHandler.Handle(new Query(User.Identifier())));
+    public Task<ActionResult> PortfolioHoldings() =>
+        this.OkOrError(stockPositionHandler.Handle(new PortfolioHoldingsQuery(User.Identifier())));
     
     [HttpGet("transactions")]
     public Task<ActionResult> Transactions(string ticker, string groupBy, string show, string txType) =>

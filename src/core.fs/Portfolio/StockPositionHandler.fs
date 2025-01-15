@@ -18,7 +18,7 @@ open core.fs.Services
 open core.fs.Services.Trading
 open core.fs.Stocks
 
-type Query =
+type PortfolioHoldingsQuery =
     {
         UserId: UserId
     }
@@ -549,24 +549,18 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 return Ok ()
     }
         
-    member this.Handle (query:Query) : Task<Result<PortfolioView,ServiceError>> = task {
+    member this.Handle (query:PortfolioHoldingsQuery) : Task<Result<PortfolioView,ServiceError>> = task {
         let! stocks = query.UserId |> storage.GetStockPositions
+        let! options = query.UserId |> storage.GetOptionPositions
+        let! cryptos = query.UserId |> storage.GetCryptos
         
         let openStocks = stocks |> Seq.filter _.IsOpen
-        
-        let! options = storage.GetOwnedOptions(query.UserId)
-        let openOptions =
-            options
-            |> Seq.filter (fun o -> o.State.Closed.HasValue = false)
-            |> Seq.sortBy _.State.Expiration
-            |> Seq.toList
-            
-        let! cryptos = storage.GetCryptos(query.UserId)
+        let openOptions = options|> Seq.filter _.IsOpen
         
         let view =
             {
                 OpenStockCount = openStocks |> Seq.length
-                OpenOptionCount = openOptions.Length
+                OpenOptionCount = openOptions |> Seq.length
                 OpenCryptoCount = cryptos |> Seq.length
             }
             

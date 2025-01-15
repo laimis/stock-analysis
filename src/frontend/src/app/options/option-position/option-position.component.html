@@ -94,9 +94,10 @@
                 </div>
 
                 <!-- Contracts Table -->
-                <div class="mt-4">
-                    <h6 class="mb-3">Option Contracts</h6>
-                    <div class="table-responsive">
+                <div class="row mt-4">
+                    <div class="col">
+                        <h6 class="mb-3">Option Contracts</h6>
+                        <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
@@ -175,10 +176,19 @@
                             </tbody>
                         </table>
                     </div>
+                    </div>
                 </div>
                 
-                <div class="mt-4">
-                    <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
+                <div class="row mt-4">
+                    <div class="col">
+                        <app-option-contract-pricing [position]="position"></app-option-contract-pricing>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col">
+                        <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
+                    </div>
                 </div>
 
                 <!-- Notes Section -->

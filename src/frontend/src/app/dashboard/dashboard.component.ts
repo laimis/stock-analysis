@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {Router} from '@angular/router';
-import {Dashboard, StocksService} from '../services/stocks.service';
+import {PortfolioHoldings, StocksService} from '../services/stocks.service';
 
 
 @Component({
@@ -12,7 +12,7 @@ import {Dashboard, StocksService} from '../services/stocks.service';
 })
 export class DashboardComponent implements OnInit {
 
-    dashboard: Dashboard
+    dashboard: PortfolioHoldings
     loaded: boolean = false
 
     toolLinks = [
@@ -38,7 +38,7 @@ export class DashboardComponent implements OnInit {
 
         this.title.setTitle("Dashboard - Nightingale Trading")
 
-        this.stocks.getPortfolio().subscribe(result => {
+        this.stocks.getPortfolioHoldings().subscribe(result => {
             this.dashboard = result;
             this.loaded = true;
         }, error => {

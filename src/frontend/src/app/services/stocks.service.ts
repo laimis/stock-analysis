@@ -206,8 +206,8 @@ export class StocksService {
         return this.http.get<StockSearchResult[]>(`/api/stocks/search/${term}`)
     }
 
-    getPortfolio(): Observable<Dashboard> {
-        return this.http.get<Dashboard>('/api/portfolio')
+    getPortfolioHoldings(): Observable<PortfolioHoldings> {
+        return this.http.get<PortfolioHoldings>('/api/portfolio')
     }
 
     // ------- portfolio ----------------
@@ -654,7 +654,7 @@ export class OwnedCrypto {
     transactions: Transaction[]
 }
 
-export class Dashboard {
+export class PortfolioHoldings {
     openOptionCount: number
     openStockCount: number
     openCryptoCount: number
@@ -917,10 +917,15 @@ export interface DataPoint {
     ticker?: string
 }
 
+export enum ChartAnnotationLineType {
+    Horizontal = "Horizontal",
+    Vertical = "Vertical"
+}
+
 export interface ChartAnnotationLine {
     value: number
     label: string
-    chartAnnotationLineType: string
+    chartAnnotationLineType: ChartAnnotationLineType
 }
 
 export interface DataPointContainer {
@@ -928,6 +933,7 @@ export interface DataPointContainer {
     chartType: ChartType
     data: DataPoint[],
     annotationLine?: ChartAnnotationLine
+    includeZero?: boolean
 }
 
 export interface StockTradingPerformanceCollection {

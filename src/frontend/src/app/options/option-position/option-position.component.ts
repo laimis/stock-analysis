@@ -12,6 +12,7 @@ import {
 import {
     OptionContractCloseModalComponent
 } from "../option-dashboard/option-contract-close-modal/option-contract-close-modal.component";
+import {OptionContractPricingComponent} from "../option-contract-pricing/option-contract-pricing.component";
 
 @Component({
   selector: 'app-option-position',
@@ -27,7 +28,8 @@ import {
         NgIf,
         OptionBrokerageOrdersComponent,
         OptionPositionCloseModalComponent,
-        OptionContractCloseModalComponent
+        OptionContractCloseModalComponent,
+        OptionContractPricingComponent
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'

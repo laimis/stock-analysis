@@ -98,4 +98,14 @@ export class OptionOpenComponent {
     }
 
     protected readonly open = open;
+
+    expandedPositions: boolean[] = [];
+    toggleAccordion(index: number) {
+        // Initialize array if needed
+        if (!this.expandedPositions) {
+            this.expandedPositions = new Array(this.positions.length).fill(false);
+        }
+        // Toggle the expanded state
+        this.expandedPositions[index] = !this.expandedPositions[index];
+    }
 }

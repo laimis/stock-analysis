@@ -1,8 +1,13 @@
 import {Component, Input} from '@angular/core';
-import {ChartAnnotationLine, ChartType, DataPoint, DataPointContainer} from "../../services/stocks.service";
+import {
+    ChartAnnotationLine,
+    ChartAnnotationLineType,
+    ChartType,
+    DataPoint,
+    DataPointContainer
+} from "../../services/stocks.service";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
-import {parse} from "date-fns";
 import {parseDate} from "../../services/utils";
 
 function toChartJSPoint(p: DataPoint) {
@@ -28,7 +33,7 @@ function toAnnotationDataPoints(annotationLine: ChartAnnotationLine, dataPoints:
     // it can be either horizontal or vertical
     // if it is horizontal, it's x is the x of the data points and y is a constant value
 
-    if (annotationLine.chartAnnotationLineType === "Horizontal") {
+    if (annotationLine.chartAnnotationLineType === ChartAnnotationLineType.Horizontal) {
         return dataPoints.map(p => {
             return {
                 label: p.label,
@@ -125,6 +130,7 @@ function toChart(containers: DataPointContainer[]) {
         },
         axisY: {
             gridThickness: 0,
+            includeZero: containers[0].includeZero
             // crosshair: {
             //   enabled: true
             // }

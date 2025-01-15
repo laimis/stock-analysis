@@ -32,7 +32,8 @@
                         data-bs-toggle="collapse"
                         [attr.data-bs-target]="'#collapse' + i"
                         [attr.aria-expanded]="false"
-                        [attr.aria-controls]="'collapse' + i">
+                        [attr.aria-controls]="'collapse' + i"
+                        (click)="toggleAccordion(i)">
                     <div class="d-flex w-100 justify-content-between align-items-center">
                         <div>
                             <span class="fw-bold me-2">{{position.underlyingTicker}}</span>
@@ -51,6 +52,7 @@
                  data-bs-parent="#positionsAccordion">
                 <div class="accordion-body">
                     <app-option-position
+                        *ngIf="expandedPositions[i]"
                         [position]="position"
                         [orders]="orders"
                         (positionDeleted)="positionsChanged.emit()"

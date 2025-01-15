@@ -1,15 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-    ChartType,
     DailyPositionReport,
-    DataPointContainer,
     PositionInstance,
     StockQuote,
     StocksService,
     TickerCorrelation
 } from '../services/stocks.service';
-import {convertToLocalTime, GetErrors} from "../services/utils";
+import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
@@ -19,9 +17,9 @@ import {CorrelationsComponent} from "../shared/reports/correlations.component";
 import {FormsModule} from "@angular/forms";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
-import {DatePipe, DecimalPipe, NgFor, NgIf} from "@angular/common";
-import {OptionPricing, OptionService} from "../services/option.service";
-import {LineChartComponent} from "../shared/line-chart/line-chart.component";
+import {NgIf} from "@angular/common";
+import {OptionPosition, OptionService} from "../services/option.service";
+import {OptionContractPricingComponent} from "../options/option-contract-pricing/option-contract-pricing.component";
 
 function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
@@ -70,10 +68,7 @@ function createProfitScatter(entries: PositionInstance[], quotes: Map<string, St
         CanvasJSAngularChartsModule,
         ErrorDisplayComponent,
         NgIf,
-        NgFor,
-        LineChartComponent,
-        DatePipe,
-        DecimalPipe
+        OptionContractPricingComponent
     ]
 })
 export class PlaygroundComponent implements OnInit {
@@ -193,80 +188,18 @@ export class PlaygroundComponent implements OnInit {
         concat([positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily]).subscribe()
     }
 
-    optionSymbols: string = 'CELH  250221C00027500';
-    optionPricingData: OptionPricing[] = [];
-    loadingOptionPricing: boolean = false;
-    optionChartOptions: any[] = []
-    optionDataContainers: DataPointContainer[] = []
-    fetchOptionPricing() {
-        this.errors = [];
-        this.loadingOptionPricing = true;
-        const symbols = this.optionSymbols
-        this.optionService.getOptionPricing(symbols).subscribe((data) => {
-            this.optionPricingData = data;
-            this.generateOptionPricingChart();
-            this.loadingOptionPricing = false;
-        }, (error) => {
-            this.errors = GetErrors(error);
-            this.loadingOptionPricing = false;
-        });
+    optionPosition: OptionPosition = null;
+    loadingOptionPosition: boolean = false;
+    loadOptionPosition() {
+        this.loadingOptionPosition = true;
+        const positionId = 'e1f844e2-07ef-4029-88f2-b3ac37f510ba'
+        this.optionService.get(positionId).subscribe((data) => {
+            this.optionPosition = data
+            this.loadingOptionPosition = false;
+        },(error) => {
+            this.errors = GetErrors(error)
+            this.loadingOptionPosition = false;
+        })
     }
-
-    generateOptionPricingChart() {
-        // turn the option pricing data into datapoint container structures that then can be rendered by the line component
-        let dateWithoutMilliseconds = (date: Date) => {
-            return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds())
-        }
-        
-        // first, let's get the mark changes over time
-        const markChanges = this.optionPricingData.map(op => {
-            let date = convertToLocalTime(
-                dateWithoutMilliseconds(
-                    new Date(op.timestamp)
-                )
-            );
-            let dateStr = date.toISOString();
-            return {label: dateStr, value: op.mark, isDate: false}
-        });
-        
-        let container : DataPointContainer = {
-            label: "Mark vs Time",
-            chartType: ChartType.Line,
-            data: markChanges
-        }
-        
-        // underlying price changes
-        const underlyingChanges = this.optionPricingData.map(op => {
-            let date = convertToLocalTime(
-                dateWithoutMilliseconds(
-                    new Date(op.timestamp)
-                )
-            );
-            let dateStr = date.toISOString();
-            return {label: dateStr, value: op.underlyingPrice, isDate: false}
-        });
-        
-        let underlyingContainer : DataPointContainer = {
-            label: "Underlying Price vs Time",
-            chartType: ChartType.Line,
-            data: underlyingChanges
-        }
-        
-        let deltaChanges = this.optionPricingData.map(op => {
-            let date = convertToLocalTime(
-                dateWithoutMilliseconds(
-                    new Date(op.timestamp)
-                )
-            );
-            let dateStr = date.toISOString();
-            return {label: dateStr, value: op.delta, isDate: false}
-        });
-        let deltaContainer : DataPointContainer = {
-            label: "Delta vs Time",
-            chartType: ChartType.Line,
-            data: deltaChanges
-        }
-        
-        this.optionDataContainers = [container, underlyingContainer, deltaContainer];
-    }
+    
 }
