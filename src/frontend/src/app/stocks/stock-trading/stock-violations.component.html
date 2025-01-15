@@ -53,7 +53,9 @@
                             [positionId]="violation.localPosition?.positionId"
                             [orders]="orders"
                             [filteredTickers]="[violation.ticker]"
-                            [justOrders]="true">
+                            [justOrders]="true"
+                            (orderRecorded)="orderExecuted(violation.ticker)"
+                            >
                         </app-brokerage-orders>
                     </div>
                 }
