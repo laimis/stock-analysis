@@ -60,7 +60,7 @@ export class BrokerageOrdersComponent {
         this.groupAndRenderOrders()
     }
     @Output()
-    onRecordOrder = new EventEmitter<BrokerageStockOrder>();
+    orderRecorded = new EventEmitter<BrokerageStockOrder>();
 
     groupAndRenderOrders() {
         let isTickerVisible = (ticker: string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
@@ -102,12 +102,12 @@ export class BrokerageOrdersComponent {
 
         if (order.isBuyOrder) {
             this.stocks.purchase(obj).subscribe(
-                _ => this.onRecordOrder.emit(),
+                _ => this.orderRecorded.emit(),
                 err => this.errors = GetErrors(err)
             )
         } else if (order.isSellOrder) {
             this.stocks.sell(obj).subscribe(
-                _ => this.onRecordOrder.emit(),
+                _ => this.orderRecorded.emit(),
                 err => this.errors = GetErrors(err)
             )
         }

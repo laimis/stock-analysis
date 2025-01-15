@@ -223,7 +223,7 @@
                         <app-brokerage-orders [orders]="positionOrders"
                                               [filteredTickers]="[_position.ticker]"
                                               [positionId]="_position.positionId"
-                                              (onRecordOrder)="positionChanged.emit()"
+                                              (orderRecorded)="positionChanged.emit()"
                         ></app-brokerage-orders>
                     } @else {
                         <span class="text-muted">No orders</span>

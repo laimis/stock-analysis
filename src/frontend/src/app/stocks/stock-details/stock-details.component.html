@@ -104,7 +104,7 @@
         [filteredTickers]="[stock.ticker]"
         [orders]="orders"
         [positionId]="currentPosition?.positionId"
-        (onRecordOrder)="positionChanged()"
+        (orderRecorded)="positionChanged()"
     >
     </app-brokerage-orders>
 
