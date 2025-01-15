@@ -5,25 +5,39 @@ open core.Options
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Options
     
+type OptionContractView(underlyingTicker:core.Shared.Ticker, expiration:OptionExpiration, strikePrice:decimal, optionType:core.fs.Options.OptionType, quantity:int, cost:decimal, instruction:OptionOrderInstruction option, chain:OptionChain option) =
+    let chainDetail = chain |> Option.bind(_.FindMatchingOption(strikePrice, expiration, optionType))
+    let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
+    let pctItm =
+        match underlyingPrice with
+        | Some(price) -> 
+            let itmPrice = 
+                match optionType with
+                | Call -> price - strikePrice
+                | Put -> strikePrice - price
+            itmPrice / price |> Some
+        | None -> None
+    let market = chainDetail |> Option.map(fun o -> o.Mark * decimal quantity |> abs)
+        
+    member this.Expiration = expiration
+    member this.StrikePrice = strikePrice
+    member this.OptionType = optionType
+    member this.Quantity = quantity
+    member this.Cost = cost
+    member this.Market = market
+    member this.Details = chainDetail
+    member this.PctInTheMoney = pctItm
+    member this.UnderlyingTicker = underlyingTicker
+    member this.Instruction = instruction
+    
 type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     
     let labels = state.Labels |> Seq.map id |> Seq.toArray
     let contracts =
         state.Contracts.Keys
         |> Seq.map (fun k ->
-            let chainDetail = chain |> Option.bind(_.FindMatchingOption(k.Strike, k.Expiration, k.OptionType))
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
-            let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
-            let pctItm =
-                match underlyingPrice with
-                | Some(price) -> 
-                    let itmPrice = 
-                        match k.OptionType with
-                        | Call -> price - k.Strike
-                        | Put -> k.Strike - price
-                    itmPrice / price |> Some
-                | None -> None
-            {|expiration = k.Expiration; strikePrice = k.Strike; optionType = k.OptionType; quantity = quantity; cost = cost; details = chainDetail; pctInTheMoney = pctItm|}
+            OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, cost, None, chain)
         )
     
     member this.PositionId = state.PositionId
@@ -32,7 +46,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.DaysHeld = state.DaysHeld
     member this.DaysToExpiration =
         contracts
-        |> Seq.map (fun c -> c.expiration.ToDateTimeOffset() - DateTimeOffset.Now)
+        |> Seq.map (fun c -> c.Expiration.ToDateTimeOffset() - DateTimeOffset.Now)
         |> Seq.map (fun ts -> ts.TotalDays |> int)
         |> Seq.distinct
         |> Seq.sort
@@ -43,11 +57,11 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Cost = state.Cost
     member this.Market =
         contracts
-        |> Seq.sumBy (fun c -> c.details |> Option.map(fun o -> o.Mark * decimal c.quantity) |> Option.defaultValue 0m)
+        |> Seq.sumBy (fun c -> c.Details |> Option.map(fun o -> o.Mark * decimal c.Quantity) |> Option.defaultValue 0m)
     member this.Spread =
         // get min and max values of the contract strike prices
-        let minStrike = contracts |> Seq.map (fun c -> c.strikePrice) |> Seq.min
-        let maxStrike = contracts |> Seq.map (fun c -> c.strikePrice) |> Seq.max
+        let minStrike = contracts |> Seq.map _.StrikePrice |> Seq.min
+        let maxStrike = contracts |> Seq.map _.StrikePrice |> Seq.max
         maxStrike - minStrike
     member this.Profit =
         match this.IsClosed with
@@ -171,7 +185,24 @@ type OwnedOptionStats(summaries:seq<OwnedOptionView>) =
         | 0m -> 0m
         | _ -> this.AverageDaysHeld / this.AverageDays
     
-type OptionDashboardView(closed:seq<OptionPositionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrder>) =
+type OptionOrderView(order:OptionOrder, chain:OptionChain option) =
+    member this.OrderId = order.OrderId
+    member this.Price = order.Price
+    member this.Quantity = order.Quantity
+    member this.Status = order.Status
+    member this.Type = order.Type
+    member this.ExecutionTime = order.ExecutionTime
+    member this.EnteredTime = order.EnteredTime
+    member this.ExpirationTime = order.ExpirationTime
+    member this.CanBeCancelled = order.CanBeCancelled
+    member this.CanBeRecorded = order.CanBeRecorded
+    member this.IsActive = order.IsActive
+    member this.Contracts =
+        order.Legs |> Seq.map (fun l ->
+            OptionContractView(l.UnderlyingTicker, l.Expiration, l.StrikePrice, l.OptionType, l.Quantity, l.Price |> Option.defaultValue 0m, l.Instruction |> Some, chain)
+        )
+    
+type OptionDashboardView(closed:seq<OptionPositionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrderView>) =
     
     member this.Closed = closed
     member this.Open = ``open``

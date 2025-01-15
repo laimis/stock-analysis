@@ -54,7 +54,7 @@ export class OptionPositionComponent {
         if (this.position == null) {
             return;
         }
-        this.positionOrders = value.filter(o => o.legs[0].underlyingTicker === this.position.underlyingTicker);
+        this.positionOrders = value.filter(o => o.contracts[0].underlyingTicker === this.position.underlyingTicker);
     }
     get orders() : BrokerageOptionOrder[] {
         return this.positionOrders;

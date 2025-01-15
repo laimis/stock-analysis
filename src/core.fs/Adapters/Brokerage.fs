@@ -103,7 +103,7 @@ type OptionLeg = {
     OptionType: OptionType
     UnderlyingTicker : Ticker
     Instruction: OptionOrderInstruction
-    Quantity: decimal
+    Quantity: int
     Price: decimal option
     Expiration: OptionExpiration
     StrikePrice: decimal

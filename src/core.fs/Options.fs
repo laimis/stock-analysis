@@ -49,15 +49,7 @@ type OptionType =
             | "CALL" -> Call
             | "PUT" -> Put
             | _ -> failwithf $"Invalid option type: %s{value}"
-            
 
-type OptionLeg = {
-    OptionType: OptionType
-    StrikePrice: decimal
-    ExpirationDate: DateTimeOffset
-    Quantity: int
-    Price: decimal
-}
 
 type OptionTransaction = {
     EventId: Guid

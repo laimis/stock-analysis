@@ -26,13 +26,16 @@ function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDef
 }
 
 export interface OptionContract {
+    underlyingTicker: string
     optionType: string
     strikePrice: number
     expiration: string
     quantity: number
     cost: number
+    market: number
     pctInTheMoney: number | undefined
     details: OptionDefinition | undefined
+    instruction: string | undefined
 }
 export interface OptionPosition {
     positionId: string
@@ -207,16 +210,13 @@ export interface BrokerageOptionOrder {
     type: string
     quantity: number
     status: string
-    instruction: string
-    description: string
     executionTime: string
     enteredTime: string
     canBeCancelled: boolean
     canBeRecorded: boolean
     isActive: boolean
-    legs: OptionOrderLeg[]
+    contracts: OptionContract[]
 }
-
 
 export interface OptionsContainer {
     open: OptionPosition[]

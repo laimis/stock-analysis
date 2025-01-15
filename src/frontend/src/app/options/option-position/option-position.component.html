@@ -99,28 +99,28 @@
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
-                            <tr>
-                                <th>Itm/Otm</th>
-                                <th>Type</th>
-                                <th>Strike</th>
-                                <th>Expiration</th>
-                                <th>Quantity</th>
-                                <th>Cost</th>
-                                <th>Market</th>
-                                <th>Delta</th>
-                                <th>IV</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Itm/Otm</th>
+                                    <th>Type</th>
+                                    <th>Strike</th>
+                                    <th>Expiration</th>
+                                    <th>Quantity</th>
+                                    <th>Cost</th>
+                                    <th>Market</th>
+                                    <th>Delta</th>
+                                    <th>IV</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <tbody>
                                 @for (contract of position.contracts; track contract) {
                                     <tr>
                                         <td>
                                             <span class="badge p-1 m-1" [ngClass]="{
-                                                'bg-success-subtle text-success': contract.pctInTheMoney > 0,
+                                                'bg-success-subtle text-success': contract.pctInTheMoney >= 0,
                                                 'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
                                             }">
-                                                {{ contract.pctInTheMoney > 0 ? 'ITM ' : 'OTM ' }}
+                                                {{ contract.pctInTheMoney >= 0 ? 'ITM ' : 'OTM ' }}
                                                 {{ contract.pctInTheMoney | percent }}
                                             </span>
                                         </td>
@@ -137,18 +137,29 @@
                                         <td>{{ contract.quantity }}</td>
                                         <td>{{ contract.cost | currency }}</td>
                                         <td>
-                                            {{ contract.details?.mark | currency}}
-                                            @if (contract.cost && contract.details?.mark) {
-                                                <span class="badge p-1 m1" [ngClass]="{
-                                    'bg-success-subtle text-success': (contract.details?.mark - contract.cost) / Math.abs(contract.cost) > 0,
-                                    'bg-danger-subtle text-danger': (contract.details?.mark - contract.cost) / Math.abs(contract.cost) < 0
-                                }">
-                                    <i class="bi" [ngClass]="{
-                                        'bi-arrow-up': (contract.details?.mark - contract.cost) / Math.abs(contract.cost) > 0,
-                                        'bi-arrow-down': (contract.details?.mark - contract.cost) / Math.abs(contract.cost) < 0
-                                    }"></i>
-                                                    {{ ((contract.details?.mark - contract.cost) / Math.abs(contract.cost)) | percent:'1.1' }}
-                                </span>
+                                            @if (contract.cost && contract.market) {
+                                                {{ contract.market | currency }}
+                                                @let valueIncrease = contract.market - contract.cost;
+                                                <span class="badge p-1 m-1" [ngClass]="{
+                                                    'bg-success-subtle text-success': valueIncrease > 0,
+                                                    'bg-danger-subtle text-danger': valueIncrease < 0 
+                                                }">
+                                                    <i class="bi" [ngClass]="{
+                                                        'bi-arrow-up': valueIncrease > 0,
+                                                        'bi-arrow-down': valueIncrease < 0
+                                                    }"></i>
+                                                    {{ (valueIncrease / contract.cost) | percent:'1.1' }}
+                                                </span>
+                                                <span class="badge p-1 m-1" [ngClass]="{
+                                                    'bg-success-subtle text-success': valueIncrease > 0,
+                                                    'bg-danger-subtle text-danger': valueIncrease < 0 
+                                                }">
+                                                    <i class="bi" [ngClass]="{
+                                                        'bi-arrow-up': valueIncrease > 0,
+                                                        'bi-arrow-down': valueIncrease < 0
+                                                    }"></i>
+                                                    {{ (valueIncrease) | currency }}
+                                                </span>
                                             }
                                         </td>
                                         

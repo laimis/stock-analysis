@@ -568,10 +568,10 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 let instruction = l.instruction |> parseOptionOrderInstruction
                 let quantityFactor =
                     match instruction with
-                    | OptionOrderInstruction.BuyToOpen -> 1m
-                    | OptionOrderInstruction.BuyToClose -> 1m
-                    | OptionOrderInstruction.SellToOpen -> -1m
-                    | OptionOrderInstruction.SellToClose -> -1m
+                    | OptionOrderInstruction.BuyToOpen -> 1
+                    | OptionOrderInstruction.BuyToClose -> 1
+                    | OptionOrderInstruction.SellToOpen -> -1
+                    | OptionOrderInstruction.SellToClose -> -1
                 
                 {
                     LegId = l.legId.ToString()
@@ -580,7 +580,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     OptionType = if l.instrument.putCall = "PUT" then OptionType.Put else OptionType.Call  
                     UnderlyingTicker = l.instrument.underlyingSymbol |> Ticker 
                     Ticker = l.instrument.symbol |> Ticker
-                    Quantity = l.quantity * quantityFactor
+                    Quantity = (l.quantity |> int) * quantityFactor
                     Instruction = instruction
                     Price = o.ResolveOptionLegPrice(l.legId)
                     Expiration = expiration

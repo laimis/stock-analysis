@@ -3,13 +3,13 @@ import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
 import {
     BrokerageOptionOrder,
-    BrokerageOptionPosition,
+    BrokerageOptionPosition, OptionContract,
     OptionOrderLeg,
     OptionPosition, OptionService
 } from "../../services/option.service";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
-import {CurrencyPipe, DecimalPipe, NgClass, NgIf} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgClass, NgIf, PercentPipe} from "@angular/common";
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {
     OptionPositionCreateModalComponent
@@ -29,7 +29,8 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
         DecimalPipe,
         OptionPositionCreateModalComponent,
         NgIf,
-        ErrorDisplayComponent
+        ErrorDisplayComponent,
+        PercentPipe
     ]
 })
 
@@ -88,8 +89,8 @@ export class OptionBrokerageOrdersComponent {
     }
 
     applyOrderToPosition(order: BrokerageOptionOrder) {
-        let isOpen = order.legs.filter(leg => leg.instruction.endsWith('ToOpen'))
-        let isClose = order.legs.filter(leg => leg.instruction.endsWith('ToClose'))
+        let isOpen = order.contracts.filter(leg => leg.instruction.endsWith('ToOpen'))
+        let isClose = order.contracts.filter(leg => leg.instruction.endsWith('ToClose'))
         
         if (isOpen.length > 0 && isClose.length > 0) {
             this.errors = ['Cannot have both open and close legs in the same order']
@@ -102,14 +103,14 @@ export class OptionBrokerageOrdersComponent {
         }
 
         let contracts =
-            order.legs.map(leg =>
+            order.contracts.map(contract =>
                 {
                     return {
-                        optionType: leg.optionType,
-                        strikePrice: leg.strikePrice,
-                        expirationDate: leg.expiration,
-                        quantity: leg.quantity,
-                        cost: leg.price,
+                        optionType: contract.optionType,
+                        strikePrice: contract.strikePrice,
+                        expirationDate: contract.expiration,
+                        quantity: contract.quantity,
+                        cost: contract.market,
                         filled: order.executionTime
                     }
                 }
@@ -139,23 +140,23 @@ export class OptionBrokerageOrdersComponent {
             cost: order.price,
             showPL: false,
             marketValue: undefined,
-            brokerageContracts: order.legs.map(leg => {
+            brokerageContracts: order.contracts.map(contract => {
                 return {
-                    ticker: leg.underlyingTicker,
-                    averageCost: leg.price,
-                    quantity: leg.quantity,
-                    description: leg.description,
-                    optionType: leg.optionType,
-                    strikePrice: leg.strikePrice,
+                    ticker: contract.underlyingTicker,
+                    averageCost: contract.cost,
+                    quantity: contract.quantity,
+                    description: "",
+                    optionType: contract.optionType,
+                    strikePrice: contract.strikePrice,
                     marketValue: undefined,
-                    expirationDate: leg.expiration
+                    expirationDate: contract.expiration
                 }
             })
         }
         this.isModalVisible = true
     }
     
-    marketPrice(legs:OptionOrderLeg[]) : number {
+    marketPrice(legs:OptionContract[]) : number {
         // go through each leg and add up the price of each leg to the total
         // to determine what value to use, look at instruction property, if it says 
         // BuyTo* then the positive price value should be used, if it says SellTo* then the negative price value should be used
@@ -163,9 +164,9 @@ export class OptionBrokerageOrdersComponent {
         let total = 0
         legs.forEach(leg => {
             if (leg.instruction.startsWith("BuyTo")) {
-                total += leg.price
+                total += leg.market
             } else if (leg.instruction.startsWith("SellTo")) {
-                total -= leg.price
+                total -= leg.market
             }
         })
         return total

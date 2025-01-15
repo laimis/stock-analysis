@@ -299,47 +299,32 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     )
                     |> Result.defaultValue (Seq.empty, Array.empty)
                 
-                let! openBrokerageOrders =
+                let! _ =
                     brokerageOrders
                     |> Seq.filter _.IsActive
                     |> Seq.map (fun o -> o.Legs)
                     |> Seq.concat
                     |> Seq.map(fun l -> async {
-                        // let's see if we can get the chain
-                        if chainLookupMap.ContainsKey(l.UnderlyingTicker) then
-                            return chainLookupMap[l.UnderlyingTicker].FindMatchingOption(l.StrikePrice, l.Expiration, l.OptionType)
-                        else
+                        if chainLookupMap.ContainsKey(l.UnderlyingTicker) |> not then
                             let! chain = brokerage.GetOptionChain user.State l.UnderlyingTicker |> Async.AwaitTask
                             match chain with
-                            | Ok chain ->
-                                chainLookupMap.Add(l.UnderlyingTicker, chain)
-                                return chain.FindMatchingOption(l.StrikePrice, l.Expiration, l.OptionType)
-                            | Error _ -> return None
+                            | Ok chain -> chainLookupMap.Add(l.UnderlyingTicker, chain)
+                            | Error _ -> ()
                     })
                     |> Async.Sequential
                     
-                let matchingChainDetails =
-                    openBrokerageOrders
-                    |> Seq.choose id
-                    
-                let brokerageOrders =
+                let brokerageOrderViews =
                     brokerageOrders
                     |> Seq.map (fun o ->
-                        match o.IsActive with
-                        | true -> {
-                                o with Legs = o.Legs |> Seq.map (fun l ->
-                                    let found = matchingChainDetails |> Seq.tryFind (fun d -> d.StrikePrice = l.StrikePrice && d.Expiration = l.Expiration && d.OptionType = l.OptionType)
-                                    match found with
-                                    | Some d -> { l with Price = d.Mark |> Some }
-                                    | None ->
-                                        logger.LogError($"Unable to find matching option for {l.UnderlyingTicker} {l.StrikePrice} {l.OptionType} {l.Expiration}")
-                                        l
-                                    ) |> Seq.toArray
-                            }
-                        | false -> o
+                        let ticker = o.Legs[0].UnderlyingTicker
+                        let chain =
+                            match chainLookupMap.TryGetValue(ticker) with
+                            | true, chain -> chain |> Some
+                            | _ -> None
+                        OptionOrderView(o, chain)
                     )
 
-                return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrders) |> Ok
+                return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrderViews) |> Ok
         }
         
     member _.Handle(ownership:OptionOwnershipQuery) : System.Threading.Tasks.Task<Result<OptionPositionView seq, ServiceError>> = task {

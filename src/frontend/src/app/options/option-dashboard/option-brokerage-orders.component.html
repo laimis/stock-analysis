@@ -23,8 +23,8 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
                         <div class="d-flex align-items-center gap-2">
-                            <app-trading-view-link [ticker]="order.legs[0].underlyingTicker"></app-trading-view-link>
-                            <app-stock-link [ticker]="order.legs[0].underlyingTicker"></app-stock-link>
+                            <app-trading-view-link [ticker]="order.contracts[0].underlyingTicker"></app-trading-view-link>
+                            <app-stock-link [ticker]="order.contracts[0].underlyingTicker"></app-stock-link>
                         </div>
                         <span class="badge rounded-pill" [ngClass]="{
                             'bg-success': order.status === 'Filled',
@@ -79,37 +79,58 @@
 
                 <!-- Enhanced Legs Table -->
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="bg-light">
-                        <tr>
-                            <th><small class="text-uppercase">Instruction</small></th>
-                            <th><small class="text-uppercase">Type</small></th>
-                            <th><small class="text-uppercase">Strike</small></th>
-                            <th><small class="text-uppercase">Expiration</small></th>
-                            <th class="ps-4"><small class="text-uppercase">Quantity</small></th>
-                            <th class="text-end pe-4"><small class="text-uppercase">Price</small></th>
-                        </tr>
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Itm/Otm</th>
+                                <th>Type</th>
+                                <th>Strike</th>
+                                <th>Expiration</th>
+                                <th>Quantity</th>
+                                <th>Market</th>
+                                <th>Delta</th>
+                                <th>IV</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            @for (leg of order.legs; track leg) {
+                            @for (contract of order.contracts; track contract) {
                                 <tr>
                                     <td>
-                                        <span class="badge" [ngClass]="{
-                                            'bg-success': leg.instruction === 'BuyToOpen' || leg.instruction === 'BuyToClose',
-                                            'bg-danger': leg.instruction === 'SellToOpen' || leg.instruction === 'SellToClose'
-                                        }">{{ leg.instruction }}</span>
+                                        <span class="badge p-1 m-1" [ngClass]="{
+                                            'bg-success-subtle text-success': contract.pctInTheMoney >= 0,
+                                            'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
+                                        }">
+                                            {{ contract.pctInTheMoney >= 0 ? 'ITM ' : 'OTM ' }}
+                                            {{ contract.pctInTheMoney | percent }}
+                                        </span>
                                     </td>
-                                    <td>{{leg.optionType}}</td>
-                                    <td>{{ leg.strikePrice | currency }}</td>
-                                    <td>{{ leg.expiration }}</td>
-                                    <td class="ps-4">{{ leg.quantity | number }}</td>
-                                    <td class="text-end pe-4">{{ leg.price | currency }}</td>
+                                    <td>
+                                        <span class="badge p-1 m-1" [ngClass]="{
+                                            'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
+                                            'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
+                                        }">
+                                            {{ contract.optionType }}
+                                        </span>
+                                    </td>
+                                    <td>{{ contract.strikePrice | currency }}</td>
+                                    <td>{{ contract.expiration }}</td>
+                                    <td class="ps-4">
+                                        {{ contract.quantity | number }}
+                                        <span class="badge m-1" [ngClass]="{
+                                            'bg-success': contract.instruction === 'BuyToOpen' || contract.instruction === 'BuyToClose',
+                                            'bg-danger': contract.instruction === 'SellToOpen' || contract.instruction === 'SellToClose'
+                                        }">{{ contract.instruction }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">{{ contract.market | currency }}</td>
+                                    <td>{{ contract.details?.delta | number }}</td>
+                                    <td>{{ contract.details?.volatility | number}}</td>
                                 </tr>
                             }
-                            @if (order.canBeCancelled) {
+                            @if (order.isActive) {
                                 <tr class="bg-light fw-bold">
                                     <td colspan="5" class="ps-4">Current Market Price</td>
-                                    <td class="text-end pe-4">{{ marketPrice(order.legs) | currency }}</td>
+                                    <td class="text-end pe-4">{{ marketPrice(order.contracts) | currency }}</td>
+                                    <td colspan="2"></td>
                                 </tr>
                             }
                         </tbody>
