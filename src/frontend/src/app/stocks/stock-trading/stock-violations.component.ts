@@ -32,14 +32,6 @@ export class StockViolationsComponent {
         this.tickersInViolations = value.map(v => v.ticker)
     }
 
-    positionOpened(val: openpositioncommand) {
-        this.refreshRequested.emit(val.ticker)
-    }
-
-    orderExecuted(ticker: string) {
-        this.refreshRequested.emit(ticker)
-    }
-
     tickerHasOrders(ticker: string) {
         return this.orders.some(o => o.ticker == ticker)
     }

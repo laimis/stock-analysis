@@ -37,7 +37,7 @@
                             [presetTicker]="violation.ticker"
                             [showAnalysis]="false"
                             [isPendingPositionMode]="false"
-                            (positionOpened)="positionOpened($event)"
+                            (positionOpened)="this.refreshRequested.emit($event.ticker)"
                             (newPositionWorkflowStarted)="showElement(sizeInfo)">
                         </app-stock-trading-new-position>
                     </div>
@@ -54,7 +54,7 @@
                             [orders]="orders"
                             [filteredTickers]="[violation.ticker]"
                             [justOrders]="true"
-                            (orderRecorded)="orderExecuted(violation.ticker)"
+                            (orderRecorded)="refreshRequested.emit(violation.ticker)"
                             >
                         </app-brokerage-orders>
                     </div>
@@ -81,7 +81,7 @@
 
     @if (tickersInViolations.length > 0) {
         <div class="mt-4">
-            <app-brokerage-new-order (brokerageOrderEntered)="orderExecuted($event)"></app-brokerage-new-order>
+            <app-brokerage-new-order (brokerageOrderEntered)="refreshRequested.emit($event)"></app-brokerage-new-order>
         </div>
     }
 </div>
