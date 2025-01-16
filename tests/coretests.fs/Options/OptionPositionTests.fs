@@ -7,7 +7,9 @@ open core.fs.Options
 open testutils
 
 let ticker = TestDataGenerator.NET
-let expiration = DateTimeOffset.UtcNow.AddMonths(2).ToString("yyyy-MM-dd")
+let expiration =
+    DateTimeOffset.UtcNow.AddMonths(2).ToString("yyyy-MM-dd")
+    |> OptionExpiration.create
     
 [<Fact>]
 let ``Basic operations work`` () =
@@ -16,7 +18,7 @@ let ``Basic operations work`` () =
     
     position.UnderlyingTicker |> should equal ticker
     position.IsClosed |> should equal false
-    position.IsOpen |> should equal true
+    position.IsOpen |> should equal false // haven't bought any contracts yet
     
     let optionType = OptionType.Put
     let quantity = 1
@@ -144,13 +146,12 @@ let ``Trying to assign contracts that are not sold should throw``() =
 [<Fact>]
 let ``Buy to open using wrong date format, fails``() =
     
-    let wrongDate = DateTimeOffset.UtcNow.AddDays(7).ToString("MMMM dd, yyyy")
-    
     (fun () ->
+        let wrongDate = DateTimeOffset.UtcNow.AddDays(7).ToString("MMMM dd, yyyy") |> OptionExpiration.create
         OptionPosition.``open`` ticker DateTimeOffset.UtcNow
         |> OptionPosition.buyToOpen wrongDate 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
         |> ignore)
-    |> should throw typeof<Exception>
+    |> should throw typeof<FormatException>
     
 [<Fact>]
 let ``Expire fails if there are no contracts to expire``() =
@@ -207,3 +208,28 @@ let ``Labels work``() =
     let positionWithLabelRemoved = positionWithLabel |> OptionPosition.deleteLabel testKey DateTimeOffset.UtcNow
     
     positionWithLabelRemoved.Labels |> should be Empty
+
+[<Fact>]
+let ``Create option without purchasing the contracts should work``() =
+    
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    position.IsClosed |> should equal false
+    position.IsOpen |> should equal false
+    
+    let cost = 1.45m
+    
+    let modifiedPosition =
+        position
+        |> OptionPosition.establishDesiredCost cost DateTimeOffset.UtcNow
+        |> OptionPosition.createPendingBuyOrder expiration 27.5m OptionType.Call 1 DateTimeOffset.UtcNow
+        |> OptionPosition.createPendingSellOrder expiration 32.5m OptionType.Call 1 DateTimeOffset.UtcNow
+        |> OptionPosition.addNotes (Some "thinking about doing this again, not sure if I will get in") DateTimeOffset.UtcNow
+        
+    modifiedPosition.IsClosed |> should equal false
+    modifiedPosition.IsOpen |> should equal false
+    modifiedPosition.DesiredCost |> should equal (Some cost)
+    modifiedPosition.PendingContracts |> should haveCount 2
+    
+    
+    

@@ -33,7 +33,6 @@ export class OptionPositionCreateModalComponent {
     positionNotes: string;
     positionStrategy: string;
     optionStrategies: { key: string, value: string }[] = []
-    isPaperPosition: boolean | undefined;
 
     @HostListener('document:keydown.escape')
     onEscape() {
@@ -57,7 +56,6 @@ export class OptionPositionCreateModalComponent {
 
     turnIntoPosition(position: BrokerageOptionPosition, filledDate: string) {
         console.log('mapping', position, filledDate)
-        let isPaperPosition = this.isPaperPosition === undefined ? false : this.isPaperPosition
         // this will need to be completely rewritten
         let command = {
 
@@ -65,7 +63,6 @@ export class OptionPositionCreateModalComponent {
             filled: filledDate,
             notes: this.positionNotes,
             strategy: this.positionStrategy,
-            isPaperPosition: isPaperPosition,
             contracts: position.brokerageContracts.map(l => ({
                 quantity: l.quantity,
                 strikePrice: l.strikePrice,

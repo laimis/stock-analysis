@@ -1,16 +1,22 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {DatePipe} from '@angular/common';
+import {DatePipe, NgIf} from '@angular/common';
 import {Title} from '@angular/platform-browser';
 import {GetErrors} from 'src/app/services/utils';
 import {OptionPosition, OptionService} from "../../services/option.service";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {OptionPositionComponent} from "../option-position/option-position.component";
 
 @Component({
     selector: 'app-owned-option-detail',
     templateUrl: './owned-option-detail.component.html',
     styleUrls: ['./owned-option-detail.component.css'],
-    providers: [DatePipe],
-    standalone: false
+    imports: [
+        ErrorDisplayComponent,
+        OptionPositionComponent,
+        NgIf
+    ],
+    providers: [DatePipe]
 })
 export class OwnedOptionComponent implements OnInit {
     public position: OptionPosition;

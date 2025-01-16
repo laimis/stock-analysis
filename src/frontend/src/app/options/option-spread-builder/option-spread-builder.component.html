@@ -261,9 +261,7 @@
                                 
                                 <!-- section to create order with input for total cost and button to submit it -->
                                 <div class="mt-3">
-                                    <label for="totalCost" class="form-label">Total Cost</label>
-                                    <input id="totalCost" type="number" class="form-control" #totalCost [value]="calculateUsingMark()">
-                                    <button class="btn btn-primary mt-2" (click)="createOrder(totalCost.valueAsNumber)">Create Order</button>
+                                    <button class="btn btn-primary mt-2" (click)="createOrder()">Create Order</button>
                                 </div>
                                 
                             </li>
@@ -396,6 +394,16 @@
                 </div>
             </div>
         </div>
+
+        <app-option-pendingposition-create-modal
+            [ticker]="ticker"
+            [isVisible]="isModalVisible"
+            [selectedLegs]="selectedLegs"
+            [price]="calculateUsingMark()"
+            (isVisibleChange)="isModalVisible = $event"
+            (positionCreated)="positionCreated()"
+            (errorsOccurred)="errors = $event">
+        </app-option-pendingposition-create-modal>
     }
 
 </div>

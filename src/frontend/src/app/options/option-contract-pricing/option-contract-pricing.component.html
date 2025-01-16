@@ -1,4 +1,40 @@
 <div>
     <app-loading *ngIf="loading"></app-loading>
-    <app-line-chart [dataContainer]="container" *ngFor="let container of dataPointContainers"></app-line-chart>
+    @if(hasPrice) {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-6">
+                        <div class="price-card text-center p-3 rounded bg-light">
+                            <div class="text-muted mb-1">
+                                <i class="bi bi-arrow-down-circle"></i>
+                                Minimum Price
+                            </div>
+                            <div class="price-value text-primary">
+                                {{ minPrice | currency }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="price-card text-center p-3 rounded bg-light">
+                            <div class="text-muted mb-1">
+                                <i class="bi bi-arrow-up-circle"></i>
+                                Maximum Price
+                            </div>
+                            <div class="price-value text-success">
+                                {{ maxPrice | currency }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <app-line-chart [dataContainer]="container" *ngFor="let container of dataPointContainers"></app-line-chart>
+    }
+    
+    @if(hasPrice === false && loading === false) {
+    <div class="alert alert-warning" role="alert">
+        No pricing available for this contract.
+    </div>
+    }
 </div>

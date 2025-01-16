@@ -9,39 +9,47 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        <span>{{selectedOption?.brokerageContracts[0]?.ticker}}</span>,
-                        {{ selectedOption?.cost | currency }} cost basis,
-                        {{ selectedOption?.marketValue | currency }} market value
+                        <span>{{ticker}}</span>, {{ price | currency }}
                     </div>
 
                     <div class="mb-4">
                         <h6 class="text-muted mb-3">Position Details</h6>
                         <div class="card bg-light">
                             <div class="card-body">
-                                <div class="row g-3" *ngFor="let contract of selectedOption?.brokerageContracts;">
-                                    <div class="col-4">
-                                        <label class="small text-muted">Option Type</label>
-                                        <p class="mb-0">{{ contract.optionType }}</p>
+                                <div class="row mb-3 g-3" *ngFor="let leg of selectedLegs;">
+                                    <div class="col">
+                                        <label class="small text-muted">Expiration</label>
+                                        <p class="small mb-0">{{ leg.option.expiration }}</p>
                                     </div>
-                                    <div class="col-4">
-                                        <label class="small text-muted">Strike Price</label>
-                                        <p class="mb-0">{{ contract.strikePrice | currency }}</p>
+                                    <div class="col">
+                                        <label class="small text-muted">Type</label>
+                                        <p class="small mb-0">{{ leg.option.optionType }}</p>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col">
+                                        <label class="small text-muted">Strike</label>
+                                        <p class="small mb-0">{{ leg.option.strikePrice | currency }}</p>
+                                    </div>
+                                    <div class="col">
+                                        <label class="small text-muted">Action</label>
+                                        <p class="small mb-0">{{ leg.action }}</p>
+                                    </div>
+                                    <div class="col">
                                         <label class="small text-muted">Quantity</label>
-                                        <p class="mb-0">{{ contract.quantity }}</p>
+                                        <p class="small mb-0">{{ leg.quantity }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    
                     <div class="mb-3">
-                        <label for="filledDate" class="form-label">Fill Date</label>
-                        <input type="date"
-                               class="form-control"
-                               id="filledDate"
-                               #selectedFillDate>
+                        <label for="price" class="form-label">Price</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="price"
+                            [(ngModel)]="price"
+                            placeholder="Enter price for position (negative for debit)">
                     </div>
 
                     <div class="mb-3">
@@ -69,7 +77,7 @@
                     <button type="button" class="btn btn-secondary" (click)="close()">
                         Cancel
                     </button>
-                    <button type="button" class="btn btn-primary" (click)="createPosition(selectedFillDate.value)">
+                    <button type="button" class="btn btn-primary" (click)="createPosition()">
                         <i class="bi bi-check2"></i>
                         Create Position
                     </button>

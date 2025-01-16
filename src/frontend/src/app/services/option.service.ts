@@ -3,12 +3,12 @@ import {KeyValuePair, Note, Transaction} from './stocks.service';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 
-function toBuyLeg(option: OptionDefinition) {
-    return {option: option, action: 'BUY'}
+function toBuyLeg(option: OptionDefinition) : OptionLeg {
+    return {option: option, action: 'buy', quantity: 1}
 }
 
-function toSellLeg(option: OptionDefinition) {
-    return {option: option, action: 'SELL'}
+function toSellLeg(option: OptionDefinition) : OptionLeg {
+    return {option: option, action: 'sell', quantity: 1}
 }
 
 function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDefinition[]> {
@@ -103,9 +103,10 @@ export class OptionSpread {
     legs: OptionLeg[]
 }
 
-export class OptionLeg {
-    action: string
-    option: OptionDefinition
+export interface OptionLeg {
+    option: OptionDefinition;
+    action: 'buy' | 'sell';
+    quantity: number;
 }
 
 export class OptionBreakdown {
@@ -228,8 +229,9 @@ export interface OptionsContainer {
     sellStats: OptionStats
 }
 
-export class openoptionpositioncommand {
-}
+export class openoptionpositioncommand {}
+
+export class openpendingoptionpositioncommand {}
 
 export interface OptionPricing {
         optionPositionId: string
@@ -282,6 +284,9 @@ export class OptionService {
         return this.http.post<OptionPosition>('/api/portfolio/optionpositions', command)
     }
 
+    openpending(command: openpendingoptionpositioncommand): Observable<OptionPosition> {
+        return this.http.post<OptionPosition>('/api/portfolio/optionpositions/pending', command)
+    }
     get(positionId: string): Observable<OptionPosition> {
         return this.http.get<OptionPosition>('/api/portfolio/optionpositions/' + positionId)
     }

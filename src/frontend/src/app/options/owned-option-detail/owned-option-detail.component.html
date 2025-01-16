@@ -7,54 +7,6 @@
             </ol>
         </nav>
         <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-        <div class="card" *ngIf="position">
-            <div class="card-body">
-                <h3 class="card-title">
-                    <app-stock-link [ticker]="position.underlyingTicker"></app-stock-link>
-                    @if (position.isOpen) { <span class="float-end">Active</span> }
-                    @if (position.isClosed) { <span class="float-end">position closed</span> }
-                </h3>
-                <div class="mt-2 row">
-                    <div class="col">
-                        <div class="stat-label">Profit</div>
-                        <div>{{ position.profit | currency }}</div>
-                    </div>
-                    <div class="col">
-                        <div class="stat-label">Profit / Day Held</div>
-                        <div>{{ (position.profit / position.daysHeld) | currency }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div *ngIf="position">
-            <caption>Contracts</caption>
-            <table class="table table-striped border">
-                <tbody>
-                    @for (t of position.contracts; track t) {
-                        <tr
-                            [ngClass]="{'table-success': t.cost> 0, 'table-warning': t.cost < 0, 'table-light': t.cost === 0}"
-                        >
-                            <td>{{ t.expiration }}</td>
-                            <td>{{ t.strikePrice | currency }}</td>
-                            <td>{{ t.optionType }}</td>
-                            <td>{{ t.quantity }} contracts</td>
-                            <td>{{ t.cost | currency }}</td>
-                        </tr>
-                    }
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4">Total</td>
-                        <td>{{ position.cost | currency }}</td>
-                    </tr>
-            </table>
-        </div>
-        <div class="mb-3" *ngIf="position">
-            <label>Delete this option position from your portfolio</label>
-            <div>
-                <button type="button" class="btn btn-secondary mb-1 me-2 float-end" (click)="delete()">Delete
-                </button>
-            </div>
-        </div>
+        <app-option-position [position]="position"></app-option-position>
     </div>
 </div>
