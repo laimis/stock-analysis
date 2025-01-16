@@ -515,8 +515,6 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | Some _ ->
                 
                 let! optionPricings = accounts.GetOptionPricing query.UserId query.Symbol
-                
-                Console.WriteLine($"Got {optionPricings |> Seq.length} option pricings")
                 return optionPricings |> Ok
         }
     member this.Handle(query: ChainQuery) =

@@ -430,10 +430,6 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
 
             const string query = @"SELECT * FROM optionpricings WHERE userid = :userId AND symbol = :symbol ORDER BY timestamp ASC";
             
-            Console.WriteLine($"Query: {query}");
-            Console.WriteLine($"UserId: {userId.Item}");
-            Console.WriteLine($"Symbol: {symbol.Item}");
-            
             var reader = await db.ExecuteReaderAsync(query, new {userId = userId.Item, symbol = symbol.Item});
             
             var result = new List<OptionPricing>();
