@@ -167,7 +167,7 @@
                                         <td>{{ contract.details?.delta | number }}</td>
                                         <td>{{ contract.details?.volatility | number}}</td>
                                         <td>
-                                            <button class="btn btn-outline-secondary btn-sm" (click)="closeContract(contract)">
+                                            <button class="btn btn-outline-secondary btn-sm" (click)="closeContract(contract)" *ngIf="position.isOpen">
                                                 Close Contract
                                             </button>
                                         </td>

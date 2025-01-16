@@ -15,7 +15,6 @@ import {ProfileCreateComponent} from './profile/profile-create.component';
 import {ProfileLoginComponent} from './profile/profile-login.component';
 import {SummaryComponent} from './summary/summary.component';
 import {RouterModule} from '@angular/router';
-import {OwnedOptionComponent} from './options/owned-option-detail/owned-option-detail.component';
 import {StockDetailsComponent} from './stocks/stock-details/stock-details.component';
 import {TransactionsComponent} from './transactions/transactions.component';
 import {ProfilePasswordResetComponent} from './profile/profile-passwordreset.component';
@@ -124,7 +123,6 @@ import {OptionOpenComponent} from "./options/option-dashboard/option-open.compon
         ProfilePasswordResetComponent,
         ProfileVerifyComponent,
         SummaryComponent,
-        OwnedOptionComponent,
         InflectionPointsComponent,
         StockDetailsComponent,
         StockFundamentalsComponent,

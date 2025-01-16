@@ -80,8 +80,6 @@ type OpenOptionPositionCommand = {
     Notes: string option
     [<Required>]
     Strategy: string option
-    [<Required>]
-    IsPaperPosition: bool option
 }
 type CreatePendingOptionPositionCommand = {
     [<Required>]
@@ -168,7 +166,6 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     ) openPosition
                 |> OptionPosition.addNotes command.Notes DateTimeOffset.UtcNow
                 |> OptionPosition.setLabelIfValueNotNone "strategy" command.Strategy DateTimeOffset.UtcNow
-                |> OptionPosition.setLabelIfValueNotNone "isPaperPosition" (command.IsPaperPosition |> Option.map _.ToString()) DateTimeOffset.UtcNow
                 
             match withAttribute.Transactions with
             | [] ->
