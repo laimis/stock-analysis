@@ -31,7 +31,7 @@
                     </div>
                 </button>
             </h2>
-            <div [id]="'collapse' + i" class="accordion-collapse" [ngClass]="{'collapse':expandedPositions[i] === false}">
+            <div [id]="'collapse' + i" class="accordion-collapse" [ngClass]="{'collapse':!expandedPositions[i]}">
                 <div class="accordion-body">
                     <app-option-position
                         *ngIf="expandedPositions[i]"

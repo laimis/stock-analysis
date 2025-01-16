@@ -319,6 +319,14 @@ public class PortfolioController(
             )
         );
     
+    [HttpPost("optionpositions/pending")]
+    public Task<ActionResult> OpenPendingOptionPosition([FromBody]CreatePendingOptionPositionCommand command) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                User.Identifier(), command
+            )
+        );
+    
     [HttpGet("optionpositions/ownership/{ticker}")]
     public Task<ActionResult> OptionOwnership([FromRoute] string ticker) =>
         this.OkOrError(

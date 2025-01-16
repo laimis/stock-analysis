@@ -89,7 +89,7 @@ type PriceMonitoringService(
                         
                         let! positions = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
                         
-                        let openPositions = positions |> Seq.filter _.IsOpen
+                        let openPositions = positions |> Seq.filter (fun p -> p.IsClosed |> not) 
                         
                         // let's go out and get the latest price for each open position contracts
                         let! positionsWithChainOptions =

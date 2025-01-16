@@ -1,0 +1,88 @@
+<div *ngIf="isVisible" class="modal-backdrop" (click)="onOverlayClick($event)">
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Position</h5>
+                    <button type="button" class="btn-close" (click)="close()"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <span>{{ticker}}</span>, {{ price | currency }}
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Position Details</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row mb-3 g-3" *ngFor="let leg of selectedLegs;">
+                                    <div class="col">
+                                        <label class="small text-muted">Expiration</label>
+                                        <p class="small mb-0">{{ leg.option.expiration }}</p>
+                                    </div>
+                                    <div class="col">
+                                        <label class="small text-muted">Type</label>
+                                        <p class="small mb-0">{{ leg.option.optionType }}</p>
+                                    </div>
+                                    <div class="col">
+                                        <label class="small text-muted">Strike</label>
+                                        <p class="small mb-0">{{ leg.option.strikePrice | currency }}</p>
+                                    </div>
+                                    <div class="col">
+                                        <label class="small text-muted">Action</label>
+                                        <p class="small mb-0">{{ leg.action }}</p>
+                                    </div>
+                                    <div class="col">
+                                        <label class="small text-muted">Quantity</label>
+                                        <p class="small mb-0">{{ leg.quantity }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Price</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="price"
+                            [(ngModel)]="price"
+                            placeholder="Enter price for position (negative for debit)">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea
+                            class="form-control"
+                            id="notes"
+                            rows="3"
+                            [(ngModel)]="positionNotes"
+                            placeholder="Add any relevant notes about this position..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="strategyInput" class="form-label">Strategy</label>
+                        <select class="form-select" id="strategyInput" [(ngModel)]="positionStrategy">
+                            @for (s of optionStrategies; track s) {
+                                <option value="{{s.key}}">{{ s.value }}</option>
+                            }
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="close()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" (click)="createPosition()">
+                        <i class="bi bi-check2"></i>
+                        Create Position
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

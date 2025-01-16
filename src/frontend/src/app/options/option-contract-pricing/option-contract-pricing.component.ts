@@ -4,7 +4,7 @@ import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
 import {ChartAnnotationLineType, ChartType, DataPointContainer} from "../../services/stocks.service";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
-import {NgForOf, NgIf} from "@angular/common";
+import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 
 @Component({
@@ -13,7 +13,8 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
         LineChartComponent,
         NgForOf,
         LoadingComponent,
-        NgIf
+        NgIf,
+        CurrencyPipe
     ],
   templateUrl: './option-contract-pricing.component.html',
   styleUrl: './option-contract-pricing.component.css'
@@ -21,7 +22,10 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
 export class OptionContractPricingComponent {
     dataPointContainers: DataPointContainer[];
     private cost: number;
+    minPrice: number;
+    maxPrice: number;
     loading: boolean = false;
+    hasPrice: boolean = false;
 
     constructor(private optionService: OptionService) { }
     
@@ -48,11 +52,19 @@ export class OptionContractPricingComponent {
         forkJoin(observables).subscribe({
             next: (pricingResults) => {
 
-                let cost = []
+                let cost : number[] = []
+                let minPrice = Number.MAX_VALUE
+                let maxPrice = Number.MIN_VALUE
                 for (let pricingIndex = 0; pricingIndex < pricingResults[0].length; pricingIndex++) {
                     let total = 0
                     for (let contractIndex = 0; contractIndex < pricingResults.length; contractIndex++) {
                         total += pricingResults[contractIndex][pricingIndex].mark * value[contractIndex].quantity
+                    }
+                    if (total < minPrice) {
+                        minPrice = total
+                    }
+                    if (total > maxPrice) {
+                        maxPrice = total
                     }
                     cost.push(total)
                 }
@@ -96,6 +108,12 @@ export class OptionContractPricingComponent {
                 }
 
                 this.dataPointContainers = [costContainer, underlyingContainer];
+                this.minPrice = minPrice
+                this.maxPrice = maxPrice
+                this.hasPrice = costContainer.data.length > 0
+                console.log("cost container", costContainer)
+                console.log(this.hasPrice)
+                console.log(costContainer.data.length)
                 this.loading = false
             },
             error: (error) => {

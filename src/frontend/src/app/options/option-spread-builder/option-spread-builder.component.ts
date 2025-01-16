@@ -7,18 +7,11 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
+import {BrokerageService} from "../../services/brokerage.service";
+import {OptionChain, OptionDefinition, OptionLeg, OptionService} from "../../services/option.service";
 import {
-    BrokerageService,
-    OptionOrderCommand, OptionOrderInstruction,
-    OptionOrderType
-} from "../../services/brokerage.service";
-import {OptionChain, OptionDefinition, OptionService} from "../../services/option.service";
-
-interface OptionLeg {
-    option: OptionDefinition;
-    action: 'buy' | 'sell';
-    quantity: number;
-}
+    OptionPendingPositionCreateModalComponent
+} from "../option-dashboard/option-pendingposition-create-modal/option-pendingposition-create-modal.component";
 
 interface SpreadCandidate {
     longOption:OptionDefinition,
@@ -39,7 +32,8 @@ interface SpreadCandidate {
         ErrorDisplayComponent,
         NgClass,
         StockLinkAndTradingviewLinkComponent,
-        StockSearchComponent
+        StockSearchComponent,
+        OptionPendingPositionCreateModalComponent
     ],
     templateUrl: './option-spread-builder.component.html',
     styleUrl: './option-spread-builder.component.css'
@@ -383,41 +377,13 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
     builtSpreads: SpreadCandidate[] = null
     
-    createOrder(price:number) {
-        
-        let orderType = price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
-        let session = "NORMAL"
-        let duration = "GOOD_TILL_CANCEL"
-        let orderStrategyType = "SINGLE"
-        
-        let collections = this.selectedLegs.map(x => {
-            return {
-                instruction: x.action === "buy" ? OptionOrderInstruction.BUY_TO_OPEN : OptionOrderInstruction.SELL_TO_OPEN,
-                quantity: x.quantity,
-                instrument: {
-                    symbol: x.option.symbol,
-                    assetType: "OPTION"
-                }
-            }
-        })
-        
-        let order : OptionOrderCommand = {
-            orderType,
-            session,
-            price,
-            duration,
-            orderStrategyType,
-            orderLegCollection: collections
-        }
-        
-        this.brokerageService.issueOptionOrder(order).subscribe(
-            (data) => {
-                alert("Order created")
-            },
-            (error) => {
-                console.log("Error creating order", error)
-            }
-        )
+    isModalVisible: boolean = false
+    createOrder() {
+        this.isModalVisible = true
+    }
+    
+    positionCreated() {
+        this.isModalVisible = false
     }
     
     findDebitCallSpreads() {
