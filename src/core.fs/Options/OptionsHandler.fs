@@ -64,7 +64,7 @@ type OptionPricingQuery = { UserId: UserId; Symbol: OptionTicker}
 type OptionContractInput = {
     StrikePrice: decimal
     OptionType: core.fs.Options.OptionType
-    ExpirationDate: string
+    ExpirationDate: OptionExpiration
     Filled: DateTimeOffset
     Quantity: int
     Cost: decimal
@@ -83,6 +83,19 @@ type OpenOptionPositionCommand = {
     [<Required>]
     IsPaperPosition: bool option
 }
+type CreatePendingOptionPositionCommand = {
+    [<Required>]
+    UnderlyingTicker: Ticker option
+    [<Required>]
+    Contracts: OptionContractInput[]
+    [<Required>]
+    Notes: string option
+    [<Required>]
+    Strategy: string option
+    [<Required>]
+    Cost: decimal option
+}
+
 type CloseContractsCommand = {
     PositionId: OptionPositionId
     UserId: UserId
@@ -111,6 +124,31 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
         
     interface IApplicationService
 
+    member this.Handle(userId:UserId, command:CreatePendingOptionPositionCommand) = task {
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            
+            let pendingPosition =
+                OptionPosition.``open`` command.UnderlyingTicker.Value DateTimeOffset.UtcNow
+                |> OptionPosition.establishDesiredCost command.Cost.Value DateTimeOffset.UtcNow
+            
+            let pendingPositionWithOrders =
+                command.Contracts
+                |> Array.fold (fun position (contract:OptionContractInput) ->
+                    match contract.Quantity with
+                    | x when x > 0 -> position |> OptionPosition.createPendingBuyOrder contract.ExpirationDate contract.StrikePrice contract.OptionType x DateTimeOffset.UtcNow
+                    | x when x < 0 -> position |> OptionPosition.createPendingSellOrder contract.ExpirationDate contract.StrikePrice contract.OptionType -x DateTimeOffset.UtcNow
+                    | _ -> position
+                    ) pendingPosition
+                |> OptionPosition.addNotes command.Notes DateTimeOffset.UtcNow
+                |> OptionPosition.setLabelIfValueNotNone "strategy" command.Strategy DateTimeOffset.UtcNow
+            
+            do! storage.SaveOptionPosition userId None pendingPositionWithOrders
+            return OptionPositionView(pendingPosition, None) |> Ok
+    }
+    
     member this.Handle(userId:UserId, command: OpenOptionPositionCommand) = task {
         
         let! user = userId |> accounts.GetUser
@@ -122,10 +160,10 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             
             let withAttribute =
                 command.Contracts
-                |> Array.fold (fun position (leg:OptionContractInput) ->
-                    match leg.Quantity with
-                    | x when x > 0 -> position |> OptionPosition.buyToOpen leg.ExpirationDate leg.StrikePrice leg.OptionType x leg.Cost leg.Filled
-                    | x when x < 0 -> position |> OptionPosition.sellToOpen leg.ExpirationDate leg.StrikePrice leg.OptionType -x leg.Cost leg.Filled
+                |> Array.fold (fun position (contract:OptionContractInput) ->
+                    match contract.Quantity with
+                    | x when x > 0 -> position |> OptionPosition.buyToOpen contract.ExpirationDate contract.StrikePrice contract.OptionType x contract.Cost contract.Filled
+                    | x when x < 0 -> position |> OptionPosition.sellToOpen contract.ExpirationDate contract.StrikePrice contract.OptionType -x contract.Cost contract.Filled
                     | _ -> position
                     ) openPosition
                 |> OptionPosition.addNotes command.Notes DateTimeOffset.UtcNow

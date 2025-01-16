@@ -169,4 +169,5 @@ CREATE TABLE optionpricings (
 );
 CREATE INDEX optionpricings_userid ON optionpricings(userid);
 CREATE INDEX optionpricings_optionpositionid ON optionpricings(optionpositionid);
+CREATE INDEX optionpricings_symbol ON optionpricings(symbol);
 ALTER TABLE optionpricings OWNER TO stocks;

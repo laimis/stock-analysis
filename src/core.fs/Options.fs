@@ -53,7 +53,7 @@ type OptionType =
 
 type OptionTransaction = {
     EventId: Guid
-    Expiration: string
+    Expiration: OptionExpiration
     Strike: decimal
     OptionType: string
     Quantity: int
@@ -68,29 +68,36 @@ type OptionContract = {
     OptionType: OptionType
 }
 
-type QuantityAndCost = QuantityAndCost of int * decimal
+type ContractQuantityAndCost = QuantityAndCost of int * decimal
+type ContractQuantity = Quantity of int
 
 type OptionPositionState =
     {
         PositionId: OptionPositionId
         UnderlyingTicker : Ticker
-        Opened: DateTimeOffset
+        Created: DateTimeOffset
+        Opened: DateTimeOffset option
         Closed: DateTimeOffset option
         Cost: decimal
+        DesiredCost: decimal option
         Profit: decimal
         Transactions: OptionTransaction list
-        Contracts: Map<OptionContract, QuantityAndCost>
+        Contracts: Map<OptionContract, ContractQuantityAndCost>
+        PendingContracts: Map<OptionContract, ContractQuantity>
         Notes: core.fs.Note list
         Labels: Dictionary<string, string>
         Version: int
         Events: AggregateEvent list
     }
-    member this.IsOpen = this.Closed.IsNone
+    member this.IsOpen = this.Closed.IsNone && this.Opened.IsSome
     member this.IsClosed = this.Closed.IsSome
     member this.DaysHeld = 
-        match this.Closed with
-        | Some closed -> closed.Subtract(this.Opened).Days |> int
-        | None -> DateTimeOffset.UtcNow.Subtract(this.Opened).Days |> int
+        match this.Opened with
+        | Some opened ->
+            let refDate = match this.Closed with | Some closed -> closed | _ -> DateTimeOffset.UtcNow 
+            refDate.Subtract(opened).Days |> int |> Some
+        | _ ->
+            None
     
     interface IAggregate with
         member this.Version = this.Version
@@ -103,7 +110,6 @@ type OptionPositionOpened(id, aggregateId, ``when``, underlyingTicker:string) =
     member this.PositionId = aggregateId |> OptionPositionId
     member this.UnderlyingTicker = underlyingTicker
 
-// create abstract class OptionContractTransaction
 type OptionContractTransaction(id, aggregateId, ``when``, expiration:string, strike:decimal, optionType:string, quantity:int, price:decimal) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     
@@ -167,28 +173,43 @@ type OptionPositionLabelSet(id, aggregateId, ``when``, key:string, value:string)
 type OptionPositionLabelDeleted(id, aggregateId, ``when``, key:string) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.Key = key
+    
+type OptionBuyToOpenOrderCreated(id, aggregateId, ``when``, expiration:string, strike:decimal, optionType:string, quantity:int) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Expiration = expiration
+    member this.Strike = strike
+    member this.OptionType = optionType
+    member this.Quantity = quantity
+    
+type OptionSellToOpenOrderCreated(id, aggregateId, ``when``, expiration:string, strike:decimal, optionType:string, quantity:int) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Expiration = expiration
+    member this.Strike = strike
+    member this.OptionType = optionType
+    member this.Quantity = quantity
+    
+type OptionDesiredCostEstablished(id, aggregateId, ``when``, cost:decimal) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Cost = cost
 
 module OptionPosition =
     
-    // ensure that the option is stored as yyyy-MM-dd, and can be converted to datetime offset
-    let private toOptionExpirationDate (date:string) =
-        match DateTimeOffset.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None) with 
-        | true, d -> d
-        | _ -> failwith "Invalid date format. Expected yyyy-MM-dd"
-        
     let private createInitialState (event: OptionPositionOpened) : OptionPositionState=
         {
             PositionId = event.PositionId
+            Created = event.When
             Closed = None
-            Opened = event.When
+            Opened = None
             UnderlyingTicker = event.UnderlyingTicker |> Ticker
             Profit = 0m
             Cost = 0m
+            DesiredCost = None
             Version = 1
             Notes = []
             Labels = Dictionary<string, string>()
             Transactions = []
             Contracts = Map.empty
+            PendingContracts = Map.empty
             Events = [event]
         }
         
@@ -204,39 +225,41 @@ module OptionPosition =
             
         | :? OptionContractBoughtToOpen as x ->
             let debit = decimal x.Quantity * x.Price
-            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString; }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost + debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
-            { p with Transactions = p.Transactions @ [transaction]; Cost = p.Cost + debit; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
+            let updatedOpened = match p.Opened with | None -> x.When | Some opened -> opened
+            { p with Transactions = p.Transactions @ [transaction]; Cost = p.Cost + debit; Opened = Some updatedOpened; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
         | :? OptionContractSoldToOpen as x ->
             let credit = decimal x.Quantity * x.Price
-            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost + credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
-            { p with Transactions = p.Transactions @ [transaction]; Cost = p.Cost - credit; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
+            let updatedOpened = match p.Opened with | None -> x.When | Some opened -> opened
+            { p with Transactions = p.Transactions @ [transaction]; Cost = p.Cost - credit; Opened = Some updatedOpened; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
         | :? OptionContractBoughtToClose as x ->
             let debit = decimal x.Quantity * x.Price
-            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost - debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
-            { p with Transactions = p.Transactions @ [transaction]; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
+            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractSoldToClose as x ->
             let credit = decimal x.Quantity * x.Price
-            let transaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
+            let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
             let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost - credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
-            { p with Transactions = p.Transactions @ [transaction]; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
+            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionPositionClosed as x ->
             let debits = p.Transactions |> List.map _.Debited |> List.choose id |> List.sum
@@ -245,15 +268,15 @@ module OptionPosition =
             { p with Closed = Some x.When; Profit = profit; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractsExpired as x ->
-            let expirationTransaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
+            let expirationTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             { p with Transactions = p.Transactions @ [expirationTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractsAssigned as x ->
-            let assignmentTransaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
+            let assignmentTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             { p with Transactions = p.Transactions @ [assignmentTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractsExercised as x ->
-            let exerciseTransaction = { EventId = x.Id; Expiration = x.Expiration; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
+            let exerciseTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             { p with Transactions = p.Transactions @ [exerciseTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionPositionDeleted as x ->
@@ -266,6 +289,19 @@ module OptionPosition =
         | :? OptionPositionLabelDeleted as x ->
             p.Labels.Remove(x.Key) |> ignore
             { p with Version = p.Version + 1; Events = p.Events @ [x] }
+            
+        | :? OptionDesiredCostEstablished as x ->
+            { p with DesiredCost = x.Cost |> Some; Version = p.Version + 1; Events = p.Events @ [x] }
+            
+        | :? OptionBuyToOpenOrderCreated as x ->
+            let contract = { Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
+            let quantity = Quantity(x.Quantity)
+            { p with PendingContracts = p.PendingContracts |> Map.add contract quantity; Version = p.Version + 1; Events = p.Events @ [x] }
+            
+        | :? OptionSellToOpenOrderCreated as x ->
+            let contract = { Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
+            let quantity = Quantity(x.Quantity)
+            { p with PendingContracts = p.PendingContracts |> Map.add contract quantity; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
 
@@ -296,12 +332,11 @@ module OptionPosition =
         OptionPositionOpened(Guid.NewGuid(), Guid.NewGuid(), date, ticker.Value)
         |> createInitialState
 
-    let private verifyOptionTransactionParams (expiration:string) (strike:decimal) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
+    let private verifyOptionTransactionParams (expiration:OptionExpiration) (strike:decimal) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         date |> failIfInvalidDate
-        let expirationAsDate = expiration |> toOptionExpirationDate 
         
-        if expirationAsDate < date then
+        if expiration.ToDateTimeOffset() < date then
             failwith "Expiration date must be after transaction date"
             
         if quantity <= 0 then
@@ -326,7 +361,7 @@ module OptionPosition =
         else
             position
             
-    let private findMatchingTransactions (expiration:string) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
+    let private findMatchingTransactions (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
         position.Transactions
         |> List.filter (
             fun x ->
@@ -335,23 +370,23 @@ module OptionPosition =
                 x.Strike = strike
         )
     
-    let buyToOpen (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
+    let buyToOpen (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         verifyOptionTransactionParams expiration strike quantity price date position
         
-        let e = OptionContractBoughtToOpen(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
+        let e = OptionContractBoughtToOpen(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity, price)
         
         apply e position
         
-    let sellToOpen (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
+    let sellToOpen (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         verifyOptionTransactionParams expiration strike quantity price date position
         
-        let e = OptionContractSoldToOpen(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
+        let e = OptionContractSoldToOpen(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity, price)
         
         apply e position
         
-    let buyToClose (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
+    let buyToClose (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         verifyOptionTransactionParams expiration strike quantity price date position
         
@@ -368,11 +403,11 @@ module OptionPosition =
         if abs(contractsAvailable) < quantity then
             raise (InvalidOperationException($"Not enough contracts available to close, have {contractsAvailable} and trying to close {quantity}"))
         
-        let e = OptionContractBoughtToClose(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
+        let e = OptionContractBoughtToClose(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity, price)
         
         apply e position |> closeIfAllContractsAreClosed date
         
-    let sellToClose (expiration:string) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
+    let sellToClose (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (quantity:int) (price:decimal) (date:DateTimeOffset) (position:OptionPositionState) =
         
         verifyOptionTransactionParams expiration strike quantity price date position
         
@@ -386,11 +421,11 @@ module OptionPosition =
         if contractsAvailable < quantity then
             raise (InvalidOperationException($"Not enough contracts available to close, have {contractsAvailable} and trying to close {quantity}"))
         
-        let e = OptionContractSoldToClose(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration, strike, optionType.ToString(), quantity, price)
+        let e = OptionContractSoldToClose(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity, price)
         
         apply e position |> closeIfAllContractsAreClosed date
 
-    let expire (expiration:string) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
+    let expire (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
         
         if position.IsClosed then
             failwith "Position is closed"
@@ -403,12 +438,12 @@ module OptionPosition =
             |> List.sum
             
         if contractsToExpire <> 0 then
-            let e = OptionContractsExpired(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow, expiration, strike, optionType.ToString(), contractsToExpire)
+            let e = OptionContractsExpired(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow, expiration.ToString(), strike, optionType.ToString(), contractsToExpire)
             apply e position |> closeIfAllContractsAreClosed DateTimeOffset.UtcNow
         else
             raise (InvalidOperationException("No contracts to expire"))
             
-    let assign (expiration:string) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
+    let assign (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
         
         if position.IsClosed then
             failwith "Position is closed"
@@ -424,12 +459,12 @@ module OptionPosition =
             raise (InvalidOperationException("Cannot assign contracts that are not owned"))
         
         if contractsToAssign < 0 then // can only assign contracts that are owned
-            let e = OptionContractsAssigned(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow, expiration, strike, optionType.ToString(), contractsToAssign)
+            let e = OptionContractsAssigned(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow, expiration.ToString(), strike, optionType.ToString(), contractsToAssign)
             apply e position |> closeIfAllContractsAreClosed DateTimeOffset.UtcNow
         else
             raise (InvalidOperationException("No contracts to assign"))
             
-    let exercise (expiration:string) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
+    let exercise (expiration:OptionExpiration) (strike:decimal) (optionType:OptionType) (position:OptionPositionState) =
         
         if position.IsClosed then
             failwith "Position is closed"
@@ -442,7 +477,7 @@ module OptionPosition =
             |> List.sum
             
         if contractsToExercise <> 0 then
-            let e = OptionContractsExercised(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow, expiration, strike, optionType.ToString(), contractsToExercise)
+            let e = OptionContractsExercised(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, DateTimeOffset.UtcNow, expiration.ToString(), strike, optionType.ToString(), contractsToExercise)
             apply e position
         else
             position
@@ -475,8 +510,27 @@ module OptionPosition =
         | _ ->
             let e = OptionPositionLabelDeleted(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, key)
             apply e position
-        
             
+            
+    let establishDesiredCost cost date position =
+        let desiredCostEvent = OptionDesiredCostEstablished(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, cost)
+        apply desiredCostEvent position
+        
+    let createPendingBuyOrder expiration strike optionType quantity date position =
+        
+        if quantity <= 0 then
+            failwith "Quantity must be greater than zero"
+            
+        let e = OptionBuyToOpenOrderCreated(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity)
+        apply e position
+        
+    let createPendingSellOrder expiration strike optionType quantity date position =
+        
+        if quantity <= 0 then
+            failwith "Quantity must be greater than zero"
+            
+        let e = OptionSellToOpenOrderCreated(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity)
+        apply e position
 
 type OptionPricing =
     {
