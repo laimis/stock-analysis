@@ -298,9 +298,9 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
 
                 let chainLookupMap = Dictionary<Ticker, OptionChain>()
                 
-                let! openOptions =
+                let! openAndPendingOptions =
                     optionPositions
-                    |> Seq.filter _.IsOpen
+                    |> Seq.filter (fun o -> o.IsClosed |> not)
                     |> Seq.map (fun o ->
                         async {
                             let! chain = brokerage.GetOptionChain user.State o.UnderlyingTicker |> Async.AwaitTask
@@ -315,7 +315,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                             return OptionPositionView(o, chain)
                         })
                     |> Async.Sequential
-
+                
                 let! brokerageAccount = brokerage.GetAccount(user.State)
 
                 let brokeragePositions, brokerageOrders =
@@ -324,8 +324,8 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                         
                         let positions =
                             a.OptionPositions |> Seq.filter (fun p ->
-                                openOptions
-                                |> Seq.exists (fun o -> o.UnderlyingTicker = p.Ticker)
+                                openAndPendingOptions
+                                |> Seq.exists (fun o -> o.UnderlyingTicker = p.Ticker && o.IsOpen)
                                 |> not)
                             
                         let orders = a.OptionOrders
@@ -358,8 +358,11 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                             | _ -> None
                         OptionOrderView(o, chain)
                     )
+                    
+                let openOptions = openAndPendingOptions |> Seq.filter _.IsOpen
+                let pendingOptions = openAndPendingOptions |> Seq.filter (fun o -> o.IsOpen |> not && o.IsClosed |> not)
 
-                return OptionDashboardView(closedOptions, openOptions, brokeragePositions, brokerageOrderViews) |> Ok
+                return OptionDashboardView(pendingOptions, openOptions, closedOptions, brokeragePositions, brokerageOrderViews) |> Ok
         }
         
     member _.Handle(ownership:OptionOwnershipQuery) : System.Threading.Tasks.Task<Result<OptionPositionView seq, ServiceError>> = task {

@@ -401,8 +401,7 @@
             [selectedLegs]="selectedLegs"
             [price]="calculateUsingMark()"
             (isVisibleChange)="isModalVisible = $event"
-            (positionCreated)="positionCreated()"
-            (errorsOccurred)="errors = $event">
+            (positionCreated)="positionCreated()">
         </app-option-pendingposition-create-modal>
     }
 

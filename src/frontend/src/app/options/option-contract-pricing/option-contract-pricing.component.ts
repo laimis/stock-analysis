@@ -121,6 +121,9 @@ export class OptionContractPricingComponent {
                 // Handle error appropriately
                 this.loading = false;
                 this.errorOccurred.emit(GetErrors(error));
+            },
+            complete: () => {
+                this.loading = false;
             }
         });
     }

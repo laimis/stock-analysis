@@ -9,6 +9,7 @@ import {
     OptionOrderInstruction,
     OptionOrderType
 } from "../../../services/brokerage.service";
+import {ErrorDisplayComponent} from "../../../shared/error-display/error-display.component";
 
 @Component({
   selector: 'app-option-pendingposition-create-modal',
@@ -16,7 +17,8 @@ import {
         CurrencyPipe,
         FormsModule,
         NgForOf,
-        NgIf
+        NgIf,
+        ErrorDisplayComponent
     ],
   templateUrl: './option-pendingposition-create-modal.component.html',
   styleUrl: './option-pendingposition-create-modal.component.css'
@@ -35,8 +37,8 @@ export class OptionPendingPositionCreateModalComponent {
     @Input() isVisible: boolean = false;
     @Output() isVisibleChange = new EventEmitter<boolean>();
     @Output() positionCreated = new EventEmitter();
-    @Output() errorsOccurred = new EventEmitter<string[]>();
 
+    errors: string[] = []
     positionNotes: string;
     positionStrategy: string;
     optionStrategies: { key: string, value: string }[] = []
@@ -96,7 +98,7 @@ export class OptionPendingPositionCreateModalComponent {
             },
             (error) => {
                 console.log("Error creating order", error)
-                this.errorsOccurred.emit(GetErrors(error))
+                this.errors = GetErrors(error)
             }
         )
     }
@@ -127,7 +129,7 @@ export class OptionPendingPositionCreateModalComponent {
                 },
                 error: (err) => {
                     console.log('error', err)
-                    this.errorsOccurred.emit(GetErrors(err))
+                    this.errors = GetErrors(err)
                 },
                 complete: () => {
                     console.log('complete')

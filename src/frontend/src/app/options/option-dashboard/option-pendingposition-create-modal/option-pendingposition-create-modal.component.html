@@ -11,6 +11,8 @@
                     <div class="mb-3">
                         <span>{{ticker}}</span>, {{ price | currency }}
                     </div>
+                    
+                    <app-error-display [errors]="errors"></app-error-display>
 
                     <div class="mb-4">
                         <h6 class="text-muted mb-3">Position Details</h6>

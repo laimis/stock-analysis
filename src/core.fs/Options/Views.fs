@@ -28,6 +28,7 @@ type OptionContractView(underlyingTicker:core.Shared.Ticker, expiration:OptionEx
     member this.Details = chainDetail
     member this.PctInTheMoney = pctItm
     member this.UnderlyingTicker = underlyingTicker
+    member this.UnderlyingPrice = underlyingPrice
     member this.Instruction = instruction
     
 type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
@@ -39,9 +40,14 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
             let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
             OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, cost, None, chain)
         )
+        |> Seq.toList
     
     member this.PositionId = state.PositionId
     member this.UnderlyingTicker = state.UnderlyingTicker
+    member this.UnderlyingPrice =
+        match contracts with
+        | [] -> None
+        | _ -> contracts[0].UnderlyingPrice
     member this.Opened = state.Opened
     member this.DaysHeld = state.DaysHeld
     member this.DaysToExpiration =
@@ -59,10 +65,13 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         contracts
         |> Seq.sumBy (fun c -> c.Details |> Option.map(fun o -> o.Mark * decimal c.Quantity) |> Option.defaultValue 0m)
     member this.Spread =
-        // get min and max values of the contract strike prices
-        let minStrike = contracts |> Seq.map _.StrikePrice |> Seq.min
-        let maxStrike = contracts |> Seq.map _.StrikePrice |> Seq.max
-        maxStrike - minStrike
+        match contracts with
+        | [] -> 0m
+        | _ ->
+            // get min and max values of the contract strike prices
+            let minStrike = contracts |> Seq.map _.StrikePrice |> Seq.min
+            let maxStrike = contracts |> Seq.map _.StrikePrice |> Seq.max
+            maxStrike - minStrike
     member this.Profit =
         match this.IsClosed with
         | true -> state.Profit
@@ -202,10 +211,11 @@ type OptionOrderView(order:OptionOrder, chain:OptionChain option) =
             OptionContractView(l.UnderlyingTicker, l.Expiration, l.StrikePrice, l.OptionType, l.Quantity, l.Price |> Option.defaultValue 0m, l.Instruction |> Some, chain)
         )
     
-type OptionDashboardView(closed:seq<OptionPositionView>, ``open``:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrderView>) =
+type OptionDashboardView(pending:seq<OptionPositionView>,``open``:seq<OptionPositionView>,closed:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrderView>) =
     
     member this.Closed = closed
     member this.Open = ``open``
+    member this.Pending = pending
     member this.Orders = orders
     member this.BrokeragePositions = brokeragePositions
     member this.OverallStats = OwnedOptionStats([]) // TODO make stats to incorporate the new option position structure

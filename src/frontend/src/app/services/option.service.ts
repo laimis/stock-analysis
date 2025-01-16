@@ -40,6 +40,7 @@ export interface OptionContract {
 export interface OptionPosition {
     positionId: string
     underlyingTicker: string
+    underlyingPrice: number
     contracts: OptionContract[]
     transactions: OptionPositionTransaction[]
     cost: number
@@ -221,6 +222,7 @@ export interface BrokerageOptionOrder {
 
 export interface OptionsContainer {
     open: OptionPosition[]
+    pending: OptionPosition[]
     closed: OptionPosition[]
     brokeragePositions: BrokerageOptionContract[]
     orders: BrokerageOptionOrder[]

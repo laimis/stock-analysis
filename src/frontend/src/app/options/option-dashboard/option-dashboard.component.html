@@ -6,6 +6,9 @@
         <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
             Open Positions
         </a>
+        <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
+            Pending Positions
+        </a>
         <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]=""
            (click)="activateTab('brokerage')">
             Brokerage
@@ -37,6 +40,9 @@
 @if (loaded && isActive('open')) {
     <app-option-open [positions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
 }
+    @if(loaded && isActive('pending')) {
+        <app-option-open [positions]=optionsContainer.pending [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
+    }
 @if (loaded && isActive('brokerage')) {
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"
                                     (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
