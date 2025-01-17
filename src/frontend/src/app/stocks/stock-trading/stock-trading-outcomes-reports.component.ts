@@ -2,7 +2,7 @@ import {Component, Input} from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {
     OutcomesReport,
-    PositionInstance, SimulationNotices,
+    StockPosition, SimulationNotices,
     StockGaps,
     StocksService,
     TickerCorrelation
@@ -52,14 +52,14 @@ export class StockPositionReportsComponent {
     }
 
     @Input()
-    set dailyAnalysis(value: PositionInstance[]) {
+    set dailyAnalysis(value: StockPosition[]) {
         if (value) {
             this.loadPositionData(value)
         }
     }
 
     @Input()
-    set allTimeAnalysis(value: PositionInstance[]) {
+    set allTimeAnalysis(value: StockPosition[]) {
         if (value) {
             this.loading.allBars = true
             this.loadAllTimeData(value)
@@ -82,7 +82,7 @@ export class StockPositionReportsComponent {
         return this.expandedGroups.has(group);
     }
 
-    loadPositionData(positions: PositionInstance[]) {
+    loadPositionData(positions: StockPosition[]) {
         this.loading.daily = true
         this.loading.weekly = true
         this.loading.positions = true
@@ -157,7 +157,7 @@ export class StockPositionReportsComponent {
         concat(openSimulationNotices$, positionReport$, dailyReport$, weeklyReport$, correlationReport$).subscribe()
     }
 
-    loadAllTimeData(positions: PositionInstance[]) {
+    loadAllTimeData(positions: StockPosition[]) {
         this.tickers = positions.map(p => p.ticker)
         this.service.reportOutcomesAllBars(this.tickers).subscribe(report => {
             this.loading.allBars = false

@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
     BrokerageStockOrder, KeyValuePair,
     PositionEvent,
-    PositionInstance,
+    StockPosition,
     StockQuote,
     StrategyProfitPoint
 } from '../../services/stocks.service';
@@ -40,10 +40,10 @@ export class StockTradingPositionComponent {
         this.strategies = GetStockStrategies()
     }
 
-    _position: PositionInstance;
+    _position: StockPosition;
 
     @Input()
-    set position(v: PositionInstance) {
+    set position(v: StockPosition) {
         this._position = v
 
         if (this._position) {

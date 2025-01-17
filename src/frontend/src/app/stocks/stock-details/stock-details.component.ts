@@ -3,7 +3,7 @@ import {
     BrokerageStockOrder,
     PendingStockPosition,
     PositionChartInformation,
-    PositionInstance,
+    StockPosition,
     PriceFrequency,
     Prices,
     StockDetails,
@@ -30,7 +30,7 @@ export class StockDetailsComponent implements OnInit {
     ticker: string
     stock: StockDetails
     stockOwnership: StockOwnership
-    currentPosition: PositionInstance
+    currentPosition: StockPosition
     currentPositionChartInfo: PositionChartInformation
     pendingPosition: PendingStockPosition|null = null
     options: OptionPosition[]

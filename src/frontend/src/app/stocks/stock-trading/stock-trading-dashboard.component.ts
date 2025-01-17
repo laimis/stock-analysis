@@ -4,7 +4,7 @@ import {
     AccountStatus,
     BrokerageAccount, BrokerageAccountSnapshot,
     OutcomeValueTypeEnum,
-    PositionInstance,
+    StockPosition,
     StockQuote,
     StockTradingPositions,
     StockViolation
@@ -23,8 +23,8 @@ import {GlobalService} from "../../services/global.service";
 export class StockTradingDashboardComponent implements OnInit {
     balances: BrokerageAccountSnapshot[]
     userState: AccountStatus
-    positions: PositionInstance[]
-    sortedPositions: PositionInstance[]
+    positions: StockPosition[]
+    sortedPositions: StockPosition[]
     loaded: boolean = false
     loading: boolean = true
     activeTab: string = 'positions'
@@ -34,7 +34,7 @@ export class StockTradingDashboardComponent implements OnInit {
     quotes: Map<string, StockQuote>
     strategies: { key: string; value: string }[] = []
     metricToRender: string
-    metricFunc: (p: PositionInstance) => any;
+    metricFunc: (p: StockPosition) => any;
     metricType: OutcomeValueTypeEnum;
     invested: number = 0
     readonly toggleVisuallyHidden = toggleVisuallyHidden;
@@ -84,7 +84,7 @@ export class StockTradingDashboardComponent implements OnInit {
         return stockOpenPositionExportLink()
     }
 
-    matchesStrategyCheck(p: PositionInstance, strategy: string) {
+    matchesStrategyCheck(p: StockPosition, strategy: string) {
         return strategy === "" ?
             p.labels.findIndex(l => l.key === "strategy") === -1 :
             p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
@@ -114,69 +114,69 @@ export class StockTradingDashboardComponent implements OnInit {
 
         switch (value) {
             case "pl":
-                this.metricFunc = (p: PositionInstance) => p.profit
+                this.metricFunc = (p: StockPosition) => p.profit
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break;
             case "plPercent":
-                this.metricFunc = (p: PositionInstance) => p.gainPct
+                this.metricFunc = (p: StockPosition) => p.gainPct
                 this.metricType = OutcomeValueTypeEnum.Percentage
                 break;
             case "plUnrealized":
-                this.metricFunc = (p: PositionInstance) => p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare) + p.profit
+                this.metricFunc = (p: StockPosition) => p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare) + p.profit
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break;
             case "plUnrealizedPercent":
-                this.metricFunc = (p: PositionInstance) => (this.getPrice(p) - p.averageCostPerShare) / p.averageCostPerShare
+                this.metricFunc = (p: StockPosition) => (this.getPrice(p) - p.averageCostPerShare) / p.averageCostPerShare
                 this.metricType = OutcomeValueTypeEnum.Percentage
                 break;
             case "cost":
-                this.metricFunc = (p: PositionInstance) => p.cost
+                this.metricFunc = (p: StockPosition) => p.cost
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break;
             case "ticker":
-                this.metricFunc = (p: PositionInstance) => p.ticker
+                this.metricFunc = (p: StockPosition) => p.ticker
                 this.metricType = OutcomeValueTypeEnum.String
                 break
             case "daysSinceLastTransaction":
-                this.metricFunc = (p: PositionInstance) => p.daysSinceLastTransaction
+                this.metricFunc = (p: StockPosition) => p.daysSinceLastTransaction
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
             case "riskedAmount":
-                this.metricFunc = (p: PositionInstance) => p.riskedAmount ? p.riskedAmount : 0
+                this.metricFunc = (p: StockPosition) => p.riskedAmount ? p.riskedAmount : 0
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break
             case "riskedAmountFromStop":
-                this.metricFunc = (p: PositionInstance) => (p.stopPrice - p.averageCostPerShare) * p.numberOfShares
+                this.metricFunc = (p: StockPosition) => (p.stopPrice - p.averageCostPerShare) * p.numberOfShares
                 this.metricType = OutcomeValueTypeEnum.Currency
                 break
             case "daysHeld":
-                this.metricFunc = (p: PositionInstance) => p.daysHeld
+                this.metricFunc = (p: StockPosition) => p.daysHeld
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
             case "unrealizedRR":
-                this.metricFunc = (p: PositionInstance) => this.calculateUnrealizedRR(p)
+                this.metricFunc = (p: StockPosition) => this.calculateUnrealizedRR(p)
                 this.metricType = OutcomeValueTypeEnum.Number
                 break
             case "percentToStopFromCost":
-                this.metricFunc = (p: PositionInstance) => p.percentToStopFromCost
+                this.metricFunc = (p: StockPosition) => p.percentToStopFromCost
                 this.metricType = OutcomeValueTypeEnum.Percentage
                 break
             default:
-                this.metricFunc = (p: PositionInstance) => p.rr
+                this.metricFunc = (p: StockPosition) => p.rr
                 this.metricType = OutcomeValueTypeEnum.Number
         }
 
         this.updatePositions()
     }
 
-    getPrice(p: PositionInstance) {
+    getPrice(p: StockPosition) {
         if (this.quotes) {
             return this.quotes[p.ticker]?.price
         }
         return 0
     }
 
-    calculateUnrealizedRR(p: PositionInstance) {
+    calculateUnrealizedRR(p: StockPosition) {
         return (p.profit + p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
     }
 

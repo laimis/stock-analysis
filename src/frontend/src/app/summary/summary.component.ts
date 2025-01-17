@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Title} from '@angular/platform-browser';
-import {PositionInstance, StocksService, WeeklyReport} from '../services/stocks.service';
+import {StockPosition, StocksService, WeeklyReport} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 
 @Component({
@@ -29,7 +29,7 @@ export class SummaryComponent implements OnInit {
         this.loadEntries()
     }
 
-    getStrategy(p: PositionInstance) {
+    getStrategy(p: StockPosition) {
         return p.labels.find(l => l.key === 'strategy')?.value
     }
 

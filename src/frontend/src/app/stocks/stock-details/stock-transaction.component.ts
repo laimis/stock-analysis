@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {openpositioncommand, PositionInstance, stocktransactioncommand} from '../../services/stocks.service';
+import {openpositioncommand, StockPosition, stocktransactioncommand} from '../../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
@@ -14,7 +14,7 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 export class StockTransactionComponent implements OnInit {
 
     @Input()
-    position: PositionInstance
+    position: StockPosition
 
     @Input()
     ticker: string

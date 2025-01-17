@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {PositionInstance} from 'src/app/services/stocks.service';
+import {StockPosition} from 'src/app/services/stocks.service';
 import {stockClosedPositionExportLink} from "../../services/links.service";
 import {GetStockStrategies} from "../../services/utils";
 
@@ -14,9 +14,9 @@ export class StockTradingClosedPositionsComponent {
     tickers: string[];
     groupedByMonth: {
         month: string,
-        positions: PositionInstance[],
-        wins: PositionInstance[],
-        losses: PositionInstance[]
+        positions: StockPosition[],
+        wins: StockPosition[],
+        losses: StockPosition[]
     }[]
     strategies: string[] = []
     sortColumn: string = 'closed'
@@ -31,14 +31,14 @@ export class StockTradingClosedPositionsComponent {
     LAYOUT_OPTION_SPLIT_OUTCOME: string = 'splitoutcome'
     layout: string = this.LAYOUT_OPTION_TABLE
 
-    private _positions: PositionInstance[];
+    private _positions: StockPosition[];
 
-    get positions(): PositionInstance[] {
+    get positions(): StockPosition[] {
         return this._positions
     }
 
     @Input()
-    set positions(value: PositionInstance[]) {
+    set positions(value: StockPosition[]) {
         this._positions = value
         this.tickers = value
             .map(p => p.ticker)
@@ -52,7 +52,7 @@ export class StockTradingClosedPositionsComponent {
             let arr = a.get(key)
             arr.push(b)
             return a
-        }, new Map<string, PositionInstance[]>())
+        }, new Map<string, StockPosition[]>())
 
         let groupedByMonthArray = []
         groupedByMonth.forEach((value, key) => {
@@ -93,7 +93,7 @@ export class StockTradingClosedPositionsComponent {
         return stockClosedPositionExportLink()
     }
 
-    matchesFilter(position: PositionInstance) {
+    matchesFilter(position: StockPosition) {
 
         if (this.tickerFilter != 'all' && !position.ticker.toLowerCase().includes(this.tickerFilter.toLowerCase())) {
             return false
@@ -153,12 +153,12 @@ export class StockTradingClosedPositionsComponent {
         this.strategyFilter = value
     }
 
-    matchesStrategyCheck(p: PositionInstance, strategy: string) {
+    matchesStrategyCheck(p: StockPosition, strategy: string) {
         return p.labels.findIndex(l => l.key === "strategy" && l.value === strategy) !== -1
     }
 
     // returned as we want no separator in that case (ie, if sorted by gain, grouping those by month makes no sense)
-    getPropertyForSeperatorGrouping(position: PositionInstance) {
+    getPropertyForSeperatorGrouping(position: StockPosition) {
         var groupingInput = ""
         if (this.sortColumn === 'opened') {
             groupingInput = position.opened
@@ -178,26 +178,26 @@ export class StockTradingClosedPositionsComponent {
         return this.positions.filter(p => this.getPropertyForSeperatorGrouping(p) === month)
     }
 
-    getRRSumForMonth(position: PositionInstance) {
+    getRRSumForMonth(position: StockPosition) {
         var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return positions.reduce((a, b) => a + b.rr, 0)
     }
 
-    getProfitSumForMonth(position: PositionInstance) {
+    getProfitSumForMonth(position: StockPosition) {
         var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return this.getProfitSum(positions)
     }
 
-    getProfitSum(positions: PositionInstance[]) {
+    getProfitSum(positions: StockPosition[]) {
         return positions.reduce((a, b) => a + b.profit, 0)
     }
 
-    getTradeCountByGradeForMonth(position: PositionInstance, grade: string) {
+    getTradeCountByGradeForMonth(position: StockPosition, grade: string) {
         var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return positions.filter(p => p.grade === grade).length
     }
 
-    getTradeCountForMonth(position: PositionInstance) {
+    getTradeCountForMonth(position: StockPosition) {
         var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return positions.length
     }
@@ -231,21 +231,21 @@ export class StockTradingClosedPositionsComponent {
     private getSortFunc(column: string) {
         switch (column) {
             case "daysHeld":
-                return (a: PositionInstance, b: PositionInstance) => a.daysHeld - b.daysHeld
+                return (a: StockPosition, b: StockPosition) => a.daysHeld - b.daysHeld
             case "opened":
-                return (a: PositionInstance, b: PositionInstance) => a.opened.localeCompare(b.opened)
+                return (a: StockPosition, b: StockPosition) => a.opened.localeCompare(b.opened)
             case "closed":
-                return (a: PositionInstance, b: PositionInstance) => a.closed.localeCompare(b.closed)
+                return (a: StockPosition, b: StockPosition) => a.closed.localeCompare(b.closed)
             case "rr":
-                return (a: PositionInstance, b: PositionInstance) => a.rr - b.rr
+                return (a: StockPosition, b: StockPosition) => a.rr - b.rr
             case "profit":
-                return (a: PositionInstance, b: PositionInstance) => a.profit - b.profit
+                return (a: StockPosition, b: StockPosition) => a.profit - b.profit
             case "gainPct":
-                return (a: PositionInstance, b: PositionInstance) => a.gainPct - b.gainPct
+                return (a: StockPosition, b: StockPosition) => a.gainPct - b.gainPct
             case "grade":
-                return (a: PositionInstance, b: PositionInstance) => (a.grade ?? "").localeCompare((b.grade ?? ""))
+                return (a: StockPosition, b: StockPosition) => (a.grade ?? "").localeCompare((b.grade ?? ""))
             case "ticker":
-                return (a: PositionInstance, b: PositionInstance) => a.ticker.localeCompare(b.ticker)
+                return (a: StockPosition, b: StockPosition) => a.ticker.localeCompare(b.ticker)
         }
 
         console.log("unrecognized sort column " + column)

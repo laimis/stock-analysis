@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-    PositionInstance,
+    StockPosition,
     StockTradingPerformanceCollection,
     TradingStrategyPerformance
 } from 'src/app/services/stocks.service';
@@ -16,7 +16,7 @@ import {GetErrors} from "../../services/utils";
 })
 export class StockTradingReviewDashboardComponent implements OnInit {
     activeTab: string = 'positions';
-    past: PositionInstance[];
+    past: StockPosition[];
     performance: StockTradingPerformanceCollection;
     strategies: TradingStrategyPerformance[]
     errors: string[] = []

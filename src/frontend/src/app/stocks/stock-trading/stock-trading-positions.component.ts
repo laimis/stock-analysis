@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {toggleVisuallyHidden} from 'src/app/services/utils';
-import {BrokerageStockOrder, OutcomeValueTypeEnum, PositionInstance, StockQuote} from '../../services/stocks.service';
+import {BrokerageStockOrder, OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 
 
@@ -14,11 +14,11 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 export class StockTradingPositionsComponent {
 
     @Input()
-    metricFunc: (p: PositionInstance) => any;
+    metricFunc: (p: StockPosition) => any;
     @Input()
     metricType: OutcomeValueTypeEnum;
     @Input()
-    positions: PositionInstance[]
+    positions: StockPosition[]
     @Output()
     positionChanged = new EventEmitter()
 
@@ -43,11 +43,11 @@ export class StockTradingPositionsComponent {
         toggleVisuallyHidden(elem)
     }
 
-    getQuote(p: PositionInstance) {
+    getQuote(p: StockPosition) {
         return this.quotes[p.ticker]
     }
 
-    getPrice(p: PositionInstance) {
+    getPrice(p: StockPosition) {
         if (this.quotes) {
             return this.quotes[p.ticker]?.price
         }

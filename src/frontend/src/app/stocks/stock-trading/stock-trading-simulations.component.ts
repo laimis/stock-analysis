@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-    PositionInstance,
+    StockPosition,
     PriceBar,
     PriceFrequency,
     StocksService,
@@ -73,7 +73,7 @@ export class StockTradingSimulationsComponent implements OnInit {
         return this.results.find(result => result.strategyName === name)
     }
 
-    findTrade(position:PositionInstance) {
+    findTrade(position:StockPosition) {
         let alternateStrategy = this.getStrategyEntry(this.alternateStrategy);
         return alternateStrategy.results.find(r => r.position.ticker === position.ticker && r.position.opened === position.opened)
     }

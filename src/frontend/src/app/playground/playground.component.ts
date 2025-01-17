@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     DailyPositionReport,
-    PositionInstance,
+    StockPosition,
     StockQuote,
     StocksService,
     TickerCorrelation
@@ -21,11 +21,11 @@ import {NgIf} from "@angular/common";
 import {OptionPosition, OptionService} from "../services/option.service";
 import {OptionContractPricingComponent} from "../options/option-contract-pricing/option-contract-pricing.component";
 
-function unrealizedProfit(position: PositionInstance, quote: StockQuote) {
+function unrealizedProfit(position: StockPosition, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
 }
 
-function createProfitScatter(entries: PositionInstance[], quotes: Map<string, StockQuote>) {
+function createProfitScatter(entries: StockPosition[], quotes: Map<string, StockQuote>) {
     const mapped = entries.map(p => {
         return {x: p.daysHeld, y: unrealizedProfit(p, quotes[p.ticker]), label: p.ticker}
     })

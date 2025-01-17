@@ -6,7 +6,7 @@ import {
     openpositioncommand,
     PastStockTradingPerformance,
     PastStockTradingPositions,
-    PositionInstance, SimulationNotices,
+    StockPosition, SimulationNotices,
     StockOwnership,
     StockTradingPositions,
     stocktransactioncommand,
@@ -21,8 +21,8 @@ export class StockPositionsService {
     constructor(private http: HttpClient) {
     }
 
-    get(positionId: string): Observable<PositionInstance> {
-        return this.http.get<PositionInstance>(`/api/portfolio/stockpositions/${positionId}`)
+    get(positionId: string): Observable<StockPosition> {
+        return this.http.get<StockPosition>(`/api/portfolio/stockpositions/${positionId}`)
     }
     
     getTradingEntries(): Observable<StockTradingPositions> {
@@ -70,8 +70,8 @@ export class StockPositionsService {
         )
     }
 
-    openPosition(command: openpositioncommand): Observable<PositionInstance> {
-        return this.http.post<PositionInstance>(`/api/portfolio/stockpositions`, command)
+    openPosition(command: openpositioncommand): Observable<StockPosition> {
+        return this.http.post<StockPosition>(`/api/portfolio/stockpositions`, command)
     }
 
     deletePosition(positionId: string): Observable<object> {

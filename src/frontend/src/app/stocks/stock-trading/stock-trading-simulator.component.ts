@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {openpositioncommand, PositionInstance} from '../../services/stocks.service';
+import {openpositioncommand, StockPosition} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
 
@@ -48,8 +48,8 @@ export class StockTradingSimulatorComponent implements OnInit {
 
     showExisting: boolean = false
     positionFilter: string = ''
-    positions: PositionInstance[] = []
-    filteredPositions: PositionInstance[] = []
+    positions: StockPosition[] = []
+    filteredPositions: StockPosition[] = []
 
     constructor(private stocks: StockPositionsService) {
     }
@@ -173,7 +173,7 @@ export class StockTradingSimulatorComponent implements OnInit {
         this.filteredPositions = this.positions.filter(p => p.ticker.toLowerCase().indexOf(this.positionFilter.toLowerCase()) > -1)
     }
 
-    loadPosition(p: PositionInstance) {
+    loadPosition(p: StockPosition) {
 
         this.reset()
         var first = true;

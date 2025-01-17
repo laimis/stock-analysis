@@ -541,8 +541,8 @@ export interface WeeklyReport {
     stockProfit: number
     optionProfit: number
     totalProfit: number
-    openedStocks: PositionInstance[]
-    closedStocks: PositionInstance[]
+    openedStocks: StockPosition[]
+    closedStocks: StockPosition[]
     openedOptions: OptionPosition[]
     closedOptions: OptionPosition[]
     plStockTransactions: StockPLTransaction[]
@@ -558,7 +558,7 @@ export class StockViolation {
     pricePerShare: number
     ticker: string
     currentPrice: number
-    localPosition: PositionInstance
+    localPosition: StockPosition
     pendingPosition: PendingStockPosition
 }
 
@@ -781,7 +781,7 @@ export interface StockProfile {
 }
 
 export interface StockOwnership {
-    positions: PositionInstance[]
+    positions: StockPosition[]
 }
 
 export interface TickerOutcomes {
@@ -987,7 +987,7 @@ export interface BrokerageAccountSnapshot {
 }
 
 export interface StockTradingPositions {
-    current: PositionInstance[]
+    current: StockPosition[]
     violations: StockViolation[]
     brokerageAccount: BrokerageAccount
     prices: Map<string, StockQuote>
@@ -995,7 +995,7 @@ export interface StockTradingPositions {
 }
 
 export interface PastStockTradingPositions {
-    past: PositionInstance[]
+    past: StockPosition[]
 }
 
 export interface PastStockTradingPerformance {
@@ -1042,7 +1042,7 @@ export interface Note {
     created: string
 }
 
-export interface PositionInstance {
+export interface StockPosition {
     positionId: string,
     isOpen: boolean,
     averageBuyCostPerShare: number,
@@ -1085,7 +1085,7 @@ export interface TradingStrategyResult {
     maxDrawdownFirst10Bars: number
     maxGainPct: number
     maxGainFirst10Bars: number
-    position: PositionInstance
+    position: StockPosition
     strategyName: string
     forcedClosed: boolean
 }

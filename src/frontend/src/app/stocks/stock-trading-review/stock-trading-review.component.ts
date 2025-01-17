@@ -3,7 +3,7 @@ import {Title} from '@angular/platform-browser';
 import {
     BrokerageStockOrder,
     DailyPositionReport, PositionChartInformation,
-    PositionInstance,
+    StockPosition,
     PriceFrequency,
     StocksService,
     TradingStrategyResults
@@ -22,7 +22,7 @@ import {concat} from "rxjs";
 })
 export class StockTradingReviewComponent {
 
-    currentPosition: PositionInstance
+    currentPosition: StockPosition
     simulationResults: TradingStrategyResults
     simulationErrors: string[];
     scoresErrors: string[];
@@ -47,14 +47,14 @@ export class StockTradingReviewComponent {
         private title: Title) {
     }
 
-    private _positions: PositionInstance[];
+    private _positions: StockPosition[];
 
-    get positions(): PositionInstance[] {
+    get positions(): StockPosition[] {
         return this._positions
     }
 
     @Input()
-    set positions(value: PositionInstance[]) {
+    set positions(value: StockPosition[]) {
         this._index = 0
         this._positions = value
         this.updateCurrentPosition()
@@ -72,7 +72,7 @@ export class StockTradingReviewComponent {
         this.loadPositionData(positionId);
     }
 
-    getPrice(position: PositionInstance) {
+    getPrice(position: StockPosition) {
         let quote = this.getQuote(position)
 
         if (quote) {
@@ -88,7 +88,7 @@ export class StockTradingReviewComponent {
         return 0
     }
 
-    getQuote(position: PositionInstance) {
+    getQuote(position: StockPosition) {
         if (this.quotes && position.ticker in this.quotes) {
             return this.quotes[position.ticker]
         }
@@ -135,7 +135,7 @@ export class StockTradingReviewComponent {
         );
     }
 
-    private setTitle(position: PositionInstance) {
+    private setTitle(position: StockPosition) {
         this.title.setTitle(`Trading Review - ${position.ticker} - Nightingale Trading`)
     }
     
@@ -183,7 +183,7 @@ export class StockTradingReviewComponent {
         concat(loadPositionPromise, simulationPromise, reportPromise).subscribe()
     }
     
-    private loadPrices(position: PositionInstance) {
+    private loadPrices(position: StockPosition) {
         this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily)
             .subscribe(
                 r => {
