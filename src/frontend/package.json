@@ -12,6 +12,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
+    "browser": {
+      "path": false  
+    },
   "private": true,
   "dependencies": {
     "@angular-eslint/eslint-plugin": "^18.0.1",
