@@ -42,8 +42,10 @@ export interface OptionPosition {
     underlyingTicker: string
     underlyingPrice: number
     contracts: OptionContract[]
+    pendingContracts: OptionContract[]
     transactions: OptionPositionTransaction[]
     cost: number
+    desiredCost: number
     market: number
     spread: number
     profit: number

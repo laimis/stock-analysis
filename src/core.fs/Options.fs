@@ -78,7 +78,7 @@ type OptionPositionState =
         Created: DateTimeOffset
         Opened: DateTimeOffset option
         Closed: DateTimeOffset option
-        Cost: decimal
+        Cost: decimal option
         DesiredCost: decimal option
         Profit: decimal
         Transactions: OptionTransaction list
@@ -202,7 +202,7 @@ module OptionPosition =
             Opened = None
             UnderlyingTicker = event.UnderlyingTicker |> Ticker
             Profit = 0m
-            Cost = 0m
+            Cost = None
             DesiredCost = None
             Version = 1
             Notes = []
@@ -231,7 +231,8 @@ module OptionPosition =
             let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost + debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             let updatedOpened = match p.Opened with | None -> x.When | Some opened -> opened
-            { p with Transactions = p.Transactions @ [transaction]; Cost = p.Cost + debit; Opened = Some updatedOpened; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
+            let newCost = (p.Cost |> Option.defaultValue 0m) + debit |> Some
+            { p with Transactions = p.Transactions @ [transaction]; Cost = newCost; Opened = Some updatedOpened; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
         | :? OptionContractSoldToOpen as x ->
             let credit = decimal x.Quantity * x.Price
@@ -241,7 +242,8 @@ module OptionPosition =
             let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost + credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             let updatedOpened = match p.Opened with | None -> x.When | Some opened -> opened
-            { p with Transactions = p.Transactions @ [transaction]; Cost = p.Cost - credit; Opened = Some updatedOpened; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
+            let newCost = (p.Cost |> Option.defaultValue 0m) - credit |> Some
+            { p with Transactions = p.Transactions @ [transaction]; Cost = newCost; Opened = Some updatedOpened; Version = p.Version + 1; Contracts = updatedContracts; Events = p.Events @ [x] }
             
         | :? OptionContractBoughtToClose as x ->
             let debit = decimal x.Quantity * x.Price
@@ -300,7 +302,7 @@ module OptionPosition =
             
         | :? OptionSellToOpenOrderCreated as x ->
             let contract = { Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
-            let quantity = Quantity(x.Quantity)
+            let quantity = Quantity(-x.Quantity)
             { p with PendingContracts = p.PendingContracts |> Map.add contract quantity; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)

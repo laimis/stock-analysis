@@ -25,16 +25,26 @@ type PriceMonitoringService(
     }
     
     let matchDetailWithContract (p:OptionPositionState, chain:OptionChain) =
-        p.Contracts.Keys
-        |> Seq.map( fun c ->
+        let matchDetailWithContract (p:OptionPositionState,c:OptionContract, chain:OptionChain) =
             let detail = chain.FindMatchingOption(c.Strike, c.Expiration, c.OptionType)
             match detail with
             | None ->
                 logger.LogError($"Failed to find option contract for {c.Strike} {c.Expiration} {c.OptionType} in chain for {p.UnderlyingTicker} for {p.Opened} to {p.Closed.Value}")
                 None
             | Some detail ->
-                Some (p,c,detail)
-        )
+                Some (p, c, detail)
+                
+        let activeContracts =
+            p.Contracts.Keys
+            |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
+            |> Seq.choose id
+            
+        let pendingContracts =
+            p.PendingContracts.Keys
+            |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
+            |> Seq.choose id
+            
+        Seq.append activeContracts pendingContracts
         
     let saveOptionPricing (userId:UserId) timestamp (position:OptionPositionState) (contract:OptionContract) (pricing:OptionDetail) = async {
         let pricing = {
@@ -101,7 +111,6 @@ type PriceMonitoringService(
                             positionsWithChainOptions
                             |> Seq.choose id
                             |> Seq.collect matchDetailWithContract
-                            |> Seq.choose id
                             |> Seq.map (fun (position,contract,optionDetail) -> saveOptionPricing pair.Id timestamp position contract optionDetail)
                             |> Async.Sequential
                             

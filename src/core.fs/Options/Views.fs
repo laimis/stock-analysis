@@ -35,13 +35,22 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     
     let labels = state.Labels |> Seq.map id |> Seq.toArray
     let contracts =
-        state.Contracts.Keys
-        |> Seq.map (fun k ->
-            let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
-            OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, cost, None, chain)
-        )
-        |> Seq.toList
-    
+        match state.Contracts.Count with
+        | 0 ->
+            state.PendingContracts.Keys
+            |> Seq.map (fun k ->
+                let (Quantity(quantity)) = state.PendingContracts[k]
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, 0m, None, chain)
+            )
+            |> Seq.toList
+        | _ ->
+            state.Contracts.Keys
+            |> Seq.map (fun k ->
+                let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, cost, None, chain)
+            )
+            |> Seq.toList
+        
     member this.PositionId = state.PositionId
     member this.UnderlyingTicker = state.UnderlyingTicker
     member this.UnderlyingPrice =
@@ -60,7 +69,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Closed = state.Closed
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen
-    member this.Cost = state.Cost
+    member this.Cost = match state.Cost with Some c -> c | None -> state.DesiredCost |> Option.defaultValue 0m
     member this.Market =
         contracts
         |> Seq.sumBy (fun c -> c.Details |> Option.map(fun o -> o.Mark * decimal c.Quantity) |> Option.defaultValue 0m)

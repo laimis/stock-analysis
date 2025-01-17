@@ -42,6 +42,7 @@ export class OptionPendingPositionCreateModalComponent {
     positionNotes: string;
     positionStrategy: string;
     optionStrategies: { key: string, value: string }[] = []
+    createOrder: boolean = true
 
     @HostListener('document:keydown.escape')
     onEscape() {
@@ -88,7 +89,6 @@ export class OptionPendingPositionCreateModalComponent {
             orderStrategyType,
             orderLegCollection: collections
         }
-        console.log("I would issue brokerage order now", order)
 
         this.brokerageService.issueOptionOrder(order).subscribe(
             (data) => {
@@ -104,28 +104,30 @@ export class OptionPendingPositionCreateModalComponent {
     }
 
     turnIntoPosition() {
-        console.log('mapping pending position' )
-        // this will need to be completely rewritten
+        
         let command = {
 
             underlyingTicker: this.ticker,
-            cost: this.price,
+            cost: Math.abs(this.price),
             notes: this.positionNotes,
             strategy: this.positionStrategy,
             contracts: this.selectedLegs.map(l => ({
-                quantity: l.quantity,
+                quantity: l.action === 'buy' ? l.quantity : -l.quantity,
                 strikePrice: l.option.strikePrice,
                 expirationDate: l.option.expiration,
                 optionType: l.option.optionType
             }))
         }
-        
-        console.log('command', command)
 
         this.optionService.openpending(command).subscribe({
                 next: (position) => {
                     console.log('next', position)
-                    this.brokerageOrder()
+                    if (this.createOrder) {
+                        this.brokerageOrder()
+                    } else {
+                        this.close()
+                        this.positionCreated.emit()
+                    }
                 },
                 error: (err) => {
                     console.log('error', err)

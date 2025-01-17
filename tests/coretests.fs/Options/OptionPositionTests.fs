@@ -28,7 +28,7 @@ let ``Basic operations work`` () =
         |> OptionPosition.buyToOpen expiration 120m optionType quantity 6.05m DateTimeOffset.UtcNow
         |> OptionPosition.sellToOpen expiration 115m optionType quantity 4.20m DateTimeOffset.UtcNow
         
-    positionWithContracts.Cost |> should equal 1.85m
+    positionWithContracts.Cost |> should equal (Some 1.85m)
     positionWithContracts.Profit |> should equal 0m
     positionWithContracts.Transactions |> should haveLength 2m
     positionWithContracts.IsClosed |> should equal false
@@ -47,7 +47,7 @@ let ``Basic operations work`` () =
         |> OptionPosition.sellToClose expiration 120m optionType quantity 11.11m DateTimeOffset.UtcNow
         |> OptionPosition.buyToClose expiration 115m optionType quantity 8.11m DateTimeOffset.UtcNow
         
-    positionWithContractsClosed.Cost |> should equal 1.85m
+    positionWithContractsClosed.Cost |> should equal (Some 1.85m)
     positionWithContractsClosed.Profit |> should equal 1.15m
     positionWithContractsClosed.Transactions |> should haveLength 4m
     positionWithContractsClosed.IsClosed |> should equal true
