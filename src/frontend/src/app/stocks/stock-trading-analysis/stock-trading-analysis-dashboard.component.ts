@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {StockPosition} from 'src/app/services/stocks.service';
+import {PortfolioHoldings, StockPosition, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {isQuestionOrPlusOrMinusToken} from "typescript";
 
 @Component({
     selector: 'app-stock-trading-analysis-dashboard',
@@ -11,19 +12,21 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 })
 export class StockTradingAnalysisDashboardComponent implements OnInit {
 
-    positions: StockPosition[]
+    portfolioHoldings: PortfolioHoldings
     errors: string[]
 
     constructor(
-        private stocksService: StockPositionsService
+        private stocksService: StocksService
     ) {
     }
 
     ngOnInit() {
-        this.stocksService.getTradingEntries().subscribe((data) => {
-            this.positions = data.current
+        this.stocksService.getPortfolioHoldings().subscribe((data) => {
+            this.portfolioHoldings = data
         }, (error) => {
             this.errors = GetErrors(error)
         })
     }
+
+    protected readonly isQuestionOrPlusOrMinusToken = isQuestionOrPlusOrMinusToken;
 }

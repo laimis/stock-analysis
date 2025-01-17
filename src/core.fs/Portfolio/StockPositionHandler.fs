@@ -14,6 +14,7 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.CSV
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
+open core.fs.Options
 open core.fs.Services
 open core.fs.Services.Trading
 open core.fs.Stocks
@@ -554,15 +555,11 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let! options = query.UserId |> storage.GetOptionPositions
         let! cryptos = query.UserId |> storage.GetCryptos
         
-        let openStocks = stocks |> Seq.filter _.IsOpen
-        let openOptions = options|> Seq.filter _.IsOpen
+        let openStocks = stocks |> Seq.filter _.IsOpen |> Seq.map StockPositionWithCalculations
+        let openOptions = options|> Seq.filter _.IsOpen |> Seq.map (fun o -> OptionPositionView(o, None))
+        let openCryptos = cryptos |> Seq.map _.State
         
-        let view =
-            {
-                OpenStockCount = openStocks |> Seq.length
-                OpenOptionCount = openOptions |> Seq.length
-                OpenCryptoCount = cryptos |> Seq.length
-            }
+        let view = PortfolioView(openStocks, openOptions, openCryptos)
             
         return view |> Ok 
     }

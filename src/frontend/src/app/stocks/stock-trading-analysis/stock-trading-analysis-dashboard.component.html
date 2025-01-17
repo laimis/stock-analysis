@@ -1,7 +1,7 @@
 <div>
     <app-error-display [errors]="errors"></app-error-display>
-    @if (!positions && !errors) {
+    @if (!portfolioHoldings && !errors) {
         <app-loading></app-loading>
     }
-    <app-stock-trading-outcomes-reports [dailyAnalysis]="positions"></app-stock-trading-outcomes-reports>
+    <app-stock-trading-outcomes-reports [dailyAnalysis]="portfolioHoldings"></app-stock-trading-outcomes-reports>
 </div>

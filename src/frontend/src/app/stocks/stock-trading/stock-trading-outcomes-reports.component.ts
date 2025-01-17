@@ -5,7 +5,7 @@ import {
     StockPosition, SimulationNotices,
     StockGaps,
     StocksService,
-    TickerCorrelation
+    TickerCorrelation, PortfolioHoldings
 } from '../../services/stocks.service';
 import {catchError, finalize, map} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
@@ -52,7 +52,7 @@ export class StockPositionReportsComponent {
     }
 
     @Input()
-    set dailyAnalysis(value: StockPosition[]) {
+    set dailyAnalysis(value: PortfolioHoldings) {
         if (value) {
             this.loadPositionData(value)
         }
@@ -82,7 +82,7 @@ export class StockPositionReportsComponent {
         return this.expandedGroups.has(group);
     }
 
-    loadPositionData(positions: StockPosition[]) {
+    loadPositionData(portfolio: PortfolioHoldings) {
         this.loading.daily = true
         this.loading.weekly = true
         this.loading.positions = true
@@ -116,7 +116,12 @@ export class StockPositionReportsComponent {
             finalize(() => this.loading.positions = false)
         )
 
-        this.tickers = positions.map(p => p.ticker)
+        this.tickers = Array.from(
+            new Set(
+                portfolio.stocks.map(p => p.ticker).concat(portfolio.options.map(p => p.underlyingTicker))
+            )
+        )
+        
         const dailyReport$ = this.service.reportOutcomesSingleBarDaily(this.tickers).pipe(
             map(report => this.singleBarReportDaily = report),
             catchError(

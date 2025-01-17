@@ -14,10 +14,10 @@
                                 <div>
                                     <h5 class="card-title mb-1">Stocks</h5>
                                     <p class="text-muted mb-0">
-                                        @if (dashboard.openStockCount === 0) {
+                                        @if (dashboard.stocks.length === 0) {
                                             No tickers on file
                                         } @else {
-                                            {{ dashboard.openStockCount }} active positions
+                                            {{ dashboard.stocks.length }} active positions
                                         }
                                     </p>
                                 </div>
@@ -43,10 +43,10 @@
                                 <div>
                                     <h5 class="card-title mb-1">Options</h5>
                                     <p class="text-muted mb-0">
-                                        @if (dashboard.openOptionCount === 0) {
+                                        @if (dashboard.options.length === 0) {
                                             No open contracts
                                         } @else {
-                                            {{ dashboard.openOptionCount }} open contracts
+                                            {{ dashboard.options.length }} open contracts
                                         }
                                     </p>
                                 </div>
@@ -72,10 +72,10 @@
                                 <div>
                                     <h5 class="card-title mb-1">Crypto</h5>
                                     <p class="text-muted mb-0">
-                                        @if (dashboard.openCryptoCount === 0) {
+                                        @if (dashboard.cryptos.length === 0) {
                                             No crypto tokens
                                         } @else {
-                                            {{ dashboard.openCryptoCount }} active tokens
+                                            {{ dashboard.cryptos.length }} active tokens
                                         }
                                     </p>
                                 </div>

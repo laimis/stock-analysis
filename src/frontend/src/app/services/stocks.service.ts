@@ -655,9 +655,9 @@ export class OwnedCrypto {
 }
 
 export class PortfolioHoldings {
-    openOptionCount: number
-    openStockCount: number
-    openCryptoCount: number
+    stocks: StockPosition[]
+    options: OptionPosition[]
+    cryptos: OwnedCrypto[]
 }
 
 export interface PriceBar {

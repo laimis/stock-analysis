@@ -3,11 +3,13 @@ namespace core.fs.Portfolio
 open System
 open System.Collections.Generic
 open Microsoft.FSharp.Collections
+open core.Cryptos
 open core.Shared
 open core.Stocks
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
+open core.fs.Options
 open core.fs.Reports
 open core.fs.Services.Analysis
 open core.fs.Services.Trading
@@ -338,12 +340,11 @@ type TradingPerformanceContainerView(inputPositions:StockPositionWithCalculation
     member _.Performances = performances    
     member _.Trends = trends
             
-type PortfolioView =
-    {
-        OpenStockCount: int
-        OpenOptionCount: int
-        OpenCryptoCount: int
-    }
+type PortfolioView(stocks:StockPositionWithCalculations seq, options:OptionPositionView seq, cryptos:OwnedCryptoState seq) =
+    
+    member this.Stocks = stocks
+    member this.Options = options
+    member this.Cryptos = cryptos
 
 type TradingEntriesView =
     {
