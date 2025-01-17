@@ -220,7 +220,7 @@
             <div class="row mt-3">
                 <div class="col">
                     @if (positionOrders.length > 0) {
-                        <app-brokerage-orders [orders]="positionOrders"
+                        <app-brokerage-orders [account]="brokerageAccount"
                                               [filteredTickers]="[_position.ticker]"
                                               [positionId]="_position.positionId"
                                               (orderRecorded)="positionChanged.emit()"

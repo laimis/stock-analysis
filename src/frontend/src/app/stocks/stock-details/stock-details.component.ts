@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {
-    BrokerageStockOrder,
     PendingStockPosition,
     PositionChartInformation,
     StockPosition,
@@ -8,7 +7,7 @@ import {
     Prices,
     StockDetails,
     StockOwnership,
-    StocksService
+    StocksService, BrokerageAccount
 } from '../../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {Title} from '@angular/platform-browser';
@@ -35,7 +34,7 @@ export class StockDetailsComponent implements OnInit {
     pendingPosition: PendingStockPosition|null = null
     options: OptionPosition[]
     prices: Prices
-    orders: BrokerageStockOrder[]
+    account: BrokerageAccount
     activeTab: string = ''
     startDate: string
     endDate: string
@@ -105,7 +104,7 @@ export class StockDetailsComponent implements OnInit {
         this.brokerage.brokerageAccount().subscribe(
             a => {
                 this.loading.orders = false
-                this.orders = a.stockOrders
+                this.account = a
             },
             e => {
                 this.loading.orders = false
@@ -193,8 +192,8 @@ export class StockDetailsComponent implements OnInit {
                 if (this.currentPosition && this.prices) {
                     
                     
-                    let buyOrders = this.orders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
-                    let sellOrders = this.orders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
+                    let buyOrders = this.account.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
+                    let sellOrders = this.account.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
                     
                     this.currentPositionChartInfo = {
                         averageBuyPrice: this.currentPosition.averageCostPerShare,

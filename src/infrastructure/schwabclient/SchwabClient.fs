@@ -555,7 +555,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
             OrderId = o.orderId.ToString()
             CanBeCancelled = o.cancelable
-            Legs = o.orderLegCollection.Value |> Array.map(fun l ->
+            Contracts = o.orderLegCollection.Value |> Array.map(fun l ->
                 
                 // description is in the following format:
                 // FLOOR & DECOR HLDGS INC 11/15/2024 $115 Put
@@ -579,7 +579,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     Description = l.instrument.description
                     OptionType = if l.instrument.putCall = "PUT" then OptionType.Put else OptionType.Call  
                     UnderlyingTicker = l.instrument.underlyingSymbol |> Ticker 
-                    Ticker = l.instrument.symbol |> Ticker
+                    Ticker = l.instrument.symbol |> OptionTicker
                     Quantity = (l.quantity |> int) * quantityFactor
                     Instruction = instruction
                     Price = o.ResolveOptionLegPrice(l.legId)

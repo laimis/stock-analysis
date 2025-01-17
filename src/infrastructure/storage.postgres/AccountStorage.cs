@@ -207,7 +207,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = :cash, equity = :equity, longVal
                 _ => throw new Exception($"Unknown asset type: {assetType}")
             };
 
-        public async Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<StockOrder> orders)
+        public async Task SaveAccountBrokerageStockOrders(UserId userId, IEnumerable<StockOrder> orders)
         {
             using var db = GetConnection();
             
@@ -239,7 +239,13 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
             }
             tx.Commit();
         }
-        
+
+        public Task SaveAccountBrokerageOptionOrders(UserId userId, IEnumerable<OptionOrder> orders)
+        {
+            // TODO: Implement
+            return Task.CompletedTask;
+        }
+
         public async Task<IEnumerable<StockOrder>> GetAccountBrokerageOrders(UserId userId)
         {
             using var db = GetConnection();

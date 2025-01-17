@@ -102,7 +102,7 @@
 
     <app-brokerage-orders
         [filteredTickers]="[stock.ticker]"
-        [orders]="orders"
+        [account]="account"
         [positionId]="currentPosition?.positionId"
         (orderRecorded)="positionChanged()"
     >

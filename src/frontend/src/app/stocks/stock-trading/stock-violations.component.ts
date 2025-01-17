@@ -1,5 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageStockOrder, openpositioncommand, StockViolation} from 'src/app/services/stocks.service';
+import {
+    BrokerageAccount,
+    StockViolation
+} from 'src/app/services/stocks.service';
 import {showElement, toggleVisuallyHidden} from "../../services/utils";
 
 @Component({
@@ -11,8 +14,10 @@ import {showElement, toggleVisuallyHidden} from "../../services/utils";
 export class StockViolationsComponent {
 
     tickersInViolations: string[] = []
+    
     @Input()
-    orders: BrokerageStockOrder[] = []
+    brokerageAccount: BrokerageAccount
+    
     @Output()
     refreshRequested = new EventEmitter<string>()
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
@@ -33,7 +38,7 @@ export class StockViolationsComponent {
     }
 
     tickerHasOrders(ticker: string) {
-        return this.orders.some(o => o.ticker == ticker)
+        return this.brokerageAccount.stockOrders.some(o => o.ticker == ticker)
     }
 
     getDiffPrice(v: StockViolation) {

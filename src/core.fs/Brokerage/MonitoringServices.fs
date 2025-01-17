@@ -368,8 +368,8 @@ type AccountMonitoringService(
                     let snapshot = AccountBalancesSnapshot(cash.Value, equity.Value, longValue.Value, shortValue.Value, marketNow)
                     do! snapshot |> accounts.SaveAccountBalancesSnapshot (user.State.Id |> UserId) |> Async.AwaitTask
                     
-                    // save orders
-                    do! account.StockOrders |> accounts.SaveAccountBrokerageOrders (user.State.Id |> UserId) |> Async.AwaitTask
+                    do! account.StockOrders |> accounts.SaveAccountBrokerageStockOrders (user.State.Id |> UserId) |> Async.AwaitTask
+                    do! account.OptionOrders |> accounts.SaveAccountBrokerageOptionOrders (user.State.Id |> UserId) |> Async.AwaitTask
                     
                     logger.LogInformation $"Saved balances for {user.State.Id}: {cash} {equity} {shortValue} {longValue}"
                     

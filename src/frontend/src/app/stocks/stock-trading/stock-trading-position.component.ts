@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
+    BrokerageAccount,
     BrokerageStockOrder, KeyValuePair,
     PositionEvent,
     StockPosition,
@@ -23,7 +24,7 @@ export class StockTradingPositionComponent {
     numberOfProfitPoints: number = 4
     positionStrategy: string = null
     positionOrders: BrokerageStockOrder[] = [];
-    allOrders: BrokerageStockOrder[] = [];
+    brokerageAccount: BrokerageAccount;
     strategies: { key: string; value: string; }[];
     showOrderForm: boolean = false;
     
@@ -70,8 +71,8 @@ export class StockTradingPositionComponent {
 
         this.brokerageService.brokerageAccount().subscribe(
             account => {
-                this.allOrders = account.stockOrders
-                this.positionOrders = this.allOrders.filter(o => o.ticker == this._position.ticker)
+                this.brokerageAccount = account
+                this.positionOrders = this.brokerageAccount.stockOrders.filter(o => o.ticker == this._position.ticker)
             },
             err => {
                 let errors = GetErrors(err)

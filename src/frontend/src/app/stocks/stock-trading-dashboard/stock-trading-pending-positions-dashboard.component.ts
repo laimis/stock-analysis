@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {BrokerageStockOrder} from "../../services/stocks.service";
+import {BrokerageAccount, BrokerageStockOrder} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
 import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
@@ -29,7 +29,7 @@ import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.co
 })
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
     feedbackMessage: string;
-    orders: BrokerageStockOrder[];
+    account: BrokerageAccount;
     
     constructor(
         private brokerage: BrokerageService,
@@ -50,7 +50,7 @@ export class StockTradingPendingPositionsDashboardComponent implements OnInit {
 
     getOrders() {
         this.brokerage.brokerageAccount().subscribe(account => {
-            this.orders = account.stockOrders
+            this.account = account
         }, error => {
             this.feedbackMessage = GetErrors(error)[0]
         })

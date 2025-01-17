@@ -92,7 +92,7 @@
     @if (isActive('violations')) {
         <app-stock-violations
             [violations]="violations"
-            [orders]="brokerageAccount.stockOrders"
+            [brokerageAccount]="brokerageAccount"
             (refreshRequested)="refresh()"
         ></app-stock-violations>
     }

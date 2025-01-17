@@ -1,11 +1,12 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageStockOrder, stocktransactioncommand} from 'src/app/services/stocks.service';
+import {BrokerageAccount, BrokerageStockOrder, stocktransactioncommand} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
 import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../shared/stocks/stock-link-and-tradingview-link.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
+import {BrokerageOptionOrder} from "../services/option.service";
 
 let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
     let tickerComparison = a.ticker.localeCompare(b.ticker)
@@ -40,11 +41,16 @@ export class BrokerageOrdersComponent {
     constructor(private brokerage: BrokerageService, private stocks: StockPositionsService) {
     }
 
-    private _orders: BrokerageStockOrder[] = [];
+    private _stockOrders: BrokerageStockOrder[] = [];
+    private _optionOrders: BrokerageOptionOrder[] = [];
+    
+    optionOrders: BrokerageOptionOrder[];
 
     @Input()
-    set orders(value: BrokerageStockOrder[]) {
-        this._orders = value
+    set account(value: BrokerageAccount) {
+        this._stockOrders = value.stockOrders
+        this._optionOrders = value.optionOrders
+        console.log("Option orders: " + this.optionOrders)
         this.groupAndRenderOrders()
     }
 
@@ -65,13 +71,17 @@ export class BrokerageOrdersComponent {
     groupAndRenderOrders() {
         let isTickerVisible = (ticker: string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
 
-        if (this._orders) {
-            const buys = this._orders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const sells = this._orders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const filled = this._orders.filter(o => !o.isActive && !o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
-            const cancelled = this._orders.filter(o => o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
+        if (this._stockOrders) {
+            const buys = this._stockOrders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+            const sells = this._stockOrders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
+            const filled = this._stockOrders.filter(o => !o.isActive && !o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
+            const cancelled = this._stockOrders.filter(o => o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
             this.groupedOrders = [buys, sells, filled, cancelled]
             this.isEmpty = this.groupedOrders.every(o => o.length == 0)
+        }
+        
+        if (this._optionOrders) {
+            this.optionOrders = this._optionOrders.filter(o => isTickerVisible(o.contracts[0].underlyingTicker))
         }
     }
 
@@ -85,7 +95,7 @@ export class BrokerageOrdersComponent {
     
     refreshOrders() {
         this.brokerage.brokerageAccount().subscribe(
-            a => { this.orders = a.stockOrders },
+            a => { this.account = a },
             err => this.errors = GetErrors(err)
         )
     }

@@ -216,7 +216,7 @@ type OptionOrderView(order:OptionOrder, chain:OptionChain option) =
     member this.CanBeRecorded = order.CanBeRecorded
     member this.IsActive = order.IsActive
     member this.Contracts =
-        order.Legs |> Seq.map (fun l ->
+        order.Contracts |> Seq.map (fun l ->
             OptionContractView(l.UnderlyingTicker, l.Expiration, l.StrikePrice, l.OptionType, l.Quantity, l.Price |> Option.defaultValue 0m, l.Instruction |> Some, chain)
         )
     

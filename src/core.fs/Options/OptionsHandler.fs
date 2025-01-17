@@ -337,7 +337,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 let! _ =
                     brokerageOrders
                     |> Seq.filter _.IsActive
-                    |> Seq.map (fun o -> o.Legs)
+                    |> Seq.map (fun o -> o.Contracts)
                     |> Seq.concat
                     |> Seq.map(fun l -> async {
                         if chainLookupMap.ContainsKey(l.UnderlyingTicker) |> not then
@@ -351,7 +351,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 let brokerageOrderViews =
                     brokerageOrders
                     |> Seq.map (fun o ->
-                        let ticker = o.Legs[0].UnderlyingTicker
+                        let ticker = o.Contracts[0].UnderlyingTicker
                         let chain =
                             match chainLookupMap.TryGetValue(ticker) with
                             | true, chain -> chain |> Some

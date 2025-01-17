@@ -98,7 +98,7 @@ type OptionOrderType =
 type OptionLeg = {
     LegId : string
     Cusip : string
-    Ticker : Ticker
+    Ticker : OptionTicker
     Description: string
     OptionType: OptionType
     UnderlyingTicker : Ticker
@@ -120,7 +120,7 @@ type OptionOrder = {
     EnteredTime: DateTimeOffset
     ExpirationTime: DateTimeOffset option
     CanBeCancelled : bool
-    Legs : OptionLeg []
+    Contracts : OptionLeg []
 } with
         
     member this.IsActive : bool =

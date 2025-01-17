@@ -36,6 +36,7 @@
                                 <td>
                                     <span title="{{p.statusDescription ?? p.status}}" class="badge" [ngClass]="{
                                         'bg-success': p.status === 'Active',
+                                        'bg-warning': p.status === 'Filled',
                                         'bg-secondary': p.status !== 'Active'
                                     }">{{ p.status }}</span>
                                 </td>
@@ -80,5 +81,58 @@
                 </tbody>
             </table>
         </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 100px;">Status</th>
+                        <th>Stock</th>
+                        <th>Details</th>
+                        <th class="text-end">Price</th>
+                        <th>Entered</th>
+                        <th>Processed</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(order of optionOrders; track order;) {
+                        <tr [ngClass]="{
+                            'table-success': order.isActive,
+                            'table-secondary': !order.isActive
+                        }">
+                            <td><span title="{{order.status}}" class="badge" [ngClass]="{
+                                        'bg-warning': order.status === 'Filled',
+                                        'bg-success': order.status === 'Working' || order.status === 'PendingActivation',
+                                        'bg-secondary': order.status !== 'Active' && order.status !== 'PendingActivation'
+                                    }">{{ order.status }}</span></td>
+                            <td><app-stock-link-and-tradingview-link [ticker]="order.contracts[0].underlyingTicker"></app-stock-link-and-tradingview-link></td>
+                            <td>
+                                @for(contract of order.contracts; track contract) {
+                                    <div>
+                                        <span class="badge" [ngClass]="{
+                                            'bg-success':contract.instruction === 'BuyToOpen' || contract.instruction === 'SellToOpen',
+                                            'bg-danger':contract.instruction === 'BuyToClose' || contract.instruction === 'SellToClose'
+                                            }">
+                                            {{contract.instruction}}
+                                        </span>
+                                        {{contract.optionType}} {{contract.strikePrice | currency}} {{contract.expiration}}
+                                    </div>    
+                                }
+                            </td>
+                            <td class="text-end">{{order.price}}</td>
+                            <td>{{order.enteredTime | date: 'short'}}</td>
+                            <td>{{order.executionTime | date: 'short'}}</td>
+                            <td class="text-end">
+                                @if (order.canBeCancelled) {
+                                    <button class="btn btn-warning btn-sm" (click)="cancelOrder(order.orderId)">Cancel</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
     </div>
 </section>

@@ -13,7 +13,8 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, List<AccountBalancesSnapshot>> _snapshots = new();
     private static readonly Dictionary<UserId, List<AccountTransaction>> _transactions = new();
     private static readonly Dictionary<UserId, object> _viewModels = new();
-    private static readonly Dictionary<UserId, List<StockOrder>> _orders = new();
+    private static readonly Dictionary<UserId, List<StockOrder>> _stockOrders = new();
+    private static readonly Dictionary<UserId, List<OptionOrder>> _optionOrders = new();
     private static readonly Dictionary<UserId, List<OptionPricing>> _optionPricings = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
@@ -62,7 +63,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         _transactions[userId].AddRange(transactions);
         return Task.CompletedTask;
     }
-    
+
     public Task InsertAccountBrokerageTransactions(UserId userId, IEnumerable<AccountTransaction> transactions)
     {
         if (_transactions.ContainsKey(userId) == false)
@@ -134,18 +135,29 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task<IEnumerable<StockOrder>> GetAccountBrokerageOrders(UserId userId)
     {
-        _orders.TryGetValue(userId, out var orders);
+        _stockOrders.TryGetValue(userId, out var orders);
         return Task.FromResult<IEnumerable<StockOrder>>(orders ?? new List<StockOrder>());
     }
     
-    public Task SaveAccountBrokerageOrders(UserId userId, IEnumerable<StockOrder> order)
+    public Task SaveAccountBrokerageStockOrders(UserId userId, IEnumerable<StockOrder> order)
     {
-        if (_orders.ContainsKey(userId) == false)
+        if (_stockOrders.ContainsKey(userId) == false)
         {
-            _orders[userId] = [];
+            _stockOrders[userId] = [];
         }
         
-        _orders[userId].AddRange(order);
+        _stockOrders[userId].AddRange(order);
+        return Task.CompletedTask;
+    }
+
+    public Task SaveAccountBrokerageOptionOrders(UserId userId, IEnumerable<OptionOrder> orders)
+    {
+        if (_optionOrders.ContainsKey(userId) == false)
+        {
+            _optionOrders[userId] = [];
+        }
+        
+        _optionOrders[userId].AddRange(orders);
         return Task.CompletedTask;
     }
 }

@@ -51,7 +51,7 @@
                     <div class="mb-3">
                         <app-brokerage-orders
                             [positionId]="violation.localPosition?.positionId"
-                            [orders]="orders"
+                            [account]="brokerageAccount"
                             [filteredTickers]="[violation.ticker]"
                             [justOrders]="true"
                             (orderRecorded)="refreshRequested.emit(violation.ticker)"

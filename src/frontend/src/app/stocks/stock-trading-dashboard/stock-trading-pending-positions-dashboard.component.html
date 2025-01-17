@@ -31,8 +31,8 @@
     </app-stock-trading-pendingpositions>
     <app-brokerage-orders
         *ngIf="isActive('orders')"
-        (ordersChanged)="getOrders()"
-        [orders]="orders"
+        (orderRecorded)="getOrders()"
+        [account]="account"
     ></app-brokerage-orders>
     <app-brokerage-new-order *ngIf="isActive('orders')"></app-brokerage-new-order>
     

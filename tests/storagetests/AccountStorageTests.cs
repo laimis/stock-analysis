@@ -138,7 +138,7 @@ namespace storagetests
                 CanBeCancelled = true
             };
             
-            await storage.SaveAccountBrokerageOrders(userId, new [] { order });
+            await storage.SaveAccountBrokerageStockOrders(userId, new [] { order });
             
             var fromDb = await storage.GetAccountBrokerageOrders(userId);
             
