@@ -29,6 +29,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     recentlyTriggeredExpanded = false;
     sourceLists: string[] = []
     errors: string[] = null
+    private expandedIdentifiers = new Set<string>();
 
     @Input()
     hideRecentTriggered: boolean = false;
@@ -84,10 +85,6 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     createGroups() {
         const compareTickers = (a: StockAlert, b: StockAlert) => a.ticker.localeCompare(b.ticker);
 
-        // filter out alerts based on source list selection, alert
-        // should be included if selection is All or if the alert
-        // sourceLists property contains the selection
-        
         const alertsOfInterest =
             this.container.alerts.filter(a => this.selectedSourceList === 'All' || a.sourceLists.includes(this.selectedSourceList))
                 .sort(compareTickers);
@@ -100,16 +97,16 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
             const group = {
                 identifier: identifier,
                 alerts: alerts,
-                expanded: this.selectedSourceList !== 'All'
+                expanded: this.expandedIdentifiers.has(identifier) || this.selectedSourceList !== 'All'
             }
             groups.push(group);
-        })
+        });
 
-        this.applySort(groups)
+        this.applySort(groups);
 
-        this.alertGroups = groups
+        this.alertGroups = groups;
         this.lastRefreshed = new Date().toLocaleString();
-        this.scheduled = false
+        this.scheduled = false;
     }
 
     toggleVisibility(elem:HTMLElement) {
@@ -170,14 +167,17 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     toggleGroupExpansion(group: StockAlertGroup) {
         group.expanded = !group.expanded
         if (group.expanded) {
+            this.expandedIdentifiers.add(group.identifier);
             this.turnOffRefresh()
         } else {
+            this.expandedIdentifiers.delete(group.identifier);
             this.turnOnRefresh()
         }
     }
     
     sourceListSelection(event:any) {
-        this.selectedSourceList = event.target.value
-        this.createGroups()
+        this.selectedSourceList = event.target.value;
+        this.expandedIdentifiers.clear(); // Clear expanded states when changing source list
+        this.createGroups();
     }
 }
