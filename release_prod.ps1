@@ -17,28 +17,24 @@ function Exit-With-Error ($message) {
 }
 
 function Git-Checkout-Merge($message) {
-    
-    # make sure we don't have pending changes
-    Invoke-Expression 'git push'
-
     $v = Invoke-Expression 'git describe --tags --abbrev=0'
-
     write-host $v
-
     $version = new-object System.Version($v.Substring(1))
-
     $newVersion = new-object System.Version($version.Major, $version.Minor, ($version.Build + 1))
 
-    $cmd = "git tag -a v$($newVersion) -m '$message'"
-    Invoke-Expression $cmd
-    Invoke-Expression "git push --tags"
-    
     $cmd = "git checkout prod"
     Invoke-Expression $cmd
     
-    $cmd = "git merge main --squash -m '$message'"
+    $cmd = "git pull"
     Invoke-Expression $cmd
     
+    $cmd = "git merge main -m '$message'"
+    Invoke-Expression $cmd
+    
+    $cmd = "git tag -a v$($newVersion) -m '$message'"
+    Invoke-Expression $cmd
+    
+    Invoke-Expression "git push --tags"
     $cmd = "git push"
     Invoke-Expression $cmd
     
@@ -139,6 +135,6 @@ Ensure-Angular-Lints
 
 Ensure-Angular-Builds
 
-$newVersion = Git-Checkout-Merge $message
+Git-Checkout-Merge $message
 
-Speak-Message "$newVersion Release Complete"
+Speak-Message "Release Complete"
