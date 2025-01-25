@@ -2,7 +2,6 @@ module core.fs.Alerts.MonitoringServices
 
 open System
 open System.Collections.Generic
-open System.Threading
 open core.Account
 open core.Shared
 open core.fs
@@ -178,21 +177,34 @@ type PatternMonitoringService(
             let! ownedStocks = emailIdPair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
             let portfolioList =
                 ownedStocks
-                |> Seq.filter (_.IsOpen)
-                |> Seq.map (_.Ticker)
-                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PortfolioIdentifier]; user=userId})
+                |> Seq.filter _.IsOpen
+                |> Seq.map _.Ticker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.StockPortfolioIdentifier]; user=userId})
+                
+            let! options = emailIdPair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
+            let optionList =
+                options
+                |> Seq.filter _.IsOpen
+                |> Seq.map _.UnderlyingTicker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionPortfolioIdentifier]; user=userId})
 
             let! pendingPositions = emailIdPair.Id |> portfolio.GetPendingStockPositions |> Async.AwaitTask
-            let pendingList =
+            let pendingStocksList =
                 pendingPositions
                 |> Seq.filter (fun p -> p.State.IsClosed |> not)
-                |> Seq.map (_.State.Ticker)
-                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.PendingIdentifier]; user=userId})
+                |> Seq.map _.State.Ticker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.StocksPendingIdentifier]; user=userId})
+                
+            let pendingOptionsList =
+                options
+                |> Seq.filter (fun p -> p.IsClosed |> not && p.IsOpen |> not)
+                |> Seq.map _.UnderlyingTicker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionsPendingIdentifier]; user=userId})
 
             let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
             let stockList =
                 lists
-                |> Seq.filter (_.State.ContainsTag(Constants.MonitorTagPattern))
+                |> Seq.filter _.State.ContainsTag(Constants.MonitorTagPattern)
                 |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=userId}))
                 |> Seq.concat
 
@@ -205,9 +217,15 @@ type PatternMonitoringService(
                 | true, _ -> tickerMap[ticker] <- {check with listNames = check.listNames @ tickerMap[ticker].listNames}
                 | _ -> tickerMap.Add(ticker, check)
 
-            portfolioList |> Seq.iter (fun check -> addTicker check.ticker check)
-            pendingList |> Seq.iter (fun check -> addTicker check.ticker check)
-            stockList |> Seq.iter (fun check -> addTicker check.ticker check)
+            [
+                portfolioList
+                optionList
+                pendingStocksList
+                pendingOptionsList
+                stockList
+            ]
+            |> Seq.concat
+            |> Seq.iter (fun check -> addTicker check.ticker check)
 
             return tickerMap.Values
     }

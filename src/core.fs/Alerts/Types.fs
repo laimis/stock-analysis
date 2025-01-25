@@ -23,8 +23,10 @@ namespace core.fs.Alerts
         let MonitorTagPattern = "monitor:patterns"
         let MonitorNamePattern = "Patterns"
         let StopLossIdentifier = "Stop loss"
-        let PortfolioIdentifier = "💼 Portfolio"
-        let PendingIdentifier = "⏳ Pending"
+        let StockPortfolioIdentifier = "💼 - Stocks"
+        let OptionPortfolioIdentifier = "💼 - Options"
+        let StocksPendingIdentifier = "⏳ - Stocks"
+        let OptionsPendingIdentifier = "⏳ - Options"
     
     
     [<Struct>]
@@ -52,7 +54,7 @@ namespace core.fs.Alerts
                 ``when`` = ``when``
                 ticker = ticker
                 description = "Stop price"
-                sourceLists = [Constants.PortfolioIdentifier]
+                sourceLists = [Constants.StockPortfolioIdentifier]
                 userId = userId
                 alertType = SentimentType.Negative
                 valueFormat = ValueFormat.Currency
