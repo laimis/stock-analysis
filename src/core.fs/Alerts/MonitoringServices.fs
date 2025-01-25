@@ -348,6 +348,8 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
         | Some user ->
             let! stocks = pair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
             let tickersFromPositions = stocks |> Seq.filter _.IsOpen |> Seq.map _.Ticker
+            let! options = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
+            let tickersFromOptions = options |> Seq.filter _.IsOpen |> Seq.map _.UnderlyingTicker
             let! lists = pair.Id |> portfolio.GetStockLists |> Async.AwaitTask
             let tickersFromLists =
                 lists
@@ -355,7 +357,7 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
                 |> Seq.map (fun l -> l.State.Tickers |> Seq.map _.Ticker)
                 |> Seq.concat
 
-            let set = HashSet<Ticker>(tickersFromLists |> Seq.append tickersFromPositions);
+            let set = HashSet<Ticker>([tickersFromLists; tickersFromPositions; tickersFromOptions] |> Seq.concat);
 
             tickersToCheck[user.State] <- set;
     }
