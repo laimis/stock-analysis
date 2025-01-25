@@ -1,8 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {PortfolioHoldings, StockPosition, StocksService} from 'src/app/services/stocks.service';
+import {PortfolioHoldings, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
-import {StockPositionsService} from "../../services/stockpositions.service";
-import {isQuestionOrPlusOrMinusToken} from "typescript";
 
 @Component({
     selector: 'app-stock-trading-analysis-dashboard',
@@ -27,6 +25,4 @@ export class StockTradingAnalysisDashboardComponent implements OnInit {
             this.errors = GetErrors(error)
         })
     }
-
-    protected readonly isQuestionOrPlusOrMinusToken = isQuestionOrPlusOrMinusToken;
 }
