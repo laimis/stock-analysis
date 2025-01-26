@@ -45,6 +45,18 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
+                "budgets": [
+                    {
+                        "type": "initial",
+                        "maximumWarning": "500kB",
+                        "maximumError": "2.8MB"
+                    },
+                    {
+                        "type": "anyComponentStyle",
+                        "maximumWarning": "2kB",
+                        "maximumError": "4kB"
+                    }
+                ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,

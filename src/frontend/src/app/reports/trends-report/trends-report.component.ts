@@ -10,7 +10,7 @@ import {
     TrendType,
     ValueWithFrequency
 } from "../../services/stocks.service";
-import {DatePipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
+import { NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
@@ -47,6 +47,9 @@ export class TrendsReportComponent implements OnInit {
     selectedTicker: string;
     selectedStartDate: string;
     selectedTrendType: TrendType;
+    
+    Ema20OverSma50 = TrendType.Ema20OverSma50
+    Sma50OverSma200 = TrendType.Sma50OverSma200
 
     dataPointContainers: DataPointContainer[] = []
     errors: string[];
@@ -113,8 +116,9 @@ export class TrendsReportComponent implements OnInit {
         })
     }
 
-    tickerSelected(ticker: string) {
+    tickerSelected(ticker: string, trendType: TrendType) {
         this.selectedTicker = ticker
+        this.selectedTrendType = trendType
         this.applyFilters()
     }
 

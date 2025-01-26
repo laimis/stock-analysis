@@ -3,25 +3,25 @@
 
     <app-error-display *ngIf="errors"></app-error-display>
 
-    <div *ngFor="let trendSummary of [shortTermTrendSummary, longTermTrendSummary]" class="row mb-4">
-        <div *ngFor="let ticker of Object.keys(trendSummary)" class="col-md-4">
-            @if (trendSummary[ticker] && trendSummary[ticker].currentTrend) {
-            <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
-                <span (click)="tickerSelected(ticker)" role="button">
-                    <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
-                    {{ ticker }}
-                    
-                </span>
-                <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Up'" class="fas fa-arrow-up text-success"></i>
-                <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Down'" class="fas fa-arrow-down text-danger"></i>
-                <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>
+    <div *ngFor="let trendSummary of [shortTermTrendSummary, longTermTrendSummary]" class="card mb-4">
+        <h5 class="card-header">{{trendSummary === shortTermTrendSummary ? 'Short Term' : 'Long term'}}</h5>
+        <div class="card-body">
+            <div class="row">
+                <div *ngFor="let ticker of Object.keys(trendSummary)" class="col-md-4">
+                    @if (trendSummary[ticker] && trendSummary[ticker].currentTrend) {
+                    <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
+                        <span (click)="tickerSelected(ticker, trendSummary === shortTermTrendSummary ? Ema20OverSma50 : Sma50OverSma200)" role="button">
+                            <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
+                            {{ ticker }}
+                            
+                        </span>
+                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Up'" class="fas fa-arrow-up text-success"></i>
+                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Down'" class="fas fa-arrow-down text-danger"></i>
+                        <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>
+                    </div>
+                    }
+                </div>
             </div>
-            } @else {
-            <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
-                <span (click)="tickerSelected(ticker)" role="button">{{ ticker }}</span>
-                <span class="text-muted">Loading...</span>
-            </div>
-            }
         </div>
     </div>
 
@@ -30,12 +30,12 @@
             <div class="row align-items-end">
                 <div class="col-md-4">
                     <app-stock-search
-                        (tickerSelected)="tickerSelected($event)"
+                        (tickerSelected)="tickerSelected($event, selectedTrendType)"
                         [cssClass]="'d-flex ms-auto form-control'"
                         [justTickers]="true"
                         [label]="'Ticker'"
                         [placeholder]="'Search for a symbol'"
-                        [ticker]="selectedTicker">
+                        [ticker]="selectedTicker">  
                     </app-stock-search>
                 </div>
                 <div class="col-md-4">
@@ -63,12 +63,10 @@
     </div>
 
     <app-loading *ngIf="loading"></app-loading>
-
-
-
+    
     <div *ngIf="currentTrend" class="card mb-5">
         <div class="card-header">
-            <h4>Current Trend</h4>
+            <h4>Selected Trend</h4>
         </div>
         <div class="card-body">
             <div class="row">
