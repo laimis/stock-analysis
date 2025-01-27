@@ -125,11 +125,16 @@ public static class Jobs
 
     public static void AddJobs(IConfiguration configuration, IServiceCollection services, ILogger logger)
     {
-        services.AddHangfire(config => { config.UseDashboardMetrics(); });
+        services.AddHangfire(config =>
+        {
+            config.UseDashboardMetrics();
+        });
 
         if (BackendJobsEnabled(configuration))
         {
-            services.AddHangfireServer();
+            services.AddHangfireServer(
+                s => s.WorkerCount = 2
+            );
         }
         else
         {
