@@ -257,7 +257,7 @@ export class StockTradingPositionComponent {
                 (_) => {
                     this.notesControl.setValue('')
                     this.showNotesForm = false
-                    this.positionChanged.emit()
+                    this._position.notes.push({id:'', created: (new Date()).toISOString(), content: this.notesControl.value})
                 },
                 err => {
                     let errors = GetErrors(err)
