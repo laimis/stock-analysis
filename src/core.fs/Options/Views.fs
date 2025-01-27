@@ -17,7 +17,7 @@ type OptionContractView(underlyingTicker:core.Shared.Ticker, expiration:OptionEx
                 | Put -> strikePrice - price
             itmPrice / price |> Some
         | None -> None
-    let market = chainDetail |> Option.map(fun o -> o.Mark * decimal quantity |> abs)
+    let market = chainDetail |> Option.map(_.Mark)
         
     member this.Expiration = expiration
     member this.StrikePrice = strikePrice
@@ -47,7 +47,11 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
             state.Contracts.Keys
             |> Seq.map (fun k ->
                 let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
-                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, cost, None, chain)
+                let perContractCost =
+                    match quantity with
+                    | 0 -> 0m
+                    | _ -> cost / decimal quantity |> abs
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, perContractCost, None, chain)
             )
             |> Seq.toList
         
