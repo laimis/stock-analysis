@@ -255,9 +255,9 @@ export class StockTradingPositionComponent {
         if (this.notesControl.invalid === false) {
             this.stockService.addNotes(this._position.positionId, this.notesControl.value).subscribe(
                 (_) => {
-                    this.notesControl.setValue('')
                     this.showNotesForm = false
                     this._position.notes.push({id:'', created: (new Date()).toISOString(), content: this.notesControl.value})
+                    this.notesControl.setValue('')
                 },
                 err => {
                     let errors = GetErrors(err)
