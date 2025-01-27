@@ -171,6 +171,8 @@ module PositionAnalysis =
             (fun o -> o.Key = PositionAnalysisKeys.PositionSize && o.Value < 0.0m)
         ]
         
+        let daysHeldIntervals = [22m; 30m]
+        
         [
             AnalysisOutcomeEvaluation(
                 "Below stop loss",
@@ -184,12 +186,16 @@ module PositionAnalysis =
                 PositionAnalysisKeys.PercentToStopLoss,
                 tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.PercentToStopLoss && o.Value >= percentToStopThreshold && o.Value <= 0.0m) ]
             )
-            AnalysisOutcomeEvaluation(
-                $"Opened 30 days ago",
-                OutcomeType.Neutral,
-                PositionAnalysisKeys.DaysHeld,
-                tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value = 30m) ]
-            )
+            yield!
+                daysHeldIntervals
+                |> List.map(fun i ->
+                    AnalysisOutcomeEvaluation(
+                        $"Opened {i} days ago",
+                        OutcomeType.Neutral,
+                        PositionAnalysisKeys.DaysHeld,
+                        tickerOutcomes |> TickerOutcomes.filter [ (fun o -> o.Key = PositionAnalysisKeys.DaysHeld && o.Value = i) ]
+                    )
+                )
             AnalysisOutcomeEvaluation(
                 $"Opened in the last {recentlyOpenThreshold.TotalDays |> int} days",
                 OutcomeType.Neutral,
