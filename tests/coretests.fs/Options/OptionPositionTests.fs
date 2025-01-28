@@ -38,7 +38,7 @@ let ``Basic operations work`` () =
         |> Seq.iter (fun quantityAndCost ->
             let contractQuantity =
                 match quantityAndCost with
-                | QuantityAndCost(q, _) -> q
+                | OpenedContractQuantityAndCost(_, q, _) -> q
             contractQuantity |> abs |> should equal 1
         )
     
@@ -57,7 +57,7 @@ let ``Basic operations work`` () =
         |> Seq.iter (fun quantityAndCost ->
             let contractQuantity =
                 match quantityAndCost with
-                | QuantityAndCost(q, _) -> q
+                | OpenedContractQuantityAndCost(_, q, _) -> q
             contractQuantity |> abs |> should equal 0
         )
     
@@ -216,6 +216,7 @@ let ``Create option without purchasing the contracts should work``() =
     
     position.IsClosed |> should equal false
     position.IsOpen |> should equal false
+    position.Cost |> should be (equal None)
     
     let cost = 1.45m
     
@@ -252,3 +253,24 @@ let ``Closing pending position should work``() =
     closedPosition.IsClosed |> should equal true
     closedPosition.IsOpen |> should equal false
     closedPosition.Notes |> should haveLength 2
+
+[<Fact>]
+let ``Buying multiple contracts at different quantities maintains accurate cost``() =
+    
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    let cost = 1.45m
+    
+    let modifiedPosition =
+        position
+        |> OptionPosition.buyToOpen expiration 27.5m OptionType.Call 1 cost DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen expiration 27.5m OptionType.Call 2 cost DateTimeOffset.UtcNow
+        
+    modifiedPosition.Cost |> should equal (Some 4.35m)
+    let quantityAndCost = modifiedPosition.Contracts.Values |> Seq.head
+    match quantityAndCost with
+    | OpenedContractQuantityAndCost(longOrShort, quantity, cost) ->
+        Long |> should equal longOrShort
+        quantity |> should equal 3
+        cost |> should equal 4.35m
+    

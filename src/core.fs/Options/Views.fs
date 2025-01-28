@@ -5,7 +5,16 @@ open core.Options
 open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Options
     
-type OptionContractView(underlyingTicker:core.Shared.Ticker, expiration:OptionExpiration, strikePrice:decimal, optionType:core.fs.Options.OptionType, quantity:int, cost:decimal, instruction:OptionOrderInstruction option, chain:OptionChain option) =
+type OptionContractView(
+    underlyingTicker:core.Shared.Ticker,
+    expiration:OptionExpiration,
+    strikePrice:decimal,
+    optionType:core.fs.Options.OptionType,
+    longOrShort:LongOrShort,
+    quantity:int,
+    cost:decimal,
+    instruction:OptionOrderInstruction option,
+    chain:OptionChain option) =
     let chainDetail = chain |> Option.bind(_.FindMatchingOption(strikePrice, expiration, optionType))
     let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
     let pctItm =
@@ -23,6 +32,7 @@ type OptionContractView(underlyingTicker:core.Shared.Ticker, expiration:OptionEx
     member this.StrikePrice = strikePrice
     member this.OptionType = optionType
     member this.Quantity = quantity
+    member this.IsShort = longOrShort = Short
     member this.Cost = cost
     member this.Market = market
     member this.Details = chainDetail
@@ -39,19 +49,19 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         | 0 ->
             state.PendingContracts.Keys
             |> Seq.map (fun k ->
-                let (Quantity(quantity)) = state.PendingContracts[k]
-                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, 0m, None, chain)
+                let (PendingContractQuantity(longOrShort, quantity)) = state.PendingContracts[k]
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, 0m, None, chain)
             )
             |> Seq.toList
         | _ ->
             state.Contracts.Keys
             |> Seq.map (fun k ->
-                let (QuantityAndCost(quantity, cost)) = state.Contracts[k]
+                let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = state.Contracts[k]
                 let perContractCost =
                     match quantity with
                     | 0 -> 0m
                     | _ -> cost / decimal quantity |> abs
-                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, quantity, perContractCost, None, chain)
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, perContractCost, None, chain)
             )
             |> Seq.toList
         
@@ -221,7 +231,8 @@ type OptionOrderView(order:OptionOrder, chain:OptionChain option) =
     member this.IsActive = order.IsActive
     member this.Contracts =
         order.Contracts |> Seq.map (fun l ->
-            OptionContractView(l.UnderlyingTicker, l.Expiration, l.StrikePrice, l.OptionType, l.Quantity, l.Price |> Option.defaultValue 0m, l.Instruction |> Some, chain)
+            let longOrShort = if l.Quantity > 0 then Long else Short
+            OptionContractView(l.UnderlyingTicker, l.Expiration, l.StrikePrice, l.OptionType, longOrShort, l.Quantity, l.Price |> Option.defaultValue 0m, l.Instruction |> Some, chain)
         )
     
 type OptionDashboardView(pending:seq<OptionPositionView>,``open``:seq<OptionPositionView>,closed:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrderView>) =

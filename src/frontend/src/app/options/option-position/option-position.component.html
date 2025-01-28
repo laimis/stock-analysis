@@ -144,8 +144,10 @@
                                         <td>{{ contract.quantity }}</td>
                                         <td>{{ contract.cost | currency }}</td>
                                         <td>
-                                            @if (contract.cost && contract.market) {
+                                            @if (contract.market) {
                                                 {{ contract.market | currency }}
+                                            }
+                                            @if (contract.cost && contract.market) {
                                                 @let valueIncrease = contract.market - contract.cost;
                                                 <span class="badge p-1 m-1" [ngClass]="{
                                                     'bg-success-subtle text-success': valueIncrease > 0,

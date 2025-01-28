@@ -68,8 +68,12 @@ type OptionContract = {
     OptionType: OptionType
 }
 
-type ContractQuantityAndCost = QuantityAndCost of int * decimal
-type ContractQuantity = Quantity of int
+type LongOrShort =
+    | Long
+    | Short
+
+type OpenedContractQuantityAndCost = OpenedContractQuantityAndCost of LongOrShort * int * decimal
+type PendingContractQuantity = PendingContractQuantity of LongOrShort * int
 
 type OptionPositionState =
     {
@@ -82,8 +86,8 @@ type OptionPositionState =
         DesiredCost: decimal option
         Profit: decimal
         Transactions: OptionTransaction list
-        Contracts: Map<OptionContract, ContractQuantityAndCost>
-        PendingContracts: Map<OptionContract, ContractQuantity>
+        Contracts: Map<OptionContract, OpenedContractQuantityAndCost>
+        PendingContracts: Map<OptionContract, PendingContractQuantity>
         Notes: core.fs.Note list
         Labels: Dictionary<string, string>
         Version: int
@@ -227,8 +231,8 @@ module OptionPosition =
             let debit = decimal x.Quantity * x.Price
             let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString; }
-            let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
-            let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost + debit)
+            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (OpenedContractQuantityAndCost(Long, 0, 0m))
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity + x.Quantity, cost + debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             let updatedOpened = match p.Opened with | None -> x.When | Some opened -> opened
             let newCost = (p.Cost |> Option.defaultValue 0m) + debit |> Some
@@ -238,8 +242,8 @@ module OptionPosition =
             let credit = decimal x.Quantity * x.Price
             let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
-            let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
-            let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost + credit)
+            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (OpenedContractQuantityAndCost(Short, 0, 0m))
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity - x.Quantity, cost + credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             let updatedOpened = match p.Opened with | None -> x.When | Some opened -> opened
             let newCost = (p.Cost |> Option.defaultValue 0m) - credit |> Some
@@ -249,8 +253,8 @@ module OptionPosition =
             let debit = decimal x.Quantity * x.Price
             let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
-            let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
-            let updatedQuantityAndCost = QuantityAndCost(quantity + x.Quantity, cost - debit)
+            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity + x.Quantity, cost - debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; Version = p.Version + 1; Events = p.Events @ [x] }
             
@@ -258,8 +262,8 @@ module OptionPosition =
             let credit = decimal x.Quantity * x.Price
             let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
-            let (QuantityAndCost(quantity, cost)) = p.Contracts |> Map.tryFind contract |> Option.defaultValue (QuantityAndCost(0, 0m))
-            let updatedQuantityAndCost = QuantityAndCost(quantity - x.Quantity, cost - credit)
+            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity - x.Quantity, cost - credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
             { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; Version = p.Version + 1; Events = p.Events @ [x] }
             
@@ -297,12 +301,12 @@ module OptionPosition =
             
         | :? OptionBuyToOpenOrderCreated as x ->
             let contract = { Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
-            let quantity = Quantity(x.Quantity)
+            let quantity = PendingContractQuantity(Long, x.Quantity)
             { p with PendingContracts = p.PendingContracts |> Map.add contract quantity; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionSellToOpenOrderCreated as x ->
             let contract = { Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
-            let quantity = Quantity(-x.Quantity)
+            let quantity = PendingContractQuantity(Short, -x.Quantity)
             { p with PendingContracts = p.PendingContracts |> Map.add contract quantity; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | _ -> failwith ("Unknown event: " + event.GetType().Name)

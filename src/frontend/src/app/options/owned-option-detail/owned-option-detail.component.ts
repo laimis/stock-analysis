@@ -3,9 +3,11 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {DatePipe, NgIf} from '@angular/common';
 import {Title} from '@angular/platform-browser';
 import {GetErrors} from 'src/app/services/utils';
-import {OptionPosition, OptionService} from "../../services/option.service";
+import {BrokerageOptionOrder, OptionPosition, OptionService} from "../../services/option.service";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {OptionPositionComponent} from "../option-position/option-position.component";
+import {BrokerageService} from "../../services/brokerage.service";
+import {concat} from "rxjs";
 
 @Component({
     selector: 'app-owned-option-detail',
@@ -20,12 +22,14 @@ import {OptionPositionComponent} from "../option-position/option-position.compon
 })
 export class OwnedOptionComponent implements OnInit {
     public position: OptionPosition;
+    public orders: BrokerageOptionOrder[];
 
     public errors: string[]
     public filled: string
 
     constructor(
         private optionService: OptionService,
+        private brokerageService: BrokerageService,
         private route: ActivatedRoute,
         private router: Router,
         private datePipe: DatePipe,
@@ -46,6 +50,12 @@ export class OwnedOptionComponent implements OnInit {
         this.optionService.get(id).subscribe(result => {
             this.position = result
             this.title.setTitle(this.position.underlyingTicker + " option position - Nightingale Trading")
+        }, error => {
+            this.errors = GetErrors(error)
+        });
+        
+        this.brokerageService.brokerageAccount().subscribe(result => {
+            this.orders = result.optionOrders
         }, error => {
             this.errors = GetErrors(error)
         })

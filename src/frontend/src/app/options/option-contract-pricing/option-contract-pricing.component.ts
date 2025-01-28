@@ -37,7 +37,7 @@ export class OptionContractPricingComponent {
         }
     }
     
-    @Input() set contracts (value : OptionContract[]) {
+    @Input() set contracts (contracts : OptionContract[]) {
         let dateWithoutMilliseconds = (date: Date) => {
             return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds())
         }
@@ -47,7 +47,7 @@ export class OptionContractPricingComponent {
         }
         
         this.loading = true;
-        let observables = value.map((contract) => this.optionService.getOptionPricing(contract.details.symbol))
+        let observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.details.symbol))
 
         forkJoin(observables).subscribe({
             next: (pricingResults) => {
@@ -58,7 +58,8 @@ export class OptionContractPricingComponent {
                 for (let pricingIndex = 0; pricingIndex < pricingResults[0].length; pricingIndex++) {
                     let total = 0
                     for (let contractIndex = 0; contractIndex < pricingResults.length; contractIndex++) {
-                        total += pricingResults[contractIndex][pricingIndex].mark * value[contractIndex].quantity
+                        let multiplier = contracts[contractIndex].isShort ? -1 : 1
+                        total += pricingResults[contractIndex][pricingIndex].mark * multiplier
                     }
                     if (total < minPrice) {
                         minPrice = total

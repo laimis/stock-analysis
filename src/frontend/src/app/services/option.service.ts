@@ -36,6 +36,7 @@ export interface OptionContract {
     pctInTheMoney: number | undefined
     details: OptionDefinition | undefined
     instruction: string | undefined
+    isShort: boolean
 }
 export interface OptionPosition {
     positionId: string
