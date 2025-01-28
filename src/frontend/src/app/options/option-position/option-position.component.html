@@ -370,9 +370,13 @@
                 <!-- Action Buttons -->
                 <div class="mt-4">
                     <div class="d-flex gap-2 justify-content-end">
-                        <button class="btn btn-outline-secondary" (click)="closePositionWithMarketOrder()">
+                        <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="closePositionWithMarketOrder()">
                             <i class="bi bi-x-lg me-1"></i>
                             Create Close Order
+                        </button>
+                        <button *ngIf="!position.isOpen && !position.isClosed" class="btn btn-outline-secondary" (click)="closePendingPosition()">
+                            <i class="bi bi-x-lg me-1"></i>
+                            Close Pending Position
                         </button>
                         <button class="btn btn-outline-danger" (click)="deletePosition()">
                             <i class="bi bi-trash me-1"></i>

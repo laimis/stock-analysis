@@ -417,4 +417,12 @@ public class PortfolioController(
                     notes: content)
             )
         );
+    
+    [HttpPost("optionpositions/{positionId}/close")]
+    public Task CloseOptionPosition([FromBody]CloseOptionPositionCommand command) =>
+        this.OkOrError(
+            optionsHandler.Handle(
+                command, User.Identifier()
+                )
+            );
 }

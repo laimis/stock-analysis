@@ -533,6 +533,16 @@ module OptionPosition =
             
         let e = OptionSellToOpenOrderCreated(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date, expiration.ToString(), strike, optionType.ToString(), quantity)
         apply e position
+        
+    let close notes date (position:OptionPositionState) =
+        
+        // only close if it's not open (ie is pending)
+        if position.IsOpen then
+            failwith "Cannot close a position that is open"
+            
+        position
+        |> addNotes notes date
+        |> closeIfAllContractsAreClosed date
 
 type OptionPricing =
     {

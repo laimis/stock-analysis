@@ -122,6 +122,27 @@ export class OptionPositionComponent {
     closePositionWithMarketOrder() {
         this.showCloseModal = true;
     }
+
+    closePendingPosition() {
+        if (confirm("Are you sure you want to close this pending position?")) {
+            // provide reason
+            let reason = prompt("Please provide a reason for closing this position");
+            this.optionService.closePosition(this.position.positionId, reason).subscribe({
+                next: (result) => {
+                    console.log("Closed pending position: " + this.position.positionId);
+                    this.positionChanged.emit();
+                },
+                error: (error) => {
+                    console.error("Error closing pending position: " + this.position.positionId);
+                    let errors = GetErrors(error);
+                    this.errorOccurred.emit(errors);
+                },
+                complete: () => {
+                    console.log("Close pending position complete");
+                }
+            });
+        }
+    }
     
     closeContract(contract: OptionContract) {
         this.contractToClose = contract;

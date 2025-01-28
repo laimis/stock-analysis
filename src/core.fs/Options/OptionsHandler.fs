@@ -112,6 +112,13 @@ type AddOptionNotesCommand = {
     Notes: string
 }
 
+type CloseOptionPositionCommand = {
+    [<Required>]
+    PositionId: OptionPositionId
+    [<Required>]
+    Notes:string option
+}
+
 type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
 
     let fsOptionTypeConvert oldType =
@@ -191,6 +198,26 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     |> storage.SaveOptionPosition command.UserId previous
                     
                 return true |> Ok
+    }
+    
+    member this.Handle(command: CloseOptionPositionCommand, userId:UserId) = task {
+        let! user = userId |> accounts.GetUser
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some _ ->
+            let! openPosition = storage.GetOptionPosition command.PositionId userId
+            match openPosition with
+            | None -> return "Option not found" |> ServiceError |> Error
+            | Some op when op.IsClosed -> return "Option is already closed" |> ServiceError |> Error
+            | Some op ->
+                
+                let withClosedPosition =
+                    op
+                    |> OptionPosition.close command.Notes DateTimeOffset.UtcNow
+                
+                do! storage.SaveOptionPosition userId openPosition withClosedPosition
+                
+                return OptionPositionView(withClosedPosition, None) |> Ok
     }
     
     member this.Handle(command: CloseContractsCommand) = task {
@@ -303,6 +330,9 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     |> Seq.filter (fun o -> o.IsClosed |> not)
                     |> Seq.map (fun o ->
                         async {
+                            match chainLookupMap.TryGetValue(o.UnderlyingTicker) with
+                            | true, chain -> return OptionPositionView(o, chain |> Some)
+                            | _ ->
                             let! chain = brokerage.GetOptionChain user.State o.UnderlyingTicker |> Async.AwaitTask
 
                             let chain =

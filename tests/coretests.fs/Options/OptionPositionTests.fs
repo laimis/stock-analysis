@@ -232,4 +232,23 @@ let ``Create option without purchasing the contracts should work``() =
     modifiedPosition.PendingContracts |> should haveCount 2
     
     
+[<Fact>]
+let ``Closing pending position should work``() =
     
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    let cost = 1.45m
+    
+    let modifiedPosition =
+        position
+        |> OptionPosition.establishDesiredCost cost DateTimeOffset.UtcNow
+        |> OptionPosition.createPendingBuyOrder expiration 27.5m OptionType.Call 1 DateTimeOffset.UtcNow
+        |> OptionPosition.createPendingSellOrder expiration 32.5m OptionType.Call 1 DateTimeOffset.UtcNow
+        |> OptionPosition.addNotes (Some "thinking about doing this again, not sure if I will get in") DateTimeOffset.UtcNow
+        
+    let closedPosition =
+        modifiedPosition |> OptionPosition.close (Some "after thinking about it more, decide not to persue this") DateTimeOffset.UtcNow
+        
+    closedPosition.IsClosed |> should equal true
+    closedPosition.IsOpen |> should equal false
+    closedPosition.Notes |> should haveLength 2

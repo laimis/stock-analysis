@@ -322,6 +322,10 @@ export class OptionService {
     openContracts(id: string, contracts: any[]) {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/opencontracts', contracts)
     }
+    
+    closePosition(id:string, notes:string) {
+        return this.http.post('/api/portfolio/optionpositions/' + id + '/close', {positionId:id, notes})
+    }
 
     buyOption(obj: object): Observable<any> {
         return this.http.post<string>('/api/options/buy', obj)
