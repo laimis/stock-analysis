@@ -26,11 +26,18 @@
                     </div>
                     <div class="col-md-3">
                         <div class="stat-group">
+                            @if (position.isClosed === false) {
                             <div class="stat-label text-muted mb-1">Market</div>
-                            <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
-                                {{position.market | currency}}
-                            </div>
-                            <small>{{ position.profit | currency }}</small>
+                                <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
+                                    {{position.market | currency}}
+                                </div>
+                                <small>{{ position.profit | currency }}</small>
+                            } @else {
+                                <div class="stat-label text-muted mb-1">Profit</div>
+                                <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
+                                    {{ position.profit | currency }}
+                                </div>
+                            }
                         </div>
                     </div>
                     <div class="col-md-3">

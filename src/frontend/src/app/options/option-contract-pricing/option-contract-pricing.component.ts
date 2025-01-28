@@ -94,11 +94,6 @@ export class OptionContractPricingComponent {
                     label: "Total Cost",
                     chartType: ChartType.Line,
                     data: costData,
-                    annotationLine: {
-                        chartAnnotationLineType: ChartAnnotationLineType.Horizontal,
-                        label: 'Cost',
-                        value: this.cost
-                    },
                     includeZero: true
                 }
 
@@ -112,9 +107,6 @@ export class OptionContractPricingComponent {
                 this.minPrice = minPrice
                 this.maxPrice = maxPrice
                 this.hasPrice = costContainer.data.length > 0
-                console.log("cost container", costContainer)
-                console.log(this.hasPrice)
-                console.log(costContainer.data.length)
                 this.loading = false
             },
             error: (error) => {
