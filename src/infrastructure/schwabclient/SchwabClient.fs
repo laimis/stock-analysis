@@ -669,7 +669,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             logError "Timeout function {function} with exception: {exception}" [|resource; e.Message|]
             return e.Message |> ServiceError |> Error
         | e ->
-            logError "Failed to call {function} with exception: {exception}" [|resource; e.Message|]
+            logError "Failed to call {function} with exception: {exception}" [|resource; e|]
             return e.Message |> ServiceError |> Error
     }
     
