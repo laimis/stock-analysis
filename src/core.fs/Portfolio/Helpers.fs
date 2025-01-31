@@ -44,16 +44,21 @@ module Helpers =
                     match localPosition.NumberOfShares = brokeragePosition.Quantity with
                     | true -> None
                     | false ->
-                        let violation = {
-                                CurrentPrice = currentPrice
-                                Message = $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost:F2} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare:F2}"
-                                NumberOfShares = brokeragePosition.Quantity
-                                PricePerShare = brokeragePosition.AverageCost
-                                Ticker = brokeragePosition.Ticker
-                                LocalPosition = localPositionOption
-                                PendingPosition = localPendingPositionOption
-                            }
-                        Some violation
+                        // check if the difference is more than 1, sometimes the fractional share math might not be exact
+                        let difference = System.Math.Abs(localPosition.NumberOfShares - brokeragePosition.Quantity)
+                        match difference < 1m with
+                        | true -> None
+                        | false ->
+                            let violation = {
+                                    CurrentPrice = currentPrice
+                                    Message = $"Owned {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost:F2} but NGTrading says {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare:F2}"
+                                    NumberOfShares = brokeragePosition.Quantity
+                                    PricePerShare = brokeragePosition.AverageCost
+                                    Ticker = brokeragePosition.Ticker
+                                    LocalPosition = localPositionOption
+                                    PendingPosition = localPendingPositionOption
+                                }
+                            Some violation
                 )
             
         let localSideViolations =
@@ -85,6 +90,10 @@ module Helpers =
                     match brokeragePosition.Quantity = localPosition.NumberOfShares with
                     | true -> None
                     | false ->
+                        let difference = System.Math.Abs(localPosition.NumberOfShares - brokeragePosition.Quantity)
+                        match difference < 1m with
+                        | true -> None
+                        | false ->
                         let violation = {
                                 CurrentPrice = currentPrice
                                 Message = $"Owned {localPosition.NumberOfShares} @ ${localPosition.AverageCostPerShare:F2} but brokerage says {brokeragePosition.Quantity} @ ${brokeragePosition.AverageCost:F2}"

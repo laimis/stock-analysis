@@ -191,9 +191,8 @@ export class StockDetailsComponent implements OnInit {
         concat(pricesPromise, ownershipPromise).subscribe(() => {
                 if (this.currentPosition && this.prices) {
                     
-                    
-                    let buyOrders = this.account.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
-                    let sellOrders = this.account.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
+                    let buyOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
+                    let sellOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
                     
                     this.currentPositionChartInfo = {
                         averageBuyPrice: this.currentPosition.averageCostPerShare,

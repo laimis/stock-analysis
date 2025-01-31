@@ -307,6 +307,12 @@ public class PortfolioController(
             )
         );
     
+    [HttpPost("stockpositions/{positionId}/reinvestdividend")]
+    public Task<ActionResult> ReinvestDividend([FromBody] ReinvestDividendCommand command) =>
+        this.OkOrError(
+            stockPositionHandler.Handle(User.Identifier(), command)
+        );
+    
     [HttpDelete("stockpositions/{positionId}/stop")]
     public async Task<ActionResult> DeleteStop([FromRoute] string positionId) =>
         this.OkOrError(await stockPositionHandler.Handle(User.Identifier(), new DeleteStop(StockPositionId.NewStockPositionId(Guid.Parse(positionId)))));

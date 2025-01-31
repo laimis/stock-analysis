@@ -181,6 +181,12 @@ type StockPositionDividend(id, aggregateId, ``when``, activityId, description, n
     member this.Description = description
     member this.NetAmount = netAmount
     
+type StockPositionDividendReinvested(id, aggregateId, ``when``, activityId, numberOfShares, price) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.ActivityId = activityId
+    member this.NumberOfShares = numberOfShares
+    member this.Price = price
+    
 type StockPositionFee(id, aggregateId, ``when``, activityId, description, netAmount) =
     inherit AggregateEvent(id, aggregateId, ``when``)
     member this.ActivityId = activityId
@@ -263,6 +269,10 @@ module StockPosition =
         
         | :? StockPositionDividend as x ->
             let newTransactions = p.Transactions @ [Dividend { ActivityId = x.ActivityId; Description = x.Description; NetAmount = x.NetAmount; Date = x.When; Ticker = p.Ticker }]
+            { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
+            
+        | :? StockPositionDividendReinvested as x ->
+            let newTransactions = p.Transactions @ [Share { Ticker = p.Ticker; TransactionId = x.Id; Type = Buy; NumberOfShares = x.NumberOfShares; Price = x.Price; Date = x.When }]
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
         | :? StockPositionFee as x ->
@@ -465,6 +475,20 @@ module StockPosition =
         | false ->
             let e = StockPositionDividend(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, activityId, description, netAmount)
             apply e stockPosition
+    
+    let reinvestDividend activityId price date stockPosition =
+        if price <= 0m then
+            failwith "Price must be greater than zero"
+            
+        // find the dividend transaction
+        let activity = stockPosition.Transactions |> List.tryFind (fun x -> match x with | Dividend s -> s.ActivityId = activityId | _ -> false)
+        match activity with
+        | Some (Dividend dividend) ->
+            let numberOfShares = dividend.NetAmount / price
+            let e = StockPositionDividendReinvested(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, activityId, numberOfShares, price)
+            apply e stockPosition
+        | Some _ -> failwith "Found transaction but it's not a dividend"
+        | None -> failwith "Dividend not found"
             
     let processFee activityId date description netAmount stockPosition =
         
@@ -601,7 +625,7 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             | _ -> liquidationSlots |> List.average
             
     let averageCostPerShare =
-        let liquidatedTotal = liquidationSource |> List.sumBy (_.NumberOfShares) |> int
+        let liquidatedTotal = liquidationSource |> List.sumBy _.NumberOfShares |> int
         let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
         match remainingShares with
         | [] -> averageBuyCostPerShare
@@ -713,10 +737,10 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         | [] -> 0m
         | _ ->
             let totalCost = completedPositionTransactions |> List.sumBy (fun x -> x.NumberOfShares * x.Price)
-            let totalShares = completedPositionTransactions |> List.sumBy (_.NumberOfShares)
+            let totalShares = completedPositionTransactions |> List.sumBy _.NumberOfShares
             totalCost / totalShares
         
-    member this.CompletedPositionShares = completedPositionTransactions |> List.sumBy (_.NumberOfShares)
+    member this.CompletedPositionShares = completedPositionTransactions |> List.sumBy _.NumberOfShares
         
     member this.ClosePrice =
         match liquidationSlots with

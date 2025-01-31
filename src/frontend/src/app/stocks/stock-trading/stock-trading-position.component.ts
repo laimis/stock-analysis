@@ -190,6 +190,29 @@ export class StockTradingPositionComponent {
                 })
     }
 
+    reinvestDividend(activityId:string) {
+        let price = prompt("Please provide the price at which the dividend will be reinvested")
+        if (!price) {
+            return
+        }
+        let numPrice = parseFloat(price)
+        if (isNaN(numPrice)) {
+            alert("Please provide a valid price")
+            return
+        }
+        this.stockService.reinvestDividend(this._position.positionId, activityId, numPrice)
+            .subscribe(
+                (_) => {
+                    this.positionChanged.emit()
+                },
+                err => {
+                    let errors = GetErrors(err)
+                    alert("Error reinvesting dividend: " + errors.join(", "))
+                }
+            )
+        
+    }
+
     showCloseModal: boolean = false;
     closeReason: string = '';
     openCloseModal() {

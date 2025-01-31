@@ -319,11 +319,11 @@
                                                     <small>{{ t.date | parsedDate }}</small>
                                                 </td>
                                                 <td style="width: 100px;">
-                                            <span class="badge" [ngClass]="{'bg-success': t.type === 'buy',
-                                                                          'bg-danger': t.type === 'sell',
-                                                                          'bg-info': t.type !== 'buy' && t.type !== 'sell'}">
-                                                {{ t.type }}
-                                            </span>
+                                                    <span class="badge" [ngClass]="{'bg-success': t.type === 'buy',
+                                                                                  'bg-danger': t.type === 'sell',
+                                                                                  'bg-info': t.type !== 'buy' && t.type !== 'sell'}">
+                                                        {{ t.type }}
+                                                    </span>
                                                 </td>
                                                 <td>{{ t.description }}</td>
                                                 <td class="text-end" style="width: 100px;">
@@ -331,6 +331,13 @@
                                                         <button class="btn btn-outline-danger btn-sm"
                                                                 (click)="deleteTransaction(t.id)">
                                                             <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    }
+                                                    @if (t.type === 'dividend') {
+                                                        <!-- reinvest dividend button -->
+                                                        <button class="btn btn-outline-primary btn-sm"
+                                                                (click)="reinvestDividend(t.id)">
+                                                            <i class="bi bi-arrow-repeat"></i>
                                                         </button>
                                                     }
                                                 </td>

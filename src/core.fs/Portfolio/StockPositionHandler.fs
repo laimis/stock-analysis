@@ -133,6 +133,16 @@ type DeleteStop =
         PositionId: StockPositionId
     }
     
+type ReinvestDividendCommand =
+    {
+        [<Required>]
+        PositionId: StockPositionId
+        [<Required>]
+        ActivityId: string
+        [<Required>]
+        Price: decimal option
+    }
+    
 type SetStop =
     {
         [<Required>]
@@ -932,6 +942,27 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
             return tradingEntries |> Ok
     }
+    
+    member _.Handle (userId:UserId, command:ReinvestDividendCommand) = task {
+        let! user = accounts.GetUser userId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | _ ->
+            let! stockPosition = storage.GetStockPosition command.PositionId userId
+            match stockPosition with
+            | None -> return "Stock position not found" |> ServiceError |> Error
+            | Some stockPositionState ->
+                
+                let updated =
+                   stockPositionState
+                   |> StockPosition.reinvestDividend command.ActivityId command.Price.Value DateTimeOffset.UtcNow
+                   
+                do! updated |> storage.SaveStockPosition userId stockPosition
+                
+                return Ok ()
+    }
+                
+                
     
     member _.Handle (query:QueryPastTradingPerformance) = task {
         let! user = accounts.GetUser(query.UserId)

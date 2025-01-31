@@ -82,6 +82,10 @@ export class StockPositionsService {
         return this.http.post(`/api/portfolio/stockpositions/${positionId}/issueclosingorders`, {positionId, closeReason})
     }
 
+    reinvestDividend(positionId: string, activityId: string, price:number): Observable<object> {
+        return this.http.post(`/api/portfolio/stockpositions/${positionId}/reinvestdividend`, {positionId, activityId, price})
+    }
+
     setLabel(positionId: string, label: KeyValuePair): Observable<object> {
         return this.http.post(`/api/portfolio/stockpositions/${positionId}/labels`, {
             key: label.key,

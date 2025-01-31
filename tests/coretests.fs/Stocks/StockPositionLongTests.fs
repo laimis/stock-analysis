@@ -351,3 +351,17 @@ let ``Dividends and fees are handled properly``() =
         
     position.Transactions |> should haveLength 3
     position.NumberOfShares |> should equal 1m
+
+[<Fact>]
+let ``Reinvest is handled``() =
+    
+    let position =
+        StockPosition.openLong ticker DateTimeOffset.UtcNow
+        |> StockPosition.buy 1m 1m DateTimeOffset.UtcNow
+        |> StockPosition.processDividend "acitivityId" DateTimeOffset.UtcNow "Qualified Dividend" 1m
+        |> StockPosition.reinvestDividend "acitivityId" 50.35m DateTimeOffset.UtcNow
+        
+    position.Transactions |> should haveLength 3
+    // number of shares should be 1 from before plus the amount that was earned as a dividend and divided by the price of the stock at the time of the reinvestment
+    position.NumberOfShares |> should equal (1m + (1m/50.35m))
+        
