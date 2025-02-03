@@ -18,8 +18,8 @@ let ``Basic operations work`` () =
     
     position.UnderlyingTicker |> should equal ticker
     position.IsClosed |> should equal false
-    position.IsOpen |> should equal false // haven't bought any contracts yet
-    position.IsPending |> should equal false
+    position.IsOpen |> should equal false
+    position.IsPending |> should equal true
     position.IsPendingClosed |> should equal false
     
     let optionType = OptionType.Put
@@ -35,6 +35,8 @@ let ``Basic operations work`` () =
     positionWithContracts.Transactions |> should haveLength 2m
     positionWithContracts.IsClosed |> should equal false
     positionWithContracts.IsOpen |> should equal true
+    positionWithContracts.IsPending |> should equal false
+    positionWithContracts.IsPendingClosed |> should equal false
     positionWithContracts.Contracts.Count |> should equal 2
     positionWithContracts.Contracts.Values
         |> Seq.iter (fun quantityAndCost ->
@@ -258,7 +260,7 @@ let ``Closing pending position should work``() =
     let closedPosition =
         modifiedPosition |> OptionPosition.close (Some "after thinking about it more, decide not to persue this") DateTimeOffset.UtcNow
         
-    closedPosition.IsClosed |> should equal true
+    closedPosition.IsClosed |> should equal false
     closedPosition.IsOpen |> should equal false
     closedPosition.IsPending |> should equal false
     closedPosition.IsPendingClosed |> should equal true
