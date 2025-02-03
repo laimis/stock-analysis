@@ -3,7 +3,6 @@ using core.Cryptos;
 using core.fs.Services;
 using core.fs.Adapters.CSV;
 using core.fs.Stocks;
-using core.Options;
 using csvparser;
 using testutils;
 using Xunit;
@@ -43,27 +42,6 @@ namespace csvparsertests
             Assert.Contains("BTC", report);
             Assert.Contains("buy", report);
             Assert.Contains("sell", report);
-        }
-
-        [Fact]
-        public void ExportOptionsHeader()
-        {
-            var option = new OwnedOption(
-                TestDataGenerator.NET,
-                2.5m,
-                OptionType.CALL,
-                DateTimeOffset.UtcNow.AddDays(1),
-                Guid.NewGuid());
-            
-            option.Sell(1, 20, DateTimeOffset.UtcNow, "some note");
-
-            var report = CSVExport.options(_csvWriter, new[] {option});
-
-            Assert.Contains("Ticker,Type,Strike,OptionType,Expiration,Amount,Premium,Filled", report);
-            
-            Assert.Contains(TestDataGenerator.NET.Value, report);
-            Assert.Contains("CALL", report);
-            Assert.Contains("2.5", report);
         }
 
         [Fact]

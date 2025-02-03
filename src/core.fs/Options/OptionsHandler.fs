@@ -3,7 +3,6 @@
 open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
-open core.Options
 open core.Shared
 open core.fs
 open core.fs.Accounts
@@ -22,7 +21,7 @@ type OptionTransactionInput =
         [<Required>]
         ExpirationDate : Nullable<DateTimeOffset>
         [<Required>]
-        OptionType : core.fs.Options.OptionType        
+        OptionType : OptionType        
         [<Range(1, 10000, ErrorMessage = "Invalid number of contracts specified")>]
         NumberOfContracts : int
         [<Range(1, 100000)>]
@@ -37,7 +36,7 @@ type OptionTransactionInput =
     
 type DashboardQuery = { UserId:UserId }
 type ExportQuery = { UserId: UserId }
-type ExpireData = { OptionId: Guid; UserId: UserId }
+type ExpireData = { PositionId: OptionPositionId; UserId: UserId }
 type ExpireCommand =
     | Expire of ExpireData
     | Assign of ExpireData
@@ -50,10 +49,6 @@ type ExpireViaLookupCommand =
 
 type DeleteOptionPositionCommand = { PositionId: OptionPositionId; UserId: UserId }
 
-type BuyOrSellCommand =
-    | Buy of OptionTransactionInput * UserId
-    | Sell of OptionTransactionInput * UserId
-
 type OptionPositionQuery = { PositionId: OptionPositionId; UserId: UserId }
 type RemoveOptionPositionLabelCommand = { Key: string; PositionId: OptionPositionId; UserId: UserId }
 type SetOptionPositionLabel = { Key: string; Value: string; PositionId: OptionPositionId; }
@@ -63,7 +58,7 @@ type OptionPricingQuery = { UserId: UserId; Symbol: OptionTicker}
 
 type OptionContractInput = {
     StrikePrice: decimal
-    OptionType: core.fs.Options.OptionType
+    OptionType: OptionType
     ExpirationDate: OptionExpiration
     Filled: DateTimeOffset
     Quantity: int
@@ -121,12 +116,6 @@ type CloseOptionPositionCommand = {
 
 type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
 
-    let fsOptionTypeConvert oldType =
-        match oldType with
-        | OptionType.CALL -> core.fs.Options.OptionType.Call 
-        | OptionType.PUT -> core.fs.Options.OptionType.Put
-        | _ -> raise (ArgumentException("Invalid option type"))
-        
     interface IApplicationService
 
     member this.Handle(userId:UserId, command:CreatePendingOptionPositionCommand) = task {
@@ -409,7 +398,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
     }
 
     member _.Handle(request: ExportQuery) = task {
-        let! options = request.UserId |> storage.GetOwnedOptions
+        let! options = request.UserId |> storage.GetOptionPositions
 
         let csv = options |> CSVExport.options csvWriter
 
@@ -418,51 +407,25 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
 
     member this.Handle(command: ExpireCommand) =
         task {
-            let data, assign =
+            let data, _ =
                 match command with
                 | Expire data -> (data, false)
                 | Assign data -> (data, true)
 
-            let! option = storage.GetOwnedOption data.OptionId data.UserId
+            let! option = storage.GetOptionPosition data.PositionId data.UserId
 
             match option with
-            | null ->
-                return
-                    $"option for id {data.OptionId} not found"
-                    |> ServiceError |> Error
-            | _ ->
-                option.Expire(assign = assign)
-                do! storage.SaveOwnedOption option data.UserId
-                return option |> Ok
-        }
-
-    member this.Handle(command: ExpireViaLookupCommand) =
-        task {
-            let data, assigned =
-                match command with
-                | ExpireViaLookup data -> (data, false)
-                | AssignViaLookup data -> (data, true)
-
-            let! options = storage.GetOwnedOptions(data.UserId)
-
-            let option =
-                options
-                |> Seq.tryFind (fun o ->
-                    o.State.Ticker = data.Ticker
-                    && o.State.StrikePrice = data.StrikePrice
-                    && o.State.Expiration = data.Expiration)
-
-            match option with
-            | Some o ->
-                o.Expire(assign = assigned)
-                do! storage.SaveOwnedOption o data.UserId
-                return o |> Ok
-
             | None ->
                 return
-                    $"option for ticker {data.Ticker} strike {data.StrikePrice} expiration {data.Expiration} not found"
+                    $"option for id {data.PositionId} not found"
                     |> ServiceError |> Error
+            | Some _ ->
+                // fail, need to implement
+                return "Not implemented" |> ServiceError |> Error
         }
+
+    member this.Handle(_: ExpireViaLookupCommand) =
+        "Not implemented" |> ServiceError |> Error
 
     member this.Handle(command: DeleteOptionPositionCommand) =
         task {
@@ -473,46 +436,6 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | Some opt ->
                 do! opt |> OptionPosition.delete |> storage.DeleteOptionPosition command.UserId (Some opt)
                 return true |> Ok
-        }
-
-    member this.Handle(cmd: BuyOrSellCommand) =
-        task {
-            let buy (opt: OwnedOption) (data: OptionTransactionInput) =
-                opt.Buy(data.NumberOfContracts, data.Premium.Value, data.Filled.Value, data.Notes)
-
-            let sell (opt: OwnedOption) (data: OptionTransactionInput) =
-                opt.Sell(data.NumberOfContracts, data.Premium.Value, data.Filled.Value, data.Notes)
-
-            let data, userId, func =
-                match cmd with
-                | Buy (buyData, userId) -> (buyData, userId, buy)
-                | Sell (sellData, userId) -> (sellData, userId, sell)
-
-            let! user = accounts.GetUser(userId)
-
-            match user with
-            | None -> return "User not found" |> ServiceError |> Error
-            | _ ->
-
-                let optionType =
-                    match data.OptionType with
-                    | Call -> OptionType.CALL
-                    | Put -> OptionType.PUT
-                    
-                let! options = storage.GetOwnedOptions(userId)
-                
-                let option =
-                    options
-                    |> Seq.tryFind (fun o ->
-                        o.IsMatch(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value))
-                    |> Option.defaultWith (fun () ->
-                        OwnedOption(data.Ticker, data.StrikePrice.Value, optionType, data.ExpirationDate.Value, userId |> IdentifierHelper.getUserId))
-
-                func option data
-
-                do! storage.SaveOwnedOption option userId
-
-                return option |> Ok
         }
 
     member this.Handle(query: OptionPositionQuery) =

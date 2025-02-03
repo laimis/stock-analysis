@@ -7,7 +7,6 @@ using core.fs.Accounts;
 using core.fs.Adapters.Storage;
 using core.fs.Options;
 using core.fs.Stocks;
-using core.Options;
 using core.Routines;
 using core.Shared;
 using core.Stocks;
@@ -97,11 +96,6 @@ namespace storage.shared
             await _aggregateStorage.DeleteAggregate(_stock_position_entity, state.PositionId.Item, userId);
         }
 
-        public Task SaveOwnedOption(OwnedOption option, UserId userId)
-        {
-            return Save(option, _option_entity, userId);
-        }
-
         public async Task<FSharpOption<OptionPositionState>> GetOptionPosition(OptionPositionId positionId, UserId userId)
         {
             var positions = await _aggregateStorage.GetEventsAsync(_option_position_entity, positionId.Item, userId);
@@ -140,20 +134,6 @@ namespace storage.shared
 
             return list.GroupBy(e => e.AggregateId)
                 .Select(g => new OwnedStock(g));
-        }
-
-        public async Task<OwnedOption> GetOwnedOption(Guid optionId, UserId userId)
-        {
-            return (await GetOwnedOptions(userId)).SingleOrDefault(s => s.State.Id == optionId);
-        }
-
-        public async Task<IEnumerable<OwnedOption>> GetOwnedOptions(UserId userId)
-        {
-            var list = await _aggregateStorage.GetEventsAsync(_option_entity, userId);
-
-            return list.GroupBy(e => e.AggregateId)
-                .Select(g => new OwnedOption(g))
-                .Where(g => g.State.Deleted == false);
         }
 
         public async Task Delete(UserId userId)

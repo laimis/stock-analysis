@@ -3,11 +3,9 @@ namespace core.fs.Adapters.Storage
 open System.Collections.Generic
 open System.Threading.Tasks
 open core.Cryptos
-open core.Options
 open core.Routines
 open core.Stocks
 open core.fs.Accounts
-open core.fs.Adapters.Options
 open core.fs.Options
 open core.fs.Stocks
 
@@ -33,10 +31,6 @@ type IPortfolioStorage =
     abstract member GetRoutine : routineId:System.Guid -> userId:UserId -> Task<Routine>
     abstract member SaveRoutine : routine:Routine -> userId:UserId -> Task
     abstract member DeleteRoutine : routine:Routine -> userId:UserId -> Task
-    
-    abstract member GetOwnedOptions : userId:UserId -> Task<IEnumerable<OwnedOption>>
-    abstract member GetOwnedOption : optionId:System.Guid -> userId:UserId -> Task<OwnedOption>
-    abstract member SaveOwnedOption : option:OwnedOption -> userId:UserId -> Task
     
     abstract member GetOptionPosition : positionId:OptionPositionId -> userId:UserId -> Task<OptionPositionState option>
     abstract member GetOptionPositions : userId:UserId -> Task<IEnumerable<OptionPositionState>>

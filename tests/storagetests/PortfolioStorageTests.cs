@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using core.Cryptos;
 using core.fs.Adapters.Storage;
 using core.fs.Accounts;
+using core.fs.Options;
 using core.fs.Stocks;
-using core.Options;
 using core.Routines;
 using core.Shared;
 using core.Stocks;
@@ -41,7 +41,7 @@ namespace storagetests
         {
             var storage = CreateStorage();
 
-            Assert.Null(await storage.GetOwnedOption(Guid.NewGuid(), _userId));
+            Assert.Null(await storage.GetOptionPosition(OptionPositionId.NewOptionPositionId(Guid.NewGuid()), _userId));
         }
         
         [Fact]
@@ -129,35 +129,28 @@ namespace storagetests
         {
             var expiration = DateTimeOffset.UtcNow.AddDays(30).Date;
 
-            var option = new OwnedOption(
+            var option = OptionPosition.open(
                 GenerateTestTicker(),
-                2.5m,
-                OptionType.CALL,
-                expiration,
-                _userId.Item
+                DateTimeOffset.UtcNow
             );
 
             var storage = CreateStorage();
 
-            await storage.SaveOwnedOption(option, _userId);
+            await storage.SaveOptionPosition(_userId, FSharpOption<OptionPositionState>.None, option);
 
-            var loaded = await storage.GetOwnedOption(
-                option.State.Id,
-                _userId);
+            var loaded = await storage.GetOptionPosition(option.PositionId, _userId);
 
-            Assert.NotNull(loaded);
+            Assert.NotNull(loaded.Value);
 
-            Assert.Equal(option.State.StrikePrice, loaded.State.StrikePrice);
+            Assert.Equal(option.UnderlyingTicker, loaded.Value.UnderlyingTicker);
 
-            var list = await storage.GetOwnedOptions(_userId);
+            var list = await storage.GetOptionPositions(_userId);
 
-            var fromList = list.Single(o => o.State.Ticker.Equals(option.State.Ticker));
-
-            Assert.Equal(option.State.StrikePrice, fromList.State.StrikePrice);
+            var fromList = list.Single(o => o.UnderlyingTicker.Equals(option.UnderlyingTicker));
 
             await storage.Delete(_userId);
 
-            var afterDelete = await storage.GetOwnedOptions(_userId);
+            var afterDelete = await storage.GetOptionPositions(_userId);
 
             Assert.Empty(afterDelete);
         }

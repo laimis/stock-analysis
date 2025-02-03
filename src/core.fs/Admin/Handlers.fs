@@ -1,11 +1,11 @@
 namespace core.fs.Admin
 
-open core.Options
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.CSV
 open core.fs.Adapters.Email
 open core.fs.Adapters.Storage
+open core.fs.Options
 open core.fs.Services
 open core.fs.Stocks
 
@@ -13,7 +13,7 @@ type Query = {
     everyone: bool
 }
         
-type QueryResponse(user:User, stocks:StockPositionState seq, options:OwnedOption seq) =
+type QueryResponse(user:User, stocks:StockPositionState seq, options:OptionPositionState seq) =
     let stockLength = stocks |> Seq.length
     let optionLength = options |> Seq.length
     
@@ -40,7 +40,7 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
     let buildQueryResponse userId =
         async {
             let! user = storage.GetUser(userId) |> Async.AwaitTask
-            let! options = portfolio.GetOwnedOptions(userId) |> Async.AwaitTask
+            let! options = portfolio.GetOptionPositions(userId) |> Async.AwaitTask
             let! stocks = portfolio.GetStockPositions(userId) |> Async.AwaitTask
             
             return QueryResponse(user.Value, stocks, options)

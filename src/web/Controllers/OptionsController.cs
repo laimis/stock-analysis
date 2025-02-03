@@ -1,11 +1,7 @@
-using System;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using core.fs.Options;
 using core.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 
@@ -36,47 +32,6 @@ namespace web.Controllers
                 )
             );
         
-
-        [HttpPost("sell")]
-        public Task<ActionResult> Sell([FromBody]OptionTransactionInput cmd)
-        {
-            return this.OkOrError(
-                handler.Handle(
-                    BuyOrSellCommand.NewSell(cmd, User.Identifier())
-                )
-            );
-        }
-
-        [HttpPost("buy")]
-        public Task<ActionResult> Buy([FromBody]OptionTransactionInput cmd)
-        {
-            return this.OkOrError(
-                handler.Handle(
-                    BuyOrSellCommand.NewBuy(cmd, User.Identifier())
-                )
-            );
-        }
-
-        [HttpPost("{optionId}/expire")]
-        public Task<ActionResult> Expire([FromRoute] Guid optionId)
-            => this.OkOrError(
-                handler.Handle(
-                    ExpireCommand.NewExpire(
-                        new ExpireData(userId: User.Identifier(), optionId: optionId)
-                    )
-                )
-            );
-        
-        [HttpPost("{optionId}/assign")]
-        public Task<ActionResult> Assign([FromRoute] Guid optionId)
-            => this.OkOrError(
-                handler.Handle(
-                    ExpireCommand.NewAssign(
-                        new ExpireData(userId: User.Identifier(), optionId: optionId)
-                    )
-                )
-            );
-        
         [HttpGet("export")]
         public async Task<ActionResult> Export()
         {
@@ -85,21 +40,6 @@ namespace web.Controllers
                     new ExportQuery(
                         User.Identifier()
                     )
-                )
-            );
-        }
-
-        [HttpPost("import")]
-        public async Task<ActionResult> Import(IFormFile file, [FromServices]Import.Handler service, CancellationToken token)
-        {
-            using var streamReader = new StreamReader(file.OpenReadStream());
-
-            var content = await streamReader.ReadToEndAsync(token);
-
-            return await this.OkOrError(
-                service.Handle(
-                    new Import.Command(content, User.Identifier()),
-                    token
                 )
             );
         }

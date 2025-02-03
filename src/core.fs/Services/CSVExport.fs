@@ -2,11 +2,10 @@ namespace core.fs.Services
 
 open System
 open core.Cryptos
-open core.Options
-open core.Shared
 open core.Stocks
 open core.fs.Accounts
 open core.fs.Adapters.CSV
+open core.fs.Options
 open core.fs.Services.Trading
 open core.fs.Stocks
 
@@ -287,53 +286,58 @@ module CSVExport =
             
         writer.Generate(rows)
         
-    let options (writer:ICSVWriter) (options:seq<OwnedOption>) =
+    let options (writer:ICSVWriter) (options:seq<OptionPositionState>) =
         
-        let buys = options |> Seq.collect (fun o -> o.State.Buys |> Seq.map (fun e -> (o, e :> AggregateEvent)))
-        let sells = options |> Seq.collect (fun o -> o.State.Sells |> Seq.map (fun e -> (o, e :> AggregateEvent)))
-        let expirations = options |> Seq.collect (fun o -> o.State.Expirations |> Seq.map (fun e -> (o, e :> AggregateEvent)))
-        
-        let data = buys |> Seq.append sells |> Seq.append expirations
-        
-        
+        let data = options |> Seq.collect (fun o -> o.Events |> Seq.map (fun e -> (o, e)))
             
         let rows =
             data
             |> Seq.sortBy (fun (_, e) -> e.When)
             |> Seq.map (fun (o, e) -> 
                 match e with
-                | :? OptionSold as os ->
+                | :? OptionContractSoldToOpen as os ->
                     {
-                        Ticker = o.State.Ticker.Value
+                        Ticker = o.UnderlyingTicker.Value
                         Type = "sell"
-                        Strike = o.State.StrikePrice
-                        OptionType = o.State.OptionType.ToString()
-                        Expiration = o.State.Expiration |> date
-                        Amount = os.NumberOfContracts |> decimal
-                        Premium = os.Premium
+                        Strike = os.Strike
+                        OptionType = os.OptionType
+                        Expiration = os.Expiration
+                        Amount = os.Quantity |> decimal
+                        Premium = os.Price
                         Filled = os.When |> date
                     }
-                | :? OptionPurchased as op ->
+                | :? OptionContractBoughtToOpen as op ->
                     {
-                        Ticker = o.State.Ticker.Value
+                        Ticker = o.UnderlyingTicker.Value
                         Type = "buy"
-                        Strike = o.State.StrikePrice
-                        OptionType = o.State.OptionType.ToString()
-                        Expiration = o.State.Expiration |> date
-                        Amount = op.NumberOfContracts |> decimal
-                        Premium = op.Premium
+                        Strike = op.Strike
+                        OptionType = op.OptionType
+                        Expiration = op.Expiration
+                        Amount = op.Quantity |> decimal
+                        Premium = op.Price
                         Filled = op.When |> date
                     }
-                | :? OptionExpired as oe ->
+                | :? OptionContractBoughtToClose as bc ->
                     {
-                        Ticker = o.State.Ticker.Value
-                        Type = (if oe.Assigned then "assigned" else "expired")
-                        Strike = o.State.StrikePrice
-                        OptionType = o.State.OptionType.ToString()
-                        Expiration = o.State.Expiration |> date
-                        Amount = 0m
-                        Premium = 0m
-                        Filled = oe.When |> date
+                        Ticker = o.UnderlyingTicker.Value
+                        Type = "buy"
+                        Strike = bc.Strike
+                        OptionType = bc.OptionType
+                        Expiration = bc.Expiration
+                        Amount = bc.Quantity |> decimal
+                        Premium = bc.Price
+                        Filled = bc.When |> date
+                    }
+                | :? OptionContractSoldToClose as sc ->
+                    {
+                        Ticker = o.UnderlyingTicker.Value
+                        Type = "sell"
+                        Strike = sc.Strike
+                        OptionType = sc.OptionType
+                        Expiration = sc.Expiration
+                        Amount = sc.Quantity |> decimal
+                        Premium = sc.Price
+                        Filled = sc.When |> date
                     }
                 | _ -> { Ticker = ""; Type = ""; Strike = 0m; OptionType = ""; Expiration = ""; Amount = 0m; Premium = 0m; Filled = "" }
             )

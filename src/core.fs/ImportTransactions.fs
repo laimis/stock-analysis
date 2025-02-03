@@ -117,15 +117,18 @@ module ImportTransactions =
                         |> Seq.map(fun r -> async {
                             match r.IsOption(),r.IsStock(),r.IsBuy(),r.IsSell() with
                             | true, _, true, _ -> // buy option
-                                let data = r |> createOptionTransaction
-                                let cmd = BuyOrSellCommand.Buy(data, cmd.UserId)
-                                let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
-                                return result |> Result.bind (fun _ -> Ok ())
+                                // let data = r |> createOptionTransaction
+                                // let cmd = BuyOrSellCommand.Buy(data, cmd.UserId)
+                                // let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
+                                // TODO: implement
+                                return Ok ()
                             | true, _, _, true -> // sell option
-                                let data = r |> createOptionTransaction
-                                let cmd = BuyOrSellCommand.Sell(data, cmd.UserId)
-                                let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
-                                return result |> Result.bind (fun _ -> Ok ())
+                                // let data = r |> createOptionTransaction
+                                // let cmd = BuyOrSellCommand.Sell(data, cmd.UserId)
+                                // let! result = optionsImport.Handle(cmd) |> Async.AwaitTask
+                                // return result |> Result.bind (fun _ -> Ok ())
+                                // TODO: implement
+                                return Ok()
                             | _, true, true, _ -> // buy stock
                                 let data = r |> createStockTransaction 
                                 let cmd = core.fs.Portfolio.Buy(data, cmd.UserId)
