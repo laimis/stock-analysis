@@ -7,6 +7,7 @@ using web.Utils;
 using core.fs.Reports;
 using core.fs.Stocks;
 using core.Shared;
+using Microsoft.FSharp.Core;
 
 namespace web.Controllers
 {
@@ -131,7 +132,19 @@ namespace web.Controllers
             service.Handle(
                 new WeeklySummaryQuery(period: period, userId: User.Identifier())
             );
-
-
+        
+        
+        [HttpGet("transactions")]
+        public Task<ActionResult> Transactions(string ticker, string groupBy, string show, string txType) =>
+            this.OkOrError(
+                service.Handle(
+                    new TransactionsQuery(
+                        userId: User.Identifier(),
+                        show: show,
+                        groupBy: groupBy,
+                        txType: txType,
+                        ticker: string.IsNullOrWhiteSpace(ticker) ? FSharpOption<Ticker>.None : new FSharpOption<Ticker>(new Ticker(ticker)))
+                )
+            );
     }
 }

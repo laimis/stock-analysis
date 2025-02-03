@@ -5,8 +5,6 @@ open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open System.Threading.Tasks
 open Microsoft.FSharp.Core
-open core.Cryptos
-open core.Options
 open core.Shared
 open core.fs
 open core.fs.Accounts
@@ -249,15 +247,6 @@ type QueryPastTradingEntries =
 type QueryPastTradingPerformance =
     {
         UserId: UserId
-    }
-    
-type QueryTransactions =
-    {
-        UserId: UserId
-        Show:string
-        GroupBy:string
-        TxType:string
-        Ticker:Ticker option
     }
     
 type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser,logger:ILogger) =
@@ -961,8 +950,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 
                 return Ok ()
     }
-                
-                
     
     member _.Handle (query:QueryPastTradingPerformance) = task {
         let! user = accounts.GetUser(query.UserId)
@@ -1003,83 +990,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 }
                 
             return tradingEntries |> Ok
-    }
-    
-    member _.Handle(query:QueryTransactions) : Task<Result<TransactionsView, ServiceError>>  = task {
-        
-        let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
-            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, $"{plTransaction.Type} {plTransaction.NumberOfShares} shares", plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
-            
-        let toSharedTransactionForDividend (stock:StockPositionWithCalculations) (dividend:StockPositionDividendTransaction) : Transaction =
-            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Dividend", dividend.NetAmount, dividend.NetAmount, dividend.Date, false)
-            
-        let toSharedTransactionForFee (stock:StockPositionWithCalculations) (fee:StockPositionFeeTransaction) : Transaction =
-            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Fee", fee.NetAmount, fee.NetAmount, fee.Date, false)
-            
-        let toTransactionsView (stockPositions:StockPositionState seq) (options:OwnedOption seq) (cryptos:OwnedCrypto seq) =
-            let stocks = stockPositions |> Seq.map StockPositionWithCalculations |> Seq.toArray
-            let tickers =
-                stocks
-                |> Seq.map _.Ticker
-                |> Seq.append (options |> Seq.map _.State.Ticker)
-                |> Seq.distinct
-                |> Seq.sort
-                |> Seq.toArray
-            
-            let stockTransactions =
-                match query.Show = "stocks" || query.Show = "stocksandoptions" || query.Show = null with
-                | true ->
-                    stocks
-                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
-                    |> Seq.collect (fun s -> s.PLTransactions |> Seq.map (toSharedTransaction s))
-                | false -> Seq.empty
-                
-            let stockDividends =
-                match query.Show = "dividends" || query.Show = null with
-                | true ->
-                    stocks
-                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
-                    |> Seq.collect (fun s -> s.Dividends |> Seq.map (toSharedTransactionForDividend s))
-                | false -> Seq.empty
-                
-            let stockFees =
-                match query.Show = "fees" || query.Show = null with
-                | true ->
-                    stocks
-                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
-                    |> Seq.collect (fun s -> s.Fees |> Seq.map (toSharedTransactionForFee s))
-                | false -> Seq.empty
-            
-            let optionTransactions =
-                match query.Show = "options" || query.Show = "stocksandoptions" || query.Show = null with
-                | true ->
-                    options
-                    |> Seq.filter (fun o -> query.Ticker.IsNone || o.State.Ticker = query.Ticker.Value)
-                    |> Seq.collect _.State.Transactions
-                    |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
-                | false -> Seq.empty
-                
-            let cryptoTransactions =
-                match query.Show = "cryptos" || query.Show = null with
-                | true ->
-                    cryptos
-                    |> Seq.filter (fun c -> query.Ticker.IsNone || c.State.Token = query.Ticker.Value.Value)
-                    |> Seq.collect _.State.Transactions
-                    |> Seq.map _.ToSharedTransaction()
-                    |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
-                | false -> Seq.empty
-                
-            let log = stockTransactions |> Seq.append stockDividends |> Seq.append stockFees |> Seq.append optionTransactions |> Seq.append cryptoTransactions
-                
-            TransactionsView(log, query.GroupBy, tickers);
-            
-        let! stocks = storage.GetStockPositions(query.UserId)
-        let! options = storage.GetOwnedOptions(query.UserId)
-        let! cryptos = storage.GetCryptos(query.UserId)
-        
-        let transactionsView = toTransactionsView stocks options cryptos 
-        
-        return transactionsView |> Ok
     }
     
     member _.HandleStop(userId,cmd:SetStop) = task {

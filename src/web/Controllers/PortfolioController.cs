@@ -24,19 +24,6 @@ public class PortfolioController(
     [HttpGet]
     public Task<ActionResult> PortfolioHoldings() =>
         this.OkOrError(stockPositionHandler.Handle(new PortfolioHoldingsQuery(User.Identifier())));
-    
-    [HttpGet("transactions")]
-    public Task<ActionResult> Transactions(string ticker, string groupBy, string show, string txType) =>
-        this.OkOrError(
-            stockPositionHandler.Handle(
-                new QueryTransactions(
-                    userId: User.Identifier(),
-                    show: show,
-                    groupBy: groupBy,
-                    txType: txType,
-                    ticker: string.IsNullOrWhiteSpace(ticker) ? FSharpOption<Ticker>.None : new FSharpOption<Ticker>(new Ticker(ticker)))
-            )
-        );
 
     [HttpGet("stockpositions/export/closed")]
     public Task<ActionResult> ExportClosed() =>

@@ -14,13 +14,6 @@ export class StocksService {
         return this.http.get<object[]>('/api/events?entity=' + type)
     }
 
-    getTransactions(ticker: string, groupBy: string, filter: string, txType: string): Observable<TransactionsView> {
-        if (ticker === null) {
-            ticker = ''
-        }
-        return this.http.get<TransactionsView>(`/api/portfolio/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
-    }
-
     // ----------------- alerts ---------------------
     smsOff(): Observable<any> {
         return this.http.post<any>('/api/alerts/sms/off', {})
@@ -390,6 +383,13 @@ export class StocksService {
         endpoint += '&trendType=' + trendType
 
         return this.http.get<Trends>(endpoint)
+    }
+
+    reportTransactions(ticker: string, groupBy: string, filter: string, txType: string): Observable<TransactionsView> {
+        if (ticker === null) {
+            ticker = ''
+        }
+        return this.http.get<TransactionsView>(`/api/reports/transactions?ticker=${ticker}&groupBy=${groupBy}&show=${filter}&txType=${txType}`)
     }
 
     private handleError(error: HttpErrorResponse) {

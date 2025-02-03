@@ -37,7 +37,7 @@ export class TransactionsComponent implements OnInit {
 
     loadData() {
         this.loading = true
-        this.stockService.getTransactions(this.ticker, this.groupBy, this.filterType, this.txType).subscribe(r => {
+        this.stockService.reportTransactions(this.ticker, this.groupBy, this.filterType, this.txType).subscribe(r => {
             this.response = r
             this.loading = false
             this.title.setTitle("Transactions - Nightingale Trading")

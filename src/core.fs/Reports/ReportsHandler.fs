@@ -4,6 +4,8 @@ open System
 open System.Collections.Generic
 open System.ComponentModel.DataAnnotations
 open System.Globalization
+open System.Threading.Tasks
+open core.Cryptos
 open core.Shared
 open core.fs
 open core.fs.Accounts
@@ -67,6 +69,15 @@ type GapReportView =
     {
         gaps: Gap seq
         ticker: string
+    }
+    
+type TransactionsQuery =
+    {
+        UserId: UserId
+        Show:string
+        GroupBy:string
+        TxType:string
+        Ticker:Ticker option
     }
     
 type OutcomesReportDuration =
@@ -307,6 +318,109 @@ type WeeklySummaryView(
             |> Seq.sumBy (fun (t:StockPositionFeeTransaction) -> t.NetAmount)
         member this.OptionProfit = this.ClosedOptions |> Seq.sumBy _.Profit |> fun x -> x * optionMultipler
         member this.TotalProfit = this.StockProfit + this.DividendProfit + this.FeeProfit + this.OptionProfit
+
+
+    
+type TransactionGroup(name:string,transactions:Transaction seq) =
+    let sum = transactions |> Seq.sumBy _.Amount
+    member _.Name = name
+    member _.Transactions = transactions
+    member _.Sum = sum
+
+type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Ticker array) =
+    
+    let groupByValue (groupBy:string) (t:Transaction) =
+        match groupBy with
+        | "ticker" -> t.Ticker.Value
+        | "week" -> t.DateAsDate.AddDays(- float t.DateAsDate.DayOfWeek+1.0).ToString("MMMM dd, yyyy")
+        | "year" -> t.DateAsDate.ToString("yyyy")
+        | _ -> t.DateAsDate.ToString("MMMM, yyyy")
+        
+    let ordered groupBy (transactions:Transaction seq) =
+        match groupBy with
+        | "ticker" -> transactions |> Seq.sortBy _.Ticker
+        | _ -> transactions |> Seq.sortByDescending _.DateAsDate
+    
+    // build the P/L chart data where we go through each transaction and maintain a running total and
+    // the date at which this total was calculated
+    let plChartData title filter (txs:Transaction seq) =
+        let zeroLineAnnotation = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
+        let plDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, zeroLineAnnotation)
+        let _ =
+            txs
+            |> Seq.filter filter
+            |> Seq.groupBy _.DateAsDate.Date
+            |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
+            |> Seq.sortBy fst
+            |> Seq.fold (fun total (txDate,amount) ->
+                let newTotal = total + amount
+                plDataContainer.Add(txDate, newTotal)
+                newTotal
+            ) 0m
+        
+        plDataContainer
+        
+    let drawdownChartData title filter (txs:Transaction seq) =
+        // go over txs after applying a filter on them and generate a running drawdown
+        // chart data. The drawdown is calculated as the difference between the current
+        // total and the maximum total so far
+        let drawdownDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, None)
+        let _ =
+            txs
+            |> Seq.filter filter
+            |> Seq.groupBy _.DateAsDate.Date
+            |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
+            |> Seq.sortBy fst
+            |> Seq.fold (fun total (txDate,amount) ->
+                // if new total is positive, keep total at 0, we are only interested in drawdowns, so to speak
+                let newTotal = 
+                    match total + amount with
+                    | x when x > 0m -> 0m
+                    | x -> x
+                
+                drawdownDataContainer.Add(txDate, total)
+                    
+                newTotal
+                
+            ) 0m
+        
+        drawdownDataContainer
+    
+    let availableYears = transactions |> Seq.map (fun t -> t.DateAsDate.Year) |> Seq.distinct |> Seq.sortDescending |> Seq.toArray
+    
+    let plBreakdowns =
+        availableYears
+        |> Array.collect (fun year ->
+            [|
+                plChartData $"P/L {year}" (fun (t:Transaction)-> t.DateAsDate.Year = year) transactions
+                drawdownChartData $"Drawdown {year}" (fun (t:Transaction)-> t.DateAsDate.Year = year) transactions
+            |]
+        )
+        
+    let grouped =
+        match groupBy with
+        | null  -> Seq.empty<TransactionGroup>
+        | _ -> 
+            let grouped =
+                transactions
+                |> ordered groupBy
+                |> Seq.groupBy (groupByValue groupBy)
+                |> Seq.map TransactionGroup
+            
+            match groupBy with
+            | "ticker" -> grouped |> Seq.sortByDescending (fun g -> g.Transactions |> Seq.sumBy _.Amount)
+            | _ -> grouped
+            
+    let tickerSymbols = tickers |> Array.map _.Value
+    let credit = transactions |> Seq.sumBy _.Amount
+    let debit = transactions |> Seq.sumBy _.Amount
+    
+    member _.Transactions = ordered groupBy transactions
+    member _.Tickers = tickerSymbols
+    member _.Grouped = grouped
+    member _.Credit = credit
+    member _.Debit = debit
+    member _.PLBreakdowns = plBreakdowns
 
 type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IMarketHours,storage:IPortfolioStorage) =
     
@@ -852,4 +966,93 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
         )
         
         return view
+    }
+    
+    member _.Handle(query:TransactionsQuery) : Task<Result<TransactionsView, ServiceError>>  = task {
+        
+        let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, $"{plTransaction.Type} {plTransaction.NumberOfShares} shares", plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
+            
+        let toSharedTransactionForDividend (stock:StockPositionWithCalculations) (dividend:StockPositionDividendTransaction) : Transaction =
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Dividend", dividend.NetAmount, dividend.NetAmount, dividend.Date, false)
+            
+        let toSharedTransactionForFee (stock:StockPositionWithCalculations) (fee:StockPositionFeeTransaction) : Transaction =
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Fee", fee.NetAmount, fee.NetAmount, fee.Date, false)
+            
+        let toSharedTransactionForOption (o:OptionPositionState) =
+            let minStrike = o.Contracts |> Seq.minBy _.Key.Strike
+            let maxStrike = o.Contracts |> Seq.maxBy _.Key.Strike
+            let spread = (maxStrike.Key.Strike - minStrike.Key.Strike) * 100m |> int
+            let debitOrCredit = o.Cost |> Option.defaultValue 0m |> fun x -> if x > 0m then "Debit" else "Credit"
+            let callOrPut = o.Contracts |> Seq.head |> fun x -> if x.Key.OptionType = Call then "Call" else "Put"
+            let spreadDescription =
+                match spread with
+                | x when x = 0 -> $"{callOrPut} option contract"
+                | _ -> $"{spread} {debitOrCredit} {callOrPut} spread"
+            let description = $"{o.UnderlyingTicker} {spreadDescription}"
+            Transaction.PLTx(o.PositionId |> OptionPositionId.guid, o.UnderlyingTicker, description, o.Cost |> Option.defaultValue 0m, o.Profit * 100m, o.Closed.Value, true)
+            
+        let toTransactionsView (stockPositions:StockPositionState seq) (options:OptionPositionState seq) (cryptos:OwnedCrypto seq) =
+            let stocks = stockPositions |> Seq.map StockPositionWithCalculations |> Seq.toArray
+            let tickers =
+                stocks
+                |> Seq.map _.Ticker
+                |> Seq.append (options |> Seq.map _.UnderlyingTicker)
+                |> Seq.distinct
+                |> Seq.sort
+                |> Seq.toArray
+            
+            let stockTransactions =
+                match query.Show = "stocks" || query.Show = "stocksandoptions" || query.Show = null with
+                | true ->
+                    stocks
+                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
+                    |> Seq.collect (fun s -> s.PLTransactions |> Seq.map (toSharedTransaction s))
+                | false -> Seq.empty
+                
+            let stockDividends =
+                match query.Show = "dividends" || query.Show = null with
+                | true ->
+                    stocks
+                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
+                    |> Seq.collect (fun s -> s.Dividends |> Seq.map (toSharedTransactionForDividend s))
+                | false -> Seq.empty
+                
+            let stockFees =
+                match query.Show = "fees" || query.Show = null with
+                | true ->
+                    stocks
+                    |> Seq.filter (fun s -> query.Ticker.IsNone || s.Ticker = query.Ticker.Value)
+                    |> Seq.collect (fun s -> s.Fees |> Seq.map (toSharedTransactionForFee s))
+                | false -> Seq.empty
+            
+            let optionTransactions =
+                match query.Show = "options" || query.Show = "stocksandoptions" || query.Show = null with
+                | true ->
+                    options
+                    |> Seq.filter (fun o -> o.IsClosed && (query.Ticker.IsNone || o.UnderlyingTicker = query.Ticker.Value))
+                    |> Seq.map toSharedTransactionForOption
+                | false -> Seq.empty
+                
+            let cryptoTransactions =
+                match query.Show = "cryptos" || query.Show = null with
+                | true ->
+                    cryptos
+                    |> Seq.filter (fun c -> query.Ticker.IsNone || c.State.Token = query.Ticker.Value.Value)
+                    |> Seq.collect _.State.Transactions
+                    |> Seq.map _.ToSharedTransaction()
+                    |> Seq.filter (fun t -> if query.TxType = "pl" then t.IsPL else t.IsPL |> not)
+                | false -> Seq.empty
+                
+            let log = stockTransactions |> Seq.append stockDividends |> Seq.append stockFees |> Seq.append optionTransactions |> Seq.append cryptoTransactions
+                
+            TransactionsView(log, query.GroupBy, tickers);
+            
+        let! stocks = storage.GetStockPositions(query.UserId)
+        let! options = storage.GetOptionPositions(query.UserId)
+        let! cryptos = storage.GetCryptos(query.UserId)
+        
+        let transactionsView = toTransactionsView stocks options cryptos 
+        
+        return transactionsView |> Ok
     }

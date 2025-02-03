@@ -1,7 +1,6 @@
 namespace core.fs.Portfolio
 
 open System
-open System.Collections.Generic
 open Microsoft.FSharp.Collections
 open core.Cryptos
 open core.Shared
@@ -10,7 +9,6 @@ open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Options
-open core.fs.Reports
 open core.fs.Services.Analysis
 open core.fs.Services.Trading
 
@@ -365,104 +363,3 @@ type PastTradingPerformanceView =
         performance: TradingPerformanceContainerView
         strategyPerformance: TradingStrategyPerformance array
     }
-    
-type TransactionGroup(name:string,transactions:Transaction seq) =
-    let sum = transactions |> Seq.sumBy _.Amount
-    member _.Name = name
-    member _.Transactions = transactions
-    member _.Sum = sum
-
-type TransactionsView(transactions:Transaction seq, groupBy:string, tickers:Ticker array) =
-    
-    let groupByValue (groupBy:string) (t:Transaction) =
-        match groupBy with
-        | "ticker" -> t.Ticker.Value
-        | "week" -> t.DateAsDate.AddDays(- float t.DateAsDate.DayOfWeek+1.0).ToString("MMMM dd, yyyy")
-        | "year" -> t.DateAsDate.ToString("yyyy")
-        | _ -> t.DateAsDate.ToString("MMMM, yyyy")
-        
-    let ordered groupBy (transactions:Transaction seq) =
-        match groupBy with
-        | "ticker" -> transactions |> Seq.sortBy _.Ticker
-        | _ -> transactions |> Seq.sortByDescending _.DateAsDate
-    
-    // build the P/L chart data where we go through each transaction and maintain a running total and
-    // the date at which this total was calculated
-    let plChartData title filter (txs:Transaction seq) =
-        let zeroLineAnnotation = ChartAnnotationLine(0, ChartAnnotationLineType.Horizontal) |> Option.Some
-        let plDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, zeroLineAnnotation)
-        let _ =
-            txs
-            |> Seq.filter filter
-            |> Seq.groupBy _.DateAsDate.Date
-            |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
-            |> Seq.sortBy fst
-            |> Seq.fold (fun total (txDate,amount) ->
-                let newTotal = total + amount
-                plDataContainer.Add(txDate, newTotal)
-                newTotal
-            ) 0m
-        
-        plDataContainer
-        
-    let drawdownChartData title filter (txs:Transaction seq) =
-        // go over txs after applying a filter on them and generate a running drawdown
-        // chart data. The drawdown is calculated as the difference between the current
-        // total and the maximum total so far
-        let drawdownDataContainer = ChartDataPointContainer<decimal>(title, DataPointChartType.Line, None)
-        let _ =
-            txs
-            |> Seq.filter filter
-            |> Seq.groupBy _.DateAsDate.Date
-            |> Seq.map (fun (date, ts) -> date, ts |> Seq.sumBy _.Amount)
-            |> Seq.sortBy fst
-            |> Seq.fold (fun total (txDate,amount) ->
-                // if new total is positive, keep total at 0, we are only interested in drawdowns, so to speak
-                let newTotal = 
-                    match total + amount with
-                    | x when x > 0m -> 0m
-                    | x -> x
-                
-                drawdownDataContainer.Add(txDate, total)
-                    
-                newTotal
-                
-            ) 0m
-        
-        drawdownDataContainer
-    
-    let availableYears = transactions |> Seq.map (fun t -> t.DateAsDate.Year) |> Seq.distinct |> Seq.sortDescending |> Seq.toArray
-    
-    let plBreakdowns =
-        availableYears
-        |> Array.collect (fun year ->
-            [|
-                plChartData $"P/L {year}" (fun (t:Transaction)-> t.DateAsDate.Year = year) transactions
-                drawdownChartData $"Drawdown {year}" (fun (t:Transaction)-> t.DateAsDate.Year = year) transactions
-            |]
-        )
-        
-    let grouped =
-        match groupBy with
-        | null  -> Seq.empty<TransactionGroup>
-        | _ -> 
-            let grouped =
-                transactions
-                |> ordered groupBy
-                |> Seq.groupBy (groupByValue groupBy)
-                |> Seq.map TransactionGroup
-            
-            match groupBy with
-            | "ticker" -> grouped |> Seq.sortByDescending (fun g -> g.Transactions |> Seq.sumBy _.Amount)
-            | _ -> grouped
-            
-    let tickerSymbols = tickers |> Array.map _.Value
-    let credit = transactions |> Seq.sumBy _.Amount
-    let debit = transactions |> Seq.sumBy _.Amount
-    
-    member _.Transactions = ordered groupBy transactions
-    member _.Tickers = tickerSymbols
-    member _.Grouped = grouped
-    member _.Credit = credit
-    member _.Debit = debit
-    member _.PLBreakdowns = plBreakdowns
