@@ -817,13 +817,13 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             
         let closedOptions =
             options
-            |> Seq.filter (fun s -> s.Closed.IsSome && s.Closed.Value >= DateTimeOffset(start) && s.Closed.Value <= DateTimeOffset(``end``))
+            |> Seq.filter (fun s -> s.IsClosed && s.Closed.Value >= DateTimeOffset(start) && s.Closed.Value <= DateTimeOffset(``end``))
             |> Seq.sortBy _.UnderlyingTicker
             |> Seq.toList
             
         let openedOptions =
             options
-            |> Seq.filter (fun s -> s.Closed.IsNone && s.Opened.IsSome && s.Opened.Value >= DateTimeOffset(start) && s.Opened.Value <= DateTimeOffset(``end``))
+            |> Seq.filter (fun s -> s.IsOpen && s.Opened.Value >= DateTimeOffset(start) && s.Opened.Value <= DateTimeOffset(``end``))
             |> Seq.sortBy _.UnderlyingTicker
             |> Seq.toList
            
