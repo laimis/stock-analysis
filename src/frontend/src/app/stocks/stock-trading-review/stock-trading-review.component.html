@@ -70,47 +70,6 @@
             <app-daily-outcome-scores [report]="dailyPositionReport" [showProfit]="currentPosition.isClosed"></app-daily-outcome-scores>    
         }
     </section>
-
-    @if (currentPosition && currentPosition.isClosed) {
-        <section class="my-4">
-            <h5>Grade</h5>
-            @if (gradingError) {
-                <div class="alert alert-danger" role="alert">
-                    {{ gradingError }}
-                </div>
-            }
-            @if (gradingSuccess) {
-                <div class="alert alert-success" role="alert">
-                    {{ gradingSuccess }}
-                </div>
-            }
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="gradeOptions" id="gradeA" autocomplete="off" [checked]="this.assignedGrade === 'A'" (click)="this.assignedGrade = 'A'">
-                            <label class="btn btn-outline-primary" for="gradeA">A</label>
-
-                            <input type="radio" class="btn-check" name="gradeOptions" id="gradeB" autocomplete="off" [checked]="this.assignedGrade === 'B'" (click)="this.assignedGrade = 'B'">
-                            <label class="btn btn-outline-primary" for="gradeB">B</label>
-
-                            <input type="radio" class="btn-check" name="gradeOptions" id="gradeC" autocomplete="off" [checked]="this.assignedGrade === 'C'" (click)="this.assignedGrade = 'C'">
-                            <label class="btn btn-outline-primary" for="gradeC">C</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="notesInput" class="form-label">Notes</label>
-                        <textarea #gradeNotes [ngClass]="assignedNote ? 'visually-hidden' : ''" class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
-                        <div #gradeLabel [ngClass]="assignedNote ? '' : 'visually-hidden'">{{gradeNotes.value}}</div>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button [ngClass]="assignedNote ? 'visually-hidden' : ''" (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
-                        <button [ngClass]="assignedNote ? '' : 'visually-hidden'" (click)="toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-secondary" #editGradeButton>Edit Grade</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-    }
     
     <section>
         <h5>Position Information</h5>

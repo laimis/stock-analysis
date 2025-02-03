@@ -27,7 +27,11 @@ export class StockTradingPositionComponent {
     brokerageAccount: BrokerageAccount;
     strategies: { key: string; value: string; }[];
     showOrderForm: boolean = false;
-    
+    gradingError: string = null
+    gradingSuccess: string = null
+    assignedGrade: string = null
+    assignedNote: string = null
+
     @Input()
     quote: StockQuote
     @Output()
@@ -50,6 +54,8 @@ export class StockTradingPositionComponent {
         if (this._position) {
             this.positionStrategy = v.labels.find(l => l.key == "strategy")?.value
             this.positionProfitPoints = []
+            this.assignedGrade = this._position.grade
+            this.assignedNote = this._position.gradeNote
             this.setCandidateValues()
             if (v.isOpen) {
                 this.updatePositionOrders()
@@ -290,6 +296,25 @@ export class StockTradingPositionComponent {
         }
     }
 
+    assignGrade(note: string) {
+        this.assignedNote = note
+        this.stockService.assignGrade(
+            this._position.positionId,
+            this.assignedGrade,
+            note).subscribe(
+            (_: any) => {
+                this.gradingSuccess = "Grade assigned successfully"
+                setTimeout(() => {
+                    this.gradingSuccess = null
+                }, 5000)
+            },
+            (error) => {
+                let errors = GetErrors(error)
+                this.gradingError = errors.join(', ')
+            }
+        );
+    }
+
     deleteTransaction(transactionId: string) {
         if (confirm("are you sure you want to delete the transaction?")) {
             this.stockService.deleteTransaction(this._position.positionId, transactionId)
@@ -410,5 +435,7 @@ export class StockTradingPositionComponent {
         }
         return (this.quote.price - this._position.averageCostPerShare) / this._position.averageCostPerShare
     }
+
+    protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
 }
 

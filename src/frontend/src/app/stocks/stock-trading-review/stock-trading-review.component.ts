@@ -35,10 +35,6 @@ export class StockTradingReviewComponent {
     orders: BrokerageStockOrder[]
     @Output()
     positionChanged: EventEmitter<any> = new EventEmitter()
-    gradingError: string = null
-    gradingSuccess: string = null
-    assignedGrade: string = null
-    assignedNote: string = null
     private _index: number = 0
 
     constructor(
@@ -63,9 +59,6 @@ export class StockTradingReviewComponent {
     updateCurrentPosition() {
         const positionId = this._positions[this._index].positionId
         this.currentPosition = null
-        // get price data and pass it to chart
-        this.gradingError = null
-        this.gradingSuccess = null
         this.simulationResults = null
         this.dailyPositionReport = null
         this.positionChartInformation = null
@@ -116,25 +109,6 @@ export class StockTradingReviewComponent {
         this.updateCurrentPosition()
     }
 
-    assignGrade(note: string) {
-        this.assignedNote = note
-        this.stockPositionsService.assignGrade(
-            this.currentPosition.positionId,
-            this.assignedGrade,
-            note).subscribe(
-            (_: any) => {
-                this.gradingSuccess = "Grade assigned successfully"
-                setTimeout(() => {
-                    this.gradingSuccess = null
-                }, 5000)
-            },
-            (error) => {
-                let errors = GetErrors(error)
-                this.gradingError = errors.join(', ')
-            }
-        );
-    }
-
     private setTitle(position: StockPosition) {
         this.title.setTitle(`Trading Review - ${position.ticker} - Nightingale Trading`)
     }
@@ -144,13 +118,11 @@ export class StockTradingReviewComponent {
             .pipe(
                 tap(p => {
                     this.currentPosition = p
-                    this.assignedGrade = this.currentPosition.grade
-                    this.assignedNote = this.currentPosition.gradeNote
                     this.setTitle(p)
                     this.loadPrices(p)
                 }),
                 catchError(e => {
-                    this.gradingError = GetErrors(e).join(', ')
+                    this.simulationErrors = GetErrors(e)
                     return []
                 })
             )
