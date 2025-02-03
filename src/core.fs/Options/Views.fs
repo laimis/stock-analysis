@@ -83,6 +83,8 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Closed = state.Closed
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen
+    member this.IsPending = state.IsPending
+    member this.IsPendingClosed = state.IsPendingClosed
     member this.Cost = match state.Cost with Some c -> c | None -> state.DesiredCost |> Option.defaultValue 0m
     member this.Market =
         contracts

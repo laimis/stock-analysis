@@ -390,7 +390,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     )
                     
                 let openOptions = openAndPendingOptions |> Seq.filter _.IsOpen
-                let pendingOptions = openAndPendingOptions |> Seq.filter (fun o -> o.IsOpen |> not && o.IsClosed |> not)
+                let pendingOptions = openAndPendingOptions |> Seq.filter _.IsPending
 
                 return OptionDashboardView(pendingOptions, openOptions, closedOptions, brokeragePositions, brokerageOrderViews) |> Ok
         }
