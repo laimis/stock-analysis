@@ -1,37 +1,32 @@
 @if (closedOptions) {
-    <table class="table mt-2">
-        <thead>
-        <tr>
-            <th>Option</th>
-            <th>Closed</th>
-            <th>P/L</th>
-            <th>P/L %</th>
-            <th>P/L Daily</th>
-            <th>Days Held</th>
-            <th>Days Held %</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-            @for (o of closedOptions; track o) {
-                <tr>
-                    <td style="width: 100px">
-                        <div>
-                            <app-stock-link [ticker]="o.underlyingTicker"></app-stock-link>
-                            @for(contract of o.contracts; track contract) {
-                                <span class="badge bg-primary me-1">{{ contract.strikePrice }} {{ contract.expiration | date:'MM/dd' }}</span>
-                            }
-                        </div>
-                    </td>
-                    <td>{{ o.closed | date:'MM/dd' }}</td>
-                    <td>{{ o.profit | currency }}</td>
-                    <td>{{ o.profit / o.cost | percent }}</td>
-                    <td>{{ o.profit / o.daysHeld | currency }}</td>
-                    <td>{{ o.daysHeld }} / {{ o.daysToExpiration[0] }}</td>
-                    <td>{{ o.daysHeld / o.daysToExpiration[0] | percent }}</td>
-                    <td><a [routerLink]="[ '/optiondetails', o.positionId ]">details</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="container my-4">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                <div class="input-group">
+                    <button (click)="previous()" class="btn btn-outline-secondary" type="button"><i
+                        class="fas fa-chevron-left"></i></button>
+                    <select class="form-select"
+                            (change)="dropdownClick($event.target)"> @for (position of closedOptions; track position; let i = $index) {
+                        <option [value]="i"
+                                [selected]="position.positionId === currentPosition.positionId"> {{ position.underlyingTicker }}
+                        </option>
+                    } </select>
+                    <button (click)="next()" class="btn btn-outline-secondary" type="button"><i
+                        class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="d-flex justify-content-between">
+                    <div><span class="text-muted">Profit:</span> <span
+                        class="ms-2">{{ currentPosition.profit | currency }}</span></div>
+                    <div><span class="text-muted">Gain %:</span> <span
+                        class="ms-2">{{ currentPosition.profit / currentPosition.cost | percent }}</span></div>
+                    <div><span class="text-muted">Days Held:</span> <span
+                        class="ms-2">{{ currentPosition.daysHeld }}</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <app-option-position [position]="currentPosition"></app-option-position>
 }

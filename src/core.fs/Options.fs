@@ -94,7 +94,9 @@ type OptionPositionState =
         Events: AggregateEvent list
     }
     member this.IsOpen = this.Closed.IsNone && this.Opened.IsSome
-    member this.IsClosed = this.Closed.IsSome
+    member this.IsClosed = this.Closed.IsSome && this.Opened.IsSome
+    member this.IsPending = this.Closed.IsNone && this.Opened.IsNone
+    member this.IsPendingClosed = this.Closed.IsSome && this.Opened.IsNone
     member this.DaysHeld = 
         match this.Opened with
         | Some opened ->

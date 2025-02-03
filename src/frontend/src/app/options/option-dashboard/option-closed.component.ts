@@ -1,27 +1,61 @@
 import {Component, Input} from '@angular/core';
 import {OptionPosition} from "../../services/option.service";
-import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
-import {CurrencyPipe, DatePipe, PercentPipe} from "@angular/common";
-import {RouterLink} from "@angular/router";
+import {CurrencyPipe, PercentPipe} from "@angular/common";
+import {ReactiveFormsModule} from "@angular/forms";
+import {OptionPositionComponent} from "../option-position/option-position.component";
 
 @Component({
     selector: 'app-option-closed',
     templateUrl: './option-closed.component.html',
     styleUrls: ['./option-closed.component.css'],
     imports: [
-        StockLinkComponent,
         CurrencyPipe,
-        DatePipe,
         PercentPipe,
-        RouterLink
+        ReactiveFormsModule,
+        OptionPositionComponent
     ]
 })
 
 export class OptionClosedComponent {
+    private _closedOptions: OptionPosition[];
+    currentPosition: OptionPosition;
+    currentPositionIndex: number;
 
     @Input()
-    closedOptions: OptionPosition[]
+    set closedOptions(value: OptionPosition[]) {
+        this._closedOptions = value;
+        if (this._closedOptions) {
+            this.setCurrentPosition(0);
+        }
+    }
+    get closedOptions(): OptionPosition[] {
+        return this._closedOptions;
+    }
+    
+    setCurrentPosition(index: number) {
+        this.currentPosition = this._closedOptions[index];
+        this.currentPositionIndex = index;
+    }
+    
+    previous() {
+        if (this.currentPositionIndex > 0) {
+            this.setCurrentPosition(this.currentPositionIndex - 1);
+        } else {
+            this.setCurrentPosition(this._closedOptions.length - 1);
+        }
+    }
+    
+    next() {
+        if (this.currentPositionIndex < this._closedOptions.length - 1) {
+            this.setCurrentPosition(this.currentPositionIndex + 1);
+        } else {
+            this.setCurrentPosition(0);
+        }
+    }
 
-    constructor() {
+    dropdownClick(et: EventTarget) {
+        let target = et as HTMLSelectElement;
+        let index = target.selectedIndex;
+        this.setCurrentPosition(index);
     }
 }

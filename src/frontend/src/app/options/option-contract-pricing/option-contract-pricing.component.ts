@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
-import {ChartAnnotationLineType, ChartType, DataPointContainer} from "../../services/stocks.service";
+import {ChartType, DataPointContainer} from "../../services/stocks.service";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
 import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
 import {LoadingComponent} from "../../shared/loading/loading.component";
@@ -47,7 +47,7 @@ export class OptionContractPricingComponent {
         }
         
         this.loading = true;
-        let observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.details.symbol))
+        let observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.details?.symbol))
 
         forkJoin(observables).subscribe({
             next: (pricingResults) => {

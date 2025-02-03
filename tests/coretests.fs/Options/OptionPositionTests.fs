@@ -19,6 +19,8 @@ let ``Basic operations work`` () =
     position.UnderlyingTicker |> should equal ticker
     position.IsClosed |> should equal false
     position.IsOpen |> should equal false // haven't bought any contracts yet
+    position.IsPending |> should equal false
+    position.IsPendingClosed |> should equal false
     
     let optionType = OptionType.Put
     let quantity = 1
@@ -52,6 +54,8 @@ let ``Basic operations work`` () =
     positionWithContractsClosed.Transactions |> should haveLength 4m
     positionWithContractsClosed.IsClosed |> should equal true
     positionWithContractsClosed.IsOpen |> should equal false
+    positionWithContractsClosed.IsPending |> should equal false
+    positionWithContractsClosed.IsPendingClosed |> should equal false
     positionWithContractsClosed.Contracts.Count |> should equal 2
     positionWithContractsClosed.Contracts.Values
         |> Seq.iter (fun quantityAndCost ->
@@ -216,6 +220,8 @@ let ``Create option without purchasing the contracts should work``() =
     
     position.IsClosed |> should equal false
     position.IsOpen |> should equal false
+    position.IsPending |> should equal true
+    position.IsPendingClosed |> should equal false
     position.Cost |> should be (equal None)
     
     let cost = 1.45m
@@ -229,6 +235,8 @@ let ``Create option without purchasing the contracts should work``() =
         
     modifiedPosition.IsClosed |> should equal false
     modifiedPosition.IsOpen |> should equal false
+    modifiedPosition.IsPending |> should equal true
+    modifiedPosition.IsPendingClosed |> should equal false
     modifiedPosition.DesiredCost |> should equal (Some cost)
     modifiedPosition.PendingContracts |> should haveCount 2
     
@@ -252,6 +260,8 @@ let ``Closing pending position should work``() =
         
     closedPosition.IsClosed |> should equal true
     closedPosition.IsOpen |> should equal false
+    closedPosition.IsPending |> should equal false
+    closedPosition.IsPendingClosed |> should equal true
     closedPosition.Notes |> should haveLength 2
 
 [<Fact>]

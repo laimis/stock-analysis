@@ -197,7 +197,7 @@ type PatternMonitoringService(
                 
             let pendingOptionsList =
                 options
-                |> Seq.filter (fun p -> p.IsClosed |> not && p.IsOpen |> not)
+                |> Seq.filter _.IsPending
                 |> Seq.map _.UnderlyingTicker
                 |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionsPendingIdentifier]; user=userId})
 
