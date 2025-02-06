@@ -490,11 +490,14 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
     
     member _.Handle(request:PortfolioCorrelationQuery) = task {
         let! stocks = storage.GetStockPositions request.UserId
+        let! options = storage.GetOptionPositions request.UserId
             
         let tickers = 
             stocks
             |> Seq.filter _.IsOpen
             |> Seq.map _.Ticker
+            |> Seq.append (options |> Seq.filter _.IsOpen |> Seq.map _.UnderlyingTicker)
+            |> Seq.distinct
             
         return! runCorrelations request.UserId request.Days tickers
     }
