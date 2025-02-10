@@ -236,7 +236,7 @@
             <div class="col">
                 <div class="card shadow-sm">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 cursor-pointer hover-lighten"
-                        (click)="toggleVisibility(olderNotes)">
+                        (click)="toggleNotesExpanded()">
                         <div class="d-flex align-items-center">
                             <i class="bi bi-journal-text me-3 text-primary"></i>
                             <h5 class="mb-0 d-flex align-items-center">
@@ -271,7 +271,7 @@
                             </div>
                         </div>
                     </div>
-                    <div #olderNotes class="visually-hidden">
+                    <div [ngClass]="{'visually-hidden': !notesExpanded}">
                         <div class="card-body">
                             <div class="note-timeline mt-3">
                                 @for (note of _position.notes; track note) {

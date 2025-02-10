@@ -76,6 +76,7 @@
         <app-stock-trading-position
                                     [position]="currentPosition"
                                     [quote]="getQuote(currentPosition)"
+                                    [notesExpanded]="true"
                                     (positionChanged)="positionChanged.emit()"
         ></app-stock-trading-position>
     </section>

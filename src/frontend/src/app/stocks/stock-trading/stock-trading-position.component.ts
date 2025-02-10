@@ -31,7 +31,9 @@ export class StockTradingPositionComponent {
     gradingSuccess: string = null
     assignedGrade: string = null
     assignedNote: string = null
-
+    
+    @Input()
+    notesExpanded = false
     @Input()
     quote: StockQuote
     @Output()
@@ -294,6 +296,11 @@ export class StockTradingPositionComponent {
                 }
             )
         }
+    }
+    
+    toggleNotesExpanded() {
+        console.log("toggling notes expanded: " + this.notesExpanded)
+        this.notesExpanded = !this.notesExpanded
     }
 
     assignGrade(note: string) {
