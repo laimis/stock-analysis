@@ -164,7 +164,16 @@ type OptionPositionStats(summaries:seq<OptionPositionView>) =
     member this.AverageDaysHeldPercentage =
         match optionTrades with
         | [] -> 0m
-        | _ -> optionTrades |> List.map (fun s -> decimal (s.DaysHeld |> Option.defaultValue 0) / decimal (s.DaysToExpiration |> Seq.head)) |> List.average
+        | _ ->
+            optionTrades
+            |> List.map (fun s ->
+                let daysHeld = s.DaysHeld |> Option.defaultValue 0
+                let daysToExpiration = s.DaysToExpiration |> Seq.head
+                match daysToExpiration with
+                | 0 -> 0m
+                | _ -> decimal daysHeld / decimal daysToExpiration
+            )
+            |> List.average
     
 type OptionOrderView(order:OptionOrder, chain:OptionChain option) =
     member this.OrderId = order.OrderId
