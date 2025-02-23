@@ -37,6 +37,7 @@ export interface OptionContract {
     details: OptionDefinition | undefined
     instruction: string | undefined
     isShort: boolean
+    brokerageSymbol: string
 }
 export interface OptionPosition {
     positionId: string

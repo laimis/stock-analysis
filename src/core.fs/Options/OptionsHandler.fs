@@ -322,7 +322,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                             match chainLookupMap.TryGetValue(o.UnderlyingTicker) with
                             | true, chain -> return OptionPositionView(o, chain |> Some)
                             | _ ->
-                            let! chain = brokerage.GetOptionChain user.State o.UnderlyingTicker |> Async.AwaitTask
+                            let! chain = brokerage.GetOptionChain user.State OptionChainSource.UseCache o.UnderlyingTicker |> Async.AwaitTask
 
                             let chain =
                                 match chain with
@@ -360,7 +360,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                     |> Seq.concat
                     |> Seq.map(fun l -> async {
                         if chainLookupMap.ContainsKey(l.UnderlyingTicker) |> not then
-                            let! chain = brokerage.GetOptionChain user.State l.UnderlyingTicker |> Async.AwaitTask
+                            let! chain = brokerage.GetOptionChain user.State OptionChainSource.UseCache l.UnderlyingTicker |> Async.AwaitTask
                             match chain with
                             | Ok chain -> chainLookupMap.Add(l.UnderlyingTicker, chain)
                             | Error _ -> ()
@@ -450,7 +450,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 match option with
                 | None -> return "Option not found" |> ServiceError |> Error
                 | Some option ->
-                    let! chain = brokerage.GetOptionChain user.State option.UnderlyingTicker
+                    let! chain = brokerage.GetOptionChain user.State UseCache option.UnderlyingTicker
                     return
                         match chain with
                         | Error e ->
@@ -478,7 +478,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
             | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
 
-                let! details = brokerage.GetOptionChain user.State query.Ticker
+                let! details = brokerage.GetOptionChain user.State SkipCache query.Ticker
                 
                 return details |> Result.map OptionChainView
         }

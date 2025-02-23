@@ -47,7 +47,7 @@ export class OptionContractPricingComponent {
         }
         
         this.loading = true;
-        let observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.details?.symbol))
+        let observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.brokerageSymbol))
 
         forkJoin(observables).subscribe({
             next: (pricingResults) => {

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {OptionPosition} from "../../services/option.service";
+import {BrokerageOptionOrder, OptionPosition} from "../../services/option.service";
 import {CurrencyPipe, PercentPipe} from "@angular/common";
 import {ReactiveFormsModule} from "@angular/forms";
 import {OptionPositionComponent} from "../option-position/option-position.component";
@@ -20,6 +20,7 @@ export class OptionClosedComponent {
     private _closedOptions: OptionPosition[];
     currentPosition: OptionPosition;
     currentPositionIndex: number;
+    positionOrders: BrokerageOptionOrder[];
 
     @Input()
     set closedOptions(value: OptionPosition[]) {
@@ -32,8 +33,12 @@ export class OptionClosedComponent {
         return this._closedOptions;
     }
     
+    @Input()
+    orders : BrokerageOptionOrder[];
+    
     setCurrentPosition(index: number) {
         this.currentPosition = this._closedOptions[index];
+        this.positionOrders = this.orders.filter((order) => order.contracts[0].underlyingTicker == this.currentPosition.underlyingTicker);
         this.currentPositionIndex = index;
     }
     

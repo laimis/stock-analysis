@@ -267,6 +267,10 @@ type IMarketHours =
 type IBrokerageGetPriceHistory =
     
     abstract member GetPriceHistory : state:UserState -> ticker:Ticker -> frequency:PriceFrequency -> start:DateTimeOffset option -> ``end``:DateTimeOffset option -> Task<Result<PriceBars,ServiceError>>
+
+type OptionChainSource =
+    | UseCache
+    | SkipCache
     
 type IBrokerage =
     inherit IBrokerageGetPriceHistory
@@ -284,7 +288,7 @@ type IBrokerage =
     abstract member GetQuotes : state:UserState -> tickers:Ticker seq -> Task<Result<Dictionary<Ticker, StockQuote>,ServiceError>>
     abstract member GetMarketHours : state:UserState -> start:DateTimeOffset -> Task<Result<MarketHours,ServiceError>>
     abstract member Search : state:UserState -> searchQueryType:SearchQueryType -> query:string -> limit:int -> Task<Result<SearchResult[],ServiceError>>
-    abstract member GetOptionChain : state:UserState -> ticker:Ticker -> Task<Result<OptionChain,ServiceError>>
+    abstract member GetOptionChain : state:UserState -> source:OptionChainSource -> ticker:Ticker -> Task<Result<OptionChain,ServiceError>>
     abstract member GetStockProfile : state:UserState -> ticker:Ticker -> Task<Result<StockProfile,ServiceError>>
     abstract member GetTransactions : state:UserState -> types:AccountTransactionType array -> Task<Result<AccountTransaction[],ServiceError>>
     abstract member OptionOrder : state:UserState -> payload:string -> Task<Result<unit,ServiceError>>

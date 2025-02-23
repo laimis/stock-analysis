@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="OptionChainCache.fs" />
     <Compile Include="SchwabClient.fs" />
   </ItemGroup>
 

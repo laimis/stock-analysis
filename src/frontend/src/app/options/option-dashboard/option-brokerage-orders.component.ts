@@ -110,7 +110,7 @@ export class OptionBrokerageOrdersComponent {
                         strikePrice: contract.strikePrice,
                         expirationDate: contract.expiration,
                         quantity: contract.quantity,
-                        cost: contract.market,
+                        cost: contract.cost,
                         filled: order.executionTime
                     }
                 }

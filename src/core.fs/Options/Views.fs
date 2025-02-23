@@ -39,6 +39,17 @@ type OptionContractView(
     member this.UnderlyingTicker = underlyingTicker
     member this.UnderlyingPrice = underlyingPrice
     member this.Instruction = instruction
+    member this.BrokerageSymbol =
+        match chainDetail with
+        | Some detail -> detail.Symbol
+        | None ->
+            let ticker = underlyingTicker.Value.PadRight(6)
+            let date = expiration.ToDateTimeOffset()
+            let dateStr = date.ToString("yyMMdd")
+            let optionTypeStr = match optionType with | Call -> "C" | Put -> "P"
+            let strikeStr = (strikePrice * 1000m |> int).ToString("00000000")
+            $"{ticker}{dateStr}{optionTypeStr}{strikeStr}"
+            
     
 type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     

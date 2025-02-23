@@ -15,7 +15,7 @@ type PriceMonitoringService(
     logger: ILogger) =
 
     let fetchChain (user:UserState) (p:OptionPositionState) = async {
-        let! chainResult = brokerage.GetOptionChain user p.UnderlyingTicker |> Async.AwaitTask
+        let! chainResult = brokerage.GetOptionChain user OptionChainSource.SkipCache p.UnderlyingTicker |> Async.AwaitTask
         match chainResult with
         | Error e ->
             logger.LogError($"Failed to get option chain for {p.UnderlyingTicker} for {p.Opened} to {p.Closed.Value}: {e.Message}")

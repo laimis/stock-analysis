@@ -22,6 +22,7 @@ open Polly
 open Polly.RateLimit
 open core.fs.Adapters.Stocks
 open core.fs.Options
+open schwabclient
     
 type ErrorResponse = {
     message: string option
@@ -314,6 +315,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             raise (ArgumentNullException("clientId"))
         if String.IsNullOrWhiteSpace(clientSecret) then
             raise (ArgumentNullException("clientSecret"))
+    
+    let optionChainCache = OptionChainCache.OptionChainCache()
+    
     
     let _httpClient = new HttpClient()
     let _asyncLock = AsyncLock()
@@ -648,12 +652,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
     
     member private this.CallApi<'T> (user: UserState) (resource: SchwabResourceEndpoint) (debug: bool option) = task {
         try
+            let sw = System.Diagnostics.Stopwatch.StartNew()
             let! response, content = this.CallApiWithoutSerialization user resource HttpMethod.Get None
-
-            if debug.IsSome && debug.Value then
-                logError "debug function: {function}" [|resource|]
-                logError "debug response code: {statusCode}" [|response.StatusCode|]
-                logError "debug response output: {content}" [|content|]
+            sw.Stop()
+            
+            match debug with
+            | Some true ->
+                logInfo "Call to {function} took {time}ms" [|resource; sw.ElapsedMilliseconds|]
+            | _ -> ()
                 
             if not response.IsSuccessStatusCode then
                 let error = JsonSerializer.Deserialize<ErrorResponse>(content)
@@ -1163,65 +1169,77 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     | _ -> ServiceError "Could not find quote for ticker" |> Error
         }
 
-        member this.GetOptionChain (state: UserState) (ticker: Ticker) = task {
+        member this.GetOptionChain (state: UserState) (source:OptionChainSource) (ticker: Ticker) = task {
             
             let execFunc state = task {
 
-                let resource = $"/chains?symbol={ticker.Value}" |> MarketDataUrl
-                
-                let! chainResponse = this.CallApi<OptionChain> state resource None
-                
-                return chainResponse
-                |> Result.map (fun chain ->
-                    let toOptionDetails (map: Dictionary<string, Dictionary<string, OptionDescriptor[]>>) underlyingPrice =
-                        map
-                        |> Seq.collect (fun (KeyValue(_, v)) -> v.Values |> Seq.collect id)
-                        |> Seq.map (fun d ->
-                            let expirationDate =
-                                match DateTimeOffset.TryParse(d.expirationDate) with
-                                | false, _ -> failwith $"Could not parse expiration date: {d.expirationDate}"
-                                | true, dt -> dt |> OptionExpiration.createFromDateTimeOffset
+                let cachedValue =
+                    match optionChainCache.TryGetValue(ticker) with
+                    | Some chain -> Some chain
+                    | None -> None
+                    
+                match cachedValue.IsSome && source = OptionChainSource.UseCache with
+                | true -> return Ok cachedValue.Value
+                | false ->
+                    let resource = $"/chains?symbol={ticker.Value}" |> MarketDataUrl
+                    
+                    let! chainResponse = this.CallApi<OptionChain> state resource None
+                    
+                    match chainResponse with
+                    | Error error -> return Error error
+                    | Ok chain ->
+                        let toOptionDetails (map: Dictionary<string, Dictionary<string, OptionDescriptor[]>>) underlyingPrice =
+                            map
+                            |> Seq.collect (fun (KeyValue(_, v)) -> v.Values |> Seq.collect id)
+                            |> Seq.map (fun d ->
+                                let expirationDate =
+                                    match DateTimeOffset.TryParse(d.expirationDate) with
+                                    | false, _ -> failwith $"Could not parse expiration date: {d.expirationDate}"
+                                    | true, dt -> dt |> OptionExpiration.createFromDateTimeOffset
+                                    
+                                let optionType =
+                                    match d.putCall.Value.ToLower() with
+                                    | "put" -> OptionType.Put
+                                    | "call" -> OptionType.Call
+                                    | _ -> failwith $"Unknown option type: {d.putCall.Value}"
                                 
-                            let optionType =
-                                match d.putCall.Value.ToLower() with
-                                | "put" -> OptionType.Put
-                                | "call" -> OptionType.Call
-                                | _ -> failwith $"Unknown option type: {d.putCall.Value}"
-                            
-                            let detail = core.fs.Adapters.Options.OptionDetail(d.symbol.Value, optionType, d.description.Value, expirationDate)
-                            detail.Ask <- d.ask
-                            detail.Bid <- d.bid
-                            detail.Last <- d.last
-                            detail.Mark <- d.mark
-                            detail.StrikePrice <- d.strikePrice
-                            detail.Volume <- d.totalVolume
-                            detail.OpenInterest <- d.openInterest
-                            detail.DaysToExpiration <- d.daysToExpiration
-                            detail.Delta <- d.delta
-                            detail.Gamma <- d.gamma
-                            detail.Theta <- d.theta
-                            detail.Vega <- d.vega
-                            detail.Rho <- d.rho
-                            detail.ExchangeName <- d.exchangeName
-                            detail.InTheMoney <- d.inTheMoney
-                            detail.IntrinsicValue <- d.intrinsicValue
-                            detail.TimeValue <- d.timeValue
-                            detail.Volatility <- d.volatility
-                            detail.MarkChange <- d.markChange
-                            detail.MarkPercentChange <- d.markPercentChange
-                            detail.UnderlyingPrice <- underlyingPrice
-                            detail
-                        )
+                                let detail = core.fs.Adapters.Options.OptionDetail(d.symbol.Value, optionType, d.description.Value, expirationDate)
+                                detail.Ask <- d.ask
+                                detail.Bid <- d.bid
+                                detail.Last <- d.last
+                                detail.Mark <- d.mark
+                                detail.StrikePrice <- d.strikePrice
+                                detail.Volume <- d.totalVolume
+                                detail.OpenInterest <- d.openInterest
+                                detail.DaysToExpiration <- d.daysToExpiration
+                                detail.Delta <- d.delta
+                                detail.Gamma <- d.gamma
+                                detail.Theta <- d.theta
+                                detail.Vega <- d.vega
+                                detail.Rho <- d.rho
+                                detail.ExchangeName <- d.exchangeName
+                                detail.InTheMoney <- d.inTheMoney
+                                detail.IntrinsicValue <- d.intrinsicValue
+                                detail.TimeValue <- d.timeValue
+                                detail.Volatility <- d.volatility
+                                detail.MarkChange <- d.markChange
+                                detail.MarkPercentChange <- d.markPercentChange
+                                detail.UnderlyingPrice <- underlyingPrice
+                                detail
+                            )
 
-                    let options =
-                        Seq.concat [
-                            toOptionDetails chain.callExpDateMap chain.underlyingPrice
-                            toOptionDetails chain.putExpDateMap chain.underlyingPrice
-                        ]
-                        |> Seq.toArray
+                        let options =
+                            Seq.concat [
+                                toOptionDetails chain.callExpDateMap chain.underlyingPrice
+                                toOptionDetails chain.putExpDateMap chain.underlyingPrice
+                            ]
+                            |> Seq.toArray
+                            
+                        let mapped = core.fs.Adapters.Options.OptionChain(chain.symbol.Value, chain.volatility, chain.numberOfContracts, options, chain.underlyingPrice)
                         
-                    core.fs.Adapters.Options.OptionChain(chain.symbol.Value, chain.volatility, chain.numberOfContracts, options, chain.underlyingPrice)
-                )
+                        optionChainCache.Set(ticker, mapped)
+                        
+                        return Ok mapped
             }
             
             return! execIfConnectedToBrokerage state execFunc

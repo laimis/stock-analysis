@@ -51,7 +51,7 @@
                                  (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
 }
 @if (loaded && isActive('closed')) {
-    <app-option-closed [closedOptions]=optionsContainer.closed></app-option-closed>
+    <app-option-closed [orders]="optionsContainer.orders" [closedOptions]=optionsContainer.closed></app-option-closed>
 }
 @if (loaded && isActive('performance')) {
     <app-option-performance
