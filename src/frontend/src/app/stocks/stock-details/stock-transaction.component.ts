@@ -3,13 +3,16 @@ import {openpositioncommand, StockPosition, stocktransactioncommand} from '../..
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
+import {FormsModule} from "@angular/forms";
 
 @Component({
     selector: 'app-stock-transaction',
     templateUrl: './stock-transaction.component.html',
     styleUrls: ['./stock-transaction.component.css'],
-    providers: [DatePipe],
-    standalone: false
+    imports: [
+        FormsModule
+    ],
+    providers: [DatePipe]
 })
 export class StockTransactionComponent implements OnInit {
 

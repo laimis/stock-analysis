@@ -1,11 +1,14 @@
 import {Component, Input} from '@angular/core';
 import {StockDetails, StockProfile} from '../../services/stocks.service';
+import {KeyValuePipe} from "@angular/common";
 
 @Component({
     selector: 'app-stock-fundamentals',
     templateUrl: './stock-fundamentals.component.html',
-    styleUrls: ['./stock-fundamentals.component.css'],
-    standalone: false
+    imports: [
+        KeyValuePipe
+    ],
+    styleUrls: ['./stock-fundamentals.component.css']
 })
 
 export class StockFundamentalsComponent {

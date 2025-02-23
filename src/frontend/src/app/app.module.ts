@@ -15,7 +15,6 @@ import {ProfileCreateComponent} from './profile/profile-create.component';
 import {ProfileLoginComponent} from './profile/profile-login.component';
 import {SummaryComponent} from './summary/summary.component';
 import {RouterModule} from '@angular/router';
-import {StockDetailsComponent} from './stocks/stock-details/stock-details.component';
 import {TransactionsComponent} from './transactions/transactions.component';
 import {ProfilePasswordResetComponent} from './profile/profile-passwordreset.component';
 import {ProfileVerifyComponent} from './profile/profile-verify.component';
@@ -24,9 +23,6 @@ import {TermsComponent} from './terms/terms.component';
 import {PrivacyComponent} from './privacy/privacy.component';
 import {AdminEmailComponent} from './admin/email/admin-email.component';
 import {AdminWeeklyComponent} from './admin/weekly/admin-weekly.component';
-import {StockFundamentalsComponent} from './stocks/stock-details/stock-fundamentals.component';
-import {StockOwnershipComponent} from './stocks/stock-details/stock-ownership.component';
-import {StockOptionComponent} from './stocks/stock-details/stock-option.component';
 import {StockPositionReportsComponent} from './stocks/stock-trading/stock-trading-outcomes-reports.component';
 import {AdminUsersComponent} from './admin/users/admin-users.component';
 import {
@@ -44,11 +40,9 @@ import {
 } from './stocks/stock-trading-review/stock-trading-closed-positions.component';
 import {BrokerageOrdersComponent} from './brokerage/brokerage-orders.component';
 import {StockViolationsComponent} from './stocks/stock-trading/stock-violations.component';
-import {StockTransactionComponent} from './stocks/stock-details/stock-transaction.component';
 import {StockTradingSimulatorComponent} from './stocks/stock-trading/stock-trading-simulator.component';
 import {BrokerageNewOrderComponent} from './brokerage/brokerage-new-order.component';
 import {StockAnalysisComponent} from './stocks/stock-details/stock-analysis.component';
-import {StockTradingPositionComponent} from './stocks/stock-trading/stock-trading-position.component';
 import {AlertsComponent} from './alerts/alerts.component';
 import {OutcomesComponent} from './shared/reports/outcomes.component';
 import {OutcomesAnalysisReportComponent} from './shared/reports/outcomes-analysis-report.component';
@@ -99,6 +93,8 @@ import {
     OptionPositionCreateModalComponent
 } from "./options/option-dashboard/option-position-create-modal/option-position-create-modal.component";
 import {OptionOpenComponent} from "./options/option-dashboard/option-open.component";
+import {StockTradingPositionComponent} from "./stocks/stock-trading/stock-trading-position.component";
+import {StockDailyScoresComponent} from "./shared/stock-daily-scores/stock-daily-scores.component";
 
 
 @NgModule({
@@ -124,14 +120,8 @@ import {OptionOpenComponent} from "./options/option-dashboard/option-open.compon
         ProfileVerifyComponent,
         SummaryComponent,
         InflectionPointsComponent,
-        StockDetailsComponent,
-        StockFundamentalsComponent,
         StockPositionReportsComponent,
-        StockOptionComponent,
-        StockTransactionComponent,
-        StockOwnershipComponent,
         StockViolationsComponent,
-        StockTradingPositionComponent,
         StockTradingPositionsComponent,
         StockTradingClosedPositionsComponent,
         StockTradingDashboardComponent,
@@ -194,7 +184,9 @@ import {OptionOpenComponent} from "./options/option-dashboard/option-open.compon
         DailyOutcomeScoresComponent,
         OptionPositionComponent,
         OptionPositionCreateModalComponent,
-        OptionOpenComponent
+        OptionOpenComponent,
+        StockTradingPositionComponent,
+        StockDailyScoresComponent
     ],
     providers: [
         {provide: "windowObject", useValue: window},

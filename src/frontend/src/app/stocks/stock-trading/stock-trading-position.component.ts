@@ -9,14 +9,35 @@ import {
 } from '../../services/stocks.service';
 import {GetErrors, GetStockStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
-import {FormControl} from "@angular/forms";
+import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrokerageService} from "../../services/brokerage.service";
+import {CurrencyPipe, DecimalPipe, NgClass, NgIf, PercentPipe} from "@angular/common";
+import {ParsedDatePipe} from "../../services/parsedDate.filter";
+import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
+import {LoadingComponent} from "../../shared/loading/loading.component";
+import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.component";
+import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-stock-trading-position',
     templateUrl: './stock-trading-position.component.html',
-    styleUrls: ['./stock-trading-position.component.css'],
-    standalone: false
+    imports: [
+        CurrencyPipe,
+        ParsedDatePipe,
+        FormsModule,
+        PercentPipe,
+        DecimalPipe,
+        TradingViewLinkComponent,
+        LoadingComponent,
+        NgClass,
+        BrokerageNewOrderComponent,
+        BrokerageOrdersComponent,
+        ReactiveFormsModule,
+        NgIf,
+        ErrorDisplayComponent
+    ],
+    styleUrls: ['./stock-trading-position.component.css']
 })
 export class StockTradingPositionComponent {
     candidateRiskAmount: number = 0

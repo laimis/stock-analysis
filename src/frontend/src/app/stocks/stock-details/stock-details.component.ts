@@ -9,7 +9,7 @@ import {
     StockOwnership,
     StocksService, BrokerageAccount
 } from '../../services/stocks.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {Title} from '@angular/platform-browser';
 import {GetErrors} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
@@ -17,12 +17,39 @@ import {BrokerageService} from "../../services/brokerage.service";
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
 import {OptionPosition, OptionService} from "../../services/option.service";
+import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
+import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
+import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
+import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.component";
+import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
+import {StockOptionComponent} from "./stock-option.component";
+import {StockFundamentalsComponent} from "./stock-fundamentals.component";
+import {StockAnalysisComponent} from "./stock-analysis.component";
+import {StockOwnershipComponent} from "./stock-ownership.component";
+import {StockTransactionComponent} from "./stock-transaction.component";
+import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 
 @Component({
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
-    styleUrls: ['./stock-details.component.css'],
-    standalone: false
+    imports: [
+        StockTradingNewPositionComponent,
+        StockLinkAndTradingviewLinkComponent,
+        CurrencyPipe,
+        DatePipe,
+        BrokerageNewOrderComponent,
+        BrokerageOrdersComponent,
+        StockOptionComponent,
+        StockFundamentalsComponent,
+        StockAnalysisComponent,
+        StockOwnershipComponent,
+        StockTransactionComponent,
+        NgClass,
+        RouterLink,
+        TradingViewLinkComponent,
+        NgIf
+    ],
+    styleUrls: ['./stock-details.component.css']
 })
 export class StockDetailsComponent implements OnInit {
 

@@ -1,13 +1,20 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DatePipe} from '@angular/common';
-import {GetErrors} from 'src/app/services/utils';
 import {OptionPosition, OptionService} from "../../services/option.service";
+import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
+import {RouterLink} from "@angular/router";
+import {OptionSpreadBuilderComponent} from "../../options/option-spread-builder/option-spread-builder.component";
+import {GetErrors} from "../../services/utils";
 
 @Component({
     selector: 'app-stock-option',
     templateUrl: './stock-option.component.html',
-    providers: [DatePipe],
-    standalone: false
+    imports: [
+        ErrorDisplayComponent,
+        RouterLink,
+        OptionSpreadBuilderComponent
+    ],
+    providers: [DatePipe]
 })
 export class StockOptionComponent implements OnInit {
 

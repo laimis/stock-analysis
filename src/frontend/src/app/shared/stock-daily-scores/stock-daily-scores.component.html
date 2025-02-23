@@ -1,0 +1,55 @@
+<!-- Daily Outcome Scores -->
+<section class="card shadow-sm mb-4 daily-scores-card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-calendar-check fs-4 me-2 text-primary"></i>
+                <h5 class="card-title mb-0">Daily Outcome Scores</h5>
+            </div>
+            <div class="date-controls d-flex align-items-center gap-3">
+                <!-- Start Date -->
+                <div class="date-control">
+                    <label class="form-label small text-muted mb-1">Start Date</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-calendar3"></i>
+                        </span>
+                        <input
+                            type="date"
+                            class="form-control border-start-0 ps-0"
+                            [ngModel]="selectedStartDate | date:'yyyy-MM-dd'"
+                            (ngModelChange)="onStartDateChange($event)"
+                            aria-label="Select start date">
+                    </div>
+                    
+                </div>
+
+                <!-- End Date -->
+                <div class="date-control">
+                    <label class="form-label small text-muted mb-1">End Date</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-calendar3"></i>
+                        </span>
+                        <input
+                            type="date"
+                            class="form-control border-start-0 ps-0"
+                            [ngModel]="selectedEndDate | date:'yyyy-MM-dd'"
+                            (ngModelChange)="onEndDateChange($event)"
+                            aria-label="Select end date">
+                    </div>
+                </div>
+
+                <!-- Shortcuts -->
+                <div class="d-flex align-items-end gap-2">
+                    <a href="#" class="btn btn-outline-secondary btn-sm" (click)="setDateRange(180, $event)">6M</a>
+                    <a href="#" class="btn btn-outline-secondary btn-sm" (click)="setDateRange(365, $event)">1Y</a>
+                </div>
+
+            </div>
+        </div>
+        <app-loading *ngIf="dailyBreakdownsLoading"></app-loading>
+        <app-error-display *ngIf="dailyBreakdownErrors" [errors]="dailyBreakdownErrors"></app-error-display>
+        <app-daily-outcome-scores *ngIf="dailyBreakdowns" [report]="dailyBreakdowns"></app-daily-outcome-scores>
+    </div>
+</section>

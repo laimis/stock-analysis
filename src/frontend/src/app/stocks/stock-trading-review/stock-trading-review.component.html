@@ -59,20 +59,12 @@
         }
     </section>
 
-    <section *ngIf="currentPosition">
-        <h5>Daily Gain Breakdown</h5>
-        @if (scoresErrors) {
-            <app-error-display [errors]="scoresErrors"></app-error-display>
-        }
-        @if (!dailyPositionReport && !scoresErrors) {
-            <app-loading></app-loading>
-        }
-        @if (dailyPositionReport) {
-            <app-daily-outcome-scores [report]="dailyPositionReport" [showProfit]="currentPosition.isClosed"></app-daily-outcome-scores>    
-        }
-    </section>
+    <app-stock-daily-scores 
+        *ngIf="currentPosition"
+        [ticker]="currentPosition.ticker"
+        [startDate]="currentPosition.opened"></app-stock-daily-scores>
     
-    <section>
+    <section *ngIf="currentPosition">
         <h5>Position Information</h5>
         <app-stock-trading-position
                                     [position]="currentPosition"
