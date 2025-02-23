@@ -70,7 +70,7 @@ export class StockAnalysisComponent {
     ) {
         this.selectedStartDate = new Date();
         this.selectedEndDate = new Date();
-        this.selectedStartDate.setDate(this.selectedStartDate.getDate() - 30);
+        this.selectedStartDate.setDate(this.selectedStartDate.getDate() - 365);
     }
     
     @Input()
