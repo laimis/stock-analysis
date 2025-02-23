@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 import {CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
@@ -7,7 +7,6 @@ import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
-import {BrokerageService} from "../../services/brokerage.service";
 import {OptionChain, OptionDefinition, OptionLeg, OptionService} from "../../services/option.service";
 import {
     OptionPendingPositionCreateModalComponent
@@ -40,26 +39,28 @@ interface SpreadCandidate {
 })
 export class OptionSpreadBuilderComponent implements OnInit {
     
-    constructor(private optionService: OptionService, private brokerageService:BrokerageService, private route: ActivatedRoute) {
+    constructor(private optionService: OptionService, private route: ActivatedRoute) {
     }
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
-            const ticker = params.get('ticker');
-            if (ticker) {
-                this.initTicker(ticker);
-            }
+            this.ticker = params.get('ticker');
         }, error => {
             this.errors = GetErrors(error);
         })
     }
-    
-    initTicker(value:string) {
-        this.ticker = value;
-        this.loadOptions(value);
-    }
 
-    // option business
-    ticker: string;
+    _ticker: string;
+    @Input()
+    set ticker(value: string) {
+        if (value) {
+            this._ticker = value;
+            this.loadOptions(value);
+        }
+    }
+    get ticker(): string {
+        return this._ticker;
+    }
+    
     options: OptionDefinition[] = []; // Will be populated with stub data
     selectedLegs: OptionLeg[] = [];
     filteredOptions: OptionDefinition[] = [];

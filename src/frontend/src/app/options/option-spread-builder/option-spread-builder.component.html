@@ -3,7 +3,7 @@
     <app-error-display [errors]="errors"></app-error-display>
     
     <div *ngIf="!ticker">
-        <app-stock-search (tickerSelected)="initTicker($event)" [label]="'Look up ticker to start building trade'"></app-stock-search>
+        <app-stock-search (tickerSelected)="ticker = $event" [label]="'Look up ticker to start building trade'"></app-stock-search>
     </div>
 
     <app-loading *ngIf="loading"></app-loading>
