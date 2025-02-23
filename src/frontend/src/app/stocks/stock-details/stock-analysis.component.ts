@@ -202,4 +202,12 @@ export class StockAnalysisComponent {
         
         concat(dailyReport, multipleBarOutcomesPromise, dailyOutcomesPromise, percentDistribution).subscribe();
     }
+
+    setDateRange(days: number, event: Event) {
+        event.preventDefault();
+        this.selectedEndDate = new Date();
+        this.selectedStartDate = new Date();
+        this.selectedStartDate.setDate(this.selectedStartDate.getDate() - days);
+        this.refreshDailyBreakdowns();
+    }
 }

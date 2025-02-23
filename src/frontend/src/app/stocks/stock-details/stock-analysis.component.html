@@ -58,6 +58,12 @@
                         </div>
                     </div>
 
+                    <!-- Shortcuts -->
+                    <div class="d-flex align-items-end gap-2">
+                        <a href="#" class="btn btn-outline-secondary btn-sm" (click)="setDateRange(180, $event)">6M</a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm" (click)="setDateRange(365, $event)">1Y</a>
+                    </div>
+
                 </div>
             </div>
             <app-loading *ngIf="dailyBreakdownsLoading"></app-loading>
