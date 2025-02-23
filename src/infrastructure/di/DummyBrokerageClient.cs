@@ -107,7 +107,7 @@ public class DummyBrokerageClient : IBrokerage
         throw new NotImplementedException();
     }
 
-    public Task<FSharpResult<OptionChain, ServiceError>> GetOptionChain(UserState state, Ticker ticker)
+    public Task<FSharpResult<OptionChain, ServiceError>> GetOptionChain(UserState state, OptionChainSource source, Ticker ticker)
     {
         throw new NotImplementedException();
     }

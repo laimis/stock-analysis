@@ -18,7 +18,8 @@ type OptionContractView(
     let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
     let pctItm =
         match underlyingPrice with
-        | Some(price) -> 
+        | Some(price) ->
+            
             let itmPrice = 
                 match optionType with
                 | Call -> price - strikePrice
