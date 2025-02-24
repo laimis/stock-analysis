@@ -61,8 +61,7 @@
 
     <app-stock-daily-scores 
         *ngIf="currentPosition"
-        [ticker]="currentPosition.ticker"
-        [startDate]="currentPosition.opened"></app-stock-daily-scores>
+        [dailyScoresInput]="{ticker: currentPosition.ticker, startDate: currentPosition.opened}"></app-stock-daily-scores>
     
     <section *ngIf="currentPosition">
         <h5>Position Information</h5>

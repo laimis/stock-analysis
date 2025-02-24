@@ -8,6 +8,11 @@ import {DailyPositionReport, StocksService} from "../../services/stocks.service"
 import {GetErrors, parseDate} from "../../services/utils";
 import {catchError, tap} from "rxjs/operators";
 
+interface DailyScoresInput {
+    ticker: string;
+    startDate?: string;
+}
+
 @Component({
   selector: 'app-stock-daily-scores',
     imports: [
@@ -36,21 +41,18 @@ export class StockDailyScoresComponent {
         this.selectedStartDate.setDate(this.selectedStartDate.getDate() - 365);
     }
     
-    _ticker: string;
+    _dailyScoresInput : DailyScoresInput;
     @Input()
-    get ticker() {
-        return this._ticker;
+    get dailyScoresInput() {
+        return this._dailyScoresInput;
     }
-    set ticker(value: string) {
-        this._ticker = value;
-        this.refreshDailyBreakdowns();
-    }
-    
-    @Input()
-    set startDate(value: string) {
-        // sometimes the date comes in as a string with a time, we only want the date
-        value = value.split('T')[0];
-        this.selectedStartDate = parseDate(value);
+    set dailyScoresInput(value: DailyScoresInput) {
+        this._dailyScoresInput = value;
+        if (value.startDate) {
+            const startDate = value.startDate.split('T')[0];
+            this.selectedStartDate = parseDate(startDate);
+        }
+        
         this.refreshDailyBreakdowns();
     }
 
@@ -80,7 +82,7 @@ export class StockDailyScoresComponent {
         this.dailyBreakdownErrors = [];
         const startStr = this.selectedStartDate.toISOString().split('T')[0];
         const endStr = this.selectedEndDate.toISOString().split('T')[0];
-        return this.stockService.reportDailyTickerReport(this.ticker, startStr, endStr)
+        return this.stockService.reportDailyTickerReport(this.dailyScoresInput.ticker, startStr, endStr)
             .pipe(
                 tap(report => {
                     this.dailyBreakdowns = report

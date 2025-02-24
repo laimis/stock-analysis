@@ -16,7 +16,7 @@
     </section>
 
     <!-- Stock Analysis -->
-    <app-stock-daily-scores [ticker]="ticker"></app-stock-daily-scores>
+    <app-stock-daily-scores [dailyScoresInput]="{ticker}"></app-stock-daily-scores>
 
     <!-- Gaps -->
     <section *ngIf="gaps" class="card shadow-sm mb-4">

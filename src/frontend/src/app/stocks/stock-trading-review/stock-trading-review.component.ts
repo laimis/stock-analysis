@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
     BrokerageStockOrder,
-    DailyPositionReport, PositionChartInformation,
+    PositionChartInformation,
     StockPosition,
     PriceFrequency,
     StocksService,
@@ -25,9 +25,7 @@ export class StockTradingReviewComponent {
     currentPosition: StockPosition
     simulationResults: TradingStrategyResults
     simulationErrors: string[];
-    scoresErrors: string[];
     pricesErrors: string[]
-    dailyPositionReport: DailyPositionReport
     positionChartInformation: PositionChartInformation;
     @Input()
     quotes: object
@@ -43,7 +41,7 @@ export class StockTradingReviewComponent {
         private title: Title) {
     }
 
-    private _positions: StockPosition[];
+    private _positions: StockPosition[] = [];
 
     get positions(): StockPosition[] {
         return this._positions
@@ -57,12 +55,13 @@ export class StockTradingReviewComponent {
     }
 
     updateCurrentPosition() {
-        const positionId = this._positions[this._index].positionId
         this.currentPosition = null
         this.simulationResults = null
-        this.dailyPositionReport = null
         this.positionChartInformation = null
-        this.loadPositionData(positionId);
+        if (this._positions && this._positions.length > 0) {
+            const positionId = this._positions[this._index].positionId
+            this.loadPositionData(positionId);
+        }
     }
 
     getPrice(position: StockPosition) {
@@ -140,19 +139,7 @@ export class StockTradingReviewComponent {
                 })
             )
         
-        const reportPromise = this.stockService.reportDailyPositionReport(positionId)
-            .pipe(
-                tap(r => {
-                    this.scoresErrors = null
-                    this.dailyPositionReport = r
-                }),
-                catchError(e => {
-                    this.scoresErrors = GetErrors(e)
-                    return []
-                })
-            )
-        
-        concat(loadPositionPromise, simulationPromise, reportPromise).subscribe()
+        concat(loadPositionPromise, simulationPromise).subscribe()
     }
     
     private loadPrices(position: StockPosition) {
