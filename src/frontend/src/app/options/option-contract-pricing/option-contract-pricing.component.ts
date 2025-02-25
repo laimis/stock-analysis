@@ -54,7 +54,7 @@ export class OptionContractPricingComponent {
 
                 let cost : number[] = []
                 let minPrice = Number.MAX_VALUE
-                let maxPrice = Number.MIN_VALUE
+                let maxPrice = -Number.MAX_VALUE
                 for (let pricingIndex = 0; pricingIndex < pricingResults[0].length; pricingIndex++) {
                     let total = 0
                     for (let contractIndex = 0; contractIndex < pricingResults.length; contractIndex++) {
@@ -67,6 +67,8 @@ export class OptionContractPricingComponent {
                     if (total > maxPrice) {
                         maxPrice = total
                     }
+                    //let's log in the console the date and total cost
+                    console.log('Date:', pricingResults[0][pricingIndex].timestamp, 'Total:', total)
                     cost.push(total)
                 }
 
@@ -103,11 +105,69 @@ export class OptionContractPricingComponent {
                     data: underlyingData
                 }
 
-                this.dataPointContainers = [costContainer, underlyingContainer];
-                this.minPrice = minPrice
-                this.maxPrice = maxPrice
-                this.hasPrice = costContainer.data.length > 0
-                this.loading = false
+                let individualContractOI = pricingResults.map((pricing) => {
+                    return pricing.map((op) => op.openInterest);
+                });
+                let individualContractOIContainers = individualContractOI.map((mark, idx) => {
+                    return {
+                        label: "$" + contracts[idx].strikePrice + " Open Interest",
+                        chartType: ChartType.Line,
+                        data: mark.map((m, i) => {
+                            let date = convertToLocalTime(
+                                dateWithoutMilliseconds(
+                                    new Date(pricingResults[0][i].timestamp)
+                                )
+                            );
+                            return {label: dateStr(date), value: m, isDate: false}
+                        })
+                    }
+                });
+
+                let individualCost = pricingResults.map((pricing) => {
+                    return pricing.map((op) => op.mark);
+                });
+                let individualContractMarkContainers = individualCost.map((mark, idx) => {
+                    return {
+                        label: "$" + contracts[idx].strikePrice + " Mark",
+                        chartType: ChartType.Line,
+                        data: mark.map((m, i) => {
+                            let date = convertToLocalTime(
+                                dateWithoutMilliseconds(
+                                    new Date(pricingResults[0][i].timestamp)
+                                )
+                            );
+                            return {label: dateStr(date), value: m, isDate: false}
+                        })
+                    }
+                });
+
+                let individualIV = pricingResults.map((pricing) => {
+                    return pricing.map((op) => op.volatility);
+                });
+                let individualIVContainers = individualIV.map((iv, idx) => {
+                    return {
+                        label: "$" + contracts[idx].strikePrice + " IV",
+                        chartType: ChartType.Line,
+                        data: iv.map((m, i) => {
+                            let date = convertToLocalTime(
+                                dateWithoutMilliseconds(
+                                    new Date(pricingResults[0][i].timestamp)
+                                )
+                            );
+                            // check if IV is 999, usually indicates bad data, set that to 0
+                            if (m === -999) {
+                                m = 0;
+                            }
+                            return {label: dateStr(date), value: m, isDate: false}
+                        })
+                    }
+                });
+
+                this.dataPointContainers = [costContainer, underlyingContainer, ...individualContractMarkContainers, ...individualContractOIContainers, ...individualIVContainers];
+                this.minPrice = minPrice;
+                this.maxPrice = maxPrice;
+                this.hasPrice = costContainer.data.length > 0;
+                this.loading = false;
             },
             error: (error) => {
                 console.error('Error fetching option pricing:', error);

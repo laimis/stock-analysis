@@ -713,6 +713,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
 
                 let! enterResponse, content = this.CallApiWithoutSerialization user resource HttpMethod.Post (Some data)
 
+                logInfo "Enter order response: {content}" [|content|]
+
                 return
                     match enterResponse.IsSuccessStatusCode with
                     | true -> Ok ()

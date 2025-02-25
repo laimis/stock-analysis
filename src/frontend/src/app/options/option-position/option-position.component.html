@@ -106,10 +106,32 @@
                     </div>
                 </div>
 
+                <!-- Action Buttons -->
+                <div class="mt-4">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showAddToPositionModal()">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Add To Position
+                        </button>
+                        <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showClosePositionModal()">
+                            <i class="bi bi-x-lg me-1"></i>
+                            Create Close Order
+                        </button>
+                        <button *ngIf="!position.isOpen && !position.isClosed" class="btn btn-outline-secondary" (click)="closePendingPosition()">
+                            <i class="bi bi-x-lg me-1"></i>
+                            Close Pending Position
+                        </button>
+                        <button class="btn btn-outline-danger" (click)="deletePosition()">
+                            <i class="bi bi-trash me-1"></i>
+                            Delete Position
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Contracts Table -->
                 <div class="row mt-4" *ngIf="position.contracts.length > 0">
                     <div class="col">
-                        <h6 class="mb-3">Option Contracts</h6>
+                        <h4 class="mb-3">Option Contracts</h4>
                         <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
@@ -152,30 +174,38 @@
                                         <td>{{ contract.cost | currency }}</td>
                                         <td>
                                             @if (contract.market) {
-                                                {{ contract.market | currency }}
-                                            }
-                                            @if (contract.cost && contract.market) {
-                                                @let valueIncrease = contract.market - contract.cost;
-                                                <span class="badge p-1 m-1" [ngClass]="{
-                                                    'bg-success-subtle text-success': valueIncrease > 0,
-                                                    'bg-danger-subtle text-danger': valueIncrease < 0 
-                                                }">
-                                                    <i class="bi" [ngClass]="{
-                                                        'bi-arrow-up': valueIncrease > 0,
-                                                        'bi-arrow-down': valueIncrease < 0
-                                                    }"></i>
-                                                    {{ (valueIncrease / contract.cost) | percent:'1.1' }}
-                                                </span>
-                                                <span class="badge p-1 m-1" [ngClass]="{
-                                                    'bg-success-subtle text-success': valueIncrease > 0,
-                                                    'bg-danger-subtle text-danger': valueIncrease < 0 
-                                                }">
-                                                    <i class="bi" [ngClass]="{
-                                                        'bi-arrow-up': valueIncrease > 0,
-                                                        'bi-arrow-down': valueIncrease < 0
-                                                    }"></i>
-                                                    {{ (valueIncrease) | currency }}
-                                                </span>
+                                                <div class="d-flex align-items-center">
+                                                    <span>{{ contract.market | currency }}</span>
+                                                    @if (contract.details) {
+                                                        <small class="text-muted ms-1" 
+                                                               data-bs-toggle="tooltip" 
+                                                               data-bs-placement="right"
+                                                               [title]="'Bid: ' + (contract.details.bid | currency) + ' / Ask: ' + (contract.details.ask | currency)">
+                                                            ({{ contract.details.bid | currency }}/{{ contract.details.ask | currency }})
+                                                        </small>
+                                                    }
+                                                </div>
+                                                @if (contract.cost && contract.market) {
+                                                    @let valueIncrease = contract.market - contract.cost;
+                                                    <div class="d-flex gap-1 mt-1">
+                                                        <span class="badge p-1" [ngClass]="{
+                                                            'bg-success-subtle text-success': valueIncrease > 0,
+                                                            'bg-danger-subtle text-danger': valueIncrease < 0 
+                                                        }">
+                                                            <i class="bi" [ngClass]="{
+                                                                'bi-arrow-up': valueIncrease > 0,
+                                                                'bi-arrow-down': valueIncrease < 0
+                                                            }"></i>
+                                                            {{ (valueIncrease / contract.cost) | percent:'1.1' }}
+                                                        </span>
+                                                        <span class="badge p-1" [ngClass]="{
+                                                            'bg-success-subtle text-success': valueIncrease > 0,
+                                                            'bg-danger-subtle text-danger': valueIncrease < 0 
+                                                        }">
+                                                            {{ valueIncrease | currency }}
+                                                        </span>
+                                                    </div>
+                                                }
                                             }
                                         </td>
                                         
@@ -191,18 +221,6 @@
                             </tbody>
                         </table>
                     </div>
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col">
-                        <app-option-contract-pricing [position]="position"></app-option-contract-pricing>
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col">
-                        <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
                     </div>
                 </div>
 
@@ -265,6 +283,18 @@
                                 </div>
                             </div>
                         }
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col">
+                        <app-option-contract-pricing [position]="position"></app-option-contract-pricing>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col">
+                        <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
                     </div>
                 </div>
 
@@ -376,23 +406,7 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="mt-4">
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="closePositionWithMarketOrder()">
-                            <i class="bi bi-x-lg me-1"></i>
-                            Create Close Order
-                        </button>
-                        <button *ngIf="!position.isOpen && !position.isClosed" class="btn btn-outline-secondary" (click)="closePendingPosition()">
-                            <i class="bi bi-x-lg me-1"></i>
-                            Close Pending Position
-                        </button>
-                        <button class="btn btn-outline-danger" (click)="deletePosition()">
-                            <i class="bi bi-trash me-1"></i>
-                            Delete Position
-                        </button>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -400,7 +414,8 @@
         [position]="position"
         [isVisible]="showCloseModal"
         (isVisibleChange) = "showCloseModal = $event"
-        (errorsOccurred)="errorOccurred.emit($event)" (positionOrderCreated)="positionChanged.emit()"></app-option-position-close-modal>
+        (errorsOccurred)="errorOccurred.emit($event)"
+        (positionOrderCreated)="positionChanged.emit()"></app-option-position-close-modal>
     
     <app-option-contract-close-modal
         [position]="position"
@@ -409,4 +424,11 @@
         (isVisibleChange)="showContractCloseModal = $event"
         (errorsOccurred)="errorOccurred.emit($event)"
         (contractOrderCreated)="positionChanged.emit()"></app-option-contract-close-modal>
+
+    <app-option-position-add-modal
+        [position]="position"
+        [isVisible]="showAddModal"
+        (isVisibleChange)="showAddModal = $event"
+        (errorsOccurred)="errorOccurred.emit($event)"
+        (positionOrderCreated)="positionChanged.emit()"></app-option-position-add-modal>
 }

@@ -13,6 +13,7 @@ import {
     OptionContractCloseModalComponent
 } from "../option-dashboard/option-contract-close-modal/option-contract-close-modal.component";
 import {OptionContractPricingComponent} from "../option-contract-pricing/option-contract-pricing.component";
+import {OptionPositionAddModalComponent} from "./option-position-add-modal/option-position-add-modal.component";
 
 @Component({
   selector: 'app-option-position',
@@ -29,7 +30,8 @@ import {OptionContractPricingComponent} from "../option-contract-pricing/option-
         OptionBrokerageOrdersComponent,
         OptionPositionCloseModalComponent,
         OptionContractCloseModalComponent,
-        OptionContractPricingComponent
+        OptionContractPricingComponent,
+        OptionPositionAddModalComponent
     ],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
@@ -45,7 +47,8 @@ export class OptionPositionComponent {
     showNotesForm: boolean = false;
     notesExpanded: boolean = true;
     notesControl = new FormControl();
-    showCloseModal: boolean = false;
+    showCloseModal = false;
+    showAddModal = false;
     showContractCloseModal: boolean
     contractToClose: OptionContract;
     
@@ -107,7 +110,10 @@ export class OptionPositionComponent {
     addNote() {
         this.optionService.addNotes(this.position.positionId, this.notesControl.value).subscribe({
             next: (result) => {
-                this.positionChanged.emit();
+                let note = {content: this.notesControl.value, created: new Date().toDateString(), id: "0"};
+                this.position.notes.push(note);
+                this.showNotesForm = false;
+                this.notesControl.setValue("");
             },
             error: (error) => {
                 let errors = GetErrors(error);
@@ -118,8 +124,12 @@ export class OptionPositionComponent {
             }
         });
     }
+
+    showAddToPositionModal() {
+        this.showAddModal = true;
+    }
     
-    closePositionWithMarketOrder() {
+    showClosePositionModal() {
         this.showCloseModal = true;
     }
 
