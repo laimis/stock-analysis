@@ -138,6 +138,10 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         match this.IsClosed with
         | true -> state.Profit
         | false -> this.Market - this.Cost
+    member this.GainPct = 
+        match this.Cost with
+        | 0m -> 0m
+        | _ -> this.Profit / Math.Abs(this.Cost)
     member this.Transactions = state.Transactions
     member this.Notes = state.Notes
     member this.Labels = labels

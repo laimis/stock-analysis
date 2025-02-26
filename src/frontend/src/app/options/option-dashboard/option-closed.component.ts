@@ -63,4 +63,8 @@ export class OptionClosedComponent {
         let index = target.selectedIndex;
         this.setCurrentPosition(index);
     }
+    
+    abs(value: number) {
+        return Math.abs(value);
+    }
 }

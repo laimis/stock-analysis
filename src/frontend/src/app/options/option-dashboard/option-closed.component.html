@@ -20,7 +20,7 @@
                     <div><span class="text-muted">Profit:</span> <span
                         class="ms-2">{{ currentPosition.profit | currency }}</span></div>
                     <div><span class="text-muted">Gain:</span> <span
-                        class="ms-2">{{ currentPosition.profit / currentPosition.cost | percent }}</span></div>
+                        class="ms-2">{{ currentPosition.gainPct | percent }}</span></div>
                     <div><span class="text-muted">Days Held:</span> <span
                         class="ms-2">{{ currentPosition.daysHeld }}</span></div>
                 </div>

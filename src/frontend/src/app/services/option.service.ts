@@ -52,6 +52,7 @@ export interface OptionPosition {
     spread: number
     risked: number
     profit: number
+    gainPct: number
     daysHeld: number
     daysToExpiration: number[]
     isOpen: boolean
