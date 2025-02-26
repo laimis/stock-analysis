@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import { OptionPerformanceView, OptionTradePerformanceMetrics } from 'src/app/services/option.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { OptionPerformanceView, OptionTradePerformanceMetrics } from 'src/app/se
     ]
 })
 
-export class OptionPerformanceComponent {
+export class OptionPerformanceComponent implements OnInit, OnChanges {
 
     @Input() performance: OptionPerformanceView;
   
