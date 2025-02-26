@@ -38,10 +38,10 @@
     </div>
 
 @if (loaded && isActive('open')) {
-    <app-option-open [positions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
+    <app-option-positions [positions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-positions>
 }
     @if(loaded && isActive('pending')) {
-        <app-option-open [positions]=optionsContainer.pending [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-open>
+        <app-option-positions [positions]=optionsContainer.pending [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-positions>
     }
 @if (loaded && isActive('brokerage')) {
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"

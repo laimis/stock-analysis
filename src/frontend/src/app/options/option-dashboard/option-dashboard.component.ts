@@ -5,7 +5,7 @@ import {OptionsContainer, OptionService} from "../../services/option.service";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {NgClass, NgIf} from "@angular/common";
-import {OptionOpenComponent} from "./option-open.component";
+import {OptionPositionsComponent} from "./option-positions.component";
 import {OptionBrokeragePositionsComponent} from "./option-brokerage-positions.component";
 import {OptionBrokerageOrdersComponent} from "./option-brokerage-orders.component";
 import {OptionClosedComponent} from "./option-closed.component";
@@ -21,7 +21,7 @@ import {OptionSpreadBuilderComponent} from "../option-spread-builder/option-spre
         NgIf,
         NgClass,
         RouterLink,
-        OptionOpenComponent,
+        OptionPositionsComponent,
         OptionBrokeragePositionsComponent,
         OptionBrokerageOrdersComponent,
         OptionClosedComponent,

@@ -92,7 +92,7 @@ import {OptionPositionComponent} from "./options/option-position/option-position
 import {
     OptionPositionCreateModalComponent
 } from "./options/option-dashboard/option-position-create-modal/option-position-create-modal.component";
-import {OptionOpenComponent} from "./options/option-dashboard/option-open.component";
+import {OptionPositionsComponent} from "./options/option-dashboard/option-positions.component";
 import {StockTradingPositionComponent} from "./stocks/stock-trading/stock-trading-position.component";
 import {StockDailyScoresComponent} from "./shared/stock-daily-scores/stock-daily-scores.component";
 
@@ -184,7 +184,7 @@ import {StockDailyScoresComponent} from "./shared/stock-daily-scores/stock-daily
         DailyOutcomeScoresComponent,
         OptionPositionComponent,
         OptionPositionCreateModalComponent,
-        OptionOpenComponent,
+        OptionPositionsComponent,
         StockTradingPositionComponent,
         StockDailyScoresComponent
     ],
