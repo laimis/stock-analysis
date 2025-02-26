@@ -31,6 +31,7 @@ export class OptionContractCloseModalComponent implements OnChanges {
 
     positionNotes: string;
     price: number;
+    quantity: number;
     costDrops: { [key: string]: number } = {};
     
     constructor(
@@ -43,6 +44,7 @@ export class OptionContractCloseModalComponent implements OnChanges {
         if (this.position && this.contract?.details) {
             console.log("setting price value", this.contract.details?.mark)
             this.price = this.contract.details.mark;
+            this.quantity = Math.abs(this.contract.quantity);
             this.calculateCostDrops();
         }
     }
@@ -95,7 +97,7 @@ export class OptionContractCloseModalComponent implements OnChanges {
             orderLegCollection: [
                 {
                     instruction: instruction,
-                    quantity: Math.abs(contract.quantity),
+                    quantity: Math.abs(this.quantity),
                     instrument: {
                         symbol: contract.details.symbol,
                         assetType: "OPTION"

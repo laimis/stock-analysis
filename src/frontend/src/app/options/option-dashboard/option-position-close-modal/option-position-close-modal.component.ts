@@ -33,12 +33,14 @@ export class OptionPositionCloseModalComponent implements OnChanges {
 
     positionNotes: string;
     price: number;
+    quantity: number;
     spreadValues: { [key: string]: number } = {};
 
     ngOnChanges() {
         if (this.position) {
             console.log("setting price value", this.position.market)
-            this.price = this.position.market;
+            this.quantity = Math.abs(this.position.contracts[0].quantity)
+            this.price = this.position.market / this.quantity;
             this.calculateSpreadValues();
         }
     }
@@ -84,15 +86,15 @@ export class OptionPositionCloseModalComponent implements OnChanges {
         let collections = position.contracts.map(x => {
             return {
                 instruction: x.quantity < 0 ? OptionOrderInstruction.BUY_TO_CLOSE : OptionOrderInstruction.SELL_TO_CLOSE,
-                quantity: Math.abs(x.quantity),
+                quantity: Math.abs(this.quantity),
                 instrument: {
                     symbol: x.details.symbol,
                     assetType: "OPTION"
                 }
-            }
-        })
-        
-        let order : OptionOrderCommand = {
+            };
+        });
+
+        let order: OptionOrderCommand = {
             orderType,
             session,
             price,

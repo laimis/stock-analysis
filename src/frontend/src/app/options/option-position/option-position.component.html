@@ -31,7 +31,6 @@
                                 <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
                                     {{position.market | currency}}
                                 </div>
-                                <small>{{ position.profit | currency }}</small>
                             } @else {
                                 <div class="stat-label text-muted mb-1">Profit</div>
                                 <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
