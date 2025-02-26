@@ -218,6 +218,17 @@
                                     </tr>
                                 }
                             </tbody>
+                            <tfoot *ngIf="position.contracts.length > 1 && position.isOpen">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold"></td>
+                                    <td></td>
+                                    <td>{{ position.cost / abs(position.contracts[0].quantity) | currency }}</td>
+                                    <td>{{ position.market / abs(position.contracts[0].quantity) | currency }}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                     </div>

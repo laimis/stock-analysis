@@ -189,5 +189,5 @@ export class OptionPositionComponent {
     }
 
 
-    protected readonly Math = Math;
+    protected readonly abs = Math.abs;
 }
