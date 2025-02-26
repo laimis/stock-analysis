@@ -87,9 +87,9 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.DaysToExpiration =
         // days are countedfrom the time it's opened
         let referenceDate = 
-            match state.IsOpen && state.IsClosed with
-            | true -> state.Opened.Value
-            | false -> DateTimeOffset.Now
+            match state.Opened with
+            | Some opened -> opened
+            | None -> DateTimeOffset.Now
 
         contracts
         |> Seq.map (fun c -> c.Expiration.ToDateTimeOffset() - referenceDate)
@@ -102,7 +102,10 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.IsOpen = state.IsOpen
     member this.IsPending = state.IsPending
     member this.IsPendingClosed = state.IsPendingClosed
-    member this.Cost = match state.Cost with Some c -> c | None -> state.DesiredCost |> Option.defaultValue 0m
+    member this.Cost =
+        match state.Cost with
+        | Some c -> c
+        | None -> state.DesiredCost |> Option.defaultValue 0m
     member this.Market =
         contracts
         |> Seq.sumBy (fun c -> c.Details |> Option.map(fun o -> o.Mark * decimal c.Quantity) |> Option.defaultValue 0m)
@@ -119,8 +122,8 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         match contracts with
         | x when x.Length > 1 ->
             match this.Cost with
-            | x when x < 0m -> this.Spread + this.Cost
-            | _ -> this.Spread - this.Cost
+            | cost when cost < 0m -> this.Spread + this.Cost
+            | _ -> this.Cost
         | x when x.Length = 1 -> 
             let contract = x[0]
             match contract.IsShort with
@@ -148,9 +151,6 @@ type OptionPositionStats(summaries:seq<OptionPositionView>) =
     let losses = optionTrades |> List.filter (fun s -> s.Profit < 0m)
     
     member this.Count = optionTrades |> List.length
-    member this.Assigned = None // TODO: implement
-    member this.AveragePremiumCapture = None // TODO: implement
-    
     member this.Wins = wins |> List.length
     member this.AvgWinAmount =
         match wins with
