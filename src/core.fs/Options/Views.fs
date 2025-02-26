@@ -85,8 +85,14 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Opened = state.Opened
     member this.DaysHeld = state.DaysHeld
     member this.DaysToExpiration =
+        // days are countedfrom the time it's opened
+        let referenceDate = 
+            match state.IsOpen && state.IsClosed with
+            | true -> state.Opened.Value
+            | false -> DateTimeOffset.Now
+
         contracts
-        |> Seq.map (fun c -> c.Expiration.ToDateTimeOffset() - DateTimeOffset.Now)
+        |> Seq.map (fun c -> c.Expiration.ToDateTimeOffset() - referenceDate)
         |> Seq.map (fun ts -> ts.TotalDays |> int)
         |> Seq.distinct
         |> Seq.sort
@@ -108,6 +114,23 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
             let minStrike = contracts |> Seq.map _.StrikePrice |> Seq.min
             let maxStrike = contracts |> Seq.map _.StrikePrice |> Seq.max
             maxStrike - minStrike
+    member this.Risked =
+        // for spreads, the risk is the cost of the spread
+        match contracts with
+        | x when x.Length > 1 ->
+            match this.Cost with
+            | x when x < 0m -> this.Spread + this.Cost
+            | _ -> this.Spread - this.Cost
+        | x when x.Length = 1 -> 
+            let contract = x[0]
+            match contract.IsShort with
+            | true -> 
+                match contract.OptionType with
+                | Call -> Double.PositiveInfinity |> decimal
+                | Put -> contract.StrikePrice
+            | false -> this.Cost
+        | _ -> 0m
+        
     member this.Profit =
         match this.IsClosed with
         | true -> state.Profit

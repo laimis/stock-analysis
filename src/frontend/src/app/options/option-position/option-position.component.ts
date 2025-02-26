@@ -14,25 +14,27 @@ import {
 } from "../option-dashboard/option-contract-close-modal/option-contract-close-modal.component";
 import {OptionContractPricingComponent} from "../option-contract-pricing/option-contract-pricing.component";
 import {OptionPositionAddModalComponent} from "./option-position-add-modal/option-position-add-modal.component";
+import { ParsedDatePipe } from "../../services/parsedDate.filter";
 
 @Component({
   selector: 'app-option-position',
     imports: [
-        NgClass,
-        CurrencyPipe,
-        DatePipe,
-        ReactiveFormsModule,
-        FormsModule,
-        DecimalPipe,
-        StockLinkAndTradingviewLinkComponent,
-        PercentPipe,
-        NgIf,
-        OptionBrokerageOrdersComponent,
-        OptionPositionCloseModalComponent,
-        OptionContractCloseModalComponent,
-        OptionContractPricingComponent,
-        OptionPositionAddModalComponent
-    ],
+    NgClass,
+    CurrencyPipe,
+    DatePipe,
+    ReactiveFormsModule,
+    FormsModule,
+    DecimalPipe,
+    StockLinkAndTradingviewLinkComponent,
+    PercentPipe,
+    NgIf,
+    OptionBrokerageOrdersComponent,
+    OptionPositionCloseModalComponent,
+    OptionContractCloseModalComponent,
+    OptionContractPricingComponent,
+    OptionPositionAddModalComponent,
+    ParsedDatePipe
+],
   templateUrl: './option-position.component.html',
   styleUrl: './option-position.component.css'
 })

@@ -1,15 +1,3 @@
-.stat-group {
-    padding: 1rem;
-    background-color: var(--bs-light);
-    border-radius: 0.5rem;
-    height: 100%;
-}
-
-.stat-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
 .cursor-pointer {
     cursor: pointer;
 }

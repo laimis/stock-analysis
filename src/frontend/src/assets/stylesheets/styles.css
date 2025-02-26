@@ -113,6 +113,14 @@ section.card {
 .card-body {
     padding: 1.25rem;
 }
+.card {
+    border: 1px solid rgba(0,0,0,.125);
+    transition: all 0.3s ease;
+}
+
+.card-shadow:hover {
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
 
 .bg-negative {
     background-color: #FFB6C1 !important;

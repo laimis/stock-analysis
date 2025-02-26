@@ -45,15 +45,6 @@
     border-radius: 0.375rem;
 }
 
-.card {
-    border: 1px solid rgba(0,0,0,.125);
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-}
-
 .btn-link {
     color: var(--bs-body-color);
 }

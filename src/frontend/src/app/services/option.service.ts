@@ -50,6 +50,7 @@ export interface OptionPosition {
     desiredCost: number
     market: number
     spread: number
+    risked: number
     profit: number
     daysHeld: number
     daysToExpiration: number[]

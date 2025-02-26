@@ -1,122 +1,122 @@
 @if (_position) {
     <div class="mb-3">
-        <div class="card">
+        <div class="card card-shadow">
         <div class="card-body">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="stat-label">Cost/Share</div>
-                <div>{{ _position.averageCostPerShare | currency }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">Number of Shares</div>
-                <div>
-                    @if (_position.isClosed) {
-                        {{ _position.completedPositionShares }}
-                    } @else {
-                        {{ _position.numberOfShares }} / {{ _position.completedPositionShares }}
-                    }
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stat-label">Cost/Share</div>
+                    <div>{{ _position.averageCostPerShare | currency }}</div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">Cost</div>
-                <div>{{ _position.cost | currency }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">Opened</div>
-                <div>{{ _position.opened | parsedDate }} ({{ _position.daysHeld }})</div>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-3">
-                <div class="stat-label">Current Price</div>
-                <div>{{ getPrice() | currency }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">
-                    Stop Price
-                    <span class="bi bi-pencil" role="button" (click)="openStopModal()"></span>
-                </div>
-                <div>{{ candidateStopPrice | currency }}</div>
-                <div>
-                    <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
-                </div>
-            </div>
-            
-            <div class="col-md-3" #riskReadonlyDiv>
-                <div class="stat-label">
-                    Risk Amount
-                    <span class="bi bi-pencil" role="button"
-                          (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
-                </div>
-                <div>{{ candidateRiskAmount | currency }}</div>
-                <div>
-                    <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
-                </div>
-            </div>
-            <div class="col-md-3 visually-hidden" #riskEditDiv>
-                <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
-                <span class="bi bi-x-circle ms-2" role="button"
-                      (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
-                <div class="input-group">
-                    <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount"
-                           type="number">
-                    <button class="btn btn-outline-secondary" (click)="setRiskAmount([riskReadonlyDiv,riskEditDiv])">
-                        Update
-                    </button>
-                </div>
-            </div>
-            <div class="col-md-3" #strategyReadonyDiv>
-                <div class="stat-label">
-                    Strategy
-                    <span class="bi bi-pencil" role="button"
-                          (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
-                </div>
-                <div>{{ positionStrategy }}</div>
-            </div>
-            <div class="col-md-3 visually-hidden" #strategyEditDiv>
-                <label class="form-label stat-label" for="strategyInput">Strategy</label>
-                <span class="bi bi-x-circle ms-2" role="button"
-                      (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
-                <div class="input-group">
-                    <select class="form-select" id="strategyInput" #strategyInput>
-                        <option value="">Choose...</option>
-                        @for (s of strategies; track s) {
-                            <option
-                                value="{{s.key}}" [selected]="positionStrategy === s.key">{{ s.value }}
-                            </option>
+                <div class="col-md-3">
+                    <div class="stat-label">Number of Shares</div>
+                    <div>
+                        @if (_position.isClosed) {
+                            {{ _position.completedPositionShares }}
+                        } @else {
+                            {{ _position.numberOfShares }} / {{ _position.completedPositionShares }}
                         }
-                    </select>
-                    <button class="btn btn-outline-secondary"
-                            (click)="setStrategy(strategyInput.value,[strategyReadonyDiv,strategyEditDiv])">Update
-                    </button>
+                    </div>
                 </div>
-                <div>
-                    <a href="#"
-                       (click)="strategyInput.value = ''; clearStrategy([strategyReadonyDiv,strategyEditDiv]);">Clear
-                        Strategy</a>
+                <div class="col-md-3">
+                    <div class="stat-label">Cost</div>
+                    <div>{{ _position.cost | currency }}</div>
                 </div>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-3">
-                <div class="stat-label">Profit</div>
-                <div>{{ _position.profit | currency }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">Profit Gain</div>
-                <div>{{ _position.gainPct | percent:'1.2-2' }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">R/R</div>
-                <div>{{ _position.rr | number }}</div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-label">Chart</div>
-                <div>
-                    <app-trading-view-link [ticker]="_position.ticker"></app-trading-view-link>
+                <div class="col-md-3">
+                    <div class="stat-label">Opened</div>
+                    <div>{{ _position.opened | parsedDate }} ({{ _position.daysHeld }})</div>
                 </div>
             </div>
-        </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="stat-label">Current Price</div>
+                    <div>{{ getPrice() | currency }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-label">
+                        Stop Price
+                        <span class="bi bi-pencil" role="button" (click)="openStopModal()"></span>
+                    </div>
+                    <div>{{ candidateStopPrice | currency }}</div>
+                    <div>
+                        <a href="#" (click)="deleteStopPrice();">Delete Stop Price</a>
+                    </div>
+                </div>
+                
+                <div class="col-md-3" #riskReadonlyDiv>
+                    <div class="stat-label">
+                        Risk Amount
+                        <span class="bi bi-pencil" role="button"
+                            (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
+                    </div>
+                    <div>{{ candidateRiskAmount | currency }}</div>
+                    <div>
+                        <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
+                    </div>
+                </div>
+                <div class="col-md-3 visually-hidden" #riskEditDiv>
+                    <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
+                    <span class="bi bi-x-circle ms-2" role="button"
+                        (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
+                    <div class="input-group">
+                        <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount"
+                            type="number">
+                        <button class="btn btn-outline-secondary" (click)="setRiskAmount([riskReadonlyDiv,riskEditDiv])">
+                            Update
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3" #strategyReadonyDiv>
+                    <div class="stat-label">
+                        Strategy
+                        <span class="bi bi-pencil" role="button"
+                            (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
+                    </div>
+                    <div>{{ positionStrategy }}</div>
+                </div>
+                <div class="col-md-3 visually-hidden" #strategyEditDiv>
+                    <label class="form-label stat-label" for="strategyInput">Strategy</label>
+                    <span class="bi bi-x-circle ms-2" role="button"
+                        (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
+                    <div class="input-group">
+                        <select class="form-select" id="strategyInput" #strategyInput>
+                            <option value="">Choose...</option>
+                            @for (s of strategies; track s) {
+                                <option
+                                    value="{{s.key}}" [selected]="positionStrategy === s.key">{{ s.value }}
+                                </option>
+                            }
+                        </select>
+                        <button class="btn btn-outline-secondary"
+                                (click)="setStrategy(strategyInput.value,[strategyReadonyDiv,strategyEditDiv])">Update
+                        </button>
+                    </div>
+                    <div>
+                        <a href="#"
+                        (click)="strategyInput.value = ''; clearStrategy([strategyReadonyDiv,strategyEditDiv]);">Clear
+                            Strategy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="stat-label">Profit</div>
+                    <div>{{ _position.profit | currency }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-label">Profit Gain</div>
+                    <div>{{ _position.gainPct | percent:'1.2-2' }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-label">R/R</div>
+                    <div>{{ _position.rr | number }}</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-label">Chart</div>
+                    <div>
+                        <app-trading-view-link [ticker]="_position.ticker"></app-trading-view-link>
+                    </div>
+                </div>
+            </div>
         @if (_position.isOpen) {
             <div class="row mt-3">
                 <div class="col-md-3">

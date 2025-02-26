@@ -8,7 +8,7 @@
                             <app-stock-link-and-tradingview-link [ticker]="position.underlyingTicker"></app-stock-link-and-tradingview-link>
                         </h5>
                     </div>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center" *ngIf="position.underlyingPrice">
                         <span class="text-muted me-2">Stock price:</span>
                         <span class="h5 mb-0">{{ position.underlyingPrice | currency }}</span>
                     </div>
@@ -17,48 +17,54 @@
 
             <div class="card-body">
                 <!-- Main Position Statistics -->
-                <div class="row g-4">
-                    <div class="col-md-3">
-                        <div class="stat-group">
-                            <div class="stat-label text-muted mb-1">Cost</div>
-                            <div class="h5 mb-0">{{ position.cost | currency }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-group">
-                            @if (position.isClosed === false) {
-                            <div class="stat-label text-muted mb-1">Market</div>
-                                <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
-                                    {{position.market | currency}}
+                <div class="card card-shadow">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-label">Cost</div>
+                                <div>{{ position.cost | currency }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Number of Contracts</div>
+                                <div>
+                                    {{ position.contracts.length }}
                                 </div>
-                            } @else {
-                                <div class="stat-label text-muted mb-1">Profit</div>
-                                <div class="h5 mb-0" [ngClass]="{ 'text-success': position.profit > 0, 'text-danger': position.profit < 0}">
-                                    {{ position.profit | currency }}
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Day Held</div>
+                                {{ position.daysHeld }} / {{ position.daysToExpiration[0]}}
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Opened</div>
+                                <div>{{ position.opened| parsedDate }}</div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="stat-label">Profit</div>
+                                <div>{{ position.profit | currency }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Spread</div>
+                                <div>
+                                    {{ position.spread | currency }}
                                 </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-group">
-                            <div class="stat-label text-muted mb-1">Days Held</div>
-                            <div class="h5 mb-0">{{ position.daysHeld }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-group">
-                            <div class="stat-label text-muted mb-1">Days To Expiration</div>
-                            <div class="h5 mb-0">
-                                @if (position.daysToExpiration.length > 0) {
-                                    {{ position.daysToExpiration[0] | number }}
-                                } @else {
-                                    N/A
-                                }
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Risked</div>
+                                <div>{{ position.risked | currency }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Closed</div>                                
+                                <div>
+                                    <span *ngIf="position.isOpen">N/A</span>
+                                    <span *ngIf="position.isClosed">{{ position.closed | parsedDate }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
                 </div>
-                
                 <div class="row mt-2">
                     <!-- Labels Section -->
                     <div class="col">
@@ -139,12 +145,14 @@
                                     <th>Type</th>
                                     <th>Strike</th>
                                     <th>Expiration</th>
+                                    @if(position.isClosed === false) {
                                     <th>Quantity</th>
                                     <th>Cost</th>
                                     <th>Market</th>
                                     <th>Delta</th>
                                     <th>IV</th>
                                     <th></th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody>
@@ -169,6 +177,7 @@
                                         </td>
                                         <td>{{ contract.strikePrice | currency }}</td>
                                         <td>{{ contract.expiration }}</td>
+                                        @if(position.isClosed === false) {
                                         <td>{{ contract.quantity }}</td>
                                         <td>{{ contract.cost | currency }}</td>
                                         <td>
@@ -215,6 +224,7 @@
                                                 Close Contract
                                             </button>
                                         </td>
+                                        }
                                     </tr>
                                 }
                             </tbody>
