@@ -54,10 +54,7 @@
     <app-option-closed [orders]="optionsContainer.orders" [closedOptions]=optionsContainer.closed></app-option-closed>
 }
 @if (loaded && isActive('performance')) {
-    <app-option-performance
-        [overallStats]="optionsContainer.overallStats"
-        [buyStats]="optionsContainer.buyStats"
-        [sellStats]="optionsContainer.sellStats">
+    <app-option-performance [performance]="optionsContainer.performance">
     </app-option-performance>
 }
     @if(loaded && isActive('spreadbuilder')) {

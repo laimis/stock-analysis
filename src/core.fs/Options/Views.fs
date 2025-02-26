@@ -143,6 +143,313 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Labels = labels
     member this.Contracts = contracts
     
+type OptionTradePerformanceMetrics = {
+    // Basic statistics
+    NumberOfTrades: int
+    Wins: int
+    Losses: int
+    WinPct: decimal
+    
+    // Profit metrics
+    TotalProfit: decimal
+    AvgWinAmount: decimal
+    MaxWinAmount: decimal
+    AvgLossAmount: decimal
+    MaxLossAmount: decimal
+    
+    // Risk-adjusted metrics
+    SharpeRatio: decimal
+    SortinoRatio: decimal
+    ProfitFactor: decimal
+    
+    // Expectancy and R-multiples
+    Expectancy: decimal
+    AvgRMultiple: decimal
+    
+    // Drawdown metrics
+    MaxDrawdown: decimal
+    RecoveryFactor: decimal
+    UlcerIndex: decimal
+    
+    // Risk management
+    AvgRiskPerTrade: decimal
+    AvgDaysHeld: decimal
+    WinAvgDaysHeld: decimal
+    LossAvgDaysHeld: decimal
+    
+    // Options-specific
+    AvgIVPercentileEntry: decimal
+    AvgIVPercentileExit: decimal
+    AvgThetaPerDay: decimal
+    
+    // Return metrics
+    AvgReturnPct: decimal
+    WinAvgReturnPct: decimal
+    LossAvgReturnPct: decimal
+    ReturnPctRatio: decimal
+    RiskAdjustedReturn: decimal
+    
+    // Consistency metrics
+    ReturnStdDev: decimal
+    DownsideDeviation: decimal
+    
+    // Strategy distribution
+    StrategyDistribution: Map<string, int>
+}
+
+module OptionPerformance =
+    let calculateDrawdowns (trades: OptionPositionView list) =
+        if trades.IsEmpty then
+            0m, 0m
+        else
+            let orderedTrades = trades |> List.sortBy (fun t -> t.Opened |> Option.defaultValue DateTimeOffset.MinValue)
+            
+            let mutable peakEquity = 0m
+            let mutable currentEquity = 0m
+            let mutable maxDrawdown = 0m
+            let mutable drawdownSum = 0m
+            let mutable drawdownDuration = 0
+            let mutable maxDrawdownDuration = 0
+            
+            for trade in orderedTrades do
+                currentEquity <- currentEquity + trade.Profit
+                
+                if currentEquity > peakEquity then
+                    peakEquity <- currentEquity
+                    drawdownDuration <- 0
+                else
+                    let drawdown = peakEquity - currentEquity
+                    maxDrawdown <- max maxDrawdown drawdown
+                    drawdownSum <- drawdownSum + drawdown * drawdown // For Ulcer Index
+                    drawdownDuration <- drawdownDuration + 1
+                    maxDrawdownDuration <- max maxDrawdownDuration drawdownDuration
+                    
+            let ulcerIndex = 
+                if trades.Length > 0 then
+                    sqrt (drawdownSum / decimal trades.Length |> float) |> decimal
+                else
+                    0m
+                
+            maxDrawdown, ulcerIndex
+            
+    let calculateRMultiple (trade: OptionPositionView) =
+        if trade.Risked <= 0m then 1m  // Default if risk can't be determined
+        else trade.Profit / trade.Risked
+            
+    let calculateReturns (trades: OptionPositionView list) =
+        if trades.IsEmpty then
+            0m, 0m, 0m
+        else
+            let returns = 
+                trades 
+                |> List.map (fun t -> 
+                    match t.Cost with
+                    | 0m -> 0m  // Avoid division by zero
+                    | cost -> t.Profit / abs cost
+                )
+            
+            let mean = returns |> List.average
+            
+            let variance = 
+                returns 
+                |> List.map (fun r -> (r - mean) * (r - mean))
+                |> List.average
+                
+            let stdDev = variance |> float |> sqrt |> decimal
+            
+            let downsideReturns = returns |> List.filter (fun r -> r < 0m)
+            
+            let downsideDeviation =
+                if downsideReturns.IsEmpty then 0m
+                else
+                    let downsideVariance = 
+                        downsideReturns 
+                        |> List.map (fun r -> r * r)
+                        |> List.average
+                        |> float
+                    sqrt downsideVariance |> decimal
+                    
+            mean, stdDev, downsideDeviation
+    
+    let calculatePerformanceMetrics (trades: OptionPositionView list) =
+        if trades.IsEmpty then
+            { 
+                // Empty metrics with zeros
+                NumberOfTrades = 0
+                Wins = 0
+                Losses = 0
+                WinPct = 0m
+                TotalProfit = 0m
+                AvgWinAmount = 0m
+                MaxWinAmount = 0m
+                AvgLossAmount = 0m
+                MaxLossAmount = 0m
+                SharpeRatio = 0m
+                SortinoRatio = 0m
+                ProfitFactor = 0m
+                Expectancy = 0m
+                AvgRMultiple = 0m
+                MaxDrawdown = 0m
+                RecoveryFactor = 0m
+                UlcerIndex = 0m
+                AvgRiskPerTrade = 0m
+                AvgDaysHeld = 0m
+                WinAvgDaysHeld = 0m
+                LossAvgDaysHeld = 0m
+                AvgIVPercentileEntry = 0m
+                AvgIVPercentileExit = 0m
+                AvgThetaPerDay = 0m
+                AvgReturnPct = 0m
+                WinAvgReturnPct = 0m
+                LossAvgReturnPct = 0m
+                ReturnPctRatio = 0m
+                RiskAdjustedReturn = 0m
+                ReturnStdDev = 0m
+                DownsideDeviation = 0m
+                StrategyDistribution = Map.empty
+            }
+        else
+            // Basic trade statistics
+            let wins = trades |> List.filter (fun t -> t.Profit >= 0m)
+            let losses = trades |> List.filter (fun t -> t.Profit < 0m)
+            let winPct = decimal wins.Length / decimal trades.Length
+            
+            // Profit metrics
+            let totalProfit = trades |> List.sumBy (fun t -> t.Profit)
+            let avgWinAmount = if wins.IsEmpty then 0m else wins |> List.averageBy (fun t -> t.Profit)
+            let maxWinAmount = if wins.IsEmpty then 0m else wins |> List.map (fun t -> t.Profit) |> List.max
+            let avgLossAmount = if losses.IsEmpty then 0m else losses |> List.averageBy (fun t -> t.Profit) |> abs
+            let maxLossAmount = if losses.IsEmpty then 0m else losses |> List.map (fun t -> t.Profit) |> List.min |> abs
+            
+            // Risk multiples
+            let rMultiples = trades |> List.map calculateRMultiple
+            let avgRMultiple = if rMultiples.IsEmpty then 0m else rMultiples |> List.average
+            
+            // Drawdown calculations
+            let maxDrawdown, ulcerIndex = calculateDrawdowns trades
+            
+            // Recovery factor
+            let recoveryFactor = 
+                if maxDrawdown = 0m then 0m
+                else totalProfit / maxDrawdown
+                
+            // Risk per trade
+            let avgRiskPerTrade = trades |> List.map (fun t -> t.Risked) |> List.average
+            
+            // Days held
+            let avgDaysHeld = 
+                trades 
+                |> List.map (fun t -> t.DaysHeld |> Option.defaultValue 0) 
+                |> List.averageBy decimal
+                
+            let winAvgDaysHeld = 
+                if wins.IsEmpty then 0m
+                else wins |> List.map (fun t -> t.DaysHeld |> Option.defaultValue 0) |> List.averageBy decimal
+                
+            let lossAvgDaysHeld = 
+                if losses.IsEmpty then 0m
+                else losses |> List.map (fun t -> t.DaysHeld |> Option.defaultValue 0) |> List.averageBy decimal
+                
+            // Return calculations
+            let avgReturnPct, returnStdDev, downsideDeviation = calculateReturns trades
+            
+            let winAvgReturnPct = 
+                if wins.IsEmpty then 0m
+                else 
+                    wins 
+                    |> List.map (fun t -> match t.Cost with | 0m -> 0m | cost -> t.Profit / abs cost) 
+                    |> List.average
+                    
+            let lossAvgReturnPct = 
+                if losses.IsEmpty then 0m
+                else 
+                    losses 
+                    |> List.map (fun t -> match t.Cost with | 0m -> 0m | cost -> t.Profit / abs cost) 
+                    |> List.average
+            
+            // Profit factor
+            let grossProfit = wins |> List.sumBy (fun t -> t.Profit)
+            let grossLoss = losses |> List.sumBy (fun t -> abs t.Profit)
+            let profitFactor = if grossLoss = 0m then 0m else grossProfit / grossLoss
+            
+            // Expectancy
+            let expectancy = (winPct * avgWinAmount) - ((1m - winPct) * avgLossAmount)
+            
+            // Return % ratio
+            let returnPctRatio = 
+                match winAvgReturnPct, lossAvgReturnPct with
+                | w, l when w > 0m && l < 0m -> w / abs l
+                | _ -> 0m
+                
+            // Sharpe and Sortino ratios (assuming risk-free rate of 0 for simplicity)
+            let sharpeRatio = 
+                if returnStdDev = 0m then 0m
+                else avgReturnPct / returnStdDev
+                
+            let sortinoRatio = 
+                if downsideDeviation = 0m then 0m
+                else avgReturnPct / downsideDeviation
+                
+            // Risk-adjusted return
+            let riskAdjustedReturn = 
+                if avgRiskPerTrade = 0m then 0m
+                else avgReturnPct / avgRiskPerTrade
+                
+            // Strategy distribution
+            let strategyDistribution =
+                trades
+                |> List.choose (fun t -> 
+                    t.Labels 
+                    |> Array.tryFind (fun label -> label.Key = "strategy") 
+                    |> Option.map (fun label -> label.Value))
+                |> List.groupBy id
+                |> List.map (fun (strategy, occurrences) -> strategy, occurrences.Length)
+                |> Map.ofList
+                
+            // IV percentiles and theta - placeholders as we might need to add these data points to OptionPositionView
+            let avgIVPercentileEntry = 0m // Placeholder
+            let avgIVPercentileExit = 0m  // Placeholder
+            let avgThetaPerDay = 0m       // Placeholder
+            
+            {
+                NumberOfTrades = trades.Length
+                Wins = wins.Length
+                Losses = losses.Length
+                WinPct = winPct
+                TotalProfit = totalProfit
+                AvgWinAmount = avgWinAmount
+                MaxWinAmount = maxWinAmount
+                AvgLossAmount = avgLossAmount
+                MaxLossAmount = maxLossAmount
+                SharpeRatio = sharpeRatio
+                SortinoRatio = sortinoRatio
+                ProfitFactor = profitFactor
+                Expectancy = expectancy
+                AvgRMultiple = avgRMultiple
+                MaxDrawdown = maxDrawdown
+                RecoveryFactor = recoveryFactor
+                UlcerIndex = ulcerIndex
+                AvgRiskPerTrade = avgRiskPerTrade
+                AvgDaysHeld = avgDaysHeld
+                WinAvgDaysHeld = winAvgDaysHeld
+                LossAvgDaysHeld = lossAvgDaysHeld
+                AvgIVPercentileEntry = avgIVPercentileEntry
+                AvgIVPercentileExit = avgIVPercentileExit
+                AvgThetaPerDay = avgThetaPerDay
+                AvgReturnPct = avgReturnPct
+                WinAvgReturnPct = winAvgReturnPct
+                LossAvgReturnPct = lossAvgReturnPct
+                ReturnPctRatio = returnPctRatio
+                RiskAdjustedReturn = riskAdjustedReturn
+                ReturnStdDev = returnStdDev
+                DownsideDeviation = downsideDeviation
+                StrategyDistribution = strategyDistribution
+            }
+
+type OptionPerformanceView = {
+    Total: OptionTradePerformanceMetrics
+    ByTimeframes: Map<string, OptionTradePerformanceMetrics>
+}
 
 type OptionPositionStats(summaries:seq<OptionPositionView>) =
     
@@ -230,14 +537,74 @@ type OptionOrderView(order:OptionOrder, chain:OptionChain option) =
     
 type OptionDashboardView(pending:seq<OptionPositionView>,``open``:seq<OptionPositionView>,closed:seq<OptionPositionView>, brokeragePositions:seq<BrokerageOptionPosition>, orders:seq<OptionOrderView>) =
     
+    let closedList = closed |> Seq.toList
+    
+    let overallPerformance = OptionPerformance.calculatePerformanceMetrics closedList
+
+    // Generate timeframe-based performance metrics
+    let now = DateTimeOffset.UtcNow
+    
+    let last20 = 
+        closedList 
+        |> List.sortByDescending (fun p -> p.Closed |> Option.defaultValue DateTimeOffset.MaxValue)
+        |> List.truncate 20
+        
+    let last50 = 
+        closedList 
+        |> List.sortByDescending (fun p -> p.Closed |> Option.defaultValue DateTimeOffset.MaxValue)
+        |> List.truncate 50
+        
+    let last100 = 
+        closedList 
+        |> List.sortByDescending (fun p -> p.Closed |> Option.defaultValue DateTimeOffset.MaxValue)
+        |> List.truncate 100
+        
+    let last2Months = 
+        closedList 
+        |> List.filter (fun p -> 
+            match p.Closed with
+            | Some closed -> closed >= now.AddMonths(-2)
+            | None -> false)
+            
+    let startOfYear = DateTimeOffset(now.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+    let ytd =
+        closedList
+        |> List.filter (fun p ->
+            match p.Closed with
+            | Some closed -> closed >= startOfYear
+            | None -> false)
+            
+    let oneYear =
+        closedList
+        |> List.filter (fun p ->
+            match p.Closed with
+            | Some closed -> closed >= now.AddYears(-1)
+            | None -> false)
+            
+    let timeframePerformance = 
+        [
+            "Last 20", OptionPerformance.calculatePerformanceMetrics last20
+            "Last 50", OptionPerformance.calculatePerformanceMetrics last50
+            "Last 100", OptionPerformance.calculatePerformanceMetrics last100
+            "Last 2 Months", OptionPerformance.calculatePerformanceMetrics last2Months
+            "YTD", OptionPerformance.calculatePerformanceMetrics ytd
+            "1 Year", OptionPerformance.calculatePerformanceMetrics oneYear
+            "All Time", overallPerformance
+        ]
+        |> Map.ofList
+
     member this.Closed = closed
     member this.Open = ``open``
     member this.Pending = pending
     member this.Orders = orders
     member this.BrokeragePositions = brokeragePositions
-    member this.OverallStats = OptionPositionStats(closed) // TODO make stats to incorporate the new option position structure
+    member this.OverallStats = OptionPositionStats(closed)
     member this.BuyStats = OptionPositionStats([])
     member this.SellStats = OptionPositionStats([])
+    member this.Performance = {
+        Total = overallPerformance
+        ByTimeframes = timeframePerformance
+    }
 
 type OptionChainView(chain:OptionChain) =
     

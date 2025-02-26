@@ -160,23 +160,53 @@ export class OwnedOption {
     detail: OptionDefinition
 }
 
-export class OptionStats {
-    count: number
-    wins: number
-    assigned: number
-    averagePremiumCapture: number
-
-    avgWinAmount: number
-    losses: number
-    averageLossAmount: number
-    maxWinAmount: number
-    maxLossAmount: number
-
-    ev: number
-    averageProfitPerDay: number
-    averageDays: number
-    averageDaysHeld: number
-    averageDaysHeldPercentage: number
+export interface OptionTradePerformanceMetrics {
+    numberOfTrades: number;
+    wins: number;
+    losses: number;
+    winPct: number;
+    
+    totalProfit: number;
+    avgWinAmount: number;
+    maxWinAmount: number;
+    avgLossAmount: number;
+    maxLossAmount: number;
+    
+    sharpeRatio: number;
+    sortinoRatio: number;
+    profitFactor: number;
+    
+    expectancy: number;
+    avgRMultiple: number;
+    
+    maxDrawdown: number;
+    recoveryFactor: number;
+    ulcerIndex: number;
+    
+    avgRiskPerTrade: number;
+    avgDaysHeld: number;
+    winAvgDaysHeld: number;
+    lossAvgDaysHeld: number;
+    
+    avgIVPercentileEntry: number;
+    avgIVPercentileExit: number;
+    avgThetaPerDay: number;
+    
+    avgReturnPct: number;
+    winAvgReturnPct: number;
+    lossAvgReturnPct: number;
+    returnPctRatio: number;
+    riskAdjustedReturn: number;
+    
+    returnStdDev: number;
+    downsideDeviation: number;
+    
+    strategyDistribution: Record<string, number>;
+  }
+  
+export interface OptionPerformanceView {
+    total: OptionTradePerformanceMetrics;
+    byTimeframes: Record<string, OptionTradePerformanceMetrics>;
 }
 
 export interface BrokerageOptionContract {
@@ -231,9 +261,7 @@ export interface OptionsContainer {
     closed: OptionPosition[]
     brokeragePositions: BrokerageOptionContract[]
     orders: BrokerageOptionOrder[]
-    overallStats: OptionStats
-    buyStats: OptionStats
-    sellStats: OptionStats
+    performance: OptionPerformanceView
 }
 
 export class openoptionpositioncommand {}

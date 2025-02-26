@@ -1,18 +1,231 @@
-@if (overallStats) {
-    <div class="mb-5 container">
-        <div class="row mb-2"><h5>Overall stats</h5></div>
-        <app-option-stats [stats]=overallStats></app-option-stats>
+<div class="container-fluid">
+    <!-- Timeframe Selector -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label" for="performancePeriod">Performance Period</label>
+                <select #timeframeSelect (change)="onTimeframeChange(timeframeSelect.value)" class="form-select"
+                        id="performancePeriod">
+                    @for (period of timeframeOptions; track period) {
+                        <option [value]="period" [selected]="selectedTimeframe === period">{{ period }}</option>
+                    }
+                </select>
+            </div>
+        </div>
     </div>
-}
-@if (sellStats) {
-    <div class="mb-5 container">
-        <div class="row mb-2"><h5>Sell stats</h5></div>
-        <app-option-stats [stats]=sellStats></app-option-stats>
-    </div>
-}
-@if (buyStats) {
-    <div class="mb-5 container">
-        <div class="row mb-2"><h5>Buy stats</h5></div>
-        <app-option-stats [stats]=buyStats></app-option-stats>
-    </div>
-}
+
+    <!-- Performance Summary -->
+    @if (currentMetrics) {
+        <section class="mb-4">
+            <h5>Performance Summary - {{ selectedTimeframe }}</h5>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Trade Statistics -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="stat-label">Total Trades</div>
+                            <div>{{ currentMetrics.numberOfTrades }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Wins</div>
+                            <div>{{ currentMetrics.wins }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Losses</div>
+                            <div>{{ currentMetrics.losses }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Win %</div>
+                            <div>{{ currentMetrics.winPct | percent:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Total P/L</div>
+                            <div>{{ currentMetrics.totalProfit | currency }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Win Statistics -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="stat-label">Avg Win $</div>
+                            <div>{{ currentMetrics.avgWinAmount | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Win Avg Return %</div>
+                            <div>{{ currentMetrics.winAvgReturnPct | percent:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Max Win $</div>
+                            <div>{{ currentMetrics.maxWinAmount | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Win Days Held</div>
+                            <div>{{ currentMetrics.winAvgDaysHeld | number:'1.0-1' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Profit Factor</div>
+                            <div>{{ currentMetrics.profitFactor | number:'1.2-2' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Loss Statistics -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="stat-label">Avg Loss $</div>
+                            <div>{{ currentMetrics.avgLossAmount | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Loss Avg Return %</div>
+                            <div>{{ currentMetrics.lossAvgReturnPct | percent:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Max Loss $</div>
+                            <div>{{ currentMetrics.maxLossAmount | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Loss Days Held</div>
+                            <div>{{ currentMetrics.lossAvgDaysHeld | number:'1.0-1' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Return % Ratio</div>
+                            <div>{{ currentMetrics.returnPctRatio | number:'1.2-2' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Risk-Adjusted Metrics -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="stat-label">Sharpe Ratio</div>
+                            <div>{{ currentMetrics.sharpeRatio | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Sortino Ratio</div>
+                            <div>{{ currentMetrics.sortinoRatio | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Expectancy</div>
+                            <div>{{ currentMetrics.expectancy | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Avg R-Multiple</div>
+                            <div>{{ currentMetrics.avgRMultiple | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Avg Risk/Trade</div>
+                            <div>{{ currentMetrics.avgRiskPerTrade | currency }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Drawdown & Consistency -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="stat-label">Max Drawdown</div>
+                            <div>{{ currentMetrics.maxDrawdown | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Recovery Factor</div>
+                            <div>{{ currentMetrics.recoveryFactor | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Ulcer Index</div>
+                            <div>{{ currentMetrics.ulcerIndex | number:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Return Std Dev</div>
+                            <div>{{ currentMetrics.returnStdDev | percent:'1.2-2' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Risk-Adj Return</div>
+                            <div>{{ currentMetrics.riskAdjustedReturn | percent:'1.2-2' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Options-Specific -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="stat-label">Avg Days Held</div>
+                            <div>{{ currentMetrics.avgDaysHeld | number:'1.0-1' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Avg IV % Entry</div>
+                            <div>{{ currentMetrics.avgIVPercentileEntry | percent:'1.0-1' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Avg IV % Exit</div>
+                            <div>{{ currentMetrics.avgIVPercentileExit | percent:'1.0-1' }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Avg Theta/Day</div>
+                            <div>{{ currentMetrics.avgThetaPerDay | currency }}</div>
+                        </div>
+                        <div class="col">
+                            <div class="stat-label">Avg Return %</div>
+                            <div>{{ currentMetrics.avgReturnPct | percent:'1.2-2' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    <!-- Charts Section -->
+    <section class="mb-4">
+        <h5>Performance Charts</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        Cumulative P&L
+                    </div>
+                    <div class="card-body">
+                        <!-- Placeholder for chart -->
+                        <div class="chart-placeholder">
+                            Cumulative P&L Chart
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        Return Distribution
+                    </div>
+                    <div class="card-body">
+                        <!-- Placeholder for chart -->
+                        <div class="chart-placeholder">
+                            Return Distribution Chart
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        Win/Loss Calendar
+                    </div>
+                    <div class="card-body">
+                        <!-- Placeholder for chart -->
+                        <div class="chart-placeholder">
+                            Win/Loss Calendar Chart
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        Strategy Performance Comparison
+                    </div>
+                    <div class="card-body">
+                        <!-- Placeholder for chart -->
+                        <div class="chart-placeholder">
+                            Strategy Comparison Chart
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

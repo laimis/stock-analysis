@@ -1,0 +1,48 @@
+<div class="mt-4" *ngIf="positions && positions.length === 0">
+    You have no option options contracts on record. To record a position, select the ticker below to get started:
+    <div class="row">
+        <div class="col">
+            <app-stock-search
+                label="{{null}}"
+                placeholder="Search for securities using ticker or name"
+                (tickerSelected)="onTickerSelected($event)"
+                cssClass="form-control">
+            </app-stock-search>
+        </div>
+    </div>
+</div>
+<div class="mt-4" *ngIf="positions.length > 0">
+    
+    <div class="accordion" id="positionsAccordion">
+        <div class="accordion-item mb-3 position-card" *ngFor="let position of positions; let i = index">
+            <h2 class="accordion-header" [id]="'heading' + i">
+                <button class="accordion-button collapsed" type="button"
+                        (click)="toggleAccordion(i)">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-bold me-2">{{position.underlyingTicker}}</span>
+                            <span class="badge bg-secondary">{{position.daysToExpiration[0]}} days to expiration</span>
+                        </div>
+                        <div class="position-summary">
+                            <span [ngClass]="{'text-success': position.profit > 0, 'text-black': position.profit < 0}">
+                                {{position.profit | currency}}
+                            </span>
+                        </div>
+                    </div>
+                </button>
+            </h2>
+            <div [id]="'collapse' + i" class="accordion-collapse" [ngClass]="{'collapse':!expandedPositions[i]}">
+                <div class="accordion-body">
+                    <app-option-position
+                        *ngIf="expandedPositions[i]"
+                        [position]="position"
+                        [orders]="orders"
+                        (positionDeleted)="positionsChanged.emit()"
+                        (positionChanged)="positionsChanged.emit()"
+                        (errorOccurred)="errorOccurred.emit($event)">
+                    </app-option-position>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
