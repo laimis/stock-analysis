@@ -11,6 +11,30 @@
     @if(optionChain) {
         <div class="row mb-3">
             <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <label for="minSpread" class="form-label">Min Spread:</label>
+                        <input id="minSpread" type="number" class="form-control" [(ngModel)]="minSpread">
+                    </div>
+                    <div class="col">
+                        <label for="maxSpread" class="form-label">Max Spread:</label>
+                        <input id="maxSpread" type="number" class="form-control" [(ngModel)]="maxSpread">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="minCostSpreadRatio" class="form-label">Cost Spread Ratio:</label>
+                        <input id="minCostSpreadRatio" type="number" class="form-control" [(ngModel)]="minCostSpreadRatio">
+                    </div>
+                    <div class="col">
+                        <label for="maxCostSpreadRatio" class="form-label">Max Cost Spread Ratio:</label>
+                        <input id="maxCostSpreadRatio" type="number" class="form-control" [(ngModel)]="maxCostSpreadRatio">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
                 <button class="btn btn-primary me-2" (click)="this.manualSelection = true">Select Spreads Manually</button>
                 <button class="btn btn-primary me-2" (click)="this.manualSelection = false; findDebitCallSpreads()">Find Debit Call Spreads</button>
                 <button class="btn btn-primary me-2" (click)="this.manualSelection = false; findCreditCallSpreads()">Find Credit Call Spreads</button>

@@ -38,6 +38,9 @@ interface SpreadCandidate {
     styleUrl: './option-spread-builder.component.css'
 })
 export class OptionSpreadBuilderComponent implements OnInit {
+    parseInt(input: string): number {
+        return Number.parseInt(input);
+    }
     
     constructor(private optionService: OptionService, private route: ActivatedRoute) {
     }
@@ -82,6 +85,12 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
     errors: string[] = [];
     loading: boolean = false;
+
+    // filters for credit spreads
+    minSpread = 0;
+    maxSpread = 0;
+    minCostSpreadRatio = 0;
+    maxCostSpreadRatio = 0;
 
     putOpenInterest() {
         return this.filteredOptions.filter(x => x.optionType == "Put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
@@ -572,25 +581,24 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
         // For put credit spreads, we sell the higher strike and buy the lower strike
         for (let shortOption of putOptions) {
-            const validShort =
-                shortOption.delta > -0.65  // Less aggressive delta for short put
-                && shortOption.delta < -0.35  // Not too far OTM
+            for (let longOption of putOptions) {
+                
+                const validLong =
+                    longOption.strikePrice < shortOption.strikePrice  // Lower strike for protection
+                    && Date.parse(longOption.expiration) == Date.parse(shortOption.expiration)
+                    
+                if (validLong) {
+                    // Credit received is what we get for selling higher strike minus what we pay for lower strike
+                    let credit = shortOption.mark - longOption.mark
+                    let spread = Math.abs(shortOption.strikePrice - longOption.strikePrice)
 
-            if (validShort) {
-                for (let longOption of putOptions) {
-                    const validLong =
-                        longOption.strikePrice < shortOption.strikePrice  // Lower strike for protection
-                        && Date.parse(longOption.expiration) == Date.parse(shortOption.expiration)
-                        && longOption.delta >= -0.35  // Further OTM for cheaper protection
-
-                    if (validLong) {
-                        // Credit received is what we get for selling higher strike minus what we pay for lower strike
-                        let credit = shortOption.mark - longOption.mark
-
-                        // Only include spreads where we receive a credit
-                        if (credit > 0) {
-                            spreads.push({ longOption, shortOption, cost: credit })
-                        }
+                    // Only include spreads where we receive a credit
+                    if (credit > 0 
+                        && credit / spread >= this.minCostSpreadRatio
+                        && credit / spread <= this.maxCostSpreadRatio
+                        && spread >= this.minSpread
+                        && spread <= this.maxSpread) {
+                        spreads.push({ longOption, shortOption, cost: credit })
                     }
                 }
             }
