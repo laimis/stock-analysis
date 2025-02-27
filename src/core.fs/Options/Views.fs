@@ -139,9 +139,9 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         | true -> state.Profit
         | false -> this.Market - this.Cost
     member this.GainPct = 
-        match this.Cost with
+        match this.Risked with
         | 0m -> 0m
-        | _ -> this.Profit / Math.Abs(this.Cost)
+        | _ -> this.Profit / this.Risked
     member this.Transactions = state.Transactions
     member this.Notes = state.Notes
     member this.Labels = labels
@@ -246,11 +246,7 @@ module OptionPerformance =
         else
             let returns = 
                 trades 
-                |> List.map (fun t -> 
-                    match t.Cost with
-                    | 0m -> 0m  // Avoid division by zero
-                    | cost -> t.Profit / abs cost
-                )
+                |> List.map (fun t -> t.GainPct)
             
             let mean = returns |> List.average
             
