@@ -8,10 +8,6 @@
         <input class="form-check-input" type="checkbox" id="closePositionsSwitch" [(ngModel)]="closePositions" [disabled]="loading">
         <label class="form-check-label" for="closePositionsSwitch">Close positions at end of simulations</label>
     </div>
-    <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" id="adjustSizesSwitch" [(ngModel)]="adjustSizes" [disabled]="loading">
-        <label class="form-check-label" for="adjustSizesSwitch">Adjust position size</label>
-    </div>
     <div class="mt-3">
         <button class="btn btn-primary" (click)="simulateTrades()" [disabled]="loading">Simulate trades</button>
     </div>

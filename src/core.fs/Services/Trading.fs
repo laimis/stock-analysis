@@ -913,7 +913,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
             closeIfOpenAtTheEnd,
             actualTrade = None)
         
-    member this.Run(user:UserState, position:StockPositionState,adjustSizeBasedOnRisk:bool,closeIfOpenAtTheEnd) =
+    member this.Run(user:UserState, position:StockPositionState,closeIfOpenAtTheEnd) =
         
         let calculations = position |> StockPositionWithCalculations
         
@@ -925,20 +925,7 @@ type TradingStrategyRunner(brokerage:IBrokerageGetPriceHistory, hours:IMarketHou
         let numberOfShares =
             match position.StockPositionType with
             | Short -> calculations.CompletedPositionShares * -1m
-            | Long ->
-                let initialRisk =
-                    match calculations.InitialRiskedAmount |> Option.defaultValue 0m with
-                    | x when x <= 1m -> 80m
-                    | x -> x
-                    
-                let risk = calculations.RiskedAmount |> Option.defaultValue initialRisk
-                
-                let adjustment = 
-                    match adjustSizeBasedOnRisk with
-                    | true -> risk / initialRisk
-                    | false -> 1m
-                    
-                Math.Floor(calculations.CompletedPositionShares * adjustment)
+            | Long -> calculations.CompletedPositionShares
                 
         this.Run(
             user=user,

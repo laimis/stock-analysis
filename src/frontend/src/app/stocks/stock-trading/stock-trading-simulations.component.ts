@@ -5,12 +5,11 @@ import {
     PriceBar,
     PriceFrequency,
     StocksService,
-    TradingStrategyPerformance, TradingStrategyResult
-} from '../../services/stocks.service';
+    TradingStrategyPerformance} from '../../services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
-import {catchError, concatAll, tap} from "rxjs/operators";
-import {concat, forkJoin} from "rxjs";
+import {catchError, tap} from "rxjs/operators";
+import {forkJoin} from "rxjs";
 
 @Component({
     selector: 'app-stock-trading-simulations',
@@ -24,7 +23,6 @@ export class StockTradingSimulationsComponent implements OnInit {
     errors: string[];
     numberOfTrades: number = 40;
     closePositions: boolean = true;
-    adjustSizes: boolean = false;
     loading: boolean = false;
     benchmarks: {ticker: string, prices: PriceBar[] }[] = [];
 
@@ -56,7 +54,7 @@ export class StockTradingSimulationsComponent implements OnInit {
         this.loading = true
         this.errors = [];
         this.benchmarks = [];
-        this.stockPositions.simulatePositions(this.closePositions, this.adjustSizes, this.numberOfTrades).subscribe(results => {
+        this.stockPositions.simulatePositions(this.closePositions, this.numberOfTrades).subscribe(results => {
             this.results = results.sort((a, b) => b.performance.profit - a.performance.profit);
             this.loading = false;
             this.fetchBenchmarks();

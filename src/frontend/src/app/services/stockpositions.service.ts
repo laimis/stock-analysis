@@ -43,9 +43,9 @@ export class StockPositionsService {
         )
     }
 
-    simulatePositions(closePositionIfOpenAtTheEnd: boolean, adjustSizeBasedOnRisk: boolean, numberOfTrades: number): Observable<TradingStrategyPerformance[]> {
+    simulatePositions(closePositionIfOpenAtTheEnd: boolean, numberOfTrades: number): Observable<TradingStrategyPerformance[]> {
         return this.http.get<TradingStrategyPerformance[]>(
-            `/api/portfolio/stockpositions/simulate/trades?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}&adjustSizeBasedOnRisk=${adjustSizeBasedOnRisk}`
+            `/api/portfolio/stockpositions/simulate/trades?numberOfTrades=${numberOfTrades}&closePositionIfOpenAtTheEnd=${closePositionIfOpenAtTheEnd}`
         )
     }
     

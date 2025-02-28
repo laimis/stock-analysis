@@ -218,7 +218,6 @@ type SimulateUserTrades =
         UserId: UserId
         NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
-        AdjustSizeBasedOnRisk: bool
     }
     
 type SimulateOpenTrades =
@@ -231,7 +230,6 @@ type ExportUserSimulatedTrades =
         UserId: UserId
         NumberOfTrades: int
         ClosePositionIfOpenAtTheEnd: bool
-        AdjustSizeBasedOnRisk: bool
     }
 
 type QueryTradingEntries =
@@ -676,7 +674,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             | None -> return "Stock position not found" |> ServiceError |> Error
             | Some stock ->
                 let runner = TradingStrategyRunner(brokerage, marketHours, logger)
-                let! simulation = runner.Run(user.State, position=stock, adjustSizeBasedOnRisk=false, closeIfOpenAtTheEnd=command.CloseIfOpenAtTheEnd)
+                let! simulation = runner.Run(user.State, position=stock, closeIfOpenAtTheEnd=command.CloseIfOpenAtTheEnd)
                 return simulation |> Ok
     }
     
@@ -706,7 +704,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 runner.Run(
                     user,
                     position=position,
-                    adjustSizeBasedOnRisk=false,
                     closeIfOpenAtTheEnd=false
                 ) |> Async.AwaitTask
             
@@ -777,12 +774,11 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
     
     member _.Handle (command:SimulateUserTrades) = task {
         
-        let runSimulation (runner:TradingStrategyRunner) user closeIfOpenAtEnd adjustSizeBasedOnRisk (position:StockPositionState) = async {
+        let runSimulation (runner:TradingStrategyRunner) user closeIfOpenAtEnd (position:StockPositionState) = async {
             let! results =
                 runner.Run(
                     user,
                     position=position,
-                    adjustSizeBasedOnRisk=adjustSizeBasedOnRisk,
                     closeIfOpenAtTheEnd=closeIfOpenAtEnd
                 ) |> Async.AwaitTask
             
@@ -815,7 +811,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
             
             let! simulations =
                 positions
-                |> List.map (runSimulation runner user.State command.ClosePositionIfOpenAtTheEnd command.AdjustSizeBasedOnRisk)
+                |> List.map (runSimulation runner user.State command.ClosePositionIfOpenAtTheEnd)
                 |> Async.Sequential
                 |> Async.StartAsTask
                 
@@ -832,7 +828,6 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
         let (simulateCommand:SimulateUserTrades) = {
             UserId = command.UserId
             NumberOfTrades = command.NumberOfTrades
-            AdjustSizeBasedOnRisk = command.AdjustSizeBasedOnRisk
             ClosePositionIfOpenAtTheEnd = command.ClosePositionIfOpenAtTheEnd}
         let! results = this.Handle(simulateCommand)
         
