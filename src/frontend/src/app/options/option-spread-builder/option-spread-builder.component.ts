@@ -18,6 +18,13 @@ interface SpreadCandidate {
     cost:number
 }
 
+enum SpreadType {
+    DEBIT_CALL = 'DEBIT_CALL',
+    CREDIT_CALL = 'CREDIT_CALL',
+    DEBIT_PUT = 'DEBIT_PUT',
+    CREDIT_PUT = 'CREDIT_PUT'
+  }
+
 @Component({
     selector: 'app-option-spread-builder',
     imports: [
@@ -79,18 +86,25 @@ export class OptionSpreadBuilderComponent implements OnInit {
     filterMinimumStrike: number = 0;
     filterMaximumSpread: number = 0;
     
-    manualSelection: boolean = false;
+    manualSelection: boolean = true;
     
     optionChain: OptionChain;
 
     errors: string[] = [];
     loading: boolean = false;
 
-    // filters for credit spreads
+    // filter settings for findind spreads
     minSpread = 0;
     maxSpread = 0;
     minCostSpreadRatio = 0;
     maxCostSpreadRatio = 0;
+    minExpirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 30 days from now
+    maxExpirationDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 90 days from now
+    maxBidAskSpreadPercent: number = 10; // 10%
+    selectedSpreadType: SpreadType = SpreadType.DEBIT_CALL;
+
+    isCallSelected: boolean = true;
+    isDebitSelected: boolean = true;
 
     putOpenInterest() {
         return this.filteredOptions.filter(x => x.optionType == "Put").map(x => x.openInterest).reduce((a, b) => a + b, 0)
@@ -115,7 +129,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 this.optionChain = data
                 this.options = this.optionChain.options
                 this.createOptionBasedFilters();
-                this.loadFiltersFromLocalStorage()
+                this.loadFiltersFromLocalStorage();
+                this.loadFindSettingsFromLocalStorage();
                 this.applyFiltersAndSort();
                 this.refreshLegsIfNeeded();
                 this.loading = false
@@ -198,6 +213,52 @@ export class OptionSpreadBuilderComponent implements OnInit {
             this.filterVolumeOI = filters.filterVolumeOI;
             this.filterBid = filters.filterBid;
             this.filterMinimumStrike = filters.filterMinimumStrike;
+        }   
+    }
+
+    saveFindFiltersInLocalStorage() {
+        const key = `optionSpreadBuilderFindFilters-${this.ticker}`;
+        const filters = {
+            minSpread: this.minSpread,
+            maxSpread: this.maxSpread,
+            minCostSpreadRatio: this.minCostSpreadRatio,
+            maxCostSpreadRatio: this.maxCostSpreadRatio,
+            minExpirationDate: this.minExpirationDate,
+            maxExpirationDate: this.maxExpirationDate,
+            maxBidAskSpreadPercent: this.maxBidAskSpreadPercent,
+            isCallSelected: this.isCallSelected,
+            isDebitSelected: this.isDebitSelected
+        }
+        localStorage.setItem(key, JSON.stringify(filters));
+        console.log("saved find filters", filters)
+    }
+
+    loadFindSettingsFromLocalStorage() {
+        const key = `optionSpreadBuilderFindFilters-${this.ticker}`;
+        const filters = JSON.parse(localStorage.getItem(key));
+        if (filters) {
+            this.minSpread = filters.minSpread;
+            this.maxSpread = filters.maxSpread;
+            this.minCostSpreadRatio = filters.minCostSpreadRatio;
+            this.maxCostSpreadRatio = filters.maxCostSpreadRatio;
+            if (filters.minExpirationDate) {
+                this.minExpirationDate = filters.minExpirationDate;
+            }
+            if (filters.maxExpirationDate) {
+                this.maxExpirationDate = filters.maxExpirationDate;
+            }
+            if (filters.maxBidAskSpreadPercent !== undefined) {
+                this.maxBidAskSpreadPercent = filters.maxBidAskSpreadPercent;
+            }
+            if (filters.isCallSelected !== undefined) {
+                this.isCallSelected = filters.isCallSelected;
+            }
+            if (filters.isDebitSelected !== undefined) {
+                this.isDebitSelected = filters.isDebitSelected;
+            }
+            console.log("loaded find filters", filters);
+        } else {
+            console.log("no find filters found");
         }
     }
     
@@ -386,6 +447,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
     rollToExpiration(input) {}
 
     builtSpreads: SpreadCandidate[] = null
+    candidateOptions : OptionDefinition[] = []
     
     isModalVisible: boolean = false
     createOrder() {
@@ -395,217 +457,92 @@ export class OptionSpreadBuilderComponent implements OnInit {
     positionCreated() {
         this.isModalVisible = false
     }
-    
-    findDebitCallSpreads() {
-        let spreads : {longOption:OptionDefinition, shortOption:OptionDefinition, cost:number}[] = []
+
+    findSpreads(spreadType: SpreadType) {
+        this.saveFindFiltersInLocalStorage();
         
-        // first filter out available options to a valid call option
-        // the filter should take options that are 30 to 90 days out
-        // spread should be 10% or less of the stock price
-        // some open interest, and some volume
-        let minExpirationDate = Date.now() + 30 * 24 * 60 * 60 * 1000
-        let maxExpirationDate = Date.now() + 90 * 24 * 60 * 60 * 1000
+        let spreads: SpreadCandidate[] = [];
+        const isCall = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.CREDIT_CALL;
+        const isDebit = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.DEBIT_PUT;
         
-        let callOptions = this.options.filter(x => 
-            x.optionType == "Call" 
-            && x.openInterest > 0 
+        // Filter options based on option type and other criteria
+        let filteredOptions = this.options.filter(x =>
+            x.optionType == (isCall ? "Call" : "Put")
+            && x.openInterest > 0
             && x.volume > 0
-            && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expiration) > minExpirationDate
-            && Date.parse(x.expiration) < maxExpirationDate)
-        
-        for (let longOption of callOptions) {
-            const validLong = 
-                longOption.delta > 0.35
-                && longOption.delta < 0.8
-            if (validLong) {
-                for (let shortOption of callOptions) {
-                    const validShort = 
-                        shortOption.strikePrice > longOption.strikePrice
-                        && Date.parse(shortOption.expiration) == Date.parse(longOption.expiration)
-                        && shortOption.delta <= 0.35
-                    if (validShort) {
-                        let cost = longOption.mark - shortOption.mark
-                        spreads.push({ longOption, shortOption, cost })
-                    }
-                }
-            }
-        }
-        
-        // sort spreads, first by spread, then cost
-        this.builtSpreads = spreads.sort((a, b) => {
-            let aSpread = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice) - a.cost
-            let bSpread = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice) - a.cost
+            && Math.abs(x.bid - x.ask) <= (this.maxBidAskSpreadPercent / 100) * x.mark
+            && Date.parse(x.expiration) > Date.parse(this.minExpirationDate)
+            && Date.parse(x.expiration) < Date.parse(this.maxExpirationDate));
             
-            if (aSpread == bSpread) {
-                return a.cost - b.cost
-            } else {
-                return aSpread - bSpread
-            }
-        })
-    }
-
-    findCreditCallSpreads() {
-        let spreads: SpreadCandidate[] = []
-
-        // Filter options 30-90 days out
-        // Spread should be 10% or less of stock price
-        // Require some open interest and volume
-        let minExpirationDate = Date.now() + 30 * 24 * 60 * 60 * 1000
-        let maxExpirationDate = Date.now() + 90 * 24 * 60 * 60 * 1000
-
-        let callOptions = this.options.filter(x =>
-            x.optionType == "Call"
-            && x.openInterest > 0
-            && x.volume > 0
-            && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expiration) > minExpirationDate
-            && Date.parse(x.expiration) < maxExpirationDate)
-
-        // For credit spreads, we sell the lower strike and buy the higher strike
-        for (let shortOption of callOptions) {
-            const validShort =
-                shortOption.delta > 0.35
-                && shortOption.delta < 0.65  // More conservative delta range for selling options
-
-            if (validShort) {
-                for (let longOption of callOptions) {
-                    const validLong =
-                        longOption.strikePrice > shortOption.strikePrice  // Higher strike for protection
-                        && Date.parse(longOption.expiration) == Date.parse(shortOption.expiration)
-                        && longOption.delta <= 0.35  // Further OTM for protection
-
-                    if (validLong) {
-                        // Credit received is the difference between what we receive for selling
-                        // the lower strike and what we pay for the higher strike
-                        let credit = shortOption.mark - longOption.mark
-
-                        // Only include spreads where we receive a credit
-                        if (credit > 0) {
-                            spreads.push({ longOption, shortOption, cost: credit })
-                        }
-                    }
-                }
-            }
-        }
-
-        // Sort spreads by maximum return on risk
-        // For credit spreads: (credit received) / (spread width - credit received)
-        this.builtSpreads = spreads.sort((a, b) => {
-            let aSpreadWidth = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice)
-            let bSpreadWidth = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice)
-
-            let aRiskRewardRatio = a.cost / (aSpreadWidth - a.cost)
-            let bRiskRewardRatio = b.cost / (bSpreadWidth - b.cost)
-
-            // Sort by risk/reward ratio in descending order (higher is better)
-            return bRiskRewardRatio - aRiskRewardRatio
-        })
-    }
-
-    findDebitPutSpreads() {
-        let spreads: SpreadCandidate[] = []
-
-        // Filter for put options 30-90 days out
-        let minExpirationDate = Date.now() + 30 * 24 * 60 * 60 * 1000
-        let maxExpirationDate = Date.now() + 90 * 24 * 60 * 60 * 1000
-
-        let putOptions = this.options.filter(x =>
-            x.optionType == "Put"  // Changed to Put
-            && x.openInterest > 0
-            && x.volume > 0
-            && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expiration) > minExpirationDate
-            && Date.parse(x.expiration) < maxExpirationDate)
-
-        // For put debit spreads, we buy the higher strike and sell the lower strike
-        for (let longOption of putOptions) {
-            const validLong =
-                longOption.delta < -0.35  // Negative delta for puts
-                && longOption.delta > -0.8 // More aggressive delta for long put
-
-            if (validLong) {
-                for (let shortOption of putOptions) {
-                    const validShort =
-                        shortOption.strikePrice < longOption.strikePrice  // Lower strike for short put
-                        && Date.parse(shortOption.expiration) == Date.parse(longOption.expiration)
-                        && shortOption.delta >= -0.35  // Less aggressive delta for short put
-
-                    if (validShort) {
-                        // Cost is what we pay for higher strike minus what we receive for lower strike
-                        let cost = longOption.mark - shortOption.mark
-
-                        // Only include spreads where the cost is positive (debit spread)
-                        if (cost > 0) {
-                            spreads.push({ longOption, shortOption, cost })
-                        }
-                    }
-                }
-            }
-        }
-
-        // Sort spreads by potential return relative to cost
-        this.builtSpreads = spreads.sort((a, b) => {
-            // Maximum profit is the difference in strikes minus the cost
-            let aMaxProfit = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice) - a.cost
-            let bMaxProfit = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice) - b.cost
-
-            // Return on Investment (ROI) = maxProfit / cost
-            let aROI = aMaxProfit / a.cost
-            let bROI = bMaxProfit / b.cost
-
-            if (aROI == bROI) {
-                // If ROI is the same, prefer the spread with lower cost
-                return a.cost - b.cost
-            } else {
-                // Sort by ROI in descending order (higher is better)
-                return bROI - aROI
-            }
-        })
-    }
-
-    findCreditPutSpreads() {
-        let spreads: SpreadCandidate[] = []
-
-        // Filter for put options 30-90 days out
-        let minExpirationDate = Date.now() + 30 * 24 * 60 * 60 * 1000
-        let maxExpirationDate = Date.now() + 90 * 24 * 60 * 60 * 1000
-
-        let putOptions = this.options.filter(x =>
-            x.optionType == "Put"
-            && x.openInterest > 0
-            && x.volume > 0
-            && Math.abs(x.bid - x.ask) <= 0.1 * x.mark
-            && Date.parse(x.expiration) > minExpirationDate
-            && Date.parse(x.expiration) < maxExpirationDate)
-
-        // For put credit spreads, we sell the higher strike and buy the lower strike
-        for (let shortOption of putOptions) {
-            for (let longOption of putOptions) {
-                
-                const validLong =
-                    longOption.strikePrice < shortOption.strikePrice  // Lower strike for protection
-                    && Date.parse(longOption.expiration) == Date.parse(shortOption.expiration)
+        this.candidateOptions = filteredOptions;
+        
+        // Set up parameters based on spread type
+        const longIsLowerStrike = isDebit === isCall;
+        
+        // Loop through options to find spreads
+        for (let firstOption of filteredOptions) {
+            for (let secondOption of filteredOptions) {
+                // Determine long and short legs based on strike and spread type
+                const longOption = longIsLowerStrike ? 
+                    (firstOption.strikePrice < secondOption.strikePrice ? firstOption : secondOption) :
+                    (firstOption.strikePrice > secondOption.strikePrice ? firstOption : secondOption);
                     
-                if (validLong) {
-                    // Credit received is what we get for selling higher strike minus what we pay for lower strike
-                    let credit = shortOption.mark - longOption.mark
-                    let spread = Math.abs(shortOption.strikePrice - longOption.strikePrice)
-
-                    // Only include spreads where we receive a credit
-                    if (credit > 0 
-                        && credit / spread >= this.minCostSpreadRatio
-                        && credit / spread <= this.maxCostSpreadRatio
-                        && spread >= this.minSpread
-                        && spread <= this.maxSpread) {
-                        spreads.push({ longOption, shortOption, cost: credit })
+                const shortOption = longOption === firstOption ? secondOption : firstOption;
+                
+                // Check if this is a valid pair
+                const validPair =
+                    ((longIsLowerStrike && longOption.strikePrice < shortOption.strikePrice) ||
+                    (!longIsLowerStrike && longOption.strikePrice > shortOption.strikePrice)) &&
+                    Date.parse(longOption.expiration) === Date.parse(shortOption.expiration);
+                    
+                if (validPair) {
+                    // Calculate cost/credit and spread
+                    const priceDifference = longOption.mark - shortOption.mark;
+                    const spread = Math.abs(longOption.strikePrice - shortOption.strikePrice);
+                    
+                    // For debit spreads, cost must be positive; for credit spreads, credit must be positive
+                    if ((isDebit && priceDifference > 0) || (!isDebit && priceDifference < 0)) {
+                        const costOrCredit = isDebit ? priceDifference : -priceDifference;
+                        
+                        // Apply filters
+                        if (costOrCredit / spread >= this.minCostSpreadRatio 
+                            && costOrCredit / spread <= this.maxCostSpreadRatio
+                            && spread >= this.minSpread
+                            && spread <= this.maxSpread) {
+                            spreads.push({ longOption, shortOption, cost: costOrCredit });
+                        }
                     }
                 }
             }
         }
+        
+        // Sort based on spread type
+        this.builtSpreads = isDebit ? this.sortDebitSpreads(spreads) : this.sortCreditSpreads(spreads);
+    }
 
-        // Sort spreads by return on risk
-        this.builtSpreads = spreads.sort((a, b) => {
+    findSelectedSpreads() {
+        this.manualSelection = false;
+        
+        // Determine the spread type based on the selected options
+        let spreadType: SpreadType;
+        
+        if (this.isCallSelected && this.isDebitSelected) {
+            spreadType = SpreadType.DEBIT_CALL;
+        } else if (this.isCallSelected && !this.isDebitSelected) {
+            spreadType = SpreadType.CREDIT_CALL;
+        } else if (!this.isCallSelected && this.isDebitSelected) {
+            spreadType = SpreadType.DEBIT_PUT;
+        } else {
+            spreadType = SpreadType.CREDIT_PUT;
+        }
+        
+        // Find the spreads
+        this.findSpreads(spreadType);
+    }
+
+    // Utility method for sorting credit spreads
+    sortCreditSpreads(spreads: SpreadCandidate[]): SpreadCandidate[] {
+        return spreads.sort((a, b) => {
             let aSpreadWidth = Math.abs(a.shortOption.strikePrice - a.longOption.strikePrice)
             let bSpreadWidth = Math.abs(b.shortOption.strikePrice - b.longOption.strikePrice)
 
@@ -620,6 +557,31 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 // Sort by return on risk in descending order (higher is better)
                 return bReturnOnRisk - aReturnOnRisk
             }
-        })
+        });
     }
+
+    // Utility method for sorting debit spreads
+    sortDebitSpreads(spreads: SpreadCandidate[]): SpreadCandidate[] {
+        return spreads.sort((a, b) => {
+            // Maximum profit is the difference in strikes minus the cost
+            let aSpreadWidth = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice)
+            let bSpreadWidth = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice)
+            
+            let aMaxProfit = aSpreadWidth - a.cost
+            let bMaxProfit = bSpreadWidth - b.cost
+
+            // Return on Investment (ROI) = maxProfit / cost
+            let aROI = aMaxProfit / a.cost
+            let bROI = bMaxProfit / b.cost
+
+            if (aROI === bROI) {
+                // If ROI is the same, prefer the spread with lower cost
+                return a.cost - b.cost
+            } else {
+                // Sort by ROI in descending order (higher is better)
+                return bROI - aROI
+            }
+        });
+    }
+
 }
