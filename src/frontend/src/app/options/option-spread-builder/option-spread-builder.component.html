@@ -44,8 +44,8 @@
                     <div class="card-body">
                         <h5 class="card-title">Spread Finder</h5>
                         <div class="d-flex">
-                            <button class="btn me-2" (click)="findSelectedSpreads()" [ngClass]="{'btn-primary':manualSelection===false, 'btn-secondary': manualSelection}">Find Spreads</button>
-                            <button class="btn" (click)="manualSelection = true"  [ngClass]="{'btn-primary':manualSelection, 'btn-secondary': manualSelection === false}">Select Manually</button>
+                            <button class="btn me-2" (click)="toggleSpreadFindUI()" [ngClass]="{'btn-primary':manualSelection===false, 'btn-secondary': manualSelection}">Find Spreads</button>
+                            <button class="btn" (click)="toggleManualUI()"  [ngClass]="{'btn-primary':manualSelection, 'btn-secondary': manualSelection === false}">Select Manually</button>
                         </div>
                         <div class="mt-2" *ngIf="candidateOptions.length">
                             <small class="text-muted">Candidate options: {{ candidateOptions.length }}</small>
@@ -60,14 +60,14 @@
                 <div class="row">
                     <div class="col">
                         <label for="minExpirationDate" class="form-label">Min Expiration Date:</label>
-                        <select id="minExpirationDate" class="form-select" [(ngModel)]="minExpirationDate" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <select id="minExpirationDate" class="form-select" [(ngModel)]="minExpirationDate" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                             <option value="">All</option>
                             <option *ngFor="let exp of uniqueExpirations" [value]="exp">{{ exp }} [{{ daysToExpiration(exp) }} days]</option>
                         </select>
                     </div>
                     <div class="col">
                         <label for="maxExpirationDate" class="form-label">Max Expiration Date:</label>
-                        <select id="maxExpirationDate" class="form-select" [(ngModel)]="maxExpirationDate" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <select id="maxExpirationDate" class="form-select" [(ngModel)]="maxExpirationDate" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                             <option value="">All</option>
                             <option *ngFor="let exp of uniqueExpirations" [value]="exp">{{ exp }} [{{ daysToExpiration(exp) }} days]</option>
                         </select>
@@ -76,27 +76,27 @@
                 <div class="row">
                     <div class="col">
                         <label for="minSpread" class="form-label">Min Spread:</label>
-                        <input id="minSpread" type="number" class="form-control" [(ngModel)]="minSpread" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <input id="minSpread" type="number" class="form-control" [(ngModel)]="minSpread" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                     </div>
                     <div class="col">
                         <label for="maxSpread" class="form-label">Max Spread:</label>
-                        <input id="maxSpread" type="number" class="form-control" [(ngModel)]="maxSpread" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <input id="maxSpread" type="number" class="form-control" [(ngModel)]="maxSpread" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
                         <label for="minCostSpreadRatio" class="form-label">Min Cost Spread Ratio:</label>
-                        <input id="minCostSpreadRatio" type="number" class="form-control" [(ngModel)]="minCostSpreadRatio" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <input id="minCostSpreadRatio" type="number" class="form-control" [(ngModel)]="minCostSpreadRatio" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                     </div>
                     <div class="col">
                         <label for="maxCostSpreadRatio" class="form-label">Max Cost Spread Ratio:</label>
-                        <input id="maxCostSpreadRatio" type="number" class="form-control" [(ngModel)]="maxCostSpreadRatio" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <input id="maxCostSpreadRatio" type="number" class="form-control" [(ngModel)]="maxCostSpreadRatio" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
                         <label for="maxBidAskSpreadPercent" class="form-label">Max Bid/Ask Spread (% of mark):</label>
-                        <input id="maxBidAskSpreadPercent" type="number" class="form-control" [(ngModel)]="maxBidAskSpreadPercent" (ngModelChange)="saveFindFiltersInLocalStorage()">
+                        <input id="maxBidAskSpreadPercent" type="number" class="form-control" [(ngModel)]="maxBidAskSpreadPercent" (ngModelChange)="saveFindFiltersAndFindSpreads()">
                     </div>
                 </div>
                 <div class="row">

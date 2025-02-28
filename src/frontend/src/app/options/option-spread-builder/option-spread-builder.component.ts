@@ -216,7 +216,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
         }   
     }
 
-    saveFindFiltersInLocalStorage() {
+    saveFindFiltersAndFindSpreads() {
         const key = `optionSpreadBuilderFindFilters-${this.ticker}`;
         const filters = {
             minSpread: this.minSpread,
@@ -231,6 +231,21 @@ export class OptionSpreadBuilderComponent implements OnInit {
         }
         localStorage.setItem(key, JSON.stringify(filters));
         console.log("saved find filters", filters)
+
+        // Determine the spread type based on the selected options
+        let spreadType: SpreadType;
+        
+        if (this.isCallSelected && this.isDebitSelected) {
+            spreadType = SpreadType.DEBIT_CALL;
+        } else if (this.isCallSelected && !this.isDebitSelected) {
+            spreadType = SpreadType.CREDIT_CALL;
+        } else if (!this.isCallSelected && this.isDebitSelected) {
+            spreadType = SpreadType.DEBIT_PUT;
+        } else {
+            spreadType = SpreadType.CREDIT_PUT;
+        }
+
+        this.findSpreads(spreadType);
     }
 
     loadFindSettingsFromLocalStorage() {
@@ -459,7 +474,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
     }
 
     findSpreads(spreadType: SpreadType) {
-        this.saveFindFiltersInLocalStorage();
+        this.saveFindFiltersAndFindSpreads();
         
         let spreads: SpreadCandidate[] = [];
         const isCall = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.CREDIT_CALL;
@@ -478,6 +493,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
         
         // Set up parameters based on spread type
         const longIsLowerStrike = isDebit === isCall;
+
+        const processedPairs = new Set<string>();
         
         // Loop through options to find spreads
         for (let firstOption of filteredOptions) {
@@ -488,6 +505,18 @@ export class OptionSpreadBuilderComponent implements OnInit {
                     (firstOption.strikePrice > secondOption.strikePrice ? firstOption : secondOption);
                     
                 const shortOption = longOption === firstOption ? secondOption : firstOption;
+                
+                // Create a unique identifier for this pair, regardless of order
+                // Use option IDs if available, otherwise create a composite key using strikes and expiration
+                const pairId = `${Math.min(longOption.strikePrice, shortOption.strikePrice)}-${Math.max(longOption.strikePrice, shortOption.strikePrice)}-${longOption.expiration}`;
+                
+                // Skip if we've already processed this pair
+                if (processedPairs.has(pairId)) {
+                    continue;
+                }
+                
+                // Add to processed set
+                processedPairs.add(pairId);
                 
                 // Check if this is a valid pair
                 const validPair =
@@ -520,24 +549,12 @@ export class OptionSpreadBuilderComponent implements OnInit {
         this.builtSpreads = isDebit ? this.sortDebitSpreads(spreads) : this.sortCreditSpreads(spreads);
     }
 
-    findSelectedSpreads() {
+    toggleSpreadFindUI() {
         this.manualSelection = false;
-        
-        // Determine the spread type based on the selected options
-        let spreadType: SpreadType;
-        
-        if (this.isCallSelected && this.isDebitSelected) {
-            spreadType = SpreadType.DEBIT_CALL;
-        } else if (this.isCallSelected && !this.isDebitSelected) {
-            spreadType = SpreadType.CREDIT_CALL;
-        } else if (!this.isCallSelected && this.isDebitSelected) {
-            spreadType = SpreadType.DEBIT_PUT;
-        } else {
-            spreadType = SpreadType.CREDIT_PUT;
-        }
-        
-        // Find the spreads
-        this.findSpreads(spreadType);
+    }
+
+    toggleManualUI() {
+        this.manualSelection = true;
     }
 
     // Utility method for sorting credit spreads
