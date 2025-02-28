@@ -41,8 +41,8 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-3">
-                                <div class="stat-label">Profit</div>
-                                <div>{{ position.profit | currency }}</div>
+                                <div class="stat-label">Market</div>
+                                <div>{{ position.market | currency }}</div>
                             </div>
                             <div class="col-md-3">
                                 <div class="stat-label">Spread</div>
@@ -60,6 +60,24 @@
                                     <span *ngIf="position.isOpen">N/A</span>
                                     <span *ngIf="position.isClosed">{{ position.closed | parsedDate }}</span>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="stat-label">Profit</div>
+                                <div>{{ position.profit | currency }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label">Gain</div>
+                                <div>{{ position.gainPct | percent }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label"></div>
+                                <div></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-label"></div>
+                                <div></div>
                             </div>
                         </div>
                     </div>
@@ -147,7 +165,7 @@
                                     <th>Expiration</th>
                                     @if(position.isClosed === false) {
                                     <th>Quantity</th>
-                                    <th>Cost</th>
+                                    <th *ngIf="!position.isPending">Cost</th>
                                     <th>Market</th>
                                     <th>Delta</th>
                                     <th>IV</th>
@@ -179,7 +197,7 @@
                                         <td>{{ contract.expiration }}</td>
                                         @if(position.isClosed === false) {
                                         <td>{{ contract.quantity }}</td>
-                                        <td>{{ contract.cost | currency }}</td>
+                                        <td *ngIf="!position.isPending">{{ contract.cost | currency }}</td>
                                         <td>
                                             @if (contract.market) {
                                                 <div class="d-flex align-items-center">
@@ -228,12 +246,12 @@
                                     </tr>
                                 }
                             </tbody>
-                            <tfoot *ngIf="position.contracts.length > 1 && position.isOpen">
+                            <tfoot *ngIf="position.cost || position.market">
                                 <tr>
                                     <td colspan="4" class="text-end fw-bold"></td>
                                     <td></td>
-                                    <td>{{ position.cost / abs(position.contracts[0].quantity) | currency }}</td>
-                                    <td>{{ position.market / abs(position.contracts[0].quantity) | currency }}</td>
+                                    <td *ngIf="position.isOpen">{{ getTotalCost(position.contracts) | currency }}</td>
+                                    <td><span *ngIf="position.market">{{ getTotalMarket(position.contracts) | currency }}</span></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -247,8 +265,7 @@
                 <!-- Notes Section -->
                 <div class="mt-4">
                     <div class="card shadow-sm">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 cursor-pointer"
-                             (click)="toggleNotes()">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-journal-text me-2 text-primary"></i>
                                 <h6 class="mb-0">Notes
@@ -262,8 +279,10 @@
                                         (click)="$event.stopPropagation(); showNotesForm = !showNotesForm">
                                     <i class="bi bi-plus-lg"></i> Add Note
                                 </button>
-                                <i class="bi" [class.bi-chevron-down]="!notesExpanded"
-                                   [class.bi-chevron-up]="notesExpanded"></i>
+                                <button class="btn btn-sm" (click)="toggleNotes()">
+                                    <i class="bi" [class.bi-chevron-down]="!notesExpanded"
+                                    [class.bi-chevron-up]="notesExpanded"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -321,7 +340,7 @@
                 <!-- Transactions -->
                 <div class="mt-4">
                     <div class="card shadow-sm">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 cursor-pointer"
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3"
                              (click)="toggleTransactions()">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-clock-history me-2 text-primary"></i>

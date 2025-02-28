@@ -57,6 +57,7 @@ export interface OptionPosition {
     daysToExpiration: number[]
     isOpen: boolean
     isClosed: boolean
+    isPending: boolean
     opened: string
     closed: string
     notes: Note[]

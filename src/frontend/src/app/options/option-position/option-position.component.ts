@@ -190,6 +190,14 @@ export class OptionPositionComponent {
         this.transactionsExpanded = !this.transactionsExpanded;
     }
 
+    getTotalCost(contracts:OptionContract[]) {
+        return contracts.reduce((sum, c) => sum + c.cost * c.quantity, 0);
+    }
+
+    getTotalMarket(contracts:OptionContract[]) {
+        return contracts.reduce((sum, c) => sum + c.market * c.quantity, 0);
+    }
+
 
     protected readonly abs = Math.abs;
 }
