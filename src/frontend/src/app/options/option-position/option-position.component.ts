@@ -48,6 +48,7 @@ export class OptionPositionComponent {
     newLabelValue: string;
     showNotesForm: boolean = false;
     notesExpanded: boolean = true;
+    pricingExpanded: boolean = false;
     notesControl = new FormControl();
     showCloseModal = false;
     showAddModal = false;
@@ -103,6 +104,10 @@ export class OptionPositionComponent {
                 console.log("Add label complete");
             }
         });
+    }
+
+    togglePricing() {
+        this.pricingExpanded = !this.pricingExpanded;
     }
     
     toggleNotes() {
@@ -190,12 +195,22 @@ export class OptionPositionComponent {
         this.transactionsExpanded = !this.transactionsExpanded;
     }
 
-    getTotalCost(contracts:OptionContract[]) {
-        return contracts.reduce((sum, c) => sum + c.cost * c.quantity, 0);
+    getCostPerContract(contracts:OptionContract[]) {
+        if (contracts.length == 0) {
+            return 0;
+        }
+        let quantity = Math.abs(contracts[0].quantity)
+        let sum = contracts.reduce((sum, c) => sum + c.cost * c.quantity, 0);
+        return sum / quantity;
     }
 
-    getTotalMarket(contracts:OptionContract[]) {
-        return contracts.reduce((sum, c) => sum + c.market * c.quantity, 0);
+    getMarketPerContract(contracts:OptionContract[]) {
+        if (contracts.length == 0) {
+            return 0;
+        }
+        let quantity = Math.abs(contracts[0].quantity)
+        let sum = contracts.reduce((sum, c) => sum + c.market * c.quantity, 0);
+        return sum / quantity;
     }
 
 

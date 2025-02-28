@@ -1,31 +1,26 @@
 <div>
     <app-loading *ngIf="loading"></app-loading>
     @if(hasPrice) {
-        <h4>Contract Pricing History</h4>
-        <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-                <div class="row g-4">
-                    <div class="col-6">
-                        <div class="price-card text-center p-3 rounded bg-light">
-                            <div class="text-muted mb-1">
-                                <i class="bi bi-arrow-down-circle"></i>
-                                Minimum Price
-                            </div>
-                            <div class="price-value text-primary">
-                                {{ minPrice | currency }}
-                            </div>
-                        </div>
+        <div class="row g-4">
+            <div class="col-6">
+                <div class="price-card text-center p-3 rounded bg-light">
+                    <div class="text-muted mb-1">
+                        <i class="bi bi-arrow-down-circle"></i>
+                        Minimum Price
                     </div>
-                    <div class="col-6">
-                        <div class="price-card text-center p-3 rounded bg-light">
-                            <div class="text-muted mb-1">
-                                <i class="bi bi-arrow-up-circle"></i>
-                                Maximum Price
-                            </div>
-                            <div class="price-value text-success">
-                                {{ maxPrice | currency }}
-                            </div>
-                        </div>
+                    <div class="price-value text-primary">
+                        {{ minPrice | currency }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="price-card text-center p-3 rounded bg-light">
+                    <div class="text-muted mb-1">
+                        <i class="bi bi-arrow-up-circle"></i>
+                        Maximum Price
+                    </div>
+                    <div class="price-value text-success">
+                        {{ maxPrice | currency }}
                     </div>
                 </div>
             </div>

@@ -1,451 +1,451 @@
 @if (position) {
     <div class="mb-3">
-        <div class="card shadow-sm">
-            <div class="card-header bg-light py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <h5 class="mb-0">
-                            <app-stock-link-and-tradingview-link [ticker]="position.underlyingTicker"></app-stock-link-and-tradingview-link>
-                        </h5>
+        <!-- Main Position Statistics -->
+        <div class="card card-shadow">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-label">Cost</div>
+                        <div>{{ position.cost | currency }}</div>
                     </div>
-                    <div class="d-flex align-items-center" *ngIf="position.underlyingPrice">
-                        <span class="text-muted me-2">Stock price:</span>
-                        <span class="h5 mb-0">{{ position.underlyingPrice | currency }}</span>
+                    <div class="col-md-3">
+                        <div class="stat-label">Number of Contracts</div>
+                        <div>
+                            {{ position.contracts.length }}
+                        </div>
+                    </div>
+                    @if(position.isPending) {
+                        <div class="col-md-3">
+                            <div class="stat-label">Days to Expiration</div>
+                            <span>{{ position.daysToExpiration[0]}}</span>
+                        </div>
+                    } @else {
+                    <div class="col-md-3">
+                        <div class="stat-label">Days Held</div>
+                        <span>{{ position.daysHeld }} / {{ position.daysToExpiration[0]}}</span>
+                    </div>
+                    }
+                    <div class="col-md-3">
+                        <div class="stat-label">Opened</div>
+                        <div>{{ position.isOpen ? (position.opened | parsedDate) : 'N/A' }}</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="stat-label">Market</div>
+                        <div>{{ position.market | currency }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-label">Spread</div>
+                        <div>
+                            {{ position.spread | currency }}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-label">Risked</div>
+                        <div>{{ position.risked | currency }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-label">Closed</div>                                
+                        <div>{{ position.isClosed ? (position.closed | parsedDate) : 'N/A' }}</div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="stat-label">Profit</div>
+                        <div>{{ position.profit | currency }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-label">Gain</div>
+                        <div>{{ position.gainPct | percent }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-label">Links</div>
+                        <div>
+                            <app-stock-link-and-tradingview-link [ticker]="position.underlyingTicker"></app-stock-link-and-tradingview-link>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-label"></div>
+                        <div></div>
                     </div>
                 </div>
             </div>
-
-            <div class="card-body">
-                <!-- Main Position Statistics -->
-                <div class="card card-shadow">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="stat-label">Cost</div>
-                                <div>{{ position.cost | currency }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Number of Contracts</div>
-                                <div>
-                                    {{ position.contracts.length }}
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Day Held</div>
-                                {{ position.daysHeld }} / {{ position.daysToExpiration[0]}}
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Opened</div>
-                                <div>{{ position.opened| parsedDate }}</div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <div class="stat-label">Market</div>
-                                <div>{{ position.market | currency }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Spread</div>
-                                <div>
-                                    {{ position.spread | currency }}
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Risked</div>
-                                <div>{{ position.risked | currency }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Closed</div>                                
-                                <div>
-                                    <span *ngIf="position.isOpen">N/A</span>
-                                    <span *ngIf="position.isClosed">{{ position.closed | parsedDate }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <div class="stat-label">Profit</div>
-                                <div>{{ position.profit | currency }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label">Gain</div>
-                                <div>{{ position.gainPct | percent }}</div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label"></div>
-                                <div></div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-label"></div>
-                                <div></div>
-                            </div>
-                        </div>
+            
+        </div>
+        <div class="row mt-2">
+            <!-- Labels Section -->
+            <div class="col">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        @for (label of position.labels; track label) {
+                            <span class="badge bg-info-subtle text-dark d-flex align-items-center">
+                                <strong>{{ label.key }}:</strong> 
+                                <span class="ms-1">{{ label.value }}</span>
+                                <button type="button"
+                                        class="btn btn-link btn-sm text-dark p-0 ms-2"
+                                        (click)="removeLabel(label)">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            </span>
+                        }
                     </div>
-                    
+                    <button class="btn btn-outline-secondary btn-sm"
+                            (click)="showAddLabelForm = !showAddLabelForm">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
                 </div>
-                <div class="row mt-2">
-                    <!-- Labels Section -->
-                    <div class="col">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex flex-wrap gap-2">
-                                @for (label of position.labels; track label) {
-                                    <span class="badge bg-info-subtle text-dark d-flex align-items-center">
-                                        <strong>{{ label.key }}:</strong> 
-                                        <span class="ms-1">{{ label.value }}</span>
-                                        <button type="button"
-                                                class="btn btn-link btn-sm text-dark p-0 ms-2"
-                                                (click)="removeLabel(label)">
-                                            <i class="bi bi-x-circle"></i>
-                                        </button>
+            </div>
+        </div>
+        
+        <div class="row mt-2" *ngIf="showAddLabelForm">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text"
+                            class="form-control form-control-sm"
+                            placeholder="Key"
+                            [(ngModel)]="newLabelKey">
+                    <input type="text"
+                            class="form-control form-control-sm"
+                            placeholder="Value"
+                            [(ngModel)]="newLabelValue">
+                    <button class="btn btn-sm btn-outline-primary"
+                            type="button"
+                            (click)="addLabel()">Add</button>
+                    <button class="btn btn-sm btn-outline-secondary"
+                            type="button"
+                            (click)="showAddLabelForm = false">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-4">
+            <div class="d-flex gap-2 justify-content-end">
+                <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showAddToPositionModal()">
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Add To Position
+                </button>
+                <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showClosePositionModal()">
+                    <i class="bi bi-x-lg me-1"></i>
+                    Create Close Order
+                </button>
+                <button *ngIf="!position.isOpen && !position.isClosed" class="btn btn-outline-secondary" (click)="closePendingPosition()">
+                    <i class="bi bi-x-lg me-1"></i>
+                    Close Pending Position
+                </button>
+                <button class="btn btn-outline-danger" (click)="deletePosition()">
+                    <i class="bi bi-trash me-1"></i>
+                    Delete Position
+                </button>
+            </div>
+        </div>
+
+        <!-- Contracts Table -->
+        <div class="row mt-4" *ngIf="position.contracts.length > 0">
+            <div class="col">
+                <h4 class="mb-3">Option Contracts</h4>
+                <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Itm/Otm</th>
+                            <th>Type</th>
+                            <th>Strike</th>
+                            <th>Expiration</th>
+                            @if(position.isClosed === false) {
+                            <th>Quantity</th>
+                            <th *ngIf="!position.isPending">Cost</th>
+                            <th>Market</th>
+                            <th>Delta</th>
+                            <th>IV</th>
+                            <th></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (contract of position.contracts; track contract) {
+                            <tr>
+                                <td>
+                                    <span class="badge p-1 m-1" [ngClass]="{
+                                        'bg-success-subtle text-success': contract.pctInTheMoney >= 0,
+                                        'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
+                                    }">
+                                        {{ contract.pctInTheMoney >= 0 ? 'ITM ' : 'OTM ' }}
+                                        {{ contract.pctInTheMoney | percent }}
                                     </span>
+                                </td>
+                                <td>
+                                    <span class="badge p-1 m-1" [ngClass]="{
+                                        'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
+                                        'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
+                                    }">
+                                        {{ contract.optionType }}
+                                    </span>
+                                </td>
+                                <td>{{ contract.strikePrice | currency }}</td>
+                                <td>{{ contract.expiration }}</td>
+                                @if(position.isClosed === false) {
+                                <td>{{ contract.quantity }}</td>
+                                <td *ngIf="!position.isPending">{{ contract.cost | currency }}</td>
+                                <td>
+                                    @if (contract.market) {
+                                        <div class="d-flex align-items-center">
+                                            <span>{{ contract.market | currency }}</span>
+                                            @if (contract.details) {
+                                                <small class="text-muted ms-1" 
+                                                        data-bs-toggle="tooltip" 
+                                                        data-bs-placement="right"
+                                                        [title]="'Bid: ' + (contract.details.bid | currency) + ' / Ask: ' + (contract.details.ask | currency)">
+                                                    ({{ contract.details.bid | currency }}/{{ contract.details.ask | currency }})
+                                                </small>
+                                            }
+                                        </div>
+                                        @if (contract.cost && contract.market) {
+                                            @let valueIncrease = contract.market - contract.cost;
+                                            <div class="d-flex gap-1 mt-1">
+                                                <span class="badge p-1" [ngClass]="{
+                                                    'bg-success-subtle text-success': valueIncrease > 0,
+                                                    'bg-danger-subtle text-danger': valueIncrease < 0 
+                                                }">
+                                                    <i class="bi" [ngClass]="{
+                                                        'bi-arrow-up': valueIncrease > 0,
+                                                        'bi-arrow-down': valueIncrease < 0
+                                                    }"></i>
+                                                    {{ (valueIncrease / contract.cost) | percent:'1.1' }}
+                                                </span>
+                                                <span class="badge p-1" [ngClass]="{
+                                                    'bg-success-subtle text-success': valueIncrease > 0,
+                                                    'bg-danger-subtle text-danger': valueIncrease < 0 
+                                                }">
+                                                    {{ valueIncrease | currency }}
+                                                </span>
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                                
+                                <td>{{ contract.details?.delta | number }}</td>
+                                <td>{{ contract.details?.volatility | number}}</td>
+                                <td>
+                                    <button class="btn btn-outline-secondary btn-sm" (click)="closeContract(contract)" *ngIf="position.isOpen">
+                                        Close Contract
+                                    </button>
+                                </td>
                                 }
-                            </div>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot *ngIf="position.cost || position.market">
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold"></td>
+                            <td><span *ngIf="position.isOpen || position.market">Per Contract</span></td>
+                            <td *ngIf="position.isOpen">{{ getCostPerContract(position.contracts) | currency }}</td>
+                            <td><span *ngIf="position.market">{{ getMarketPerContract(position.contracts) | currency }}</span></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="mt-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-journal-text me-2 text-primary"></i>
+                        <h6 class="mb-0">Notes
+                            <span class="badge bg-secondary ms-2">
+                                {{ position.notes.length }}
+                            </span>
+                        </h6>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary"
+                                (click)="$event.stopPropagation(); showNotesForm = !showNotesForm">
+                            <i class="bi bi-plus-lg"></i> Add Note
+                        </button>
+                        <button class="btn btn-sm" (click)="toggleNotes()">
+                            <i class="bi" [class.bi-chevron-down]="!notesExpanded"
+                            [class.bi-chevron-up]="notesExpanded"></i>
+                        </button>
+                    </div>
+                </div>
+
+                @if (showNotesForm) {
+                    <div class="card-body border-bottom">
+                        <textarea class="form-control"
+                                    rows="3"
+                                    [formControl]="notesControl"
+                                    placeholder="Enter your note here..."></textarea>
+                        <div class="mt-3 d-flex gap-2">
+                            <button class="btn btn-primary btn-sm"
+                                    [disabled]="notesControl.invalid"
+                                    (click)="addNote()">
+                                <i class="bi bi-save me-1"></i> Save Note
+                            </button>
                             <button class="btn btn-outline-secondary btn-sm"
-                                    (click)="showAddLabelForm = !showAddLabelForm">
-                                <i class="bi bi-plus-lg"></i>
+                                    (click)="showNotesForm = false">
+                                Cancel
                             </button>
                         </div>
                     </div>
-                </div>
-                
-                <div class="row mt-2" *ngIf="showAddLabelForm">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input type="text"
-                                   class="form-control form-control-sm"
-                                   placeholder="Key"
-                                   [(ngModel)]="newLabelKey">
-                            <input type="text"
-                                   class="form-control form-control-sm"
-                                   placeholder="Value"
-                                   [(ngModel)]="newLabelValue">
-                            <button class="btn btn-sm btn-outline-primary"
-                                    type="button"
-                                    (click)="addLabel()">Add</button>
-                            <button class="btn btn-sm btn-outline-secondary"
-                                    type="button"
-                                    (click)="showAddLabelForm = false">Cancel</button>
+                }
+
+                @if (notesExpanded) {
+                    <div class="card-body p-0">
+                        <div class="note-timeline p-3">
+                            @for (note of position.notes; track note) {
+                                <div class="note-item mb-3 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">
+                                            {{ note.created | date:'medium' }}
+                                        </small>
+                                    </div>
+                                    <div class="note-content">{{ note.content }}</div>
+                                </div>
+                            }
                         </div>
                     </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="mt-4">
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showAddToPositionModal()">
-                            <i class="bi bi-plus-lg me-1"></i>
-                            Add To Position
-                        </button>
-                        <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showClosePositionModal()">
-                            <i class="bi bi-x-lg me-1"></i>
-                            Create Close Order
-                        </button>
-                        <button *ngIf="!position.isOpen && !position.isClosed" class="btn btn-outline-secondary" (click)="closePendingPosition()">
-                            <i class="bi bi-x-lg me-1"></i>
-                            Close Pending Position
-                        </button>
-                        <button class="btn btn-outline-danger" (click)="deletePosition()">
-                            <i class="bi bi-trash me-1"></i>
-                            Delete Position
+                }
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-journal-text me-2 text-primary"></i>
+                        <h6 class="mb-0">Pricing</h6>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm" (click)="togglePricing()">
+                            <i class="bi" [class.bi-chevron-down]="!pricingExpanded"
+                            [class.bi-chevron-up]="pricingExpanded"></i>
                         </button>
                     </div>
                 </div>
+                <div class="card-body p-0" *ngIf="pricingExpanded">
+                    <app-option-contract-pricing [position]="position"></app-option-contract-pricing>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col">
+                <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
+            </div>
+        </div>
 
-                <!-- Contracts Table -->
-                <div class="row mt-4" *ngIf="position.contracts.length > 0">
-                    <div class="col">
-                        <h4 class="mb-3">Option Contracts</h4>
+        <!-- Transactions -->
+        <div class="mt-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3"
+                        (click)="toggleTransactions()">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock-history me-2 text-primary"></i>
+                        <h6 class="mb-0">Transactions
+                            <span class="badge bg-secondary ms-2">
+                {{ position.transactions.length }}
+            </span>
+                        </h6>
+                    </div>
+                    <div class="d-flex align-items-center">
+        <span class="me-3" [ngClass]="{
+            'text-success': (getTotalCredited() - getTotalDebited()) > 0,
+            'text-danger': (getTotalCredited() - getTotalDebited()) < 0
+        }">
+            {{ (getTotalCredited() - getTotalDebited()) | currency }}
+        </span>
+                        <i class="bi" [class.bi-chevron-down]="!transactionsExpanded"
+                            [class.bi-chevron-up]="transactionsExpanded"></i>
+                    </div>
+                </div>
+
+                @if (transactionsExpanded) {
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
                                 <tr>
-                                    <th>Itm/Otm</th>
+                                    <th>Date</th>
                                     <th>Type</th>
                                     <th>Strike</th>
                                     <th>Expiration</th>
-                                    @if(position.isClosed === false) {
                                     <th>Quantity</th>
-                                    <th *ngIf="!position.isPending">Cost</th>
-                                    <th>Market</th>
-                                    <th>Delta</th>
-                                    <th>IV</th>
-                                    <th></th>
-                                    }
+                                    <th>Debit</th>
+                                    <th>Credit</th>
+                                    <th>Net</th>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @for (contract of position.contracts; track contract) {
-                                    <tr>
-                                        <td>
-                                            <span class="badge p-1 m-1" [ngClass]="{
-                                                'bg-success-subtle text-success': contract.pctInTheMoney >= 0,
-                                                'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
-                                            }">
-                                                {{ contract.pctInTheMoney >= 0 ? 'ITM ' : 'OTM ' }}
-                                                {{ contract.pctInTheMoney | percent }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge p-1 m-1" [ngClass]="{
-                                                'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
-                                                'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
-                                            }">
-                                                {{ contract.optionType }}
-                                            </span>
-                                        </td>
-                                        <td>{{ contract.strikePrice | currency }}</td>
-                                        <td>{{ contract.expiration }}</td>
-                                        @if(position.isClosed === false) {
-                                        <td>{{ contract.quantity }}</td>
-                                        <td *ngIf="!position.isPending">{{ contract.cost | currency }}</td>
-                                        <td>
-                                            @if (contract.market) {
-                                                <div class="d-flex align-items-center">
-                                                    <span>{{ contract.market | currency }}</span>
-                                                    @if (contract.details) {
-                                                        <small class="text-muted ms-1" 
-                                                               data-bs-toggle="tooltip" 
-                                                               data-bs-placement="right"
-                                                               [title]="'Bid: ' + (contract.details.bid | currency) + ' / Ask: ' + (contract.details.ask | currency)">
-                                                            ({{ contract.details.bid | currency }}/{{ contract.details.ask | currency }})
-                                                        </small>
-                                                    }
-                                                </div>
-                                                @if (contract.cost && contract.market) {
-                                                    @let valueIncrease = contract.market - contract.cost;
-                                                    <div class="d-flex gap-1 mt-1">
-                                                        <span class="badge p-1" [ngClass]="{
-                                                            'bg-success-subtle text-success': valueIncrease > 0,
-                                                            'bg-danger-subtle text-danger': valueIncrease < 0 
-                                                        }">
-                                                            <i class="bi" [ngClass]="{
-                                                                'bi-arrow-up': valueIncrease > 0,
-                                                                'bi-arrow-down': valueIncrease < 0
-                                                            }"></i>
-                                                            {{ (valueIncrease / contract.cost) | percent:'1.1' }}
-                                                        </span>
-                                                        <span class="badge p-1" [ngClass]="{
-                                                            'bg-success-subtle text-success': valueIncrease > 0,
-                                                            'bg-danger-subtle text-danger': valueIncrease < 0 
-                                                        }">
-                                                            {{ valueIncrease | currency }}
-                                                        </span>
-                                                    </div>
-                                                }
-                                            }
-                                        </td>
-                                        
-                                        <td>{{ contract.details?.delta | number }}</td>
-                                        <td>{{ contract.details?.volatility | number}}</td>
-                                        <td>
-                                            <button class="btn btn-outline-secondary btn-sm" (click)="closeContract(contract)" *ngIf="position.isOpen">
-                                                Close Contract
-                                            </button>
-                                        </td>
-                                        }
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot *ngIf="position.cost || position.market">
+                                </thead>
+                                <tbody>
+                                    @for (transaction of position.transactions; track transaction) {
+                                        <tr>
+                                            <td>{{ transaction.when | date:'MMM d, y HH:mm' }}</td>
+                                            <td>
+                                <span class="badge p-1 m-1" [ngClass]="{
+                                    'bg-success-subtle text-success': transaction.optionType.toLowerCase() === 'call',
+                                    'bg-danger-subtle text-danger': transaction.optionType.toLowerCase() === 'put'
+                                }">
+                                    {{ transaction.optionType }}
+                                </span>
+                                            </td>
+                                            <td>{{ transaction.strike | currency }}</td>
+                                            <td>{{ transaction.expiration | date:'shortDate' }}</td>
+                                            <td>
+                                <span [ngClass]="{
+                                    'text-success': transaction.quantity > 0,
+                                    'text-danger': transaction.quantity < 0
+                                }">
+                                    {{ transaction.quantity > 0 ? '+' : '' }}{{ transaction.quantity }}
+                                </span>
+                                            </td>
+                                            <td>
+                                <span class="text-danger" *ngIf="transaction.debited">
+                                    -{{ transaction.debited | currency }}
+                                </span>
+                                            </td>
+                                            <td>
+                                <span class="text-success" *ngIf="transaction.credited">
+                                    +{{ transaction.credited | currency }}
+                                </span>
+                                            </td>
+                                            <td>
+                                <span [ngClass]="{
+                                    'text-success': (transaction.credited - transaction.debited) > 0,
+                                    'text-danger': (transaction.credited - transaction.debited) < 0
+                                }">
+                                    {{ (transaction.credited - transaction.debited) | currency }}
+                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light">
                                 <tr>
-                                    <td colspan="4" class="text-end fw-bold"></td>
-                                    <td></td>
-                                    <td *ngIf="position.isOpen">{{ getTotalCost(position.contracts) | currency }}</td>
-                                    <td><span *ngIf="position.market">{{ getTotalMarket(position.contracts) | currency }}</span></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td colspan="5" class="text-end fw-bold">Total:</td>
+                                    <td class="text-danger">
+                                        -{{ getTotalDebited() | currency }}
+                                    </td>
+                                    <td class="text-success">
+                                        +{{ getTotalCredited() | currency }}
+                                    </td>
+                                    <td [ngClass]="{
+                            'text-success': (getTotalCredited() - getTotalDebited()) > 0,
+                            'text-danger': (getTotalCredited() - getTotalDebited()) < 0
+                        }" class="fw-bold">
+                                        {{ (getTotalCredited() - getTotalDebited()) | currency }}
+                                    </td>
                                 </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    </div>
-                </div>
-
-                <!-- Notes Section -->
-                <div class="mt-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-journal-text me-2 text-primary"></i>
-                                <h6 class="mb-0">Notes
-                                    <span class="badge bg-secondary ms-2">
-                                        {{ position.notes.length }}
-                                    </span>
-                                </h6>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-primary"
-                                        (click)="$event.stopPropagation(); showNotesForm = !showNotesForm">
-                                    <i class="bi bi-plus-lg"></i> Add Note
-                                </button>
-                                <button class="btn btn-sm" (click)="toggleNotes()">
-                                    <i class="bi" [class.bi-chevron-down]="!notesExpanded"
-                                    [class.bi-chevron-up]="notesExpanded"></i>
-                                </button>
-                            </div>
+                                </tfoot>
+                            </table>
                         </div>
-
-                        @if (showNotesForm) {
-                            <div class="card-body border-bottom">
-                                <textarea class="form-control"
-                                          rows="3"
-                                          [formControl]="notesControl"
-                                          placeholder="Enter your note here..."></textarea>
-                                <div class="mt-3 d-flex gap-2">
-                                    <button class="btn btn-primary btn-sm"
-                                            [disabled]="notesControl.invalid"
-                                            (click)="addNote()">
-                                        <i class="bi bi-save me-1"></i> Save Note
-                                    </button>
-                                    <button class="btn btn-outline-secondary btn-sm"
-                                            (click)="showNotesForm = false">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        }
-
-                        @if (notesExpanded) {
-                            <div class="card-body p-0">
-                                <div class="note-timeline p-3">
-                                    @for (note of position.notes; track note) {
-                                        <div class="note-item mb-3 pb-3 border-bottom">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <small class="text-muted">
-                                                    {{ note.created | date:'medium' }}
-                                                </small>
-                                            </div>
-                                            <div class="note-content">{{ note.content }}</div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        }
                     </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col">
-                        <app-option-contract-pricing [position]="position"></app-option-contract-pricing>
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col">
-                        <app-option-brokerage-orders [orders]="positionOrders" [position]="position" (ordersUpdated)="positionChanged.emit()"></app-option-brokerage-orders>
-                    </div>
-                </div>
-
-                <!-- Transactions -->
-                <div class="mt-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3"
-                             (click)="toggleTransactions()">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-clock-history me-2 text-primary"></i>
-                                <h6 class="mb-0">Transactions
-                                    <span class="badge bg-secondary ms-2">
-                        {{ position.transactions.length }}
-                    </span>
-                                </h6>
-                            </div>
-                            <div class="d-flex align-items-center">
-                <span class="me-3" [ngClass]="{
-                    'text-success': (getTotalCredited() - getTotalDebited()) > 0,
-                    'text-danger': (getTotalCredited() - getTotalDebited()) < 0
-                }">
-                    {{ (getTotalCredited() - getTotalDebited()) | currency }}
-                </span>
-                                <i class="bi" [class.bi-chevron-down]="!transactionsExpanded"
-                                   [class.bi-chevron-up]="transactionsExpanded"></i>
-                            </div>
-                        </div>
-
-                        @if (transactionsExpanded) {
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-light">
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Type</th>
-                                            <th>Strike</th>
-                                            <th>Expiration</th>
-                                            <th>Quantity</th>
-                                            <th>Debit</th>
-                                            <th>Credit</th>
-                                            <th>Net</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (transaction of position.transactions; track transaction) {
-                                                <tr>
-                                                    <td>{{ transaction.when | date:'MMM d, y HH:mm' }}</td>
-                                                    <td>
-                                        <span class="badge p-1 m-1" [ngClass]="{
-                                            'bg-success-subtle text-success': transaction.optionType.toLowerCase() === 'call',
-                                            'bg-danger-subtle text-danger': transaction.optionType.toLowerCase() === 'put'
-                                        }">
-                                            {{ transaction.optionType }}
-                                        </span>
-                                                    </td>
-                                                    <td>{{ transaction.strike | currency }}</td>
-                                                    <td>{{ transaction.expiration | date:'shortDate' }}</td>
-                                                    <td>
-                                        <span [ngClass]="{
-                                            'text-success': transaction.quantity > 0,
-                                            'text-danger': transaction.quantity < 0
-                                        }">
-                                            {{ transaction.quantity > 0 ? '+' : '' }}{{ transaction.quantity }}
-                                        </span>
-                                                    </td>
-                                                    <td>
-                                        <span class="text-danger" *ngIf="transaction.debited">
-                                            -{{ transaction.debited | currency }}
-                                        </span>
-                                                    </td>
-                                                    <td>
-                                        <span class="text-success" *ngIf="transaction.credited">
-                                            +{{ transaction.credited | currency }}
-                                        </span>
-                                                    </td>
-                                                    <td>
-                                        <span [ngClass]="{
-                                            'text-success': (transaction.credited - transaction.debited) > 0,
-                                            'text-danger': (transaction.credited - transaction.debited) < 0
-                                        }">
-                                            {{ (transaction.credited - transaction.debited) | currency }}
-                                        </span>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                        <tfoot class="table-light">
-                                        <tr>
-                                            <td colspan="5" class="text-end fw-bold">Total:</td>
-                                            <td class="text-danger">
-                                                -{{ getTotalDebited() | currency }}
-                                            </td>
-                                            <td class="text-success">
-                                                +{{ getTotalCredited() | currency }}
-                                            </td>
-                                            <td [ngClass]="{
-                                    'text-success': (getTotalCredited() - getTotalDebited()) > 0,
-                                    'text-danger': (getTotalCredited() - getTotalDebited()) < 0
-                                }" class="fw-bold">
-                                                {{ (getTotalCredited() - getTotalDebited()) | currency }}
-                                            </td>
-                                        </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                
+                }
             </div>
         </div>
     </div>

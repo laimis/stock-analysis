@@ -31,7 +31,6 @@ export class OptionContractPricingComponent {
     
     @Input() set position (value : OptionPosition) {
         if (value) {
-            console.log('OptionContractPricingComponent: position set:', value);
             this.cost = value.cost;
             this.contracts = value.contracts;
         }
@@ -67,8 +66,6 @@ export class OptionContractPricingComponent {
                     if (total > maxPrice) {
                         maxPrice = total
                     }
-                    //let's log in the console the date and total cost
-                    console.log('Date:', pricingResults[0][pricingIndex].timestamp, 'Total:', total)
                     cost.push(total)
                 }
 

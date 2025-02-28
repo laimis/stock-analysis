@@ -5,18 +5,18 @@ import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../servic
 import {OptionPositionComponent} from "../option-position/option-position.component";
 import {CurrencyPipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
+import { StockLinkComponent } from "../../shared/stocks/stock-link.component";
 
 @Component({
     selector: 'app-option-positions',
     templateUrl: './option-positions.component.html',
     imports: [
-        OptionPositionComponent,
-        CurrencyPipe,
-        StockSearchComponent,
-        NgIf,
-        NgForOf,
-        NgClass
-    ],
+    OptionPositionComponent,
+    CurrencyPipe,
+    StockSearchComponent,
+    NgIf,
+    StockLinkComponent
+],
     styleUrls: ['./option-positions.component.css']
 })
 
@@ -103,7 +103,7 @@ export class OptionPositionsComponent {
     protected readonly open = open;
 
     expandedPositions: boolean[] = [];
-    toggleAccordion(index: number) {
+    toggleExpandedPositions(index: number) {
         // Initialize array if needed
         if (!this.expandedPositions) {
             this.expandedPositions = new Array(this.positions.length).fill(false);
