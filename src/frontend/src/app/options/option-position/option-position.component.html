@@ -9,9 +9,9 @@
                         <div>{{ position.cost | currency }}</div>
                     </div>
                     <div class="col-md-3">
-                        <div class="stat-label">Number of Contracts</div>
+                        <div class="stat-label">Risked/Spread</div>
                         <div>
-                            {{ position.contracts.length }}
+                            {{ position.spread > 0 ? (position.risked / position.spread | currency) : 'N/A' }}
                         </div>
                     </div>
                     @if(position.isPending) {
