@@ -317,19 +317,13 @@
         
         <div class="mt-4">
             <div class="card shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                <div class="card-header cursor-pointer bg-light d-flex justify-content-between align-items-center py-3" (click)="togglePricing()">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-journal-text me-2 text-primary"></i>
                         <h6 class="mb-0">Pricing</h6>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm" (click)="togglePricing()">
-                            <i class="bi" [class.bi-chevron-down]="!pricingExpanded"
-                            [class.bi-chevron-up]="pricingExpanded"></i>
-                        </button>
-                    </div>
                 </div>
-                <div class="card-body p-0" *ngIf="pricingExpanded">
+                <div class="card-body p-2" *ngIf="pricingExpanded">
                     <app-option-contract-pricing [position]="position"></app-option-contract-pricing>
                 </div>
             </div>

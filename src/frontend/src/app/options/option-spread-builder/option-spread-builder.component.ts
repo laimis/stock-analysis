@@ -2,7 +2,7 @@ import {Component, OnInit, Input} from '@angular/core';
 import {CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
-import {GetErrors} from "../../services/utils";
+import {GetErrors, parseDate} from "../../services/utils";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
@@ -98,8 +98,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
     maxSpread = 0;
     minCostSpreadRatio = 0;
     maxCostSpreadRatio = 0;
-    minExpirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 30 days from now
-    maxExpirationDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // 90 days from now
+    minExpirationDate = new Date(Date.now()).toISOString().split('T')[0];
+    maxExpirationDate = new Date(Date.now()).toISOString().split('T')[0];
     maxBidAskSpreadPercent: number = 10; // 10%
     selectedSpreadType: SpreadType = SpreadType.DEBIT_CALL;
 
@@ -130,8 +130,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 this.options = this.optionChain.options
                 this.createOptionBasedFilters();
                 this.loadFiltersFromLocalStorage();
-                this.loadFindSettingsFromLocalStorage();
                 this.applyFiltersAndSort();
+                this.loadFindSettingsFromLocalStorage();
                 this.refreshLegsIfNeeded();
                 this.loading = false
             },
@@ -186,7 +186,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
             return this.sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         });
         
-        console.log("filteredOptions", this.filteredOptions)
+        console.log("manual option filtering", this.filteredOptions)
     }
     
     storeFiltersInLocalStorage() {
@@ -216,8 +216,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
         }   
     }
 
-    saveFindFiltersAndFindSpreads() {
-        const key = `optionSpreadBuilderFindFilters-${this.ticker}`;
+    saveFindFilters() {
+        const key = `optionSpreadBuilderFindFilters`;
         const filters = {
             minSpread: this.minSpread,
             maxSpread: this.maxSpread,
@@ -231,25 +231,10 @@ export class OptionSpreadBuilderComponent implements OnInit {
         }
         localStorage.setItem(key, JSON.stringify(filters));
         console.log("saved find filters", filters)
-
-        // Determine the spread type based on the selected options
-        let spreadType: SpreadType;
-        
-        if (this.isCallSelected && this.isDebitSelected) {
-            spreadType = SpreadType.DEBIT_CALL;
-        } else if (this.isCallSelected && !this.isDebitSelected) {
-            spreadType = SpreadType.CREDIT_CALL;
-        } else if (!this.isCallSelected && this.isDebitSelected) {
-            spreadType = SpreadType.DEBIT_PUT;
-        } else {
-            spreadType = SpreadType.CREDIT_PUT;
-        }
-
-        this.findSpreads(spreadType);
     }
 
     loadFindSettingsFromLocalStorage() {
-        const key = `optionSpreadBuilderFindFilters-${this.ticker}`;
+        const key = `optionSpreadBuilderFindFilters`;
         const filters = JSON.parse(localStorage.getItem(key));
         if (filters) {
             this.minSpread = filters.minSpread;
@@ -257,10 +242,21 @@ export class OptionSpreadBuilderComponent implements OnInit {
             this.minCostSpreadRatio = filters.minCostSpreadRatio;
             this.maxCostSpreadRatio = filters.maxCostSpreadRatio;
             if (filters.minExpirationDate) {
-                this.minExpirationDate = filters.minExpirationDate;
+                // see if you can find them in the unique expirations
+                let exists = this.uniqueExpirations.find(x => x === filters.minExpirationDate);
+                if (exists) {
+                    this.minExpirationDate = filters.minExpirationDate;
+                } else {
+                    this.minExpirationDate = this.uniqueExpirations[0];
+                }
             }
             if (filters.maxExpirationDate) {
-                this.maxExpirationDate = filters.maxExpirationDate;
+                let exists = this.uniqueExpirations.find(x => x === filters.maxExpirationDate);
+                if (exists) {
+                    this.maxExpirationDate = filters.maxExpirationDate;
+                } else {
+                    this.maxExpirationDate = this.uniqueExpirations[this.uniqueExpirations.length - 1];
+                }
             }
             if (filters.maxBidAskSpreadPercent !== undefined) {
                 this.maxBidAskSpreadPercent = filters.maxBidAskSpreadPercent;
@@ -274,6 +270,17 @@ export class OptionSpreadBuilderComponent implements OnInit {
             console.log("loaded find filters", filters);
         } else {
             console.log("no find filters found");
+            // initialize with defaults
+            this.minSpread = 1;
+            this.maxSpread = 5;
+            this.minCostSpreadRatio = 0.20;
+            this.maxCostSpreadRatio = 0.40;
+            if (this.uniqueExpirations.length > 0) {
+                this.minExpirationDate = this.uniqueExpirations[0];
+                this.maxExpirationDate = this.uniqueExpirations[this.uniqueExpirations.length - 1];
+            }
+            this.isCallSelected = true;
+            this.isDebitSelected = true;
         }
     }
     
@@ -473,7 +480,28 @@ export class OptionSpreadBuilderComponent implements OnInit {
         this.isModalVisible = false
     }
 
+    findSelectedSpreads() {
+        this.saveFindFilters();
+
+        // Determine the spread type based on the selected options
+        let spreadType: SpreadType;
+        
+        if (this.isCallSelected && this.isDebitSelected) {
+            spreadType = SpreadType.DEBIT_CALL;
+        } else if (this.isCallSelected && !this.isDebitSelected) {
+            spreadType = SpreadType.CREDIT_CALL;
+        } else if (!this.isCallSelected && this.isDebitSelected) {
+            spreadType = SpreadType.DEBIT_PUT;
+        } else {
+            spreadType = SpreadType.CREDIT_PUT;
+        }
+
+        this.findSpreads(spreadType);
+    }
+
     findSpreads(spreadType: SpreadType) {
+
+        console.log("findSpreads", spreadType)
         
         let spreads: SpreadCandidate[] = [];
         const isCall = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.CREDIT_CALL;
@@ -484,11 +512,13 @@ export class OptionSpreadBuilderComponent implements OnInit {
             x.optionType == (isCall ? "Call" : "Put")
             && x.openInterest > 0
             && x.volume > 0
-            && Math.abs(x.bid - x.ask) <= (this.maxBidAskSpreadPercent / 100) * x.mark
-            && Date.parse(x.expiration) > Date.parse(this.minExpirationDate)
-            && Date.parse(x.expiration) < Date.parse(this.maxExpirationDate));
-            
+            && Math.abs(x.bid - x.ask) <= (this.maxBidAskSpreadPercent / 100) * x.mark &&
+            parseDate(x.expiration) >= parseDate(this.minExpirationDate) &&
+            parseDate(x.expiration) <= parseDate(this.maxExpirationDate));
+        
         this.candidateOptions = filteredOptions;
+
+        console.log("filtered options", filteredOptions)
         
         // Set up parameters based on spread type
         const longIsLowerStrike = isDebit === isCall;
@@ -511,11 +541,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 
                 // Skip if we've already processed this pair
                 if (processedPairs.has(pairId)) {
+                    console.log("skipping pair", pairId);
                     continue;
                 }
-                
-                // Add to processed set
-                processedPairs.add(pairId);
                 
                 // Check if this is a valid pair
                 const validPair =
@@ -537,6 +565,10 @@ export class OptionSpreadBuilderComponent implements OnInit {
                             && costOrCredit / spread <= this.maxCostSpreadRatio
                             && spread >= this.minSpread
                             && spread <= this.maxSpread) {
+
+                            // Add to processed set
+                            processedPairs.add(pairId);
+                
                             spreads.push({ longOption, shortOption, cost: costOrCredit });
                         }
                     }
@@ -548,12 +580,18 @@ export class OptionSpreadBuilderComponent implements OnInit {
         this.builtSpreads = isDebit ? this.sortDebitSpreads(spreads) : this.sortCreditSpreads(spreads);
     }
 
-    toggleSpreadFindUI() {
-        this.manualSelection = false;
-    }
-
-    toggleManualUI() {
-        this.manualSelection = true;
+    toggleSelectionMode(isManual: boolean) {
+        this.manualSelection = isManual;
+        
+        // If switching to find spreads mode, immediately run the search
+        if (!isManual) {
+            this.findSelectedSpreads();
+        }
+        
+        // If switching to manual mode, apply any existing filters
+        if (isManual) {
+            this.applyFiltersAndSort();
+        }
     }
 
     // Utility method for sorting credit spreads

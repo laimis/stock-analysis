@@ -37,37 +37,33 @@
             </div>
         </div>
 
-        
         <div class="row mb-3">
             <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Spread Finder</h5>
-                        <div class="d-flex">
-                            <button class="btn me-2" (click)="toggleSpreadFindUI()" [ngClass]="{'btn-primary':manualSelection===false, 'btn-secondary': manualSelection}">Find Spreads</button>
-                            <button class="btn" (click)="toggleManualUI()"  [ngClass]="{'btn-primary':manualSelection, 'btn-secondary': manualSelection === false}">Select Manually</button>
-                        </div>
-                        <div class="mt-2" *ngIf="candidateOptions.length">
-                            <small class="text-muted">Candidate options: {{ candidateOptions.length }}</small>
-                        </div>
-                    </div>
+                <div class="btn-group w-100">
+                    <input type="radio" class="btn-check" name="selectionMode" id="findSpreadsMode" 
+                        [value]="false" [(ngModel)]="manualSelection" (change)="toggleSelectionMode(false)" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="findSpreadsMode">Find Spreads</label>
+                    
+                    <input type="radio" class="btn-check" name="selectionMode" id="manualMode"
+                        [value]="true" [(ngModel)]="manualSelection" (change)="toggleSelectionMode(true)" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="manualMode">Select Manually</label>
                 </div>
             </div>
         </div>
-
+        
         <div class="row mb-3" *ngIf="manualSelection === false">
             <div class="col">
                 <div class="row">
                     <div class="col">
                         <label for="minExpirationDate" class="form-label">Min Expiration Date:</label>
-                        <select id="minExpirationDate" class="form-select" [(ngModel)]="minExpirationDate" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <select id="minExpirationDate" class="form-select" [(ngModel)]="minExpirationDate" (ngModelChange)="findSelectedSpreads()">
                             <option value="">All</option>
                             <option *ngFor="let exp of uniqueExpirations" [value]="exp">{{ exp }} [{{ daysToExpiration(exp) }} days]</option>
                         </select>
                     </div>
                     <div class="col">
                         <label for="maxExpirationDate" class="form-label">Max Expiration Date:</label>
-                        <select id="maxExpirationDate" class="form-select" [(ngModel)]="maxExpirationDate" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <select id="maxExpirationDate" class="form-select" [(ngModel)]="maxExpirationDate" (ngModelChange)="findSelectedSpreads()">
                             <option value="">All</option>
                             <option *ngFor="let exp of uniqueExpirations" [value]="exp">{{ exp }} [{{ daysToExpiration(exp) }} days]</option>
                         </select>
@@ -76,27 +72,27 @@
                 <div class="row">
                     <div class="col">
                         <label for="minSpread" class="form-label">Min Spread:</label>
-                        <input id="minSpread" type="number" class="form-control" [(ngModel)]="minSpread" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <input id="minSpread" type="number" class="form-control" [(ngModel)]="minSpread" (ngModelChange)="findSelectedSpreads()">
                     </div>
                     <div class="col">
                         <label for="maxSpread" class="form-label">Max Spread:</label>
-                        <input id="maxSpread" type="number" class="form-control" [(ngModel)]="maxSpread" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <input id="maxSpread" type="number" class="form-control" [(ngModel)]="maxSpread" (ngModelChange)="findSelectedSpreads()">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
                         <label for="minCostSpreadRatio" class="form-label">Min Cost Spread Ratio:</label>
-                        <input id="minCostSpreadRatio" type="number" class="form-control" [(ngModel)]="minCostSpreadRatio" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <input id="minCostSpreadRatio" type="number" class="form-control" [(ngModel)]="minCostSpreadRatio" (ngModelChange)="findSelectedSpreads()">
                     </div>
                     <div class="col">
                         <label for="maxCostSpreadRatio" class="form-label">Max Cost Spread Ratio:</label>
-                        <input id="maxCostSpreadRatio" type="number" class="form-control" [(ngModel)]="maxCostSpreadRatio" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <input id="maxCostSpreadRatio" type="number" class="form-control" [(ngModel)]="maxCostSpreadRatio" (ngModelChange)="findSelectedSpreads()">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
                         <label for="maxBidAskSpreadPercent" class="form-label">Max Bid/Ask Spread (% of mark):</label>
-                        <input id="maxBidAskSpreadPercent" type="number" class="form-control" [(ngModel)]="maxBidAskSpreadPercent" (ngModelChange)="saveFindFiltersAndFindSpreads()">
+                        <input id="maxBidAskSpreadPercent" type="number" class="form-control" [(ngModel)]="maxBidAskSpreadPercent" (ngModelChange)="findSelectedSpreads()">
                     </div>
                 </div>
                 <div class="row">
@@ -104,11 +100,11 @@
                         <label class="form-label">Option Type:</label>
                         <div class="btn-group w-100">
                             <input type="radio" class="btn-check" name="optionType" id="callOption" 
-                                   [value]="true" [(ngModel)]="isCallSelected" autocomplete="off">
+                                   [value]="true" [(ngModel)]="isCallSelected" autocomplete="off" (change)="findSelectedSpreads()">
                             <label class="btn btn-outline-primary" for="callOption">Call</label>
                             
                             <input type="radio" class="btn-check" name="optionType" id="putOption"
-                                   [value]="false" [(ngModel)]="isCallSelected" autocomplete="off">
+                                   [value]="false" [(ngModel)]="isCallSelected" autocomplete="off" (change)="findSelectedSpreads()">
                             <label class="btn btn-outline-primary" for="putOption">Put</label>
                         </div>
                     </div>
@@ -116,11 +112,11 @@
                         <label class="form-label">Spread Type:</label>
                         <div class="btn-group w-100">
                             <input type="radio" class="btn-check" name="spreadType" id="debitSpread"
-                                   [value]="true" [(ngModel)]="isDebitSelected" autocomplete="off">
+                                   [value]="true" [(ngModel)]="isDebitSelected" autocomplete="off" (change)="findSelectedSpreads()">
                             <label class="btn btn-outline-primary" for="debitSpread">Debit</label>
                             
                             <input type="radio" class="btn-check" name="spreadType" id="creditSpread" 
-                                   [value]="false" [(ngModel)]="isDebitSelected" autocomplete="off">
+                                   [value]="false" [(ngModel)]="isDebitSelected" autocomplete="off" (change)="findSelectedSpreads()">
                             <label class="btn btn-outline-primary" for="creditSpread">Credit</label>
                         </div>
                     </div>
