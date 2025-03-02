@@ -9,7 +9,6 @@ open testutils
 
 let ticker = TestDataGenerator.NET
 
-[<Fact>]
 let position =
     StockPosition.openLong ticker (DateTimeOffset.Parse("2020-01-23"))
     |> StockPosition.buy 10m 30m (DateTimeOffset.Parse("2020-01-23"))

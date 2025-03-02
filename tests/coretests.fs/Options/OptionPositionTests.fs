@@ -286,3 +286,20 @@ let ``Buying multiple contracts at different quantities maintains accurate cost`
         quantity |> should equal 3
         cost |> should equal 4.35m
     
+
+[<Fact>]
+let ``Opening up pending credit spread`` () =
+
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+
+    let cost = -4.2m
+
+    let modifiedPosition =
+        position
+        |> OptionPosition.establishDesiredCost cost DateTimeOffset.UtcNow
+        |> OptionPosition.createPendingSellOrder expiration 120m OptionType.Put 1 DateTimeOffset.UtcNow
+        |> OptionPosition.createPendingBuyOrder expiration 115m OptionType.Put 1 DateTimeOffset.UtcNow
+
+    modifiedPosition.DesiredCost |> should equal (Some cost)
+    modifiedPosition.Cost |> should equal None
+    modifiedPosition.PendingContracts |> should haveCount 2

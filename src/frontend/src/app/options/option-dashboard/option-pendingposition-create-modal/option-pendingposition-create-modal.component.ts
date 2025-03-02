@@ -105,10 +105,14 @@ export class OptionPendingPositionCreateModalComponent {
 
     turnIntoPosition() {
         
+        // the reason for this is that the cost is negative for a credit spread
+        // but the cost is positive for a debit spread, but it's entered as negative as in I am buying, debiting
+        let cost = this.price * -1
+        
         let command = {
 
             underlyingTicker: this.ticker,
-            cost: Math.abs(this.price),
+            cost: cost,
             notes: this.positionNotes,
             strategy: this.positionStrategy,
             contracts: this.selectedLegs.map(l => ({
