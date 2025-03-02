@@ -474,7 +474,6 @@ export class OptionSpreadBuilderComponent implements OnInit {
     }
 
     findSpreads(spreadType: SpreadType) {
-        this.saveFindFiltersAndFindSpreads();
         
         let spreads: SpreadCandidate[] = [];
         const isCall = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.CREDIT_CALL;

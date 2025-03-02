@@ -11,7 +11,7 @@
                     <div class="col-md-3">
                         <div class="stat-label">Risked/Spread</div>
                         <div>
-                            {{ position.spread > 0 ? (position.risked / position.spread | currency) : 'N/A' }}
+                            {{ position.spread > 0 ? (position.risked / position.spread | percent) : 'N/A' }}
                         </div>
                     </div>
                     @if(position.isPending) {
