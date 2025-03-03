@@ -17,6 +17,10 @@ export class PeakValleyAnalysisComponent {
 
   @Input()
   set prices(result: Prices) {
+    if (!result) {
+      return;
+    }
+    
     const inflectionPoints = calculateInflectionPoints(result.prices);
     const completeAnalysisResults = getCompleteTrendAnalysis(inflectionPoints, result.prices[result.prices.length - 1])
     this.trendAnalysisResult = completeAnalysisResults.establishedTrend

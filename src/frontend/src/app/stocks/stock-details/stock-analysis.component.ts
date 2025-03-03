@@ -20,6 +20,7 @@ import {PercentChangeDistributionComponent} from "../../shared/reports/percent-c
 import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
 import {FormsModule} from "@angular/forms";
 import {StockDailyScoresComponent} from "../../shared/stock-daily-scores/stock-daily-scores.component";
+import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/peak-valley-analysis.component";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -27,17 +28,18 @@ import {StockDailyScoresComponent} from "../../shared/stock-daily-scores/stock-d
     styleUrls: ['./stock-analysis.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
     imports: [
-        NgIf,
-        NgClass,
-        DatePipe,
-        GapsComponent,
-        LineChartComponent,
-        OutcomesAnalysisReportComponent,
-        PercentChangeDistributionComponent,
-        CandlestickChartComponent,
-        FormsModule,
-        StockDailyScoresComponent
-    ]
+    NgIf,
+    NgClass,
+    DatePipe,
+    GapsComponent,
+    LineChartComponent,
+    OutcomesAnalysisReportComponent,
+    PercentChangeDistributionComponent,
+    CandlestickChartComponent,
+    FormsModule,
+    StockDailyScoresComponent,
+    PeakValleyAnalysisComponent
+]
 })
 export class StockAnalysisComponent {
     multipleBarOutcomes: TickerOutcomes;
@@ -64,8 +66,6 @@ export class StockAnalysisComponent {
     @Input()
     endDate: string
 
-
-
     @Input()
     set prices(prices: Prices) {
         this.chartInfo = {
@@ -80,6 +80,9 @@ export class StockAnalysisComponent {
             renderMovingAverages: true
         }
         this.loadData(this.ticker)
+    }
+    get prices(): Prices {
+        return this.chartInfo?.prices;
     }
 
     getValue(o: StockAnalysisOutcome) {

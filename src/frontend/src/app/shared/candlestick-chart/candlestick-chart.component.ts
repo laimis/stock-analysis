@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy} from '@angular/core';
+import {AfterViewInit, Component, Input, OnDestroy} from '@angular/core';
 import {
     ChartMarker,
     MovingAverages,
@@ -69,15 +69,25 @@ export function toSeriesMarker(marker: ChartMarker): SeriesMarker<Time> {
     selector: 'app-candlestick-chart',
     templateUrl: './candlestick-chart.component.html',
 })
-export class CandlestickChartComponent implements OnDestroy {
+export class CandlestickChartComponent implements OnDestroy, AfterViewInit {
     chart: IChartApi;
+    chartInformationData: PositionChartInformation;
+    viewInitialized = false;
 
     @Input()
     chartHeight: number = 400;
+    
+    chartId: string;
+
+    constructor() {
+        this.chartId = 'chart-' + Math.random().toString(36).substring(7);
+        console.log("chartId: " + this.chartId)
+    }
 
     @Input()
     set chartInformation(value: PositionChartInformation) {
-        if (value) {
+        this.chartInformationData = value;
+        if (value && this.viewInitialized) {
             this.renderChart(value);
         }
     }
@@ -86,12 +96,21 @@ export class CandlestickChartComponent implements OnDestroy {
         this.removeChart();
     }
 
+    ngAfterViewInit(): void {
+        this.viewInitialized = true;
+        if (this.chartInformationData) {
+            this.renderChart(this.chartInformationData);
+        }
+    }
+
     renderChart(info: PositionChartInformation) {
 
+        const element = document.getElementById(this.chartId);
+        console.log("rendering chart with chart id of " + this.chartId + " and element " + element)
         this.removeChart();
 
         this.chart = createChart(
-            document.getElementById("chart"),
+            element,
             {
                 height: this.chartHeight,
                 rightPriceScale: {

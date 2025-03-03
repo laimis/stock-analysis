@@ -18,6 +18,9 @@
     <!-- Stock Analysis -->
     <app-stock-daily-scores [dailyScoresInput]="{ticker}"></app-stock-daily-scores>
 
+    <!-- Peak and valley analysis -->
+    <app-peak-valley-analysis [prices]="prices"></app-peak-valley-analysis>
+
     <!-- Gaps -->
     <section *ngIf="gaps" class="card shadow-sm mb-4">
         <div class="card-body">
