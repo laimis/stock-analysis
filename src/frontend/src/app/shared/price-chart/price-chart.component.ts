@@ -85,6 +85,9 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
     }
 
     @Input()
+    chartType: 'candlestick' | 'line' = 'candlestick';
+
+    @Input()
     set chartInformation(value: PositionChartInformation) {
         this.chartInformationData = value;
         if (value && this.viewInitialized) {
@@ -122,25 +125,45 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             }
         );
 
-        const barSeries = this.chart.addCandlestickSeries();
         let priceBars = info.prices.prices.map(toPriceBar)
-        barSeries.setData(priceBars);
+        
+        let mainSeries;
+
+        if (this.chartType == 'candlestick') {
+            mainSeries = this.chart.addCandlestickSeries();
+            mainSeries.setData(priceBars);
+        } else {
+            // For line chart, we need to transform the data to close prices only
+            mainSeries = this.chart.addLineSeries({
+                color: 'rgba(56, 121, 217, 1)',
+                lineWidth: 2,
+                crosshairMarkerVisible: true,
+                crosshairMarkerRadius: 4
+            });
+            
+            const lineData = info.prices.prices.map(p => ({
+                time: p.dateStr,
+                value: p.close
+            }));
+            
+            mainSeries.setData(lineData);
+        }
 
         if (info.averageBuyPrice) {
-            barSeries.createPriceLine(
+            mainSeries.createPriceLine(
                 createPriceLine('avg cost', info.averageBuyPrice, blue)
             );
         }
 
         if (info.stopPrice) {
-            barSeries.createPriceLine(
+            mainSeries.createPriceLine(
                 createPriceLine('stop', info.stopPrice, red)
             );
         }
         
         if (info.buyOrders) {
             info.buyOrders.forEach((b) => {
-                barSeries.createPriceLine(
+                mainSeries.createPriceLine(
                     createPriceLine('B', b, green)
                 );
             });
@@ -148,7 +171,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
         
         if (info.sellOrders) {
             info.sellOrders.forEach((s) => {
-                barSeries.createPriceLine(
+                mainSeries.createPriceLine(
                     createPriceLine('S', s, red)
                 );
             });
@@ -183,10 +206,10 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             let seriesMarkers = markers.map(toSeriesMarker)
             console.log(seriesMarkers)
             seriesMarkers.sort((a, b) => a.time.toLocaleString().localeCompare(b.time.toLocaleString()))
-            barSeries.setMarkers(seriesMarkers)
+            mainSeries.setMarkers(seriesMarkers)
         }
 
-        barSeries.priceScale().applyOptions({
+        mainSeries.priceScale().applyOptions({
             scaleMargins: {
                 top: 0.1, // highest point of the series will be 10% away from the top
                 bottom: 0.4, // lowest point will be 40% away from the bottom
