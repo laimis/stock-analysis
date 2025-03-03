@@ -73,7 +73,7 @@ import {OptionSpreadsComponent} from './options/option-chain/option-spreads.comp
 import {RoutinesActiveRoutineComponent} from './routines/routines-active-routine.component';
 import {LineChartComponent} from './shared/line-chart/line-chart.component';
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
-import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-chart.component";
+import {PriceChartComponent} from "./shared/price-chart/price-chart.component";
 import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-and-tradingview-link.component";
 import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
@@ -170,7 +170,7 @@ import {StockDailyScoresComponent} from "./shared/stock-daily-scores/stock-daily
         CorrelationsComponent,
         StockTradingNewPositionComponent,
         BrokerageOrdersComponent,
-        CandlestickChartComponent,
+        PriceChartComponent,
         GapsComponent,
         ParsedDatePipe,
         OutcomesAnalysisReportComponent,

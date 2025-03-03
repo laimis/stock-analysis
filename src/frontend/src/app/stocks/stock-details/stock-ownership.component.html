@@ -11,7 +11,7 @@
                 }
             </h5>
             @if (positionChartInformation && position.isOpen) {
-                <app-candlestick-chart [chartInformation]="positionChartInformation"></app-candlestick-chart>
+                <app-price-chart [chartInformation]="positionChartInformation"></app-price-chart>
             }
             <app-stock-trading-position
                 [position]="position"

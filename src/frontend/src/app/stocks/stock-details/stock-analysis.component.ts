@@ -17,7 +17,7 @@ import {GapsComponent} from "../../shared/reports/gaps.component";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
 import {OutcomesAnalysisReportComponent} from "../../shared/reports/outcomes-analysis-report.component";
 import {PercentChangeDistributionComponent} from "../../shared/reports/percent-change-distribution.component";
-import {CandlestickChartComponent} from "../../shared/candlestick-chart/candlestick-chart.component";
+import {PriceChartComponent} from "../../shared/price-chart/price-chart.component";
 import {FormsModule} from "@angular/forms";
 import {StockDailyScoresComponent} from "../../shared/stock-daily-scores/stock-daily-scores.component";
 import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/peak-valley-analysis.component";
@@ -35,7 +35,7 @@ import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/p
     LineChartComponent,
     OutcomesAnalysisReportComponent,
     PercentChangeDistributionComponent,
-    CandlestickChartComponent,
+    PriceChartComponent,
     FormsModule,
     StockDailyScoresComponent,
     PeakValleyAnalysisComponent
