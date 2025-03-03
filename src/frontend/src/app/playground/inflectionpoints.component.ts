@@ -7,19 +7,20 @@ import {
     Prices,
     StocksService
 } from '../services/stocks.service';
-import {GetErrors} from "../services/utils";
+import {GetErrors, humanFriendlyDuration} from "../services/utils";
 import {
     age,
+    analyzeTrend,
     calculateInflectionPoints,
     histogramToDataPointContainer,
-    humanFriendlyTime,
     InfectionPointType,
     InflectionPointLog,
     logToDataPointContainer,
     toChartMarker,
     toDailyBreakdownDataPointCointainer,
     toHistogram,
-    toInflectionPointLog
+    toInflectionPointLog,
+    TrendAnalysisResult
 } from "../services/prices.service";
 
 @Component({
@@ -38,6 +39,7 @@ export class InflectionPointsComponent implements OnInit {
     peaksAndValleys: DataPointContainer[];
     log: InflectionPointLog[];
     errors: string[];
+    trendAnalysisResult: TrendAnalysisResult;
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
 
@@ -59,6 +61,7 @@ export class InflectionPointsComponent implements OnInit {
                 this.prices = result
 
                 const inflectionPoints = calculateInflectionPoints(result.prices);
+                this.trendAnalysisResult = analyzeTrend(inflectionPoints)
                 const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
                 const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
 
@@ -70,7 +73,8 @@ export class InflectionPointsComponent implements OnInit {
                     averageBuyPrice: null,
                     stopPrice: null,
                     buyOrders: [],
-                    sellOrders: []
+                    sellOrders: [],
+                    renderMovingAverages: false
                 }
 
                 const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
@@ -80,7 +84,7 @@ export class InflectionPointsComponent implements OnInit {
 
                 this.log = toInflectionPointLog(inflectionPoints).reverse()
 
-                const humanFriendlyTimeDuration = humanFriendlyTime(this.ageValueToUse)
+                const humanFriendlyTimeDuration = humanFriendlyDuration(this.ageValueToUse)
                 const resistanceHistogram = toHistogram(peaks.filter(p => age(p) < this.ageValueToUse))
                 const resistanceHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' resistance histogram', resistanceHistogram)
 

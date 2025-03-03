@@ -1,4 +1,4 @@
-import {parse} from "date-fns";
+import {formatDistance, parse} from "date-fns";
 
 export function GetErrors(err: any): string[] {
     try {
@@ -104,4 +104,11 @@ export function parseDate(date: string) {
 
 export function convertToLocalTime(date: Date) {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+}
+
+export function humanFriendlyDuration(numberOfDays: number) {
+    // use date-fns to convert number of days to human friendly duration
+    let today = new Date()
+    let numberOfDaysAgoAsDate = new Date(today.setDate(today.getDate() - numberOfDays))
+    return formatDistance(numberOfDaysAgoAsDate, new Date(), {includeSeconds: false, addSuffix: true})
 }

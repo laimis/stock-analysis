@@ -76,7 +76,8 @@ export class StockAnalysisComponent {
             averageBuyPrice: null,
             stopPrice: null,
             buyOrders: [],
-            sellOrders: []
+            sellOrders: [],
+            renderMovingAverages: true
         }
         this.loadData(this.ticker)
     }

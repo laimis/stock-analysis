@@ -31,6 +31,28 @@ function nextDay(currentDate: string): string {
     return date.toISOString().substring(0, 10)
 }
 
+function filterBySignificance(points: InflectionPoint[], minPercentChange = 0.03, minAge = 5) {
+    // Filter out minor fluctuations
+    let significant: InflectionPoint[] = [];
+    if (points.length <= 1) return points;
+    
+    significant.push(points[0]);
+    
+    for (let i = 1; i < points.length; i++) {
+        const lastPoint = significant[significant.length - 1];
+        const percentChange = Math.abs(
+            (points[i].priceValue - lastPoint.priceValue) / lastPoint.priceValue
+        );
+        const age = Math.abs(points[i].gradient.index - lastPoint.gradient.index);
+        
+        if (percentChange >= minPercentChange && age >= minAge) {
+            significant.push(points[i]);
+        }
+    }
+    
+    return significant;
+}
+
 export function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPoint[], priceFunc?): DataPointContainer {
 
     if (priceFunc) {
@@ -84,11 +106,12 @@ export function toDailyBreakdownDataPointCointainer(label: string, points: Infle
 
     return {
         label: label,
-        chartType: ChartType.Line,
+        chartType: ChartType.Scatter,
         data: dataPoints
     }
 }
 
+// main thing
 export function calculateInflectionPoints(prices: PriceBar[]) {
     let diffs: Gradient[] = []
 
@@ -119,7 +142,7 @@ export function calculateInflectionPoints(prices: PriceBar[]) {
         }
     }
 
-    return inflectionPoints;
+    return filterBySignificance(inflectionPoints);
 }
 
 // this function will traverse the inflection points and calculate
@@ -210,23 +233,273 @@ export function logToDataPointContainer(label: string, log: InflectionPointLog[]
     }
 }
 
-// TODO: this function does not belong here, another module would be good
-export function humanFriendlyTime(ageValueToUse: number) {
-    // check if we are dealing with years
-    if (ageValueToUse > 365) {
-        return Math.round(ageValueToUse / 365) + ' years'
-    }
+// TREND FUNCTIONS
+export enum TrendDirection {
+    Uptrend = "Uptrend",
+    Downtrend = "Downtrend",
+    Sideways = "Sideways",
+    InsufficientData = "Insufficient data"
+}
 
-    // check if we are dealing with months
-    if (ageValueToUse > 30) {
-        return Math.round(ageValueToUse / 30) + ' months'
-    }
+export type TrendDirectionAndStrength = {
+    direction: TrendDirection;
+    strength: number;
+}
 
-    // check if we are dealing with weeks
-    if (ageValueToUse > 7) {
-        return Math.round(ageValueToUse / 7) + ' weeks'
-    }
+export type TrendAnalysisDetails = {
+    slopeAnalysis: TrendDirectionAndStrength;
+    patternAnalysis: TrendDirectionAndStrength;
+    rangeAnalysis: TrendDirectionAndStrength;
+    strengthAnalysis: TrendDirectionAndStrength;
+}
 
-    // check if we are dealing with days
-    return Math.round(ageValueToUse) + ' days'
+export interface TrendAnalysisResult {
+    trend: TrendDirection;
+    confidence: number;
+    details: TrendAnalysisDetails;
+}
+
+function linearRegressionAnalysis(inflectionPoints: InflectionPoint[], minPoints = 8): TrendDirectionAndStrength {
+    if (inflectionPoints.length < minPoints) return { direction: TrendDirection.InsufficientData, strength: 0 };
+    
+    // Extract recent points (last N points)
+    const recentPoints = inflectionPoints.slice(-minPoints);
+    
+    // Prepare data for regression
+    const x: number[] = recentPoints.map((p, i) => i);
+    const y: number[] = recentPoints.map(p => p.priceValue);
+    
+    // Calculate linear regression slope
+    const n = x.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    
+    for (let i = 0; i < n; i++) {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumX2 += x[i] * x[i];
+    }
+    
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    const threshold = 0.005; // Adjust based on sensitivity needed
+    
+    if (slope > threshold) return { direction: TrendDirection.Uptrend, strength: 1 };
+    if (slope < -threshold) return { direction: TrendDirection.Downtrend, strength: 1 };
+    return { direction: TrendDirection.Sideways, strength: 1 };
+}
+
+function analyzePeaksAndValleys(inflectionPoints: InflectionPoint[], lookback = 4): TrendDirectionAndStrength {
+    if (inflectionPoints.length < lookback * 2) return {direction: TrendDirection.InsufficientData, strength: 0};
+    
+    // Extract peaks and valleys
+    const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak).slice(-lookback);
+    const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley).slice(-lookback);
+    
+    // Check if we have at least 2 peaks and 2 valleys
+    if (peaks.length < 2 || valleys.length < 2) return {direction: TrendDirection.InsufficientData, strength: 0};
+    
+    // Check for higher highs and higher lows (uptrend)
+    const higherHighs = areIncreasing(peaks.map(p => p.priceValue));
+    const higherLows = areIncreasing(valleys.map(p => p.priceValue));
+    
+    // Check for lower highs and lower lows (downtrend)
+    const lowerHighs = areDecreasing(peaks.map(p => p.priceValue));
+    const lowerLows = areDecreasing(valleys.map(p => p.priceValue));
+    
+    if (higherHighs && higherLows) return {direction: TrendDirection.Uptrend, strength: 1};
+    if (lowerHighs && lowerLows) return {direction: TrendDirection.Downtrend, strength: 1};
+    if (higherHighs || higherLows) return {direction: TrendDirection.Uptrend, strength: 0.5};
+    if (lowerHighs || lowerLows) return {direction: TrendDirection.Downtrend, strength: 0.5};
+    
+    return {direction: TrendDirection.Sideways, strength: 0};
+}
+
+function areIncreasing(values: number[]): boolean {
+    for (let i = 1; i < values.length; i++) {
+        if (values[i] <= values[i-1]) return false;
+    }
+    return true;
+}
+
+function areDecreasing(values: number[]): boolean {
+    for (let i = 1; i < values.length; i++) {
+        if (values[i] >= values[i-1]) return false;
+    }
+    return true;
+}
+
+// NOTE: not used, keeping it to think about it if to add it or not
+function analyzePercentChanges(inflectionPoints: InflectionPoint[], threshold = 0.03): TrendDirectionAndStrength {
+    if (inflectionPoints.length < 4) return { direction: TrendDirection.InsufficientData, strength: 0 };
+    
+    // Calculate cumulative percentage change over the most recent inflection points
+    let cumulativeChange = 0;
+    for (let i = 1; i < inflectionPoints.length; i++) {
+        const change = (inflectionPoints[i].priceValue - inflectionPoints[i-1].priceValue) / 
+                        inflectionPoints[i-1].priceValue;
+        cumulativeChange += change;
+    }
+    
+    // Look at the total change from first to last point
+    const totalChange = (inflectionPoints[inflectionPoints.length-1].priceValue - 
+                         inflectionPoints[0].priceValue) / 
+                         inflectionPoints[0].priceValue;
+    
+    // Adjust these thresholds based on your sensitivity preferences
+    if (totalChange > threshold) return { direction: TrendDirection.Uptrend, strength: 1 };
+    if (totalChange < -threshold) return { direction: TrendDirection.Downtrend, strength: 1 };
+    return { direction: TrendDirection.Sideways, strength: 1 };
+}
+
+function analyzeRange(inflectionPoints: InflectionPoint[]): TrendDirectionAndStrength {
+    if (inflectionPoints.length < 4) return { direction: TrendDirection.InsufficientData, strength: 0 };
+    
+    // Find min and max prices
+    const prices = inflectionPoints.map(p => p.priceValue);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    
+    // Calculate the range as a percentage of the average price
+    const range = maxPrice - minPrice;
+    const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+    const rangePercent = range / avgPrice;
+    
+    // If range is small relative to price, it's sideways
+    if (rangePercent < 0.05) return {direction: TrendDirection.Sideways, strength: 1}; // 5% range threshold
+    
+    // Check position of latest price within the range
+    const latestPrice = inflectionPoints[inflectionPoints.length-1].priceValue;
+    const positionInRange = (latestPrice - minPrice) / range;
+    
+    if (positionInRange > 0.7) return { direction: TrendDirection.Uptrend, strength: 1 }; // Near the top of range
+    if (positionInRange < 0.3) return { direction: TrendDirection.Downtrend, strength: 1 }; // Near the bottom of range
+    return { direction: TrendDirection.Sideways, strength: 1 }; // In middle of range
+}
+
+function calculateTrendStrength(inflectionPoints: InflectionPoint[], numberOfPoints = 8): TrendDirectionAndStrength {
+    if (inflectionPoints.length < numberOfPoints) return {direction: TrendDirection.InsufficientData, strength: 0};
+    
+    // Extract recent points
+    const recentPoints = inflectionPoints.slice(-numberOfPoints);
+    
+    // 1. Calculate linear regression slope
+    const x: number[] = recentPoints.map((p, i) => i);
+    const y: number[] = recentPoints.map(p => p.priceValue);
+    
+    const n = x.length;
+    let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+    
+    for (let i = 0; i < n; i++) {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumX2 += x[i] * x[i];
+    }
+    
+    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+    
+    // 2. Check for higher highs/lower lows
+    const peaks = recentPoints.filter(p => p.type === InfectionPointType.Peak);
+    const valleys = recentPoints.filter(p => p.type === InfectionPointType.Valley);
+    
+    let patternScore = 0;
+    
+    if (peaks.length >= 2) {
+        // Check if peaks are increasing (uptrend) or decreasing (downtrend)
+        const peakDiff = peaks[peaks.length-1].priceValue - peaks[0].priceValue;
+        patternScore += Math.sign(peakDiff);
+    }
+    
+    if (valleys.length >= 2) {
+        // Check if valleys are increasing (uptrend) or decreasing (downtrend)
+        const valleyDiff = valleys[valleys.length-1].priceValue - valleys[0].priceValue;
+        patternScore += Math.sign(valleyDiff);
+    }
+    
+    // 3. Calculate total percentage change
+    const totalChange = (recentPoints[recentPoints.length-1].priceValue - 
+                         recentPoints[0].priceValue) / 
+                         recentPoints[0].priceValue;
+    
+    // 4. Normalize and combine factors
+    const normalizedSlope = Math.min(Math.max(slope * 20, -1), 1); // Scale slope to [-1, 1]
+    const normalizedChange = Math.min(Math.max(totalChange * 10, -1), 1); // Scale change to [-1, 1]
+    const normalizedPattern = patternScore / 2; // Already in [-1, 1] range
+    
+    // Combine scores (can adjust weights as needed)
+    const combinedScore = (normalizedSlope + normalizedChange + normalizedPattern) / 3;
+    
+    // Convert to trend and strength
+    let direction: TrendDirection;
+    if (combinedScore > 0.2) direction = TrendDirection.Uptrend;
+    else if (combinedScore < -0.2) direction = TrendDirection.Downtrend;
+    else direction = TrendDirection.Sideways;
+    
+    // Return both trend and strength [-1 to 1]
+    return {
+        direction: direction,
+        strength: Math.abs(combinedScore)
+    };
+}
+
+export function analyzeTrend(inflectionPoints: InflectionPoint[]): TrendAnalysisResult {
+    if (inflectionPoints.length < 8) {
+        return {
+            trend: TrendDirection.InsufficientData,
+            confidence: 0,
+            details: {
+                slopeAnalysis: {direction: TrendDirection.InsufficientData, strength: 0},
+                patternAnalysis: {direction: TrendDirection.InsufficientData, strength: 0},
+                rangeAnalysis: {direction: TrendDirection.InsufficientData, strength: 0},
+                strengthAnalysis: {direction: TrendDirection.InsufficientData, strength: 0}
+            }
+        };
+    }
+    
+    // Get results from different methods
+    const slopeResult = linearRegressionAnalysis(inflectionPoints);
+    const patternResult = analyzePeaksAndValleys(inflectionPoints);
+    const rangeResult = analyzeRange(inflectionPoints);
+    const strengthResult = calculateTrendStrength(inflectionPoints);
+    
+    // Vote for the final trend
+    let upVotes = 0, downVotes = 0, sidewaysVotes = 0;
+    
+    [slopeResult, patternResult, rangeResult, strengthResult].forEach(result => {
+        if (result.direction === TrendDirection.Uptrend) {
+            upVotes += result.strength;
+        } else if (result.direction === TrendDirection.Downtrend) {
+            downVotes += result.strength;
+        } else {
+            sidewaysVotes += result.strength;
+        }
+    });
+    
+    let finalTrend: TrendDirection;
+    let confidence: number;
+    
+    if (upVotes > downVotes && upVotes > sidewaysVotes) {
+        finalTrend = TrendDirection.Uptrend;
+        confidence = upVotes / 4; // 4 is max possible votes
+    } else if (downVotes > upVotes && downVotes > sidewaysVotes) {
+        finalTrend = TrendDirection.Downtrend;
+        confidence = downVotes / 4;
+    } else {
+        finalTrend = TrendDirection.Sideways;
+        confidence = sidewaysVotes / 4;
+    }
+    
+    // Adjust confidence by trend strength
+    confidence = (confidence + strengthResult.strength) / 2;
+    
+    return {
+        trend: finalTrend,
+        confidence: confidence,
+        details: {
+            slopeAnalysis: slopeResult,
+            patternAnalysis: patternResult,
+            rangeAnalysis: rangeResult,
+            strengthAnalysis: strengthResult
+        }
+    };
 }

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-    DailyPositionReport,
+    PriceFrequency,
     StockPosition,
     StockQuote,
     StocksService,
@@ -11,15 +11,13 @@ import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
 import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
-import {DailyOutcomeScoresComponent} from "../shared/reports/daily-outcome-scores.component";
 import {LoadingComponent} from "../shared/loading/loading.component";
 import {CorrelationsComponent} from "../shared/reports/correlations.component";
 import {FormsModule} from "@angular/forms";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 import {NgIf} from "@angular/common";
-import {OptionPosition, OptionService} from "../services/option.service";
-import {OptionContractPricingComponent} from "../options/option-contract-pricing/option-contract-pricing.component";
+import { calculateInflectionPoints, InfectionPointType } from '../services/prices.service';
 
 function unrealizedProfit(position: StockPosition, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
@@ -38,7 +36,6 @@ function createProfitScatter(entries: StockPosition[], quotes: Map<string, Stock
         },
         axisX: {
             title: "Days Held",
-            // valueFormatString: "YYYY-MM-DD",
             gridThickness: 0.1,
         },
         axisY: {
@@ -61,14 +58,12 @@ function createProfitScatter(entries: StockPosition[], quotes: Map<string, Stock
     templateUrl: './playground.component.html',
     styleUrls: ['./playground.component.css'],
     imports: [
-        DailyOutcomeScoresComponent,
         LoadingComponent,
         CorrelationsComponent,
         FormsModule,
         CanvasJSAngularChartsModule,
         ErrorDisplayComponent,
-        NgIf,
-        OptionContractPricingComponent
+        NgIf
     ]
 })
 export class PlaygroundComponent implements OnInit {
@@ -81,7 +76,6 @@ export class PlaygroundComponent implements OnInit {
     constructor(
         private stocks: StocksService,
         private stockPositions: StockPositionsService,
-        private optionService: OptionService,
         private route: ActivatedRoute) {
     }
 
@@ -120,19 +114,6 @@ export class PlaygroundComponent implements OnInit {
         })
     }
     
-    loadingCombinedDailyChart: boolean = false
-    dailyReport: DailyPositionReport
-    runCombinedDailyChart() {
-        this.loadingCombinedDailyChart = true
-        this.stocks.reportDailyPositionReport("6d5e5329-ecc8-41c5-aba1-d94ed914885f").subscribe((data) => {
-            this.dailyReport = data
-            this.loadingCombinedDailyChart = false
-        }, (error) => {
-            this.errors = GetErrors(error)
-            this.loadingCombinedDailyChart = false
-        })
-    }
-
     run() {
 
         this.status = "Running"
@@ -186,20 +167,6 @@ export class PlaygroundComponent implements OnInit {
         this.status = "Running..."
 
         concat([positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily]).subscribe()
-    }
-
-    optionPosition: OptionPosition = null;
-    loadingOptionPosition: boolean = false;
-    loadOptionPosition() {
-        this.loadingOptionPosition = true;
-        const positionId = 'e1f844e2-07ef-4029-88f2-b3ac37f510ba'
-        this.optionService.get(positionId).subscribe((data) => {
-            this.optionPosition = data
-            this.loadingOptionPosition = false;
-        },(error) => {
-            this.errors = GetErrors(error)
-            this.loadingOptionPosition = false;
-        })
     }
     
 }

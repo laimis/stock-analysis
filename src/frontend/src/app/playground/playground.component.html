@@ -5,16 +5,7 @@
     <button (click)="run()" class="btn btn-primary">Multiple API call demo</button>
 
     {{ status }}
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Option Contract Charts</h5>
-            <button (click)="loadOptionPosition()" class="btn btn-primary" [disabled]="loadingOptionPosition">Load Option</button>
-            <app-option-contract-pricing [position]="optionPosition"></app-option-contract-pricing>
-            <app-loading *ngIf="loadingOptionPosition"></app-loading>
-        </div>
-    </div>
     
-
     <div class="card mt-4">
         <div class="card-body">
             <h5 class="card-title">Scatter plot demo</h5>
@@ -34,15 +25,6 @@
             <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
             <app-loading *ngIf="loadingCorrelations"></app-loading>
             <app-correlations *ngIf="correlations" [correlations]="correlations" [days]="daysForCorrelations"></app-correlations>
-        </div>
-    </div>
-    
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Combined Daily Chart Demo</h5>
-            <button (click)="runCombinedDailyChart()" class="btn btn-primary">Run Combined Daily Chart</button>
-            <app-loading *ngIf="loadingCombinedDailyChart"></app-loading>
-            <app-daily-outcome-scores *ngIf="dailyReport" [report]="dailyReport"></app-daily-outcome-scores>
         </div>
     </div>
     

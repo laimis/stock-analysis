@@ -711,6 +711,7 @@ export interface PositionChartInformation {
     markers: ChartMarker[]
     buyOrders: number[]
     sellOrders: number[]
+    renderMovingAverages: boolean
 }
 
 export interface MovingAveragesContainer {

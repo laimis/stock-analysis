@@ -21,18 +21,33 @@
             </select>
         </div>
     </div>
-    <app-candlestick-chart [chartInformation]="chartInfo">
-    </app-candlestick-chart>
+
+    <app-candlestick-chart [chartInformation]="chartInfo"></app-candlestick-chart>
+    
+    <section *ngIf="trendAnalysisResult">
+        <h3>Trend Information</h3>
+        <p>Current Trend: {{ trendAnalysisResult.trend }}</p>
+        <p>Confidence: {{ trendAnalysisResult.confidence | percent }}</p>
+
+        <h3>Analysis</h3>
+        <div>Slope: {{ trendAnalysisResult.details.slopeAnalysis.direction }} {{ trendAnalysisResult.details.slopeAnalysis.strength | percent }}</div>
+        <div>Pattern: {{ trendAnalysisResult.details.patternAnalysis.direction }} {{ trendAnalysisResult.details.patternAnalysis.strength | percent }}</div>
+        <div>Range: {{ trendAnalysisResult.details.rangeAnalysis.direction }} {{ trendAnalysisResult.details.rangeAnalysis.strength | percent }}</div>
+        <div>Strength: {{ trendAnalysisResult.details.strengthAnalysis.direction }} {{ trendAnalysisResult.details.strengthAnalysis.strength | percent }}</div>
+        
+    </section>
+    
+    <section>
+        <h3>Peaks & Valleys</h3>
+        <app-line-chart [dataContainers]="peaksAndValleys"></app-line-chart>
+    </section>
+
     @for (container of lineContainers; track container) {
         <section>
             <!--    <h3>{{container.label}}</h3>-->
             <app-line-chart [dataContainer]="container"></app-line-chart>
         </section>
     }
-    <section>
-        <h3>Peaks & Valleys</h3>
-        <app-line-chart [dataContainers]="peaksAndValleys"></app-line-chart>
-    </section>
     <table class="table table-hover">
         <thead>
         <tr>

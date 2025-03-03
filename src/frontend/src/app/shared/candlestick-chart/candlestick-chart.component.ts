@@ -135,10 +135,12 @@ export class CandlestickChartComponent implements OnDestroy {
             });
         }
 
-        addLineSeries(this.chart, info.prices.movingAverages.ema20, red, info.prices.movingAverages.ema20.interval, priceBars);
-        addLineSeries(this.chart, info.prices.movingAverages.sma50, green, info.prices.movingAverages.sma50.interval, priceBars);
-        addLineSeries(this.chart, info.prices.movingAverages.sma150, lightblue, info.prices.movingAverages.sma150.interval, priceBars);
-        addLineSeries(this.chart, info.prices.movingAverages.sma200, blue, info.prices.movingAverages.sma200.interval, priceBars);
+        if (info.renderMovingAverages) {
+            addLineSeries(this.chart, info.prices.movingAverages.ema20, red, info.prices.movingAverages.ema20.interval, priceBars);
+            addLineSeries(this.chart, info.prices.movingAverages.sma50, green, info.prices.movingAverages.sma50.interval, priceBars);
+            addLineSeries(this.chart, info.prices.movingAverages.sma150, lightblue, info.prices.movingAverages.sma150.interval, priceBars);
+            addLineSeries(this.chart, info.prices.movingAverages.sma200, blue, info.prices.movingAverages.sma200.interval, priceBars);
+        }
 
         let markers = []
 

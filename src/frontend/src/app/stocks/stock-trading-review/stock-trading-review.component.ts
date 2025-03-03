@@ -172,7 +172,8 @@ export class StockTradingReviewComponent {
                         ticker: position.ticker,
                         transactions: position.transactions,
                         buyOrders: buyOrders,
-                        sellOrders: sellOrders
+                        sellOrders: sellOrders,
+                        renderMovingAverages: true,
                     }
                 },
                 e => {
