@@ -10,7 +10,6 @@ import {
 import {GetErrors, humanFriendlyDuration} from "../services/utils";
 import {
     age,
-    analyzeTrend,
     calculateInflectionPoints,
     getCompleteTrendAnalysis,
     histogramToDataPointContainer,
@@ -25,16 +24,28 @@ import {
     TrendChangeAlert
 } from "../services/prices.service";
 
+import { PeakValleyAnalysisComponent } from '../shared/peak-valley-analysis/peak-valley-analysis.component';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LineChartComponent } from "../shared/line-chart/line-chart.component";
+
 @Component({
     selector: 'app-inflection-points',
     templateUrl: './inflectionpoints.component.html',
-    standalone: false
+    imports: [
+    PeakValleyAnalysisComponent,
+    ErrorDisplayComponent,
+    FormsModule,
+    PercentPipe,
+    LineChartComponent,
+    CurrencyPipe
+]
 })
 export class InflectionPointsComponent implements OnInit {
     tickers: string[];
     options: any;
     prices: Prices;
-    chartInfo: PositionChartInformation;
     priceFrequency: PriceFrequency = PriceFrequency.Daily;
     ageValueToUse: number;
     lineContainers: DataPointContainer[];
@@ -62,26 +73,11 @@ export class InflectionPointsComponent implements OnInit {
         this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
             result => {
                 this.prices = result
-
                 const inflectionPoints = calculateInflectionPoints(result.prices);
-                const completeAnalysisResults = getCompleteTrendAnalysis(inflectionPoints, result.prices[result.prices.length - 1])
-                this.trendAnalysisResult = completeAnalysisResults.establishedTrend
-                this.trendChangeAlert = completeAnalysisResults.potentialChange
                 const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
                 const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
 
-                this.chartInfo = {
-                    ticker: this.tickers[0],
-                    prices: result,
-                    markers: inflectionPoints.map(toChartMarker),
-                    transactions: [],
-                    averageBuyPrice: null,
-                    stopPrice: null,
-                    buyOrders: [],
-                    sellOrders: [],
-                    renderMovingAverages: false
-                }
-
+                
                 const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
                 const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
                 const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
@@ -109,12 +105,10 @@ export class InflectionPointsComponent implements OnInit {
     }
 
     priceFrequencyChanged() {
-        this.chartInfo = null
         this.renderPrices(this.tickers);
     }
 
     ageValueChanged() {
-        this.chartInfo = null
         this.renderPrices(this.tickers);
     }
 }

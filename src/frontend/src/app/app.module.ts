@@ -77,7 +77,6 @@ import {CandlestickChartComponent} from "./shared/candlestick-chart/candlestick-
 import {StockLinkAndTradingviewLinkComponent} from "./shared/stocks/stock-link-and-tradingview-link.component";
 import {NgOptimizedImage} from "@angular/common";
 import {StockSearchComponent} from "./stocks/stock-search/stock-search.component";
-import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
 import {TradesReportComponent} from "./reports/trades-report/trades-report.component";
 import {LoadingComponent} from "./shared/loading/loading.component";
 import {StockTradingChartsComponent} from "./stocks/stock-trading/stock-trading-charts.component";
@@ -119,7 +118,6 @@ import {StockDailyScoresComponent} from "./shared/stock-daily-scores/stock-daily
         ProfilePasswordResetComponent,
         ProfileVerifyComponent,
         SummaryComponent,
-        InflectionPointsComponent,
         StockPositionReportsComponent,
         StockViolationsComponent,
         StockTradingPositionsComponent,
