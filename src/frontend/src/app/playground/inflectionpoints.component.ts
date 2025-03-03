@@ -12,6 +12,7 @@ import {
     age,
     analyzeTrend,
     calculateInflectionPoints,
+    getCompleteTrendAnalysis,
     histogramToDataPointContainer,
     InfectionPointType,
     InflectionPointLog,
@@ -20,7 +21,8 @@ import {
     toDailyBreakdownDataPointCointainer,
     toHistogram,
     toInflectionPointLog,
-    TrendAnalysisResult
+    TrendAnalysisResult,
+    TrendChangeAlert
 } from "../services/prices.service";
 
 @Component({
@@ -40,6 +42,7 @@ export class InflectionPointsComponent implements OnInit {
     log: InflectionPointLog[];
     errors: string[];
     trendAnalysisResult: TrendAnalysisResult;
+    trendChangeAlert: TrendChangeAlert;
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
 
@@ -61,7 +64,9 @@ export class InflectionPointsComponent implements OnInit {
                 this.prices = result
 
                 const inflectionPoints = calculateInflectionPoints(result.prices);
-                this.trendAnalysisResult = analyzeTrend(inflectionPoints)
+                const completeAnalysisResults = getCompleteTrendAnalysis(inflectionPoints, result.prices[result.prices.length - 1])
+                this.trendAnalysisResult = completeAnalysisResults.establishedTrend
+                this.trendChangeAlert = completeAnalysisResults.potentialChange
                 const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
                 const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
 

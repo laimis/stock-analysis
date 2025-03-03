@@ -259,6 +259,14 @@ export interface TrendAnalysisResult {
     details: TrendAnalysisDetails;
 }
 
+export interface TrendChangeAlert {
+    detected: boolean;
+    direction: TrendDirection;
+    strength: number; // 0-1 scale
+    evidence: string[];
+  }
+  
+
 function linearRegressionAnalysis(inflectionPoints: InflectionPoint[], minPoints = 8): TrendDirectionAndStrength {
     if (inflectionPoints.length < minPoints) return { direction: TrendDirection.InsufficientData, strength: 0 };
     
@@ -477,24 +485,25 @@ export function analyzeTrend(inflectionPoints: InflectionPoint[]): TrendAnalysis
     
     let finalTrend: TrendDirection;
     let confidence: number;
+    let numberOfMethods = 4;
     
     if (upVotes > downVotes && upVotes > sidewaysVotes) {
         finalTrend = TrendDirection.Uptrend;
-        confidence = upVotes / 4; // 4 is max possible votes
+        confidence = upVotes;
     } else if (downVotes > upVotes && downVotes > sidewaysVotes) {
         finalTrend = TrendDirection.Downtrend;
-        confidence = downVotes / 4;
+        confidence = downVotes;
     } else {
         finalTrend = TrendDirection.Sideways;
-        confidence = sidewaysVotes / 4;
+        confidence = sidewaysVotes;
     }
     
     // Adjust confidence by trend strength
-    confidence = (confidence + strengthResult.strength) / 2;
+    const adjustedConfidence = (confidence / numberOfMethods + strengthResult.strength) / 2;
     
     return {
         trend: finalTrend,
-        confidence: confidence,
+        confidence: adjustedConfidence,
         details: {
             slopeAnalysis: slopeResult,
             patternAnalysis: patternResult,
@@ -503,3 +512,154 @@ export function analyzeTrend(inflectionPoints: InflectionPoint[]): TrendAnalysis
         }
     };
 }
+
+export function detectPotentialTrendChange(
+    inflectionPoints: InflectionPoint[], 
+    latestPrice: number,
+    latestBar: PriceBar
+  ): TrendChangeAlert {
+    if (inflectionPoints.length < 4) {
+      return { detected: false, direction: null, strength: 0, evidence: ["Insufficient data"] };
+    }
+    
+    // Extract recent peaks and valleys
+    const recentPeaks = inflectionPoints
+      .filter(p => p.type === InfectionPointType.Peak)
+      .slice(-3);
+    
+    const recentValleys = inflectionPoints
+      .filter(p => p.type === InfectionPointType.Valley)
+      .slice(-3);
+    
+    const lastInflectionPoint = inflectionPoints[inflectionPoints.length - 1];
+    const daysSinceLastInflection = (new Date(latestBar.dateStr).getTime() - 
+                                    new Date(lastInflectionPoint.gradient.bar.dateStr).getTime()) / 
+                                    (1000 * 3600 * 24);
+    
+    let evidence: string[] = [];
+    let bullishStrength = 0;
+    let bearishStrength = 0;
+    
+    // Track BULLISH signals
+    
+    // Check if latest price is breaking above recent peaks (bullish)
+    const peaksExceeded = recentPeaks.filter(p => latestPrice > p.priceValue);
+    if (peaksExceeded.length > 0) {
+      evidence.push(`BULLISH: Price (${latestPrice.toFixed(2)}) exceeds ${peaksExceeded.length} of the last ${recentPeaks.length} peaks`);
+      bullishStrength += peaksExceeded.length / recentPeaks.length * 0.5;
+    }
+    
+    // Check if price is rising significantly from last valley
+    if (recentValleys.length > 0) {
+      const lastValley = recentValleys[recentValleys.length - 1];
+      const percentRise = (latestPrice - lastValley.priceValue) / lastValley.priceValue;
+      
+      if (percentRise > 0.05) { // 5% rise from valley
+        evidence.push(`BULLISH: Price has risen ${(percentRise * 100).toFixed(1)}% from last valley`);
+        bullishStrength += Math.min(percentRise, 0.2) * 2.5; // Cap at 0.5 contribution
+      }
+    }
+    
+    // Check for higher lows pattern (bullish)
+    if (recentValleys.length >= 2) {
+      const increasing = areIncreasing(recentValleys.map(v => v.priceValue));
+      if (increasing) {
+        evidence.push("BULLISH: Pattern of higher lows detected");
+        bullishStrength += 0.2;
+      }
+    }
+    
+    // Track BEARISH signals
+    
+    // Check if latest price is breaking below recent valleys (bearish)
+    const valleysExceeded = recentValleys.filter(v => latestPrice < v.priceValue);
+    if (valleysExceeded.length > 0) {
+      evidence.push(`BEARISH: Price (${latestPrice.toFixed(2)}) is below ${valleysExceeded.length} of the last ${recentValleys.length} valleys`);
+      bearishStrength += valleysExceeded.length / recentValleys.length * 0.5;
+    }
+    
+    // Check if price is falling significantly from last peak
+    if (recentPeaks.length > 0) {
+      const lastPeak = recentPeaks[recentPeaks.length - 1];
+      const percentFall = (lastPeak.priceValue - latestPrice) / lastPeak.priceValue;
+      
+      if (percentFall > 0.05) { // 5% fall from peak
+        evidence.push(`BEARISH: Price has fallen ${(percentFall * 100).toFixed(1)}% from last peak`);
+        bearishStrength += Math.min(percentFall, 0.2) * 2.5; // Cap at 0.5 contribution
+      }
+    }
+    
+    // Check for lower highs pattern (bearish)
+    if (recentPeaks.length >= 2) {
+      const decreasing = areDecreasing(recentPeaks.map(p => p.priceValue));
+      if (decreasing) {
+        evidence.push("BEARISH: Pattern of lower highs detected");
+        bearishStrength += 0.2;
+      }
+    }
+    
+    // Check time since last inflection point - neutral factor
+    if (daysSinceLastInflection > 10) {
+      evidence.push(`NEUTRAL: ${Math.floor(daysSinceLastInflection)} days since last inflection point (unusual duration)`);
+      // This doesn't affect directional strength
+    }
+    
+    // Determine final direction and strength
+    let directionSignal: TrendDirection | null = null;
+    let netStrength = 0;
+    
+    // Only set a direction if one signal is significantly stronger
+    const SIGNIFICANCE_THRESHOLD = 0.2; // Minimum difference to consider one signal stronger
+    
+    if (bullishStrength > bearishStrength + SIGNIFICANCE_THRESHOLD) {
+      directionSignal = TrendDirection.Uptrend;
+      netStrength = bullishStrength;
+    } else if (bearishStrength > bullishStrength + SIGNIFICANCE_THRESHOLD) {
+      directionSignal = TrendDirection.Downtrend;
+      netStrength = bearishStrength;
+    } else {
+      // If signals are contradictory and similar in strength, it's unclear
+      if (bullishStrength > 0.3 && bearishStrength > 0.3) {
+        evidence.push("CONFLICT: Strong but contradictory signals detected");
+        netStrength = Math.max(bullishStrength, bearishStrength) * 0.5; // Reduce strength due to conflict
+      } else {
+        netStrength = Math.max(bullishStrength, bearishStrength);
+      }
+    }
+    
+    // Add strength details to evidence
+    if (bullishStrength > 0 || bearishStrength > 0) {
+      evidence.push(`Signal strength: Bullish=${bullishStrength.toFixed(2)}, Bearish=${bearishStrength.toFixed(2)}`);
+    }
+    
+    // Determine if signal is strong enough
+    const detected = netStrength >= 0.4; // Threshold for significance
+    
+    return {
+      detected,
+      direction: directionSignal,
+      strength: Math.min(netStrength, 1), // Cap at 1
+      evidence
+    };
+  }
+  
+  // Helper for combined analysis including trend change alerts
+  export function getCompleteTrendAnalysis(
+    inflectionPoints: InflectionPoint[],
+    latestBar: PriceBar
+  ): {
+    establishedTrend: TrendAnalysisResult,
+    potentialChange: TrendChangeAlert
+  } {
+    const trendAnalysis = analyzeTrend(inflectionPoints);
+    const changeAlert = detectPotentialTrendChange(
+      inflectionPoints, 
+      latestBar.close, 
+      latestBar
+    );
+    
+    return {
+      establishedTrend: trendAnalysis,
+      potentialChange: changeAlert
+    };
+  }
