@@ -2,6 +2,7 @@ import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@
 import {Component, Input} from '@angular/core';
 import {
     DailyPositionReport,
+    DataPointContainer,
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
@@ -51,7 +52,7 @@ export class StockAnalysisComponent {
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
-    obvContainer: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").DataPointContainer;
+    obvContainer: DataPointContainer;
     
     constructor(
         private stockService: StocksService,
