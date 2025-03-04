@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DailyOutcomeScoresComponent} from "../reports/daily-outcome-scores.component";
 import {DatePipe, NgIf} from "@angular/common";
 import {ErrorDisplayComponent} from "../error-display/error-display.component";
@@ -56,6 +56,9 @@ export class StockDailyScoresComponent {
         this.refreshDailyBreakdowns();
     }
 
+    @Output()
+    dailyBreakdownFetched: EventEmitter<DailyPositionReport> = new EventEmitter<DailyPositionReport>();
+
     onStartDateChange($event) {
         if ($event) {
             this.selectedStartDate = parseDate($event);
@@ -87,6 +90,7 @@ export class StockDailyScoresComponent {
                 tap(report => {
                     this.dailyBreakdowns = report
                     this.dailyBreakdownsLoading = false;
+                    this.dailyBreakdownFetched.emit(report);
                 }),
                 catchError(err => {
                     this.dailyBreakdownErrors = GetErrors(err);

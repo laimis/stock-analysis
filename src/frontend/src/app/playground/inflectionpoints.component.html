@@ -23,6 +23,11 @@
     </div>
 
     <app-peak-valley-analysis [prices]="prices"></app-peak-valley-analysis>
+
+    <section>
+        <h3>OBV</h3>
+        <app-peak-valley-analysis [obv]="obvContainer"></app-peak-valley-analysis>
+    </section>
     
     <section>
         <h3>Peaks & Valleys</h3>
@@ -50,10 +55,10 @@
         <tbody>
             @for (entry of log; track entry) {
                 <tr>
-                    <td>{{ entry.from.gradient.bar.close }}</td>
-                    <td>{{ entry.from.gradient.bar.dateStr }}</td>
-                    <td>{{ entry.to.gradient.bar.close }}</td>
-                    <td>{{ entry.to.gradient.bar.dateStr }}</td>
+                    <td>{{ entry.from.gradient.dataPoint.close }}</td>
+                    <td>{{ entry.from.gradient.dataPoint.dateStr }}</td>
+                    <td>{{ entry.to.gradient.dataPoint.close }}</td>
+                    <td>{{ entry.to.gradient.dataPoint.dateStr }}</td>
                     <td>{{ entry.days }}</td>
                     <td>{{ entry.change | currency }}</td>
                     <td>{{ entry.percentChange | percent }}</td>

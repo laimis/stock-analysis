@@ -15,11 +15,31 @@
         </div>
     </section>
 
-    <!-- Stock Analysis -->
-    <app-stock-daily-scores [dailyScoresInput]="{ticker}"></app-stock-daily-scores>
+    <app-stock-daily-scores [dailyScoresInput]="{ticker}" (dailyBreakdownFetched)="dailyBreakdownFetched($event)"></app-stock-daily-scores>
 
-    <!-- Peak and valley analysis -->
-    <app-peak-valley-analysis [prices]="prices"></app-peak-valley-analysis>
+    <!-- Peak and valley analysis for price-->
+    <section class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-graph-up me-2"></i>Peak/Valley Analysis (Price)
+            </h5>
+        </div>
+        <div class="card-body">
+            <app-peak-valley-analysis [prices]="prices"></app-peak-valley-analysis>
+        </div>
+    </section>
+
+    <!-- Peak and valley analysis for obv -->
+    <section class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-graph-up me-2"></i>Peak/Valley Analysis (OBV)
+            </h5>
+        </div>
+        <div class="card-body">
+            <app-peak-valley-analysis [obv]="obvContainer"></app-peak-valley-analysis>
+        </div>
+    </section>
 
     <!-- Gaps -->
     <section *ngIf="gaps" class="card shadow-sm mb-4">

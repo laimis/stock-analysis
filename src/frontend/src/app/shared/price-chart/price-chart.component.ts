@@ -88,6 +88,9 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
     chartType: 'candlestick' | 'line' = 'candlestick';
 
     @Input()
+    priceScaleMode: 'normal' | 'logarithmic' = 'logarithmic';
+
+    @Input()
     set chartInformation(value: PositionChartInformation) {
         this.chartInformationData = value;
         if (value && this.viewInitialized) {
@@ -109,15 +112,17 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
     renderChart(info: PositionChartInformation) {
 
         const element = document.getElementById(this.chartId);
-        console.log("rendering chart with chart id of " + this.chartId + " and element " + element)
+
         this.removeChart();
+
+        let priceScaleMode = this.priceScaleMode == 'logarithmic' ? PriceScaleMode.Logarithmic : PriceScaleMode.Normal
 
         this.chart = createChart(
             element,
             {
                 height: this.chartHeight,
                 rightPriceScale: {
-                    mode: PriceScaleMode.Logarithmic
+                    mode: priceScaleMode
                 },
                 crosshair: {
                     mode: CrosshairMode.Normal

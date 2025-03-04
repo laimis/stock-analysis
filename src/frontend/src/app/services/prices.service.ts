@@ -3,19 +3,19 @@ import {green, red} from "./charts.service";
 
 export enum InfectionPointType { Peak = "Peak", Valley = "Valley" }
 
-export type Gradient = { delta: number, index: number, bar: PriceBar }
+export type Gradient = { delta: number, index: number, dataPoint: PriceBar }
 export type InflectionPoint = { gradient: Gradient, type: InfectionPointType, priceValue: number }
 
 export function toPeak(gradient: Gradient): InflectionPoint {
-    return {gradient: gradient, type: InfectionPointType.Peak, priceValue: gradient.bar.high}
+    return {gradient: gradient, type: InfectionPointType.Peak, priceValue: gradient.dataPoint.close}
 }
 
 export function toValley(gradient: Gradient): InflectionPoint {
-    return {gradient: gradient, type: InfectionPointType.Valley, priceValue: gradient.bar.low}
+    return {gradient: gradient, type: InfectionPointType.Valley, priceValue: gradient.dataPoint.close}
 }
 
 export function toChartMarker(inflectionPoint: InflectionPoint): ChartMarker {
-    const bar = inflectionPoint.gradient.bar
+    const bar = inflectionPoint.gradient.dataPoint
     return {
         label: inflectionPoint.priceValue.toFixed(2),
         date: bar.dateStr,
@@ -58,15 +58,15 @@ export function toDailyBreakdownDataPointCointainer(label: string, points: Infle
     if (priceFunc) {
         points = points.map(p => {
             let bar: PriceBar = {
-                dateStr: p.gradient.bar.dateStr,
-                close: priceFunc(p.gradient.bar.close),
-                open: priceFunc(p.gradient.bar.open),
-                high: priceFunc(p.gradient.bar.high),
-                low: priceFunc(p.gradient.bar.low),
-                volume: p.gradient.bar.volume
+                dateStr: p.gradient.dataPoint.dateStr,
+                close: priceFunc(p.gradient.dataPoint.close),
+                open: priceFunc(p.gradient.dataPoint.open),
+                high: priceFunc(p.gradient.dataPoint.high),
+                low: priceFunc(p.gradient.dataPoint.low),
+                volume: p.gradient.dataPoint.volume
             }
             let newGradient: Gradient = {
-                bar: bar,
+                dataPoint: bar,
                 delta: p.gradient.delta,
                 index: p.gradient.index
             }
@@ -76,16 +76,16 @@ export function toDailyBreakdownDataPointCointainer(label: string, points: Infle
 
     // we want to generate a data point for each day, even if there is no peak or valley
     // start with the first date and keep on going until we reach the last date
-    let currentDate = points[0].gradient.bar.dateStr
+    let currentDate = points[0].gradient.dataPoint.dateStr
     let currentIndex = 0
     let dataPoints: DataPoint[] = []
 
     while (currentIndex < points.length) {
 
-        if (currentDate == points[currentIndex].gradient.bar.dateStr) {
+        if (currentDate == points[currentIndex].gradient.dataPoint.dateStr) {
 
             dataPoints.push({
-                label: points[currentIndex].gradient.bar.dateStr,
+                label: points[currentIndex].gradient.dataPoint.dateStr,
                 isDate: true,
                 value: points[currentIndex].priceValue
             })
@@ -117,7 +117,7 @@ export function calculateInflectionPoints(prices: PriceBar[]) {
 
     for (let i = 0; i < prices.length - 1; i++) {
         let diff = prices[i + 1].close - prices[i].close
-        let val: Gradient = {bar: prices[i], delta: diff, index: i}
+        let val: Gradient = {dataPoint: prices[i], delta: diff, index: i}
         diffs.push(val);
     }
 
@@ -125,11 +125,11 @@ export function calculateInflectionPoints(prices: PriceBar[]) {
     for (let i = 0; i < diffs.length - 1; i++) {
         if (i == 0) {
             let smoothedDiff = (diffs[i].delta + diffs[i + 1].delta) / 2
-            smoothed.push({bar: diffs[i].bar, delta: smoothedDiff, index: i});
+            smoothed.push({dataPoint: diffs[i].dataPoint, delta: smoothedDiff, index: i});
             continue;
         }
         let smoothedDiff = (diffs[i - 1].delta + diffs[i].delta + diffs[i + 1].delta) / 3
-        smoothed.push({bar: diffs[i].bar, delta: smoothedDiff, index: i});
+        smoothed.push({dataPoint: diffs[i].dataPoint, delta: smoothedDiff, index: i});
     }
 
     let inflectionPoints: InflectionPoint[] = []
@@ -163,9 +163,9 @@ export function toInflectionPointLog(inflectionPoints: InflectionPoint[]): Infle
     while (i < inflectionPoints.length) {
         let point1 = inflectionPoints[i - 1]
         let point2 = inflectionPoints[i]
-        let days = (new Date(point2.gradient.bar.dateStr).getTime() - new Date(point1.gradient.bar.dateStr).getTime()) / (1000 * 3600 * 24)
-        let change = point2.gradient.bar.close - point1.gradient.bar.close
-        let percentChange = change / point2.gradient.bar.close
+        let days = (new Date(point2.gradient.dataPoint.dateStr).getTime() - new Date(point1.gradient.dataPoint.dateStr).getTime()) / (1000 * 3600 * 24)
+        let change = point2.gradient.dataPoint.close - point1.gradient.dataPoint.close
+        let percentChange = change / point2.gradient.dataPoint.close
         log.push({from: point1, to: point2, days: days, change: change, percentChange: percentChange})
         i += 1
     }
@@ -211,7 +211,7 @@ export function histogramToDataPointContainer(title: string, histogram: {}) {
 }
 
 export function age(point: InflectionPoint): number {
-    const date = new Date(point.gradient.bar.dateStr).getTime()
+    const date = new Date(point.gradient.dataPoint.dateStr).getTime()
     const now = new Date().getTime()
     return (now - date) / (1000 * 3600 * 24)
 }
@@ -221,7 +221,7 @@ export function logToDataPointContainer(label: string, log: InflectionPointLog[]
     for (let i = 0; i < log.length; i++) {
         let point = log[i]
         dataPoints.push({
-            label: point.from.gradient.bar.dateStr,
+            label: point.from.gradient.dataPoint.dateStr,
             isDate: true,
             value: Math.round(point.percentChange * 100)
         })
@@ -533,7 +533,7 @@ export function detectPotentialTrendChange(
     
     const lastInflectionPoint = inflectionPoints[inflectionPoints.length - 1];
     const daysSinceLastInflection = (new Date(latestBar.dateStr).getTime() - 
-                                    new Date(lastInflectionPoint.gradient.bar.dateStr).getTime()) / 
+                                    new Date(lastInflectionPoint.gradient.dataPoint.dateStr).getTime()) / 
                                     (1000 * 3600 * 24);
     
     let evidence: string[] = [];
@@ -600,7 +600,7 @@ export function detectPotentialTrendChange(
     
     // Check time since last inflection point - neutral factor
     if (daysSinceLastInflection > 10) {
-      evidence.push(`NEUTRAL: ${Math.floor(daysSinceLastInflection)} days since last inflection point (unusual duration)`);
+    //   evidence.push(`NEUTRAL: ${Math.floor(daysSinceLastInflection)} days since last inflection point (unusual duration)`);
       // This doesn't affect directional strength
     }
     

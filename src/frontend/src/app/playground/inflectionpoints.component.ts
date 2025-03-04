@@ -56,6 +56,7 @@ export class InflectionPointsComponent implements OnInit {
     trendChangeAlert: TrendChangeAlert;
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
+    obvContainer: DataPointContainer;
 
     constructor(
         private stocks: StocksService,
@@ -73,6 +74,7 @@ export class InflectionPointsComponent implements OnInit {
         this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
             result => {
                 this.prices = result
+
                 const inflectionPoints = calculateInflectionPoints(result.prices);
                 const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
                 const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
@@ -99,6 +101,16 @@ export class InflectionPointsComponent implements OnInit {
                 ]
 
                 this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
+            },
+            error => this.errors = GetErrors(error)
+        );
+
+        let startDate = new Date();
+        startDate.setDate(startDate.getDate() - 365);
+
+        this.stocks.reportDailyTickerReport(tickers[0], startDate.toISOString().split('T')[0]).subscribe(
+            result => {
+                this.obvContainer = result.dailyObv
             },
             error => this.errors = GetErrors(error)
         );

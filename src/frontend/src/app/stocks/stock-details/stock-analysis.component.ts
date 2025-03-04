@@ -1,6 +1,7 @@
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
+    DailyPositionReport,
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
@@ -50,6 +51,7 @@ export class StockAnalysisComponent {
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
+    obvContainer: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").DataPointContainer;
     
     constructor(
         private stockService: StocksService,
@@ -141,5 +143,9 @@ export class StockAnalysisComponent {
             )
         
         concat(multipleBarOutcomesPromise, dailyOutcomesPromise, percentDistribution).subscribe();
+    }
+
+    dailyBreakdownFetched($event: DailyPositionReport) {
+        this.obvContainer = $event.dailyObv;
     }
 }
