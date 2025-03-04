@@ -111,8 +111,141 @@ export function toDailyBreakdownDataPointCointainer(label: string, points: Infle
     }
 }
 
-// main thing
-export function calculateInflectionPoints(prices: PriceBar[]) {
+function calculateVolatility(prices: PriceBar[], window = 10): number[] {
+    const volatility: number[] = [];
+    
+    // Need at least window+1 prices to calculate window volatilities
+    if (prices.length <= window) {
+        return Array(prices.length).fill(0);
+    }
+    
+    for (let i = window; i < prices.length; i++) {
+        // Get price changes in the window
+        const priceChanges: number[] = [];
+        for (let j = i - window + 1; j <= i; j++) {
+            if (j > 0) {
+                priceChanges.push(Math.abs(prices[j].close - prices[j-1].close));
+            }
+        }
+        
+        // Calculate standard deviation
+        const mean = priceChanges.reduce((sum, val) => sum + val, 0) / priceChanges.length;
+        const squaredDiffs = priceChanges.map(val => Math.pow(val - mean, 2));
+        const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / squaredDiffs.length;
+        const stdDev = Math.sqrt(variance);
+        
+        volatility.push(stdDev);
+    }
+    
+    // Pad the beginning with the first calculated volatility
+    const firstVol = volatility[0] || 0;
+    return Array(window).fill(firstVol).concat(volatility);
+}
+
+function calculateInflectionPointsVolatilitySmoothing(prices: PriceBar[]) {
+    // First calculate price differences
+    let diffs: Gradient[] = [];
+    for (let i = 0; i < prices.length - 1; i++) {
+        let diff = prices[i + 1].close - prices[i].close;
+        let val: Gradient = {dataPoint: prices[i], delta: diff, index: i};
+        diffs.push(val);
+    }
+    
+    // Calculate volatility for the entire price series
+    const volatility = calculateVolatility(prices);
+    
+    // Normalize volatility to a range suitable for smoothing factor
+    const maxVol = Math.max(...volatility);
+    const minVol = Math.min(...volatility);
+    const normalizedVol = volatility.map(vol => {
+        if (maxVol === minVol) return 0.5; // Default if all volatility values are the same
+        return 0.2 + 0.6 * ((vol - minVol) / (maxVol - minVol)); // Scale to 0.2-0.8 range
+    });
+    
+    // Apply adaptive smoothing
+    let smoothed: Gradient[] = [];
+    for (let i = 0; i < diffs.length; i++) {
+        if (i === 0 || i === diffs.length - 1) {
+            // Handle edge cases - first and last point
+            smoothed.push(diffs[i]);
+            continue;
+        }
+        
+        // Get adaptive smoothing factor based on normalized volatility
+        // Higher volatility = higher smoothing factor
+        const smoothingFactor = normalizedVol[i];
+        
+        // Calculate exponential moving average style smoothing
+        // Uses current point and previous smoothed point
+        const prevSmoothed = smoothed.length > 0 ? smoothed[smoothed.length - 1].delta : diffs[i-1].delta;
+        const currentDiff = diffs[i].delta;
+        const smoothedDiff = (currentDiff * (1 - smoothingFactor)) + (prevSmoothed * smoothingFactor);
+        
+        smoothed.push({
+            dataPoint: diffs[i].dataPoint, 
+            delta: smoothedDiff, 
+            index: i
+        });
+    }
+    
+    // Detect inflection points
+    let inflectionPoints: InflectionPoint[] = [];
+    for (let i = 0; i < smoothed.length - 1; i++) {
+        if (smoothed[i].delta > 0 && smoothed[i + 1].delta < 0) {
+            inflectionPoints.push(toPeak(smoothed[i + 1]));
+        } else if (smoothed[i].delta < 0 && smoothed[i + 1].delta > 0) {
+            inflectionPoints.push(toValley(smoothed[i + 1]));
+        }
+    }
+    
+    return filterBySignificance(inflectionPoints);
+}
+
+function calculateInflectionPointsFixedSmoothing(prices: PriceBar[], smoothingFactor = 0.5) {
+    // First calculate price differences
+    let diffs: Gradient[] = [];
+    for (let i = 0; i < prices.length - 1; i++) {
+        let diff = prices[i + 1].close - prices[i].close;
+        let val: Gradient = {dataPoint: prices[i], delta: diff, index: i};
+        diffs.push(val);
+    }
+
+    // Apply fixed smoothing factor
+    let smoothed: Gradient[] = [];
+    for (let i = 0; i < diffs.length; i++) {
+        if (i === 0 || i === diffs.length - 1) {
+            // Handle edge cases - first and last point
+            smoothed.push(diffs[i]);
+            continue;
+        }
+
+        // Calculate exponential moving average style smoothing
+        // Uses current point and previous smoothed point
+        const prevSmoothed = smoothed.length > 0 ? smoothed[smoothed.length - 1].delta : diffs[i-1].delta;
+        const currentDiff = diffs[i].delta;
+        const smoothedDiff = (currentDiff * (1 - smoothingFactor)) + (prevSmoothed * smoothingFactor);
+
+        smoothed.push({
+            dataPoint: diffs[i].dataPoint,
+            delta: smoothedDiff,
+            index: i
+        });
+    }
+
+    // Detect inflection points
+    let inflectionPoints: InflectionPoint[] = [];
+    for (let i = 0; i < smoothed.length - 1; i++) {
+        if (smoothed[i].delta > 0 && smoothed[i + 1].delta < 0) {
+            inflectionPoints.push(toPeak(smoothed[i + 1]));
+        } else if (smoothed[i].delta < 0 && smoothed[i + 1].delta > 0) {
+            inflectionPoints.push(toValley(smoothed[i + 1]));
+        }
+    }
+
+    return filterBySignificance(inflectionPoints);
+}
+
+function calculateInflectionPointsSimpleAverageSmoothing(prices: PriceBar[]) {
     let diffs: Gradient[] = []
 
     for (let i = 0; i < prices.length - 1; i++) {
@@ -143,6 +276,12 @@ export function calculateInflectionPoints(prices: PriceBar[]) {
     }
 
     return filterBySignificance(inflectionPoints);
+}
+
+// main thing
+export function calculateInflectionPoints(prices: PriceBar[]) {
+    return calculateInflectionPointsFixedSmoothing(prices);
+    // return calculateInflectionPointsVolatilitySmoothing(prices);
 }
 
 // this function will traverse the inflection points and calculate
@@ -622,8 +761,10 @@ export function detectPotentialTrendChange(
       if (bullishStrength > 0.3 && bearishStrength > 0.3) {
         evidence.push("CONFLICT: Strong but contradictory signals detected");
         netStrength = Math.max(bullishStrength, bearishStrength) * 0.5; // Reduce strength due to conflict
+        directionSignal = TrendDirection.Sideways;
       } else {
         netStrength = Math.max(bullishStrength, bearishStrength);
+        directionSignal = bullishStrength >= bearishStrength ? TrendDirection.Uptrend : TrendDirection.Downtrend;
       }
     }
     

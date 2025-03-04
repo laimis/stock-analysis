@@ -127,7 +127,7 @@
                         'bg-danger': trendChangeAlert.direction === 'Downtrend',
                         'bg-secondary': !trendChangeAlert.detected || !trendChangeAlert.direction
                     }">
-                        <span class="h5 mb-0">{{ trendChangeAlert.detected ? (trendChangeAlert.direction || 'Mixed Signals') : 'No Change Detected' }}</span>
+                        <span class="h5 mb-0">{{ trendChangeAlert.direction }}</span>
                     </span>
                 </div>
                 <div class="card-body">
