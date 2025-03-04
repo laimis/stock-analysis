@@ -19,6 +19,7 @@ open core.fs.Services.GapAnalysis
 open core.fs.Services.Trends
 open core.fs.Stocks
 open core.fs.Stocks.StockPosition
+open core.fs.Services
 
 type ChainQuery =
     {
@@ -222,6 +223,24 @@ type TrendsQuery =
         End: string option
     }
     
+    member this.StartDate (marketHours:IMarketHours) =
+        match this.Start with
+        | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketStartOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow.AddYears(-10)
+        | None -> DateTimeOffset.UtcNow.AddYears(-10)
+        
+    member this.EndDate (marketHours:IMarketHours) =
+        match this.End with
+        | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketEndOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow
+        | None -> DateTimeOffset.UtcNow
+
+type InflectionPointsQuery =
+    {
+        UserId: UserId
+        Ticker: Ticker
+        Start: string option
+        End: string option
+    }
+
     member this.StartDate (marketHours:IMarketHours) =
         match this.Start with
         | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketStartOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow.AddYears(-10)
@@ -859,6 +878,60 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             let prices = priceResult |> Result.defaultValue (Dictionary<Ticker,StockQuote>())
                 
             return SellsView(stocks, prices) |> Ok
+    }
+
+    member _.Handle (query:InflectionPointsQuery) = task {
+        let start = query.StartDate marketHours
+        let ``end`` = query.EndDate marketHours
+        
+        let! user = accounts.GetUser query.UserId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            let! priceResponse =
+                brokerage.GetPriceHistory
+                    user.State
+                    query.Ticker
+                    Daily
+                    (start |> Some)
+                    (``end`` |> Some)
+            
+            return priceResponse |> Result.map (fun prices ->
+                
+                let priceInflectionPoints = InflectionPoints.calculateInflectionPoints prices.Bars
+                let priceTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis priceInflectionPoints prices.Last
+                let obv = MultipleBarPriceAnalysis.Indicators.onBalanceVolume prices
+
+                // ranges for normalization
+                let values = obv |> Array.map (fun point -> point.Value)
+                let min = values |> Array.min
+                let max = values |> Array.max
+                let rng = max - min
+
+                let obvMappedToPriceBars = 
+                    obv |> Array.map (
+                        fun point -> 
+                            let normalizedValue = 100m * (point.Value - min) / rng
+                            PriceBar(
+                                DateTimeOffset.Parse(point.Label),
+                                normalizedValue,
+                                normalizedValue,
+                                normalizedValue,
+                                normalizedValue,
+                                0)
+                    )
+                let obvInflectionPoints = InflectionPoints.calculateInflectionPoints obvMappedToPriceBars
+                let obvTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis obvInflectionPoints obvMappedToPriceBars[obvMappedToPriceBars.Length - 1]
+
+                {|
+                    priceInflectionPoints = priceInflectionPoints;
+                    priceTrendAnalysis = priceTrendAnalysis;
+                    obvInflectionPoints = obvInflectionPoints;
+                    obvTrendAnalysis = obvTrendAnalysis;
+                    prices = prices.Bars;
+                    obv = obvMappedToPriceBars
+                |}
+            )
     }
 
 

@@ -226,11 +226,11 @@ export class StockDetailsComponent implements OnInit {
                         stopPrice: this.currentPosition.stopPrice,
                         transactions: this.currentPosition.transactions,
                         markers: [],
-                        prices: this.prices,
+                        prices: this.prices.prices,
                         ticker: this.currentPosition.ticker,
                         buyOrders: buyOrders,
                         sellOrders: sellOrders,
-                        renderMovingAverages: true
+                        movingAverages: this.prices.movingAverages
                     }
                 }
             }

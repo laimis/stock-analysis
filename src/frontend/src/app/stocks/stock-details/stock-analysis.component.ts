@@ -53,6 +53,9 @@ export class StockAnalysisComponent {
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
     obvContainer: DataPointContainer;
+    private _prices: Prices;
+    pricesTrendDataSet: { prices: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").PriceBar[]; inflectionPoints: import("d:/programming/stock-analysis/src/frontend/src/app/services/inflectionpoints.service").InflectionPoint[]; trendAnalysis: { establishedTrend: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendAnalysisResult; potentialChange: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendChangeAlert; }; };
+    obvTrendDataSet: { prices: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").PriceBar[]; inflectionPoints: import("d:/programming/stock-analysis/src/frontend/src/app/services/inflectionpoints.service").InflectionPoint[]; trendAnalysis: { establishedTrend: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendAnalysisResult; potentialChange: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendChangeAlert; }; };
     
     constructor(
         private stockService: StocksService,
@@ -71,21 +74,22 @@ export class StockAnalysisComponent {
 
     @Input()
     set prices(prices: Prices) {
+        this._prices = prices;
         this.chartInfo = {
             ticker: this.ticker,
-            prices: prices,
+            prices: prices.prices,
             transactions: [],
             markers: [],
             averageBuyPrice: null,
             stopPrice: null,
             buyOrders: [],
             sellOrders: [],
-            renderMovingAverages: true
+            movingAverages: prices.movingAverages
         }
         this.loadData(this.ticker)
     }
     get prices(): Prices {
-        return this.chartInfo?.prices;
+        return this._prices
     }
 
     getValue(o: StockAnalysisOutcome) {
@@ -142,8 +146,28 @@ export class StockAnalysisComponent {
                     return [];
                 })
             )
+
+        const inflectionReport = this.stockService.reportInflectionPoints(ticker, this.startDate)
+            .pipe(
+                tap(data => {
+                    this.pricesTrendDataSet = {
+                        prices: data.prices,
+                        inflectionPoints: data.priceInflectionPoints,
+                        trendAnalysis: data.priceTrendAnalysis
+                    }
+                    this.obvTrendDataSet = {
+                        prices: data.obv,
+                        inflectionPoints: data.obvInflectionPoints,
+                        trendAnalysis: data.obvTrendAnalysis
+                    }
+                }),
+                catchError(err => {
+                    console.error(err);
+                    return [];
+                })
+            )
         
-        concat(multipleBarOutcomesPromise, dailyOutcomesPromise, percentDistribution).subscribe();
+        concat(inflectionReport, multipleBarOutcomesPromise, dailyOutcomesPromise, percentDistribution).subscribe();
     }
 
     dailyBreakdownFetched($event: DailyPositionReport) {

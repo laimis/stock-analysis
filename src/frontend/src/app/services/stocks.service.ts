@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
 import {BrokerageOptionOrder, OptionPosition} from "./option.service";
+import { InflectionPoint } from './inflectionpoints.service';
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -370,6 +371,32 @@ export class StocksService {
 
         return this.http.get<DailyOutcomeScoresReport>(endpoint)
     }
+    
+    reportInflectionPoints(
+        ticker: string,
+        start: string,
+        end: string = null): Observable<{
+            obvTrendAnalysis: {
+                establishedTrend: TrendAnalysisResult,
+                potentialChange: TrendChangeAlert
+            },
+            obvInflectionPoints: InflectionPoint[],
+            priceTrendAnalysis: {
+                establishedTrend: TrendAnalysisResult,
+                potentialChange: TrendChangeAlert
+            },
+            priceInflectionPoints: InflectionPoint[],
+            prices: PriceBar[]
+            obv: PriceBar[]
+        }> {
+    
+        var endpoint = '/api/reports/inflectionpoints/' + ticker + '?start=' + start
+        if (end) {
+            endpoint += '&end=' + end
+        }
+
+        return this.http.get<any>(endpoint)
+    }
 
     reportTrends(
         ticker: string,
@@ -704,14 +731,14 @@ export interface ChartMarker {
 
 export interface PositionChartInformation {
     ticker: string
-    prices: Prices
+    prices: PriceBar[]
     averageBuyPrice: number | null
     stopPrice: number | null
     transactions: StockTransaction[]
     markers: ChartMarker[]
     buyOrders: number[]
     sellOrders: number[]
-    renderMovingAverages: boolean
+    movingAverages: MovingAveragesContainer | null
 }
 
 export interface MovingAveragesContainer {
@@ -1244,3 +1271,35 @@ export interface AccountTransaction {
     inserted?: string;
     applied?: string;
 }
+
+export enum TrendDirection {
+    Uptrend = "Uptrend",
+    Downtrend = "Downtrend",
+    Sideways = "Sideways",
+    InsufficientData = "Insufficient data"
+}
+
+export type TrendDirectionAndStrength = {
+    direction: TrendDirection;
+    strength: number;
+}
+
+export type TrendAnalysisDetails = {
+    slopeAnalysis: TrendDirectionAndStrength;
+    patternAnalysis: TrendDirectionAndStrength;
+    rangeAnalysis: TrendDirectionAndStrength;
+    strengthAnalysis: TrendDirectionAndStrength;
+}
+
+export interface TrendAnalysisResult {
+    trend: TrendDirection;
+    confidence: number;
+    details: TrendAnalysisDetails;
+}
+
+export interface TrendChangeAlert {
+    detected: boolean;
+    direction: TrendDirection;
+    strength: number; // 0-1 scale
+    evidence: string[];
+  }

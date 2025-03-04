@@ -130,7 +130,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             }
         );
 
-        let priceBars = info.prices.prices.map(toPriceBar)
+        let priceBars = info.prices.map(toPriceBar)
         
         let mainSeries;
 
@@ -146,7 +146,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
                 crosshairMarkerRadius: 4
             });
             
-            const lineData = info.prices.prices.map(p => ({
+            const lineData = info.prices.map(p => ({
                 time: p.dateStr,
                 value: p.close
             }));
@@ -182,11 +182,11 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             });
         }
 
-        if (info.renderMovingAverages) {
-            addLineSeries(this.chart, info.prices.movingAverages.ema20, red, info.prices.movingAverages.ema20.interval, priceBars);
-            addLineSeries(this.chart, info.prices.movingAverages.sma50, green, info.prices.movingAverages.sma50.interval, priceBars);
-            addLineSeries(this.chart, info.prices.movingAverages.sma150, lightblue, info.prices.movingAverages.sma150.interval, priceBars);
-            addLineSeries(this.chart, info.prices.movingAverages.sma200, blue, info.prices.movingAverages.sma200.interval, priceBars);
+        if (info.movingAverages) {
+            addLineSeries(this.chart, info.movingAverages.ema20, red, info.movingAverages.ema20.interval, priceBars);
+            addLineSeries(this.chart, info.movingAverages.sma50, green, info.movingAverages.sma50.interval, priceBars);
+            addLineSeries(this.chart, info.movingAverages.sma150, lightblue, info.movingAverages.sma150.interval, priceBars);
+            addLineSeries(this.chart, info.movingAverages.sma200, blue, info.movingAverages.sma200.interval, priceBars);
         }
 
         let markers = []
@@ -236,7 +236,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
                 bottom: 0,
             },
         });
-        let volumeData = info.prices.prices.map(toVolumeBar)
+        let volumeData = info.prices.map(toVolumeBar)
         volumeSeries.setData(volumeData);
 
         this.chart.timeScale().setVisibleRange({

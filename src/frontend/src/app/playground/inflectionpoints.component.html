@@ -3,30 +3,15 @@
     @for (ticker of tickers; track ticker) {
         <span class="badge bg-success m-1">{{ ticker }}</span>
     }
-    <div class="row">
-        <div class="col">
-            <label class="form-label" for="priceFrequency">Price Frequency</label>
-            <select (ngModelChange)="priceFrequencyChanged()" [(ngModel)]="priceFrequency" class="form-select"
-                    id="priceFrequency">
-                <option value="Daily">Daily</option>
-                <option value="Weekly">Weekly</option>
-            </select>
-        </div>
-        <div class="col">
-            <label class="form-label" for="ageValueToUse">Support/Resistance Age</label>
-            <select (ngModelChange)="ageValueChanged()" [(ngModel)]="ageValueToUse" class="form-select"
-                    id="ageValueToUse">
-                <option [value]="twoMonths">2 months</option>
-                <option [value]="sixMonths">6 months</option>
-            </select>
-        </div>
-    </div>
-
-    <app-peak-valley-analysis [prices]="prices"></app-peak-valley-analysis>
+    
+    <section>
+        <h3>Backend Price</h3>
+        <app-peak-valley-analysis [completeDataSet]="completePriceDataSet"></app-peak-valley-analysis>
+    </section>
 
     <section>
-        <h3>OBV</h3>
-        <app-peak-valley-analysis [obv]="obvContainer"></app-peak-valley-analysis>
+        <h3>Backend OBV</h3>
+        <app-peak-valley-analysis [completeDataSet]="completeOBVDataSet"></app-peak-valley-analysis>
     </section>
     
     <section>

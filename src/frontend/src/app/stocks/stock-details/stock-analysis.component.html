@@ -25,7 +25,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <app-peak-valley-analysis [prices]="prices"></app-peak-valley-analysis>
+            <app-peak-valley-analysis [completeDataSet]="pricesTrendDataSet"></app-peak-valley-analysis>
         </div>
     </section>
 
@@ -37,7 +37,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <app-peak-valley-analysis [obv]="obvContainer"></app-peak-valley-analysis>
+            <app-peak-valley-analysis [completeDataSet]="obvTrendDataSet"></app-peak-valley-analysis>
         </div>
     </section>
 
@@ -62,7 +62,7 @@
     <section *ngIf="chartInfo" class="card shadow-sm mb-4">
         <div class="card-body">
             <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR Chart</h5>
-            <app-line-chart [dataContainer]="chartInfo.prices.atr"></app-line-chart>
+            <app-line-chart [dataContainer]="prices.atr"></app-line-chart>
         </div>
     </section>
     
@@ -70,7 +70,7 @@
     <section *ngIf="chartInfo" class="card shadow-sm mb-4">
         <div class="card-body">
             <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR % Chart</h5>
-            <app-line-chart [dataContainer]="chartInfo.prices.atrPercent"></app-line-chart>
+            <app-line-chart [dataContainer]="prices.atrPercent"></app-line-chart>
         </div>
     </section>
 

@@ -58,20 +58,20 @@ type PricesView(prices:PriceBars) =
     member _.Prices = prices.Bars
     member _.ATR =
         let atrContainer = prices|> MultipleBarPriceAnalysis.Indicators.averageTrueRage
-
         let container = ChartDataPointContainer<decimal>($"ATR ({atrContainer.Period} days)", DataPointChartType.Line)
-        
         atrContainer.DataPoints |> Array.iter container.Add
-        
         container
         
     member _.ATRPercent =
         let atrContainer = prices|> MultipleBarPriceAnalysis.Indicators.averageTrueRangePercentage
-
         let container = ChartDataPointContainer<decimal>($"ATR %% ({atrContainer.Period} days)", DataPointChartType.Line)
-        
         atrContainer.DataPoints |> Array.iter container.Add
-        
+        container
+
+    member _.OBV =
+        let obvContainer = prices|> MultipleBarPriceAnalysis.Indicators.onBalanceVolume
+        let container = ChartDataPointContainer<decimal>($"OBV", DataPointChartType.Line)
+        obvContainer |> Array.iter container.Add
         container
         
 type QuoteQuery =

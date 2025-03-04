@@ -4,6 +4,7 @@ open Xunit
 open FsUnit
 open core.fs.Services.Trends
 open testutils
+open core.fs.Services.InflectionPoints
 
 let trends = TestDataGenerator.PriceBars(TestDataGenerator.NET) |> TrendCalculator.generate TestDataGenerator.NET TrendType.Ema20OverSma50
 let rounded (precision:int) (value:decimal) = System.Math.Round(value, precision)
@@ -59,8 +60,8 @@ let ``Down trend bars stats are correct``() =
 
 [<Fact>]
 let ``Current trend params are correct``() =
-    trends.CurrentTrend.trendType |> should equal TrendType.Ema20OverSma50
-    trends.CurrentTrend.direction |> should equal Down
+    trends.CurrentTrend.trendType |> should equal Ema20OverSma50
+    trends.CurrentTrend.direction |> should equal Downtrend
     trends.CurrentTrend.start |> snd |> _.DateStr |> should equal "2022-09-23"
     trends.CurrentTrend.end_ |> snd |> _.DateStr |> should equal "2022-11-30"
     trends.CurrentTrend.GainPercent |> MultipleBarPriceAnalysisTests.rounded 3 |> should equal -0.097

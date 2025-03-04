@@ -1,4 +1,4 @@
-import {PriceBar} from "./stocks.service";
+import {PriceBar, TrendAnalysisResult, TrendChangeAlert, TrendDirection, TrendDirectionAndStrength} from "./stocks.service";
 
 export enum InfectionPointType { Peak = "Peak", Valley = "Valley" }
 
@@ -207,94 +207,6 @@ export function calculateInflectionPoints(prices: PriceBar[]) {
     return calculateInflectionPointsFixedSmoothing(prices);
     // return calculateInflectionPointsVolatilitySmoothing(prices);
 }
-
-// this function will traverse the inflection points and calculate
-// the change from peak to valley and valley to peak, and how many days
-// have past between the points
-export type InflectionPointLog = {
-    from: InflectionPoint,
-    to: InflectionPoint,
-    days: number,
-    change: number,
-    percentChange: number
-}
-
-export function toInflectionPointLog(inflectionPoints: InflectionPoint[]): InflectionPointLog[] {
-
-    let log: InflectionPointLog[] = []
-    let i = 1
-    while (i < inflectionPoints.length) {
-        let point1 = inflectionPoints[i - 1]
-        let point2 = inflectionPoints[i]
-        let days = (new Date(point2.gradient.dataPoint.dateStr).getTime() - new Date(point1.gradient.dataPoint.dateStr).getTime()) / (1000 * 3600 * 24)
-        let change = point2.gradient.dataPoint.close - point1.gradient.dataPoint.close
-        let percentChange = change / point2.gradient.dataPoint.close
-        log.push({from: point1, to: point2, days: days, change: change, percentChange: percentChange})
-        i += 1
-    }
-    return log
-}
-
-export function toHistogram(inflectionPoints: InflectionPoint[]) {
-    // build a histogram of the inflection points
-    // the histogram will have a key for each price
-    // and the value will be the number of times that price was hit
-    let histogram = {}
-
-    for (let i = 0; i < inflectionPoints.length; i++) {
-        let price = inflectionPoints[i].priceValue
-
-        // we will round the price to the nearest dollar
-        let rounded = Math.round(price)
-
-        if (histogram[rounded]) {
-            histogram[rounded] += 1
-        } else {
-            histogram[rounded] = 1
-        }
-    }
-
-    return histogram
-}
-
-export function age(point: InflectionPoint): number {
-    const date = new Date(point.gradient.dataPoint.dateStr).getTime()
-    const now = new Date().getTime()
-    return (now - date) / (1000 * 3600 * 24)
-}
-
-// TREND FUNCTIONS
-export enum TrendDirection {
-    Uptrend = "Uptrend",
-    Downtrend = "Downtrend",
-    Sideways = "Sideways",
-    InsufficientData = "Insufficient data"
-}
-
-export type TrendDirectionAndStrength = {
-    direction: TrendDirection;
-    strength: number;
-}
-
-export type TrendAnalysisDetails = {
-    slopeAnalysis: TrendDirectionAndStrength;
-    patternAnalysis: TrendDirectionAndStrength;
-    rangeAnalysis: TrendDirectionAndStrength;
-    strengthAnalysis: TrendDirectionAndStrength;
-}
-
-export interface TrendAnalysisResult {
-    trend: TrendDirection;
-    confidence: number;
-    details: TrendAnalysisDetails;
-}
-
-export interface TrendChangeAlert {
-    detected: boolean;
-    direction: TrendDirection;
-    strength: number; // 0-1 scale
-    evidence: string[];
-  }
   
 
 function linearRegressionAnalysis(inflectionPoints: InflectionPoint[], minPoints = 8): TrendDirectionAndStrength {

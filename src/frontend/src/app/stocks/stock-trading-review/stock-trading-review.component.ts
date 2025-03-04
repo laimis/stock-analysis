@@ -74,7 +74,7 @@ export class StockTradingReviewComponent {
         // check if we have prices perhaps available
         if (this.positionChartInformation && this.positionChartInformation.prices) {
             let prices = this.positionChartInformation.prices
-            return prices.prices[prices.prices.length - 1].close
+            return prices[prices.length - 1].close
         }
 
         return 0
@@ -168,12 +168,12 @@ export class StockTradingReviewComponent {
                         averageBuyPrice: position.averageCostPerShare,
                         stopPrice: position.stopPrice,
                         markers: [],
-                        prices: r,
+                        prices: r.prices,
                         ticker: position.ticker,
                         transactions: position.transactions,
                         buyOrders: buyOrders,
                         sellOrders: sellOrders,
-                        renderMovingAverages: true,
+                        movingAverages: r.movingAverages
                     }
                 },
                 e => {

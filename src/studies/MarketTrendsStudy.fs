@@ -19,7 +19,7 @@ let private outputToCsv (outputFilename:string) (trends:Trends) =
         |> List.map (fun t ->
             TrendCsv.Row(
                 ticker=t.ticker.Value,
-                direction=(match t.direction with | Up -> "Up" | Down -> "Down"),
+                direction=(match t.direction with | Uptrend -> "Up" | Downtrend -> "Down"),
                 start=(t.start |> snd |> _.DateStr),
                 ``end``=(t.end_ |> snd |> _.DateStr),
                 bars=t.NumberOfBars.ToString(),
@@ -64,7 +64,7 @@ let private outputToConsole (trends:Trends) =
     // take the last trend which is the current trend
     let currentTrend = trends.CurrentTrend
     
-    Console.WriteLine("\nCurrent trend: " + (match currentTrend.direction with | Up -> "Up" | Down -> "Down") + " trend")
+    Console.WriteLine("\nCurrent trend: " + (match currentTrend.direction with | TrendDirection.Uptrend -> "Up" | TrendDirection.Downtrend -> "Down") + " trend")
     
     Console.WriteLine($"Start: {currentTrend.start |> snd |> _.DateStr}")
     Console.WriteLine($"End: {currentTrend.end_ |> snd |> _.DateStr}")

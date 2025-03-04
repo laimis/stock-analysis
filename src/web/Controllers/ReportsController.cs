@@ -117,11 +117,23 @@ namespace web.Controllers
         [HttpGet("trends/{ticker}")]
         public Task<ActionResult> Trends(string ticker, [FromQuery] string start, [FromQuery] string end, [FromQuery] string trendType) =>
             this.OkOrError(
-                service.Handle(
+            service.Handle(
                     new TrendsQuery(
                         User.Identifier(),
                         new Ticker(ticker),
                         core.fs.Services.Trends.TrendType.FromString(trendType),
+                        start, end
+                    )
+                )
+            );
+
+        [HttpGet("inflectionpoints/{ticker}")]
+        public Task<ActionResult> InflectionPoints(string ticker, [FromQuery] string start, [FromQuery] string end) =>
+            this.OkOrError(
+                service.Handle(
+                    new InflectionPointsQuery(
+                        User.Identifier(),
+                        new Ticker(ticker),
                         start, end
                     )
                 )

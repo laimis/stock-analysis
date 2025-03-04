@@ -1,24 +1,9 @@
 module core.fs.Services.Trends
 
-open System.Threading
 open core.Shared
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
-
-type TrendDirection =
-    | Up
-    | Down
-    
-    static member FromString s =
-        match s with
-        | nameof Up -> Up
-        | nameof Down -> Down
-        | _ -> failwith $"Invalid trend type {s}"
-        
-    override this.ToString() =
-        match this with
-        | Up -> nameof Up
-        | Down -> nameof Down
+open InflectionPoints
         
 type TrendType =
     | Ema20OverSma50
@@ -71,14 +56,15 @@ type Trends(ticker, trendType, trends:Trend list) =
     let compareByNumberOfBars = fun (t:Trend) -> t.NumberOfBars
     let compareByGain = fun (t:Trend) -> t.GainPercent
     
-    let upTrends = trends |> List.filter (fun t -> t.direction = Up)
-    let downTrends = trends |> List.filter (fun t -> t.direction = Down)
+    let upTrends = trends |> List.filter (fun t -> t.direction = Uptrend)
+    let downTrends = trends |> List.filter (fun t -> t.direction = Downtrend)
     
     let determineRank rankFunc trend =
         let matchingTrends = 
             match trend.direction with
-            | Up -> upTrends
-            | Down -> downTrends
+            | Uptrend -> upTrends
+            | Downtrend -> downTrends
+            | _ -> failwith "Invalid trend direction"
             
         let rank = matchingTrends |> List.sortByDescending rankFunc |> List.findIndex (fun t -> t = trend) |> fun x -> x + 1
         rank, matchingTrends.Length
@@ -137,8 +123,8 @@ module TrendCalculator =
             match indexedValues[0] with
             | _, first, second ->
                 match first > second with
-                | true -> Up
-                | false -> Down
+                | true -> Uptrend
+                | false -> Downtrend
                 
         let initialTrend = createTrend 0 initialDirection trendType
             
@@ -148,8 +134,8 @@ module TrendCalculator =
                 
                 let direction =
                     match firstMa > secondMa with
-                    | true -> Up
-                    | false -> Down
+                    | true -> Uptrend
+                    | false -> Downtrend
                 
                 match direction = trend.direction with
                 | true ->

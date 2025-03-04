@@ -190,11 +190,19 @@ public class SentimentTypeConverter : GenericConverterWithToString<SentimentType
     }
 }
 
-public class TrendDirectionConverter : GenericConverterWithToString<Trends.TrendDirection>
+public class TrendDirectionConverter : GenericConverterWithToString<InflectionPoints.TrendDirection>
 {
-    public override Trends.TrendDirection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override InflectionPoints.TrendDirection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return Trends.TrendDirection.FromString(reader.GetString());
+        return InflectionPoints.TrendDirection.FromString(reader.GetString());
+    }
+}
+
+public class InflectionPointsTypeConverer : GenericConverterWithToString<InflectionPoints.InfectionPointType>
+{
+    public override InflectionPoints.InfectionPointType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return InflectionPoints.InfectionPointType.FromString(reader.GetString());
     }
 }
 

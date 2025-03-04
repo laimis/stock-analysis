@@ -7,21 +7,17 @@ import {
     PriceBar,
     PriceFrequency,
     Prices,
-    StocksService
+    StocksService,
+    TrendAnalysisResult,
+    TrendChangeAlert
 } from '../services/stocks.service';
 import {GetErrors, humanFriendlyDuration} from "../services/utils";
 import {
-    age,
     calculateInflectionPoints,
     Gradient,
     InfectionPointType,
     InflectionPoint,
-    InflectionPointLog,
-    toHistogram,
-    toInflectionPointLog,
-    toValley,
-    TrendAnalysisResult,
-    TrendChangeAlert
+    toValley
 } from "../services/inflectionpoints.service";
 
 import { PeakValleyAnalysisComponent } from '../shared/peak-valley-analysis/peak-valley-analysis.component';
@@ -35,6 +31,58 @@ function nextDay(currentDate: string): string {
     let date = new Date(d.getFullYear(), d.getMonth(), d.getDate())
     date.setDate(date.getDate() + 1)
     return date.toISOString().substring(0, 10)
+}
+
+type InflectionPointLog = {
+    from: InflectionPoint,
+    to: InflectionPoint,
+    days: number,
+    change: number,
+    percentChange: number
+}
+
+function toInflectionPointLog(inflectionPoints: InflectionPoint[]): InflectionPointLog[] {
+
+    let log: InflectionPointLog[] = []
+    let i = 1
+    while (i < inflectionPoints.length) {
+        let point1 = inflectionPoints[i - 1]
+        let point2 = inflectionPoints[i]
+        let days = (new Date(point2.gradient.dataPoint.dateStr).getTime() - new Date(point1.gradient.dataPoint.dateStr).getTime()) / (1000 * 3600 * 24)
+        let change = point2.gradient.dataPoint.close - point1.gradient.dataPoint.close
+        let percentChange = change / point2.gradient.dataPoint.close
+        log.push({from: point1, to: point2, days: days, change: change, percentChange: percentChange})
+        i += 1
+    }
+    return log
+}
+
+function toHistogram(inflectionPoints: InflectionPoint[]) {
+    // build a histogram of the inflection points
+    // the histogram will have a key for each price
+    // and the value will be the number of times that price was hit
+    let histogram = {}
+
+    for (let i = 0; i < inflectionPoints.length; i++) {
+        let price = inflectionPoints[i].priceValue
+
+        // we will round the price to the nearest dollar
+        let rounded = Math.round(price)
+
+        if (histogram[rounded]) {
+            histogram[rounded] += 1
+        } else {
+            histogram[rounded] = 1
+        }
+    }
+
+    return histogram
+}
+
+export function age(point: InflectionPoint): number {
+    const date = new Date(point.gradient.dataPoint.dateStr).getTime()
+    const now = new Date().getTime()
+    return (now - date) / (1000 * 3600 * 24)
 }
 
 function histogramToDataPointContainer(title: string, histogram: {}) {
@@ -143,18 +191,31 @@ function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPo
 export class InflectionPointsComponent implements OnInit {
     tickers: string[];
     options: any;
-    prices: Prices;
-    priceFrequency: PriceFrequency = PriceFrequency.Daily;
+    
+    
     ageValueToUse: number;
     lineContainers: DataPointContainer[];
     peaksAndValleys: DataPointContainer[];
     log: InflectionPointLog[];
     errors: string[];
-    trendAnalysisResult: TrendAnalysisResult;
-    trendChangeAlert: TrendChangeAlert;
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
-    obvContainer: DataPointContainer;
+    
+    completePriceDataSet: {
+        prices: PriceBar[],
+        inflectionPoints: InflectionPoint[],
+        trendAnalysis: {
+            establishedTrend: TrendAnalysisResult,
+            potentialChange: TrendChangeAlert
+        }};
+
+    completeOBVDataSet: {
+        prices: PriceBar[],
+        inflectionPoints: InflectionPoint[],
+        trendAnalysis: {
+            establishedTrend: TrendAnalysisResult,
+            potentialChange: TrendChangeAlert
+        }};
 
     constructor(
         private stocks: StocksService,
@@ -169,45 +230,22 @@ export class InflectionPointsComponent implements OnInit {
     }
 
     renderPrices(tickers: string[]) {
-        this.stocks.getStockPrices(tickers[0], 365, this.priceFrequency).subscribe(
-            result => {
-                this.prices = result
-
-                const inflectionPoints = calculateInflectionPoints(result.prices);
-                const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
-                const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
-
-                const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
-                const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
-                const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
-                const smoothedValleys = toDailyBreakdownDataPointCointainer('smoothed valleys', valleys, (p: number) => Math.round(p))
-
-                this.log = toInflectionPointLog(inflectionPoints).reverse()
-
-                const humanFriendlyTimeDuration = humanFriendlyDuration(this.ageValueToUse)
-                const resistanceHistogram = toHistogram(peaks.filter(p => age(p) < this.ageValueToUse))
-                const resistanceHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' resistance histogram', resistanceHistogram)
-
-                const supportHistogram = toHistogram(valleys.filter(p => age(p) < this.ageValueToUse))
-                const supportHistogramPointContainer = histogramToDataPointContainer(humanFriendlyTimeDuration + ' support histogram', supportHistogram)
-
-                const logChart = logToDataPointContainer("Log", this.log)
-
-                this.lineContainers = [
-                    resistanceHistogramPointContainer, supportHistogramPointContainer, peaksContainer, smoothedPeaks, valleysContainer, smoothedValleys, logChart
-                ]
-
-                this.peaksAndValleys = [smoothedPeaks, smoothedValleys]
-            },
-            error => this.errors = GetErrors(error)
-        );
-
         let startDate = new Date();
         startDate.setDate(startDate.getDate() - 365);
+        let startDateStr = startDate.toISOString().split('T')[0];
 
-        this.stocks.reportDailyTickerReport(tickers[0], startDate.toISOString().split('T')[0]).subscribe(
+        this.stocks.reportInflectionPoints(tickers[0], startDateStr).subscribe(
             result => {
-                this.obvContainer = result.dailyObv
+                this.completePriceDataSet = {
+                    prices: result.prices,
+                    inflectionPoints: result.priceInflectionPoints,
+                    trendAnalysis: result.priceTrendAnalysis
+                }
+                this.completeOBVDataSet = {
+                    prices: result.obv,
+                    inflectionPoints: result.obvInflectionPoints,
+                    trendAnalysis: result.obvTrendAnalysis
+                }
             },
             error => this.errors = GetErrors(error)
         );
