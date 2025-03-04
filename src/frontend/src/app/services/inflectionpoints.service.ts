@@ -1,5 +1,4 @@
-import {ChartMarker, ChartType, DataPoint, DataPointContainer, PriceBar} from "./stocks.service";
-import {green, red} from "./charts.service";
+import {PriceBar} from "./stocks.service";
 
 export enum InfectionPointType { Peak = "Peak", Valley = "Valley" }
 
@@ -12,23 +11,6 @@ export function toPeak(gradient: Gradient): InflectionPoint {
 
 export function toValley(gradient: Gradient): InflectionPoint {
     return {gradient: gradient, type: InfectionPointType.Valley, priceValue: gradient.dataPoint.close}
-}
-
-export function toChartMarker(inflectionPoint: InflectionPoint): ChartMarker {
-    const bar = inflectionPoint.gradient.dataPoint
-    return {
-        label: inflectionPoint.priceValue.toFixed(2),
-        date: bar.dateStr,
-        color: inflectionPoint.type === InfectionPointType.Valley ? green : red,
-        shape: inflectionPoint.type === InfectionPointType.Valley ? 'arrowUp' : 'arrowDown'
-    }
-}
-
-function nextDay(currentDate: string): string {
-    let d = new Date(currentDate + " 23:00:00") // adding hours to make sure that when input is treated as midnight UTC, it is still the same day as the input
-    let date = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-    date.setDate(date.getDate() + 1)
-    return date.toISOString().substring(0, 10)
 }
 
 function filterBySignificance(points: InflectionPoint[], minPercentChange = 0.03, minAge = 5) {
@@ -51,64 +33,6 @@ function filterBySignificance(points: InflectionPoint[], minPercentChange = 0.03
     }
     
     return significant;
-}
-
-export function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPoint[], priceFunc?): DataPointContainer {
-
-    if (priceFunc) {
-        points = points.map(p => {
-            let bar: PriceBar = {
-                dateStr: p.gradient.dataPoint.dateStr,
-                close: priceFunc(p.gradient.dataPoint.close),
-                open: priceFunc(p.gradient.dataPoint.open),
-                high: priceFunc(p.gradient.dataPoint.high),
-                low: priceFunc(p.gradient.dataPoint.low),
-                volume: p.gradient.dataPoint.volume
-            }
-            let newGradient: Gradient = {
-                dataPoint: bar,
-                delta: p.gradient.delta,
-                index: p.gradient.index
-            }
-            return toValley(newGradient)
-        })
-    }
-
-    // we want to generate a data point for each day, even if there is no peak or valley
-    // start with the first date and keep on going until we reach the last date
-    let currentDate = points[0].gradient.dataPoint.dateStr
-    let currentIndex = 0
-    let dataPoints: DataPoint[] = []
-
-    while (currentIndex < points.length) {
-
-        if (currentDate == points[currentIndex].gradient.dataPoint.dateStr) {
-
-            dataPoints.push({
-                label: points[currentIndex].gradient.dataPoint.dateStr,
-                isDate: true,
-                value: points[currentIndex].priceValue
-            })
-
-            currentIndex++
-
-        } else {
-
-            dataPoints.push({
-                label: currentDate,
-                isDate: true,
-                value: points[currentIndex - 1].priceValue
-            })
-
-        }
-        currentDate = nextDay(currentDate)
-    }
-
-    return {
-        label: label,
-        chartType: ChartType.Scatter,
-        data: dataPoints
-    }
 }
 
 function calculateVolatility(prices: PriceBar[], window = 10): number[] {
@@ -333,43 +257,10 @@ export function toHistogram(inflectionPoints: InflectionPoint[]) {
     return histogram
 }
 
-export function histogramToDataPointContainer(title: string, histogram: {}) {
-    let dataPoints: DataPoint[] = []
-    for (let key in histogram) {
-        dataPoints.push({
-            label: key,
-            isDate: false,
-            value: histogram[key]
-        })
-    }
-    return {
-        label: title,
-        chartType: ChartType.Column,
-        data: dataPoints
-    }
-}
-
 export function age(point: InflectionPoint): number {
     const date = new Date(point.gradient.dataPoint.dateStr).getTime()
     const now = new Date().getTime()
     return (now - date) / (1000 * 3600 * 24)
-}
-
-export function logToDataPointContainer(label: string, log: InflectionPointLog[]) {
-    let dataPoints: DataPoint[] = []
-    for (let i = 0; i < log.length; i++) {
-        let point = log[i]
-        dataPoints.push({
-            label: point.from.gradient.dataPoint.dateStr,
-            isDate: true,
-            value: Math.round(point.percentChange * 100)
-        })
-    }
-    return {
-        label: label,
-        chartType: ChartType.Column,
-        data: dataPoints
-    }
 }
 
 // TREND FUNCTIONS
@@ -658,7 +549,7 @@ export function detectPotentialTrendChange(
     latestBar: PriceBar
   ): TrendChangeAlert {
     if (inflectionPoints.length < 4) {
-      return { detected: false, direction: null, strength: 0, evidence: ["Insufficient data"] };
+      return { detected: false, direction: TrendDirection.InsufficientData, strength: 0, evidence: ["Insufficient data"] };
     }
     
     // Extract recent peaks and valleys

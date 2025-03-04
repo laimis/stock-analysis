@@ -1,8 +1,20 @@
 import { Component, Input } from '@angular/core';
-import { DataPointContainer, PositionChartInformation, Prices } from '../../services/stocks.service';
+import { ChartMarker, DataPointContainer, PositionChartInformation, Prices } from '../../services/stocks.service';
 import { PriceChartComponent } from "../price-chart/price-chart.component";
 import { NgClass, NgIf, PercentPipe } from '@angular/common';
-import { calculateInflectionPoints, getCompleteTrendAnalysis, toChartMarker, TrendAnalysisResult, TrendChangeAlert } from 'src/app/services/prices.service';
+import { calculateInflectionPoints, getCompleteTrendAnalysis, InfectionPointType, InflectionPoint, TrendAnalysisResult, TrendChangeAlert } from 'src/app/services/inflectionpoints.service';
+import { green, red } from 'src/app/services/charts.service';
+
+
+function toChartMarker(inflectionPoint: InflectionPoint): ChartMarker {
+    const bar = inflectionPoint.gradient.dataPoint
+    return {
+        label: inflectionPoint.priceValue.toFixed(2),
+        date: bar.dateStr,
+        color: inflectionPoint.type === InfectionPointType.Valley ? green : red,
+        shape: inflectionPoint.type === InfectionPointType.Valley ? 'arrowUp' : 'arrowDown'
+    }
+}
 
 @Component({
   selector: 'app-peak-valley-analysis',

@@ -1,8 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
+    ChartType,
+    DataPoint,
     DataPointContainer,
-    PositionChartInformation,
+    PriceBar,
     PriceFrequency,
     Prices,
     StocksService
@@ -11,24 +13,120 @@ import {GetErrors, humanFriendlyDuration} from "../services/utils";
 import {
     age,
     calculateInflectionPoints,
-    getCompleteTrendAnalysis,
-    histogramToDataPointContainer,
+    Gradient,
     InfectionPointType,
+    InflectionPoint,
     InflectionPointLog,
-    logToDataPointContainer,
-    toChartMarker,
-    toDailyBreakdownDataPointCointainer,
     toHistogram,
     toInflectionPointLog,
+    toValley,
     TrendAnalysisResult,
     TrendChangeAlert
-} from "../services/prices.service";
+} from "../services/inflectionpoints.service";
 
 import { PeakValleyAnalysisComponent } from '../shared/peak-valley-analysis/peak-valley-analysis.component';
 import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LineChartComponent } from "../shared/line-chart/line-chart.component";
+
+function nextDay(currentDate: string): string {
+    let d = new Date(currentDate + " 23:00:00") // adding hours to make sure that when input is treated as midnight UTC, it is still the same day as the input
+    let date = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    date.setDate(date.getDate() + 1)
+    return date.toISOString().substring(0, 10)
+}
+
+function histogramToDataPointContainer(title: string, histogram: {}) {
+    let dataPoints: DataPoint[] = []
+    for (let key in histogram) {
+        dataPoints.push({
+            label: key,
+            isDate: false,
+            value: histogram[key]
+        })
+    }
+    return {
+        label: title,
+        chartType: ChartType.Column,
+        data: dataPoints
+    }
+}
+
+function logToDataPointContainer(label: string, log: InflectionPointLog[]) {
+    let dataPoints: DataPoint[] = []
+    for (let i = 0; i < log.length; i++) {
+        let point = log[i]
+        dataPoints.push({
+            label: point.from.gradient.dataPoint.dateStr,
+            isDate: true,
+            value: Math.round(point.percentChange * 100)
+        })
+    }
+    return {
+        label: label,
+        chartType: ChartType.Column,
+        data: dataPoints
+    }
+}
+
+function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPoint[], priceFunc?): DataPointContainer {
+
+    if (priceFunc) {
+        points = points.map(p => {
+            let bar: PriceBar = {
+                dateStr: p.gradient.dataPoint.dateStr,
+                close: priceFunc(p.gradient.dataPoint.close),
+                open: priceFunc(p.gradient.dataPoint.open),
+                high: priceFunc(p.gradient.dataPoint.high),
+                low: priceFunc(p.gradient.dataPoint.low),
+                volume: p.gradient.dataPoint.volume
+            }
+            let newGradient: Gradient = {
+                dataPoint: bar,
+                delta: p.gradient.delta,
+                index: p.gradient.index
+            }
+            return toValley(newGradient)
+        })
+    }
+
+    // we want to generate a data point for each day, even if there is no peak or valley
+    // start with the first date and keep on going until we reach the last date
+    let currentDate = points[0].gradient.dataPoint.dateStr
+    let currentIndex = 0
+    let dataPoints: DataPoint[] = []
+
+    while (currentIndex < points.length) {
+
+        if (currentDate == points[currentIndex].gradient.dataPoint.dateStr) {
+
+            dataPoints.push({
+                label: points[currentIndex].gradient.dataPoint.dateStr,
+                isDate: true,
+                value: points[currentIndex].priceValue
+            })
+
+            currentIndex++
+
+        } else {
+
+            dataPoints.push({
+                label: currentDate,
+                isDate: true,
+                value: points[currentIndex - 1].priceValue
+            })
+
+        }
+        currentDate = nextDay(currentDate)
+    }
+
+    return {
+        label: label,
+        chartType: ChartType.Scatter,
+        data: dataPoints
+    }
+}
 
 @Component({
     selector: 'app-inflection-points',
@@ -79,7 +177,6 @@ export class InflectionPointsComponent implements OnInit {
                 const peaks = inflectionPoints.filter(p => p.type === InfectionPointType.Peak)
                 const valleys = inflectionPoints.filter(p => p.type === InfectionPointType.Valley)
 
-                
                 const peaksContainer = toDailyBreakdownDataPointCointainer('peaks', peaks)
                 const valleysContainer = toDailyBreakdownDataPointCointainer('valleys', valleys)
                 const smoothedPeaks = toDailyBreakdownDataPointCointainer('smoothed peaks', peaks, (p: number) => Math.round(p))
