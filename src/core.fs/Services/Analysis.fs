@@ -304,3 +304,32 @@ module PercentChangeAnalysis =
         
     let calculateForPriceBars multipleByHundred (priceBars:PriceBars) =
         priceBars.ClosingPrices() |> calculate multipleByHundred
+
+module DataPointHelpers =
+
+    let normalize (dataPoints:DataPoint<decimal>[]) =
+
+        // ranges for normalization
+        let values = dataPoints |> Array.map (fun point -> point.Value)
+        let min = values |> Array.min
+        let max = values |> Array.max
+        let rng = max - min
+
+        dataPoints |> Array.map (
+            fun point -> 
+                let normalizedValue = 100m * (point.Value - min) / rng
+                DataPoint<decimal>(point.Label, normalizedValue, point.IsDate, None)
+        )
+
+    let toPriceBars (dataPoints:DataPoint<decimal>[]) =
+        
+        dataPoints |> Array.map (
+            fun point -> 
+                PriceBar(
+                    System.DateTimeOffset.Parse(point.Label),
+                    point.Value,
+                    point.Value,
+                    point.Value,
+                    point.Value,
+                    0)
+        )

@@ -62,6 +62,14 @@ public class AlertsController(Handler handler) : ControllerBase
         dailyAlerts.RunPatternMonitoring();
         return Task.CompletedTask;
     }
+
+    [HttpGet("triggerPriceObvTrend")]
+    [Authorize("admin")]
+    public Task TriggerPriceObvTrend([FromServices] MonitoringServices.PriceObvTrendMonitoringService priceObvTrendAlerts)
+    {
+        priceObvTrendAlerts.Run();
+        return Task.CompletedTask;
+    }
         
     [HttpGet("triggerEmail")]
     [Authorize("admin")]

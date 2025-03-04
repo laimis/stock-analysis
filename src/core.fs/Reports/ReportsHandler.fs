@@ -900,28 +900,12 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
                 
                 let priceInflectionPoints = InflectionPoints.calculateInflectionPoints prices.Bars
                 let priceTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis priceInflectionPoints prices.Last
+                
                 let obv = MultipleBarPriceAnalysis.Indicators.onBalanceVolume prices
-
-                // ranges for normalization
-                let values = obv |> Array.map (fun point -> point.Value)
-                let min = values |> Array.min
-                let max = values |> Array.max
-                let rng = max - min
-
-                let obvMappedToPriceBars = 
-                    obv |> Array.map (
-                        fun point -> 
-                            let normalizedValue = 100m * (point.Value - min) / rng
-                            PriceBar(
-                                DateTimeOffset.Parse(point.Label),
-                                normalizedValue,
-                                normalizedValue,
-                                normalizedValue,
-                                normalizedValue,
-                                0)
-                    )
-                let obvInflectionPoints = InflectionPoints.calculateInflectionPoints obvMappedToPriceBars
-                let obvTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis obvInflectionPoints obvMappedToPriceBars[obvMappedToPriceBars.Length - 1]
+                let normalized = Analysis.DataPointHelpers.normalize obv
+                let normalizedAsBars = Analysis.DataPointHelpers.toPriceBars normalized
+                let obvInflectionPoints = InflectionPoints.calculateInflectionPoints normalizedAsBars
+                let obvTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
 
                 {|
                     priceInflectionPoints = priceInflectionPoints;
@@ -929,7 +913,7 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
                     obvInflectionPoints = obvInflectionPoints;
                     obvTrendAnalysis = obvTrendAnalysis;
                     prices = prices.Bars;
-                    obv = obvMappedToPriceBars
+                    obv = normalizedAsBars
                 |}
             )
     }

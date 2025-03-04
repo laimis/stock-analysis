@@ -21,7 +21,9 @@ namespace core.fs.Alerts
     
     module Constants =
         let MonitorTagPattern = "monitor:patterns"
+        let MonitorTagObvPriceTrend = "monitor:obvpricetrend"
         let MonitorNamePattern = "Patterns"
+        let MonitorNameObvPriceTrend = "OBV Price Trend"
         let StopLossIdentifier = "Stop loss"
         let StockPortfolioIdentifier = "💼 - Stocks"
         let OptionPortfolioIdentifier = "💼 - Options"
@@ -72,6 +74,20 @@ namespace core.fs.Alerts
                 userId = userId
                 alertType = pattern.sentimentType
                 valueFormat = pattern.valueFormat
+            }
+        
+        static member GenericAlert (identifier:string) ticker description value sourceLists ``when`` userId alertType =
+            {
+                identifier = identifier
+                triggeredValue = value
+                watchedValue = value
+                ``when`` = ``when``
+                ticker = ticker
+                description = description
+                sourceLists = sourceLists
+                userId = userId
+                alertType = alertType
+                valueFormat = ValueFormat.Number
             }
     
     type AlertsView = {

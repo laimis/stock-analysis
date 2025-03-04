@@ -152,7 +152,7 @@ let areDecreasing (values: decimal list): bool =
     |> List.forall (fun (a, b) -> b < a)
 
 // The main inflection point calculation functions
-let calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (smoothingFactor: float): InflectionPoint list =
+let private calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (smoothingFactor: float): InflectionPoint list =
     // First calculate price differences
     let diffs = 
         [0 .. prices.Length - 2]
@@ -440,7 +440,12 @@ let detectPotentialTrendChange
             match recentValleys |> List.tryLast with
             | None -> None
             | Some lastValley ->
-                let percentRise = float ((latestPrice - lastValley.PriceValue) / lastValley.PriceValue)
+                let percentRise =
+                    match lastValley.PriceValue with
+                    | 0M -> 
+                        if latestPrice = 0M then 0.0 else 1.0 // If both are zero -> no change, otherwise 100% rise
+                    | _ ->
+                        float ((latestPrice - lastValley.PriceValue) / lastValley.PriceValue)
                 if percentRise > 0.05 then // 5% rise from valley
                     Some (
                         $"BULLISH: Price has risen %.1f{(percentRise * 100.0)}%% from last valley",

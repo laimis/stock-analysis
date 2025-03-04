@@ -40,6 +40,13 @@ public static class Jobs
                 service => service.RunPatternMonitoring(),
                 TimeSpan.FromMinutes(2)
             );
+
+            RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PriceObvTrendMonitoringService>(
+                recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PriceObvTrendMonitoringService),
+                methodCall: service => service.Run(),
+                cronExpression: "55 13 * * 1-5", //  1:55pm Monday through Friday
+                options: rjo
+            );
             
             RecurringJob.AddOrUpdate<core.fs.Options.MonitoringServices.PriceMonitoringService>(
                 recurringJobId: nameof(core.fs.Options.MonitoringServices.PriceMonitoringService),

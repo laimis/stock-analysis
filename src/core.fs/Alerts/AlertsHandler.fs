@@ -1,6 +1,5 @@
 namespace core.fs.Alerts
 
-    open System.Threading
     open core.Shared
     open core.Stocks
     open core.fs
@@ -48,6 +47,7 @@ namespace core.fs.Alerts
         member this.Handle (_:QueryAvailableMonitors) =
             [
                 {| name = Constants.MonitorNamePattern; tag = Constants.MonitorTagPattern |}
+                {| name = Constants.MonitorNameObvPriceTrend; tag = Constants.MonitorTagObvPriceTrend |}
             ]
             
         member this.Handle (_:Run) : Result<Unit,ServiceError> =

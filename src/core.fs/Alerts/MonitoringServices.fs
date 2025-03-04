@@ -14,6 +14,7 @@ open core.fs.Adapters.Storage
 open core.fs.Alerts
 open core.fs.Services
 open core.fs.Services.Analysis
+open core.fs.Services.InflectionPoints
 open core.fs.Stocks
 
 [<Struct>]
@@ -326,6 +327,219 @@ type PatternMonitoringService(
     interface IApplicationService
 
     member _.RunPatternMonitoring() = task {
+
+        try
+            do! runThroughMonitoringChecks logger
+        with
+            | ex ->
+                logger.LogError("Failed while running alert monitor, will sleep: " + ex.ToString())
+                container.AddNotice("Failed while running alert monitor: " + ex.Message)
+    }
+
+
+type PriceObvTrendMonitoringService(
+    accounts:IAccountStorage,
+    brokerage:IBrokerage,
+    container:StockAlertContainer,
+    marketHours:IMarketHours,
+    portfolio:IPortfolioStorage,
+    logger:ILogger) =
+
+    let identifier = "price-obv-trends"
+    let generateAlertListForUser (emailIdPair:EmailIdPair) = async {
+        let! user = emailIdPair.Id |> accounts.GetUser |> Async.AwaitTask
+
+        match user with
+        | None ->
+            return Seq.empty<PatternCheck>
+        | Some user ->
+            let userId = user.State.Id |> UserId
+            let! ownedStocks = emailIdPair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
+            let portfolioList =
+                ownedStocks
+                |> Seq.filter _.IsOpen
+                |> Seq.map _.Ticker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.StockPortfolioIdentifier]; user=userId})
+                
+            let! options = emailIdPair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
+            let optionList =
+                options
+                |> Seq.filter _.IsOpen
+                |> Seq.map _.UnderlyingTicker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionPortfolioIdentifier]; user=userId})
+
+            let! pendingPositions = emailIdPair.Id |> portfolio.GetPendingStockPositions |> Async.AwaitTask
+            let pendingStocksList =
+                pendingPositions
+                |> Seq.filter (fun p -> p.State.IsClosed |> not)
+                |> Seq.map _.State.Ticker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.StocksPendingIdentifier]; user=userId})
+                
+            let pendingOptionsList =
+                options
+                |> Seq.filter _.IsPending
+                |> Seq.map _.UnderlyingTicker
+                |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionsPendingIdentifier]; user=userId})
+
+            let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
+            let stockList =
+                lists
+                |> Seq.filter _.State.ContainsTag(Constants.MonitorNameObvPriceTrend)
+                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=userId}))
+                |> Seq.concat
+
+            // create a map of all the tickers we are checking so we can remove duplicates, and we want to prefer portfolio list entries
+            // over pending list entries over stock list entries
+            let tickerMap = Dictionary<Ticker, PatternCheck>()
+
+            let addTicker (ticker: Ticker) (check:PatternCheck) =
+                match tickerMap.TryGetValue(ticker) with
+                | true, _ -> tickerMap[ticker] <- {check with listNames = check.listNames @ tickerMap[ticker].listNames}
+                | _ -> tickerMap.Add(ticker, check)
+
+            [
+                portfolioList
+                optionList
+                pendingStocksList
+                pendingOptionsList
+                stockList
+            ]
+            |> Seq.concat
+            |> Seq.iter (fun check -> addTicker check.ticker check)
+
+            return tickerMap.Values
+    }
+
+    let generateMonitoringChecks() = task {
+        let! users = accounts.GetUserEmailIdPairs()
+
+        let! alertListOps =
+            users
+            |> Seq.map generateAlertListForUser
+            |> Async.Parallel
+            |> Async.StartAsTask
+
+        let allAlerts = alertListOps |> Seq.concat
+
+        return allAlerts
+    }
+
+    let getPrices (logger:ILogger) (user:UserState) ticker = task {
+
+        let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays -365) |> Some
+        let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow) |> Some
+
+        let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
+
+        match prices with
+        | Error err ->
+            logger.LogError($"Pattern monitor could not get price history for {ticker}: {err.Message}")
+        | Ok response ->
+            // see how many bars did we get, I suspect we get only one bar from time to time
+            match response.Length with
+            | x when x <= 1 -> logger.LogWarning($"Pattern monitor got only {response.Length} bars for {ticker}")
+            | _ -> ()
+    
+        return prices
+    }
+
+    let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
+
+        let! user = accounts.GetUser alertCheck.user |> Async.AwaitTask
+        
+        match user with
+        | None -> return None
+        | Some user ->
+            match user.State.ConnectedToBrokerage with
+            | false -> return None
+            | true ->
+                let! priceResponse = getPrices logger user.State alertCheck.ticker |> Async.AwaitTask
+
+                match priceResponse with
+                | Error _ -> return None
+                | Ok prices ->
+
+                    // first remove it if it has been triggered
+                    ["price"; "obv"; "price-obv-divergence"]
+                    |> List.iter( fun s -> container.Deregister alertCheck.ticker $"identifier-{s}" alertCheck.user)
+                    
+                    let priceInflectionPoints = InflectionPoints.calculateInflectionPoints prices.Bars
+                    let priceFullAnalysis = InflectionPoints.getCompleteTrendAnalysis priceInflectionPoints (prices.Last)
+
+                    let counter = ref 0
+
+                    // if we see trend change, we register the alert
+                    match priceFullAnalysis.EstablishedTrend.Trend = priceFullAnalysis.PotentialChange.Direction |> not && priceFullAnalysis.PotentialChange.Detected with
+                    | true -> 
+                        let description = $"Price trend change detected, from {priceFullAnalysis.EstablishedTrend.Trend} to {priceFullAnalysis.PotentialChange.Direction}"
+                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price" alertCheck.ticker description (priceFullAnalysis.PotentialChange.Strength |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
+                        container.Register alert
+                        counter := !counter + 1
+                    | false -> ()
+
+                    let normalizedObv = 
+                        prices
+                        |> MultipleBarPriceAnalysis.Indicators.onBalanceVolume
+                        |> Analysis.DataPointHelpers.normalize
+
+                    let normalizedAsBars = Analysis.DataPointHelpers.toPriceBars normalizedObv
+                    let obvInflectionPoints = InflectionPoints.calculateInflectionPoints normalizedAsBars
+                    let obvTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
+                    
+                    match obvTrendAnalysis.EstablishedTrend.Trend = obvTrendAnalysis.PotentialChange.Direction |> not && obvTrendAnalysis.PotentialChange.Detected with
+                    | true -> 
+                        let description = $"OBV trend change detected, from {obvTrendAnalysis.EstablishedTrend.Trend} to {obvTrendAnalysis.PotentialChange.Direction}"
+                        let alert = TriggeredAlert.GenericAlert $"{identifier}-obv" alertCheck.ticker description (obvTrendAnalysis.PotentialChange.Strength |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
+                        container.Register alert
+                        counter := !counter + 1
+                    | false -> ()
+
+                    let priceDirection = priceFullAnalysis.EstablishedTrend.Trend
+                    let obvDirection = obvTrendAnalysis.EstablishedTrend.Trend
+
+                    match priceDirection, obvDirection with
+                    | pd, obvd when pd <> obvd -> 
+                        let description = $"Price and OBV divergence detected, price is {priceDirection} and OBV is {obvDirection}"
+                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price-obv-divergence" alertCheck.ticker description (obvTrendAnalysis.EstablishedTrend.Confidence |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
+                        container.Register alert
+                        counter := !counter + 1
+                    | _ -> ()
+
+                    return Some (alertCheck,counter.Value)
+    }
+
+    let runThroughMonitoringChecks (logger:ILogger) = task {
+        
+        logger.LogInformation "Running price obv monitoring checks"
+        
+        let! alertsToCheck = generateMonitoringChecks()
+        
+        logger.LogInformation($"Generated {alertsToCheck |> Seq.length} price obv monitoring checks")
+        
+        let! checks =
+            alertsToCheck
+            |> Seq.map (runCheck logger)
+            |> Async.Sequential
+            |> Async.StartAsTask
+
+        let completedChecksWithCounts = checks |> Seq.choose id
+
+        let completedChecks = completedChecksWithCounts |> Seq.map fst
+
+        let totalPatternsFoundCount = completedChecksWithCounts |> Seq.map snd |> Seq.sum
+
+        logger.LogInformation $"Price OBV monitoring checks completed with {totalPatternsFoundCount} patterns found"
+        
+        container.AddNotice $"Price OBV monitoring checks completed with {totalPatternsFoundCount} patterns found"
+        
+        logger.LogInformation $"{completedChecks |> Seq.length} price obv monitoring checks completed"
+        
+        container.AddNotice $"{completedChecks |> Seq.length} price obv monitoring checks completed"
+    }
+
+    interface IApplicationService
+
+    member _.Run() = task {
 
         try
             do! runThroughMonitoringChecks logger
