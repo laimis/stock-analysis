@@ -5,6 +5,7 @@ open core.Shared
 open core.fs.Adapters.Stocks
 open core.fs.Services.Analysis
 open core.fs.Services.Trends
+open core.fs.Services.InflectionPoints
 open FSharp.Data
 open studies.ServiceHelper
 
