@@ -6,12 +6,15 @@ import {
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
+    PriceBar,
     Prices,
     StockAnalysisOutcome,
     StockGaps,
     StockPercentChangeResponse,
     StocksService,
-    TickerOutcomes
+    TickerOutcomes,
+    TrendAnalysisResult,
+    TrendChangeAlert
 } from 'src/app/services/stocks.service';
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
@@ -23,6 +26,7 @@ import {PriceChartComponent} from "../../shared/price-chart/price-chart.componen
 import {FormsModule} from "@angular/forms";
 import {StockDailyScoresComponent} from "../../shared/stock-daily-scores/stock-daily-scores.component";
 import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/peak-valley-analysis.component";
+import { InflectionPoint } from 'src/app/services/inflectionpoints.service';
 
 @Component({
     selector: 'app-stock-analysis',
@@ -54,8 +58,8 @@ export class StockAnalysisComponent {
     chartInfo: PositionChartInformation
     obvContainer: DataPointContainer;
     private _prices: Prices;
-    pricesTrendDataSet: { prices: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").PriceBar[]; inflectionPoints: import("d:/programming/stock-analysis/src/frontend/src/app/services/inflectionpoints.service").InflectionPoint[]; trendAnalysis: { establishedTrend: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendAnalysisResult; potentialChange: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendChangeAlert; }; };
-    obvTrendDataSet: { prices: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").PriceBar[]; inflectionPoints: import("d:/programming/stock-analysis/src/frontend/src/app/services/inflectionpoints.service").InflectionPoint[]; trendAnalysis: { establishedTrend: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendAnalysisResult; potentialChange: import("d:/programming/stock-analysis/src/frontend/src/app/services/stocks.service").TrendChangeAlert; }; };
+    pricesTrendDataSet: { prices: PriceBar[]; inflectionPoints: InflectionPoint[]; trendAnalysis: { establishedTrend: TrendAnalysisResult; potentialChange: TrendChangeAlert; }; };
+    obvTrendDataSet: { prices: PriceBar[]; inflectionPoints: InflectionPoint[]; trendAnalysis: { establishedTrend: TrendAnalysisResult; potentialChange: TrendChangeAlert; }; };
     
     constructor(
         private stockService: StocksService,
