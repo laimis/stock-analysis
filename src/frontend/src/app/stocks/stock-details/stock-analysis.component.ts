@@ -56,7 +56,6 @@ export class StockAnalysisComponent {
     gaps: StockGaps;
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
-    obvContainer: DataPointContainer;
     private _prices: Prices;
     pricesTrendDataSet: { prices: PriceBar[]; inflectionPoints: InflectionPoint[]; trendAnalysis: { establishedTrend: TrendAnalysisResult; potentialChange: TrendChangeAlert; }; };
     obvTrendDataSet: { prices: PriceBar[]; inflectionPoints: InflectionPoint[]; trendAnalysis: { establishedTrend: TrendAnalysisResult; potentialChange: TrendChangeAlert; }; };
@@ -172,9 +171,5 @@ export class StockAnalysisComponent {
             )
         
         concat(inflectionReport, multipleBarOutcomesPromise, dailyOutcomesPromise, percentDistribution).subscribe();
-    }
-
-    dailyBreakdownFetched($event: DailyPositionReport) {
-        this.obvContainer = $event.dailyObv;
     }
 }

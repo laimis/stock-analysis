@@ -553,7 +553,7 @@ type PriceObvTrendMonitoringService(
         
         let! alertsToCheck = generateMonitoringChecks()
         
-        logger.LogInformation($"Generated {alertsToCheck |> Seq.length} price obv monitoring checks")
+        logger.LogInformation $"Generated {alertsToCheck |> Seq.length} price obv monitoring checks"
         
         let! checks =
             alertsToCheck
