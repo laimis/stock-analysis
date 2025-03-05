@@ -396,7 +396,6 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
 
 let detectPotentialTrendChange
     (inflectionPoints: InflectionPoint list)
-    (latestPrice: decimal)
     (latestBar: PriceBar): TrendChangeAlert =
     
     if inflectionPoints.Length < 4 then
@@ -427,12 +426,12 @@ let detectPotentialTrendChange
             (System.DateTime.Parse latestBar.DateStr - System.DateTime.Parse lastInflectionPoint.Gradient.DataPoint.DateStr).TotalDays
         
         let peaksExceededCheck() =
-            let peaksExceeded = recentPeaks |> List.filter (fun p -> latestPrice > p.PriceValue)
+            let peaksExceeded = recentPeaks |> List.filter (fun p -> latestBar.Close > p.PriceValue)
             match peaksExceeded with
             | [] -> None
             | _ -> 
                 (
-                    $"BULLISH: Price ({float latestPrice:F2}) exceeds {peaksExceeded.Length} of the last {recentPeaks.Length} peaks",
+                    $"BULLISH: Price ({float latestBar.Close:F2}) exceeds {peaksExceeded.Length} of the last {recentPeaks.Length} peaks",
                     float peaksExceeded.Length / float recentPeaks.Length * 0.5
                 ) |> Some
 
@@ -443,9 +442,9 @@ let detectPotentialTrendChange
                 let percentRise =
                     match lastValley.PriceValue with
                     | 0M -> 
-                        if latestPrice = 0M then 0.0 else 1.0 // If both are zero -> no change, otherwise 100% rise
+                        if latestBar.Close = 0M then 0.0 else 1.0 // If both are zero -> no change, otherwise 100% rise
                     | _ ->
-                        float ((latestPrice - lastValley.PriceValue) / lastValley.PriceValue)
+                        float ((latestBar.Close - lastValley.PriceValue) / lastValley.PriceValue)
                 if percentRise > 0.05 then // 5% rise from valley
                     Some (
                         $"BULLISH: Price has risen %.1f{(percentRise * 100.0)}%% from last valley",
@@ -466,12 +465,12 @@ let detectPotentialTrendChange
         
         // bearish checks
         let valleysExceededCheck() =
-            let valleysExceeded = recentValleys |> List.filter (fun v -> latestPrice < v.PriceValue)
+            let valleysExceeded = recentValleys |> List.filter (fun v -> latestBar.Close < v.PriceValue)
             match valleysExceeded with
             | [] -> None
             | _ -> 
                 (
-                    $"BEARISH: Price ({float latestPrice:F2}) is below {valleysExceeded.Length} of the last {recentValleys.Length} valleys",
+                    $"BEARISH: Price ({float latestBar.Close:F2}) is below {valleysExceeded.Length} of the last {recentValleys.Length} valleys",
                     float valleysExceeded.Length / float recentValleys.Length * 0.5
                 ) |> Some
         
@@ -479,7 +478,7 @@ let detectPotentialTrendChange
             match recentPeaks |> List.tryLast with
             | None -> None
             | Some lastPeak ->
-                let percentFall = float ((lastPeak.PriceValue - latestPrice) / lastPeak.PriceValue)
+                let percentFall = float ((lastPeak.PriceValue - latestBar.Close) / lastPeak.PriceValue)
                 if percentFall > 0.05 then // 5% fall from peak
                     Some (
                         $"BEARISH: Price has fallen %.1f{percentFall * 100.0}%% from last peak",
@@ -543,7 +542,7 @@ let getCompleteTrendAnalysis
     (latestBar: PriceBar) = 
     
     let trendAnalysis = analyzeTrend inflectionPoints
-    let changeAlert = detectPotentialTrendChange inflectionPoints latestBar.Close latestBar
+    let changeAlert = detectPotentialTrendChange inflectionPoints latestBar
     
     {| 
         EstablishedTrend = trendAnalysis
