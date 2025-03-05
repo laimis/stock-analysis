@@ -346,6 +346,21 @@ type PriceObvTrendMonitoringService(
     logger:ILogger) =
 
     let identifier = "price-obv-trends"
+
+    let createAlertForTrendChange identifier (establishedTrendStrength:float) (newTrendStrength:float) ticker description sourceLists userId =
+        {
+            identifier = identifier
+            triggeredValue = establishedTrendStrength |> decimal
+            watchedValue = newTrendStrength |> decimal
+            ``when`` = DateTimeOffset.UtcNow
+            ticker = ticker
+            description = description
+            sourceLists = sourceLists
+            userId = userId
+            alertType = SentimentType.Neutral
+            valueFormat = ValueFormat.Number
+        }
+
     let generateAlertListForUser (emailIdPair:EmailIdPair) = async {
         let! user = emailIdPair.Id |> accounts.GetUser |> Async.AwaitTask
 
@@ -427,17 +442,17 @@ type PriceObvTrendMonitoringService(
     let getPrices (logger:ILogger) (user:UserState) ticker = task {
 
         let start = marketHours.GetMarketStartOfDayTimeInUtc(DateTime.UtcNow.AddDays -365) |> Some
-        let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc(DateTime.UtcNow) |> Some
+        let ``end`` = marketHours.GetMarketEndOfDayTimeInUtc DateTime.UtcNow |> Some
 
-        let! prices = brokerage.GetPriceHistory user ticker PriceFrequency.Daily start ``end``
+        let! prices = brokerage.GetPriceHistory user ticker Daily start ``end``
 
         match prices with
         | Error err ->
-            logger.LogError($"Pattern monitor could not get price history for {ticker}: {err.Message}")
+            logger.LogError $"Trend monitor could not get price history for {ticker}: {err.Message}"
         | Ok response ->
             // see how many bars did we get, I suspect we get only one bar from time to time
             match response.Length with
-            | x when x <= 1 -> logger.LogWarning($"Pattern monitor got only {response.Length} bars for {ticker}")
+            | x when x <= 1 -> logger.LogWarning $"Trend monitor got only {response.Length} bars for {ticker}"
             | _ -> ()
     
         return prices
@@ -460,37 +475,36 @@ type PriceObvTrendMonitoringService(
                 | Ok prices ->
 
                     // first remove it if it has been triggered
-                    ["price"; "obv"; "price-obv-divergence"]
+                    ["Price Trend"; "OBV Trend"; "Price/OBV Divergence"]
                     |> List.iter( fun s -> container.Deregister alertCheck.ticker $"identifier-{s}" alertCheck.user)
                     
-                    let priceInflectionPoints = InflectionPoints.calculateInflectionPoints prices.Bars
-                    let priceAnalysis = InflectionPoints.getCompleteTrendAnalysis priceInflectionPoints (prices.Last)
+                    let priceInflectionPoints = calculateInflectionPoints prices.Bars
+                    let priceAnalysis = getCompleteTrendAnalysis priceInflectionPoints prices.Last
 
                     let counter = ref 0
 
                     // if we see trend change, we register the alert
-                    match priceAnalysis.EstablishedTrend.Trend = priceAnalysis.PotentialChange.Direction |> not && priceAnalysis.PotentialChange.Detected with
+                    match priceAnalysis.EstablishedTrend.Trend <> priceAnalysis.PotentialChange.Direction &&
+                        priceAnalysis.PotentialChange.Detected with
                     | true -> 
-                        let description = $"Price trend change detected, from {priceAnalysis.EstablishedTrend.Trend} to {priceAnalysis.PotentialChange.Direction}"
-                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price" alertCheck.ticker description (priceAnalysis.PotentialChange.Strength |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
-                        container.Register alert
+                        let description = $"From {priceAnalysis.EstablishedTrend.Trend} To {priceAnalysis.PotentialChange.Direction}"
+                        createAlertForTrendChange $"Price Trend" priceAnalysis.EstablishedTrend.Confidence priceAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
                         counter.Value <- counter.Value + 1
                     | false -> ()
 
                     let normalizedObv = 
                         prices
                         |> MultipleBarPriceAnalysis.Indicators.onBalanceVolume
-                        |> Analysis.DataPointHelpers.normalize
+                        |> DataPointHelpers.normalize
 
-                    let normalizedAsBars = Analysis.DataPointHelpers.toPriceBars normalizedObv
-                    let obvInflectionPoints = InflectionPoints.calculateInflectionPoints normalizedAsBars
-                    let obvTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
+                    let normalizedAsBars = DataPointHelpers.toPriceBars normalizedObv
+                    let obvInflectionPoints = calculateInflectionPoints normalizedAsBars
+                    let obvTrendAnalysis = getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
                     
-                    match obvTrendAnalysis.EstablishedTrend.Trend = obvTrendAnalysis.PotentialChange.Direction |> not && obvTrendAnalysis.PotentialChange.Detected with
+                    match obvTrendAnalysis.EstablishedTrend.Trend <> obvTrendAnalysis.PotentialChange.Direction && obvTrendAnalysis.PotentialChange.Detected with
                     | true -> 
-                        let description = $"OBV trend change detected, from {obvTrendAnalysis.EstablishedTrend.Trend} to {obvTrendAnalysis.PotentialChange.Direction}"
-                        let alert = TriggeredAlert.GenericAlert $"{identifier}-obv" alertCheck.ticker description (obvTrendAnalysis.PotentialChange.Strength |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
-                        container.Register alert
+                        let description = $"From {obvTrendAnalysis.EstablishedTrend.Trend} To {obvTrendAnalysis.PotentialChange.Direction}"
+                        createAlertForTrendChange $"OBV Trend" obvTrendAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
                         counter.Value <- counter.Value + 1
                     | false -> ()
 
@@ -498,18 +512,37 @@ type PriceObvTrendMonitoringService(
                     let obvDirection = obvTrendAnalysis.EstablishedTrend.Trend
                     let obvPotentialChangeDirection = obvTrendAnalysis.PotentialChange.Direction
 
+                    let bearishOrBullishAsString fromDirection toDirection =
+                        match fromDirection, toDirection with
+                        | Uptrend, Downtrend -> "Bearish"
+                        | Downtrend, Uptrend -> "Bullish"
+                        | _ -> "Continuation"
+
                     match priceDirection, obvDirection with
                     | pd, obvd when pd <> obvd -> 
-                        let description = $"Price and OBV divergence detected, price is {priceDirection} and OBV is {obvDirection}"
-                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price-obv-divergence" alertCheck.ticker description (obvTrendAnalysis.EstablishedTrend.Confidence |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
-                        container.Register alert
+                        let description = $"{bearishOrBullishAsString priceDirection obvDirection}: Price: {priceDirection}, OBV: {obvDirection}"
+                        createAlertForTrendChange $"OBV Divergence" priceAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.EstablishedTrend.Confidence alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
                         counter.Value <- counter.Value + 1
                     | pd, obvd when pd = obvd && pd <> obvPotentialChangeDirection && obvTrendAnalysis.PotentialChange.Detected -> 
-                        let description = $"Both price and OBV are {obvDirection}, but OBV is about to change to {obvPotentialChangeDirection}"
-                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price-obv-divergence" alertCheck.ticker description (obvTrendAnalysis.PotentialChange.Strength |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
-                        container.Register alert
+                        let description = $"{bearishOrBullishAsString obvDirection obvPotentialChangeDirection}: OBV is changing to {obvPotentialChangeDirection}"
+                        createAlertForTrendChange $"OBV Divergence" priceAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
                         counter.Value <- counter.Value + 1
                     | _ -> ()
+
+                    // there is one more strong diversion which is when price established and changing trend is in the same direction
+                    // and obv established change is in the same direction, but obv is signaling a change
+                    let strongHit = 
+                        priceAnalysis.EstablishedTrend.Trend = priceAnalysis.PotentialChange.Direction &&
+                        priceAnalysis.EstablishedTrend.Trend = obvTrendAnalysis.EstablishedTrend.Trend &&
+                        obvTrendAnalysis.PotentialChange.Direction <> obvTrendAnalysis.EstablishedTrend.Trend
+
+                    match strongHit with
+                    | true -> 
+                        let description = $"Strong divergence: Price and OBV are in the same direction, but OBV is signaling a change to {obvTrendAnalysis.PotentialChange.Direction}"
+                        createAlertForTrendChange $"OBV Divergence" priceAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
+                        counter.Value <- counter.Value + 1
+                    | false -> ()
+
 
                     return Some (alertCheck,counter.Value)
     }

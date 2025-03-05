@@ -76,20 +76,6 @@ namespace core.fs.Alerts
                 valueFormat = pattern.valueFormat
             }
         
-        static member GenericAlert (identifier:string) ticker description value sourceLists ``when`` userId alertType =
-            {
-                identifier = identifier
-                triggeredValue = value
-                watchedValue = value
-                ``when`` = ``when``
-                ticker = ticker
-                description = description
-                sourceLists = sourceLists
-                userId = userId
-                alertType = alertType
-                valueFormat = ValueFormat.Number
-            }
-    
     type AlertsView = {
         alerts: TriggeredAlert list
         recentlyTriggered: TriggeredAlert list

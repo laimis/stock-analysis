@@ -122,15 +122,15 @@
         <!-- Action Buttons -->
         <div class="mt-4">
             <div class="d-flex gap-2 justify-content-end">
-                <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showAddToPositionModal()">
+                <button *ngIf="position.isOpen || position.isPending" class="btn btn-outline-secondary" (click)="showAddToPositionModal()">
                     <i class="bi bi-plus-lg me-1"></i>
                     Add To Position
                 </button>
-                <button *ngIf="position.isOpen" class="btn btn-outline-secondary" (click)="showClosePositionModal()">
+                <button *ngIf="position.isOpen || position.isPending" class="btn btn-outline-secondary" (click)="showClosePositionModal()">
                     <i class="bi bi-x-lg me-1"></i>
                     Create Close Order
                 </button>
-                <button *ngIf="!position.isOpen && !position.isClosed" class="btn btn-outline-secondary" (click)="closePendingPosition()">
+                <button *ngIf="position.isPending" class="btn btn-outline-secondary" (click)="closePendingPosition()">
                     <i class="bi bi-x-lg me-1"></i>
                     Close Pending Position
                 </button>

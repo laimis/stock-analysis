@@ -20,7 +20,7 @@ let private outputToCsv (outputFilename:string) (trends:Trends) =
         |> List.map (fun t ->
             TrendCsv.Row(
                 ticker=t.ticker.Value,
-                direction=(match t.direction with | Uptrend -> "Up" | Downtrend -> "Down"),
+                direction=(match t.direction with | Uptrend -> "Up" | Downtrend -> "Down" | Sideways -> "Sideways" | InsufficientData -> "InsufficientData"),
                 start=(t.start |> snd |> _.DateStr),
                 ``end``=(t.end_ |> snd |> _.DateStr),
                 bars=t.NumberOfBars.ToString(),
