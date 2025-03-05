@@ -505,8 +505,8 @@ type PriceObvTrendMonitoringService(
                         container.Register alert
                         counter.Value <- counter.Value + 1
                     | pd, obvd when pd = obvd && pd <> obvPotentialChangeDirection && obvTrendAnalysis.PotentialChange.Detected -> 
-                        let description = $"Price and OBV divergence detected, price is {priceDirection} and OBV is {obvDirection}, OBV is about to change to {obvPotentialChangeDirection}"
-                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price-obv-divergence" alertCheck.ticker description (obvTrendAnalysis.EstablishedTrend.Confidence |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
+                        let description = $"Both price and OBV are {obvDirection}, but OBV is about to change to {obvPotentialChangeDirection}"
+                        let alert = TriggeredAlert.GenericAlert $"{identifier}-price-obv-divergence" alertCheck.ticker description (obvTrendAnalysis.PotentialChange.Strength |> decimal) alertCheck.listNames DateTimeOffset.UtcNow alertCheck.user SentimentType.Neutral 
                         container.Register alert
                         counter.Value <- counter.Value + 1
                     | _ -> ()
