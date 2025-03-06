@@ -98,12 +98,8 @@ function Ensure-Git-Clean() {
     $gitStatus = git status --porcelain
     if ($null -ne $gitStatus) {
 
-        # store message as multiline string
-        $message = "
-    There are uncommitted changes in git.
-    Git status:
-    $gitStatus
-    "
+        write-host "UNCOMMITTED: $gitStatus"
+        $message = "There are uncommitted changes in git."
 
         Exit-With-Error $message
     }

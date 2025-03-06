@@ -29,8 +29,8 @@
                     @for (groupedOrder of groupedOrders; track groupedOrder) {
                         @for (p of groupedOrder; track p; let i = $index) {
                             <tr [ngClass]="{
-                            'table-success': p.isActive && p.instruction === 'Buy',
-                            'table-danger': p.isActive && p.instruction === 'Sell',
+                            'table-success': p.isActive && (p.instruction === 'Buy' || p.instruction === 'BuyToCover'),
+                            'table-danger': p.isActive && (p.instruction === 'Sell' || p.instruction === 'SellShort'),
                             'table-secondary': !p.isActive
                         }">
                                 <td>
