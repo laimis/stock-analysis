@@ -472,17 +472,18 @@ let private calculateTrendStrength (inflectionPoints: InflectionPoint list) (num
         let peaks = recentPoints |> List.filter (fun p -> p.Type = Peak)
         let valleys = recentPoints |> List.filter (fun p -> p.Type = Valley)
         
-        let mutable patternScore = 0.0
-        
-        if peaks.Length >= 2 then
-            // Check if peaks are increasing (uptrend) or decreasing (downtrend)
-            let peakDiff = peaks[peaks.Length-1].PriceValue - peaks[0].PriceValue
-            patternScore <- patternScore + (if peakDiff > 0M then 1.0 else if peakDiff < 0M then -1.0 else 0.0)
-        
-        if valleys.Length >= 2 then
-            // Check if valleys are increasing (uptrend) or decreasing (downtrend)
-            let valleyDiff = valleys[valleys.Length-1].PriceValue - valleys[0].PriceValue
-            patternScore <- patternScore + (if valleyDiff > 0M then 1.0 else if valleyDiff < 0M then -1.0 else 0.0)
+        let patternScore =
+            [
+                if peaks.Length >= 2 then
+                    // Check if peaks are increasing (uptrend) or decreasing (downtrend)
+                    let peakDiff = peaks[peaks.Length-1].PriceValue - peaks[0].PriceValue
+                    if peakDiff > 0M then 1.0 else if peakDiff < 0M then -1.0 else 0.0
+                if valleys.Length >= 2 then
+                    // Check if valleys are increasing (uptrend) or decreasing (downtrend)
+                    let valleyDiff = valleys[valleys.Length-1].PriceValue - valleys[0].PriceValue
+                    if valleyDiff > 0M then 1.0 else if valleyDiff < 0M then -1.0 else 0.0   
+            ]
+            |> List.sum
         
         // 3. Calculate total percentage change
         let totalChange = 
