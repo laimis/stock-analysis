@@ -108,6 +108,22 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr>
+                                <td>Percent Change</td>
+                                <td>{{ trendAnalysisResult.details.percentChangeAnalysis.direction }}</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar"
+                                            [ngClass]="{
+                                                'bg-success': trendAnalysisResult.details.percentChangeAnalysis.direction === 'Uptrend',
+                                                'bg-danger': trendAnalysisResult.details.percentChangeAnalysis.direction === 'Downtrend',
+                                                'bg-secondary': trendAnalysisResult.details.percentChangeAnalysis.direction === 'Sideways' || trendAnalysisResult.details.percentChangeAnalysis.direction === 'Insufficient data'
+                                            }"
+                                            [style.width]="(trendAnalysisResult.details.percentChangeAnalysis.strength * 100) + '%'">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
-    PriceFrequency,
     StockPosition,
     StockQuote,
     StocksService,
@@ -17,7 +16,6 @@ import {FormsModule} from "@angular/forms";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 import {NgIf} from "@angular/common";
-import { calculateInflectionPoints, InfectionPointType } from '../services/inflectionpoints.service';
 
 function unrealizedProfit(position: StockPosition, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares

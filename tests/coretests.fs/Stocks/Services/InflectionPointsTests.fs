@@ -9,19 +9,6 @@ open core.fs.Adapters.Stocks
 let getPriceBars ticker =
     testutils.TestDataGenerator.PriceBars ticker
 
-// Tests for basic helper functions
-[<Fact>]
-let ``areIncreasing detects increasing values`` () =
-    areIncreasing [1.0m; 2.0m; 3.0m] |> should be True
-    areIncreasing [1.0m; 1.0m; 3.0m] |> should be False
-    areIncreasing [3.0m; 2.0m; 1.0m] |> should be False
-
-[<Fact>]
-let ``areDecreasing detects decreasing values`` () =
-    areDecreasing [3.0m; 2.0m; 1.0m] |> should be True
-    areDecreasing [3.0m; 3.0m; 1.0m] |> should be False
-    areDecreasing [1.0m; 2.0m; 3.0m] |> should be False
-
 let uptrendPrices =
     "RBRK" |> Ticker |> getPriceBars |> fun f -> f.Bars
 

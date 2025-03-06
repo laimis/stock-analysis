@@ -68,6 +68,7 @@ type TrendAnalysisDetails = {
     PatternAnalysis: TrendDirectionAndStrength
     RangeAnalysis: TrendDirectionAndStrength
     StrengthAnalysis: TrendDirectionAndStrength
+    PercentChangeAnalysis: TrendDirectionAndStrength
 }
 
 type TrendAnalysisResult = {
@@ -84,13 +85,13 @@ type TrendChangeAlert = {
 }
 
 // Helper functions
-let toPeak (gradient: Gradient): InflectionPoint =
+let private toPeak (gradient: Gradient): InflectionPoint =
     { Gradient = gradient; Type = Peak; PriceValue = gradient.DataPoint.Close }
 
-let toValley (gradient: Gradient): InflectionPoint =
+let private toValley (gradient: Gradient): InflectionPoint =
     { Gradient = gradient; Type = Valley; PriceValue = gradient.DataPoint.Close }
 
-let filterBySignificance (points: InflectionPoint list) (minPercentChange: decimal) (minAge: int): InflectionPoint list =
+let private filterBySignificance (points: InflectionPoint list) (minPercentChange: decimal) (minAge: int): InflectionPoint list =
     if points.Length <= 1 then 
         points
     else
@@ -113,7 +114,7 @@ let filterBySignificance (points: InflectionPoint list) (minPercentChange: decim
                     
         filter [points.Head] points.Tail
 
-let calculateVolatility (prices: PriceBar list) (window: int): float list =
+let private calculateVolatility (prices: PriceBar list) (window: int): float list =
     if prices.Length <= window then
         List.replicate prices.Length 0.0
     else
@@ -141,17 +142,129 @@ let calculateVolatility (prices: PriceBar list) (window: int): float list =
             
         List.replicate window firstVol @ volatilities
 
-let areIncreasing (values: decimal list): bool =
+let private areIncreasing (values: decimal list): bool =
     values 
     |> List.pairwise 
     |> List.forall (fun (a, b) -> b > a)
 
-let areDecreasing (values: decimal list): bool =
+let private areDecreasing (values: decimal list): bool =
     values 
     |> List.pairwise 
     |> List.forall (fun (a, b) -> b < a)
 
-// The main inflection point calculation functions
+let private calculateInflectionPointsVolatilitySmoothing (prices: PriceBar array) (baseSmoothing: float): InflectionPoint list =
+    // First calculate price differences
+    let diffs = 
+        [0 .. prices.Length - 2]
+        |> List.map (fun i ->
+            let diff = prices[i+1].Close - prices[i].Close
+            { Delta = diff; Index = i; DataPoint = prices[i] })
+    
+    // Calculate volatility for the entire price series
+    let pricesList = prices |> Array.toList
+    let volatility = calculateVolatility pricesList 10
+    
+    // Normalize volatility to a range suitable for smoothing factor
+    let maxVol = volatility |> List.max
+    let minVol = volatility |> List.min
+    
+    let normalizedVol =
+        volatility
+        |> List.map (fun vol ->
+            if maxVol = minVol then 
+                0.5 // Default if all volatility values are the same
+            else 
+                0.2 + 0.6 * ((vol - minVol) / (maxVol - minVol))) // Scale to 0.2-0.8 range
+    
+    // Apply adaptive smoothing
+    let rec smooth (acc: Gradient list) (remaining: Gradient list) (index: int) =
+        match remaining with
+        | [] -> acc
+        | current::rest ->
+            if index = 0 || index = diffs.Length - 1 then
+                smooth (acc @ [current]) rest (index + 1)
+            else
+                let prevSmoothed = 
+                    if acc.Length > 0 then acc[acc.Length - 1].Delta
+                    else diffs[index-1].Delta
+                
+                // Get adaptive smoothing factor based on normalized volatility
+                let smoothingFactor = normalizedVol[index]
+                
+                let currentDiff = current.Delta
+                let smoothedDiff = decimal(float currentDiff * (1.0 - smoothingFactor) + float prevSmoothed * smoothingFactor)
+                
+                let smoothedGradient = { current with Delta = smoothedDiff }
+                smooth (acc @ [smoothedGradient]) rest (index + 1)
+    
+    let smoothed = smooth [] diffs 0
+    
+    // Detect inflection points
+    let inflectionPoints =
+        smoothed
+        |> List.pairwise
+        |> List.choose (fun (a, b) ->
+            if a.Delta > 0M && b.Delta < 0M then
+                Some(toPeak(b))
+            elif a.Delta < 0M && b.Delta > 0M then
+                Some(toValley(b))
+            else
+                None)
+    
+    filterBySignificance inflectionPoints 0.03M 5
+
+// First update your InflectionCalculationType type to include the new method
+type InflectionCalculationType =
+    | FixedSmoothing
+    | VolatilitySmoothing
+    | SimpleAverageSmoothing
+
+// Then add the function implementation
+let private calculateInflectionPointsSimpleAverageSmoothing (prices: PriceBar array): InflectionPoint list =
+    // First calculate price differences
+    let diffs = 
+        [0 .. prices.Length - 2]
+        |> List.map (fun i ->
+            let diff = prices[i+1].Close - prices[i].Close
+            { Delta = diff; Index = i; DataPoint = prices[i] })
+    
+    // Apply simple average smoothing (3-point moving average)
+    let rec smooth (acc: Gradient list) (remaining: Gradient list) (index: int) =
+        match remaining with
+        | [] -> acc
+        | current::rest ->
+            if index = 0 then
+                // For first point, just add it without smoothing
+                smooth (acc @ [current]) rest (index + 1)
+            elif rest.IsEmpty then
+                // For last point, also just add it without smoothing
+                smooth (acc @ [current]) rest (index + 1)
+            else
+                // Apply 3-point moving average
+                let prev = diffs[index - 1].Delta
+                let curr = current.Delta
+                let next = rest.Head.Delta
+                let smoothedDiff = (prev + curr + next) / 3M
+                
+                let smoothedGradient = { current with Delta = smoothedDiff }
+                smooth (acc @ [smoothedGradient]) rest (index + 1)
+    
+    let smoothed = smooth [] diffs 0
+    
+    // Detect inflection points
+    let inflectionPoints =
+        smoothed
+        |> List.pairwise
+        |> List.choose (fun (a, b) ->
+            if a.Delta > 0M && b.Delta < 0M then
+                Some(toPeak(b))
+            elif a.Delta < 0M && b.Delta > 0M then
+                Some(toValley(b))
+            else
+                None)
+    
+    filterBySignificance inflectionPoints 0.03M 5
+
 let private calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (smoothingFactor: float): InflectionPoint list =
     // First calculate price differences
     let diffs = 
@@ -194,10 +307,63 @@ let private calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (sm
     
     filterBySignificance inflectionPoints 0.03M 5
 
-// Main function to calculate inflection points
-let calculateInflectionPoints (prices: PriceBar array): InflectionPoint list =
-    calculateInflectionPointsFixedSmoothing prices 0.5
+let calculateInflectionPointsByType calcType prices =
+    match calcType with
+    | FixedSmoothing -> calculateInflectionPointsFixedSmoothing prices 0.5
+    | VolatilitySmoothing -> calculateInflectionPointsVolatilitySmoothing prices 0.5
+    | SimpleAverageSmoothing -> calculateInflectionPointsSimpleAverageSmoothing prices
 
+let calculateInflectionPoints (prices: PriceBar array): InflectionPoint list =
+    calculateInflectionPointsByType FixedSmoothing prices
+
+
+/// Analyzes trend direction and strength based on percentage changes between inflection points
+let private analyzePercentChanges (inflectionPoints: InflectionPoint list) (numberOfPoints:int) (percentChangeThreshold: decimal): TrendDirectionAndStrength =
+    if inflectionPoints.Length < numberOfPoints then 
+        { Direction = InsufficientData; Strength = 0.0 }
+    else
+        let inflectionPoints = inflectionPoints |> List.skip (inflectionPoints.Length - numberOfPoints)
+
+        // Calculate cumulative percentage change over the most recent inflection points
+        let cumulativeChange =
+            inflectionPoints
+            |> List.pairwise
+            |> List.sumBy (fun (a, b) ->
+                let prevPrice = a.PriceValue
+                let currentPrice = b.PriceValue
+                if prevPrice <> 0M then
+                    float((currentPrice - prevPrice) / prevPrice)
+                else 0.0)
+        
+        // Calculate the total change from first to last point
+        let firstPrice = inflectionPoints.[0].PriceValue
+        let lastPrice = inflectionPoints.[inflectionPoints.Length-1].PriceValue
+        
+        // Avoid division by zero
+        let totalChange = 
+            if firstPrice <> 0M then
+                float((lastPrice - firstPrice) / firstPrice)
+            else
+                0.0
+                
+        // Use both metrics for decision making
+        let thresholdFloat = float percentChangeThreshold
+        
+        // If both metrics agree strongly, high confidence
+        if totalChange > thresholdFloat && cumulativeChange > thresholdFloat then
+            { Direction = Uptrend; Strength = 1.0 }
+        elif totalChange < -thresholdFloat && cumulativeChange < -thresholdFloat then
+            { Direction = Downtrend; Strength = 1.0 }
+        // If totalChange shows a trend but cumulative disagrees (suggesting volatility)
+        elif abs totalChange > thresholdFloat then
+            let direction = if totalChange > 0.0 then Uptrend else Downtrend
+            { Direction = direction; Strength = 0.5 }  // Lower confidence
+        // If cumulative change is high but totalChange is small (choppy market)
+        elif abs cumulativeChange > thresholdFloat * 2.0 then
+            { Direction = Sideways; Strength = 0.7 }
+        else
+            // Truly sideways
+            { Direction = Sideways; Strength = 1.0 - min 1.0 (abs totalChange / thresholdFloat) }
 
 // Trend analysis functions
 let private linearRegressionAnalysis (inflectionPoints: InflectionPoint list) (minPoints: int): TrendDirectionAndStrength =
@@ -349,6 +515,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
                 PatternAnalysis = { Direction = InsufficientData; Strength = 0.0 }
                 RangeAnalysis = { Direction = InsufficientData; Strength = 0.0 }
                 StrengthAnalysis = { Direction = InsufficientData; Strength = 0.0 }
+                PercentChangeAnalysis = { Direction = InsufficientData; Strength = 0.0 }
             }
         }
     else
@@ -357,13 +524,14 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
         let patternResult = analyzePeaksAndValleys inflectionPoints 4
         let rangeResult = analyzeRange inflectionPoints
         let strengthResult = calculateTrendStrength inflectionPoints 8
+        let percentChangeResult = analyzePercentChanges inflectionPoints 8 0.03M // Add the new analysis
         
         // Vote for the final trend
         let mutable upVotes = 0.0
         let mutable downVotes = 0.0
         let mutable sidewaysVotes = 0.0
         
-        let results = [slopeResult; patternResult; rangeResult; strengthResult]
+        let results = [slopeResult; patternResult; rangeResult; strengthResult; percentChangeResult]
         
         for result in results do
             match result.Direction with
@@ -371,7 +539,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
             | Downtrend -> downVotes <- downVotes + result.Strength
             | _ -> sidewaysVotes <- sidewaysVotes + result.Strength
         
-        let numberOfMethods = 4.0
+        let numberOfMethods = results.Length |> float
         let finalTrend, confidence =
             if upVotes > downVotes && upVotes > sidewaysVotes then
                 Uptrend, upVotes
@@ -391,6 +559,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
                 PatternAnalysis = patternResult
                 RangeAnalysis = rangeResult
                 StrengthAnalysis = strengthResult
+                PercentChangeAnalysis = percentChangeResult
             }
         }
 
@@ -520,7 +689,7 @@ let detectPotentialTrendChange
             bullishEvidence @ bearishEvidence
             @ [
                 if daysSinceLastInflection > 10.0 then
-                    $"NEUTRAL: {System.Math.Floor daysSinceLastInflection} days since last inflection point (unusual duration)"
+                    $"NEUTRAL: {System.Math.Floor daysSinceLastInflection} days since last inflection point"
                 if bullishStrength > 0.0 || bearishStrength > 0.0 then
                     $"Signal strength: Bullish=%.2f{bullishStrength}, Bearish=%.2f{bearishStrength}"
                 if bullishStrength > 0.3 && bearishStrength > 0.3 then

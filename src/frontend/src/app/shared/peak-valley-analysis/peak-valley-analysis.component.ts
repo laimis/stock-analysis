@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { ChartMarker, DataPointContainer, PositionChartInformation, PriceBar, Prices, TrendAnalysisResult, TrendChangeAlert } from '../../services/stocks.service';
+import { ChartMarker, InfectionPointType, InflectionPoint, PositionChartInformation, PriceBar, TrendAnalysisResult, TrendChangeAlert } from '../../services/stocks.service';
 import { PriceChartComponent } from "../price-chart/price-chart.component";
 import { NgClass, NgIf, PercentPipe } from '@angular/common';
-import { calculateInflectionPoints, getCompleteTrendAnalysis, InfectionPointType, InflectionPoint } from 'src/app/services/inflectionpoints.service';
 import { green, red } from 'src/app/services/charts.service';
 
 

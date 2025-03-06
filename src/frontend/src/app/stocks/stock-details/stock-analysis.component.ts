@@ -1,8 +1,7 @@
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
-    DailyPositionReport,
-    DataPointContainer,
+    InflectionPoint,
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
@@ -26,7 +25,6 @@ import {PriceChartComponent} from "../../shared/price-chart/price-chart.componen
 import {FormsModule} from "@angular/forms";
 import {StockDailyScoresComponent} from "../../shared/stock-daily-scores/stock-daily-scores.component";
 import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/peak-valley-analysis.component";
-import { InflectionPoint } from 'src/app/services/inflectionpoints.service';
 
 @Component({
     selector: 'app-stock-analysis',

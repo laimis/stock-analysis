@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
 import {BrokerageOptionOrder, OptionPosition} from "./option.service";
-import { InflectionPoint } from './inflectionpoints.service';
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
@@ -1272,6 +1271,12 @@ export interface AccountTransaction {
     applied?: string;
 }
 
+export enum InfectionPointType { Peak = "Peak", Valley = "Valley" }
+
+export type Gradient = { delta: number, index: number, dataPoint: PriceBar }
+export type InflectionPoint = { gradient: Gradient, type: InfectionPointType, priceValue: number }
+
+
 export enum TrendDirection {
     Uptrend = "Uptrend",
     Downtrend = "Downtrend",
@@ -1289,6 +1294,7 @@ export type TrendAnalysisDetails = {
     patternAnalysis: TrendDirectionAndStrength;
     rangeAnalysis: TrendDirectionAndStrength;
     strengthAnalysis: TrendDirectionAndStrength;
+    percentChangeAnalysis: TrendDirectionAndStrength;
 }
 
 export interface TrendAnalysisResult {

@@ -4,21 +4,15 @@ import {
     ChartType,
     DataPoint,
     DataPointContainer,
+    Gradient,
+    InfectionPointType,
+    InflectionPoint,
     PriceBar,
-    PriceFrequency,
-    Prices,
     StocksService,
     TrendAnalysisResult,
     TrendChangeAlert
 } from '../services/stocks.service';
-import {GetErrors, humanFriendlyDuration} from "../services/utils";
-import {
-    calculateInflectionPoints,
-    Gradient,
-    InfectionPointType,
-    InflectionPoint,
-    toValley
-} from "../services/inflectionpoints.service";
+import {GetErrors} from "../services/utils";
 
 import { PeakValleyAnalysisComponent } from '../shared/peak-valley-analysis/peak-valley-analysis.component';
 import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
@@ -39,6 +33,14 @@ type InflectionPointLog = {
     days: number,
     change: number,
     percentChange: number
+}
+
+function toPeak(gradient: Gradient): InflectionPoint {
+    return {gradient: gradient, type: InfectionPointType.Peak, priceValue: gradient.dataPoint.close}
+}
+
+export function toValley(gradient: Gradient): InflectionPoint {
+    return {gradient: gradient, type: InfectionPointType.Valley, priceValue: gradient.dataPoint.close}
 }
 
 function toInflectionPointLog(inflectionPoints: InflectionPoint[]): InflectionPointLog[] {
