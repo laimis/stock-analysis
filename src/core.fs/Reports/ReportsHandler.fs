@@ -242,9 +242,10 @@ type InflectionPointsQuery =
     }
 
     member this.StartDate (marketHours:IMarketHours) =
+        System.Console.WriteLine($"Start date: {this.Start}")
         match this.Start with
-        | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketStartOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow.AddYears(-10)
-        | None -> DateTimeOffset.UtcNow.AddYears(-10)
+        | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketStartOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow.AddYears(-1)
+        | None -> DateTimeOffset.UtcNow.AddYears(-1)
         
     member this.EndDate (marketHours:IMarketHours) =
         match this.End with
@@ -888,6 +889,7 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
+
             let! priceResponse =
                 brokerage.GetPriceHistory
                     user.State

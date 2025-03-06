@@ -100,3 +100,128 @@ let ``detectPotentialTrendChange handles insufficient data`` () =
     changeAlert.Detected |> should be False
     changeAlert.Direction |> should equal InsufficientData
     changeAlert.Evidence |> should contain "Insufficient data"
+
+[<Fact>]
+let ``calculateInflectionPoints for downtrend simple average smoothing works``() =
+
+    let inflectionPoints = downtrendPrices |> calculateInflectionPointsByType SimpleAverageSmoothing
+
+    inflectionPoints |> should not' (be Empty)
+
+    let valleys = inflectionPoints |> List.filter (fun p -> p.Type = Valley)
+    valleys |> should haveLength 31
+    
+    let peaks = inflectionPoints |> List.filter (fun p -> p.Type = Peak)
+    peaks |> should haveLength 29
+
+    // last inflection point
+    let lastPoint = inflectionPoints.[inflectionPoints.Length - 1]
+    lastPoint.Gradient.DataPoint.DateStr |> should startWith "2022-11-22"
+    lastPoint.Type |> should equal Valley
+    lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
+    lastPoint.Gradient.DataPoint.Close |> should be (equal 44.97)
+
+
+[<Fact>]
+let ``calculateInflectionPoints for uptrend simple average smoothing works`` () =
+    let uptrendInflectionPoints = uptrendPrices |> calculateInflectionPointsByType SimpleAverageSmoothing
+    
+    uptrendInflectionPoints |> should not' (be Empty)
+
+    let valleys = uptrendInflectionPoints |> List.filter (fun p -> p.Type = Valley)
+    valleys |> should haveLength 8
+
+    let peaks = uptrendInflectionPoints |> List.filter (fun p -> p.Type = Peak)
+    peaks |> should haveLength 18
+
+    // last inflection point
+    let lastPoint = uptrendInflectionPoints.[uptrendInflectionPoints.Length - 1]
+
+    lastPoint.Gradient.DataPoint.DateStr |> should startWith "2025-02-26"
+    lastPoint.Type |> should equal Valley
+    lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
+    lastPoint.Gradient.DataPoint.Close |> should be (equal 65.84m)
+
+
+[<Fact>]
+let ``calculateInflectionPoints for downtrend using volatility smoothing works``() =
+
+    let inflectionPoints = downtrendPrices |> calculateInflectionPointsByType VolatilitySmoothing
+
+    inflectionPoints |> should not' (be Empty)
+
+    let valleys = inflectionPoints |> List.filter (fun p -> p.Type = Valley)
+    valleys |> should haveLength 32
+    
+    let peaks = inflectionPoints |> List.filter (fun p -> p.Type = Peak)
+    peaks |> should haveLength 31
+
+    // last inflection point
+    let lastPoint = inflectionPoints.[inflectionPoints.Length - 1]
+    lastPoint.Gradient.DataPoint.DateStr |> should startWith "2022-11-22"
+    lastPoint.Type |> should equal Valley
+    lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
+    lastPoint.Gradient.DataPoint.Close |> should be (equal 44.97)
+
+
+[<Fact>]
+let ``calculateInflectionPoints for uptrend using volatility smoothing works`` () =
+    let uptrendInflectionPoints = uptrendPrices |> calculateInflectionPointsByType VolatilitySmoothing
+    
+    uptrendInflectionPoints |> should not' (be Empty)
+
+    let valleys = uptrendInflectionPoints |> List.filter (fun p -> p.Type = Valley)
+    valleys |> should haveLength 12
+
+    let peaks = uptrendInflectionPoints |> List.filter (fun p -> p.Type = Peak)
+    peaks |> should haveLength 18
+
+    // last inflection point
+    let lastPoint = uptrendInflectionPoints.[uptrendInflectionPoints.Length - 1]
+
+    lastPoint.Gradient.DataPoint.DateStr |> should startWith "2025-02-27"
+    lastPoint.Type |> should equal Valley
+    lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
+    lastPoint.Gradient.DataPoint.Close |> should be (equal 64.3m)
+
+
+[<Fact>]
+let ``calculateInflectionPoints for downtrend using fixed smoothing works``() =
+
+    let inflectionPoints = downtrendPrices |> calculateInflectionPointsByType FixedSmoothing
+
+    inflectionPoints |> should not' (be Empty)
+
+    let valleys = inflectionPoints |> List.filter (fun p -> p.Type = Valley)
+    valleys |> should haveLength 28
+    
+    let peaks = inflectionPoints |> List.filter (fun p -> p.Type = Peak)
+    peaks |> should haveLength 34
+
+    // last inflection point
+    let lastPoint = inflectionPoints.[inflectionPoints.Length - 1]
+    lastPoint.Gradient.DataPoint.DateStr |> should startWith "2022-11-22"
+    lastPoint.Type |> should equal Valley
+    lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
+    lastPoint.Gradient.DataPoint.Close |> should be (equal 44.97)
+
+
+[<Fact>]
+let ``calculateInflectionPoints for uptrend using fixed smoothing works`` () =
+    let uptrendInflectionPoints = uptrendPrices |> calculateInflectionPointsByType FixedSmoothing
+    
+    uptrendInflectionPoints |> should not' (be Empty)
+
+    let valleys = uptrendInflectionPoints |> List.filter (fun p -> p.Type = Valley)
+    valleys |> should haveLength 11
+
+    let peaks = uptrendInflectionPoints |> List.filter (fun p -> p.Type = Peak)
+    peaks |> should haveLength 17
+
+    // last inflection point
+    let lastPoint = uptrendInflectionPoints.[uptrendInflectionPoints.Length - 1]
+
+    lastPoint.Gradient.DataPoint.DateStr |> should startWith "2025-03-04"
+    lastPoint.Type |> should equal Valley
+    lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
+    lastPoint.Gradient.DataPoint.Close |> should be (equal 61.56m)

@@ -213,12 +213,6 @@ let private calculateInflectionPointsVolatilitySmoothing (prices: PriceBar array
     
     filterBySignificance inflectionPoints 0.03M 5
 
-// First update your InflectionCalculationType type to include the new method
-type InflectionCalculationType =
-    | FixedSmoothing
-    | VolatilitySmoothing
-    | SimpleAverageSmoothing
-
 // Then add the function implementation
 let private calculateInflectionPointsSimpleAverageSmoothing (prices: PriceBar array): InflectionPoint list =
     // First calculate price differences
@@ -307,6 +301,13 @@ let private calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (sm
     
     filterBySignificance inflectionPoints 0.03M 5
 
+
+// First update your InflectionCalculationType type to include the new method
+type InflectionCalculationType =
+    | FixedSmoothing
+    | VolatilitySmoothing
+    | SimpleAverageSmoothing
+    
 let calculateInflectionPointsByType calcType prices =
     match calcType with
     | FixedSmoothing -> calculateInflectionPointsFixedSmoothing prices 0.5
