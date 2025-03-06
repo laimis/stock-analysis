@@ -526,18 +526,11 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
         let strengthResult = calculateTrendStrength inflectionPoints 8
         let percentChangeResult = analyzePercentChanges inflectionPoints 8 0.03M // Add the new analysis
         
-        // Vote for the final trend
-        let mutable upVotes = 0.0
-        let mutable downVotes = 0.0
-        let mutable sidewaysVotes = 0.0
-        
         let results = [slopeResult; patternResult; rangeResult; strengthResult; percentChangeResult]
         
-        for result in results do
-            match result.Direction with
-            | Uptrend -> upVotes <- upVotes + result.Strength
-            | Downtrend -> downVotes <- downVotes + result.Strength
-            | _ -> sidewaysVotes <- sidewaysVotes + result.Strength
+        let upVotes = results |> List.filter (fun r -> r.Direction = Uptrend) |> List.sumBy (fun r -> r.Strength)
+        let downVotes = results |> List.filter (fun r -> r.Direction = Downtrend) |> List.sumBy (fun r -> r.Strength)
+        let sidewaysVotes = results |> List.filter (fun r -> r.Direction = Sideways) |> List.sumBy (fun r -> r.Strength)
         
         let numberOfMethods = results.Length |> float
         let finalTrend, confidence =

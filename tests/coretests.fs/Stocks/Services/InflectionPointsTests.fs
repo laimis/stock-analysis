@@ -39,6 +39,7 @@ let ``analyzeTrend correctly identifies uptrend`` () =
     
     analysis.Trend |> should equal Uptrend
     analysis.Confidence |> should be (greaterThan 0.5)
+    analysis.Confidence |> should be (lessThanOrEqualTo 1.0)
 
 [<Fact>]
 let ``analyzeTrend correctly identifies downtrend`` () =
@@ -47,6 +48,7 @@ let ``analyzeTrend correctly identifies downtrend`` () =
     
     analysis.Trend |> should equal Downtrend
     analysis.Confidence |> should be (greaterThan 0.5)
+    analysis.Confidence |> should be (lessThanOrEqualTo 1.0)
 
 [<Fact>]
 let ``analyzeTrend returns InsufficientData for too few points`` () =
@@ -70,6 +72,7 @@ let ``detectPotentialTrendChange identifies bullish trend change`` () =
     changeAlert.Detected |> should be True
     changeAlert.Direction |> should equal Uptrend
     changeAlert.Strength |> should be (greaterThan 0.4)
+    changeAlert.Strength |> should be (lessThanOrEqualTo 1.0)
     changeAlert.Evidence |> should not' (be Empty)
 
 [<Fact>]
@@ -83,6 +86,7 @@ let ``detectPotentialTrendChange identifies bearish trend change`` () =
     changeAlert.Detected |> should be True
     changeAlert.Direction |> should equal Downtrend
     changeAlert.Strength |> should be (greaterThan 0.4)
+    changeAlert.Strength |> should be (lessThanOrEqualTo 1.0)
     changeAlert.Evidence |> should not' (be Empty)
 
 [<Fact>]
