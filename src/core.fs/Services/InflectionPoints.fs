@@ -91,7 +91,14 @@ let private toPeak (gradient: Gradient): InflectionPoint =
 let private toValley (gradient: Gradient): InflectionPoint =
     { Gradient = gradient; Type = Valley; PriceValue = gradient.DataPoint.Close }
 
-let private filterBySignificance (points: InflectionPoint list) (minPercentChange: decimal) (minAge: int): InflectionPoint list =
+// Extract common function to calculate price differences
+let private calculateGradients (prices: PriceBar array) =
+    [0 .. prices.Length - 2]
+    |> List.map (fun i ->
+        let diff = prices[i+1].Close - prices[i].Close
+        { Delta = diff; Index = i; DataPoint = prices[i] })
+
+let private filterBySignificance (minPercentChange: decimal) (minAge: int) (points: InflectionPoint list): InflectionPoint list =
     if points.Length <= 1 then 
         points
     else
@@ -113,6 +120,18 @@ let private filterBySignificance (points: InflectionPoint list) (minPercentChang
                     filter significant tail
                     
         filter [points.Head] points.Tail
+
+let private detectInflectionPoints (smoothed: Gradient list) =
+    smoothed
+    |> List.pairwise
+    |> List.choose (fun (a, b) ->
+        if a.Delta > 0M && b.Delta < 0M then
+            Some(toPeak(b))
+        elif a.Delta < 0M && b.Delta > 0M then
+            Some(toValley(b))
+        else
+            None)
+    |> filterBySignificance 0.03M 5
 
 let private calculateVolatility (prices: PriceBar list) (window: int): float list =
     if prices.Length <= window then
@@ -154,11 +173,7 @@ let private areDecreasing (values: decimal list): bool =
 
 let private calculateInflectionPointsVolatilitySmoothing (prices: PriceBar array) (baseSmoothing: float): InflectionPoint list =
     // First calculate price differences
-    let diffs = 
-        [0 .. prices.Length - 2]
-        |> List.map (fun i ->
-            let diff = prices[i+1].Close - prices[i].Close
-            { Delta = diff; Index = i; DataPoint = prices[i] })
+    let diffs = prices |> calculateGradients
     
     // Calculate volatility for the entire price series
     let pricesList = prices |> Array.toList
@@ -200,27 +215,12 @@ let private calculateInflectionPointsVolatilitySmoothing (prices: PriceBar array
     let smoothed = smooth [] diffs 0
     
     // Detect inflection points
-    let inflectionPoints =
-        smoothed
-        |> List.pairwise
-        |> List.choose (fun (a, b) ->
-            if a.Delta > 0M && b.Delta < 0M then
-                Some(toPeak(b))
-            elif a.Delta < 0M && b.Delta > 0M then
-                Some(toValley(b))
-            else
-                None)
-    
-    filterBySignificance inflectionPoints 0.03M 5
+    detectInflectionPoints smoothed
 
 // Then add the function implementation
 let private calculateInflectionPointsSimpleAverageSmoothing (prices: PriceBar array): InflectionPoint list =
     // First calculate price differences
-    let diffs = 
-        [0 .. prices.Length - 2]
-        |> List.map (fun i ->
-            let diff = prices[i+1].Close - prices[i].Close
-            { Delta = diff; Index = i; DataPoint = prices[i] })
+    let diffs = prices |> calculateGradients
     
     // Apply simple average smoothing (3-point moving average)
     let rec smooth (acc: Gradient list) (remaining: Gradient list) (index: int) =
@@ -246,26 +246,11 @@ let private calculateInflectionPointsSimpleAverageSmoothing (prices: PriceBar ar
     let smoothed = smooth [] diffs 0
     
     // Detect inflection points
-    let inflectionPoints =
-        smoothed
-        |> List.pairwise
-        |> List.choose (fun (a, b) ->
-            if a.Delta > 0M && b.Delta < 0M then
-                Some(toPeak(b))
-            elif a.Delta < 0M && b.Delta > 0M then
-                Some(toValley(b))
-            else
-                None)
-    
-    filterBySignificance inflectionPoints 0.03M 5
+    smoothed |> detectInflectionPoints
 
 let private calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (smoothingFactor: float): InflectionPoint list =
-    // First calculate price differences
-    let diffs = 
-        [0 .. prices.Length - 2]
-        |> List.map (fun i ->
-            let diff = prices[i+1].Close - prices[i].Close
-            { Delta = diff; Index = i; DataPoint = prices[i] })
+    
+    let diffs = prices |> calculateGradients
     
     // Apply fixed smoothing factor
     let rec smooth (acc: Gradient list) (remaining: Gradient list) (index: int) =
@@ -287,19 +272,7 @@ let private calculateInflectionPointsFixedSmoothing (prices: PriceBar array) (sm
     
     let smoothed = smooth [] diffs 0
     
-    // Detect inflection points
-    let inflectionPoints =
-        smoothed
-        |> List.pairwise
-        |> List.choose (fun (a, b) ->
-            if a.Delta > 0M && b.Delta < 0M then
-                Some(toPeak(b))
-            elif a.Delta < 0M && b.Delta > 0M then
-                Some(toValley(b))
-            else
-                None)
-    
-    filterBySignificance inflectionPoints 0.03M 5
+    smoothed |> detectInflectionPoints
 
 
 // First update your InflectionCalculationType type to include the new method
@@ -307,7 +280,7 @@ type InflectionCalculationType =
     | FixedSmoothing
     | VolatilitySmoothing
     | SimpleAverageSmoothing
-    
+
 let calculateInflectionPointsByType calcType prices =
     match calcType with
     | FixedSmoothing -> calculateInflectionPointsFixedSmoothing prices 0.5
