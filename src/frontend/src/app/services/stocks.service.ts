@@ -1299,7 +1299,7 @@ export type TrendAnalysisDetails = {
 
 export interface TrendAnalysisResult {
     trend: TrendDirection;
-    confidence: number;
+    strength: number;
     details: TrendAnalysisDetails;
 }
 

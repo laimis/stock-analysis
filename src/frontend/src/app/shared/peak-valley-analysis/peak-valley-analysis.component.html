@@ -20,7 +20,7 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span>Confidence:</span>
-                            <span class="fw-bold">{{ trendAnalysisResult.confidence | percent }}</span>
+                            <span class="fw-bold">{{ trendAnalysisResult.strength| percent }}</span>
                         </div>
                         <div class="progress">
                             <div class="progress-bar" role="progressbar" 
@@ -29,7 +29,7 @@
                                     'bg-danger': trendAnalysisResult.trend === 'Downtrend',
                                     'bg-secondary': trendAnalysisResult.trend === 'Sideways' || trendAnalysisResult.trend === 'Insufficient data'
                                 }"
-                                [style.width]="(trendAnalysisResult.confidence * 100) + '%'">
+                                [style.width]="(trendAnalysisResult.strength * 100) + '%'">
                             </div>
                         </div>
                     </div>

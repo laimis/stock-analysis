@@ -73,7 +73,7 @@ type TrendAnalysisDetails = {
 
 type TrendAnalysisResult = {
     Trend: TrendDirection
-    Confidence: float
+    Strength: float
     Details: TrendAnalysisDetails
 }
 
@@ -484,7 +484,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
     if inflectionPoints.Length < 8 then
         { 
             Trend = InsufficientData
-            Confidence = 0.0
+            Strength = 0.0
             Details = {
                 SlopeAnalysis = { Direction = InsufficientData; Strength = 0.0 }
                 PatternAnalysis = { Direction = InsufficientData; Strength = 0.0 }
@@ -521,7 +521,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
         
         {
             Trend = finalTrend
-            Confidence = adjustedConfidence
+            Strength = adjustedConfidence
             Details = {
                 SlopeAnalysis = slopeResult
                 PatternAnalysis = patternResult

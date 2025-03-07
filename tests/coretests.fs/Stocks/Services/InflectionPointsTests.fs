@@ -38,8 +38,8 @@ let ``analyzeTrend correctly identifies uptrend`` () =
     let analysis = analyzeTrend points
     
     analysis.Trend |> should equal Uptrend
-    analysis.Confidence |> should be (greaterThan 0.5)
-    analysis.Confidence |> should be (lessThanOrEqualTo 1.0)
+    analysis.Strength |> should be (greaterThan 0.5)
+    analysis.Strength |> should be (lessThanOrEqualTo 1.0)
 
 [<Fact>]
 let ``analyzeTrend correctly identifies downtrend`` () =
@@ -47,8 +47,8 @@ let ``analyzeTrend correctly identifies downtrend`` () =
     let analysis = analyzeTrend points
     
     analysis.Trend |> should equal Downtrend
-    analysis.Confidence |> should be (greaterThan 0.5)
-    analysis.Confidence |> should be (lessThanOrEqualTo 1.0)
+    analysis.Strength |> should be (greaterThan 0.5)
+    analysis.Strength |> should be (lessThanOrEqualTo 1.0)
 
 [<Fact>]
 let ``analyzeTrend returns InsufficientData for too few points`` () =
@@ -58,7 +58,7 @@ let ``analyzeTrend returns InsufficientData for too few points`` () =
     let analysis = analyzeTrend points
     
     analysis.Trend |> should equal InsufficientData
-    analysis.Confidence |> should be (lessThan 0.1)
+    analysis.Strength |> should be (lessThan 0.1)
 
 // Tests for trend change detection
 [<Fact>]
