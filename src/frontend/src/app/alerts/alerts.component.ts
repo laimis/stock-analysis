@@ -102,6 +102,8 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
             groups.push(group);
         });
 
+        groups.sort((a, b) => a.identifier.localeCompare(b.identifier));
+
         this.applySort(groups);
 
         this.alertGroups = groups;
