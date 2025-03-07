@@ -479,12 +479,10 @@ type PriceObvTrendMonitoringService(
 
                     let getIdentifier (s:string) = $"Trend: {s}"
 
-                    let priceIdentifier = getIdentifier "Price"
-                    let obvIdentifier = getIdentifier "OBV"
                     let obvDivergenceIdentifier = getIdentifier "Price/OBV Divergence"
                         
                     // first remove it if it has been triggered
-                    [priceIdentifier; obvIdentifier; obvDivergenceIdentifier]
+                    [obvDivergenceIdentifier]
                     |> List.iter (fun identifier -> container.Deregister alertCheck.ticker identifier alertCheck.user)
                     
                     let priceInflectionPoints = calculateInflectionPoints prices.Bars
@@ -492,14 +490,16 @@ type PriceObvTrendMonitoringService(
 
                     let counter = ref 0
 
+                    // NOTE: not using this right now, too many repeating signals, leaving just obv/price divergence
+                    // but keeping this code commented out so that I can get reminded that this exists
                     // if we see trend change, we register the alert
-                    match priceAnalysis.EstablishedTrend.Trend <> priceAnalysis.PotentialChange.Direction &&
-                        priceAnalysis.PotentialChange.Detected with
-                    | true -> 
-                        let description = $"{bearishOrBullishAsString priceAnalysis.EstablishedTrend.Trend priceAnalysis.PotentialChange.Direction}: from {priceAnalysis.EstablishedTrend.Trend} to {priceAnalysis.PotentialChange.Direction}"
-                        createAlertForTrendChange priceIdentifier priceAnalysis.EstablishedTrend.Confidence priceAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                        counter.Value <- counter.Value + 1
-                    | false -> ()
+                    // match priceAnalysis.EstablishedTrend.Trend <> priceAnalysis.PotentialChange.Direction &&
+                    //     priceAnalysis.PotentialChange.Detected with
+                    // | true -> 
+                    //     let description = $"{bearishOrBullishAsString priceAnalysis.EstablishedTrend.Trend priceAnalysis.PotentialChange.Direction}: from {priceAnalysis.EstablishedTrend.Trend} to {priceAnalysis.PotentialChange.Direction}"
+                    //     createAlertForTrendChange priceIdentifier priceAnalysis.EstablishedTrend.Confidence priceAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
+                    //     counter.Value <- counter.Value + 1
+                    // | false -> ()
 
                     let normalizedObv = 
                         prices
@@ -510,12 +510,13 @@ type PriceObvTrendMonitoringService(
                     let obvInflectionPoints = calculateInflectionPoints normalizedAsBars
                     let obvTrendAnalysis = getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
                     
-                    match obvTrendAnalysis.EstablishedTrend.Trend <> obvTrendAnalysis.PotentialChange.Direction && obvTrendAnalysis.PotentialChange.Detected with
-                    | true -> 
-                        let description = $"{bearishOrBullishAsString obvTrendAnalysis.EstablishedTrend.Trend obvTrendAnalysis.PotentialChange.Direction}: from {obvTrendAnalysis.EstablishedTrend.Trend} to {obvTrendAnalysis.PotentialChange.Direction}"
-                        createAlertForTrendChange obvIdentifier obvTrendAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                        counter.Value <- counter.Value + 1
-                    | false -> ()
+                    // NOTE: same as with price trends, keeping it to remind myself that this exists and noodle on it
+                    // match obvTrendAnalysis.EstablishedTrend.Trend <> obvTrendAnalysis.PotentialChange.Direction && obvTrendAnalysis.PotentialChange.Detected with
+                    // | true -> 
+                    //     let description = $"{bearishOrBullishAsString obvTrendAnalysis.EstablishedTrend.Trend obvTrendAnalysis.PotentialChange.Direction}: from {obvTrendAnalysis.EstablishedTrend.Trend} to {obvTrendAnalysis.PotentialChange.Direction}"
+                    //     createAlertForTrendChange obvIdentifier obvTrendAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
+                    //     counter.Value <- counter.Value + 1
+                    // | false -> ()
 
                     let priceDirection = priceAnalysis.EstablishedTrend.Trend
                     let obvDirection = obvTrendAnalysis.EstablishedTrend.Trend
