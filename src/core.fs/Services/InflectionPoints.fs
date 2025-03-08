@@ -72,7 +72,7 @@ type TrendAnalysisDetails = {
 }
 
 type TrendAnalysisResult = {
-    Trend: TrendDirection
+    Direction: TrendDirection
     Strength: float
     Details: TrendAnalysisDetails
 }
@@ -480,10 +480,10 @@ let private calculateTrendStrength (inflectionPoints: InflectionPoint list) (num
         // Return both trend and strength
         { Direction = direction; Strength = System.Math.Abs combinedScore }
 
-let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
+let inflectionPointAnalysis (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
     if inflectionPoints.Length < 8 then
         { 
-            Trend = InsufficientData
+            Direction = InsufficientData
             Strength = 0.0
             Details = {
                 SlopeAnalysis = { Direction = InsufficientData; Strength = 0.0 }
@@ -520,7 +520,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
         let adjustedConfidence = (confidence / numberOfMethods + strengthResult.Strength) / 2.0
         
         {
-            Trend = finalTrend
+            Direction = finalTrend
             Strength = adjustedConfidence
             Details = {
                 SlopeAnalysis = slopeResult
@@ -531,7 +531,7 @@ let analyzeTrend (inflectionPoints: InflectionPoint list): TrendAnalysisResult =
             }
         }
 
-let detectPotentialTrendChange
+let latestPriceAnalysis
     (inflectionPoints: InflectionPoint list)
     (latestBar: PriceBar): TrendChangeAlert =
     
@@ -674,14 +674,40 @@ let detectPotentialTrendChange
             Evidence = evidence
         }
 
-let getCompleteTrendAnalysis 
-    (inflectionPoints: InflectionPoint list)
-    (latestBar: PriceBar) = 
+let getCompleteTrendAnalysis (priceBars:PriceBar[]) = 
     
-    let trendAnalysis = analyzeTrend inflectionPoints
-    let changeAlert = detectPotentialTrendChange inflectionPoints latestBar
-    
-    {| 
-        EstablishedTrend = trendAnalysis
-        PotentialChange = changeAlert 
+    let priceInflectionPoints = calculateInflectionPoints priceBars
+    let latestBar = priceBars[priceBars.Length - 1]
+
+    let priceTrendAnalysis = inflectionPointAnalysis priceInflectionPoints
+    let latestPriceTrendAnalysis = latestPriceAnalysis priceInflectionPoints latestBar
+
+    let price =
+        {|
+            Data = priceBars
+            InflectionPoints = priceInflectionPoints
+            EstablishedTrend = priceTrendAnalysis
+            LatestTrend = latestPriceTrendAnalysis 
+        |}
+
+    // let's now also do OBV analysis
+    let obv = Analysis.MultipleBarPriceAnalysis.Indicators.onBalanceVolume priceBars
+    let normalized = Analysis.DataPointHelpers.normalize obv
+    let normalizedAsBars = Analysis.DataPointHelpers.toPriceBars normalized
+
+    let obvInflectionPoints = calculateInflectionPoints normalizedAsBars
+    let obvTrendAnalysis = inflectionPointAnalysis obvInflectionPoints
+    let latestObvTrendAnalysis = latestPriceAnalysis obvInflectionPoints (normalizedAsBars.[normalizedAsBars.Length - 1])
+
+    let obv =
+        {|
+            Data = normalizedAsBars
+            InflectionPoints = obvInflectionPoints
+            EstablishedTrend = obvTrendAnalysis
+            LatestTrend = latestObvTrendAnalysis
+        |}
+
+    {|
+        Price = price
+        OnBalanceVolume = obv
     |}

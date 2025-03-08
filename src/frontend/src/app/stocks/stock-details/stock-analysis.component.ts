@@ -1,19 +1,16 @@
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
-    InflectionPoint,
+    InflectionPointsReport,
     OutcomesReport,
     OutcomeValueTypeEnum,
     PositionChartInformation,
-    PriceBar,
     Prices,
     StockAnalysisOutcome,
     StockGaps,
     StockPercentChangeResponse,
     StocksService,
-    TickerOutcomes,
-    TrendAnalysisResult,
-    TrendChangeAlert
+    TickerOutcomes
 } from 'src/app/services/stocks.service';
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
@@ -55,8 +52,7 @@ export class StockAnalysisComponent {
     percentChangeDistribution: StockPercentChangeResponse;
     chartInfo: PositionChartInformation
     private _prices: Prices;
-    pricesTrendDataSet: { prices: PriceBar[]; inflectionPoints: InflectionPoint[]; trendAnalysis: { establishedTrend: TrendAnalysisResult; potentialChange: TrendChangeAlert; }; };
-    obvTrendDataSet: { prices: PriceBar[]; inflectionPoints: InflectionPoint[]; trendAnalysis: { establishedTrend: TrendAnalysisResult; potentialChange: TrendChangeAlert; }; };
+    inflectionPointsReport: InflectionPointsReport
     
     constructor(
         private stockService: StocksService,
@@ -150,18 +146,7 @@ export class StockAnalysisComponent {
 
         const inflectionReport = this.stockService.reportInflectionPoints(ticker, this.startDate)
             .pipe(
-                tap(data => {
-                    this.pricesTrendDataSet = {
-                        prices: data.prices,
-                        inflectionPoints: data.priceInflectionPoints,
-                        trendAnalysis: data.priceTrendAnalysis
-                    }
-                    this.obvTrendDataSet = {
-                        prices: data.obv,
-                        inflectionPoints: data.obvInflectionPoints,
-                        trendAnalysis: data.obvTrendAnalysis
-                    }
-                }),
+                tap(data => this.inflectionPointsReport = data),
                 catchError(err => {
                     console.error(err);
                     return [];

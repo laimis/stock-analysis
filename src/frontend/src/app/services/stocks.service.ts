@@ -374,27 +374,14 @@ export class StocksService {
     reportInflectionPoints(
         ticker: string,
         start: string,
-        end: string = null): Observable<{
-            obvTrendAnalysis: {
-                establishedTrend: TrendAnalysisResult,
-                potentialChange: TrendChangeAlert
-            },
-            obvInflectionPoints: InflectionPoint[],
-            priceTrendAnalysis: {
-                establishedTrend: TrendAnalysisResult,
-                potentialChange: TrendChangeAlert
-            },
-            priceInflectionPoints: InflectionPoint[],
-            prices: PriceBar[]
-            obv: PriceBar[]
-        }> {
+        end: string = null): Observable<InflectionPointsReport> {
     
         var endpoint = '/api/reports/inflectionpoints/' + ticker + '?start=' + start
         if (end) {
             endpoint += '&end=' + end
         }
 
-        return this.http.get<any>(endpoint)
+        return this.http.get<InflectionPointsReport>(endpoint)
     }
 
     reportTrends(
@@ -1274,8 +1261,8 @@ export interface AccountTransaction {
 export enum InfectionPointType { Peak = "Peak", Valley = "Valley" }
 
 export type Gradient = { delta: number, index: number, dataPoint: PriceBar }
-export type InflectionPoint = { gradient: Gradient, type: InfectionPointType, priceValue: number }
 
+export type InflectionPoint = { gradient: Gradient, type: InfectionPointType, priceValue: number }
 
 export enum TrendDirection {
     Uptrend = "Uptrend",
@@ -1298,14 +1285,26 @@ export type TrendAnalysisDetails = {
 }
 
 export interface TrendAnalysisResult {
-    trend: TrendDirection;
+    direction: TrendDirection;
     strength: number;
     details: TrendAnalysisDetails;
 }
 
-export interface TrendChangeAlert {
+export interface LatestTrendAnalysis {
     detected: boolean;
     direction: TrendDirection;
     strength: number; // 0-1 scale
     evidence: string[];
   }
+
+export interface InflectionPointsReportDetails {
+    data: PriceBar[]
+    inflectionPoints: InflectionPoint[]
+    establishedTrend: TrendAnalysisResult
+    latestTrend: LatestTrendAnalysis
+}
+
+export interface InflectionPointsReport {
+    onBalanceVolume: InflectionPointsReportDetails;
+    price: InflectionPointsReportDetails;
+}

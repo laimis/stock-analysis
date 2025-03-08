@@ -485,8 +485,7 @@ type PriceObvTrendMonitoringService(
                     [obvDivergenceIdentifier]
                     |> List.iter (fun identifier -> container.Deregister alertCheck.ticker identifier alertCheck.user)
                     
-                    let priceInflectionPoints = calculateInflectionPoints prices.Bars
-                    let priceAnalysis = getCompleteTrendAnalysis priceInflectionPoints prices.Last
+                    let analysis = getCompleteTrendAnalysis prices.Bars
 
                     // NOTE: not using this right now, too many repeating signals, leaving just obv/price divergence
                     // but keeping this code commented out so that I can get reminded that this exists
@@ -499,15 +498,6 @@ type PriceObvTrendMonitoringService(
                     //     counter.Value <- counter.Value + 1
                     // | false -> ()
 
-                    let normalizedObv = 
-                        prices
-                        |> MultipleBarPriceAnalysis.Indicators.onBalanceVolume
-                        |> DataPointHelpers.normalize
-
-                    let normalizedAsBars = DataPointHelpers.toPriceBars normalizedObv
-                    let obvInflectionPoints = calculateInflectionPoints normalizedAsBars
-                    let obvTrendAnalysis = getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
-                    
                     // NOTE: same as with price trends, keeping it to remind myself that this exists and noodle on it
                     // match obvTrendAnalysis.EstablishedTrend.Trend <> obvTrendAnalysis.PotentialChange.Direction && obvTrendAnalysis.PotentialChange.Detected with
                     // | true -> 
@@ -516,12 +506,12 @@ type PriceObvTrendMonitoringService(
                     //     counter.Value <- counter.Value + 1
                     // | false -> ()
 
-                    let establishedPriceTrend = priceAnalysis.EstablishedTrend.Trend
-                    let potentialNewPriceTrend = priceAnalysis.PotentialChange.Direction
-                    let establishedObvTrend = obvTrendAnalysis.EstablishedTrend.Trend
-                    let potentialNewObvTrend = obvTrendAnalysis.PotentialChange.Direction
-                    let establishedTrendConfidence = obvTrendAnalysis.EstablishedTrend.Strength
-                    let potentialNewTrendStrength = obvTrendAnalysis.PotentialChange.Strength
+                    let establishedPriceTrend = analysis.Price.EstablishedTrend.Direction
+                    let potentialNewPriceTrend = analysis.Price.LatestTrend.Direction
+                    let establishedObvTrend = analysis.OnBalanceVolume.EstablishedTrend.Direction
+                    let potentialNewObvTrend = analysis.OnBalanceVolume.LatestTrend.Direction
+                    let establishedTrendConfidence = analysis.OnBalanceVolume.EstablishedTrend.Strength
+                    let potentialNewTrendStrength = analysis.OnBalanceVolume.LatestTrend.Strength
 
                     let created = 
                         match establishedPriceTrend, potentialNewPriceTrend, establishedObvTrend, potentialNewObvTrend with

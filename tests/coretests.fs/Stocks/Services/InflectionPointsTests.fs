@@ -35,18 +35,18 @@ let ``calculateInflectionPoints finds peaks and valleys`` () =
 [<Fact>]
 let ``analyzeTrend correctly identifies uptrend`` () =
     let points = calculateInflectionPoints uptrendPrices
-    let analysis = analyzeTrend points
+    let analysis = inflectionPointAnalysis points
     
-    analysis.Trend |> should equal Uptrend
+    analysis.Direction |> should equal Uptrend
     analysis.Strength |> should be (greaterThan 0.5)
     analysis.Strength |> should be (lessThanOrEqualTo 1.0)
 
 [<Fact>]
 let ``analyzeTrend correctly identifies downtrend`` () =
     let points = calculateInflectionPoints downtrendPrices
-    let analysis = analyzeTrend points
+    let analysis = inflectionPointAnalysis points
     
-    analysis.Trend |> should equal Downtrend
+    analysis.Direction |> should equal Downtrend
     analysis.Strength |> should be (greaterThan 0.5)
     analysis.Strength |> should be (lessThanOrEqualTo 1.0)
 
@@ -55,9 +55,9 @@ let ``analyzeTrend returns InsufficientData for too few points`` () =
     let tooFewBars = uptrendPrices |> Array.take 2
     
     let points = calculateInflectionPoints tooFewBars
-    let analysis = analyzeTrend points
+    let analysis = inflectionPointAnalysis points
     
-    analysis.Trend |> should equal InsufficientData
+    analysis.Direction |> should equal InsufficientData
     analysis.Strength |> should be (lessThan 0.1)
 
 // Tests for trend change detection
@@ -67,7 +67,7 @@ let ``detectPotentialTrendChange identifies bullish trend change`` () =
     let latestBar = downtrendPrices[downtrendPrices.Length - 1]
     // create a fake bar with a higher close price
     let fakeBar = new PriceBar(latestBar.Date, latestBar.Open, latestBar.High, latestBar.Low, latestBar.Close + latestBar.Close * 0.1m, latestBar.Volume)    
-    let changeAlert = detectPotentialTrendChange points fakeBar
+    let changeAlert = latestPriceAnalysis points fakeBar
     
     changeAlert.Detected |> should be True
     changeAlert.Direction |> should equal Uptrend
@@ -81,7 +81,7 @@ let ``detectPotentialTrendChange identifies bearish trend change`` () =
     let latestBar = downtrendPrices[downtrendPrices.Length - 1]
     // create a fake drop to trigger a bearish alert
     let fakeBar = new PriceBar(latestBar.Date, latestBar.Open, latestBar.High, latestBar.Low, latestBar.Close - latestBar.Close * 0.1m, latestBar.Volume)
-    let changeAlert = detectPotentialTrendChange points fakeBar
+    let changeAlert = latestPriceAnalysis points fakeBar
     
     changeAlert.Detected |> should be True
     changeAlert.Direction |> should equal Downtrend
@@ -95,7 +95,7 @@ let ``detectPotentialTrendChange handles insufficient data`` () =
     
     let points = calculateInflectionPoints tooFewBars
     let latestBar = tooFewBars.[tooFewBars.Length - 1]
-    let changeAlert = detectPotentialTrendChange points latestBar
+    let changeAlert = latestPriceAnalysis points latestBar
     
     changeAlert.Detected |> should be False
     changeAlert.Direction |> should equal InsufficientData
@@ -225,3 +225,42 @@ let ``calculateInflectionPoints for uptrend using fixed smoothing works`` () =
     lastPoint.Type |> should equal Valley
     lastPoint.Gradient.Delta |> should be (greaterThan 0.0)
     lastPoint.Gradient.DataPoint.Close |> should be (equal 61.56m)
+
+[<Fact>]
+let ``get complete trend analysis for stock that has a bullish obv/price divergence``() =
+
+    let priceBars = "ACLS" |> Ticker |> getPriceBars |> fun x -> x.Bars
+    
+    let analysis = getCompleteTrendAnalysis priceBars
+
+    // established price trend should be uptrend
+    analysis.Price.EstablishedTrend.Direction |> should equal Downtrend
+    analysis.Price.LatestTrend.Direction |> should equal Downtrend
+
+    // OBV establishe trend should be downtrend but latest trend should be uptrend
+    analysis.OnBalanceVolume.EstablishedTrend.Direction |> should equal Downtrend
+    analysis.OnBalanceVolume.LatestTrend.Direction |> should equal Uptrend
+
+    // strength should be high
+    analysis.OnBalanceVolume.LatestTrend.Strength |> should be (greaterThan 0.5)
+    analysis.OnBalanceVolume.LatestTrend.Strength |> should be (lessThanOrEqualTo 1.0)
+
+[<Fact>]
+let ``get complete trend analysis for stock that has a bearish obv/price divergence``() =
+
+    let priceBars = "HD" |> Ticker |> getPriceBars |> fun x -> x.Bars
+
+    let analysis = getCompleteTrendAnalysis priceBars
+
+    // established price trend should be going from uptrend to downtrend
+    analysis.Price.EstablishedTrend.Direction |> should equal Uptrend
+    analysis.Price.LatestTrend.Direction |> should equal Downtrend
+
+    // OBV establishe trend should be uptrend but latest trend should be downtrend
+    analysis.OnBalanceVolume.EstablishedTrend.Direction |> should equal Uptrend
+    analysis.OnBalanceVolume.LatestTrend.Direction |> should equal Downtrend
+
+    // latest strength should be high
+    analysis.OnBalanceVolume.LatestTrend.Strength |> should be (greaterThan 0.5)
+    analysis.OnBalanceVolume.LatestTrend.Strength |> should be (lessThanOrEqualTo 1.0)
+    

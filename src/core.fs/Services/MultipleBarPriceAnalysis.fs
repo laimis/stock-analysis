@@ -72,19 +72,22 @@ module MultipleBarPriceAnalysis =
         let averageTrueRangePercentage (prices:PriceBars) =
             averateTrueRangeInternal (fun (x:PriceBar) -> x.TrueRangePercentage) prices
             
-        let onBalanceVolume (prices:PriceBars) =
+        let onBalanceVolume (prices:PriceBar[]) =
             
             [|0..prices.Length - 1|]
             |> Array.mapFold (fun prevObv i ->
                 
-                let currentBar = prices.Bars[i]
+                let currentBar = prices[i]
                 
                 let obv =
                     match i with
                     | 0 -> 0L
                     | _ ->
-                        let previousBar = prices.Bars[i - 1]
-                        prevObv + (if currentBar.Close > previousBar.Close then currentBar.Volume else if currentBar.Close < previousBar.Close then -currentBar.Volume else 0L)
+                        let previousBar = prices[i - 1]
+                        prevObv + match currentBar.Close with
+                                  | close when close > previousBar.Close -> currentBar.Volume
+                                  | close when close < previousBar.Close -> -currentBar.Volume
+                                  | _ -> 0L
                 
                 let result = DataPoint<decimal>(currentBar.Date, obv)
                 result, obv
@@ -465,7 +468,7 @@ module MultipleBarPriceAnalysis =
             
         let private generateOnBalanceVolumeOutcome (prices:PriceBars) =
             
-            let obv = Indicators.onBalanceVolume prices |> Array.last |> _.Value
+            let obv = Indicators.onBalanceVolume prices.Bars |> Array.last |> _.Value
             
             AnalysisOutcome(
                 key = MultipleBarOutcomeKeys.OnBalanceVolume,

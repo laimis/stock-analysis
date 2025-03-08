@@ -8,12 +8,12 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">Current Trend</h3>
                     <span class="badge" [ngClass]="{
-                        'bg-success': trendAnalysisResult.trend === 'Uptrend',
-                        'bg-danger': trendAnalysisResult.trend === 'Downtrend',
-                        'bg-secondary': trendAnalysisResult.trend === 'Sideways',
-                        'bg-warning': trendAnalysisResult.trend === 'Insufficient data'
+                        'bg-success': trendAnalysisResult.direction === 'Uptrend',
+                        'bg-danger': trendAnalysisResult.direction === 'Downtrend',
+                        'bg-secondary': trendAnalysisResult.direction === 'Sideways',
+                        'bg-warning': trendAnalysisResult.direction === 'Insufficient data'
                     }">
-                        <span class="h5 mb-0">{{ trendAnalysisResult.trend }}</span>
+                        <span class="h5 mb-0">{{ trendAnalysisResult.direction }}</span>
                     </span>
                 </div>
                 <div class="card-body">
@@ -25,9 +25,9 @@
                         <div class="progress">
                             <div class="progress-bar" role="progressbar" 
                                 [ngClass]="{
-                                    'bg-success': trendAnalysisResult.trend === 'Uptrend',
-                                    'bg-danger': trendAnalysisResult.trend === 'Downtrend',
-                                    'bg-secondary': trendAnalysisResult.trend === 'Sideways' || trendAnalysisResult.trend === 'Insufficient data'
+                                    'bg-success': trendAnalysisResult.direction === 'Uptrend',
+                                    'bg-danger': trendAnalysisResult.direction === 'Downtrend',
+                                    'bg-secondary': trendAnalysisResult.direction === 'Sideways' || trendAnalysisResult.direction === 'Insufficient data'
                                 }"
                                 [style.width]="(trendAnalysisResult.strength * 100) + '%'">
                             </div>
@@ -131,12 +131,12 @@
         </div>
 
         <div class="col-12 col-md-6" *ngIf="trendChangeAlert">
-            <div class="card h-100" [ngClass]="{'border-warning': trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.trend}">
+            <div class="card h-100" [ngClass]="{'border-warning': trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.direction}">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">
                         Trend Alert
                         <i class="bi bi-exclamation-triangle-fill text-warning ms-2" 
-                            *ngIf="trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.trend"></i>
+                            *ngIf="trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.direction"></i>
                     </h3>
                     <span class="badge" [ngClass]="{
                         'bg-success': trendChangeAlert.direction === 'Uptrend',

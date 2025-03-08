@@ -25,7 +25,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <app-peak-valley-analysis [completeDataSet]="pricesTrendDataSet"></app-peak-valley-analysis>
+            <app-peak-valley-analysis [completeDataSet]="inflectionPointsReport.price"></app-peak-valley-analysis>
         </div>
     </section>
 
@@ -37,7 +37,7 @@
             </h5>
         </div>
         <div class="card-body">
-            <app-peak-valley-analysis [completeDataSet]="obvTrendDataSet"></app-peak-valley-analysis>
+            <app-peak-valley-analysis [completeDataSet]="inflectionPointsReport.onBalanceVolume"></app-peak-valley-analysis>
         </div>
     </section>
 

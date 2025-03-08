@@ -69,7 +69,7 @@ type PricesView(prices:PriceBars) =
         container
 
     member _.OBV =
-        let obvContainer = prices|> MultipleBarPriceAnalysis.Indicators.onBalanceVolume
+        let obvContainer = prices.Bars |> MultipleBarPriceAnalysis.Indicators.onBalanceVolume
         let container = ChartDataPointContainer<decimal>($"OBV", DataPointChartType.Line)
         obvContainer |> Array.iter container.Add
         container

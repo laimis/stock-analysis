@@ -7,10 +7,10 @@ import {
     Gradient,
     InfectionPointType,
     InflectionPoint,
+    InflectionPointsReportDetails,
     PriceBar,
     StocksService,
-    TrendAnalysisResult,
-    TrendChangeAlert
+    TrendAnalysisResult
 } from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 
@@ -203,21 +203,9 @@ export class InflectionPointsComponent implements OnInit {
     protected readonly twoMonths = 365 / 6;
     protected readonly sixMonths = 365 / 2;
     
-    completePriceDataSet: {
-        prices: PriceBar[],
-        inflectionPoints: InflectionPoint[],
-        trendAnalysis: {
-            establishedTrend: TrendAnalysisResult,
-            potentialChange: TrendChangeAlert
-        }};
+    completePriceDataSet: InflectionPointsReportDetails
 
-    completeOBVDataSet: {
-        prices: PriceBar[],
-        inflectionPoints: InflectionPoint[],
-        trendAnalysis: {
-            establishedTrend: TrendAnalysisResult,
-            potentialChange: TrendChangeAlert
-        }};
+    completeOBVDataSet: InflectionPointsReportDetails
 
     constructor(
         private stocks: StocksService,
@@ -238,16 +226,8 @@ export class InflectionPointsComponent implements OnInit {
 
         this.stocks.reportInflectionPoints(tickers[0], startDateStr).subscribe(
             result => {
-                this.completePriceDataSet = {
-                    prices: result.prices,
-                    inflectionPoints: result.priceInflectionPoints,
-                    trendAnalysis: result.priceTrendAnalysis
-                }
-                this.completeOBVDataSet = {
-                    prices: result.obv,
-                    inflectionPoints: result.obvInflectionPoints,
-                    trendAnalysis: result.obvTrendAnalysis
-                }
+                this.completePriceDataSet = result.price
+                this.completeOBVDataSet = result.onBalanceVolume
             },
             error => this.errors = GetErrors(error)
         );

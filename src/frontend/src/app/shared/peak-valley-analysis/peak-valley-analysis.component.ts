@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ChartMarker, InfectionPointType, InflectionPoint, PositionChartInformation, PriceBar, TrendAnalysisResult, TrendChangeAlert } from '../../services/stocks.service';
+import { ChartMarker, InfectionPointType, InflectionPoint, InflectionPointsReportDetails, LatestTrendAnalysis, PositionChartInformation, PriceBar, TrendAnalysisResult } from '../../services/stocks.service';
 import { PriceChartComponent } from "../price-chart/price-chart.component";
 import { NgClass, NgIf, PercentPipe } from '@angular/common';
 import { green, red } from 'src/app/services/charts.service';
@@ -24,29 +24,23 @@ function toChartMarker(inflectionPoint: InflectionPoint): ChartMarker {
 export class PeakValleyAnalysisComponent {
   
   trendAnalysisResult: TrendAnalysisResult;
-  trendChangeAlert: TrendChangeAlert;
+  trendChangeAlert: LatestTrendAnalysis;
   inflectionPoints: InflectionPoint[];
   chartInfo: PositionChartInformation;
 
   @Input()
-  set completeDataSet(result: {
-    prices: PriceBar[],
-    inflectionPoints: InflectionPoint[],
-    trendAnalysis: {
-        establishedTrend: TrendAnalysisResult,
-        potentialChange: TrendChangeAlert
-    }}) {
+  set completeDataSet(result: InflectionPointsReportDetails) {
     if (!result) {
       return;
     }
 
     this.inflectionPoints = result.inflectionPoints;
-    this.trendAnalysisResult = result.trendAnalysis.establishedTrend;
-    this.trendChangeAlert = result.trendAnalysis.potentialChange;
+    this.trendAnalysisResult = result.establishedTrend;
+    this.trendChangeAlert = result.latestTrend;
 
     this.chartInfo = {
         ticker: "ticker",
-        prices: result.prices,
+        prices: result.data,
         markers: this.inflectionPoints.map(toChartMarker),
         transactions: [],
         averageBuyPrice: null,

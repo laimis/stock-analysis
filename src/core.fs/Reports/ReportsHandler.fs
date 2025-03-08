@@ -900,23 +900,7 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             
             return priceResponse |> Result.map (fun prices ->
                 
-                let priceInflectionPoints = InflectionPoints.calculateInflectionPoints prices.Bars
-                let priceTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis priceInflectionPoints prices.Last
-                
-                let obv = MultipleBarPriceAnalysis.Indicators.onBalanceVolume prices
-                let normalized = Analysis.DataPointHelpers.normalize obv
-                let normalizedAsBars = Analysis.DataPointHelpers.toPriceBars normalized
-                let obvInflectionPoints = InflectionPoints.calculateInflectionPoints normalizedAsBars
-                let obvTrendAnalysis = InflectionPoints.getCompleteTrendAnalysis obvInflectionPoints normalizedAsBars[normalizedAsBars.Length - 1]
-
-                {|
-                    priceInflectionPoints = priceInflectionPoints;
-                    priceTrendAnalysis = priceTrendAnalysis;
-                    obvInflectionPoints = obvInflectionPoints;
-                    obvTrendAnalysis = obvTrendAnalysis;
-                    prices = prices.Bars;
-                    obv = normalizedAsBars
-                |}
+                InflectionPoints.getCompleteTrendAnalysis prices.Bars
             )
     }
 
