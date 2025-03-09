@@ -54,6 +54,11 @@ public class AlertsController(Handler handler) : ControllerBase
     public Task TriggerWeekly(
         [FromServices] ILogger logger,
         [FromServices] MonitoringServices.WeeklyMonitoringService weeklyAlerts) => weeklyAlerts.Execute(true);
+
+    [HttpGet("triggerMaxProfit")]
+    [Authorize("admin")]
+    public Task TriggerMaxProfit(
+        [FromServices] core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService service) => service.ReportOnMaxProfitBasedOnDaysHeld();
         
     [HttpGet("triggerDaily")]
     [Authorize("admin")]
