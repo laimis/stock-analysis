@@ -172,7 +172,7 @@ let plotData (bars: PriceBars) =
 
     let x = [|0..(barsOfInterest.Length - 1)|]
     
-    let obv = Indicators.onBalanceVolume bars
+    let obv = Indicators.onBalanceVolume bars.Bars
 
     let priceBarTrace =
         Candlestick(

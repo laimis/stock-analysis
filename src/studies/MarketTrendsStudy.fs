@@ -65,7 +65,9 @@ let private outputToConsole (trends:Trends) =
     // take the last trend which is the current trend
     let currentTrend = trends.CurrentTrend
     
-    Console.WriteLine("\nCurrent trend: " + (match currentTrend.direction with | TrendDirection.Uptrend -> "Up" | TrendDirection.Downtrend -> "Down") + " trend")
+    Console.WriteLine("\nCurrent trend: " + 
+        (match currentTrend.direction with | Uptrend -> "Up" | Downtrend -> "Down" | Sideways -> "Sideways" | InsufficientData -> "Insufficient Data") + " trend"
+    )
     
     Console.WriteLine($"Start: {currentTrend.start |> snd |> _.DateStr}")
     Console.WriteLine($"End: {currentTrend.end_ |> snd |> _.DateStr}")
