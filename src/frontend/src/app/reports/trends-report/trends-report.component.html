@@ -15,8 +15,8 @@
                             {{ ticker }}
                             
                         </span>
-                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Up'" class="fas fa-arrow-up text-success"></i>
-                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Down'" class="fas fa-arrow-down text-danger"></i>
+                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Uptrend'" class="fas fa-arrow-up text-success"></i>
+                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Downtrend'" class="fas fa-arrow-down text-danger"></i>
                         <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>
                     </div>
                     }
@@ -78,7 +78,7 @@
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Direction:</span>
                         <strong
-                            [ngClass]="{'text-success': currentTrend.direction === 'Up', 'text-primary': currentTrend.direction === 'Down'}">{{ currentTrend.direction }}</strong>
+                            [ngClass]="{'text-success': currentTrend.direction === 'Uptrend', 'text-primary': currentTrend.direction === 'Downtrend'}">{{ currentTrend.direction }}</strong>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Trend Type:</span>

@@ -1193,8 +1193,8 @@ export class pendingstockpositioncommand {
     useLimitOrder: boolean
 }
 export enum TrendDirection {
-    Up = 'Up',
-    Down = 'Down',
+    Up = 'Uptrend',
+    Down = 'Downtrend',
 }
 
 export enum TrendType {

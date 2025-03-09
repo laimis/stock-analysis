@@ -178,8 +178,8 @@ export class TrendsReportComponent implements OnInit {
         });
     }
     
-    shortTermTrendSummary = {}
-    longTermTrendSummary = {}
+    shortTermTrendSummary = new Map<string, Trends>()
+    longTermTrendSummary = new Map<string, Trends>()
     
     loadSummary(tickers: string[]) {
         
