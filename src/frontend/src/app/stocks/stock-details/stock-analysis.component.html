@@ -25,7 +25,8 @@
             </h5>
         </div>
         <div class="card-body">
-            <app-peak-valley-analysis [completeDataSet]="inflectionPointsReport.price"></app-peak-valley-analysis>
+            <app-peak-valley-analysis *ngIf="inflectionPointsReport" [completeDataSet]="inflectionPointsReport.price"></app-peak-valley-analysis>
+            <app-loading *ngIf="!inflectionPointsReport"></app-loading>
         </div>
     </section>
 
@@ -37,7 +38,8 @@
             </h5>
         </div>
         <div class="card-body">
-            <app-peak-valley-analysis [completeDataSet]="inflectionPointsReport.onBalanceVolume"></app-peak-valley-analysis>
+            <app-peak-valley-analysis *ngIf="inflectionPointsReport" [completeDataSet]="inflectionPointsReport.onBalanceVolume"></app-peak-valley-analysis>
+            <app-loading *ngIf="!inflectionPointsReport"></app-loading>
         </div>
     </section>
 

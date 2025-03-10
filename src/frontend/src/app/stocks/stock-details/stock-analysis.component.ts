@@ -22,6 +22,7 @@ import {PriceChartComponent} from "../../shared/price-chart/price-chart.componen
 import {FormsModule} from "@angular/forms";
 import {StockDailyScoresComponent} from "../../shared/stock-daily-scores/stock-daily-scores.component";
 import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/peak-valley-analysis.component";
+import { LoadingComponent } from "../../shared/loading/loading.component";
 
 @Component({
     selector: 'app-stock-analysis',
@@ -39,7 +40,8 @@ import { PeakValleyAnalysisComponent } from "../../shared/peak-valley-analysis/p
     PriceChartComponent,
     FormsModule,
     StockDailyScoresComponent,
-    PeakValleyAnalysisComponent
+    PeakValleyAnalysisComponent,
+    LoadingComponent
 ]
 })
 export class StockAnalysisComponent {
