@@ -47,6 +47,7 @@ export interface OptionPosition {
     pendingContracts: OptionContract[]
     transactions: OptionPositionTransaction[]
     cost: number
+    closingCost: number
     desiredCost: number
     market: number
     spread: number

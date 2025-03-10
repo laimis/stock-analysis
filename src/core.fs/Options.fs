@@ -83,6 +83,7 @@ type OptionPositionState =
         Opened: DateTimeOffset option
         Closed: DateTimeOffset option
         Cost: decimal option
+        ClosingCost: decimal option
         DesiredCost: decimal option
         Profit: decimal
         Transactions: OptionTransaction list
@@ -209,6 +210,7 @@ module OptionPosition =
             UnderlyingTicker = event.UnderlyingTicker |> Ticker
             Profit = 0m
             Cost = None
+            ClosingCost = None
             DesiredCost = None
             Version = 1
             Notes = []
@@ -258,7 +260,8 @@ module OptionPosition =
             let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
             let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity + x.Quantity, cost - debit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
-            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; Version = p.Version + 1; Events = p.Events @ [x] }
+            let closingCost = (p.ClosingCost |> Option.defaultValue 0m) - debit |> Some
+            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractSoldToClose as x ->
             let credit = decimal x.Quantity * x.Price
@@ -267,7 +270,8 @@ module OptionPosition =
             let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
             let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity - x.Quantity, cost - credit)
             let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
-            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; Version = p.Version + 1; Events = p.Events @ [x] }
+            let closingCost = (p.ClosingCost |> Option.defaultValue 0m) + credit |> Some
+            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionPositionClosed as x ->
             let debits = p.Transactions |> List.map _.Debited |> List.choose id |> List.sum

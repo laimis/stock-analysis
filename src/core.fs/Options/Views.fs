@@ -106,6 +106,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         match state.Cost with
         | Some c -> c
         | None -> state.DesiredCost |> Option.defaultValue 0m
+    member this.ClosingCost = state.ClosingCost
     member this.Market =
         contracts
         |> Seq.sumBy (fun c -> c.Details |> Option.map(fun o -> o.Mark * decimal c.Quantity) |> Option.defaultValue 0m)

@@ -27,7 +27,7 @@
                     }
                     <div class="col-md-3">
                         <div class="stat-label">Opened</div>
-                        <div>{{ position.isOpen ? (position.opened | parsedDate) : 'N/A' }}</div>
+                        <div>{{ position.isOpen || position.isClosed ? (position.opened | parsedDate) : 'N/A' }}</div>
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -60,14 +60,19 @@
                         <div>{{ position.gainPct | percent }}</div>
                     </div>
                     <div class="col-md-3">
+                        <div class="stat-label">Closing Cost</div>
+                        <div>
+                            {{ position.closingCost | currency }}
+                            <span *ngIf="position.spread > 0">
+                                ({{ position.closingCost / position.spread | percent }} of spread)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="stat-label">Links</div>
                         <div>
                             <app-stock-link-and-tradingview-link [ticker]="position.underlyingTicker"></app-stock-link-and-tradingview-link>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-label"></div>
-                        <div></div>
                     </div>
                 </div>
             </div>
