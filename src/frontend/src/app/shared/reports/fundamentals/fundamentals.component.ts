@@ -44,9 +44,17 @@ export class FundamentalsComponent {
     
     this.sortedData = [...this._data].sort((a, b) => {
       // Handle null/undefined values
-      const aVal = a.fundamentals[column] !== undefined && a.fundamentals[column] !== null ? a.fundamentals[column] : -Infinity;
-      const bVal = b.fundamentals[column] !== undefined && b.fundamentals[column] !== null ? b.fundamentals[column] : -Infinity;
+      let aVal = a.fundamentals[column] !== undefined && a.fundamentals[column] !== null ? a.fundamentals[column] : -Infinity;
+      let bVal = b.fundamentals[column] !== undefined && b.fundamentals[column] !== null ? b.fundamentals[column] : -Infinity;
       
+      // try to parse as number if possible
+      if (typeof aVal === 'string' && !isNaN(parseFloat(aVal))) {
+        aVal = parseFloat(aVal);
+      }
+      if (typeof bVal === 'string' && !isNaN(parseFloat(bVal))) {
+        bVal = parseFloat(bVal);
+      }
+
       if (this.sortDirection === 1) {
         return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
       } else {
