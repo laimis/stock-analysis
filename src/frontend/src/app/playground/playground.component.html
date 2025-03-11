@@ -27,5 +27,16 @@
             <app-correlations *ngIf="correlations" [correlations]="correlations" [days]="daysForCorrelations"></app-correlations>
         </div>
     </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Fundamentals demo</h5>
+            <button (click)="runFundamentals()" class="btn btn-primary" [disabled]="loadingFundamentals">Run Fundamentals</button>
+            <app-loading *ngIf="loadingFundamentals"></app-loading>
+            <app-fundamentals *ngIf="fundamentals" [data]="fundamentals"></app-fundamentals>
+        </div>
+    </div>
+
+    
     
 </div>

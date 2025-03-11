@@ -1,0 +1,76 @@
+<section class="fundamentals-section">
+    <h5>Stock Fundamentals Analysis</h5>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover" *ngIf="data?.length">
+            <thead>
+                <tr>
+                    <th class="fixed-side">Ticker</th>
+                    <!-- Valuation Metrics -->
+                    <th role="button" (click)="sortBy('peRatio')" title="Normal PE Range: 10-25">PE Ratio</th>
+                    <th role="button" (click)="sortBy('prRatio')" title="Normal PS Range: 1-5">PS Ratio</th>
+                    <th role="button" (click)="sortBy('pegRatio')" title="Normal PEG Range: 0.8-2">PEG Ratio</th>
+                    <th role="button" (click)="sortBy('pbRatio')" title="Normal PB Range: 1-3">PB Ratio</th>
+                    <th role="button" (click)="sortBy('pcfRatio')" title="Normal PCF Range: 10-20">PCF Ratio</th>
+                    
+                    <!-- Profitability Metrics -->
+                    <th role="button" (click)="sortBy('grossMarginTTM')">Gross Margin</th>
+                    <th role="button" (click)="sortBy('netProfitMarginTTM')">Net Margin</th>
+                    <th role="button" (click)="sortBy('operatingMarginTTM')">Op. Margin</th>
+                    <th role="button" (click)="sortBy('returnOnEquity')">ROE</th>
+                    <th role="button" (click)="sortBy('returnOnAssets')">ROA</th>
+                    
+                    <!-- Financial Health -->
+                    <th role="button" (click)="sortBy('quickRatio')" title="Normal Quick Ratio Range: 1-1.5">Quick Ratio</th>
+                    <th role="button" (click)="sortBy('currentRatio')" title="Normal Current Ratio Range: 1.5-3">Current Ratio</th>
+                    <th role="button" (click)="sortBy('totalDebtToEquity')">Debt/Equity</th>
+                    
+                    <!-- Growth & Dividends -->
+                    <th role="button" (click)="sortBy('epsChangePercentTTM')">EPS Growth</th>
+                    <th role="button" (click)="sortBy('revChangeTTM')">Rev Growth</th>
+                    <th role="button" (click)="sortBy('dividendYield')">Dividend Yield</th>
+                    
+                    <!-- Risk & Market Data -->
+                    <th role="button" (click)="sortBy('beta')" title="Normal Beta Range: 0.5-1.5">Beta</th>
+                    <th role="button" (click)="sortBy('marketCap')">Market Cap</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of sortedData; track item.ticker) {
+                    <tr>
+                        <td class="fixed-side">
+                            <app-stock-link-and-tradingview-link [ticker]="item.ticker"></app-stock-link-and-tradingview-link>
+                        </td>
+                        
+                        <!-- Valuation Metrics -->
+                        <td [ngClass]="getNumberClass(item.fundamentals['peRatio'], 10, 25)">{{ item.fundamentals['peRatio'] | number:'1.2-2' }}</td>
+                        <td [ngClass]="getNumberClass(item.fundamentals['prRatio'], 1, 5)">{{ item.fundamentals['prRatio'] | number:'1.2-2' }}</td>
+                        <td [ngClass]="getNumberClass(item.fundamentals['pegRatio'], 0.8, 2)">{{ item.fundamentals['pegRatio'] | number:'1.2-2' }}</td>
+                        <td [ngClass]="getNumberClass(item.fundamentals['pbRatio'], 1, 3)">{{ item.fundamentals['pbRatio'] | number:'1.2-2' }}</td>
+                        <td [ngClass]="getNumberClass(item.fundamentals['pcfRatio'], 10, 20)">{{ item.fundamentals['pcfRatio'] | number:'1.2-2' }}</td>
+                        
+                        <!-- Profitability Metrics -->
+                        <td>{{ item.fundamentals['grossMarginTTM'] | number:'1.2-2' }}%</td>
+                        <td>{{ item.fundamentals['netProfitMarginTTM'] | number:'1.2-2' }}%</td>
+                        <td>{{ item.fundamentals['operatingMarginTTM'] | number:'1.2-2' }}%</td>
+                        <td>{{ item.fundamentals['returnOnEquity'] | number:'1.2-2' }}%</td>
+                        <td>{{ item.fundamentals['returnOnAssets'] | number:'1.2-2' }}%</td>
+                        
+                        <!-- Financial Health -->
+                        <td [ngClass]="getNumberClass(item.fundamentals['quickRatio'], 1, 1.5)">{{ item.fundamentals['quickRatio'] | number:'1.2-2' }}</td>
+                        <td [ngClass]="getNumberClass(item.fundamentals['currentRatio'], 1.5, 3)">{{ item.fundamentals['currentRatio'] | number:'1.2-2' }}</td>
+                        <td [ngClass]="getNumberClass(item.fundamentals['totalDebtToEquity'], 1, 2)">{{ item.fundamentals['totalDebtToEquity'] | number:'1.2-2' }}</td>
+                        
+                        <!-- Growth & Dividends -->
+                        <td>{{ item.fundamentals['epsChangePercentTTM'] | number:'1.2-2' }}%</td>
+                        <td>{{ item.fundamentals['revChangeTTM'] | number:'1.2-2' }}%</td>
+                        <td>{{ item.fundamentals['dividendYield'] | number:'1.2-2' }}%</td>
+                        
+                        <!-- Risk & Market Data -->
+                        <td [ngClass]="getNumberClass(item.fundamentals['beta'], 0.5, 1.5)">{{ item.fundamentals['beta'] | number:'1.2-2' }}</td>
+                        <td>{{ item.fundamentals['marketCap'] | marketCap }}</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -270,7 +270,15 @@ export class StocksService {
     reportCorrelations(tickers: string[], days:number): Observable<TickerCorrelation[]> {
         return this.http.post<TickerCorrelation[]>('/api/reports/correlations', {tickers, days})
     }
-    
+
+    reportPortfolioFundamentals(): Observable<TickerFundamentals[]> {
+        return this.http.get<TickerFundamentals[]>('/api/reports/portfolio/fundamentals')
+    }
+
+    reportFundamentals(tickers: string[]): Observable<TickerFundamentals[]> {
+        return this.http.post<TickerFundamentals[]>('/api/reports/fundamentals', {tickers})
+    }
+
     chainReport(): Observable<Chain> {
         return this.http.get<Chain>('/api/reports/chain')
     }
@@ -522,6 +530,11 @@ export interface Sell {
 
 export interface Chain {
     links: Link[]
+}
+
+export interface TickerFundamentals {
+    ticker: string
+    fundamentals: Map<string, string>
 }
 
 export interface TickerCorrelation {

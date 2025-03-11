@@ -84,9 +84,23 @@ namespace web.Controllers
             );
         
         [HttpPost("correlations")]
-        public Task<ActionResult> Correlations([FromBody] CorrelationsQuery query) =>
+    public Task<ActionResult> Correlations([FromBody] CorrelationsQuery query) =>
             this.OkOrError(
                 service.HandleCorrelationsQuery(User.Identifier(), query)
+            );
+
+        [HttpGet("portfolio/fundamentals")]
+        public Task<ActionResult> PortfolioFundamentals() =>
+            this.OkOrError(
+                service.Handle(
+                    new PortfolioFundamentalsQuery(User.Identifier())
+                )
+            );
+
+        [HttpPost("fundamentals")]
+        public Task<ActionResult> Fundamentals([FromBody] FundamentalsQuery query) =>
+            this.OkOrError(
+                service.HandleFundamentalsQuery(User.Identifier(), query)
             );
 
         [HttpGet("DailyPositionReport/{positionId}")]

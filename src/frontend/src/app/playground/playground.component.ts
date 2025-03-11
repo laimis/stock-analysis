@@ -4,7 +4,8 @@ import {
     StockPosition,
     StockQuote,
     StocksService,
-    TickerCorrelation
+    TickerCorrelation,
+    TickerFundamentals
 } from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
 import {concat} from "rxjs";
@@ -12,6 +13,7 @@ import {tap} from "rxjs/operators";
 import {StockPositionsService} from "../services/stockpositions.service";
 import {LoadingComponent} from "../shared/loading/loading.component";
 import {CorrelationsComponent} from "../shared/reports/correlations.component";
+import {FundamentalsComponent} from "../shared/reports/fundamentals/fundamentals.component";
 import {FormsModule} from "@angular/forms";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
@@ -58,6 +60,7 @@ function createProfitScatter(entries: StockPosition[], quotes: Map<string, Stock
     imports: [
         LoadingComponent,
         CorrelationsComponent,
+        FundamentalsComponent,
         FormsModule,
         CanvasJSAngularChartsModule,
         ErrorDisplayComponent,
@@ -165,6 +168,19 @@ export class PlaygroundComponent implements OnInit {
         this.status = "Running..."
 
         concat([positionReport, gapReport, singleBarDaily, singleBarWeekly, multiBarDaily]).subscribe()
+    }
+
+    loadingFundamentals = false
+    fundamentals: TickerFundamentals[]
+    runFundamentals() {
+        this.loadingFundamentals = true
+        this.stocks.reportPortfolioFundamentals().subscribe((data) => {
+            this.fundamentals = data
+            this.loadingFundamentals = false
+        }, (error) => {
+            this.errors = GetErrors(error)
+            this.loadingFundamentals = false
+        })
     }
     
 }

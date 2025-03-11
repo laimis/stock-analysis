@@ -1,0 +1,46 @@
+.fundamentals-section {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+}
+
+.fundamentals-section .fixed-side {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+}
+
+.fundamentals-section th[role="button"] {
+    cursor: pointer;
+}
+
+.fundamentals-section th[role="button"]:hover {
+    background-color: #f0f0f0;
+}
+
+/* Value highlighting classes */
+.metric-high {
+    background-color: #fbd7d7; /* Light red for high/overvalued */
+    color: #dc3545;
+}
+
+.metric-low {
+    background-color: #d7e5fd; /* Light blue for low/undervalued */
+    color: #0d6efd;
+}
+
+.metric-normal {
+    background-color: #d7f0dc; /* Light green for normal/fair value */
+    color: #198754;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .fundamentals-section table {
+        min-width: 1200px; /* Ensure table scrolls on small screens */
+    }
+}

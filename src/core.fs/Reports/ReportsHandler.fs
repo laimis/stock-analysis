@@ -130,6 +130,11 @@ type CorrelationsQuery =
         Tickers: Ticker array
     }
 
+type FundamentalsQuery =
+    {
+        Tickers: Ticker array
+    }
+
 type OutcomesReportForPositionsQuery =
     {
         UserId: UserId
@@ -192,6 +197,10 @@ type PortfolioCorrelationQuery =
         Days: int
         UserId: UserId
     }
+
+type PortfolioFundamentalsQuery = {
+    UserId: UserId
+}
     
 type SellsQuery =
     {
@@ -467,6 +476,27 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             PositionAnalysis.dailyPLAndGain prices position
         )
     }
+
+    let runFundamentals userId tickers = task {
+        let! user = accounts.GetUser userId
+        match user with
+        | None -> return "User not found" |> ServiceError |> Error
+        | Some user ->
+            
+            let! fundamentals =
+                tickers
+                |> Seq.map (fun ticker -> async {
+                    let! fundamentalResponse = brokerage.GetStockProfile user.State ticker |> Async.AwaitTask
+                    match fundamentalResponse with
+                    | Error _ -> return None
+                    | Ok fundamental -> return Some (ticker, fundamental.Fundamentals)
+                })
+                |> Async.Sequential
+                
+            let successOnly = fundamentals |> Array.choose id
+            
+            return successOnly |> Array.map(fun (ticker, fundamentals) -> {|ticker=ticker; fundamentals=fundamentals|}) |> Ok
+    }
     
     let runCorrelations userId numberOfDays tickers = task {
         let! user = accounts.GetUser userId
@@ -525,7 +555,24 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
     member _.HandleCorrelationsQuery userId (query:CorrelationsQuery) = task {
         return! runCorrelations userId query.Days query.Tickers
     }
-    
+
+    member _.Handle(request:PortfolioFundamentalsQuery) = task {
+        let! stocks = storage.GetStockPositions request.UserId
+        let! options = storage.GetOptionPositions request.UserId
+            
+        let tickers = 
+            stocks
+            |> Seq.filter _.IsOpen
+            |> Seq.map _.Ticker
+            |> Seq.append (options |> Seq.filter _.IsOpen |> Seq.map _.UnderlyingTicker)
+            |> Seq.distinct
+            
+        return! runFundamentals request.UserId tickers
+    }
+
+    member _.HandleFundamentalsQuery userId (query:FundamentalsQuery) = task {
+        return! runFundamentals userId query.Tickers
+    }
     member _.Handle(request:ChainQuery) = task {
         let! stocks = storage.GetStockPositions request.UserId
         
