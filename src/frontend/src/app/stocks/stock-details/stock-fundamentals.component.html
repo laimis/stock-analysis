@@ -10,35 +10,35 @@
             <div class="card-body">
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <div class="col">
-                        <div class="metric-card" [ngClass]="getPERatioClass(profile.fundamentals['peRatio'])" title="Normal PE Range: 10-25">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['peRatio'], 10, 25)" title="Normal PE Range: 10-25">
                             <div class="metric-name">PE Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['peRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Price to Earnings</div>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="metric-card" [ngClass]="getPSRatioClass(profile.fundamentals['prRatio'])" title="Normal PS Range: 1-5">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['prRatio'], 1, 5)" title="Normal PS Range: 1-5">
                             <div class="metric-name">PS Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['prRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Price to Sales</div>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="metric-card">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['pegRatio'], 0.8, 2)" title="Normal PEG Range: 0.8-2">
                             <div class="metric-name">PEG Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['pegRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">PE to Growth</div>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="metric-card">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['pbRatio'], 1, 3)" title="Normal PB Range: 1-3">
                             <div class="metric-name">PB Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['pbRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Price to Book</div>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="metric-card">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['pcfRatio'], 10, 20)" title="Normal PCF Range: 10-20">
                             <div class="metric-name">PCF Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['pcfRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Price to Cash Flow</div>
@@ -113,14 +113,14 @@
             <div class="card-body">
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <div class="col">
-                        <div class="metric-card">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['quickRatio'], 1, 1.5)" title="Normal Quick Ratio Range: 1-1.5">
                             <div class="metric-name">Quick Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['quickRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Acid Test Ratio</div>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="metric-card">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['currentRatio'], 1.5, 3)" title="Normal Current Ratio Range: 1.5-3">
                             <div class="metric-name">Current Ratio</div>
                             <div class="metric-value">{{ profile.fundamentals['currentRatio'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Working Capital Ratio</div>
@@ -220,13 +220,13 @@
                     <div class="col">
                         <div class="metric-card">
                             <div class="metric-name">Dividend Yield</div>
-                            <div class="metric-value">{{ profile.fundamentals['dividendYield'] | percent:'1.2-2' }}</div>
+                            <div class="metric-value">{{ profile.fundamentals['dividendYield'] | number:'1.2-2' }}%</div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="metric-card">
                             <div class="metric-name">Dividend Growth (3Y)</div>
-                            <div class="metric-value">{{ profile.fundamentals['divGrowthRate3Year'] | percent:'1.2-2' }}</div>
+                            <div class="metric-value">{{ profile.fundamentals['divGrowthRate3Year'] | number:'1.2-2' }}%</div>
                             <div class="metric-desc">3-Year Rate</div>
                         </div>
                     </div>
@@ -256,7 +256,7 @@
             <div class="card-body">
                 <div class="row row-cols-1 row-cols-md-3 g-4">
                     <div class="col">
-                        <div class="metric-card">
+                        <div class="metric-card" [ngClass]="getNumberClass(profile.fundamentals['beta'], 0.5, 1.5)" title="Normal Beta Range: 0.5-1.5">
                             <div class="metric-name">Beta</div>
                             <div class="metric-value">{{ profile.fundamentals['beta'] | number:'1.2-2' }}</div>
                             <div class="metric-desc">Market Volatility</div>

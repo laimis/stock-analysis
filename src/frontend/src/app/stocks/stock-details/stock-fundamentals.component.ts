@@ -35,17 +35,10 @@ export class StockFundamentalsComponent {
         this.summary = stock
     }
 
-    getPERatioClass(peRatio: number): string {
-        if (!peRatio) return '';
-        if (peRatio < 10) return 'metric-low';
-        if (peRatio > 25) return 'metric-high';
-        return 'metric-normal';
-    }
-
-    getPSRatioClass(psRatio: number): string {
-        if (!psRatio) return '';
-        if (psRatio < 1) return 'metric-low';
-        if (psRatio > 5) return 'metric-high';
+    getNumberClass(value: number, lowEnd:number, highEnd:number): string {
+        if (!value) return '';
+        if (value < lowEnd) return 'metric-low';
+        if (value > highEnd) return 'metric-high';
         return 'metric-normal';
     }
 }
