@@ -110,4 +110,10 @@
     } @else {
         <app-loading></app-loading>
     }
+
+    @if (fundamentalsReport) {
+        <app-fundamentals [data]="fundamentalsReport"></app-fundamentals>
+    } @else {
+        <app-loading></app-loading>
+    }
 </div>

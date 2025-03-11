@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
-import {OutcomesReport, StocksService, TickerCorrelation, TickerOutcomes} from '../../services/stocks.service';
+import {OutcomesReport, StocksService, TickerCorrelation, TickerFundamentals, TickerOutcomes} from '../../services/stocks.service';
 import {catchError, map, tap} from "rxjs/operators";
 import {concat} from "rxjs";
 
@@ -28,6 +28,7 @@ export class OutcomesReportComponent implements OnInit {
     earningsOutcomes: TickerOutcomes[];
     correlationsReport: TickerCorrelation[]
     correlationsDays: number = 60;
+    fundamentalsReport: TickerFundamentals[]
     excludeEarningsTitle: string = "Exclude Earnings";
 
     constructor(
@@ -125,7 +126,13 @@ export class OutcomesReportComponent implements OnInit {
                 catchError(errors => this.errors = GetErrors(errors))
             )
 
-        concat(singleBarDailyReport, singleBarWeekly, allBarsReport, correlationsReport).subscribe()
+        const fundamentalsReport = this.stocksService.reportFundamentals(this.tickers)
+            .pipe(
+                map(report => this.fundamentalsReport = report),
+                catchError(errors => this.errors = GetErrors(errors))
+            )
+
+        concat(singleBarDailyReport, singleBarWeekly, allBarsReport, correlationsReport, fundamentalsReport).subscribe()
     }
 
     onTickerChange(activeTicker: string) {
@@ -154,5 +161,6 @@ export class OutcomesReportComponent implements OnInit {
         this.singleBarReportWeekly = null;
         this.earningsOutcomes = [];
         this.correlationsReport = null;
+        this.fundamentalsReport = null;
     }
 }
