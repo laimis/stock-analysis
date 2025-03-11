@@ -19,7 +19,7 @@ import {concat} from "rxjs";
 import {OptionPosition, OptionService} from "../../services/option.service";
 import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
-import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
+import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf} from "@angular/common";
 import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.component";
 import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
 import {StockOptionComponent} from "./stock-option.component";
@@ -28,6 +28,7 @@ import {StockAnalysisComponent} from "./stock-analysis.component";
 import {StockOwnershipComponent} from "./stock-ownership.component";
 import {StockTransactionComponent} from "./stock-transaction.component";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
+import {MarketCapPipe} from "../../services/marketcap.filter";
 
 @Component({
     selector: 'app-stock-details',
@@ -37,6 +38,8 @@ import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.co
         StockLinkAndTradingviewLinkComponent,
         CurrencyPipe,
         DatePipe,
+        MarketCapPipe,
+        DecimalPipe,
         BrokerageNewOrderComponent,
         BrokerageOrdersComponent,
         StockOptionComponent,
@@ -257,4 +260,18 @@ export class StockDetailsComponent implements OnInit {
             }
         })
     }
+
+    getPERatioClass(peRatio: number): string {
+        if (!peRatio) return '';
+        if (peRatio < 10) return 'metric-low';
+        if (peRatio > 25) return 'metric-high';
+        return 'metric-normal';
+      }
+      
+      getPSRatioClass(psRatio: number): string {
+        if (!psRatio) return '';
+        if (psRatio < 1) return 'metric-low';
+        if (psRatio > 5) return 'metric-high';
+        return 'metric-normal';
+      }
 }

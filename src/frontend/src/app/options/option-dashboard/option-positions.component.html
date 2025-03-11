@@ -5,7 +5,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="col">
-                            <app-stock-link class="position-ticker" [ticker]="position.underlyingTicker"></app-stock-link>
+                            <app-stock-link class="position-ticker" [ticker]="position.underlyingTicker" [openInNewTab]="true"></app-stock-link>
                             <span class="position-price">{{ position.underlyingPrice | currency }}</span>
                             <i
                                 (click)="toggleExpandedPositions($index);"

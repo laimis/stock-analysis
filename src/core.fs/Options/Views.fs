@@ -83,6 +83,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         | [] -> None
         | _ -> contracts[0].UnderlyingPrice
     member this.Opened = state.Opened
+    member this.Created = state.Created
     member this.DaysHeld = state.DaysHeld
     member this.DaysToExpiration =
         // days are countedfrom the time it's opened

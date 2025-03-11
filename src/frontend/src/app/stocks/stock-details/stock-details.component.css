@@ -1,13 +1,73 @@
 label {
-    font-weight: bold;
-    margin-top: 10px;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 #company-description {
-    font-size: smaller;
+  font-size: smaller;
 }
 
 #ticker-logo {
-    max-height: 50px;
-    margin-right: 5px;
+  max-height: 50px;
+  margin-right: 5px;
+}
+
+.stock-metrics-container {
+  border-top: 1px solid #eaeaea;
+  padding-top: 10px;
+}
+
+.stock-metrics {
+  font-size: 0.95rem;
+}
+
+.metric {
+  display: inline-flex;
+  align-items: center;
+}
+
+.price-metric {
+  font-size: 1.1rem;
+}
+
+.metric .text-muted {
+  margin-right: 5px;
+}
+
+.metric .fw-bold {
+  font-weight: 600;
+}
+
+.metric-high .fw-bold {
+  color: #dc3545; /* Bootstrap danger color */
+}
+
+.metric-low .fw-bold {
+  color: #0d6efd; /* Bootstrap primary color */
+}
+
+.metric-normal .fw-bold {
+  color: #198754; /* Bootstrap success color */
+}
+
+.metric i.bi-info-circle-fill {
+  cursor: help;
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+.metric i.bi-info-circle-fill:hover {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .stock-metrics {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem !important;
+  }
+  
+  .stock-metrics-container {
+      margin-top: 1rem;
+  }
 }

@@ -59,6 +59,7 @@ export interface OptionPosition {
     isOpen: boolean
     isClosed: boolean
     isPending: boolean
+    created: string
     opened: string
     closed: string
     notes: Note[]

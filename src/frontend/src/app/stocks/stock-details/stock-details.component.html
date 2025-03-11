@@ -15,8 +15,35 @@
                         </a>
                         <span class="float-end ms-3">
                         <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
-          </span>
+                        </span>
                     </h3>
+                    
+                    <div class="stock-metrics-container mt-3 mb-3">
+                        <div class="stock-metrics d-flex flex-wrap gap-4 align-items-center">
+                            <div class="metric price-metric">
+                                <span class="text-muted">Price:</span> 
+                                <span class="fw-bold">{{ stock.quote?.price | currency }}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="text-muted">Market Cap:</span> 
+                                <span class="fw-bold">{{ stock.profile.fundamentals['marketCap'] | marketCap }}</span>
+                            </div>
+                            <div class="metric" 
+                                 [ngClass]="getPERatioClass(stock.profile.fundamentals['peRatio'])"
+                                 title="Normal PE Range: 10-25">
+                                <span class="text-muted">PE:</span> 
+                                <span class="fw-bold">{{ stock.profile.fundamentals['peRatio'] | number:'1.2-2' }}</span>
+                                <i class="bi bi-info-circle-fill ms-1 text-muted small"></i>
+                            </div>
+                            <div class="metric"
+                                 [ngClass]="getPSRatioClass(stock.profile.fundamentals['prRatio'])"
+                                 title="Normal PS Range: 1-5">
+                                <span class="text-muted">PS:</span> 
+                                <span class="fw-bold">{{ stock.profile.fundamentals['prRatio'] | number:'1.2-2' }}</span>
+                                <i class="bi bi-info-circle-fill ms-1 text-muted small"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             }
         </div>
@@ -25,7 +52,7 @@
 
 <div class="tab-container mt-2">
     <a (click)="activateTab('stocks')" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" class="tab">
-        Stocks @if (currentPosition) {
+        Stock @if (currentPosition) {
         <span class="badge rounded-pill bg-info">{{ currentPosition.numberOfShares }}</span>
     }
     </a>
@@ -44,9 +71,6 @@
        class="tab">
         Fundamentals
     </a>
-    @if (stock) {
-        <span class="float-end"><span class="text-muted">Price:</span> {{ stock.quote?.price | currency }}</span>
-    }
 </div>
 
 @if (stock && isActive('trade')) {
