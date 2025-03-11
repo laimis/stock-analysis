@@ -1,4 +1,73 @@
-label {
-    font-weight: bold;
-    margin-top: 10px;
-}
+/* Add these styles to your CSS file */
+.fundamentals-container {
+    padding: 0.5rem;
+  }
+  
+  .card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+  }
+  
+  .card-header h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .metric-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    height: 100%;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  .metric-card:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    background-color: #fff;
+  }
+  
+  .metric-name {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .metric-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #212529;
+  }
+  
+  .metric-desc {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }
+  
+  /* Valuation color indicators */
+  .metric-high .metric-value {
+    color: #dc3545; /* Bootstrap danger color for overvalued */
+  }
+  
+  .metric-low .metric-value {
+    color: #0d6efd; /* Bootstrap primary color for undervalued */
+  }
+  
+  .metric-normal .metric-value {
+    color: #198754; /* Bootstrap success color for fair value */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .row-cols-md-3 > * {
+      flex: 0 0 auto;
+      width: 100%;
+    }
+    
+    .metric-card {
+      margin-bottom: 0.5rem;
+    }
+  }
+  

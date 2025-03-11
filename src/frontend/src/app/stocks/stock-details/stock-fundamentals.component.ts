@@ -1,12 +1,18 @@
 import {Component, Input} from '@angular/core';
 import {StockDetails, StockProfile} from '../../services/stocks.service';
-import {KeyValuePipe} from "@angular/common";
+import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
+import { MarketCapPipe } from 'src/app/services/marketcap.filter';
 
 @Component({
     selector: 'app-stock-fundamentals',
     templateUrl: './stock-fundamentals.component.html',
     imports: [
-        KeyValuePipe
+        DecimalPipe,
+        CurrencyPipe,
+        PercentPipe,
+        MarketCapPipe,
+        DatePipe,
+        NgClass
     ],
     styleUrls: ['./stock-fundamentals.component.css']
 })
@@ -27,5 +33,19 @@ export class StockFundamentalsComponent {
     set stock(stock: StockDetails) {
         this.profile = stock.profile;
         this.summary = stock
+    }
+
+    getPERatioClass(peRatio: number): string {
+        if (!peRatio) return '';
+        if (peRatio < 10) return 'metric-low';
+        if (peRatio > 25) return 'metric-high';
+        return 'metric-normal';
+    }
+
+    getPSRatioClass(psRatio: number): string {
+        if (!psRatio) return '';
+        if (psRatio < 1) return 'metric-low';
+        if (psRatio > 5) return 'metric-high';
+        return 'metric-normal';
     }
 }

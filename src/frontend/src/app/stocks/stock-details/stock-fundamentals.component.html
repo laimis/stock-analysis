@@ -1,14 +1,332 @@
 @if (summary) {
-    <div>
-        <table class="table table-striped table-hover">
-            <tbody>
-                @for (fundamental of profile.fundamentals | keyvalue; track fundamental) {
-                    <tr>
-                        <td>{{ fundamental.key }}</td>
-                        <td>{{ fundamental.value }}</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="fundamentals-container">
+        <!-- Valuation Metrics -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>Valuation Metrics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card" [ngClass]="getPERatioClass(profile.fundamentals['peRatio'])" title="Normal PE Range: 10-25">
+                            <div class="metric-name">PE Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['peRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Price to Earnings</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card" [ngClass]="getPSRatioClass(profile.fundamentals['prRatio'])" title="Normal PS Range: 1-5">
+                            <div class="metric-name">PS Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['prRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Price to Sales</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">PEG Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['pegRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">PE to Growth</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">PB Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['pbRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Price to Book</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">PCF Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['pcfRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Price to Cash Flow</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profitability & Efficiency -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>Profitability & Efficiency
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Gross Margin (TTM)</div>
+                            <div class="metric-value">{{ profile.fundamentals['grossMarginTTM'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">Trailing 12 Months</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Net Profit Margin (TTM)</div>
+                            <div class="metric-value">{{ profile.fundamentals['netProfitMarginTTM'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">Trailing 12 Months</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Operating Margin (TTM)</div>
+                            <div class="metric-value">{{ profile.fundamentals['operatingMarginTTM'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">Trailing 12 Months</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Return on Equity</div>
+                            <div class="metric-value">{{ profile.fundamentals['returnOnEquity'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">ROE</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Return on Assets</div>
+                            <div class="metric-value">{{ profile.fundamentals['returnOnAssets'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">ROA</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Return on Investment</div>
+                            <div class="metric-value">{{ profile.fundamentals['returnOnInvestment'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">ROI</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Health -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-shield-check me-2"></i>Financial Health
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Quick Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['quickRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Acid Test Ratio</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Current Ratio</div>
+                            <div class="metric-value">{{ profile.fundamentals['currentRatio'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Working Capital Ratio</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Interest Coverage</div>
+                            <div class="metric-value">{{ profile.fundamentals['interestCoverage'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Times Interest Earned</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Total Debt to Capital</div>
+                            <div class="metric-value">{{ profile.fundamentals['totalDebtToCapital'] | number:'1.2-2' }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">LT Debt to Equity</div>
+                            <div class="metric-value">{{ profile.fundamentals['ltDebtToEquity'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Long-term Debt/Equity</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Total Debt to Equity</div>
+                            <div class="metric-value">{{ profile.fundamentals['totalDebtToEquity'] | number:'1.2-2' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Growth Metrics -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-arrow-up-right me-2"></i>Growth Metrics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">EPS (TTM)</div>
+                            <div class="metric-value">{{ profile.fundamentals['epsTTM'] | currency }}</div>
+                            <div class="metric-desc">Trailing 12 Months</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">EPS Change % (TTM)</div>
+                            <div class="metric-value">{{ profile.fundamentals['epsChangePercentTTM'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">Year-over-year</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">EPS Change (Year)</div>
+                            <div class="metric-value">{{ profile.fundamentals['epsChangeYear'] | number:'1.2-2' }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Revenue Change (TTM)</div>
+                            <div class="metric-value">{{ profile.fundamentals['revChangeTTM'] | number:'1.2-2' }}%</div>
+                            <div class="metric-desc">Trailing 12 Months</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Revenue Change (Year)</div>
+                            <div class="metric-value">{{ profile.fundamentals['revChangeYear'] | number:'1.2-2' }}%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dividend Information -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-cash-coin me-2"></i>Dividend Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Dividend Amount</div>
+                            <div class="metric-value">{{ profile.fundamentals['dividendAmount'] | currency }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Dividend Yield</div>
+                            <div class="metric-value">{{ profile.fundamentals['dividendYield'] | percent:'1.2-2' }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Dividend Growth (3Y)</div>
+                            <div class="metric-value">{{ profile.fundamentals['divGrowthRate3Year'] | percent:'1.2-2' }}</div>
+                            <div class="metric-desc">3-Year Rate</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Dividend Date</div>
+                            <div class="metric-value">{{ profile.fundamentals['dividendDate'] | date }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Dividend Frequency</div>
+                            <div class="metric-value">{{ profile.fundamentals['dividendFreq'] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk & Volatility -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity me-2"></i>Risk & Volatility
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Beta</div>
+                            <div class="metric-value">{{ profile.fundamentals['beta'] | number:'1.2-2' }}</div>
+                            <div class="metric-desc">Market Volatility</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">52-Week High</div>
+                            <div class="metric-value">{{ profile.fundamentals['high52'] | currency }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">52-Week Low</div>
+                            <div class="metric-value">{{ profile.fundamentals['low52'] | currency }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Short Interest</div>
+                            <div class="metric-value">{{ profile.fundamentals['shortIntToFloat'] | percent:'1.2-2' }}</div>
+                            <div class="metric-desc">% of Float</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Days to Cover</div>
+                            <div class="metric-value">{{ profile.fundamentals['shortIntDayToCover'] | number:'1.1-1' }}</div>
+                            <div class="metric-desc">Short Interest</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Data -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-building me-2"></i>Company Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Market Cap</div>
+                            <div class="metric-value">{{ profile.fundamentals['marketCap'] | marketCap }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Shares Outstanding</div>
+                            <div class="metric-value">{{ profile.fundamentals['sharesOutstanding'] | number }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Book Value/Share</div>
+                            <div class="metric-value">{{ profile.fundamentals['bookValuePerShare'] | currency }}</div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="metric-card">
+                            <div class="metric-name">Average Volume (3M)</div>
+                            <div class="metric-value">{{ profile.fundamentals['vol3MonthAvg'] | number }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 }

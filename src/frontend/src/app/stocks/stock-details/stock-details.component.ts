@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
     PendingStockPosition,
     PositionChartInformation,
@@ -9,26 +9,26 @@ import {
     StockOwnership,
     StocksService, BrokerageAccount
 } from '../../services/stocks.service';
-import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Title} from '@angular/platform-browser';
-import {GetErrors} from "../../services/utils";
-import {StockPositionsService} from "../../services/stockpositions.service";
-import {BrokerageService} from "../../services/brokerage.service";
-import {catchError, tap} from "rxjs/operators";
-import {concat} from "rxjs";
-import {OptionPosition, OptionService} from "../../services/option.service";
-import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";
-import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
-import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf} from "@angular/common";
-import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.component";
-import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
-import {StockOptionComponent} from "./stock-option.component";
-import {StockFundamentalsComponent} from "./stock-fundamentals.component";
-import {StockAnalysisComponent} from "./stock-analysis.component";
-import {StockOwnershipComponent} from "./stock-ownership.component";
-import {StockTransactionComponent} from "./stock-transaction.component";
-import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
-import {MarketCapPipe} from "../../services/marketcap.filter";
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { GetErrors } from "../../services/utils";
+import { StockPositionsService } from "../../services/stockpositions.service";
+import { BrokerageService } from "../../services/brokerage.service";
+import { catchError, tap } from "rxjs/operators";
+import { concat } from "rxjs";
+import { OptionPosition, OptionService } from "../../services/option.service";
+import { StockTradingNewPositionComponent } from "../stock-trading/stock-trading-new-position.component";
+import { StockLinkAndTradingviewLinkComponent } from "../../shared/stocks/stock-link-and-tradingview-link.component";
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf } from "@angular/common";
+import { BrokerageNewOrderComponent } from "../../brokerage/brokerage-new-order.component";
+import { BrokerageOrdersComponent } from "../../brokerage/brokerage-orders.component";
+import { StockOptionComponent } from "./stock-option.component";
+import { StockFundamentalsComponent } from "./stock-fundamentals.component";
+import { StockAnalysisComponent } from "./stock-analysis.component";
+import { StockOwnershipComponent } from "./stock-ownership.component";
+import { StockTransactionComponent } from "./stock-transaction.component";
+import { TradingViewLinkComponent } from "../../shared/stocks/trading-view-link.component";
+import { MarketCapPipe } from "../../services/marketcap.filter";
 
 @Component({
     selector: 'app-stock-details',
@@ -61,7 +61,7 @@ export class StockDetailsComponent implements OnInit {
     stockOwnership: StockOwnership
     currentPosition: StockPosition
     currentPositionChartInfo: PositionChartInformation
-    pendingPosition: PendingStockPosition|null = null
+    pendingPosition: PendingStockPosition | null = null
     options: OptionPosition[]
     prices: Prices
     account: BrokerageAccount
@@ -104,7 +104,7 @@ export class StockDetailsComponent implements OnInit {
                 // if they do not, default startDate to 365 days ago and endDate to today
                 this.startDate = this.route.snapshot.queryParams['startDate'] || new Date(new Date().setDate(new Date().getDate() - 365)).toISOString().split('T')[0]
                 this.endDate = this.route.snapshot.queryParams['endDate'] || new Date().toISOString().split('T')[0]
-                
+
                 this.loadData();
             } else {
                 this.errors.stock = ['No ticker provided']
@@ -142,7 +142,7 @@ export class StockDetailsComponent implements OnInit {
             }
         )
     }
-    
+
     pendingPositionCreated() {
         this.loadPendingPosition()
         this.loadOrders()
@@ -152,11 +152,11 @@ export class StockDetailsComponent implements OnInit {
         this.loadStockOwnership()
         this.loadOrders()
     }
-    
+
     positionChanged() {
         this.loadStockOwnership()
     }
-    
+
     loadPendingPosition() {
         this.stocks.getPendingStockPositions().subscribe(result => {
             let position = result.filter(p => p.ticker == this.ticker)[0]
@@ -193,7 +193,7 @@ export class StockDetailsComponent implements OnInit {
     }
 
     loadStockOwnership() {
-        let pricesPromise = 
+        let pricesPromise =
             this.stocks.getStockPricesForDates(this.ticker, PriceFrequency.Daily, this.startDate, this.endDate)
                 .pipe(
                     tap(result => this.prices = result),
@@ -202,7 +202,7 @@ export class StockDetailsComponent implements OnInit {
                         return []
                     })
                 )
-        
+
         let ownershipPromise =
             this.stockPositions.getStockOwnership(this.ticker)
                 .pipe(
@@ -217,26 +217,26 @@ export class StockDetailsComponent implements OnInit {
                         return []
                     })
                 )
-        
+
         concat(pricesPromise, ownershipPromise).subscribe(() => {
-                if (this.currentPosition && this.prices) {
-                    
-                    let buyOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
-                    let sellOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
-                    
-                    this.currentPositionChartInfo = {
-                        averageBuyPrice: this.currentPosition.averageCostPerShare,
-                        stopPrice: this.currentPosition.stopPrice,
-                        transactions: this.currentPosition.transactions,
-                        markers: [],
-                        prices: this.prices.prices,
-                        ticker: this.currentPosition.ticker,
-                        buyOrders: buyOrders,
-                        sellOrders: sellOrders,
-                        movingAverages: this.prices.movingAverages
-                    }
+            if (this.currentPosition && this.prices) {
+
+                let buyOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
+                let sellOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
+
+                this.currentPositionChartInfo = {
+                    averageBuyPrice: this.currentPosition.averageCostPerShare,
+                    stopPrice: this.currentPosition.stopPrice,
+                    transactions: this.currentPosition.transactions,
+                    markers: [],
+                    prices: this.prices.prices,
+                    ticker: this.currentPosition.ticker,
+                    buyOrders: buyOrders,
+                    sellOrders: sellOrders,
+                    movingAverages: this.prices.movingAverages
                 }
             }
+        }
         )
     }
 
@@ -247,7 +247,7 @@ export class StockDetailsComponent implements OnInit {
     activateTab(tabName: string) {
         this.activeTab = tabName
     }
-    
+
     closePendingPosition(pendingPosition: PendingStockPosition) {
         this.stocks.closePendingPosition(pendingPosition.id, "cancelled").subscribe(
             {
@@ -257,8 +257,8 @@ export class StockDetailsComponent implements OnInit {
                 },
                 error: err => {
                     this.errors.pending = GetErrors(err)
-            }
-        })
+                }
+            })
     }
 
     getPERatioClass(peRatio: number): string {
@@ -266,12 +266,12 @@ export class StockDetailsComponent implements OnInit {
         if (peRatio < 10) return 'metric-low';
         if (peRatio > 25) return 'metric-high';
         return 'metric-normal';
-      }
-      
-      getPSRatioClass(psRatio: number): string {
+    }
+
+    getPSRatioClass(psRatio: number): string {
         if (!psRatio) return '';
         if (psRatio < 1) return 'metric-low';
         if (psRatio > 5) return 'metric-high';
         return 'metric-normal';
-      }
+    }
 }
