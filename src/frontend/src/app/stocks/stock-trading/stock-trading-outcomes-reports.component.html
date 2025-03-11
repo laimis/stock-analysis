@@ -155,4 +155,16 @@
     @if (correlationReport) {
         <app-correlations [correlations]="correlationReport" [days]="daysForCorrelations"></app-correlations>
     }
+
+    @if (errors.fundamentals) {
+        <app-error-display [errors]="errors.fundamentals"></app-error-display>
+    }
+    @if (loading.fundamentals) {
+        <app-loading></app-loading>
+    }
+    @if (fundamentalsReport) {
+        <app-fundamentals
+            [data]="fundamentalsReport">
+        </app-fundamentals>
+    }
 </div>

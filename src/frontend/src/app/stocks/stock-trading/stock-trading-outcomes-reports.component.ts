@@ -5,7 +5,8 @@ import {
     StockPosition, SimulationNotices,
     StockGaps,
     StocksService,
-    TickerCorrelation, PortfolioHoldings
+    TickerCorrelation, PortfolioHoldings,
+    TickerFundamentals
 } from '../../services/stocks.service';
 import {catchError, finalize, map} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
@@ -26,6 +27,7 @@ export class StockPositionReportsComponent {
     positionsReport: OutcomesReport;
     gaps: StockGaps[] = [];
     correlationReport: TickerCorrelation[];
+    fundamentalsReport: TickerFundamentals[];
     tickerFilter: string;
     daysForCorrelations = 60
     
@@ -35,7 +37,8 @@ export class StockPositionReportsComponent {
         weekly: false,
         allBars: false,
         positions: false,
-        correlation: false
+        correlation: false,
+        fundamentals: false
     }
 
     errors = {
@@ -44,7 +47,8 @@ export class StockPositionReportsComponent {
         weekly: null,
         allBars: null,
         positions: null,
-        correlation: null
+        correlation: null,
+        fundamentals: null
     }
     tickers: string[] = []
 
@@ -159,7 +163,20 @@ export class StockPositionReportsComponent {
             finalize(() => this.loading.correlation = false)
         )
 
-        concat(openSimulationNotices$, positionReport$, dailyReport$, weeklyReport$, correlationReport$).subscribe()
+        const fundamentalsReport$ = this.service.reportFundamentals(this.tickers).pipe(
+            map(report => {
+                this.fundamentalsReport = report
+            }),
+            catchError(
+                error => {
+                    this.handleApiError("Unable to load fundamentals", error, (e) => this.errors.fundamentals = e)
+                    return EMPTY
+                }
+            ),
+            finalize(() => this.loading.fundamentals = false)
+        )
+
+        concat(openSimulationNotices$, positionReport$, dailyReport$, weeklyReport$, correlationReport$, fundamentalsReport$).subscribe()
     }
 
     loadAllTimeData(positions: StockPosition[]) {
