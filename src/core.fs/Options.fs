@@ -281,11 +281,48 @@ module OptionPosition =
             
         | :? OptionContractsExpired as x ->
             let expirationTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
-            { p with Transactions = p.Transactions @ [expirationTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
+            let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
+            
+            // Update the contracts map to zero out the expired contracts
+            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, 0, cost) // Set quantity to 0 for expired contracts
+            let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
+            
+            { p with 
+                Transactions = p.Transactions @ [expirationTransaction]
+                Contracts = updatedContracts  // Add updated contracts map
+                Version = p.Version + 1
+                Events = p.Events @ [x] }
             
         | :? OptionContractsAssigned as x ->
-            let assignmentTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
-            { p with Transactions = p.Transactions @ [assignmentTransaction]; Version = p.Version + 1; Events = p.Events @ [x] }
+            let assignmentTransaction = { 
+                EventId = x.Id; 
+                Expiration = x.Expiration |> OptionExpiration.create; 
+                Strike = x.Strike; 
+                OptionType = x.OptionType; 
+                Quantity = -1 * x.Quantity; 
+                Debited = None; 
+                Credited = None; 
+                When = x.When 
+            }
+            
+            // Update the contracts map to zero out the assigned contracts
+            let contract = { 
+                Expiration = OptionExpiration.create(x.Expiration); 
+                Strike = x.Strike; 
+                OptionType = x.OptionType |> OptionType.FromString 
+            }
+            
+            let (OpenedContractQuantityAndCost(longOrShort, _, cost)) = p.Contracts |> Map.find contract
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, 0, cost) // Set quantity to 0 for assigned contracts
+            let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
+            
+            { p with 
+                Transactions = p.Transactions @ [assignmentTransaction]; 
+                Contracts = updatedContracts;
+                Version = p.Version + 1; 
+                Events = p.Events @ [x] 
+            }
             
         | :? OptionContractsExercised as x ->
             let exerciseTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
@@ -367,7 +404,14 @@ module OptionPosition =
         if position.IsClosed then
             failwith "Position is already closed"
             
-        if position.Transactions |> List.sumBy _.Quantity = 0 then
+        // Check if all contracts have zero quantity after all operations
+        let allContractsClosed = 
+            position.Contracts
+            |> Map.forall (fun _ quantityAndCost ->
+                match quantityAndCost with
+                | OpenedContractQuantityAndCost(_, quantity, _) -> quantity = 0)
+        
+        if allContractsClosed then
             let e = OptionPositionClosed(Guid.NewGuid(), position.PositionId |> OptionPositionId.guid, date)
             apply e position
         else

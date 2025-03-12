@@ -308,7 +308,7 @@ let ``Opening up pending credit spread`` () =
     modifiedPosition.Cost |> should equal None
     modifiedPosition.PendingContracts |> should haveCount 2
 
-[<Fact(Skip="This test is failing, something about the code prematurely closing the position")>]
+[<Fact>]
 let ``Multi-leg option strategies calculate costs correctly``() =
     let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
     
