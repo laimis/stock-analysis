@@ -85,19 +85,27 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Opened = state.Opened
     member this.Created = state.Created
     member this.DaysHeld = state.DaysHeld
-    member this.DaysToExpiration =
-        // days are countedfrom the time it's opened
+    member this.Duration =
+        // days are counted from the time it's opened
         let referenceDate = 
             match state.Opened with
             | Some opened -> opened
-            | None -> DateTimeOffset.Now
+            | None -> DateTimeOffset.UtcNow
 
         contracts
         |> Seq.map (fun c -> c.Expiration.ToDateTimeOffset() - referenceDate)
         |> Seq.map (fun ts -> ts.TotalDays |> int)
         |> Seq.distinct
         |> Seq.sort
-        
+    member this.DaysLeft =
+        match contracts with
+        | [] -> None
+        | _ -> 
+            contracts
+            |> List.map (fun c -> c.Expiration.ToDateTimeOffset() - DateTimeOffset.UtcNow)
+            |> List.map (fun ts -> ts.TotalDays |> int) 
+            |> List.min 
+            |> Some
     member this.Closed = state.Closed
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen
@@ -500,7 +508,7 @@ type OptionPositionStats(summaries:seq<OptionPositionView>) =
     member this.AverageDays =
         match optionTrades with
         | [] -> 0m
-        | _ -> optionTrades |> List.map (fun s -> decimal (s.DaysToExpiration |> Seq.head)) |> List.average
+        | _ -> optionTrades |> List.map (fun s -> decimal (s.Duration |> Seq.head)) |> List.average
     member this.AverageDaysHeld =
         match optionTrades with
         | [] -> 0m
@@ -512,7 +520,7 @@ type OptionPositionStats(summaries:seq<OptionPositionView>) =
             optionTrades
             |> List.map (fun s ->
                 let daysHeld = s.DaysHeld |> Option.defaultValue 0
-                let daysToExpiration = s.DaysToExpiration |> Seq.head
+                let daysToExpiration = s.Duration |> Seq.head
                 match daysToExpiration with
                 | 0 -> 0m
                 | _ -> decimal daysHeld / decimal daysToExpiration

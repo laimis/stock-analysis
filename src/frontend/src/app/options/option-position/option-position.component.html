@@ -14,16 +14,16 @@
                             {{ position.spread > 0 ? (position.risked / position.spread | percent) : 'N/A' }}
                         </div>
                     </div>
-                    @if(position.isPending) {
+                    @if(position.isPending || position.isOpen) {
                         <div class="col-md-3">
                             <div class="stat-label">Days to Expiration</div>
-                            <span>{{ position.daysToExpiration[0]}}</span>
+                            <span>{{ position.daysLeft}}</span>
                         </div>
                     } @else {
-                    <div class="col-md-3">
-                        <div class="stat-label">Days Held</div>
-                        <span>{{ position.daysHeld }} / {{ position.daysToExpiration[0]}}</span>
-                    </div>
+                        <div class="col-md-3">
+                            <div class="stat-label">Days Held</div>
+                            <span>{{ position.daysHeld }} / {{ position.duration[0]}}</span>
+                        </div>
                     }
                     <div class="col-md-3">
                         @if (position.opened) {
