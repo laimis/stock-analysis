@@ -60,6 +60,8 @@ export class OptionContractPricingComponent {
                         let multiplier = contracts[contractIndex].isShort ? -1 : 1
                         total += pricingResults[contractIndex][pricingIndex].mark * multiplier
                     }
+                    // always use absolute value for total as we might be doing credit spreads
+                    total = Math.abs(total)
                     if (total < minPrice) {
                         minPrice = total
                     }
