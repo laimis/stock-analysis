@@ -250,12 +250,14 @@
                     <tfoot *ngIf="position.cost || position.market">
                         <tr>
                             <td colspan="4" class="text-end fw-bold"></td>
+                            @if(position.isClosed === false) {
                             <td><span *ngIf="position.isOpen || position.market">Per Contract</span></td>
                             <td *ngIf="position.isOpen">{{ getCostPerContract(position.contracts) | currency }}</td>
                             <td><span *ngIf="position.market">{{ getMarketPerContract(position.contracts) | currency }}</span></td>
                             <td></td>
                             <td></td>
                             <td></td>
+                            }
                         </tr>
                     </tfoot>
                 </table>

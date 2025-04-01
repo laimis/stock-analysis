@@ -97,43 +97,12 @@ export class OptionContractPricingComponent {
                 this.chartInfos.push(this.createChartInfo('Cost', costData))
                 this.chartInfos.push(this.createChartInfo('Underlying Price', underlyingData))
 
-                // let costContainer : DataPointContainer = {
-                //     label: "Total Cost",
-                //     chartType: ChartType.Line,
-                //     data: costData,
-                //     includeZero: true
-                // }
-
-                // let underlyingContainer : DataPointContainer = {
-                //     label: "Underlying Price vs Time",
-                //     chartType: ChartType.Line,
-                //     data: underlyingData
-                // }
-
                 let individualContractOI = pricingResults.map((pricing) => {
                     return pricing.map((op) => op.openInterest);
                 });
                 let individualContractOIContainers = individualContractOI.map((mark, idx) => {
                     return {
                         label: "$" + contracts[idx].strikePrice + " Open Interest",
-                        chartType: ChartType.Line,
-                        data: mark.map((m, i) => {
-                            let date = convertToLocalTime(
-                                dateWithoutMilliseconds(
-                                    new Date(pricingResults[0][i].timestamp)
-                                )
-                            );
-                            return {label: dateStr(date), value: m, isDate: false}
-                        })
-                    }
-                });
-
-                let individualCost = pricingResults.map((pricing) => {
-                    return pricing.map((op) => op.mark);
-                });
-                let individualContractMarkContainers = individualCost.map((mark, idx) => {
-                    return {
-                        label: "$" + contracts[idx].strikePrice + " Mark",
                         chartType: ChartType.Line,
                         data: mark.map((m, i) => {
                             let date = convertToLocalTime(
@@ -168,7 +137,7 @@ export class OptionContractPricingComponent {
                     }
                 });
 
-                this.dataPointContainers = [...individualContractMarkContainers, ...individualContractOIContainers, ...individualIVContainers];
+                this.dataPointContainers = [...individualContractOIContainers, ...individualIVContainers];
                 this.minPrice = minPrice;
                 this.maxPrice = maxPrice;
                 this.hasPrice = costData.length > 0;
@@ -189,16 +158,18 @@ export class OptionContractPricingComponent {
     createChartInfo(title:string, costData: { label: string; value: number; isDate: boolean; }[]): PositionChartInformation {
         // Group data points by date (yyyy-MM-dd)
         const groupedByDate = new Map<string, number[]>();
-        
+
+
         costData.forEach(dataPoint => {
             // Extract just the date part (yyyy-MM-dd) from the ISO string
             const date = new Date(dataPoint.label);
-            const dateStr = date.toISOString().split('T')[0];
-            
-            if (!groupedByDate.has(dateStr)) {
-                groupedByDate.set(dateStr, []);
+            if (date.getHours() < 13) {
+                const dateStr = date.toISOString().split('T')[0];
+                if (!groupedByDate.has(dateStr)) {
+                    groupedByDate.set(dateStr, []);
+                }
+                groupedByDate.get(dateStr).push(dataPoint.value);
             }
-            groupedByDate.get(dateStr).push(dataPoint.value);
         });
         
         // Create price bars for each date
