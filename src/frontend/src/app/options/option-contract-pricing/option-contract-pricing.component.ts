@@ -2,20 +2,22 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
-import {ChartType, DataPointContainer} from "../../services/stocks.service";
+import {ChartType, DataPointContainer, PositionChartInformation, PriceBar} from "../../services/stocks.service";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
 import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
 import {LoadingComponent} from "../../shared/loading/loading.component";
+import { PriceChartComponent } from "../../shared/price-chart/price-chart.component";
 
 @Component({
   selector: 'app-option-contract-pricing',
     imports: [
-        LineChartComponent,
-        NgForOf,
-        LoadingComponent,
-        NgIf,
-        CurrencyPipe
-    ],
+    LineChartComponent,
+    NgForOf,
+    LoadingComponent,
+    NgIf,
+    CurrencyPipe,
+    PriceChartComponent
+],
   templateUrl: './option-contract-pricing.component.html',
   styleUrl: './option-contract-pricing.component.css'
 })
@@ -26,6 +28,7 @@ export class OptionContractPricingComponent {
     maxPrice: number;
     loading: boolean = false;
     hasPrice: boolean = false;
+    chartInfos: PositionChartInformation[] = [];
 
     constructor(private optionService: OptionService) { }
     
@@ -91,18 +94,21 @@ export class OptionContractPricingComponent {
                     return {label: dateStr(date), value: c, isDate: false}
                 })
 
-                let costContainer : DataPointContainer = {
-                    label: "Total Cost",
-                    chartType: ChartType.Line,
-                    data: costData,
-                    includeZero: true
-                }
+                this.chartInfos.push(this.createChartInfo('Cost', costData))
+                this.chartInfos.push(this.createChartInfo('Underlying Price', underlyingData))
 
-                let underlyingContainer : DataPointContainer = {
-                    label: "Underlying Price vs Time",
-                    chartType: ChartType.Line,
-                    data: underlyingData
-                }
+                // let costContainer : DataPointContainer = {
+                //     label: "Total Cost",
+                //     chartType: ChartType.Line,
+                //     data: costData,
+                //     includeZero: true
+                // }
+
+                // let underlyingContainer : DataPointContainer = {
+                //     label: "Underlying Price vs Time",
+                //     chartType: ChartType.Line,
+                //     data: underlyingData
+                // }
 
                 let individualContractOI = pricingResults.map((pricing) => {
                     return pricing.map((op) => op.openInterest);
@@ -162,10 +168,10 @@ export class OptionContractPricingComponent {
                     }
                 });
 
-                this.dataPointContainers = [costContainer, underlyingContainer, ...individualContractMarkContainers, ...individualContractOIContainers, ...individualIVContainers];
+                this.dataPointContainers = [...individualContractMarkContainers, ...individualContractOIContainers, ...individualIVContainers];
                 this.minPrice = minPrice;
                 this.maxPrice = maxPrice;
-                this.hasPrice = costContainer.data.length > 0;
+                this.hasPrice = costData.length > 0;
                 this.loading = false;
             },
             error: (error) => {
@@ -180,5 +186,58 @@ export class OptionContractPricingComponent {
         });
     }
 
+    createChartInfo(title:string, costData: { label: string; value: number; isDate: boolean; }[]): PositionChartInformation {
+        // Group data points by date (yyyy-MM-dd)
+        const groupedByDate = new Map<string, number[]>();
+        
+        costData.forEach(dataPoint => {
+            // Extract just the date part (yyyy-MM-dd) from the ISO string
+            const date = new Date(dataPoint.label);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            if (!groupedByDate.has(dateStr)) {
+                groupedByDate.set(dateStr, []);
+            }
+            groupedByDate.get(dateStr).push(dataPoint.value);
+        });
+        
+        // Create price bars for each date
+        const priceBars: PriceBar[] = [];
+        
+        groupedByDate.forEach((values, dateStr) => {
+            if (values.length > 0) {
+                const open = values[0];
+                const close = values[values.length - 1];
+                const high = Math.max(...values);
+                const low = Math.min(...values);
+                
+                priceBars.push({
+                    dateStr: dateStr,
+                    open: open,
+                    close: close,
+                    high: high,
+                    low: low,
+                    volume: 0  // We don't have volume data
+                });
+            }
+        });
+        
+        // Sort price bars by date (oldest first)
+        priceBars.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+        
+        return {
+            ticker: title,
+            averageBuyPrice: null,
+            buyOrders: [],
+            sellOrders: [],
+            markers: [],
+            movingAverages: null,
+            stopPrice: null,
+            transactions: [],
+            prices: priceBars
+        };
+    }
+
     @Output() errorOccurred = new EventEmitter<string[]>();
 }
+

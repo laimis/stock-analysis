@@ -25,6 +25,7 @@
                 </div>
             </div>
         </div>
+        <app-price-chart [priceScaleMode]="'normal'" [chartTitle]="chartInfo.ticker" [chartInformation]="chartInfo" [chartType]="'candlestick'" *ngFor="let chartInfo of chartInfos"></app-price-chart>
         <app-line-chart [dataContainer]="container" *ngFor="let container of dataPointContainers"></app-line-chart>
     }
     

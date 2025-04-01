@@ -16,6 +16,7 @@ import {
     Time
 } from 'lightweight-charts';
 import {blue, green, lightblue, red, white} from "../../services/charts.service";
+import { NgIf } from '@angular/common';
 
 const numberOfVisibleBars = 60
 
@@ -68,6 +69,7 @@ export function toSeriesMarker(marker: ChartMarker): SeriesMarker<Time> {
 @Component({
     selector: 'app-price-chart',
     templateUrl: './price-chart.component.html',
+    imports: [NgIf],
 })
 export class PriceChartComponent implements OnDestroy, AfterViewInit {
     chart: IChartApi;
@@ -83,6 +85,9 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
         this.chartId = 'chart-' + Math.random().toString(36).substring(7);
         console.log("chartId: " + this.chartId)
     }
+
+    @Input()
+    chartTitle: string = '';
 
     @Input()
     chartType: 'candlestick' | 'line' = 'candlestick';
@@ -221,28 +226,39 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             },
         });
 
-        // volume
-        const volumeSeries = this.chart.addHistogramSeries({
-            priceFormat: {
-                type: 'volume',
-            },
+        // volume, only add if if the priceBars have volume data
+        let hasVolume = info.prices.some((p: PriceBar) => p.volume > 0);
+        if (!hasVolume) {
+            const volumeSeries = this.chart.addHistogramSeries({
+                priceFormat: {
+                    type: 'volume',
+                },
 
-            priceScaleId: '', // set as an overlay by setting a blank priceScaleId
-        });
-        volumeSeries.priceScale().applyOptions({
-            // set the positioning of the volume series
-            scaleMargins: {
-                top: 0.7, // highest point of the series will be 70% away from the top
-                bottom: 0,
-            },
-        });
-        let volumeData = info.prices.map(toVolumeBar)
-        volumeSeries.setData(volumeData);
+                priceScaleId: '', // set as an overlay by setting a blank priceScaleId
+            });
+            volumeSeries.priceScale().applyOptions({
+                // set the positioning of the volume series
+                scaleMargins: {
+                    top: 0.7, // highest point of the series will be 70% away from the top
+                    bottom: 0,
+                },
+            });
+            let volumeData = info.prices.map(toVolumeBar)
+            volumeSeries.setData(volumeData);
+        }
 
-        this.chart.timeScale().setVisibleRange({
-            from: priceBars[priceBars.length - numberOfVisibleBars].time,
-            to: priceBars[priceBars.length - 1].time
-        });
+        // set the visible range to the number of visible bars, but only if the length of the priceBars is greater than the number of visible bars
+        if (priceBars.length > numberOfVisibleBars) {
+            // set the visible range to the last numberOfVisibleBars
+            this.chart.timeScale().setVisibleRange({
+                from: priceBars[priceBars.length - numberOfVisibleBars].time,
+                to: priceBars[priceBars.length - 1].time
+            });
+        }
+        else {
+            this.chart.timeScale().fitContent();
+        }
+        
     
     }
 
