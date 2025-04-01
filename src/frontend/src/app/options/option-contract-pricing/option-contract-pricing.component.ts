@@ -95,7 +95,13 @@ export class OptionContractPricingComponent {
                 })
 
                 this.chartInfos.push(this.createChartInfo('Cost', costData))
-                this.chartInfos.push(this.createChartInfo('Underlying Price', underlyingData))
+                let underlyingPriceChartInfo = this.createChartInfo('Underlying Price', underlyingData)
+                let longStrikePrices = contracts.filter((contract) => !contract.isShort).map((contract) => contract.strikePrice)
+                let shortStrikePrices = contracts.filter((contract) => contract.isShort).map((contract) => contract.strikePrice)
+                underlyingPriceChartInfo.buyOrders = longStrikePrices
+                underlyingPriceChartInfo.sellOrders = shortStrikePrices
+                
+                this.chartInfos.push(underlyingPriceChartInfo)
 
                 let individualContractOI = pricingResults.map((pricing) => {
                     return pricing.map((op) => op.openInterest);
