@@ -23,6 +23,7 @@ type AccountMonitoringService(
     let hardcodedQueryToTickerMapping =
         [
             ("WISDOMTREE FLOATING RATETREASRY ETF", "USFR")
+            ("WISDOMTREE FLOATING RTETREAS ETF IV", "USFR")
             ("NEWMONT CORP", "NEM")
             ("GLOBAL PAYMENTS INC", "GPN")
             ("SOUTHWEST AIRLINES", "LUV")
