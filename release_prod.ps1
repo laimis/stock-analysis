@@ -46,7 +46,7 @@ function Git-Checkout-Merge($message) {
 function Ensure-Angular-Builds() {
     # ensure that the project can build by invoking npm run build -- --configuration production
     push-location "src/frontend"
-    invoke-expression "npm run build:prod"
+    invoke-expression "ng build --configuration production"
     $exitCode = $LASTEXITCODE
     pop-location
     if ($exitCode -ne 0) {
