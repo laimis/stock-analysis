@@ -1,181 +1,185 @@
- <div>
-     <app-error-display [errors]="errors"></app-error-display>
-     @if (container) {
-    <section *ngIf="container">
+<div>
+  <app-error-display [errors]="errors"></app-error-display>
+  @if (container) {
+    @if (container) {
+      <section>
         @if (!hideScheduling) {
-            <button class="btn btn-primary me-2" (click)="scheduleRun()">
-                Schedule Check
-            </button>
+          <button class="btn btn-primary me-2" (click)="scheduleRun()">
+            Schedule Check
+          </button>
         }
         @if (!hideMessages) {
-            <button class="btn btn-primary me-2" (click)="toggleVisibility(messagesSection)">
-                Toggle Messages ({{ container.messages.length }})
-            </button>
+          <button class="btn btn-primary me-2" (click)="toggleVisibility(messagesSection)">
+            Toggle Messages ({{ container.messages.length }})
+          </button>
         }
         <div class="float-end text-muted" role="status">
-            last refresh: {{ lastRefreshed | date:'medium' }}
+          last refresh: {{ lastRefreshed | date:'medium' }}
         </div>
         <div class="float-end me-2">
-            <select class="form-select-sm form-control" (change)="sourceListSelection($event)">
-                <option value="All">All</option>
-                @for(sourceList of sourceLists; track sourceList) {
-                    <option value="{{ sourceList }}">{{ sourceList }}</option>
-                }
-            </select>
+          <select class="form-select-sm form-control" (change)="sourceListSelection($event)">
+            <option value="All">All</option>
+            @for(sourceList of sourceLists; track sourceList) {
+              <option value="{{ sourceList }}">{{ sourceList }}</option>
+            }
+          </select>
         </div>
         @if (scheduled) {
-            <div class="alert alert-success mt-3" role="alert">
-                Scheduled!
-            </div>
+          <div class="alert alert-success mt-3" role="alert">
+            Scheduled!
+          </div>
         }
-    </section>
-    <section #messagesSection class="visually-hidden">
-        <table class="table table-hover" *ngIf="container && container.messages">
-            <thead>
-            <tr>
-                <th>Message</th>
-                <th>date</th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (alert of container.messages; track alert) {
-                    <tr>
-                        <td>{{ alert.message }}</td>
-                        <td>{{ alert.when | date:'medium' }}</td>
-                    </tr>
-                }
-        </table>
-    </section>
-    @if (container.alerts.length === 0) {
-        <div>
-            No active alerts
-        </div>
+      </section>
     }
-    @for (g of alertGroups; track g) {
+    <section #messagesSection class="visually-hidden">
+      @if (container && container.messages) {
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Message</th>
+              <th>date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (alert of container.messages; track alert) {
+              <tr>
+                <td>{{ alert.message }}</td>
+                <td>{{ alert.when | date:'medium' }}</td>
+              </tr>
+            }
+          </table>
+        }
+      </section>
+      @if (container.alerts.length === 0) {
+        <div>
+          No active alerts
+        </div>
+      }
+      @for (g of alertGroups; track g) {
         <section>
-            <div class="alert-group-summary" (click)="toggleGroupExpansion(g)" role="button">
-                <h5 style="border-bottom: none;">
-                    <i class="fas" [ngClass]="{'fa-chevron-down': !g.expanded, 'fa-chevron-up': g.expanded}"></i>
-                    {{ g.identifier }} ({{ g.alerts.length }})
-                </h5>
-            </div>
-            <div class="alert-group-details" [ngClass]="{'d-none': !g.expanded}">
-                <table class="table table-hover d-none d-md-table">
-                    <thead>
-                    <tr>
-                        <th class="sort-header" (click)="sort('ticker')">Ticker</th>
-                        <th class="sort-header" (click)="sort('description')">Description</th>
-                        <th class="sort-header" (click)="sort('watchedValue')">Watched Value</th>
-                        <th class="sort-header" (click)="sort('triggeredValue')">Triggered Value</th>
-                        <th class="sort-header" (click)="sort('when')"></th>
-                        <th class="sort-header" (click)="sort('sourceList')">Source</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @for (alert of g.alerts; track alert) {
-                            <tr
+          <div class="alert-group-summary" (click)="toggleGroupExpansion(g)" role="button">
+            <h5 style="border-bottom: none;">
+              <i class="fas" [ngClass]="{'fa-chevron-down': !g.expanded, 'fa-chevron-up': g.expanded}"></i>
+              {{ g.identifier }} ({{ g.alerts.length }})
+            </h5>
+          </div>
+          <div class="alert-group-details" [ngClass]="{'d-none': !g.expanded}">
+            <table class="table table-hover d-none d-md-table">
+              <thead>
+                <tr>
+                  <th class="sort-header" (click)="sort('ticker')">Ticker</th>
+                  <th class="sort-header" (click)="sort('description')">Description</th>
+                  <th class="sort-header" (click)="sort('watchedValue')">Watched Value</th>
+                  <th class="sort-header" (click)="sort('triggeredValue')">Triggered Value</th>
+                  <th class="sort-header" (click)="sort('when')"></th>
+                  <th class="sort-header" (click)="sort('sourceList')">Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (alert of g.alerts; track alert) {
+                  <tr
                                 [ngClass]="{
 'table-warning': alert.alertType === 'Negative',
 'table-success': alert.alertType === 'Positive',
 'text-white': alert.alertType === 'Positive'
 }">
-                                <td>
-                                    <app-stock-link-and-tradingview-link
-                                        [ticker]="alert.ticker" [openInNewTab]="true"></app-stock-link-and-tradingview-link>
-                                </td>
-                                <td>
-                                    {{ alert.description }}
-                                </td>
-                                <td>{{ getValue(alert.watchedValue, alert.valueFormat) }}</td>
-                                <td>{{ getValue(alert.triggeredValue, alert.valueFormat) }}</td>
-                                <td>Triggered on {{ alert.when | date:'short' }}</td>
-                                <td>
-                                    @for (source of alert.sourceLists; track source) {
-                                        <div><a [routerLink]="[ '/stocks/lists', source ]">{{ source }}</a></div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                </table>
-                <div class="d-md-none">
-                    @for (alert of g.alerts; track alert) {
-                        <div
-                            class="card mb-3"
+                    <td>
+                      <app-stock-link-and-tradingview-link
+                      [ticker]="alert.ticker" [openInNewTab]="true"></app-stock-link-and-tradingview-link>
+                    </td>
+                    <td>
+                      {{ alert.description }}
+                    </td>
+                    <td>{{ getValue(alert.watchedValue, alert.valueFormat) }}</td>
+                    <td>{{ getValue(alert.triggeredValue, alert.valueFormat) }}</td>
+                    <td>Triggered on {{ alert.when | date:'short' }}</td>
+                    <td>
+                      @for (source of alert.sourceLists; track source) {
+                        <div><a [routerLink]="[ '/stocks/lists', source ]">{{ source }}</a></div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </table>
+              <div class="d-md-none">
+                @for (alert of g.alerts; track alert) {
+                  <div
+                    class="card mb-3"
                             [ngClass]="{
 'bg-warning': alert.alertType === 'Negative',
 'bg-success': alert.alertType === 'Positive',
 'text-white': alert.alertType === 'Positive'
 }">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <app-stock-link-and-tradingview-link
-                                            [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
-                                    </div>
-                                    <div class="col-6">
-                                        @for(source of alert.sourceLists; track source) {
-                                            <div class="float-end">
-                                                <a [routerLink]="[ '/stocks/lists', source ]">{{ source }}</a>    
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-<span
-class="stat-label">Triggered value of</span> {{ getValue(alert.triggeredValue, alert.valueFormat) }}
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-6">
+                          <app-stock-link-and-tradingview-link
+                          [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
                         </div>
-                    }
-                </div>
+                        <div class="col-6">
+                          @for(source of alert.sourceLists; track source) {
+                            <div class="float-end">
+                              <a [routerLink]="[ '/stocks/lists', source ]">{{ source }}</a>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <span
+                          class="stat-label">Triggered value of</span> {{ getValue(alert.triggeredValue, alert.valueFormat) }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
-        </section>
-    }
-    @if (!container.alerts) {
-        <section>
+          </section>
+        }
+        @if (!container.alerts) {
+          <section>
             No alerts were triggered
-        </section>
-    }
-    @if (!hideRecentTriggered) {
-        <section>
+          </section>
+        }
+        @if (!hideRecentTriggered) {
+          <section>
             <div class="recent-triggers-summary" (click)="recentlyTriggeredExpanded = !recentlyTriggeredExpanded" role="button">
-                <h5>
-                    <i class="fas" [ngClass]="{'fa-chevron-down': !recentlyTriggeredExpanded, 'fa-chevron-up': recentlyTriggeredExpanded}"></i>
-                    Recent Triggers
-                </h5>
+              <h5>
+                <i class="fas" [ngClass]="{'fa-chevron-down': !recentlyTriggeredExpanded, 'fa-chevron-up': recentlyTriggeredExpanded}"></i>
+                Recent Triggers
+              </h5>
             </div>
             <div class="recent-triggers-details" [ngClass]="{'d-none': !recentlyTriggeredExpanded}">
-                @if (container.recentlyTriggered && !hideRecentTriggered) {
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>ticker</th>
-                            <th>description</th>
-                            <th>date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            @for (alert of container.recentlyTriggered; track alert) {
-                                <tr [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
-                                    <td>
-                                        <app-stock-link-and-tradingview-link
-                                            [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
-                                    </td>
-                                    <td>{{ alert.description }}</td>
-                                    <td>{{ alert.when | date:'short' }}</td>
-                                </tr>
-                            }
-                    </table>
+              @if (container.recentlyTriggered && !hideRecentTriggered) {
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>ticker</th>
+                      <th>description</th>
+                      <th>date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (alert of container.recentlyTriggered; track alert) {
+                      <tr [ngClass]="{'bg-warning': alert.alertType === 'Negative', 'bg-success': alert.alertType === 'Positive'}">
+                        <td>
+                          <app-stock-link-and-tradingview-link
+                          [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
+                        </td>
+                        <td>{{ alert.description }}</td>
+                        <td>{{ alert.when | date:'short' }}</td>
+                      </tr>
+                    }
+                  </table>
                 }
+              </div>
+            </section>
+          }
+          @if (!container.recentlyTriggered) {
+            <div>
+              No recent triggers
             </div>
-        </section>
-    }
-    @if (!container.recentlyTriggered) {
-        <div>
-            No recent triggers
-        </div>
-    }
-     }
-</div>
+          }
+        }
+      </div>

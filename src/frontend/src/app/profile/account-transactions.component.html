@@ -1,69 +1,91 @@
 <div class="container mt-4">
-    <h2>Brokerage Transactions</h2>
-    <app-error-display [errors]="errors"></app-error-display>
-    <table class="table table-striped">
-        <thead>
+  <h2>Brokerage Transactions</h2>
+  <app-error-display [errors]="errors"></app-error-display>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th (click)="changeSort('transactionId')">
+          Transaction ID
+          @if (sortColumn === 'transactionId') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('description')">
+          Description
+          @if (sortColumn === 'description') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('tradeDate')">
+          Trade Date
+          @if (sortColumn === 'tradeDate') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('settlementDate')">
+          Settlement Date
+          @if (sortColumn === 'settlementDate') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('netAmount')">
+          Net Amount
+          @if (sortColumn === 'netAmount') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('brokerageType')">
+          Brokerage Type
+          @if (sortColumn === 'brokerageType') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('inferredType')">
+          Inferred Type
+          @if (sortColumn === 'inferredType') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th (click)="changeSort('inferredTicker')">
+          Inferred Ticker
+          @if (sortColumn === 'inferredTicker') {
+            <i
+            [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
+          }
+        </th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (transaction of transactions; track transaction) {
         <tr>
-            <th (click)="changeSort('transactionId')">
-                Transaction ID
-                <i *ngIf="sortColumn === 'transactionId'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('description')">
-                Description
-                <i *ngIf="sortColumn === 'description'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('tradeDate')">
-                Trade Date
-                <i *ngIf="sortColumn === 'tradeDate'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('settlementDate')">
-                Settlement Date
-                <i *ngIf="sortColumn === 'settlementDate'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('netAmount')">
-                Net Amount
-                <i *ngIf="sortColumn === 'netAmount'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('brokerageType')">
-                Brokerage Type
-                <i *ngIf="sortColumn === 'brokerageType'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('inferredType')">
-                Inferred Type
-                <i *ngIf="sortColumn === 'inferredType'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th (click)="changeSort('inferredTicker')">
-                Inferred Ticker
-                <i *ngIf="sortColumn === 'inferredTicker'"
-                   [ngClass]="{'bi-arrow-up': sortDirection === 'asc', 'bi-arrow-down': sortDirection === 'desc'}"></i>
-            </th>
-            <th>Actions</th>
+          <td>{{ transaction.transactionId }}</td>
+          <td>{{ transaction.description }}</td>
+          <td>{{ transaction.tradeDate | parsedDate }}</td>
+          <td>{{ transaction.settlementDate | parsedDate }}</td>
+          <td>{{ transaction.netAmount | currency }}</td>
+          <td>{{ transaction.brokerageType }}</td>
+          <td>{{ transaction.inferredType }}</td>
+          <td>{{ transaction.inferredTicker }}</td>
+          <td>
+            @if (!transaction.applied) {
+              <button class="btn btn-sm btn-primary" (click)="markAsApplied(transaction.transactionId)">
+                Mark as Applied
+              </button>
+            }
+            @if (transaction.applied) {
+              <span>Applied</span>
+            }
+          </td>
         </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let transaction of transactions">
-            <td>{{ transaction.transactionId }}</td>
-            <td>{{ transaction.description }}</td>
-            <td>{{ transaction.tradeDate | parsedDate }}</td>
-            <td>{{ transaction.settlementDate | parsedDate }}</td>
-            <td>{{ transaction.netAmount | currency }}</td>
-            <td>{{ transaction.brokerageType }}</td>
-            <td>{{ transaction.inferredType }}</td>
-            <td>{{ transaction.inferredTicker }}</td>
-            <td>
-                <button *ngIf="!transaction.applied" class="btn btn-sm btn-primary" (click)="markAsApplied(transaction.transactionId)">
-                    Mark as Applied
-                </button>
-                <span *ngIf="transaction.applied">Applied</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
 </div>

@@ -17,7 +17,7 @@ import {FundamentalsComponent} from "../shared/reports/fundamentals/fundamentals
 import {FormsModule} from "@angular/forms";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
-import {NgIf} from "@angular/common";
+
 
 function unrealizedProfit(position: StockPosition, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
@@ -58,14 +58,13 @@ function createProfitScatter(entries: StockPosition[], quotes: Map<string, Stock
     templateUrl: './playground.component.html',
     styleUrls: ['./playground.component.css'],
     imports: [
-        LoadingComponent,
-        CorrelationsComponent,
-        FundamentalsComponent,
-        FormsModule,
-        CanvasJSAngularChartsModule,
-        ErrorDisplayComponent,
-        NgIf
-    ]
+    LoadingComponent,
+    CorrelationsComponent,
+    FundamentalsComponent,
+    FormsModule,
+    CanvasJSAngularChartsModule,
+    ErrorDisplayComponent
+]
 })
 export class PlaygroundComponent implements OnInit {
     tickers: string[];

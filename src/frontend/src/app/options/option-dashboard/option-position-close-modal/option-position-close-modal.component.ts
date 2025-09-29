@@ -1,5 +1,5 @@
 import {Component, EventEmitter, HostListener, Input, OnChanges, Output} from '@angular/core';
-import {CurrencyPipe, NgForOf, NgIf, PercentPipe} from "@angular/common";
+import { CurrencyPipe, PercentPipe } from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {OptionPosition, OptionService} from "../../../services/option.service";
 import {GetErrors} from "../../../services/utils";
@@ -8,13 +8,11 @@ import {BrokerageService, OptionOrderCommand, OptionOrderInstruction, OptionOrde
 @Component({
   selector: 'app-option-position-close-modal',
     imports: [
-        CurrencyPipe,
-        NgForOf,
-        NgIf,
-        ReactiveFormsModule,
-        FormsModule,
-        PercentPipe
-    ],
+    CurrencyPipe,
+    ReactiveFormsModule,
+    FormsModule,
+    PercentPipe
+],
   templateUrl: './option-position-close-modal.component.html',
   styleUrl: './option-position-close-modal.component.css'
 })

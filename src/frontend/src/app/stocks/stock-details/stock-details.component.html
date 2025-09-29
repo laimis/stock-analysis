@@ -1,163 +1,165 @@
 @if (loading.stock === false && stock) {
-    <div class="mt-2 mb-4">
+  <div class="mt-2 mb-4">
+    <div>
+      @if (stock.profile) {
         <div>
-            @if (stock.profile) {
-                <div>
-                    <h3>{{ stock.profile.symbol }}: {{ stock.profile.description }}
-                        <a class="float-end ms-3"
-                           href="https://client.schwab.com/app/research/#/stocks/{{stock.ticker}}"
-                           target="_blank">
-                            <img src="/assets/images/schwab_logo_80x80_2x.avif" height="25px" alt="Charles Schwab logo"/>
-                        </a>
-                        <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}"
-                           target="_blank">
-                            <img src="/assets/images/finviz.png" height="25px" alt="Finviz logo"/>
-                        </a>
-                        <span class="float-end ms-3">
-                        <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
-                        </span>
-                    </h3>
-                    
-                    <div class="stock-metrics-container mt-3 mb-3">
-                        <div class="stock-metrics d-flex flex-wrap gap-4 align-items-center">
-                            <div class="metric price-metric">
-                                <span class="text-muted">Price:</span> 
-                                <span class="fw-bold">{{ stock.quote?.price | currency }}</span>
-                            </div>
-                            <div class="metric">
-                                <span class="text-muted">Market Cap:</span> 
-                                <span class="fw-bold">{{ stock.profile.fundamentals['marketCap'] | marketCap }}</span>
-                            </div>
-                            <div class="metric" 
-                                 [ngClass]="getPERatioClass(stock.profile.fundamentals['peRatio'])"
-                                 title="Normal PE Range: 10-25">
-                                <span class="text-muted">PE:</span> 
-                                <span class="fw-bold">{{ stock.profile.fundamentals['peRatio'] | number:'1.2-2' }}</span>
-                                <i class="bi bi-info-circle-fill ms-1 text-muted small"></i>
-                            </div>
-                            <div class="metric"
-                                 [ngClass]="getPSRatioClass(stock.profile.fundamentals['prRatio'])"
-                                 title="Normal PS Range: 1-5">
-                                <span class="text-muted">PS:</span> 
-                                <span class="fw-bold">{{ stock.profile.fundamentals['prRatio'] | number:'1.2-2' }}</span>
-                                <i class="bi bi-info-circle-fill ms-1 text-muted small"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
+          <h3>{{ stock.profile.symbol }}: {{ stock.profile.description }}
+            <a class="float-end ms-3"
+              href="https://client.schwab.com/app/research/#/stocks/{{stock.ticker}}"
+              target="_blank">
+              <img src="/assets/images/schwab_logo_80x80_2x.avif" height="25px" alt="Charles Schwab logo"/>
+            </a>
+            <a class="float-end ms-3" href="https://finviz.com/quote.ashx?t={{stock.ticker}}"
+              target="_blank">
+              <img src="/assets/images/finviz.png" height="25px" alt="Finviz logo"/>
+            </a>
+            <span class="float-end ms-3">
+              <app-trading-view-link [ticker]="stock.ticker"></app-trading-view-link>
+            </span>
+          </h3>
+
+          <div class="stock-metrics-container mt-3 mb-3">
+            <div class="stock-metrics d-flex flex-wrap gap-4 align-items-center">
+              <div class="metric price-metric">
+                <span class="text-muted">Price:</span>
+                <span class="fw-bold">{{ stock.quote?.price | currency }}</span>
+              </div>
+              <div class="metric">
+                <span class="text-muted">Market Cap:</span>
+                <span class="fw-bold">{{ stock.profile.fundamentals['marketCap'] | marketCap }}</span>
+              </div>
+              <div class="metric"
+                [ngClass]="getPERatioClass(stock.profile.fundamentals['peRatio'])"
+                title="Normal PE Range: 10-25">
+                <span class="text-muted">PE:</span>
+                <span class="fw-bold">{{ stock.profile.fundamentals['peRatio'] | number:'1.2-2' }}</span>
+                <i class="bi bi-info-circle-fill ms-1 text-muted small"></i>
+              </div>
+              <div class="metric"
+                [ngClass]="getPSRatioClass(stock.profile.fundamentals['prRatio'])"
+                title="Normal PS Range: 1-5">
+                <span class="text-muted">PS:</span>
+                <span class="fw-bold">{{ stock.profile.fundamentals['prRatio'] | number:'1.2-2' }}</span>
+                <i class="bi bi-info-circle-fill ms-1 text-muted small"></i>
+              </div>
+            </div>
+          </div>
         </div>
+      }
     </div>
+  </div>
 }
 
 <div class="tab-container mt-2">
-    <a (click)="activateTab('stocks')" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" class="tab">
-        Stock @if (currentPosition) {
-        <span class="badge rounded-pill bg-info">{{ currentPosition.numberOfShares }}</span>
-    }
-    </a>
-    <a (click)="activateTab('trade')" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" class="tab">
-        Trade
-    </a>
-    <a (click)="activateTab('options')" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" class="tab">
-        Options @if (options && options.length > 0) {
-        <span class="badge rounded-pill bg-info">{{ options.length }}</span>
-    }
-    </a>
-    <a (click)="activateTab('analysis')" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" class="tab">
-        Analysis
-    </a>
-    <a (click)="activateTab('fundamentals')" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]=""
-       class="tab">
-        Fundamentals
-    </a>
+  <a (click)="activateTab('stocks')" [ngClass]="{'is-active': isActive('stocks')}" [routerLink]="" class="tab">
+    Stock @if (currentPosition) {
+    <span class="badge rounded-pill bg-info">{{ currentPosition.numberOfShares }}</span>
+  }
+</a>
+<a (click)="activateTab('trade')" [ngClass]="{'is-active': isActive('trade')}" [routerLink]="" class="tab">
+  Trade
+</a>
+<a (click)="activateTab('options')" [ngClass]="{'is-active': isActive('options')}" [routerLink]="" class="tab">
+  Options @if (options && options.length > 0) {
+  <span class="badge rounded-pill bg-info">{{ options.length }}</span>
+}
+</a>
+<a (click)="activateTab('analysis')" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" class="tab">
+  Analysis
+</a>
+<a (click)="activateTab('fundamentals')" [ngClass]="{'is-active': isActive('fundamentals')}" [routerLink]=""
+  class="tab">
+  Fundamentals
+</a>
 </div>
 
 @if (stock && isActive('trade')) {
-    <app-stock-trading-new-position
-        [isPendingPositionMode]="true"
-        [presetTicker]="stock.ticker"
-        (positionOpened)="loadOrders()"
-        (pendingPositionCreated)="pendingPositionCreated()">
-    </app-stock-trading-new-position>
-    
-    <!-- existing pending positions -->
-    <section class="card shadow-sm mb-4" *ngIf="pendingPosition">
-        <div class="card-body">
-            <div class="d-flex justify-content-between">
-                <div class="card-title">
-                    <app-stock-link-and-tradingview-link [ticker]="pendingPosition.ticker"
-                                                         [openInNewTab]="true"></app-stock-link-and-tradingview-link>
-                    <div class="d-flex align-items-center">
-                        <div class="pr-3">
-                            <span class="stat-label">Bid: </span> <span
-                            class="fw-bold">{{ pendingPosition.bid | currency }}</span>
-                        </div>
-                        <div class="px-3 border-left">
-                            <span class="stat-label">Shares: </span> <span
-                            class="fw-bold">{{ pendingPosition.numberOfShares }}</span>
-                        </div>
-                        <div class="px-3 border-left">
-                            <span class="stat-label">Created: </span><span
-                            class="fw-bold">{{ pendingPosition.created | date }} ({{ pendingPosition.numberOfDaysActive }} days ago)</span>
-                        </div>
-                        <div class="px-3 border-left">
-                            <span class="stat-label">Stop: </span> <span
-                            class="fw-bold">{{ pendingPosition.stopPrice | currency }} ({{pendingPosition.stopLossAmount | currency}})</span>
-                        </div>
-                        <div class="pl-3 border-left">
-                            <span class="stat-label">Strategy: </span><span
-                            class="fw-bold">{{ pendingPosition.strategy }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <p class="card-text">
-                {{ pendingPosition.notes }}
-            </p>
-        </div>
-        <div class="card-footer no-border">
-            <button class="btn btn-warning btn-sm" (click)="closePendingPosition(pendingPosition)">Close</button>
-        </div>
-    </section>
+  <app-stock-trading-new-position
+    [isPendingPositionMode]="true"
+    [presetTicker]="stock.ticker"
+    (positionOpened)="loadOrders()"
+    (pendingPositionCreated)="pendingPositionCreated()">
+  </app-stock-trading-new-position>
 
-
-    <app-brokerage-new-order [ticker]="stock.ticker"></app-brokerage-new-order>
-
-    <app-brokerage-orders
-        [filteredTickers]="[stock.ticker]"
-        [account]="account"
-        [positionId]="currentPosition?.positionId"
-        (orderRecorded)="positionChanged()"
-    >
-    </app-brokerage-orders>
-
+  <!-- existing pending positions -->
+  @if (pendingPosition) {
     <section class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h3 class="card-title">
-                <i class="bi bi-pencil-square me-2"></i>Manual Entry
-            </h3>
-            <app-stock-transaction
-                [ticker]="stock.ticker"
-                [position]="currentPosition">
-            </app-stock-transaction>
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="card-title">
+            <app-stock-link-and-tradingview-link [ticker]="pendingPosition.ticker"
+            [openInNewTab]="true"></app-stock-link-and-tradingview-link>
+            <div class="d-flex align-items-center">
+              <div class="pr-3">
+                <span class="stat-label">Bid: </span> <span
+              class="fw-bold">{{ pendingPosition.bid | currency }}</span>
+            </div>
+            <div class="px-3 border-left">
+              <span class="stat-label">Shares: </span> <span
+            class="fw-bold">{{ pendingPosition.numberOfShares }}</span>
+          </div>
+          <div class="px-3 border-left">
+            <span class="stat-label">Created: </span><span
+          class="fw-bold">{{ pendingPosition.created | date }} ({{ pendingPosition.numberOfDaysActive }} days ago)</span>
         </div>
-    </section>
+        <div class="px-3 border-left">
+          <span class="stat-label">Stop: </span> <span
+        class="fw-bold">{{ pendingPosition.stopPrice | currency }} ({{pendingPosition.stopLossAmount | currency}})</span>
+      </div>
+      <div class="pl-3 border-left">
+        <span class="stat-label">Strategy: </span><span
+      class="fw-bold">{{ pendingPosition.strategy }}</span>
+    </div>
+  </div>
+</div>
+</div>
+<p class="card-text">
+  {{ pendingPosition.notes }}
+</p>
+</div>
+<div class="card-footer no-border">
+  <button class="btn btn-warning btn-sm" (click)="closePendingPosition(pendingPosition)">Close</button>
+</div>
+</section>
+}
+
+
+<app-brokerage-new-order [ticker]="stock.ticker"></app-brokerage-new-order>
+
+<app-brokerage-orders
+  [filteredTickers]="[stock.ticker]"
+  [account]="account"
+  [positionId]="currentPosition?.positionId"
+  (orderRecorded)="positionChanged()"
+  >
+</app-brokerage-orders>
+
+<section class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h3 class="card-title">
+      <i class="bi bi-pencil-square me-2"></i>Manual Entry
+    </h3>
+    <app-stock-transaction
+      [ticker]="stock.ticker"
+      [position]="currentPosition">
+    </app-stock-transaction>
+  </div>
+</section>
 }
 @if (stock && stockOwnership && isActive('stocks')) {
-    <app-stock-ownership
-        [positions]=stockOwnership.positions
-        [quote]="stock.quote"
-        [positionChartInformation]="currentPositionChartInfo"
-        (positionChanged)="positionChanged()">
-    </app-stock-ownership>
+  <app-stock-ownership
+    [positions]=stockOwnership.positions
+    [quote]="stock.quote"
+    [positionChartInformation]="currentPositionChartInfo"
+    (positionChanged)="positionChanged()">
+  </app-stock-ownership>
 }
 @if (isActive('options')) {
-    <app-stock-option [ticker]=stock.ticker [options]=options></app-stock-option>
+  <app-stock-option [ticker]=stock.ticker [options]=options></app-stock-option>
 }
 @if (isActive('fundamentals')) {
-    <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
+  <app-stock-fundamentals [stock]=stock></app-stock-fundamentals>
 }
 @if (isActive('analysis') && stock) {
-    <app-stock-analysis [ticker]=stock.ticker [prices]="prices" [startDate]="startDate" [endDate]="endDate"></app-stock-analysis>
+  <app-stock-analysis [ticker]=stock.ticker [prices]="prices" [startDate]="startDate" [endDate]="endDate"></app-stock-analysis>
 }

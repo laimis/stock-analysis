@@ -1,153 +1,159 @@
 <section class="mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="m-0">Brokerage Orders</h3>
-        <div class="btn-group btn-group-sm">
-            @for(status of availableOrderStatuses; track status) {
-                <button class="btn btn-outline-secondary" [class.active]="activeFilter === status" (click)="filterOrders(status)">
-                    {{ status }}
-                </button>
-            }
-        </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="m-0">Brokerage Orders</h3>
+    <div class="btn-group btn-group-sm">
+      @for(status of availableOrderStatuses; track status) {
+        <button class="btn btn-outline-secondary" [class.active]="activeFilter === status" (click)="filterOrders(status)">
+          {{ status }}
+        </button>
+      }
     </div>
-    
-    <app-error-display [errors]="errors"></app-error-display>
+  </div>
 
-    @for(order of selectedOrders; track order) {
+  <app-error-display [errors]="errors"></app-error-display>
+
+  @for(order of selectedOrders; track order) {
         <div class="card mb-3" [ngClass]="{
             'border-success': order.status === 'Filled',
             'border-warning': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
             'border-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
         }">
-            <!-- Card Header -->
-            <div class="card-header bg-white py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <app-trading-view-link [ticker]="order.contracts[0].underlyingTicker"></app-trading-view-link>
-                            <app-stock-link [ticker]="order.contracts[0].underlyingTicker"></app-stock-link>
-                        </div>
+      <!-- Card Header -->
+      <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <app-trading-view-link [ticker]="order.contracts[0].underlyingTicker"></app-trading-view-link>
+              <app-stock-link [ticker]="order.contracts[0].underlyingTicker"></app-stock-link>
+            </div>
                         <span class="badge rounded-pill" [ngClass]="{
                             'bg-success': order.status === 'Filled',
                             'bg-warning text-dark': ['Pending', 'Working', 'PendingActivation'].includes(order.status),
                             'bg-danger': ['Canceled', 'Expired', 'Replaced'].includes(order.status)
                         }">{{ order.status }}</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <button *ngIf="order.status === 'Filled' && position" class="btn btn-outline-success btn-sm" (click)="applyOrderToPosition(order)">
-                            <i class="bi bi-check2-square me-2"></i>Apply to Position
-                        </button>
-                        <button *ngIf="order.status === 'Filled' && !position" class="btn btn-outline-success btn-sm" (click)="createPosition(order)">
-                            <i class="bi bi-plus-square me-2"></i>Create Position
-                        </button>
-                        <div class="fw-bold text-primary fs-5">
-                            {{ order.price | currency }}
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            @if (order.status === 'Filled' && position) {
+              <button class="btn btn-outline-success btn-sm" (click)="applyOrderToPosition(order)">
+                <i class="bi bi-check2-square me-2"></i>Apply to Position
+              </button>
+            }
+            @if (order.status === 'Filled' && !position) {
+              <button class="btn btn-outline-success btn-sm" (click)="createPosition(order)">
+                <i class="bi bi-plus-square me-2"></i>Create Position
+              </button>
+            }
+            <div class="fw-bold text-primary fs-5">
+              {{ order.price | currency }}
             </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Card Body -->
-            <div class="card-body p-4">
-                <!-- Timeline Information -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-4">
-                        <div class="d-flex flex-column">
-                            <small class="text-uppercase text-muted fw-bold mb-1">Entered</small>
-                            <span class="text-secondary">
-                                <i class="bi bi-clock me-1"></i>
-                                {{ order.enteredTime | parsedDate }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex flex-column" *ngIf="order.executionTime">
-                            <small class="text-uppercase text-muted fw-bold mb-1">Executed</small>
-                            <span class="text-secondary">
-                                <i class="bi bi-clock-history me-1"></i>
-                                {{ order.executionTime ? (order.executionTime | parsedDate) : 'Pending' }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-md-4 text-end">
-                        @if (order.canBeCancelled) {
-                            <button class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order)">
-                                <i class="bi bi-x-circle me-2"></i>Cancel Order
-                            </button>
-                        }
-                    </div>
-                </div>
+      <!-- Card Body -->
+      <div class="card-body p-4">
+        <!-- Timeline Information -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-4">
+            <div class="d-flex flex-column">
+              <small class="text-uppercase text-muted fw-bold mb-1">Entered</small>
+              <span class="text-secondary">
+                <i class="bi bi-clock me-1"></i>
+                {{ order.enteredTime | parsedDate }}
+              </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            @if (order.executionTime) {
+              <div class="d-flex flex-column">
+                <small class="text-uppercase text-muted fw-bold mb-1">Executed</small>
+                <span class="text-secondary">
+                  <i class="bi bi-clock-history me-1"></i>
+                  {{ order.executionTime ? (order.executionTime | parsedDate) : 'Pending' }}
+                </span>
+              </div>
+            }
+          </div>
+          <div class="col-md-4 text-end">
+            @if (order.canBeCancelled) {
+              <button class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order)">
+                <i class="bi bi-x-circle me-2"></i>Cancel Order
+              </button>
+            }
+          </div>
+        </div>
 
-                <!-- Enhanced Legs Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Itm/Otm</th>
-                                <th>Type</th>
-                                <th>Strike</th>
-                                <th>Expiration</th>
-                                <th>Quantity</th>
-                                <th>Market</th>
-                                <th>Delta</th>
-                                <th>IV</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (contract of order.contracts; track contract) {
-                                <tr>
-                                    <td>
+        <!-- Enhanced Legs Table -->
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Itm/Otm</th>
+                <th>Type</th>
+                <th>Strike</th>
+                <th>Expiration</th>
+                <th>Quantity</th>
+                <th>Market</th>
+                <th>Delta</th>
+                <th>IV</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (contract of order.contracts; track contract) {
+                <tr>
+                  <td>
                                         <span class="badge p-1 m-1" [ngClass]="{
                                             'bg-success-subtle text-success': contract.pctInTheMoney >= 0,
                                             'bg-danger-subtle text-danger': contract.pctInTheMoney < 0
                                         }">
-                                            {{ contract.pctInTheMoney >= 0 ? 'ITM ' : 'OTM ' }}
-                                            {{ contract.pctInTheMoney | percent }}
-                                        </span>
-                                    </td>
-                                    <td>
+                      {{ contract.pctInTheMoney >= 0 ? 'ITM ' : 'OTM ' }}
+                      {{ contract.pctInTheMoney | percent }}
+                    </span>
+                  </td>
+                  <td>
                                         <span class="badge p-1 m-1" [ngClass]="{
                                             'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
                                             'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
                                         }">
-                                            {{ contract.optionType }}
-                                        </span>
-                                    </td>
-                                    <td>{{ contract.strikePrice | currency }}</td>
-                                    <td>{{ contract.expiration }}</td>
-                                    <td class="ps-4">
-                                        {{ contract.quantity | number }}
+                      {{ contract.optionType }}
+                    </span>
+                  </td>
+                  <td>{{ contract.strikePrice | currency }}</td>
+                  <td>{{ contract.expiration }}</td>
+                  <td class="ps-4">
+                    {{ contract.quantity | number }}
                                         <span class="badge m-1" [ngClass]="{
                                             'bg-success': contract.instruction === 'BuyToOpen' || contract.instruction === 'BuyToClose',
                                             'bg-danger': contract.instruction === 'SellToOpen' || contract.instruction === 'SellToClose'
                                         }">{{ contract.instruction }}</span>
-                                    </td>
-                                    <td class="text-end pe-4">{{ contract.market | currency }}</td>
-                                    <td>{{ contract.details?.delta | number }}</td>
-                                    <td>{{ contract.details?.volatility | number}}</td>
-                                </tr>
-                            }
-                            @if (order.isActive) {
-                                <tr class="bg-light fw-bold">
-                                    <td colspan="5" class="ps-4">Current Market Price</td>
-                                    <td class="text-end pe-4">{{ marketPrice(order.contracts) | currency }}</td>
-                                    <td colspan="2"></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                  </td>
+                  <td class="text-end pe-4">{{ contract.market | currency }}</td>
+                  <td>{{ contract.details?.delta | number }}</td>
+                  <td>{{ contract.details?.volatility | number}}</td>
+                </tr>
+              }
+              @if (order.isActive) {
+                <tr class="bg-light fw-bold">
+                  <td colspan="5" class="ps-4">Current Market Price</td>
+                  <td class="text-end pe-4">{{ marketPrice(order.contracts) | currency }}</td>
+                  <td colspan="2"></td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
+      </div>
+    </div>
     } @empty {
-        <div class="alert alert-info d-flex align-items-center p-4" role="alert">
-            <span>No {{ activeFilter }} option orders present in brokerage account</span>
-        </div>
-    }
+    <div class="alert alert-info d-flex align-items-center p-4" role="alert">
+      <span>No {{ activeFilter }} option orders present in brokerage account</span>
+    </div>
+  }
 
-    <app-option-position-create-modal
-        [isVisible]="isModalVisible"
-        [selectedOption]="selectedOption"
-        (isVisibleChange)="isModalVisible = $event"
-        (positionCreated)="ordersUpdated.emit()"
-        (errorsOccurred)="errors = $event"></app-option-position-create-modal>
+  <app-option-position-create-modal
+    [isVisible]="isModalVisible"
+    [selectedOption]="selectedOption"
+    (isVisibleChange)="isModalVisible = $event"
+    (positionCreated)="ordersUpdated.emit()"
+  (errorsOccurred)="errors = $event"></app-option-position-create-modal>
 </section>

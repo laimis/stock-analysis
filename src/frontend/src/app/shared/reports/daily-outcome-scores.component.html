@@ -1,10 +1,16 @@
-<canvasjs-chart *ngIf="obvAndCloseOptions" [options]="obvAndCloseOptions"></canvasjs-chart>
+@if (obvAndCloseOptions) {
+  <canvasjs-chart [options]="obvAndCloseOptions"></canvasjs-chart>
+}
 
 <div class="row">
-    <div class="col">
-        <app-line-chart *ngIf="gainContainer" [dataContainer]="gainContainer"></app-line-chart>
-    </div>
-    <div class="col">
-        <app-line-chart *ngIf="profitContainer" [dataContainer]="profitContainer"></app-line-chart>
-    </div>
+  <div class="col">
+    @if (gainContainer) {
+      <app-line-chart [dataContainer]="gainContainer"></app-line-chart>
+    }
+  </div>
+  <div class="col">
+    @if (profitContainer) {
+      <app-line-chart [dataContainer]="profitContainer"></app-line-chart>
+    }
+  </div>
 </div>

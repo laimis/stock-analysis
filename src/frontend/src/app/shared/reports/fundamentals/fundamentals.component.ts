@@ -1,4 +1,4 @@
-import { DecimalPipe, NgClass, NgIf } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { TickerFundamentals } from 'src/app/services/stocks.service';
 import { StockLinkAndTradingviewLinkComponent } from "../../stocks/stock-link-and-tradingview-link.component";
@@ -7,7 +7,6 @@ import { MarketCapPipe } from 'src/app/services/marketcap.filter';
 @Component({
   selector: 'app-fundamentals',
   imports: [
-    NgIf,
     NgClass,
     DecimalPipe,
     MarketCapPipe,

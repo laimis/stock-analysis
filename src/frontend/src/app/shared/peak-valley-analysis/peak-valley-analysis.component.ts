@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ChartMarker, InfectionPointType, InflectionPoint, InflectionPointsReportDetails, LatestTrendAnalysis, PositionChartInformation, PriceBar, TrendAnalysisResult } from '../../services/stocks.service';
 import { PriceChartComponent } from "../price-chart/price-chart.component";
-import { NgClass, NgIf, PercentPipe } from '@angular/common';
+import { NgClass, PercentPipe } from '@angular/common';
 import { green, red } from 'src/app/services/charts.service';
 
 
@@ -17,7 +17,7 @@ function toChartMarker(inflectionPoint: InflectionPoint): ChartMarker {
 
 @Component({
   selector: 'app-peak-valley-analysis',
-  imports: [PriceChartComponent, NgIf, NgClass, PercentPipe],
+  imports: [PriceChartComponent, NgClass, PercentPipe],
   templateUrl: './peak-valley-analysis.component.html',
   styleUrl: './peak-valley-analysis.component.css'
 })

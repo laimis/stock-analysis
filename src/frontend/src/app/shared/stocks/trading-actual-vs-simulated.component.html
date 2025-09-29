@@ -1,71 +1,73 @@
 <div>
-    @if (sortedResults) {
-        <table class="table table-hover simulation-table table-sm mt-2">
-            <thead>
+  @if (sortedResults) {
+    <table class="table table-hover simulation-table table-sm mt-2">
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th class="sort-header" (click)="sortChanged('profit')">Profit</th>
+          <th class="sort-header" (click)="sortChanged('stopPrice')">Stop</th>
+          <th class="sort-header" (click)="sortChanged('rr')">R/R</th>
+          <th class="sort-header" (click)="sortChanged('gainPct')">% Gain</th>
+          <th class="sort-header" (click)="sortChanged('maxGainPct')">Max Fav Exc</th>
+          <th class="sort-header" (click)="sortChanged('maxDrawdownPct')">Max Adv Exc</th>
+          <th class="sort-header" (click)="sortChanged('maxGainFirst10Bars')">MFE 10</th>
+          <th class="sort-header" (click)="sortChanged('maxDrawdownFirst10Bars')">MAE 10</th>
+          <th class="sort-header" (click)="sortChanged('daysHeld')">DaysHeld</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of sortedResults; track r; let i = $index) {
+          <tr (click)="toggleShowDetails(i)">
+            <td class="text-muted">{{ r.strategyName }}</td>
+            <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{ r.position.profit | currency }}</td>
+            <td>{{ r.position.stopPrice | currency }}</td>
+            <td>{{ r.position.rr | number }}</td>
+            <td>{{ r.position.gainPct | percent:'1.2-2' }}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxGainPct | percent:'1.2-2' }}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxDrawdownPct | percent:'1.2-2' }}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainFirst10Bars < r.maxDrawdownFirst10Bars * -1}">{{ r.maxGainFirst10Bars | percent:'1.2-2' }}</td>
+            <td [ngClass]="{'bg-negative': r.maxGainFirst10Bars < r.maxDrawdownFirst10Bars * -1}">{{ r.maxDrawdownFirst10Bars | percent:'1.2-2' }}</td>
+            <td>{{ r.position.daysHeld }}</td>
+            <td>
+              <!-- font awesome icon, green color -->
+              @if (r.forcedClosed) {
+                <i class="fas fa-circle text-success"></i>
+              }
+            </td>
+          </tr>
+          @if (showDetails === i) {
             <tr>
-                <th>Strategy</th>
-                <th class="sort-header" (click)="sortChanged('profit')">Profit</th>
-                <th class="sort-header" (click)="sortChanged('stopPrice')">Stop</th>
-                <th class="sort-header" (click)="sortChanged('rr')">R/R</th>
-                <th class="sort-header" (click)="sortChanged('gainPct')">% Gain</th>
-                <th class="sort-header" (click)="sortChanged('maxGainPct')">Max Fav Exc</th>
-                <th class="sort-header" (click)="sortChanged('maxDrawdownPct')">Max Adv Exc</th>
-                <th class="sort-header" (click)="sortChanged('maxGainFirst10Bars')">MFE 10</th>
-                <th class="sort-header" (click)="sortChanged('maxDrawdownFirst10Bars')">MAE 10</th>
-                <th class="sort-header" (click)="sortChanged('daysHeld')">DaysHeld</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-                @for (r of sortedResults; track r; let i = $index) {
-                    <tr (click)="toggleShowDetails(i)">
-                        <td class="text-muted">{{ r.strategyName }}</td>
-                        <td [ngClass]="{'bg-negative': r.position.profit < 0, 'fw-bold': true}">{{ r.position.profit | currency }}</td>
-                        <td>{{ r.position.stopPrice | currency }}</td>
-                        <td>{{ r.position.rr | number }}</td>
-                        <td>{{ r.position.gainPct | percent:'1.2-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxGainPct | percent:'1.2-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainPct < r.maxDrawdownPct * -1}">{{ r.maxDrawdownPct | percent:'1.2-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainFirst10Bars < r.maxDrawdownFirst10Bars * -1}">{{ r.maxGainFirst10Bars | percent:'1.2-2' }}</td>
-                        <td [ngClass]="{'bg-negative': r.maxGainFirst10Bars < r.maxDrawdownFirst10Bars * -1}">{{ r.maxDrawdownFirst10Bars | percent:'1.2-2' }}</td>
-                        <td>{{ r.position.daysHeld }}</td>
-                        <td>
-                            <!-- font awesome icon, green color -->
-                            <i class="fas fa-circle text-success" *ngIf="r.forcedClosed"></i>
-                        </td>
-                    </tr>
-                    @if (showDetails === i) {
-                        <tr>
-                            <td></td>
-                            <td colspan="9">
-                                <table class="table small">
-                                    <tbody>
-                                        @for (e of r.position.events; track e) {
-                                            <tr class="event" [ngClass]="'event-' + e.type">
-                                                <td>{{ e.date | parsedDate }}</td>
-                                                <td>{{ e.type }}</td>
-                                                <td>{{ e.quantity }}</td>
-                                                <td>{{ e.value | currency }}</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
+              <td></td>
+              <td colspan="9">
+                <table class="table small">
+                  <tbody>
+                    @for (e of r.position.events; track e) {
+                      <tr class="event" [ngClass]="'event-' + e.type">
+                        <td>{{ e.date | parsedDate }}</td>
+                        <td>{{ e.type }}</td>
+                        <td>{{ e.quantity }}</td>
+                        <td>{{ e.value | currency }}</td>
+                      </tr>
                     }
-                }
-            </tbody>
-        </table>
-    }
-    @if (simulationErrors) {
-        <div class="placeholder col-12">
-            @for (e of simulationErrors; track e) {
-                <div>
-                    <div class="alert alert-danger" role="alert">
-                        {{ e }}
-                    </div>
-                </div>
-            }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  }
+  @if (simulationErrors) {
+    <div class="placeholder col-12">
+      @for (e of simulationErrors; track e) {
+        <div>
+          <div class="alert alert-danger" role="alert">
+            {{ e }}
+          </div>
         </div>
-    }
+      }
+    </div>
+  }
 </div>

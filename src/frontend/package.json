@@ -8,7 +8,6 @@
     "start:windows": "ng serve --port 44406 --ssl --ssl-cert \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.pem\" --ssl-key \"%APPDATA%\\ASP.NET\\https\\%npm_package_name%.key\"",
     "start:default": "ng serve --port 44406 --ssl --ssl-cert \"$HOME/.aspnet/https/${npm_package_name}.pem\" --ssl-key \"$HOME/.aspnet/https/${npm_package_name}.key\"",
     "build": "ng build",
-    "build:ssr": "ng run tradewatch:server:dev",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -17,14 +16,14 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^19.2.2",
-    "@angular/common": "^19.2.2",
-    "@angular/compiler": "^19.2.2",
-    "@angular/core": "^19.2.2",
-    "@angular/forms": "^19.2.2",
-    "@angular/platform-browser": "^19.2.2",
-    "@angular/platform-browser-dynamic": "^19.2.2",
-    "@angular/router": "^19.2.2",
+    "@angular/animations": "^20.3.2",
+    "@angular/common": "^20.3.2",
+    "@angular/compiler": "^20.3.2",
+    "@angular/core": "^20.3.2",
+    "@angular/forms": "^20.3.2",
+    "@angular/platform-browser": "^20.3.2",
+    "@angular/platform-browser-dynamic": "^20.3.2",
+    "@angular/router": "^20.3.2",
     "@canvasjs/angular-charts": "^1.0.3",
     "bootstrap": "^5.3.1",
     "bootstrap-icons": "^1.9.1",
@@ -35,15 +34,15 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.3",
+    "@angular-devkit/build-angular": "^20.3.3",
     "@angular-eslint/builder": "^18.0.1",
     "@angular-eslint/eslint-plugin": "^18.0.1",
     "@angular-eslint/eslint-plugin-template": "^18.0.1",
     "@angular-eslint/template-parser": "^18.0.1",
     "@typescript-eslint/parser": "^7.11.0",
-    "@angular/cli": "^19.2.3",
-    "@angular/compiler-cli": "^19.2.2",
-    "@angular/language-service": "^19.2.2",
+    "@angular/cli": "^20.3.3",
+    "@angular/compiler-cli": "^20.3.2",
+    "@angular/language-service": "^20.3.2",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@types/jasmine": "~3.6.0",
     "jasmine-core": "~3.8.0",
@@ -55,6 +54,6 @@
     "karma-jasmine-html-reporter": "^1.7.0",
     "object-path": ">=0.11.5",
     "run-script-os": "^1.1.6",
-    "typescript": "~5.6.3"
+    "typescript": "~5.9.2"
   }
 }

@@ -1,46 +1,47 @@
 @for (position of positions; track position.positionId) {
-    <div class="card border-info mt-4">
-        <div class="card-body">
-            <div class="card-title">
-                <div class="container">
-                    <div class="row">
-                        <div class="col">
-                            <app-stock-link class="position-ticker" [ticker]="position.underlyingTicker" [openInNewTab]="true"></app-stock-link>
-                            <span class="position-price">{{ position.underlyingPrice | currency }}</span>
-                            <i
-                                (click)="toggleExpandedPositions($index);"
-                                class="bi bi-info-square-fill ms-2" role="button"></i>
-                        </div>
-                        <div class="col text-center">
-                        </div>
-                        <div class="col">
-                            <span class="position-expiration float-end">{{position.daysLeft}} days to expiration</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <app-option-position
-                    *ngIf="expandedPositions[$index]"
-                    [position]="position"
-                    [orders]="orders"
-                    (positionDeleted)="positionsChanged.emit()"
-                    (positionChanged)="positionsChanged.emit()"
-                    (errorOccurred)="errorOccurred.emit($event)">
-                </app-option-position>
-        </div>
-    </div>
-} @empty {
-    <div class="alert alert-secondary mt-4" role="alert">
-        You have no option options contracts on record. To record a position, select the ticker below to get started:
-        <div class="row">
+  <div class="card border-info mt-4">
+    <div class="card-body">
+      <div class="card-title">
+        <div class="container">
+          <div class="row">
             <div class="col">
-                <app-stock-search
-                    label="{{null}}"
-                    placeholder="Search for securities using ticker or name"
-                    (tickerSelected)="onTickerSelected($event)"
-                    cssClass="form-control">
-                </app-stock-search>
+              <app-stock-link class="position-ticker" [ticker]="position.underlyingTicker" [openInNewTab]="true"></app-stock-link>
+              <span class="position-price">{{ position.underlyingPrice | currency }}</span>
+              <i
+                (click)="toggleExpandedPositions($index);"
+              class="bi bi-info-square-fill ms-2" role="button"></i>
             </div>
+            <div class="col text-center">
+            </div>
+            <div class="col">
+              <span class="position-expiration float-end">{{position.daysLeft}} days to expiration</span>
+            </div>
+          </div>
         </div>
+      </div>
+      @if (expandedPositions[$index]) {
+        <app-option-position
+          [position]="position"
+          [orders]="orders"
+          (positionDeleted)="positionsChanged.emit()"
+          (positionChanged)="positionsChanged.emit()"
+          (errorOccurred)="errorOccurred.emit($event)">
+        </app-option-position>
+      }
     </div>
+  </div>
+  } @empty {
+  <div class="alert alert-secondary mt-4" role="alert">
+    You have no option options contracts on record. To record a position, select the ticker below to get started:
+    <div class="row">
+      <div class="col">
+        <app-stock-search
+          label="{{null}}"
+          placeholder="Search for securities using ticker or name"
+          (tickerSelected)="onTickerSelected($event)"
+          cssClass="form-control">
+        </app-stock-search>
+      </div>
+    </div>
+  </div>
 }

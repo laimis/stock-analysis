@@ -3,12 +3,12 @@ import { BrokerageService, OptionOrderCommand, OptionOrderInstruction, OptionOrd
 import { OptionPosition, OptionService } from 'src/app/services/option.service';
 import { GetErrors } from 'src/app/services/utils';
 import { ErrorDisplayComponent } from "../../../shared/error-display/error-display.component";
-import { CurrencyPipe, NgIf } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-option-position-add-modal',
-  imports: [ErrorDisplayComponent, CurrencyPipe, FormsModule, NgIf],
+  imports: [ErrorDisplayComponent, CurrencyPipe, FormsModule],
   templateUrl: './option-position-add-modal.component.html',
   styleUrl: './option-position-add-modal.component.css'
 })

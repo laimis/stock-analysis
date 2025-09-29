@@ -1,5 +1,5 @@
 import {Component, OnInit, Input} from '@angular/core';
-import {CurrencyPipe, DecimalPipe, NgClass, NgForOf, NgIf, PercentPipe} from "@angular/common";
+import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
 import {GetErrors, parseDate} from "../../services/utils";
@@ -28,19 +28,17 @@ enum SpreadType {
 @Component({
     selector: 'app-option-spread-builder',
     imports: [
-        CurrencyPipe,
-        DecimalPipe,
-        FormsModule,
-        NgForOf,
-        NgIf,
-        PercentPipe,
-        LoadingComponent,
-        ErrorDisplayComponent,
-        NgClass,
-        StockLinkAndTradingviewLinkComponent,
-        StockSearchComponent,
-        OptionPendingPositionCreateModalComponent
-    ],
+    CurrencyPipe,
+    DecimalPipe,
+    FormsModule,
+    PercentPipe,
+    LoadingComponent,
+    ErrorDisplayComponent,
+    NgClass,
+    StockLinkAndTradingviewLinkComponent,
+    StockSearchComponent,
+    OptionPendingPositionCreateModalComponent
+],
     templateUrl: './option-spread-builder.component.html',
     styleUrl: './option-spread-builder.component.css'
 })

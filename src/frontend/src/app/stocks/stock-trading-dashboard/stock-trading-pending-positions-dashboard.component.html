@@ -1,42 +1,48 @@
 <div>
-    @if (feedbackMessage) {
-        <div class="alert alert-success" role="alert">
-            {{ feedbackMessage }}
-        </div>
-    }
-
-    <div class="tab-container mt-2">
-        <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
-            Pending Positions
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
-            New Position
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('orders')}" [routerLink]="" (click)="activateTab('orders')">
-            Orders
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
-            Analysis
-        </a>
+  @if (feedbackMessage) {
+    <div class="alert alert-success" role="alert">
+      {{ feedbackMessage }}
     </div>
-    
+  }
+
+  <div class="tab-container mt-2">
+    <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
+      Pending Positions
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]="" (click)="activateTab('positions')">
+      New Position
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('orders')}" [routerLink]="" (click)="activateTab('orders')">
+      Orders
+    </a>
+    <a class="tab" [ngClass]="{'is-active': isActive('analysis')}" [routerLink]="" (click)="activateTab('analysis')">
+      Analysis
+    </a>
+  </div>
+
+  @if (isActive('positions')) {
     <app-stock-trading-new-position
-        *ngIf="isActive('positions')"
-        (pendingPositionCreated)="pendingPositionCreated()"
-        (positionOpened)="positionOpened()">
+      (pendingPositionCreated)="pendingPositionCreated()"
+      (positionOpened)="positionOpened()">
     </app-stock-trading-new-position>
+  }
+  @if (isActive('pending')) {
     <app-stock-trading-pendingpositions
-        *ngIf="isActive('pending')"
-        (pendingPositionClosed)="pendingPositionClosed()">
+      (pendingPositionClosed)="pendingPositionClosed()">
     </app-stock-trading-pendingpositions>
+  }
+  @if (isActive('orders')) {
     <app-brokerage-orders
-        *ngIf="isActive('orders')"
-        (orderRecorded)="getOrders()"
-        [account]="account"
+      (orderRecorded)="getOrders()"
+      [account]="account"
     ></app-brokerage-orders>
-    <app-brokerage-new-order *ngIf="isActive('orders')"></app-brokerage-new-order>
-    
+  }
+  @if (isActive('orders')) {
+    <app-brokerage-new-order></app-brokerage-new-order>
+  }
+
+  @if (isActive('analysis')) {
     <app-stock-trading-pendingposition-analysis
-        *ngIf="isActive('analysis')"
     ></app-stock-trading-pendingposition-analysis>
+  }
 </div>

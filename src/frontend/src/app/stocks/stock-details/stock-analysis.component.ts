@@ -1,4 +1,4 @@
-import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
     InflectionPointsReport,
@@ -30,7 +30,6 @@ import { LoadingComponent } from "../../shared/loading/loading.component";
     styleUrls: ['./stock-analysis.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
     imports: [
-    NgIf,
     NgClass,
     DatePipe,
     GapsComponent,

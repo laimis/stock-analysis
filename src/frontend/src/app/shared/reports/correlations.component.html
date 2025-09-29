@@ -1,33 +1,37 @@
 <section class="correlations-section">
-    <h5>
-        Correlations ({{days}} days)
-        <span class="float-end" *ngIf="avgCorrelation">Avg Correlation: {{avgCorrelation | number: '1.2-2'}}</span>
-    </h5>
-    <table class="table table-striped" *ngIf="sortedCorrelations">
-        <thead>
+  <h5>
+    Correlations ({{days}} days)
+    @if (avgCorrelation) {
+      <span class="float-end">Avg Correlation: {{avgCorrelation | number: '1.2-2'}}</span>
+    }
+  </h5>
+  @if (sortedCorrelations) {
+    <table class="table table-striped">
+      <thead>
         <tr>
-            <th class="fixed-side">Ticker</th>
-            @for (c of correlationTickers; track c) {
-                <th role="button" (click)="sortByCorrelation(c)">{{ c }}</th>
-            }
-            <th (click)="sortByAverageCorrelation()">Avg</th>
+          <th class="fixed-side">Ticker</th>
+          @for (c of correlationTickers; track c) {
+            <th role="button" (click)="sortByCorrelation(c)">{{ c }}</th>
+          }
+          <th (click)="sortByAverageCorrelation()">Avg</th>
         </tr>
-        </thead>
-        <tbody>
-            @for (correlation of sortedCorrelations; track correlation) {
-                <tr>
-                    <td class="fixed-side">
-                        <app-stock-link-and-tradingview-link [ticker]="correlation.ticker"></app-stock-link-and-tradingview-link>
-                    </td>
-                    @for (c of correlation.correlations; track c) {
-                        <td
-                            [ngClass]="{'high-negative': c <= -0.5, 'high-positive': c >= 0.5, 'middle-negative': c <= -0.3 && c > -0.5, 'middle-positive': c >= 0.3 && c < 0.5}">
-                            {{ c | number:'1.2-2' }}
-                        </td>
-                    }
-                    <td>{{correlation.averageCorrelation | number: '1.2-2'}}</td>
-                </tr>
+      </thead>
+      <tbody>
+        @for (correlation of sortedCorrelations; track correlation) {
+          <tr>
+            <td class="fixed-side">
+              <app-stock-link-and-tradingview-link [ticker]="correlation.ticker"></app-stock-link-and-tradingview-link>
+            </td>
+            @for (c of correlation.correlations; track c) {
+              <td
+                [ngClass]="{'high-negative': c <= -0.5, 'high-positive': c >= 0.5, 'middle-negative': c <= -0.3 && c > -0.5, 'middle-positive': c >= 0.3 && c < 0.5}">
+                {{ c | number:'1.2-2' }}
+              </td>
             }
-        </tbody>
+            <td>{{correlation.averageCorrelation | number: '1.2-2'}}</td>
+          </tr>
+        }
+      </tbody>
     </table>
+  }
 </section>

@@ -8,16 +8,14 @@ import {
     BrokerageService,
 } from "../../../services/brokerage.service";
 import {GetErrors} from "../../../services/utils";
-import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 
 @Component({
   selector: 'app-option-contract-close-modal',
     imports: [
-        FormsModule,
-        CurrencyPipe,
-        NgIf,
-        NgForOf
-    ],
+    FormsModule,
+    CurrencyPipe
+],
   templateUrl: './option-contract-close-modal.component.html',
   styleUrl: './option-contract-close-modal.component.css'
 })

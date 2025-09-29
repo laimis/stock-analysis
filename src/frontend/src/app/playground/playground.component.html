@@ -1,42 +1,52 @@
 <div>
 
-    <app-error-display [errors]="errors"></app-error-display>
+  <app-error-display [errors]="errors"></app-error-display>
 
-    <button (click)="run()" class="btn btn-primary">Multiple API call demo</button>
+  <button (click)="run()" class="btn btn-primary">Multiple API call demo</button>
 
-    {{ status }}
-    
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Scatter plot demo</h5>
-            <button (click)="runScatterPlot()" class="btn btn-primary">Run Scatter Plot</button>
-            <app-loading *ngIf="loadingScatterPlot"></app-loading>
-            @for (option of chartOptions; track option) {
-                <canvasjs-chart [options]="option"></canvasjs-chart>
-            }
-        </div>
+  {{ status }}
+
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Scatter plot demo</h5>
+      <button (click)="runScatterPlot()" class="btn btn-primary">Run Scatter Plot</button>
+      @if (loadingScatterPlot) {
+        <app-loading></app-loading>
+      }
+      @for (option of chartOptions; track option) {
+        <canvasjs-chart [options]="option"></canvasjs-chart>
+      }
     </div>
-    
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Correlation demo</h5>
-            <label for="days" class="form-label">Number of days</label>
-            <input class="form-control" type="number" id="days" [(ngModel)]="daysForCorrelations" [disabled]="loadingCorrelations" />
-            <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
-            <app-loading *ngIf="loadingCorrelations"></app-loading>
-            <app-correlations *ngIf="correlations" [correlations]="correlations" [days]="daysForCorrelations"></app-correlations>
-        </div>
-    </div>
+  </div>
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Fundamentals demo</h5>
-            <button (click)="runFundamentals()" class="btn btn-primary" [disabled]="loadingFundamentals">Run Fundamentals</button>
-            <app-loading *ngIf="loadingFundamentals"></app-loading>
-            <app-fundamentals *ngIf="fundamentals" [data]="fundamentals"></app-fundamentals>
-        </div>
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Correlation demo</h5>
+      <label for="days" class="form-label">Number of days</label>
+      <input class="form-control" type="number" id="days" [(ngModel)]="daysForCorrelations" [disabled]="loadingCorrelations" />
+      <button (click)="runCorrelations()" class="btn btn-primary" [disabled]="loadingCorrelations">Run Correlation</button>
+      @if (loadingCorrelations) {
+        <app-loading></app-loading>
+      }
+      @if (correlations) {
+        <app-correlations [correlations]="correlations" [days]="daysForCorrelations"></app-correlations>
+      }
     </div>
+  </div>
 
-    
-    
+  <div class="card mt-4">
+    <div class="card-body">
+      <h5 class="card-title">Fundamentals demo</h5>
+      <button (click)="runFundamentals()" class="btn btn-primary" [disabled]="loadingFundamentals">Run Fundamentals</button>
+      @if (loadingFundamentals) {
+        <app-loading></app-loading>
+      }
+      @if (fundamentals) {
+        <app-fundamentals [data]="fundamentals"></app-fundamentals>
+      }
+    </div>
+  </div>
+
+
+
 </div>

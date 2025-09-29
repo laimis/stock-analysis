@@ -1,4 +1,4 @@
-import {CurrencyPipe, DecimalPipe, NgClass, NgIf, PercentPipe} from '@angular/common';
+import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
 import {Component, Input} from '@angular/core';
 import {
     AnalysisOutcomeEvaluation,
@@ -15,11 +15,10 @@ import {StockLinkComponent} from "../stocks/stock-link.component";
     styleUrls: ['./outcomes.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
     imports: [
-        NgClass,
-        TradingViewLinkComponent,
-        StockLinkComponent,
-        NgIf
-    ]
+    NgClass,
+    TradingViewLinkComponent,
+    StockLinkComponent
+]
 })
 export class OutcomesComponent {
 

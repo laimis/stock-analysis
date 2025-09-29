@@ -1,99 +1,108 @@
 <div>
-    <h3>Simulating trades</h3>
-    <div class="mb-3">
-        <label for="numTradesInput" class="form-label">Number of trades to simulate:</label>
-        <input type="number" class="form-control" id="numTradesInput" [(ngModel)]="numberOfTrades" min="1" [disabled]="loading">
-    </div>
-    <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" id="closePositionsSwitch" [(ngModel)]="closePositions" [disabled]="loading">
-        <label class="form-check-label" for="closePositionsSwitch">Close positions at end of simulations</label>
-    </div>
-    <div class="mt-3">
-        <button class="btn btn-primary" (click)="simulateTrades()" [disabled]="loading">Simulate trades</button>
-    </div>
-    
-    <app-loading *ngIf="loading"></app-loading>
-    <section *ngIf="results">
-        <h3>Results</h3>
-        <div class="row mb-3">
-            <div class="col-10">
-                <div>
-                    <span class="text-muted">Earliest date:</span> {{ results[0].performance.earliestDate | date }},
-                    <span class="text-muted">latest date:</span> {{ results[0].performance.latestDate | date }}
-                </div>
-            </div>
-            <div class="col-2">
-                <a [href]="getExportUrl()" class="btn btn-primary btn-sm float-end">Export</a>
-            </div>
+  <h3>Simulating trades</h3>
+  <div class="mb-3">
+    <label for="numTradesInput" class="form-label">Number of trades to simulate:</label>
+    <input type="number" class="form-control" id="numTradesInput" [(ngModel)]="numberOfTrades" min="1" [disabled]="loading">
+  </div>
+  <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" id="closePositionsSwitch" [(ngModel)]="closePositions" [disabled]="loading">
+    <label class="form-check-label" for="closePositionsSwitch">Close positions at end of simulations</label>
+  </div>
+  <div class="mt-3">
+    <button class="btn btn-primary" (click)="simulateTrades()" [disabled]="loading">Simulate trades</button>
+  </div>
+
+  @if (loading) {
+    <app-loading></app-loading>
+  }
+  @if (results) {
+    <section>
+      <h3>Results</h3>
+      <div class="row mb-3">
+        <div class="col-10">
+          <div>
+            <span class="text-muted">Earliest date:</span> {{ results[0].performance.earliestDate | date }},
+            <span class="text-muted">latest date:</span> {{ results[0].performance.latestDate | date }}
+          </div>
         </div>
-        <app-error-display [errors]="errors"></app-error-display>
-        <app-stock-trading-strategies [results]=results></app-stock-trading-strategies>
-        <div class="row mt-3">
-            @for(b of benchmarks; track b) {
-                <div>
-                    <span class="text-muted">{{ b.ticker }} during that time advanced from </span>
-                    {{ b.prices[0].close| currency }} to {{ b.prices[b.prices.length - 1].close | currency }}
-                    <span class="text-muted">for gain of </span>
-                    {{ (b.prices[b.prices.length - 1].close - b.prices[0].close) / b.prices[0].close | percent }}
-                </div>
-            }
+        <div class="col-2">
+          <a [href]="getExportUrl()" class="btn btn-primary btn-sm float-end">Export</a>
         </div>
+      </div>
+      <app-error-display [errors]="errors"></app-error-display>
+      <app-stock-trading-strategies [results]=results></app-stock-trading-strategies>
+      <div class="row mt-3">
+        @for(b of benchmarks; track b) {
+          <div>
+            <span class="text-muted">{{ b.ticker }} during that time advanced from </span>
+            {{ b.prices[0].close| currency }} to {{ b.prices[b.prices.length - 1].close | currency }}
+            <span class="text-muted">for gain of </span>
+            {{ (b.prices[b.prices.length - 1].close - b.prices[0].close) / b.prices[0].close | percent }}
+          </div>
+        }
+      </div>
     </section>
-    <section *ngIf="results">
-        
-        <!-- section to select the strategy to view -->
-        <div class="mb-3">
-            <label class="form-label">Select strategies to compare:</label>
-            <select class="form-select" id="strategySelectOne" [(ngModel)]="mainStrategy">
-                <option *ngFor="let strategy of results" [value]="strategy.strategyName" [selected]="mainStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
-            </select>
-            <select class="form-select" id="strategySelectTwo" [(ngModel)]="alternateStrategy">
-                <option *ngFor="let strategy of results" [value]="strategy.strategyName" [selected]="alternateStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
-            </select>
+  }
+  @if (results) {
+    <section>
+      <!-- section to select the strategy to view -->
+      <div class="mb-3">
+        <label class="form-label">Select strategies to compare:</label>
+        <select class="form-select" id="strategySelectOne" [(ngModel)]="mainStrategy">
+          @for (strategy of results; track strategy) {
+            <option [value]="strategy.strategyName" [selected]="mainStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
+          }
+        </select>
+        <select class="form-select" id="strategySelectTwo" [(ngModel)]="alternateStrategy">
+          @for (strategy of results; track strategy) {
+            <option [value]="strategy.strategyName" [selected]="alternateStrategy === strategy.strategyName">{{ strategy.strategyName }}</option>
+          }
+        </select>
+      </div>
+      @if (mainStrategy && alternateStrategy) {
+        <div>
+          <h3>{{mainStrategy}} vs {{alternateStrategy}}</h3>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Opened - Closed</th>
+                <th>Opened - Closed Alt</th>
+                <th>Profit</th>
+                <th>Profit Alt</th>
+                <th>Profit Diff</th>
+                <th>Gain %</th>
+                <th>Gain % Alt</th>
+                <th>Gain %  Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(result of biggestWinnersComparedToActual(); track result) {
+                <tr>
+                  <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
+                  <td>
+                    {{ result.position.opened | parsedDate }} - {{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }})
+                    <div class="small">stop: {{result.position.stopPrice | currency}}</div>
+                  </td>
+                  <td>
+                    @let trade = findTrade(result.position);
+                    {{ trade.position.opened | parsedDate }} - {{ trade.forcedClosed ? 'open' : trade.position.closed | parsedDate }}
+                    ({{ trade.position.daysHeld }})
+                    <div class="small">stop: {{trade.position.stopPrice | currency}}</div>
+                  </td>
+                  <td>{{ result.position.profit | currency }}</td>
+                  <td>{{ trade.position.profit | currency }}</td>
+                  <td>{{ result.position.profit - trade.position.profit | currency }}</td>
+                  <td>{{ result.position.gainPct | percent }}</td>
+                  <td>{{ trade.position.gainPct | percent }}</td>
+                  <td>{{ result.position.gainPct - trade.position.gainPct | percent }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-        
-        <div *ngIf="mainStrategy && alternateStrategy">
-            <h3>{{mainStrategy}} vs {{alternateStrategy}}</h3>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th>Opened - Closed</th>
-                        <th>Opened - Closed Alt</th>
-                        <th>Profit</th>
-                        <th>Profit Alt</th>
-                        <th>Profit Diff</th>
-                        <th>Gain %</th>
-                        <th>Gain % Alt</th>
-                        <th>Gain %  Diff</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for(result of biggestWinnersComparedToActual(); track result) {
-                        <tr>
-                            <td><app-stock-link-and-tradingview-link [openInNewTab]="true" [ticker]="result.position.ticker"></app-stock-link-and-tradingview-link></td>
-                            <td>
-                                {{ result.position.opened | parsedDate }} - {{ result.forcedClosed ? 'open' : result.position.closed | parsedDate }} ({{ result.position.daysHeld }})
-                                <div class="small">stop: {{result.position.stopPrice | currency}}</div>
-                            </td>
-                            <td>
-                                @let trade = findTrade(result.position);
-                                {{ trade.position.opened | parsedDate }} - {{ trade.forcedClosed ? 'open' : trade.position.closed | parsedDate }}
-                                ({{ trade.position.daysHeld }})
-                                <div class="small">stop: {{trade.position.stopPrice | currency}}</div>
-                            </td>
-                            <td>{{ result.position.profit | currency }}</td>
-                            <td>{{ trade.position.profit | currency }}</td>
-                            <td>{{ result.position.profit - trade.position.profit | currency }}</td>
-                            <td>{{ result.position.gainPct | percent }}</td>
-                            <td>{{ trade.position.gainPct | percent }}</td>
-                            <td>{{ result.position.gainPct - trade.position.gainPct | percent }}</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        
+      }
     </section>
-    
+  }
+
 </div>

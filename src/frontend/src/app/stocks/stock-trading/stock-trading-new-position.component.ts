@@ -1,4 +1,4 @@
-import {CurrencyPipe, DatePipe, NgClass, NgIf, PercentPipe} from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, PercentPipe } from '@angular/common';
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
     MovingAverages,
@@ -24,17 +24,16 @@ import {StockAnalysisComponent} from "../stock-details/stock-analysis.component"
     styleUrls: ['./stock-trading-new-position.component.css'],
     providers: [DatePipe],
     imports: [
-        CurrencyPipe,
-        StockSearchComponent,
-        FormsModule,
-        PercentPipe,
-        StockLinkComponent,
-        TradingViewLinkComponent,
-        NgClass,
-        NgIf,
-        StockAnalysisComponent,
-        ErrorDisplayComponent
-    ]
+    CurrencyPipe,
+    StockSearchComponent,
+    FormsModule,
+    PercentPipe,
+    StockLinkComponent,
+    TradingViewLinkComponent,
+    NgClass,
+    StockAnalysisComponent,
+    ErrorDisplayComponent
+]
 })
 export class StockTradingNewPositionComponent {
     strategies: { key: string; value: string; }[];

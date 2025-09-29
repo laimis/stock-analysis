@@ -1,80 +1,77 @@
-<div *ngIf="isVisible" class="modal-backdrop" (click)="onOverlayClick($event)">
+@if (isVisible) {
+  <div class="modal-backdrop" (click)="onOverlayClick($event)">
     <div class="modal d-block" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add To Position</h5>
-                    <button type="button" class="btn-close" (click)="close()"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <span>{{position?.underlyingTicker}}</span>,
-                        Current Price: {{position?.market | currency}}
-                    </div>
-
-                    <app-error-display [errors]="errors"></app-error-display>
-
-                    <div class="mb-4">
-                        <h6 class="text-muted mb-3">Contract Details</h6>
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <label for="quantity" class="form-label">Quantity</label>
-                                        <input
-                                            type="number"
-                                            class="form-control"
-                                            id="quantity"
-                                            [(ngModel)]="quantity"
-                                            placeholder="Enter quantity">
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="price" class="form-label">Price</label>
-                                        <input
-                                            type="number"
-                                            class="form-control"
-                                            id="price"
-                                            [(ngModel)]="price"
-                                            placeholder="Enter price">
-                                    </div>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col">
-                                        <h6 class="text-muted">Pricing Help</h6>
-                                        <p>Current Market Price: {{ position?.market | currency }}</p>
-                                        <p>Spread: {{ position?.spread | currency }}</p>
-                                        <p>50% of Spread: {{ spreadValues['50%'] | currency }}</p>
-                                        <p>60% of Spread: {{ spreadValues['60%'] | currency }}</p>
-                                        <p>70% of Spread: {{ spreadValues['70%'] | currency }}</p>
-                                        <p>80% of Spread: {{ spreadValues['80%'] | currency }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">Notes</label>
-                        <textarea
-                            class="form-control"
-                            id="notes"
-                            rows="3"
-                            [(ngModel)]="positionNotes"
-                            placeholder="Add any relevant notes..."></textarea>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="close()">
-                        Cancel
-                    </button>
-                    <button type="button" class="btn btn-primary" (click)="addToPosition()">
-                        <i class="bi bi-plus-lg"></i>
-                        Add To Position
-                    </button>
-                </div>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add To Position</h5>
+            <button type="button" class="btn-close" (click)="close()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <span>{{position?.underlyingTicker}}</span>,
+              Current Price: {{position?.market | currency}}
             </div>
+            <app-error-display [errors]="errors"></app-error-display>
+            <div class="mb-4">
+              <h6 class="text-muted mb-3">Contract Details</h6>
+              <div class="card bg-light">
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-6">
+                      <label for="quantity" class="form-label">Quantity</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="quantity"
+                        [(ngModel)]="quantity"
+                        placeholder="Enter quantity">
+                      </div>
+                      <div class="col-6">
+                        <label for="price" class="form-label">Price</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="price"
+                          [(ngModel)]="price"
+                          placeholder="Enter price">
+                        </div>
+                      </div>
+                      <div class="row g-3">
+                        <div class="col">
+                          <h6 class="text-muted">Pricing Help</h6>
+                          <p>Current Market Price: {{ position?.market | currency }}</p>
+                          <p>Spread: {{ position?.spread | currency }}</p>
+                          <p>50% of Spread: {{ spreadValues['50%'] | currency }}</p>
+                          <p>60% of Spread: {{ spreadValues['60%'] | currency }}</p>
+                          <p>70% of Spread: {{ spreadValues['70%'] | currency }}</p>
+                          <p>80% of Spread: {{ spreadValues['80%'] | currency }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="notes" class="form-label">Notes</label>
+                  <textarea
+                    class="form-control"
+                    id="notes"
+                    rows="3"
+                    [(ngModel)]="positionNotes"
+                  placeholder="Add any relevant notes..."></textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="close()">
+                  Cancel
+                </button>
+                <button type="button" class="btn btn-primary" (click)="addToPosition()">
+                  <i class="bi bi-plus-lg"></i>
+                  Add To Position
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
+    }

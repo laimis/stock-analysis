@@ -12,7 +12,7 @@ import {StockPositionsService} from "../services/stockpositions.service";
 import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {StockSearchComponent} from "../stocks/stock-search/stock-search.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
-import {CurrencyPipe, NgClass, NgIf} from "@angular/common";
+import { CurrencyPipe, NgClass } from "@angular/common";
 
 
 @Component({
@@ -20,14 +20,13 @@ import {CurrencyPipe, NgClass, NgIf} from "@angular/common";
     templateUrl: './brokerage-new-order.component.html',
     styleUrls: ['./brokerage-new-order.component.css'],
     imports: [
-        FormsModule,
-        StockSearchComponent,
-        ErrorDisplayComponent,
-        NgClass,
-        ReactiveFormsModule,
-        CurrencyPipe,
-        NgIf
-    ]
+    FormsModule,
+    StockSearchComponent,
+    ErrorDisplayComponent,
+    NgClass,
+    ReactiveFormsModule,
+    CurrencyPipe
+]
 })
 export class BrokerageNewOrderComponent {
 

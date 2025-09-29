@@ -6,7 +6,7 @@ import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-n
 import {StockTradingPendingPositionsComponent} from "../stock-trading/stock-trading-pendingpositions.component";
 import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
 import {ActivatedRoute, RouterLink} from "@angular/router";
-import {NgClass, NgIf} from "@angular/common";
+import { NgClass } from "@angular/common";
 import {
     StockTradingPendingpositionAnalysisComponent
 } from "../stock-trading/stock-trading-pendingposition-analysis.component";
@@ -17,15 +17,14 @@ import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.co
     templateUrl: './stock-trading-pending-positions-dashboard.component.html',
     styleUrls: ['./stock-trading-pending-positions-dashboard.component.css'],
     imports: [
-        StockTradingNewPositionComponent,
-        StockTradingPendingPositionsComponent,
-        BrokerageOrdersComponent,
-        RouterLink,
-        NgClass,
-        NgIf,
-        StockTradingPendingpositionAnalysisComponent,
-        BrokerageNewOrderComponent
-    ]
+    StockTradingNewPositionComponent,
+    StockTradingPendingPositionsComponent,
+    BrokerageOrdersComponent,
+    RouterLink,
+    NgClass,
+    StockTradingPendingpositionAnalysisComponent,
+    BrokerageNewOrderComponent
+]
 })
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
     feedbackMessage: string;

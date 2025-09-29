@@ -4,7 +4,7 @@ import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
 import {ChartType, DataPointContainer, PositionChartInformation, PriceBar} from "../../services/stocks.service";
 import {LineChartComponent} from "../../shared/line-chart/line-chart.component";
-import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import { PriceChartComponent } from "../../shared/price-chart/price-chart.component";
 
@@ -12,9 +12,7 @@ import { PriceChartComponent } from "../../shared/price-chart/price-chart.compon
   selector: 'app-option-contract-pricing',
     imports: [
     LineChartComponent,
-    NgForOf,
     LoadingComponent,
-    NgIf,
     CurrencyPipe,
     PriceChartComponent
 ],

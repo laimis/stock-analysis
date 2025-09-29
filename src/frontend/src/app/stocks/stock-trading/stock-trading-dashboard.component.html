@@ -1,106 +1,112 @@
 <div>
-    @if (errors) {
-        <app-error-display [errors]="errors"></app-error-display>
-    }
-    @if (!loaded) {
-        <div>
-            Loading positions...
-            <div class="spinner-border text-info spinner-border-sm" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
+  @if (errors) {
+    <app-error-display [errors]="errors"></app-error-display>
+  }
+  @if (!loaded) {
+    <div>
+      Loading positions...
+      <div class="spinner-border text-info spinner-border-sm" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+  }
+  @if (loaded) {
+    <div class="tab-container mt-2">
+      <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]=""
+        (click)="activateTab('positions')">
+        Open Positions
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]=""
+        (click)="activateTab('openreview')">
+        Open Review
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]=""
+        (click)="activateTab('violations')">
+        Violations
+        @if (violations && violations.length > 0) {
+          <span class="badge rounded-pill bg-info">{{ violations.length }}</span>
+        }
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]=""
+        (click)="activateTab('charts')">
+        Charts
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]=""
+        (click)="activateTab('summary')">
+        Overview
+      </a>
+      <a class="tab" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)"
+        [ngClass]="{'disabled': !isActive('positions') && !isActive('openreview') && !isActive('charts')}">
+        <i class="fas fa-filter"></i>
+      </a>
+      <a class="tab" [routerLink]="" (click)="refresh()">
+        @if (loading) {
+          <div class="spinner-border text-info spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        }
+        @if (!loading) {
+          <i class="fas fa-sync-alt"></i>
+        }
+      </a>
+    </div>
+    <div class="row visually-hidden" #settingsDiv>
+      <div class="col">
+        <a class="btn btn-link me-1" [href]="getOpenPositionExportLink()">Export</a>
+      </div>
+      <div class="col">
+        <div class="row">
+          <label for="strategyToFilter"
+          class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
+          <div class="col-sm-10">
+            <select class="form-select" name="strategyToFilter" id="strategyToFilter"
+              (change)="strategyToFilterChanged($event.target)">
+              @for (so of strategies; track so) {
+                <option value="{{so.key}}" [selected]="so.key === strategyToFilter">{{ so.value }}</option>
+              }
+            </select>
+          </div>
         </div>
-    }
-    @if (loaded) {
-        <div class="tab-container mt-2">
-            <a class="tab" [ngClass]="{'is-active': isActive('positions')}" [routerLink]=""
-               (click)="activateTab('positions')">
-                Open Positions
-            </a>
-            <a class="tab" [ngClass]="{'is-active': isActive('openreview')}" [routerLink]=""
-               (click)="activateTab('openreview')">
-                Open Review
-            </a>
-            <a class="tab" [ngClass]="{'is-active': isActive('violations')}" [routerLink]=""
-               (click)="activateTab('violations')">
-                Violations
-                <span class="badge rounded-pill bg-info" *ngIf="violations && violations.length > 0">{{ violations.length }}</span>
-            </a>
-            <a class="tab" [ngClass]="{'is-active': isActive('charts')}" [routerLink]=""
-               (click)="activateTab('charts')">
-                Charts
-            </a>
-            <a class="tab" [ngClass]="{'is-active': isActive('summary')}" [routerLink]=""
-               (click)="activateTab('summary')">
-                Overview
-            </a>
-            <a class="tab" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)"
-               [ngClass]="{'disabled': !isActive('positions') && !isActive('openreview') && !isActive('charts')}">
-                <i class="fas fa-filter"></i>
-            </a>
-            <a class="tab" [routerLink]="" (click)="refresh()">
-                <div class="spinner-border text-info spinner-border-sm" role="status" *ngIf="loading">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <i class="fas fa-sync-alt" *ngIf="!loading"></i>
-            </a>
+      </div>
+      <div class="col">
+        <div class="row">
+          <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
+          <div class="col-sm-10">
+            <select class="form-select" name="metricToRender" id="metricToRender"
+              (change)="metricChanged($event.target['value'])">
+              @for (so of sortOptions; track so.value) {
+                <option value="{{so.value}}" [selected]="so.value === metricToRender">{{ so.name }}</option>
+              }
+            </select>
+          </div>
         </div>
-        <div class="row visually-hidden" #settingsDiv>
-            <div class="col">
-                <a class="btn btn-link me-1" [href]="getOpenPositionExportLink()">Export</a>
-            </div>
-            <div class="col">
-                <div class="row">
-                    <label for="strategyToFilter"
-                           class="text-end col-sm-2 col-form-label col-form-label-sm">Strategy</label>
-                    <div class="col-sm-10">
-                        <select class="form-select" name="strategyToFilter" id="strategyToFilter"
-                                (change)="strategyToFilterChanged($event.target)">
-                            @for (so of strategies; track so) {
-                                <option value="{{so.key}}" [selected]="so.key === strategyToFilter">{{ so.value }}</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="row">
-                    <label for="metricToRender" class="text-end col-sm-2 col-form-label col-form-label-sm">Sort by</label>
-                    <div class="col-sm-10">
-                        <select class="form-select" name="metricToRender" id="metricToRender"
-                                (change)="metricChanged($event.target['value'])">
-                            @for (so of sortOptions; track so.value) {
-                                <option value="{{so.value}}" [selected]="so.value === metricToRender">{{ so.name }}</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-    @if (isActive('positions') && positions) {
-        <app-stock-trading-positions
-            [positions]=sortedPositions
-            [metricFunc]="metricFunc"
-            [metricType]="metricType"
-            [quotes]="quotes"
-            (positionChanged)="refresh()"></app-stock-trading-positions>
-    }
-    @if (isActive('openreview')) {
-        <app-stock-trading-review [orders]="brokerageAccount?.stockOrders" [positions]=sortedPositions [quotes]="quotes"
-                                  (positionChanged)="refresh()"></app-stock-trading-review>
-    }
-    @if (isActive('violations')) {
-        <app-stock-violations
-            [violations]="violations"
-            [brokerageAccount]="brokerageAccount"
-            (refreshRequested)="refresh()"
-        ></app-stock-violations>
-    }
-    @if (isActive('charts')) {
-        <app-stock-trading-charts [positions]="sortedPositions" [quotes]="quotes"></app-stock-trading-charts>
-    }
-    @if (isActive('summary')) {
-        <app-stock-trading-summary [quotes]="quotes" [positions]="positions" [balances]="balances"
-                                   [brokerageAccount]="brokerageAccount" [userState]="userState" ></app-stock-trading-summary>
-    }
+      </div>
+    </div>
+  }
+  @if (isActive('positions') && positions) {
+    <app-stock-trading-positions
+      [positions]=sortedPositions
+      [metricFunc]="metricFunc"
+      [metricType]="metricType"
+      [quotes]="quotes"
+    (positionChanged)="refresh()"></app-stock-trading-positions>
+  }
+  @if (isActive('openreview')) {
+    <app-stock-trading-review [orders]="brokerageAccount?.stockOrders" [positions]=sortedPositions [quotes]="quotes"
+    (positionChanged)="refresh()"></app-stock-trading-review>
+  }
+  @if (isActive('violations')) {
+    <app-stock-violations
+      [violations]="violations"
+      [brokerageAccount]="brokerageAccount"
+      (refreshRequested)="refresh()"
+    ></app-stock-violations>
+  }
+  @if (isActive('charts')) {
+    <app-stock-trading-charts [positions]="sortedPositions" [quotes]="quotes"></app-stock-trading-charts>
+  }
+  @if (isActive('summary')) {
+    <app-stock-trading-summary [quotes]="quotes" [positions]="positions" [balances]="balances"
+    [brokerageAccount]="brokerageAccount" [userState]="userState" ></app-stock-trading-summary>
+  }
 </div>

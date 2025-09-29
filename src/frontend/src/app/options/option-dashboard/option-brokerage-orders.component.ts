@@ -9,7 +9,7 @@ import {
 } from "../../services/option.service";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 import {StockLinkComponent} from "../../shared/stocks/stock-link.component";
-import {CurrencyPipe, DecimalPipe, NgClass, NgIf, PercentPipe} from "@angular/common";
+import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {
     OptionPositionCreateModalComponent
@@ -21,17 +21,16 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
     templateUrl: './option-brokerage-orders.component.html',
     styleUrls: ['./option-brokerage-orders.component.css'],
     imports: [
-        TradingViewLinkComponent,
-        StockLinkComponent,
-        NgClass,
-        CurrencyPipe,
-        ParsedDatePipe,
-        DecimalPipe,
-        OptionPositionCreateModalComponent,
-        NgIf,
-        ErrorDisplayComponent,
-        PercentPipe
-    ]
+    TradingViewLinkComponent,
+    StockLinkComponent,
+    NgClass,
+    CurrencyPipe,
+    ParsedDatePipe,
+    DecimalPipe,
+    OptionPositionCreateModalComponent,
+    ErrorDisplayComponent,
+    PercentPipe
+]
 })
 
 export class OptionBrokerageOrdersComponent {

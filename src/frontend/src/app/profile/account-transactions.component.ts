@@ -1,20 +1,18 @@
 import {Component, OnInit} from '@angular/core';
 import {AccountTransaction, StocksService} from "../services/stocks.service";
 import {ParsedDatePipe} from "../services/parsedDate.filter";
-import {CurrencyPipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import { CurrencyPipe, NgClass } from "@angular/common";
 import {GetErrors} from "../services/utils";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-account-transactions',
     imports: [
-        ParsedDatePipe,
-        CurrencyPipe,
-        NgForOf,
-        NgIf,
-        ErrorDisplayComponent,
-        NgClass
-    ],
+    ParsedDatePipe,
+    CurrencyPipe,
+    ErrorDisplayComponent,
+    NgClass
+],
     templateUrl: './account-transactions.component.html',
     styleUrl: './account-transactions.component.css'
 })

@@ -1,12 +1,16 @@
 <div class="mt-2">
-    <div>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/options">Options</a></li>
-                <li class="breadcrumb-item active" aria-current="page" *ngIf="position">{{ position.underlyingTicker }}</li>
-            </ol>
-        </nav>
-        <app-error-display *ngIf="errors" [errors]="errors"></app-error-display>
-        <app-option-position [position]="position" [orders]="orders"></app-option-position>
-    </div>
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/options">Options</a></li>
+        @if (position) {
+          <li class="breadcrumb-item active" aria-current="page">{{ position.underlyingTicker }}</li>
+        }
+      </ol>
+    </nav>
+    @if (errors) {
+      <app-error-display [errors]="errors"></app-error-display>
+    }
+    <app-option-position [position]="position" [orders]="orders"></app-option-position>
+  </div>
 </div>

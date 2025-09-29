@@ -1,192 +1,207 @@
 <div class="container">
-    <h2>Trend Dashboard</h2>
+  <h2>Trend Dashboard</h2>
 
-    <app-error-display *ngIf="errors"></app-error-display>
+  @if (errors) {
+    <app-error-display></app-error-display>
+  }
 
-    <div *ngFor="let trendSummary of [shortTermTrendSummary, longTermTrendSummary]" class="card mb-4">
-        <h5 class="card-header">{{trendSummary === shortTermTrendSummary ? 'Short Term' : 'Long term'}}</h5>
-        <div class="card-body">
-            <div class="row">
-                <div *ngFor="let ticker of Object.keys(trendSummary)" class="col-md-4">
-                    @if (trendSummary[ticker] && trendSummary[ticker].currentTrend) {
-                    <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
-                        <span (click)="tickerSelected(ticker, trendSummary === shortTermTrendSummary ? Ema20OverSma50 : Sma50OverSma200)" role="button">
-                            <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
-                            {{ ticker }}
-                            
-                        </span>
-                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Uptrend'" class="fas fa-arrow-up text-success"></i>
-                        <i *ngIf="trendSummary[ticker].currentTrend.direction === 'Downtrend'" class="fas fa-arrow-down text-danger"></i>
-                        <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>
-                    </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
+  @for (trendSummary of [shortTermTrendSummary, longTermTrendSummary]; track trendSummary) {
     <div class="card mb-4">
-        <div class="card-body">
-            <div class="row align-items-end">
-                <div class="col-md-4">
-                    <app-stock-search
-                        (tickerSelected)="tickerSelected($event, selectedTrendType)"
-                        [cssClass]="'d-flex ms-auto form-control'"
-                        [justTickers]="true"
-                        [label]="'Ticker'"
-                        [placeholder]="'Search for a symbol'"
-                        [ticker]="selectedTicker">  
-                    </app-stock-search>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label" for="trendTypeSelect">Trend Type</label>
-                        <select (ngModelChange)="trendTypeSelected($event)" [(ngModel)]="selectedTrendType" class="form-control form-select"
-                                id="trendTypeSelect">
-                            <option value="Ema20OverSma50">EMA 20 Over SMA 50</option>
-                            <option value="Sma50OverSma200">SMA 50 Over SMA 200</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label" for="startDateSelect">Start Date</label>
-                        <select (ngModelChange)="startDateSelected($event)" [(ngModel)]="selectedStartDate" class="form-control form-select"
-                                id="startDateSelect">
-                            <option value="10">10 years</option>
-                            <option value="20">20 years</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <app-loading *ngIf="loading"></app-loading>
-    
-    <div *ngIf="currentTrend" class="card mb-5">
-        <div class="card-header">
-            <h4>Selected Trend</h4>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Ticker:</span>
-                        <span>{{ currentTrend.ticker }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Direction:</span>
-                        <strong
-                            [ngClass]="{'text-success': currentTrend.direction === 'Uptrend', 'text-primary': currentTrend.direction === 'Downtrend'}">{{ currentTrend.direction }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Trend Type:</span>
-                        <span>{{ currentTrend.trendType }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Start Date:</span>
-                        <span>{{ currentTrend.startDateStr }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">End Date:</span>
-                        <span>{{ currentTrend.endDateStr }}</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Bars:</span>
-                        <span>{{ currentTrend.numberOfBars }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Gain Percentage:</span>
-                        <span>{{ currentTrend.gainPercent | percent:'1.2-2' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Max Age:</span>
-                        <span>{{ currentTrend.maxAge }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Rank by Bars:</span>
-                        <span>{{ trends.currentTrendRankByBars }}
-                            / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Rank by Gain Percentage:</span>
-                        <span>{{ trends.currentTrendRankByGain }}
-                            / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div *ngIf="trends" class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>Up Trends</h4>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Number of Up Trends:</span>
-                        <span>{{ trends.upTrends.length }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Average Gain Percentage:</span>
-                        <span>{{ trends.upGainStatistics.mean | percent:'1.2-2' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Average Bars:</span>
-                        <span>{{ trends.upBarStatistics.mean }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Max Gain Percentage:</span>
-                        <span>{{ trends.upGainStatistics.max | percent:'1.2-2' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Max Bars:</span>
-                        <span>{{ trends.upBarStatistics.max }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>Down Trends</h4>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Number of Down Trends:</span>
-                        <span>{{ trends.downTrends.length }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Average Gain Percentage:</span>
-                        <span>{{ trends.downGainStatistics.mean | percent:'1.2-2' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Average Bars:</span>
-                        <span>{{ trends.downBarStatistics.mean }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Max Loss Percentage:</span>
-                        <span>{{ trends.downGainStatistics.min | percent:'1.2-2' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Max Bars:</span>
-                        <span>{{ trends.downBarStatistics.max }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @for (container of dataPointContainers; track container) {
+      <h5 class="card-header">{{trendSummary === shortTermTrendSummary ? 'Short Term' : 'Long term'}}</h5>
+      <div class="card-body">
         <div class="row">
-            <div class="col mb-4">
-                <app-line-chart [dataContainer]="container"></app-line-chart>
+          @for (ticker of Object.keys(trendSummary); track ticker) {
+            <div class="col-md-4">
+              @if (trendSummary[ticker] && trendSummary[ticker].currentTrend) {
+                <div class="d-flex justify-content-between align-items-center border p-2 mb-2">
+                  <span (click)="tickerSelected(ticker, trendSummary === shortTermTrendSummary ? Ema20OverSma50 : Sma50OverSma200)" role="button">
+                    <app-trading-view-link [ticker]="ticker"></app-trading-view-link>
+                    {{ ticker }}
+                  </span>
+                  @if (trendSummary[ticker].currentTrend.direction === 'Uptrend') {
+                    <i class="fas fa-arrow-up text-success"></i>
+                  }
+                  @if (trendSummary[ticker].currentTrend.direction === 'Downtrend') {
+                    <i class="fas fa-arrow-down text-danger"></i>
+                  }
+                  <span>Bars: {{ trendSummary[ticker].currentTrend.numberOfBars }}</span>
+                </div>
+              }
             </div>
+          }
         </div>
-    }
+      </div>
+    </div>
+  }
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row align-items-end">
+        <div class="col-md-4">
+          <app-stock-search
+            (tickerSelected)="tickerSelected($event, selectedTrendType)"
+            [cssClass]="'d-flex ms-auto form-control'"
+            [justTickers]="true"
+            [label]="'Ticker'"
+            [placeholder]="'Search for a symbol'"
+            [ticker]="selectedTicker">
+          </app-stock-search>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label class="form-label" for="trendTypeSelect">Trend Type</label>
+            <select (ngModelChange)="trendTypeSelected($event)" [(ngModel)]="selectedTrendType" class="form-control form-select"
+              id="trendTypeSelect">
+              <option value="Ema20OverSma50">EMA 20 Over SMA 50</option>
+              <option value="Sma50OverSma200">SMA 50 Over SMA 200</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label class="form-label" for="startDateSelect">Start Date</label>
+            <select (ngModelChange)="startDateSelected($event)" [(ngModel)]="selectedStartDate" class="form-control form-select"
+              id="startDateSelect">
+              <option value="10">10 years</option>
+              <option value="20">20 years</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <app-loading></app-loading>
+  }
+
+  @if (currentTrend) {
+    <div class="card mb-5">
+      <div class="card-header">
+        <h4>Selected Trend</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Ticker:</span>
+              <span>{{ currentTrend.ticker }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Direction:</span>
+              <strong
+              [ngClass]="{'text-success': currentTrend.direction === 'Uptrend', 'text-primary': currentTrend.direction === 'Downtrend'}">{{ currentTrend.direction }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Trend Type:</span>
+              <span>{{ currentTrend.trendType }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Start Date:</span>
+              <span>{{ currentTrend.startDateStr }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">End Date:</span>
+              <span>{{ currentTrend.endDateStr }}</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Bars:</span>
+              <span>{{ currentTrend.numberOfBars }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Gain Percentage:</span>
+              <span>{{ currentTrend.gainPercent | percent:'1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Max Age:</span>
+              <span>{{ currentTrend.maxAge }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Rank by Bars:</span>
+              <span>{{ trends.currentTrendRankByBars }}
+              / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Rank by Gain Percentage:</span>
+              <span>{{ trends.currentTrendRankByGain }}
+              / {{ currentTrend.direction === TrendDirection.Up ? trends.upTrends.length : trends.downTrends.length }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (trends) {
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h4>Up Trends</h4>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Number of Up Trends:</span>
+              <span>{{ trends.upTrends.length }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Average Gain Percentage:</span>
+              <span>{{ trends.upGainStatistics.mean | percent:'1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Average Bars:</span>
+              <span>{{ trends.upBarStatistics.mean }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Max Gain Percentage:</span>
+              <span>{{ trends.upGainStatistics.max | percent:'1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Max Bars:</span>
+              <span>{{ trends.upBarStatistics.max }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h4>Down Trends</h4>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Number of Down Trends:</span>
+              <span>{{ trends.downTrends.length }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Average Gain Percentage:</span>
+              <span>{{ trends.downGainStatistics.mean | percent:'1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Average Bars:</span>
+              <span>{{ trends.downBarStatistics.mean }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Max Loss Percentage:</span>
+              <span>{{ trends.downGainStatistics.min | percent:'1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span class="text-muted">Max Bars:</span>
+              <span>{{ trends.downBarStatistics.max }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @for (container of dataPointContainers; track container) {
+    <div class="row">
+      <div class="col mb-4">
+        <app-line-chart [dataContainer]="container"></app-line-chart>
+      </div>
+    </div>
+  }
 </div>

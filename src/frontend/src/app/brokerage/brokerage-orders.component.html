@@ -1,102 +1,104 @@
 <section class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h3 class="card-title d-flex align-items-center">
-            <i class="bi bi-building me-2"></i>Brokerage Orders
-        </h3>
+  <div class="card-body">
+    <h3 class="card-title d-flex align-items-center">
+      <i class="bi bi-building me-2"></i>Brokerage Orders
+    </h3>
 
-        <app-error-display [errors]="errors"></app-error-display>
+    <app-error-display [errors]="errors"></app-error-display>
 
-        @if (isEmpty && filteredTickers.length > 0) {
-            <div class="alert alert-info">
-                No brokerage orders found for {{ filteredTickers.join(', ') }}
-            </div>
-        }
-        <div class="table-responsive" *ngIf="isEmpty === false">
-            <table class="table table-hover">
-                <thead class="table-light">
-                <tr>
-                    <th style="width: 100px;">Status</th>
-                    <th>Stock</th>
-                    <th>Type</th>
-                    <th>Quantity</th>
-                    <th class="text-end">Price</th>
-                    <th>Entered</th>
-                    <th>Processed</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @for (groupedOrder of groupedOrders; track groupedOrder) {
-                        @for (p of groupedOrder; track p; let i = $index) {
+    @if (isEmpty && filteredTickers.length > 0) {
+      <div class="alert alert-info">
+        No brokerage orders found for {{ filteredTickers.join(', ') }}
+      </div>
+    }
+    @if (isEmpty === false) {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 100px;">Status</th>
+              <th>Stock</th>
+              <th>Type</th>
+              <th>Quantity</th>
+              <th class="text-end">Price</th>
+              <th>Entered</th>
+              <th>Processed</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (groupedOrder of groupedOrders; track groupedOrder) {
+              @for (p of groupedOrder; track p; let i = $index) {
                             <tr [ngClass]="{
                             'table-success': p.isActive && (p.instruction === 'Buy' || p.instruction === 'BuyToCover'),
                             'table-danger': p.isActive && (p.instruction === 'Sell' || p.instruction === 'SellShort'),
                             'table-secondary': !p.isActive
                         }">
-                                <td>
+                  <td>
                                     <span title="{{p.statusDescription ?? p.status}}" class="badge" [ngClass]="{
                                         'bg-success': p.status === 'Active',
                                         'bg-warning': p.status === 'Filled',
                                         'bg-secondary': p.status !== 'Active'
                                     }">{{ p.status }}</span>
-                                </td>
-                                <td>
-                                    <app-stock-link-and-tradingview-link [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
-                                </td>
-                                <td>
+                  </td>
+                  <td>
+                    <app-stock-link-and-tradingview-link [ticker]="p.ticker"></app-stock-link-and-tradingview-link>
+                  </td>
+                  <td>
                                 <span class="badge" [ngClass]="{
                                     'bg-success': p.instruction === 'Buy',
                                     'bg-danger': p.instruction === 'Sell'
                                 }">
-                                    {{ p.type }} {{ p.instruction }}
-                                </span>
-                                </td>
-                                <td>{{ p.quantity }}</td>
-                                <td class="text-end">{{ p.price === 0 ? 'MARKET' : (p.price | currency) }}</td>
-                                <td>{{ p.enteredTime | date: 'short' }}</td>
-                                <td>{{ p.executionTime | date: 'short' }}</td>
-                                <td class="text-end">
-                                    @if (p.canBeCancelled) {
-                                        <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
-                                    }
-                                    @if (p.canBeRecorded && positionId) {
-                                        <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                        @if (groupedOrder.length > 0 && justOrders === false) {
-                            <tr class="table-info">
-                                <td colspan="3"></td>
-                                <td>
-                                    <b class="float-end">Total</b>
-                                </td>
-                                <td class="text-end">
-                                    {{ getTotal(groupedOrder) | currency }}
-                                </td>
-                                <td colspan="3"></td>
-                            </tr>
-                        }
+                      {{ p.type }} {{ p.instruction }}
+                    </span>
+                  </td>
+                  <td>{{ p.quantity }}</td>
+                  <td class="text-end">{{ p.price === 0 ? 'MARKET' : (p.price | currency) }}</td>
+                  <td>{{ p.enteredTime | date: 'short' }}</td>
+                  <td>{{ p.executionTime | date: 'short' }}</td>
+                  <td class="text-end">
+                    @if (p.canBeCancelled) {
+                      <button class="btn btn-warning btn-sm" (click)="cancelOrder(p.orderId)">Cancel</button>
                     }
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 100px;">Status</th>
-                        <th>Stock</th>
-                        <th>Details</th>
-                        <th class="text-end">Price</th>
-                        <th>Entered</th>
-                        <th>Processed</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for(order of optionOrders; track order;) {
+                    @if (p.canBeRecorded && positionId) {
+                      <button class="btn btn-secondary btn-sm" (click)="recordOrder(p)">Record</button>
+                    }
+                  </td>
+                </tr>
+              }
+              @if (groupedOrder.length > 0 && justOrders === false) {
+                <tr class="table-info">
+                  <td colspan="3"></td>
+                  <td>
+                    <b class="float-end">Total</b>
+                  </td>
+                  <td class="text-end">
+                    {{ getTotal(groupedOrder) | currency }}
+                  </td>
+                  <td colspan="3"></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 100px;">Status</th>
+            <th>Stock</th>
+            <th>Details</th>
+            <th class="text-end">Price</th>
+            <th>Entered</th>
+            <th>Processed</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(order of optionOrders; track order;) {
                         <tr [ngClass]="{
                             'table-success': order.isActive,
                             'table-secondary': !order.isActive
@@ -106,33 +108,33 @@
                                         'bg-success': order.status === 'Working' || order.status === 'PendingActivation',
                                         'bg-secondary': order.status !== 'Active' && order.status !== 'PendingActivation'
                                     }">{{ order.status }}</span></td>
-                            <td><app-stock-link-and-tradingview-link [ticker]="order.contracts[0].underlyingTicker"></app-stock-link-and-tradingview-link></td>
-                            <td>
-                                @for(contract of order.contracts; track contract) {
-                                    <div>
+              <td><app-stock-link-and-tradingview-link [ticker]="order.contracts[0].underlyingTicker"></app-stock-link-and-tradingview-link></td>
+              <td>
+                @for(contract of order.contracts; track contract) {
+                  <div>
                                         <span class="badge" [ngClass]="{
                                             'bg-success':contract.instruction === 'BuyToOpen' || contract.instruction === 'SellToOpen',
                                             'bg-danger':contract.instruction === 'BuyToClose' || contract.instruction === 'SellToClose'
                                             }">
-                                            {{contract.instruction}}
-                                        </span>
-                                        {{contract.optionType}} {{contract.strikePrice | currency}} {{contract.expiration}}
-                                    </div>    
-                                }
-                            </td>
-                            <td class="text-end">{{order.price}}</td>
-                            <td>{{order.enteredTime | date: 'short'}}</td>
-                            <td>{{order.executionTime | date: 'short'}}</td>
-                            <td class="text-end">
-                                @if (order.canBeCancelled) {
-                                    <button class="btn btn-warning btn-sm" (click)="cancelOrder(order.orderId)">Cancel</button>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        
+                      {{contract.instruction}}
+                    </span>
+                    {{contract.optionType}} {{contract.strikePrice | currency}} {{contract.expiration}}
+                  </div>
+                }
+              </td>
+              <td class="text-end">{{order.price}}</td>
+              <td>{{order.enteredTime | date: 'short'}}</td>
+              <td>{{order.executionTime | date: 'short'}}</td>
+              <td class="text-end">
+                @if (order.canBeCancelled) {
+                  <button class="btn btn-warning btn-sm" (click)="cancelOrder(order.orderId)">Cancel</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
+
+  </div>
 </section>

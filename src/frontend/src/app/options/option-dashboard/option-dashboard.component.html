@@ -1,63 +1,71 @@
 <div class="container">
-    <app-loading *ngIf="!loaded"></app-loading>
-    <app-error-display [errors]="errors"></app-error-display>
-    
-    <div *ngIf="loaded" class="tab-container mt-2">
-        <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
-            Open Positions
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
-            Pending Positions
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]=""
-           (click)="activateTab('brokerage')">
-            Brokerage
-            @if (optionsContainer.brokeragePositions && optionsContainer.brokeragePositions.length > 0) {
-                <span class="badge rounded-pill bg-info">
-          {{ optionsContainer.brokeragePositions.length }}
-        </span>
-            }
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('closed')}" [routerLink]="" (click)="activateTab('closed')">
-            Past Trades
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]=""
-           (click)="activateTab('performance')">
-            Performance
-        </a>
-        <a class="tab" [ngClass]="{'is-active': isActive('spreadbuilder')}" [routerLink]=""
-       (click)="activateTab('spreadbuilder')">
-            Spread Builder
-        </a>
-        <a class="tab" [routerLink]="" (click)="refreshOptions()">
-            <div class="spinner-border text-info spinner-border-sm" role="status" *ngIf="loading">
-                <span class="sr-only">Loading...</span>
-            </div>
-            <i class="fas fa-sync-alt" *ngIf="!loading"></i>
-        </a>
-    </div>
+  @if (!loaded) {
+    <app-loading></app-loading>
+  }
+  <app-error-display [errors]="errors"></app-error-display>
 
-@if (loaded && isActive('open')) {
+  @if (loaded) {
+    <div class="tab-container mt-2">
+      <a class="tab" [ngClass]="{'is-active': isActive('open')}" [routerLink]="" (click)="activateTab('open')">
+        Open Positions
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('pending')}" [routerLink]="" (click)="activateTab('pending')">
+        Pending Positions
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('brokerage')}" [routerLink]=""
+        (click)="activateTab('brokerage')">
+        Brokerage
+        @if (optionsContainer.brokeragePositions && optionsContainer.brokeragePositions.length > 0) {
+          <span class="badge rounded-pill bg-info">
+            {{ optionsContainer.brokeragePositions.length }}
+          </span>
+        }
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('closed')}" [routerLink]="" (click)="activateTab('closed')">
+        Past Trades
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('performance')}" [routerLink]=""
+        (click)="activateTab('performance')">
+        Performance
+      </a>
+      <a class="tab" [ngClass]="{'is-active': isActive('spreadbuilder')}" [routerLink]=""
+        (click)="activateTab('spreadbuilder')">
+        Spread Builder
+      </a>
+      <a class="tab" [routerLink]="" (click)="refreshOptions()">
+        @if (loading) {
+          <div class="spinner-border text-info spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        }
+        @if (!loading) {
+          <i class="fas fa-sync-alt"></i>
+        }
+      </a>
+    </div>
+  }
+
+  @if (loaded && isActive('open')) {
     <app-option-positions [positions]=optionsContainer.open [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-positions>
-}
-    @if(loaded && isActive('pending')) {
-        <app-option-positions [positions]=optionsContainer.pending [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-positions>
-    }
-@if (loaded && isActive('brokerage')) {
+  }
+  @if(loaded && isActive('pending')) {
+    <app-option-positions [positions]=optionsContainer.pending [orders]="optionsContainer.orders" (positionsChanged)="refreshOptions()" (errorOccurred)="errors = $event" ></app-option-positions>
+  }
+  @if (loaded && isActive('brokerage')) {
     <app-option-brokerage-positions [positions]="optionsContainer.brokeragePositions"
-                                    (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
-    
+    (positionsUpdated)="refreshOptions()"></app-option-brokerage-positions>
+
     <app-option-brokerage-orders [orders]="optionsContainer.orders"
-                                 (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
-}
-@if (loaded && isActive('closed')) {
+    (ordersUpdated)="refreshOptions()"></app-option-brokerage-orders>
+  }
+  @if (loaded && isActive('closed')) {
     <app-option-closed [orders]="optionsContainer.orders" [closedOptions]=optionsContainer.closed></app-option-closed>
-}
-@if (loaded && isActive('performance')) {
+  }
+  @if (loaded && isActive('performance')) {
     <app-option-performance [performance]="optionsContainer.performance">
     </app-option-performance>
-}
-    @if(loaded && isActive('spreadbuilder')) {
-        <app-option-spread-builder></app-option-spread-builder>
-    }
+  }
+  @if(loaded && isActive('spreadbuilder')) {
+    <app-option-spread-builder></app-option-spread-builder>
+  }
 </div>

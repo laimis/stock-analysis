@@ -1,187 +1,190 @@
 <div>
-    <div class="row">
-        <app-price-chart [priceScaleMode]="'normal'" [chartInformation]="chartInfo" [chartType]="'line'"></app-price-chart>
-    </div>
-    <div class="row mt-4 mb-3" *ngIf="trendAnalysisResult">
-        <div class="col-12 col-md-6">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">Current Trend</h3>
+  <div class="row">
+    <app-price-chart [priceScaleMode]="'normal'" [chartInformation]="chartInfo" [chartType]="'line'"></app-price-chart>
+  </div>
+  @if (trendAnalysisResult) {
+    <div class="row mt-4 mb-3">
+      <div class="col-12 col-md-6">
+        <div class="card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Current Trend</h3>
                     <span class="badge" [ngClass]="{
                         'bg-success': trendAnalysisResult.direction === 'Uptrend',
                         'bg-danger': trendAnalysisResult.direction === 'Downtrend',
                         'bg-secondary': trendAnalysisResult.direction === 'Sideways',
                         'bg-warning': trendAnalysisResult.direction === 'Insufficient data'
                     }">
-                        <span class="h5 mb-0">{{ trendAnalysisResult.direction }}</span>
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span>Confidence:</span>
-                            <span class="fw-bold">{{ trendAnalysisResult.strength| percent }}</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" 
+              <span class="h5 mb-0">{{ trendAnalysisResult.direction }}</span>
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span>Confidence:</span>
+                <span class="fw-bold">{{ trendAnalysisResult.strength| percent }}</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar"
                                 [ngClass]="{
                                     'bg-success': trendAnalysisResult.direction === 'Uptrend',
                                     'bg-danger': trendAnalysisResult.direction === 'Downtrend',
                                     'bg-secondary': trendAnalysisResult.direction === 'Sideways' || trendAnalysisResult.direction === 'Insufficient data'
                                 }"
-                                [style.width]="(trendAnalysisResult.strength * 100) + '%'">
-                            </div>
-                        </div>
-                    </div>
-
-                    <h5>Analysis Components</h5>
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Factor</th>
-                                <th>Direction</th>
-                                <th>Strength</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Slope</td>
-                                <td>{{ trendAnalysisResult.details.slopeAnalysis.direction }}</td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar"
+                  [style.width]="(trendAnalysisResult.strength * 100) + '%'">
+                </div>
+              </div>
+            </div>
+            <h5>Analysis Components</h5>
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Factor</th>
+                  <th>Direction</th>
+                  <th>Strength</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Slope</td>
+                  <td>{{ trendAnalysisResult.details.slopeAnalysis.direction }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar"
                                             [ngClass]="{
                                                 'bg-success': trendAnalysisResult.details.slopeAnalysis.direction === 'Uptrend',
                                                 'bg-danger': trendAnalysisResult.details.slopeAnalysis.direction === 'Downtrend',
                                                 'bg-secondary': trendAnalysisResult.details.slopeAnalysis.direction === 'Sideways' || trendAnalysisResult.details.slopeAnalysis.direction === 'Insufficient data'
                                             }"
-                                            [style.width]="(trendAnalysisResult.details.slopeAnalysis.strength * 100) + '%'">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Pattern</td>
-                                <td>{{ trendAnalysisResult.details.patternAnalysis.direction }}</td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar"
+                        [style.width]="(trendAnalysisResult.details.slopeAnalysis.strength * 100) + '%'">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Pattern</td>
+                  <td>{{ trendAnalysisResult.details.patternAnalysis.direction }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar"
                                             [ngClass]="{
                                                 'bg-success': trendAnalysisResult.details.patternAnalysis.direction === 'Uptrend',
                                                 'bg-danger': trendAnalysisResult.details.patternAnalysis.direction === 'Downtrend',
                                                 'bg-secondary': trendAnalysisResult.details.patternAnalysis.direction === 'Sideways' || trendAnalysisResult.details.patternAnalysis.direction === 'Insufficient data'
                                             }"
-                                            [style.width]="(trendAnalysisResult.details.patternAnalysis.strength * 100) + '%'">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Range</td>
-                                <td>{{ trendAnalysisResult.details.rangeAnalysis.direction }}</td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar"
+                        [style.width]="(trendAnalysisResult.details.patternAnalysis.strength * 100) + '%'">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Range</td>
+                  <td>{{ trendAnalysisResult.details.rangeAnalysis.direction }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar"
                                             [ngClass]="{
                                                 'bg-success': trendAnalysisResult.details.rangeAnalysis.direction === 'Uptrend',
                                                 'bg-danger': trendAnalysisResult.details.rangeAnalysis.direction === 'Downtrend',
                                                 'bg-secondary': trendAnalysisResult.details.rangeAnalysis.direction === 'Sideways' || trendAnalysisResult.details.rangeAnalysis.direction === 'Insufficient data'
                                             }"
-                                            [style.width]="(trendAnalysisResult.details.rangeAnalysis.strength * 100) + '%'">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Strength</td>
-                                <td>{{ trendAnalysisResult.details.strengthAnalysis.direction }}</td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar"
+                        [style.width]="(trendAnalysisResult.details.rangeAnalysis.strength * 100) + '%'">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Strength</td>
+                  <td>{{ trendAnalysisResult.details.strengthAnalysis.direction }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar"
                                             [ngClass]="{
                                                 'bg-success': trendAnalysisResult.details.strengthAnalysis.direction === 'Uptrend',
                                                 'bg-danger': trendAnalysisResult.details.strengthAnalysis.direction === 'Downtrend',
                                                 'bg-secondary': trendAnalysisResult.details.strengthAnalysis.direction === 'Sideways' || trendAnalysisResult.details.strengthAnalysis.direction === 'Insufficient data'
                                             }"
-                                            [style.width]="(trendAnalysisResult.details.strengthAnalysis.strength * 100) + '%'">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Percent Change</td>
-                                <td>{{ trendAnalysisResult.details.percentChangeAnalysis.direction }}</td>
-                                <td>
-                                    <div class="progress">
-                                        <div class="progress-bar" role="progressbar"
+                        [style.width]="(trendAnalysisResult.details.strengthAnalysis.strength * 100) + '%'">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Percent Change</td>
+                  <td>{{ trendAnalysisResult.details.percentChangeAnalysis.direction }}</td>
+                  <td>
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar"
                                             [ngClass]="{
                                                 'bg-success': trendAnalysisResult.details.percentChangeAnalysis.direction === 'Uptrend',
                                                 'bg-danger': trendAnalysisResult.details.percentChangeAnalysis.direction === 'Downtrend',
                                                 'bg-secondary': trendAnalysisResult.details.percentChangeAnalysis.direction === 'Sideways' || trendAnalysisResult.details.percentChangeAnalysis.direction === 'Insufficient data'
                                             }"
-                                            [style.width]="(trendAnalysisResult.details.percentChangeAnalysis.strength * 100) + '%'">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        [style.width]="(trendAnalysisResult.details.percentChangeAnalysis.strength * 100) + '%'">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-
-        <div class="col-12 col-md-6" *ngIf="trendChangeAlert">
-            <div class="card h-100" [ngClass]="{'border-warning': trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.direction}">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">
-                        Trend Alert
-                        <i class="bi bi-exclamation-triangle-fill text-warning ms-2" 
-                            *ngIf="trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.direction"></i>
-                    </h3>
+      </div>
+      @if (trendChangeAlert) {
+        <div class="col-12 col-md-6">
+          <div class="card h-100" [ngClass]="{'border-warning': trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.direction}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h3 class="mb-0">
+                Trend Alert
+                @if (trendChangeAlert.detected && trendChangeAlert.direction !== trendAnalysisResult.direction) {
+                  <i class="bi bi-exclamation-triangle-fill text-warning ms-2"
+                  ></i>
+                }
+              </h3>
                     <span class="badge" [ngClass]="{
                         'bg-success': trendChangeAlert.direction === 'Uptrend',
                         'bg-danger': trendChangeAlert.direction === 'Downtrend',
                         'bg-secondary': !trendChangeAlert.detected || !trendChangeAlert.direction
                     }">
-                        <span class="h5 mb-0">{{ trendChangeAlert.direction }}</span>
-                    </span>
+                <span class="h5 mb-0">{{ trendChangeAlert.direction }}</span>
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span>Signal Strength:</span>
+                  <span class="fw-bold">{{ trendChangeAlert.strength | percent }}</span>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span>Signal Strength:</span>
-                            <span class="fw-bold">{{ trendChangeAlert.strength | percent }}</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" 
+                <div class="progress">
+                  <div class="progress-bar" role="progressbar"
                                 [ngClass]="{
                                     'bg-success': trendChangeAlert.direction === 'Uptrend',
                                     'bg-danger': trendChangeAlert.direction === 'Downtrend',
                                     'bg-warning': trendChangeAlert.detected && !trendChangeAlert.direction,
                                     'bg-secondary': !trendChangeAlert.detected
                                 }"
-                                [style.width]="(trendChangeAlert.strength * 100) + '%'">
-                            </div>
-                        </div>
-                    </div>
-
-                    <h5>Evidence</h5>
-                    <div class="evidence-container">
-                        <ul class="list-group">
-                            @for (evidence of trendChangeAlert.evidence; track evidence) {
+                    [style.width]="(trendChangeAlert.strength * 100) + '%'">
+                  </div>
+                </div>
+              </div>
+              <h5>Evidence</h5>
+              <div class="evidence-container">
+                <ul class="list-group">
+                  @for (evidence of trendChangeAlert.evidence; track evidence) {
                                 <li class="list-group-item" [ngClass]="{
                                     'list-group-item-success': evidence.includes('BULLISH'),
                                     'list-group-item-danger': evidence.includes('BEARISH'),
                                     'list-group-item-secondary': evidence.includes('NEUTRAL'),
                                     'list-group-item-warning': evidence.includes('CONFLICT')
                                 }">
-                                    {{ evidence }}
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                </div>
+                      {{ evidence }}
+                    </li>
+                  }
+                </ul>
+              </div>
             </div>
+          </div>
         </div>
+      }
     </div>
+  }
 </div>

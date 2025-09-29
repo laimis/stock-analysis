@@ -16,7 +16,7 @@ import {
     Time
 } from 'lightweight-charts';
 import {blue, green, lightblue, red, white} from "../../services/charts.service";
-import { NgIf } from '@angular/common';
+
 
 const numberOfVisibleBars = 60
 
@@ -69,7 +69,7 @@ export function toSeriesMarker(marker: ChartMarker): SeriesMarker<Time> {
 @Component({
     selector: 'app-price-chart',
     templateUrl: './price-chart.component.html',
-    imports: [NgIf],
+    imports: [],
 })
 export class PriceChartComponent implements OnDestroy, AfterViewInit {
     chart: IChartApi;

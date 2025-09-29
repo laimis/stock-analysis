@@ -1,4 +1,6 @@
 <div class="chart-container">
-    <h3 *ngIf="chartTitle" class="chart-title">{{chartTitle}}</h3>
-    <div id="{{chartId}}"></div>
+  @if (chartTitle) {
+    <h3 class="chart-title">{{chartTitle}}</h3>
+  }
+  <div id="{{chartId}}"></div>
 </div>

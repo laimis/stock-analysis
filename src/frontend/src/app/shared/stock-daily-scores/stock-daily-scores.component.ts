@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {DailyOutcomeScoresComponent} from "../reports/daily-outcome-scores.component";
-import {DatePipe, NgIf} from "@angular/common";
+import { DatePipe } from "@angular/common";
 import {ErrorDisplayComponent} from "../error-display/error-display.component";
 import {LoadingComponent} from "../loading/loading.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -16,14 +16,13 @@ interface DailyScoresInput {
 @Component({
   selector: 'app-stock-daily-scores',
     imports: [
-        DailyOutcomeScoresComponent,
-        DatePipe,
-        ErrorDisplayComponent,
-        LoadingComponent,
-        NgIf,
-        ReactiveFormsModule,
-        FormsModule
-    ],
+    DailyOutcomeScoresComponent,
+    DatePipe,
+    ErrorDisplayComponent,
+    LoadingComponent,
+    ReactiveFormsModule,
+    FormsModule
+],
   templateUrl: './stock-daily-scores.component.html',
   styleUrl: './stock-daily-scores.component.css'
 })

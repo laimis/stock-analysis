@@ -1,76 +1,81 @@
 <div>
-    @if (currentPosition) {
-        <div class="container my-4">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 mb-3 mb-md-0">
-                    <div class="input-group">
-                        <button (click)="previous()" class="btn btn-outline-secondary" type="button"><i
-                            class="fas fa-chevron-left"></i></button>
-                        <select class="form-select"
-                                (change)="dropdownClick($event.target)"> @for (position of positions; track position; let i = $index) {
-                            <option [value]="i"
-                                    [selected]="position.positionId === currentPosition.positionId"> {{ position.ticker }}
-                            </option>
-                        } </select>
-                        <button (click)="next()" class="btn btn-outline-secondary" type="button"><i
-                            class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="d-flex justify-content-between">
-                        <div><app-stock-link [ticker]="currentPosition.ticker" [openInNewTab]="true"></app-stock-link></div>
-                        <div><span class="text-muted">Price:</span> <span
-                            class="ms-2">{{ getPrice(currentPosition) | currency }}</span></div>
-                        <div><span class="text-muted">Stop:</span> <span
-                            class="ms-2">{{ currentPosition.stopPrice | currency }}</span></div>
-                        <div><span class="text-muted">Cost/Share:</span> <span
-                            class="ms-2">{{ currentPosition.averageBuyCostPerShare | currency }}</span></div>
-                    </div>
-                </div>
-            </div>
+  @if (currentPosition) {
+    <div class="container my-4">
+      <div class="row align-items-center">
+        <div class="col-12 col-md-6 mb-3 mb-md-0">
+          <div class="input-group">
+            <button (click)="previous()" class="btn btn-outline-secondary" type="button"><i
+            class="fas fa-chevron-left"></i></button>
+            <select class="form-select"
+              (change)="dropdownClick($event.target)"> @for (position of positions; track position; let i = $index) {
+              <option [value]="i"
+                [selected]="position.positionId === currentPosition.positionId"> {{ position.ticker }}
+              </option>
+            } </select>
+            <button (click)="next()" class="btn btn-outline-secondary" type="button"><i
+            class="fas fa-chevron-right"></i></button>
+          </div>
         </div>
+        <div class="col-12 col-md-6">
+          <div class="d-flex justify-content-between">
+            <div><app-stock-link [ticker]="currentPosition.ticker" [openInNewTab]="true"></app-stock-link></div>
+            <div><span class="text-muted">Price:</span> <span
+          class="ms-2">{{ getPrice(currentPosition) | currency }}</span></div>
+          <div><span class="text-muted">Stop:</span> <span
+        class="ms-2">{{ currentPosition.stopPrice | currency }}</span></div>
+        <div><span class="text-muted">Cost/Share:</span> <span
+      class="ms-2">{{ currentPosition.averageBuyCostPerShare | currency }}</span></div>
+    </div>
+  </div>
+</div>
+</div>
+}
+<section>
+  <h5>Stock chart</h5>
+  @if (pricesErrors) {
+    <app-error-display [errors]="pricesErrors"></app-error-display>
+  }
+  @if (!positionChartInformation && !pricesErrors) {
+    <app-loading></app-loading>
+  }
+  @if (positionChartInformation) {
+    <app-price-chart [chartInformation]="positionChartInformation"></app-price-chart>
+  }
+</section>
+
+@if (currentPosition) {
+  <section>
+    <h5>Actual vs Trading Strategies</h5>
+    @if (simulationErrors) {
+      <app-error-display [errors]="simulationErrors"></app-error-display>
     }
-    <section>
-        <h5>Stock chart</h5>
-        @if (pricesErrors) {
-            <app-error-display [errors]="pricesErrors"></app-error-display>
-        }
-        @if (!positionChartInformation && !pricesErrors) {
-            <app-loading></app-loading>
-        }
-        @if (positionChartInformation) {
-            <app-price-chart [chartInformation]="positionChartInformation"></app-price-chart>
-        }
-    </section>
+    @if (!simulationResults && !simulationErrors) {
+      <app-loading></app-loading>
+    }
+    @if (simulationResults) {
+      <app-trading-actual-vs-simulated
+        [simulations]="simulationResults"
+        [simulationErrors]="simulationErrors">
+      </app-trading-actual-vs-simulated>
+    }
+  </section>
+}
 
-    <section *ngIf="currentPosition">
-        <h5>Actual vs Trading Strategies</h5>
-        @if (simulationErrors) {
-            <app-error-display [errors]="simulationErrors"></app-error-display>
-        }
-        @if (!simulationResults && !simulationErrors) {
-            <app-loading></app-loading>
-        }
-        @if (simulationResults) {
-            <app-trading-actual-vs-simulated
-                [simulations]="simulationResults"
-                [simulationErrors]="simulationErrors">
-            </app-trading-actual-vs-simulated>
-        }
-    </section>
+@if (currentPosition) {
+  <app-stock-daily-scores
+  [dailyScoresInput]="{ticker: currentPosition.ticker, startDate: currentPosition.opened}"></app-stock-daily-scores>
+}
 
-    <app-stock-daily-scores 
-        *ngIf="currentPosition"
-        [dailyScoresInput]="{ticker: currentPosition.ticker, startDate: currentPosition.opened}"></app-stock-daily-scores>
-    
-    <section *ngIf="currentPosition">
-        <h5>Position Information</h5>
-        <app-stock-trading-position
-                                    [position]="currentPosition"
-                                    [quote]="getQuote(currentPosition)"
-                                    [notesExpanded]="true"
-                                    (positionChanged)="positionChanged.emit()"
-        ></app-stock-trading-position>
-    </section>
+@if (currentPosition) {
+  <section>
+    <h5>Position Information</h5>
+    <app-stock-trading-position
+      [position]="currentPosition"
+      [quote]="getQuote(currentPosition)"
+      [notesExpanded]="true"
+      (positionChanged)="positionChanged.emit()"
+    ></app-stock-trading-position>
+  </section>
+}
 
 </div>

@@ -4,7 +4,7 @@ import {ActivatedRoute, RouterLink} from "@angular/router";
 import {OptionsContainer, OptionService} from "../../services/option.service";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
-import {NgClass, NgIf} from "@angular/common";
+import { NgClass } from "@angular/common";
 import {OptionPositionsComponent} from "./option-positions.component";
 import {OptionBrokeragePositionsComponent} from "./option-brokerage-positions.component";
 import {OptionBrokerageOrdersComponent} from "./option-brokerage-orders.component";
@@ -16,18 +16,17 @@ import {OptionSpreadBuilderComponent} from "../option-spread-builder/option-spre
     selector: 'app-options',
     templateUrl: './option-dashboard.component.html',
     imports: [
-        LoadingComponent,
-        ErrorDisplayComponent,
-        NgIf,
-        NgClass,
-        RouterLink,
-        OptionPositionsComponent,
-        OptionBrokeragePositionsComponent,
-        OptionBrokerageOrdersComponent,
-        OptionClosedComponent,
-        OptionPerformanceComponent,
-        OptionSpreadBuilderComponent
-    ],
+    LoadingComponent,
+    ErrorDisplayComponent,
+    NgClass,
+    RouterLink,
+    OptionPositionsComponent,
+    OptionBrokeragePositionsComponent,
+    OptionBrokerageOrdersComponent,
+    OptionClosedComponent,
+    OptionPerformanceComponent,
+    OptionSpreadBuilderComponent
+],
     styleUrls: ['./option-dashboard.component.css']
 })
 export class OptionsComponent implements OnInit {

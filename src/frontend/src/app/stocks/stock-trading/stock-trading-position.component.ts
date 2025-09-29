@@ -11,7 +11,7 @@ import {GetErrors, GetStockStrategies, toggleVisuallyHidden} from 'src/app/servi
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrokerageService} from "../../services/brokerage.service";
-import {CurrencyPipe, DecimalPipe, NgClass, NgIf, PercentPipe} from "@angular/common";
+import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
 import {LoadingComponent} from "../../shared/loading/loading.component";
@@ -23,20 +23,19 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
     selector: 'app-stock-trading-position',
     templateUrl: './stock-trading-position.component.html',
     imports: [
-        CurrencyPipe,
-        ParsedDatePipe,
-        FormsModule,
-        PercentPipe,
-        DecimalPipe,
-        TradingViewLinkComponent,
-        LoadingComponent,
-        NgClass,
-        BrokerageNewOrderComponent,
-        BrokerageOrdersComponent,
-        ReactiveFormsModule,
-        NgIf,
-        ErrorDisplayComponent
-    ],
+    CurrencyPipe,
+    ParsedDatePipe,
+    FormsModule,
+    PercentPipe,
+    DecimalPipe,
+    TradingViewLinkComponent,
+    LoadingComponent,
+    NgClass,
+    BrokerageNewOrderComponent,
+    BrokerageOrdersComponent,
+    ReactiveFormsModule,
+    ErrorDisplayComponent
+],
     styleUrls: ['./stock-trading-position.component.css']
 })
 export class StockTradingPositionComponent {

@@ -1,91 +1,105 @@
 <div class="container-fluid">
+  <section class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="bi bi-graph-up me-2"></i>Chart
+        </h5>
+        <div class="text-muted">
+          <small>{{startDate | date:'mediumDate'}} - {{endDate | date:'mediumDate'}}</small>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <app-price-chart [chartInformation]="chartInfo"></app-price-chart>
+    </div>
+  </section>
+
+  <app-stock-daily-scores [dailyScoresInput]="{ticker}"></app-stock-daily-scores>
+
+  <!-- Peak and valley analysis for price-->
+  <section class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="bi bi-graph-up me-2"></i>Peak/Valley Analysis (Price)
+      </h5>
+    </div>
+    <div class="card-body">
+      @if (inflectionPointsReport) {
+        <app-peak-valley-analysis [completeDataSet]="inflectionPointsReport.price"></app-peak-valley-analysis>
+      }
+      @if (!inflectionPointsReport) {
+        <app-loading></app-loading>
+      }
+    </div>
+  </section>
+
+  <!-- Peak and valley analysis for obv -->
+  <section class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="bi bi-graph-up me-2"></i>Peak/Valley Analysis (OBV)
+      </h5>
+    </div>
+    <div class="card-body">
+      @if (inflectionPointsReport) {
+        <app-peak-valley-analysis [completeDataSet]="inflectionPointsReport.onBalanceVolume"></app-peak-valley-analysis>
+      }
+      @if (!inflectionPointsReport) {
+        <app-loading></app-loading>
+      }
+    </div>
+  </section>
+
+  <!-- Gaps -->
+  @if (gaps) {
     <section class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="bi bi-graph-up me-2"></i>Chart
-                </h5>
-                <div class="text-muted">
-                    <small>{{startDate | date:'mediumDate'}} - {{endDate | date:'mediumDate'}}</small>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <app-price-chart [chartInformation]="chartInfo"></app-price-chart>
-        </div>
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-arrows-expand me-2"></i>{{ gaps.ticker }} Gaps</h5>
+        <app-gaps [gaps]="gaps"></app-gaps>
+      </div>
     </section>
+  }
 
-    <app-stock-daily-scores [dailyScoresInput]="{ticker}"></app-stock-daily-scores>
+  <!-- Percent Change Distribution -->
+  <section class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title"><i class="bi bi-percent me-2"></i>Change Distribution</h5>
+      <app-percent-change-distribution [percentChangeDistribution]="percentChangeDistribution">
+      </app-percent-change-distribution>
+    </div>
+  </section>
 
-    <!-- Peak and valley analysis for price-->
+  <!-- ATR Chart -->
+  @if (chartInfo) {
     <section class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0">
-                <i class="bi bi-graph-up me-2"></i>Peak/Valley Analysis (Price)
-            </h5>
-        </div>
-        <div class="card-body">
-            <app-peak-valley-analysis *ngIf="inflectionPointsReport" [completeDataSet]="inflectionPointsReport.price"></app-peak-valley-analysis>
-            <app-loading *ngIf="!inflectionPointsReport"></app-loading>
-        </div>
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR Chart</h5>
+        <app-line-chart [dataContainer]="prices.atr"></app-line-chart>
+      </div>
     </section>
+  }
 
-    <!-- Peak and valley analysis for obv -->
+  <!-- ATR % Chart -->
+  @if (chartInfo) {
     <section class="card shadow-sm mb-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0">
-                <i class="bi bi-graph-up me-2"></i>Peak/Valley Analysis (OBV)
-            </h5>
-        </div>
-        <div class="card-body">
-            <app-peak-valley-analysis *ngIf="inflectionPointsReport" [completeDataSet]="inflectionPointsReport.onBalanceVolume"></app-peak-valley-analysis>
-            <app-loading *ngIf="!inflectionPointsReport"></app-loading>
-        </div>
+      <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR % Chart</h5>
+        <app-line-chart [dataContainer]="prices.atrPercent"></app-line-chart>
+      </div>
     </section>
+  }
 
-    <!-- Gaps -->
-    <section *ngIf="gaps" class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-arrows-expand me-2"></i>{{ gaps.ticker }} Gaps</h5>
-            <app-gaps [gaps]="gaps"></app-gaps>
-        </div>
-    </section>
-
-    <!-- Percent Change Distribution -->
-    <section class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-percent me-2"></i>Change Distribution</h5>
-            <app-percent-change-distribution [percentChangeDistribution]="percentChangeDistribution">
-            </app-percent-change-distribution>
-        </div>
-    </section>
-
-    <!-- ATR Chart -->
-    <section *ngIf="chartInfo" class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR Chart</h5>
-            <app-line-chart [dataContainer]="prices.atr"></app-line-chart>
-        </div>
-    </section>
-    
-    <!-- ATR % Chart -->
-    <section *ngIf="chartInfo" class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>ATR % Chart</h5>
-            <app-line-chart [dataContainer]="prices.atrPercent"></app-line-chart>
-        </div>
-    </section>
-
-    <!-- Single Bar Outcomes -->
-    <section class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-bar-chart me-2"></i>Single Bar Outcomes</h5>
-            @if (dailyOutcomes) {
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered mb-3">
-                        <tbody>
-                        <tr>
-                            <td class="fw-bold">Positive / Negative</td>
+  <!-- Single Bar Outcomes -->
+  <section class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title"><i class="bi bi-bar-chart me-2"></i>Single Bar Outcomes</h5>
+      @if (dailyOutcomes) {
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered mb-3">
+            <tbody>
+              <tr>
+                <td class="fw-bold">Positive / Negative</td>
                             <td [ngClass]="{'text-danger': positiveCount(dailyOutcomes) < negativeCount(dailyOutcomes), 
                                 'text-success': positiveCount(dailyOutcomes) > negativeCount(dailyOutcomes)}">
                                 {{ positiveCount(dailyOutcomes) }} / {{ negativeCount(dailyOutcomes) }}
@@ -106,30 +120,30 @@
                                       'bg-secondary': o.outcomeType === 'Neutral'}">
                       {{ o.outcomeType.charAt(0) }}
                     </span>
-                                    </td>
-                                    <td>{{ o.key }}</td>
-                                    <td>{{ getValue(o) }}</td>
-                                    <td>{{ o.outcomeType }}</td>
-                                    <td>{{ o.message }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
+                  </td>
+                  <td>{{ o.key }}</td>
+                  <td>{{ getValue(o) }}</td>
+                  <td>{{ o.outcomeType }}</td>
+                  <td>{{ o.message }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-    </section>
+      }
+    </div>
+  </section>
 
-    <!-- Multiple Bar Outcomes -->
-    <section class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-bar-chart-steps me-2"></i>Multiple Bar Outcomes</h5>
-            @if (multipleBarOutcomes) {
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered mb-3">
-                        <tbody>
-                        <tr>
-                            <td class="fw-bold">Positive / Negative</td>
+  <!-- Multiple Bar Outcomes -->
+  <section class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title"><i class="bi bi-bar-chart-steps me-2"></i>Multiple Bar Outcomes</h5>
+      @if (multipleBarOutcomes) {
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered mb-3">
+            <tbody>
+              <tr>
+                <td class="fw-bold">Positive / Negative</td>
                             <td [ngClass]="{'text-danger': positiveCount(multipleBarOutcomes) < negativeCount(multipleBarOutcomes), 
                                 'text-success': positiveCount(multipleBarOutcomes) > negativeCount(multipleBarOutcomes)}">
                                 {{ positiveCount(multipleBarOutcomes) }} / {{ negativeCount(multipleBarOutcomes) }}
@@ -150,28 +164,28 @@
                                       'bg-secondary': o.outcomeType === 'Neutral'}">
                       {{ o.outcomeType.charAt(0) }}
                     </span>
-                                    </td>
-                                    <td>{{ o.key }}</td>
-                                    <td>{{ getValue(o) }}</td>
-                                    <td>{{ o.outcomeType }}</td>
-                                    <td>{{ o.message }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
+                  </td>
+                  <td>{{ o.key }}</td>
+                  <td>{{ getValue(o) }}</td>
+                  <td>{{ o.outcomeType }}</td>
+                  <td>{{ o.message }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-    </section>
+      }
+    </div>
+  </section>
 
-    <!-- Daily Analysis Report -->
-    <section class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title"><i class="bi bi-file-earmark-text me-2"></i>Daily Analysis Report</h5>
-            <app-outcomes-analysis-report
-                [report]="dailyOutcomesReport"
-                [showSummary]="true">
-            </app-outcomes-analysis-report>
-        </div>
-    </section>
+  <!-- Daily Analysis Report -->
+  <section class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title"><i class="bi bi-file-earmark-text me-2"></i>Daily Analysis Report</h5>
+      <app-outcomes-analysis-report
+        [report]="dailyOutcomesReport"
+        [showSummary]="true">
+      </app-outcomes-analysis-report>
+    </div>
+  </section>
 </div>

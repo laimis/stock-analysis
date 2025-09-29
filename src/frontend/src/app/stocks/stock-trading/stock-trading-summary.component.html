@@ -1,151 +1,155 @@
 <div class="container">
-    
-    <div class="mb-4">
-        <h3>Overview</h3>
-        @if (brokerageAccount && brokerageAccount.connected) {
-            <div class="row mb-4">
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Adj Equity</h5>
-                            <p class="card-text fs-4">{{ brokerageAccount.equity + (-1 * userState.cashTransferred) | currency }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Cash</h5>
-                            <p class="card-text fs-4"
-                               *ngIf="brokerageAccount && brokerageAccount.connected">{{ brokerageAccount.cashBalance | currency }}</p>
-                            <p class="card-text fs-4" *ngIf="!brokerageAccount || !brokerageAccount.connected">N/A</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Profit</h5>
-                            <p class="card-text fs-4">{{ totalProfit | currency }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Positions Long / Short</h5>
-                            <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        } @else {
-            <div class="row mb-4">
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Long Invested</h5>
-                            <p class="card-text fs-4">{{ totalLongCost | currency }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Short Invested</h5>
-                            <p class="card-text fs-4">{{ totalShortCost | currency }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Profit</h5>
-                            <p class="card-text fs-4">N/A (brokerage unavailable)</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md mb-4 mt-2 text-center">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-muted">Positions Long / Short</h5>
-                            <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
 
-    @if (positionGroups) {
-        <div class="mb-4">
-            <h3>Position Groups</h3>
-            <table class="table table-hover d-none d-md-table">
-                <thead>
-                <tr>
-                    <th class="sort-header" (click)="sort('strategy')">Strategy</th>
-                    <th class="sort-header" (click)="sort('profit')">Profit (w/o Div)</th>
-                    <th class="sort-header" (click)="sort('cost')">Invested</th>
-                    <th class="sort-header" (click)="sort('risk')">Risked</th>
-                    <th class="sort-header" (click)="sort('numberOfPositions')">Positions</th>
-                    <th class="sort-header" (click)="sort('gain')">Gain %</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @for (positionGroup of positionGroups; track positionGroup) {
-                        <tr>
-                            <td>{{ positionGroup.strategy }}</td>
-                            <td>{{ positionGroup.profit | currency }}</td>
-                            <td>{{ positionGroup.cost | currency }}</td>
-                            <td>{{ positionGroup.risk | currency }}</td>
-                            <td>{{ positionGroup.length }}</td>
-                            <td>{{ (positionGroup.profit / positionGroup.cost) | percent:'1.2-2' }}</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <div class="d-md-none">
-                @for (positionGroup of positionGroups; track positionGroup) {
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ positionGroup.strategy }}</h5>
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <p class="mb-1 text-muted">Profit</p>
-                                    <p class="mb-0">{{ positionGroup.profit | currency }}</p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <p class="mb-1 text-muted">Cost</p>
-                                    <p class="mb-0">{{ positionGroup.cost | currency }}</p>
-                                </div>
-                                <div class="col-6">
-                                    <p class="mb-1 text-muted">Risk</p>
-                                    <p class="mb-0">{{ positionGroup.risk | currency }}</p>
-                                </div>
-                                <div class="col-6">
-                                    <p class="mb-1 text-muted">Trades</p>
-                                    <p class="mb-0">{{ positionGroup.length }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
+  <div class="mb-4">
+    <h3>Overview</h3>
+    @if (brokerageAccount && brokerageAccount.connected) {
+      <div class="row mb-4">
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Adj Equity</h5>
+              <p class="card-text fs-4">{{ brokerageAccount.equity + (-1 * userState.cashTransferred) | currency }}</p>
             </div>
+          </div>
         </div>
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Cash</h5>
+              @if (brokerageAccount && brokerageAccount.connected) {
+                <p class="card-text fs-4"
+                >{{ brokerageAccount.cashBalance | currency }}</p>
+              }
+              @if (!brokerageAccount || !brokerageAccount.connected) {
+                <p class="card-text fs-4">N/A</p>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Profit</h5>
+              <p class="card-text fs-4">{{ totalProfit | currency }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Positions Long / Short</h5>
+              <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="row mb-4">
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Long Invested</h5>
+              <p class="card-text fs-4">{{ totalLongCost | currency }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Short Invested</h5>
+              <p class="card-text fs-4">{{ totalShortCost | currency }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Profit</h5>
+              <p class="card-text fs-4">N/A (brokerage unavailable)</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md mb-4 mt-2 text-center">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Positions Long / Short</h5>
+              <p class="card-text fs-4">{{ longPositions.length }} / {{ shortPositions.length }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     }
-    
-    @if(chartOptionsArray) {
-        <div class="mb-4">
-            <h3>Daily Balances</h3>
-            @for(chartOptions of chartOptionsArray; track chartOptions) {
-                <div class="card">
-                    <div class="card-body">
-                        <canvasjs-chart [options]="chartOptions"></canvasjs-chart>
-                    </div>
+  </div>
+
+  @if (positionGroups) {
+    <div class="mb-4">
+      <h3>Position Groups</h3>
+      <table class="table table-hover d-none d-md-table">
+        <thead>
+          <tr>
+            <th class="sort-header" (click)="sort('strategy')">Strategy</th>
+            <th class="sort-header" (click)="sort('profit')">Profit (w/o Div)</th>
+            <th class="sort-header" (click)="sort('cost')">Invested</th>
+            <th class="sort-header" (click)="sort('risk')">Risked</th>
+            <th class="sort-header" (click)="sort('numberOfPositions')">Positions</th>
+            <th class="sort-header" (click)="sort('gain')">Gain %</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (positionGroup of positionGroups; track positionGroup) {
+            <tr>
+              <td>{{ positionGroup.strategy }}</td>
+              <td>{{ positionGroup.profit | currency }}</td>
+              <td>{{ positionGroup.cost | currency }}</td>
+              <td>{{ positionGroup.risk | currency }}</td>
+              <td>{{ positionGroup.length }}</td>
+              <td>{{ (positionGroup.profit / positionGroup.cost) | percent:'1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="d-md-none">
+        @for (positionGroup of positionGroups; track positionGroup) {
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">{{ positionGroup.strategy }}</h5>
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <p class="mb-1 text-muted">Profit</p>
+                  <p class="mb-0">{{ positionGroup.profit | currency }}</p>
                 </div>
-            }
+                <div class="col-6 mb-3">
+                  <p class="mb-1 text-muted">Cost</p>
+                  <p class="mb-0">{{ positionGroup.cost | currency }}</p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1 text-muted">Risk</p>
+                  <p class="mb-0">{{ positionGroup.risk | currency }}</p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1 text-muted">Trades</p>
+                  <p class="mb-0">{{ positionGroup.length }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if(chartOptionsArray) {
+    <div class="mb-4">
+      <h3>Daily Balances</h3>
+      @for(chartOptions of chartOptionsArray; track chartOptions) {
+        <div class="card">
+          <div class="card-body">
+            <canvasjs-chart [options]="chartOptions"></canvasjs-chart>
+          </div>
         </div>
-    }
+      }
+    </div>
+  }
 
 
 </div>

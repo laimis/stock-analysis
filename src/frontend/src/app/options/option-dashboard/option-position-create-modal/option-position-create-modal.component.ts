@@ -1,5 +1,5 @@
 import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
-import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GetErrors, GetOptionStrategies} from "../../../services/utils";
 import {BrokerageOptionPosition, OptionService} from "../../../services/option.service";
@@ -7,12 +7,10 @@ import {BrokerageOptionPosition, OptionService} from "../../../services/option.s
 @Component({
   selector: 'app-option-position-create-modal',
     imports: [
-        CurrencyPipe,
-        NgForOf,
-        ReactiveFormsModule,
-        FormsModule,
-        NgIf
-    ],
+    CurrencyPipe,
+    ReactiveFormsModule,
+    FormsModule
+],
   templateUrl: './option-position-create-modal.component.html',
   styleUrl: './option-position-create-modal.component.css'
 })

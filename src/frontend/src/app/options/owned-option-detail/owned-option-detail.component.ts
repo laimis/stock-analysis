@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {DatePipe, NgIf} from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {Title} from '@angular/platform-browser';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageOptionOrder, OptionPosition, OptionService} from "../../services/option.service";
@@ -14,10 +14,9 @@ import {concat} from "rxjs";
     templateUrl: './owned-option-detail.component.html',
     styleUrls: ['./owned-option-detail.component.css'],
     imports: [
-        ErrorDisplayComponent,
-        OptionPositionComponent,
-        NgIf
-    ],
+    ErrorDisplayComponent,
+    OptionPositionComponent
+],
     providers: [DatePipe]
 })
 export class OwnedOptionComponent implements OnInit {

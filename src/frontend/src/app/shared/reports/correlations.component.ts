@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {TickerCorrelation} from '../../services/stocks.service';
-import {DecimalPipe, NgClass, NgIf} from "@angular/common";
+import { DecimalPipe, NgClass } from "@angular/common";
 import {LoadingComponent} from "../loading/loading.component";
 import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tradingview-link.component";
 
@@ -9,11 +9,10 @@ import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tra
     templateUrl: './correlations.component.html',
     styleUrls: ['./correlations.component.css'],
     imports: [
-        DecimalPipe,
-        NgIf,
-        NgClass,
-        StockLinkAndTradingviewLinkComponent
-    ]
+    DecimalPipe,
+    NgClass,
+    StockLinkAndTradingviewLinkComponent
+]
 })
 export class CorrelationsComponent {
     private _correlations: TickerCorrelation[];

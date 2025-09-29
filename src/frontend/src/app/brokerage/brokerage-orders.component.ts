@@ -3,7 +3,7 @@ import {BrokerageAccount, BrokerageStockOrder, stocktransactioncommand} from 'sr
 import {GetErrors} from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
-import {CurrencyPipe, DatePipe, NgClass, NgIf} from "@angular/common";
+import { CurrencyPipe, DatePipe, NgClass } from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../shared/stocks/stock-link-and-tradingview-link.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 import {BrokerageOptionOrder} from "../services/option.service";
@@ -21,13 +21,12 @@ let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
     templateUrl: './brokerage-orders.component.html',
     styleUrls: ['./brokerage-orders.component.css'],
     imports: [
-        NgClass,
-        StockLinkAndTradingviewLinkComponent,
-        CurrencyPipe,
-        DatePipe,
-        ErrorDisplayComponent,
-        NgIf
-    ]
+    NgClass,
+    StockLinkAndTradingviewLinkComponent,
+    CurrencyPipe,
+    DatePipe,
+    ErrorDisplayComponent
+]
 })
 export class BrokerageOrdersComponent {
     groupedOrders: BrokerageStockOrder[][];

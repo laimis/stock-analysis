@@ -1,5 +1,5 @@
 import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
-import {CurrencyPipe, NgForOf, NgIf} from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {BrokerageOptionPosition, OptionLeg, OptionService} from "../../../services/option.service";
 import {GetErrors, GetOptionStrategies} from "../../../services/utils";
@@ -14,12 +14,10 @@ import {ErrorDisplayComponent} from "../../../shared/error-display/error-display
 @Component({
   selector: 'app-option-pendingposition-create-modal',
     imports: [
-        CurrencyPipe,
-        FormsModule,
-        NgForOf,
-        NgIf,
-        ErrorDisplayComponent
-    ],
+    CurrencyPipe,
+    FormsModule,
+    ErrorDisplayComponent
+],
   templateUrl: './option-pendingposition-create-modal.component.html',
   styleUrl: './option-pendingposition-create-modal.component.css'
 })

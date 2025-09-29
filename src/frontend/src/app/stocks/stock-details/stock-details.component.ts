@@ -19,7 +19,7 @@ import { concat } from "rxjs";
 import { OptionPosition, OptionService } from "../../services/option.service";
 import { StockTradingNewPositionComponent } from "../stock-trading/stock-trading-new-position.component";
 import { StockLinkAndTradingviewLinkComponent } from "../../shared/stocks/stock-link-and-tradingview-link.component";
-import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, NgIf } from "@angular/common";
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass } from "@angular/common";
 import { BrokerageNewOrderComponent } from "../../brokerage/brokerage-new-order.component";
 import { BrokerageOrdersComponent } from "../../brokerage/brokerage-orders.component";
 import { StockOptionComponent } from "./stock-option.component";
@@ -34,24 +34,23 @@ import { MarketCapPipe } from "../../services/marketcap.filter";
     selector: 'app-stock-details',
     templateUrl: './stock-details.component.html',
     imports: [
-        StockTradingNewPositionComponent,
-        StockLinkAndTradingviewLinkComponent,
-        CurrencyPipe,
-        DatePipe,
-        MarketCapPipe,
-        DecimalPipe,
-        BrokerageNewOrderComponent,
-        BrokerageOrdersComponent,
-        StockOptionComponent,
-        StockFundamentalsComponent,
-        StockAnalysisComponent,
-        StockOwnershipComponent,
-        StockTransactionComponent,
-        NgClass,
-        RouterLink,
-        TradingViewLinkComponent,
-        NgIf
-    ],
+    StockTradingNewPositionComponent,
+    StockLinkAndTradingviewLinkComponent,
+    CurrencyPipe,
+    DatePipe,
+    MarketCapPipe,
+    DecimalPipe,
+    BrokerageNewOrderComponent,
+    BrokerageOrdersComponent,
+    StockOptionComponent,
+    StockFundamentalsComponent,
+    StockAnalysisComponent,
+    StockOwnershipComponent,
+    StockTransactionComponent,
+    NgClass,
+    RouterLink,
+    TradingViewLinkComponent
+],
     styleUrls: ['./stock-details.component.css']
 })
 export class StockDetailsComponent implements OnInit {

@@ -1,37 +1,43 @@
 <div>
-    <app-loading *ngIf="loading"></app-loading>
-    @if(hasPrice) {
-        <div class="row g-4">
-            <div class="col-6">
-                <div class="price-card text-center p-3 rounded bg-light">
-                    <div class="text-muted mb-1">
-                        <i class="bi bi-arrow-down-circle"></i>
-                        Minimum Price
-                    </div>
-                    <div class="price-value text-primary">
-                        {{ minPrice | currency }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="price-card text-center p-3 rounded bg-light">
-                    <div class="text-muted mb-1">
-                        <i class="bi bi-arrow-up-circle"></i>
-                        Maximum Price
-                    </div>
-                    <div class="price-value text-success">
-                        {{ maxPrice | currency }}
-                    </div>
-                </div>
-            </div>
+  @if (loading) {
+    <app-loading></app-loading>
+  }
+  @if(hasPrice) {
+    <div class="row g-4">
+      <div class="col-6">
+        <div class="price-card text-center p-3 rounded bg-light">
+          <div class="text-muted mb-1">
+            <i class="bi bi-arrow-down-circle"></i>
+            Minimum Price
+          </div>
+          <div class="price-value text-primary">
+            {{ minPrice | currency }}
+          </div>
         </div>
-        <app-price-chart [priceScaleMode]="'normal'" [chartTitle]="chartInfo.ticker" [chartInformation]="chartInfo" [chartType]="'candlestick'" *ngFor="let chartInfo of chartInfos"></app-price-chart>
-        <app-line-chart [dataContainer]="container" *ngFor="let container of dataPointContainers"></app-line-chart>
-    }
-    
-    @if(hasPrice === false && loading === false) {
-    <div class="alert alert-warning" role="alert">
-        No pricing available for this contract.
+      </div>
+      <div class="col-6">
+        <div class="price-card text-center p-3 rounded bg-light">
+          <div class="text-muted mb-1">
+            <i class="bi bi-arrow-up-circle"></i>
+            Maximum Price
+          </div>
+          <div class="price-value text-success">
+            {{ maxPrice | currency }}
+          </div>
+        </div>
+      </div>
     </div>
+    @for (chartInfo of chartInfos; track chartInfo) {
+      <app-price-chart [priceScaleMode]="'normal'" [chartTitle]="chartInfo.ticker" [chartInformation]="chartInfo" [chartType]="'candlestick'"></app-price-chart>
     }
+    @for (container of dataPointContainers; track container) {
+      <app-line-chart [dataContainer]="container"></app-line-chart>
+    }
+  }
+
+  @if(hasPrice === false && loading === false) {
+    <div class="alert alert-warning" role="alert">
+      No pricing available for this contract.
+    </div>
+  }
 </div>
