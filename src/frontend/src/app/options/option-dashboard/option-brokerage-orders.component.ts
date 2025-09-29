@@ -92,11 +92,6 @@ export class OptionBrokerageOrdersComponent {
         let isOpen = order.contracts.filter(leg => leg.instruction.endsWith('ToOpen'))
         let isClose = order.contracts.filter(leg => leg.instruction.endsWith('ToClose'))
         
-        if (isOpen.length > 0 && isClose.length > 0) {
-            this.errors = ['Cannot have both open and close legs in the same order']
-            return
-        }
-        
         if (isOpen.length === 0 && isClose.length === 0) {
             this.errors = ['Order must have at least one open or close leg']
             return
