@@ -5,7 +5,7 @@ import {StocksService} from 'src/app/services/stocks.service';
     selector: 'app-admin-weekly',
     templateUrl: './admin-weekly.component.html',
     styleUrls: ['./admin-weekly.component.css'],
-    standalone: false
+    standalone: true
 })
 export class AdminWeeklyComponent {
     private stockService = inject(StocksService);

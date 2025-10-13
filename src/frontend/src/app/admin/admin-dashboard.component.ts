@@ -5,7 +5,7 @@ import {StocksService} from 'src/app/services/stocks.service';
     selector: 'app-admin-dashboard',
     templateUrl: './admin-dashboard.component.html',
     styleUrls: ['./admin-dashboard.component.css'],
-    standalone: false
+    standalone: true
 })
 export class AdminDashboardComponent {
     private stockService = inject(StocksService);
