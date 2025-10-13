@@ -29,6 +29,10 @@ export class OptionContractPricingComponent {
     chartInfos: PositionChartInformation[] = [];
 
     constructor(private optionService: OptionService) { }
+
+    private getOptionContractLabel(contract: OptionContract): string {
+        return `${contract.isShort ? 'Short' : 'Long'} ${contract.optionType} ${contract.strikePrice} Exp: ${contract.expiration.split('T')[0]}`;
+    }
     
     @Input() set position (value : OptionPosition) {
         if (value) {
@@ -106,7 +110,7 @@ export class OptionContractPricingComponent {
                 });
                 let individualContractOIContainers = individualContractOI.map((mark, idx) => {
                     return {
-                        label: "$" + contracts[idx].strikePrice + " Open Interest",
+                        label: "$" + this.getOptionContractLabel(contracts[idx]) + " Open Interest",
                         chartType: ChartType.Line,
                         data: mark.map((m, i) => {
                             let date = convertToLocalTime(
@@ -124,7 +128,7 @@ export class OptionContractPricingComponent {
                 });
                 let individualIVContainers = individualIV.map((iv, idx) => {
                     return {
-                        label: "$" + contracts[idx].strikePrice + " IV",
+                        label: "$" + this.getOptionContractLabel(contracts[idx]) + " IV",
                         chartType: ChartType.Line,
                         data: iv.map((m, i) => {
                             let date = convertToLocalTime(
