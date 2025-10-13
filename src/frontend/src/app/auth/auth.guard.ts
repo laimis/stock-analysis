@@ -13,7 +13,7 @@ export class WithLoginStatus {
 
     async canActivate(): Promise<boolean> {
         //get user data
-        const result = await this.stocks.getProfile().toPromise<AccountStatus>();
+        const result = await this.stocks.getProfile().toPromise();
         this.globalService.markLoggedIn(result)
         return true;
     }
@@ -30,7 +30,7 @@ export class AuthGuard {
 
     async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
         //get user data
-        const result = await this.stocks.getProfile().toPromise<AccountStatus>();
+        const result = await this.stocks.getProfile().toPromise();
         if (!result.loggedIn) {
             this.router.navigate(['/profile/login'], {queryParams: {returnUrl: state.url}})
             return false;
@@ -55,7 +55,7 @@ export class AuthGuardUnverifiedAllowed {
 
     async canActivate(): Promise<boolean> {
         //get user data
-        const result = await this.stocks.getProfile().toPromise<AccountStatus>();
+        const result = await this.stocks.getProfile().toPromise();
         if (!result.loggedIn) {
             this.router.navigate(['/landing'])
             return false;
@@ -76,7 +76,7 @@ export class AuthGuardAdminOnly {
 
     async canActivate(): Promise<boolean> {
         //get user data
-        const result = await this.stocks.getProfile().toPromise<AccountStatus>();
+        const result = await this.stocks.getProfile().toPromise();
         if (!result.isAdmin) {
             this.router.navigate(['/unauthorized'])
             return false;
