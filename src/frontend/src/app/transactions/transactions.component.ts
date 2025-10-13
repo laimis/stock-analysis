@@ -1,11 +1,18 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {DataPointContainer, StocksService, TransactionsView} from '../services/stocks.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterModule} from '@angular/router';
 import {Title} from '@angular/platform-browser';
 import {GetErrors} from "../services/utils";
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { FormsModule } from '@angular/forms';
+import { LoadingComponent } from "../shared/loading/loading.component";
+import { LineChartComponent } from "../shared/line-chart/line-chart.component";
+import { StockLinkComponent } from "../shared/stocks/stock-link.component";
 
 @Component({
     selector: 'app-transactions',
+    imports: [CurrencyPipe, ErrorDisplayComponent, FormsModule, LoadingComponent, LineChartComponent, StockLinkComponent, RouterModule, DatePipe],
     templateUrl: './transactions.component.html',
     styleUrls: ['./transactions.component.css']
 })
@@ -43,7 +50,7 @@ export class TransactionsComponent implements OnInit {
         })
     }
     
-    breakdownSelected(groupBy: string) {
+    breakdownSelected(groupBy: any) {
         this.groupBy = groupBy
         this.loadData()
     }

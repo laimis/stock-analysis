@@ -27,9 +27,6 @@ export class NavMenuComponent {
     // doesn't collapse automatically
     navbarSupportedContentId = 'navbarSupportedContent';
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
     // on mobile, when clicking a link, collapse the menu, it
 
     constructor() {

@@ -68,12 +68,6 @@ export class OptionBrokerageOrdersComponent {
     ordersUpdated = new EventEmitter()
     selectedOrders: BrokerageOptionOrder[];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     cancelOrder(order: BrokerageOptionOrder) {
         if (!confirm('Are you sure you want to cancel this order?')) {
             return

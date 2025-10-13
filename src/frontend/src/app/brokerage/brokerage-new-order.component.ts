@@ -9,10 +9,10 @@ import {
     BrokerageService
 } from "../services/brokerage.service";
 import {StockPositionsService} from "../services/stockpositions.service";
-import {FormControl, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {StockSearchComponent} from "../stocks/stock-search/stock-search.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 import { CurrencyPipe, NgClass } from "@angular/common";
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 
 @Component({
@@ -60,9 +60,6 @@ export class BrokerageNewOrderComponent {
     ]
 
     notesControl = new FormControl('')
-
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
 
     constructor() {
         this.brokerageOrderType = BrokerageOrderType.Limit

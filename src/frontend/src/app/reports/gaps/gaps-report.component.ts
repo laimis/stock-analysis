@@ -17,11 +17,6 @@ export class GapsReportComponent implements OnInit {
     errors: string[] = null;
     gaps: StockGaps;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit(): void {
         this.route.queryParams.subscribe(queryParams => {

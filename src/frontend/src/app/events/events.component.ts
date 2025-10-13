@@ -16,11 +16,6 @@ export class EventsComponent implements OnInit {
     events: any[]
     errors = null
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         const type = this.route.snapshot.queryParamMap.get("type");

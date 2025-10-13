@@ -10,13 +10,6 @@ import {StocksService} from 'src/app/services/stocks.service';
 export class AdminDashboardComponent {
     private stockService = inject(StocksService);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
-
     turnOffSms() {
         this.stockService.smsOff().subscribe(
             _ => console.log("success"),

@@ -2,12 +2,22 @@ import { Component, OnInit, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {StockPosition, StocksService, WeeklyReport} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
+import { LoadingComponent } from "../shared/loading/loading.component";
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TradingViewLinkComponent } from "../shared/stocks/trading-view-link.component";
+import { StockLinkComponent } from "../shared/stocks/stock-link.component";
+import { StockTradingPositionComponent } from "../stocks/stock-trading/stock-trading-position.component";
 
 @Component({
     selector: 'app-review',
     templateUrl: './summary.component.html',
     styleUrls: ['./summary.component.css'],
-    standalone: false
+    imports: [
+    DatePipe, CurrencyPipe, LoadingComponent, ErrorDisplayComponent, DecimalPipe, FormsModule, NgClass, TradingViewLinkComponent, StockLinkComponent, PercentPipe,
+    StockTradingPositionComponent
+]
 })
 export class SummaryComponent implements OnInit {
     private stockService = inject(StocksService);
@@ -20,12 +30,6 @@ export class SummaryComponent implements OnInit {
     stockProfits: number;
     optionProfits: number;
     dividendProfits: number;
-
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.title.setTitle("Weekly Summary - Nightingale Trading")

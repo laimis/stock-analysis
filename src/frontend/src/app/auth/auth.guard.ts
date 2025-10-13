@@ -8,12 +8,6 @@ export class WithLoginStatus {
     private globalService = inject(GlobalService);
     private stocks = inject(StocksService);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
 
     async canActivate(): Promise<boolean> {
         //get user data
@@ -29,12 +23,6 @@ export class AuthGuard {
     private stocks = inject(StocksService);
     private router = inject(Router);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
 
     async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
         //get user data
@@ -58,12 +46,6 @@ export class AuthGuardUnverifiedAllowed {
     private stocks = inject(StocksService);
     private router = inject(Router);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
 
     async canActivate(): Promise<boolean> {
         //get user data
@@ -83,12 +65,6 @@ export class AuthGuardAdminOnly {
     private stocks = inject(StocksService);
     private router = inject(Router);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
 
     async canActivate(): Promise<boolean> {
         //get user data

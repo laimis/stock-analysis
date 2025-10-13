@@ -18,12 +18,6 @@ export class StockListsDashboardComponent implements OnInit {
     filteredLists: StockList[] = []
     errors: string[] = []
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit(): void {
         this.loadLists();
     }

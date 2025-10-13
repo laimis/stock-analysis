@@ -17,12 +17,6 @@ export class AdminEmailComponent {
     subject: string
     body: string
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     send() {
         var obj = {
             to: this.to,

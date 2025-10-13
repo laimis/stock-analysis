@@ -27,12 +27,6 @@ export class CryptoDashboardComponent implements OnInit {
     sortColumn: string
     sortDirection: number = -1
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
 
         this.stocks.getCryptos().subscribe(result => {

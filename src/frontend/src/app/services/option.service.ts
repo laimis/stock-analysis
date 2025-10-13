@@ -302,13 +302,6 @@ export interface OptionPricing {
 export class OptionService {
     private http = inject(HttpClient);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    
-    constructor() {
-    }
-    
     getOptionPricing(symbol: string): Observable<OptionPricing[]> {
         // add symbols as part of query string, separated by commas
         // but each symbol should be URL encoded

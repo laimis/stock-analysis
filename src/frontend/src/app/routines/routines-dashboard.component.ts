@@ -18,11 +18,6 @@ export class RoutineDashboardComponent implements OnInit {
     activeRoutine: Routine = null
     errors: string[] = null
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.fetchRoutines();

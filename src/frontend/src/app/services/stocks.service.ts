@@ -7,13 +7,6 @@ import {BrokerageOptionOrder, OptionPosition} from "./option.service";
 export class StocksService {
     private http = inject(HttpClient);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
-
     // ----------------- misc ---------------------
     getEvents(type: string): Observable<object[]> {
         return this.http.get<object[]>('/api/events?entity=' + type)

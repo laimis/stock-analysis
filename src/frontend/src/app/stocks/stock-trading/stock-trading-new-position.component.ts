@@ -82,9 +82,6 @@ export class StockTradingNewPositionComponent {
     errors: string[] = []
     protected readonly atrMultiplier = 2;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
     constructor() {
         const globalService = inject(GlobalService);
 

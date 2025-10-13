@@ -39,12 +39,6 @@ export class StockTradingReviewComponent {
     positionChanged: EventEmitter<any> = new EventEmitter()
     private _index: number = 0
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     private _positions: StockPosition[] = [];
 
     get positions(): StockPosition[] {

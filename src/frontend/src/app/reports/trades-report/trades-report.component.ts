@@ -344,12 +344,6 @@ export class TradesReportComponent implements OnInit {
     screenerId: string;
     tradeRecommendations: TradeRecommendation[] = []
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         // we must get screenerId parameter from the route, if it's not there, set the error informing the user
         if (!this.route.snapshot.queryParamMap.has('screenerId')) {

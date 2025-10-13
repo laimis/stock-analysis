@@ -12,11 +12,6 @@ export class RecentSellsComponent implements OnInit {
 
     sells: any;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit(): void {
         this.service.recentSells().subscribe(result => {

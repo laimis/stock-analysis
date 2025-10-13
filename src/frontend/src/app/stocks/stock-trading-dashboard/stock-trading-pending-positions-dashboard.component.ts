@@ -33,12 +33,6 @@ export class StockTradingPendingPositionsDashboardComponent implements OnInit {
     feedbackMessage: string;
     account: BrokerageAccount;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
-
     ngOnInit(): void {
         this.route.params.subscribe(param => {
             this.activeTab = param['tab'] || 'positions'

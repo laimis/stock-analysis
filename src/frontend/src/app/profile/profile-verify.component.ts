@@ -19,11 +19,6 @@ export class ProfileVerifyComponent implements OnInit {
     public id: string
     public password: string
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.id = this.route.snapshot.paramMap.get("id")

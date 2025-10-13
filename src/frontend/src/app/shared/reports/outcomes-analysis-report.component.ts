@@ -11,7 +11,6 @@ import {LoadingComponent} from "../loading/loading.component";
 import {NgClass} from "@angular/common";
 import {TradingViewLinkComponent} from "../stocks/trading-view-link.component";
 import {StockLinkComponent} from "../stocks/stock-link.component";
-import {AppModule} from "../../app.module";
 import {OutcomesComponent} from "./outcomes.component";
 
 @Component({

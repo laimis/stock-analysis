@@ -55,12 +55,6 @@ export class StockPositionReportsComponent {
     }
     tickers: string[] = []
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     @Input()
     set dailyAnalysis(value: PortfolioHoldings) {
         if (value) {

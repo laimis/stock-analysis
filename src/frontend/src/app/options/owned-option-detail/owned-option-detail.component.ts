@@ -33,11 +33,6 @@ export class OwnedOptionComponent implements OnInit {
     public errors: string[]
     public filled: string
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.filled = Date()

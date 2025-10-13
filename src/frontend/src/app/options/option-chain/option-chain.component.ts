@@ -42,12 +42,6 @@ export class OptionChainComponent implements OnInit {
     errors: string[] = [];
     selectedSpread: string = null
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         var ticker = this.route.snapshot.paramMap.get('ticker');
         if (ticker) {

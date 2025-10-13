@@ -41,12 +41,6 @@ export class StockTransactionComponent implements OnInit {
     positionType: string
     notes: string
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.filled = Date()

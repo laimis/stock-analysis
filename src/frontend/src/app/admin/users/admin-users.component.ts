@@ -14,12 +14,6 @@ export class AdminUsersComponent implements OnInit {
 
     public users: any
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
 
         this.stocks.getUsers().subscribe(result => {

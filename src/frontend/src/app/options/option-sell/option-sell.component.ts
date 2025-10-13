@@ -34,11 +34,6 @@ export class OptionSellComponent implements OnInit {
     notes: string
     protected readonly tick = tick;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         var ticker = this.route.snapshot.paramMap.get('ticker');

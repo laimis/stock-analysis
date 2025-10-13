@@ -10,12 +10,6 @@ import {StocksService} from 'src/app/services/stocks.service';
 export class AdminWeeklyComponent {
     private stockService = inject(StocksService);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
 
     kickOff(everyone: boolean) {
         this.stockService.weeklyReview({everyone: everyone}).subscribe(

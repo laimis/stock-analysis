@@ -31,12 +31,6 @@ export class StockSearchComponent implements OnInit {
     highlightedIndex = -1;
     private searchTerms = new Subject<string>();
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     @Input()
     set ticker(value: string) {
         this.selectedValue = value

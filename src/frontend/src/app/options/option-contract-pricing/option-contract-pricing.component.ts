@@ -30,11 +30,6 @@ export class OptionContractPricingComponent {
     hasPrice: boolean = false;
     chartInfos: PositionChartInformation[] = [];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() { }
-
     private getOptionContractLabel(contract: OptionContract): string {
         return `${contract.isShort ? 'Short' : 'Long'} ${contract.optionType} ${contract.strikePrice} Exp: ${contract.expiration.split('T')[0]}`;
     }

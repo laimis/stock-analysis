@@ -31,12 +31,6 @@ export class OptionPositionsComponent {
     @Output() positionsChanged = new EventEmitter();
     @Output() errorOccurred = new EventEmitter<string[]>();
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
-
     private _positions: OptionPosition[] = []
 
     @Input()

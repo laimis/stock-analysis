@@ -30,12 +30,6 @@ export class StockTradingSimulationsComponent implements OnInit {
     loading: boolean = false;
     benchmarks: {ticker: string, prices: PriceBar[] }[] = [];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         this.route.queryParams.subscribe(queryParams => {
             const n = queryParams['n'];

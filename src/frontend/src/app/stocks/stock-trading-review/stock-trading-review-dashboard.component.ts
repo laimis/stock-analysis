@@ -28,12 +28,6 @@ export class StockTradingReviewDashboardComponent implements OnInit {
         performance: true
     }
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         this.route.params.subscribe(param => {
             this.activeTab = param['tab'] || 'positions'

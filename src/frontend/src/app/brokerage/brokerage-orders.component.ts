@@ -40,11 +40,6 @@ export class BrokerageOrdersComponent {
     @Input()
     positionId: string
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     private _stockOrders: BrokerageStockOrder[] = [];
     private _optionOrders: BrokerageOptionOrder[] = [];

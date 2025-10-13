@@ -33,12 +33,6 @@ export class ProfileCreateComponent implements OnInit {
     private PLUS_PLAN: string = 'PLUS'
     private FULL_PLAN: string = 'FULL'
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         var plan = this.route.snapshot.paramMap.get("plan")
         if (plan) {

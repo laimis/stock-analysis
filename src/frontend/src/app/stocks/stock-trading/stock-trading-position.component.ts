@@ -62,9 +62,6 @@ export class StockTradingPositionComponent {
     @Output()
     positionChanged = new EventEmitter()
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
     // constructor that takes stock service
     constructor() {
         this.strategies = GetStockStrategies()

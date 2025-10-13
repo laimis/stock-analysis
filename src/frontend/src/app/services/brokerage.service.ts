@@ -75,11 +75,6 @@ export class BrokerageService {
     // going out to get it itself
     private brokerageAccountData: BrokerageAccount = null
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     buy(obj: BrokerageOrderCommand): Observable<any> {
         this.brokerageAccountData = null

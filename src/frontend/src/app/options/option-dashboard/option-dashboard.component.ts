@@ -43,13 +43,6 @@ export class OptionsComponent implements OnInit {
     activeTab: string = 'open'
     errors: string[] = null
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-
-    constructor() {
-    }
-
     ngOnInit() {
         this.title.setTitle("Options - Nightingale Trading")
         // get the active tab based on the url. The url is in the format /options/:tab

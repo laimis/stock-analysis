@@ -21,13 +21,6 @@ export class RoutineComponent implements OnInit {
     activeRoutine: Routine = null;
     mode: string;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    // accept route service where I can extract current routine name from :name parameter
-    constructor() {
-    }
-
     ngOnInit() {
         const id = this.route.snapshot.paramMap.get('id');
         this.mode = this.route.snapshot.paramMap.get('mode');

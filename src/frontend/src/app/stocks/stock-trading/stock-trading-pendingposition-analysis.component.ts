@@ -25,10 +25,7 @@ export class StockTradingPendingpositionAnalysisComponent implements OnInit {
     loading = false;
     errors: string[];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    constructor() { }
-    
+
     ngOnInit() {
         this.loading = true;
         this.stockService.reportPendingPositions().subscribe((data) => {

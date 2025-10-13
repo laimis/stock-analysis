@@ -35,12 +35,6 @@ export class OptionContractCloseModalComponent implements OnChanges {
     quantity: number;
     costDrops: { [key: string]: number } = {};
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
-
     ngOnChanges() {
         if (this.position && this.contract?.details) {
             console.log("setting price value", this.contract.details?.mark)

@@ -32,12 +32,6 @@ export class DashboardComponent implements OnInit {
         {path: '/reports/trends', label: 'Trends'},
     ];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
 
         this.title.setTitle("Dashboard - Nightingale Trading")

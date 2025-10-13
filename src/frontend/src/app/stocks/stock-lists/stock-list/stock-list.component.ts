@@ -23,12 +23,6 @@ export class StockListComponent implements OnInit {
     controlToHide: HTMLElement;
     errors: string[];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit(): void {
         this.route.params.subscribe(params => {
             const id = params['id']

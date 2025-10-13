@@ -43,12 +43,6 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     @Input()
     hideScheduling: boolean = false;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
-
     ngAfterViewInit() {
         this.turnOnRefresh();
     }

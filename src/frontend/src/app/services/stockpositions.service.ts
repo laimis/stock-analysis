@@ -19,13 +19,6 @@ import {
 export class StockPositionsService {
     private http = inject(HttpClient);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-
-    constructor() {
-    }
-
     get(positionId: string): Observable<StockPosition> {
         return this.http.get<StockPosition>(`/api/portfolio/stockpositions/${positionId}`)
     }

@@ -56,10 +56,6 @@ export class TrendsReportComponent implements OnInit {
     errors: string[];
     protected readonly TrendDirection = TrendDirection;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-
     constructor() {
         // Set default values
         this.selectedStartDate = "10";

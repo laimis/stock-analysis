@@ -60,11 +60,6 @@ export class StockAnalysisComponent {
     private _prices: Prices;
     inflectionPointsReport: InflectionPointsReport
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
     
     @Input()
     ticker: string

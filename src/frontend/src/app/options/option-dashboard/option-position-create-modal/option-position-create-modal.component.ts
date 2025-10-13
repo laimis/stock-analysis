@@ -17,10 +17,6 @@ import {BrokerageOptionPosition, OptionService} from "../../../services/option.s
 export class OptionPositionCreateModalComponent {
     private optionService = inject(OptionService);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    
     constructor() {
         this.optionStrategies = GetOptionStrategies()
     }

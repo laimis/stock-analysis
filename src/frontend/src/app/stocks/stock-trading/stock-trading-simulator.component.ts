@@ -53,12 +53,6 @@ export class StockTradingSimulatorComponent implements OnInit {
     positions: StockPosition[] = []
     filteredPositions: StockPosition[] = []
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit(): void {
         var simulations = localStorage.getItem('simulations')
         if (simulations) {

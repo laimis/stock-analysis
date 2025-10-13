@@ -210,11 +210,6 @@ export class InflectionPointsComponent implements OnInit {
 
     completeOBVDataSet: InflectionPointsReportDetails
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.ageValueToUse = this.twoMonths

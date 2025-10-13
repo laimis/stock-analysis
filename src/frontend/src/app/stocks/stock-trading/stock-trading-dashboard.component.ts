@@ -65,12 +65,6 @@ export class StockTradingDashboardComponent implements OnInit {
         {value: "daysHeld", name: "Days Held"},
     ]
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         this.route.params.subscribe(param => {
             this.activeTab = param['tab'] || 'positions'

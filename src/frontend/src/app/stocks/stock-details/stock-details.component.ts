@@ -92,12 +92,6 @@ export class StockDetailsComponent implements OnInit {
         pending: null
     }
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit(): void {
         this.route.params.subscribe(param => {
             const ticker = param['ticker']

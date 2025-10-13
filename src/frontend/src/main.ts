@@ -1,8 +1,11 @@
-import {enableProdMode} from '@angular/core';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {ApplicationConfig, enableProdMode, provideZoneChangeDetection} from '@angular/core';
 
-import {AppModule} from './app/app.module';
+import { routes } from './app/app.routes';
+import { AppComponent } from './app/app.component';
 import {environment} from './environments/environment';
+import { bootstrapApplication, } from '@angular/platform-browser';
+import {provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 
 export function getBaseUrl() {
     return document.getElementsByTagName('base')[0].href;
@@ -16,5 +19,13 @@ if (environment.production) {
     enableProdMode();
 }
 
-platformBrowserDynamic(providers).bootstrapModule(AppModule)
-    .catch(err => console.log(err));
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideHttpClient(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes)]
+};
+
+
+bootstrapApplication(AppComponent, appConfig)
+  .catch((err) => console.error(err));

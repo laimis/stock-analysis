@@ -24,11 +24,6 @@ export class AccountTransactionsComponent implements OnInit {
     sortDirection: 'asc' | 'desc' = 'desc';
     errors = [];
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {}
-    
     ngOnInit(): void {
         this.loadTransactions();
     }

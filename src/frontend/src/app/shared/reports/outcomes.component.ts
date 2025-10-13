@@ -40,12 +40,6 @@ export class OutcomesComponent {
     highlightColumn: string;
     sortDirection: number = -1
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     @Input()
     set category(value: AnalysisOutcomeEvaluation) {
         // make a copy of matching tickers so we can sort it

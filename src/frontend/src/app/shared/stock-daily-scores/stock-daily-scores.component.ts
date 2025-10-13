@@ -36,9 +36,6 @@ export class StockDailyScoresComponent {
     selectedStartDate: Date = null;
     selectedEndDate: Date = null;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
     constructor() {
         this.selectedStartDate = new Date();
         this.selectedEndDate = new Date();

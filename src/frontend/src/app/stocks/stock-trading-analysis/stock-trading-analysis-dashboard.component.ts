@@ -15,12 +15,6 @@ export class StockTradingAnalysisDashboardComponent implements OnInit {
     portfolioHoldings: PortfolioHoldings
     errors: string[]
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         this.stocksService.getPortfolioHoldings().subscribe((data) => {
             this.portfolioHoldings = data

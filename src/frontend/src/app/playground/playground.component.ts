@@ -77,11 +77,6 @@ export class PlaygroundComponent implements OnInit {
     testTicker: string;
     Infinity = Infinity
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
 
     ngOnInit() {
         const tickerParam = this.route.snapshot.queryParamMap.get('tickers')

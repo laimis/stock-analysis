@@ -50,11 +50,6 @@ export class OptionSpreadBuilderComponent implements OnInit {
         return Number.parseInt(input);
     }
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-    
-    constructor() {
-    }
     ngOnInit() {
         this.route.paramMap.subscribe(params => {
             this.ticker = params.get('ticker');

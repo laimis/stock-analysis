@@ -17,11 +17,6 @@ export class ContactComponent {
     public message: string
     public errors: string[]
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     sendMessage() {
         var obj = {

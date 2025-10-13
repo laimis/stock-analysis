@@ -25,13 +25,6 @@ export class OptionPendingPositionCreateModalComponent {
     private optionService = inject(OptionService);
     private brokerageService = inject(BrokerageService);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-        this.optionStrategies = GetOptionStrategies()
-    }
-
     @Input() ticker: string
     @Input() selectedLegs: OptionLeg[];
     @Input() price: number;

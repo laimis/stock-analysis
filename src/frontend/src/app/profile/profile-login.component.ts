@@ -30,11 +30,6 @@ export class ProfileLoginComponent implements OnInit {
     public passwordRequestSuccess: boolean
     returnUrl: string;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';

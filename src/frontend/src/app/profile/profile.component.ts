@@ -32,11 +32,6 @@ export class ProfileComponent implements OnInit {
     errors: string[]
     protected readonly max = max;
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit() {
         this.global.accountStatusFeed.subscribe(s => {

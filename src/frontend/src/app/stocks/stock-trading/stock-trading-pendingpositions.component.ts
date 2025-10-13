@@ -43,12 +43,6 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     @Output()
     pendingPositionClosed: EventEmitter<PendingStockPosition> = new EventEmitter<PendingStockPosition>()
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit(): void {
         this.refreshPendingPositions()
     }

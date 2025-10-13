@@ -13,12 +13,6 @@ export class FailuresuccesschainComponent implements OnInit {
     chain: Chain;
     render: string = "all";
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     toggle(identifier: string) {
         this.render = identifier
     }

@@ -28,11 +28,6 @@ export class OptionPositionAddModalComponent implements OnChanges {
   errors: string[] = [];
   spreadValues: { [key: string]: number } = {};
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-  
-  constructor() {}
-
   @HostListener('document:keydown.escape')
   onEscape() {
       this.close();

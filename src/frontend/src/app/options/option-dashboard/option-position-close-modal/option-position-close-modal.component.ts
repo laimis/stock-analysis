@@ -20,12 +20,6 @@ export class OptionPositionCloseModalComponent implements OnChanges {
     private brokerageService = inject(BrokerageService);
     private optionService = inject(OptionService);
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     @Input() position: OptionPosition;
     @Input() isVisible: boolean = false;
     @Output() isVisibleChange = new EventEmitter<boolean>();

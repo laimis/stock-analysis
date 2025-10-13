@@ -42,12 +42,6 @@ export class StockOptionComponent implements OnInit {
     filled: string
     notes: string
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
-
     ngOnInit() {
         this.filled = Date()
         this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');

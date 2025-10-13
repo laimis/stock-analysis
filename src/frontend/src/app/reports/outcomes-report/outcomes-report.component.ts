@@ -34,11 +34,6 @@ export class OutcomesReportComponent implements OnInit {
     fundamentalsReport: TickerFundamentals[]
     excludeEarningsTitle: string = "Exclude Earnings";
 
-    /** Inserted by Angular inject() migration for backwards compatibility */
-    constructor(...args: unknown[]);
-
-    constructor() {
-    }
 
     ngOnInit(): void {
         var titleParam = this.route.snapshot.queryParamMap.get("title");
