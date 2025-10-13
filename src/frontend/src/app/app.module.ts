@@ -131,7 +131,6 @@ import { FundamentalsComponent } from "./shared/reports/fundamentals/fundamental
         StockTradingSimulationsComponent,
         TradingPerformanceSummaryComponent,
         TradingActualVsSimulatedPositionComponent,
-        TransactionsComponent,
         TermsComponent,
         FailuresuccesschainComponent,
         RecentSellsComponent,
