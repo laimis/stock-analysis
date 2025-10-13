@@ -1,19 +1,21 @@
 import {Component, Input} from '@angular/core';
-import {LabelWithFrequency, StockTradingPerformance} from 'src/app/services/stocks.service';
+import {LabelWithFrequency, StockTradingPerformance} from "../../services/stocks.service";
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 
 
 @Component({
     selector: 'app-trading-performance-summary',
     templateUrl: './trading-performance-summary.component.html',
-    standalone: false
+    standalone: true,
+    imports: [CurrencyPipe, PercentPipe, DecimalPipe],
 })
 export class TradingPerformanceSummaryComponent {
 
     @Input()
-    public title: string;
+    public title: string = ""
 
     @Input()
-    public performance: StockTradingPerformance
+    public performance!: StockTradingPerformance
 
     getPercentageOfGrade(grade: LabelWithFrequency): number {
         let total = this.performance.gradeDistribution.map(g => g.frequency).reduce((a, b) => a + b, 0);

@@ -1,13 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {Routine, StocksService} from '../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { NgClass } from '@angular/common';
+import { RoutinesActiveRoutineComponent } from "./routines-active-routine.component";
 
 @Component({
     selector: 'app-routine',
     templateUrl: './routines-routine.component.html',
     styleUrls: ['./routines-routine.component.css'],
-    standalone: false
+    imports: [RouterLink, ErrorDisplayComponent, NgClass, RoutinesActiveRoutineComponent],
 })
 
 export class RoutineComponent implements OnInit {

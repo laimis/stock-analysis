@@ -3,25 +3,28 @@ import {
     DataPointContainer,
     StockTradingPerformance,
     StockTradingPerformanceCollection
-} from 'src/app/services/stocks.service';
+} from "../../services/stocks.service";
+import { LineChartComponent } from "src/app/shared/line-chart/line-chart.component";
+import { TradingPerformanceSummaryComponent } from "src/app/shared/stocks/trading-performance-summary.component";
 
 
 @Component({
     selector: 'app-stock-trading-performance',
     templateUrl: './stock-trading-performance.component.html',
     styleUrls: ['./stock-trading-performance.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [LineChartComponent, TradingPerformanceSummaryComponent]
 })
 export class StockTradingPerformanceComponent {
 
-    trends: DataPointContainer[]
-    performanceSelection: StockTradingPerformance
-    performanceTitle = "YTD"
+    trends: DataPointContainer[] = []
+    performanceSelection: StockTradingPerformance | null = null
+    performanceTitle = "YTD" // default selection
 
-    private _performance: StockTradingPerformanceCollection
+    private _performance: StockTradingPerformanceCollection | null = null
 
     get performance() {
-        return this._performance
+        return this._performance!
     }
 
     @Input()

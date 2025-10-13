@@ -1,20 +1,24 @@
 import { Component, inject } from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router';
+import {NavigationEnd, Router, RouterLink} from '@angular/router';
 import {GlobalService} from '../services/global.service';
 import {GetErrors} from "../services/utils";
+import { FormsModule } from '@angular/forms';
+import { NgClass } from '@angular/common';
+import { StockSearchComponent } from "../stocks/stock-search/stock-search.component";
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-nav-menu',
     templateUrl: './nav-menu.component.html',
     styleUrls: ['./nav-menu.component.css'],
-    standalone: false
+    imports: [FormsModule, NgClass, RouterLink, StockSearchComponent, ErrorDisplayComponent]
 })
 export class NavMenuComponent {
     globalService = inject(GlobalService);
     private router = inject(Router);
 
     isLoggedIn = false
-    errors: string[] = null
+    errors: string[] = []
 
     links = [
         {path: '/stocks/positions', label: 'Stocks'},
@@ -23,7 +27,7 @@ export class NavMenuComponent {
         {path: '/routines', label: 'Routines'},
         {path: '/profile', label: 'Profile'}
     ];
-    currentPath: string;
+    currentPath: string = '';
     // doesn't collapse automatically
     navbarSupportedContentId = 'navbarSupportedContent';
 
@@ -50,7 +54,9 @@ export class NavMenuComponent {
 
     collapseMenu() {
         let element = document.getElementById(this.navbarSupportedContentId);
-        element.classList.remove('show');
+        if (element) {
+            element.classList.remove('show');
+        }
     }
 
     navigateToTicker(ticker: string) {

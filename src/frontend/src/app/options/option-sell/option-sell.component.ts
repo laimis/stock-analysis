@@ -1,15 +1,19 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {DatePipe, Location} from '@angular/common';
+import {DatePipe, Location, PercentPipe} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from 'src/app/services/utils';
 import {tick} from "@angular/core/testing";
 import { OptionService } from 'src/app/services/option.service';
+import { FormsModule } from '@angular/forms';
+import { StockSearchComponent } from "src/app/stocks/stock-search/stock-search.component";
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-option-sell',
     templateUrl: './option-sell.component.html',
     providers: [DatePipe],
-    standalone: false
+    imports: [FormsModule, StockSearchComponent, ErrorDisplayComponent],
+    standalone: true
 })
 export class OptionSellComponent implements OnInit {
     private service = inject(OptionService);

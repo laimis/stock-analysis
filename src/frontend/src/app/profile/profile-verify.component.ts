@@ -2,12 +2,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from '../services/utils';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-profile-verify',
     templateUrl: './profile-verify.component.html',
     styleUrls: ['./profile-verify.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [ErrorDisplayComponent],
+    
 })
 export class ProfileVerifyComponent implements OnInit {
     private stockService = inject(StocksService);

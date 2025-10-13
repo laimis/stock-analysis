@@ -1,9 +1,11 @@
 import {Component} from '@angular/core';
-
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { NavMenuComponent } from "./nav-menu/nav-menu.component";
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.css'],
+    imports: [RouterLink, RouterOutlet, NavMenuComponent]
 })
 export class AppComponent {
     title = 'app';

@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import {toggleVisuallyHidden} from 'src/app/services/utils';
-import {BrokerageStockOrder, OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
+import { OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
+import {toggleVisuallyHidden} from "../../services/utils";
+import { StockTradingPositionComponent } from "./stock-trading-position.component";
+import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
 
 
 @Component({
@@ -9,7 +11,7 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    standalone: false
+    imports: [StockTradingPositionComponent, StockLinkComponent, CurrencyPipe]
 })
 export class StockTradingPositionsComponent {
     private percentPipe = inject(PercentPipe);
@@ -18,15 +20,15 @@ export class StockTradingPositionsComponent {
 
 
     @Input()
-    metricFunc: (p: StockPosition) => any;
+    metricFunc: (p: StockPosition) => any | null = () => null;
     @Input()
-    metricType: OutcomeValueTypeEnum;
+    metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number;
     @Input()
-    positions: StockPosition[]
+    positions: StockPosition[] = [];
     @Output()
     positionChanged = new EventEmitter()
 
-    private _quotes: Map<string, StockQuote>;
+    private _quotes: Map<string, StockQuote> = new Map<string, StockQuote>()
 
     get quotes() {
         return this._quotes
@@ -42,12 +44,12 @@ export class StockTradingPositionsComponent {
     }
 
     getQuote(p: StockPosition) {
-        return this.quotes[p.ticker]
+        return this.quotes.get(p.ticker)
     }
 
     getPrice(p: StockPosition) {
         if (this.quotes) {
-            return this.quotes[p.ticker]?.price
+            return this.quotes.get(p.ticker)?.price
         }
         return 0
     }

@@ -1,14 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {PortfolioHoldings, StocksService} from '../services/stocks.service';
+import { AlertsComponent } from "../alerts/alerts.component";
 
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'],
-    standalone: false
+    imports: [RouterLink, AlertsComponent],
 })
 export class DashboardComponent implements OnInit {
     private stocks = inject(StocksService);

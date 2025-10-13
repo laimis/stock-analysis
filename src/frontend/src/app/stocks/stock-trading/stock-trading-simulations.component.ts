@@ -10,12 +10,27 @@ import {GetErrors} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {catchError, tap} from "rxjs/operators";
 import {forkJoin} from "rxjs";
+import { FormsModule } from '@angular/forms';
+import { ErrorDisplayComponent } from 'src/app/shared/error-display/error-display.component';
+import { LoadingComponent } from 'src/app/shared/loading/loading.component';
+import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
+import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
+import { StockTradingStrategiesComponent } from "src/app/shared/stocks/stock-trading-strategies.component";
+import { ParsedDatePipe } from "../../services/parsedDate.filter";
 
 @Component({
     selector: 'app-stock-trading-simulations',
     templateUrl: './stock-trading-simulations.component.html',
     styleUrls: ['./stock-trading-simulations.component.css'],
-    standalone: false
+    imports: [
+    FormsModule,
+    ErrorDisplayComponent,
+    LoadingComponent,
+    PercentPipe, DatePipe, CurrencyPipe,
+    StockLinkAndTradingviewLinkComponent,
+    StockTradingStrategiesComponent,
+    ParsedDatePipe
+]
 })
 
 export class StockTradingSimulationsComponent implements OnInit {

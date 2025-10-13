@@ -2,14 +2,22 @@ import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import {OutcomesReport, StocksService, TickerCorrelation, TickerFundamentals, TickerOutcomes} from '../../services/stocks.service';
-import {catchError, map, tap} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {concat} from "rxjs";
+import { FormsModule } from '@angular/forms';
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { OutcomesComponent } from "src/app/shared/reports/outcomes.component";
+import { OutcomesAnalysisReportComponent } from "src/app/shared/reports/outcomes-analysis-report.component";
+import { LoadingComponent } from "src/app/shared/loading/loading.component";
+import { CorrelationsComponent } from "src/app/shared/reports/correlations.component";
+import { FundamentalsComponent } from "src/app/shared/reports/fundamentals/fundamentals.component";
 
 @Component({
     selector: 'app-outcomes-report',
     templateUrl: './outcomes-report.component.html',
     styleUrls: ['./outcomes-report.component.css'],
-    standalone: false
+    imports: [FormsModule, ErrorDisplayComponent, OutcomesComponent, OutcomesAnalysisReportComponent, LoadingComponent, CorrelationsComponent, FundamentalsComponent],
+    standalone: true
 })
 export class OutcomesReportComponent implements OnInit {
     private stocksService = inject(StocksService);

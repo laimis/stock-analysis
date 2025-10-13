@@ -5,12 +5,16 @@ import {GetErrors} from '../services/utils';
 import {GlobalService} from "../services/global.service";
 import {max} from "rxjs/operators";
 import {OptionService} from "../services/option.service";
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-profile',
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [ErrorDisplayComponent, CurrencyPipe, DatePipe, FormsModule]
 })
 export class ProfileComponent implements OnInit {
     private global = inject(GlobalService);

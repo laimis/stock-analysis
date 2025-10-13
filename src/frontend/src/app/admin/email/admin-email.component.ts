@@ -1,11 +1,13 @@
 import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {StocksService} from 'src/app/services/stocks.service';
 
 @Component({
     selector: 'app-admin-email',
     templateUrl: './admin-email.component.html',
     styleUrls: ['./admin-email.component.css'],
-    standalone: false
+    imports: [FormsModule],
+    standalone: true
 })
 export class AdminEmailComponent {
     private stockService = inject(StocksService);

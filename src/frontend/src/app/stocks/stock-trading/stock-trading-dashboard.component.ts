@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
     AccountStatus,
     BrokerageAccount, BrokerageAccountSnapshot,
@@ -11,14 +11,21 @@ import {
 } from '../../services/stocks.service';
 import {GetErrors, GetStockStrategies, isLongTermStrategy, toggleVisuallyHidden} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
+import { StockTradingPositionsComponent } from './stock-trading-positions.component';
+import { StockTradingSummaryComponent } from './stock-trading-summary.component';
+import { StockTradingChartsComponent } from './stock-trading-charts.component';
+import { StockViolationsComponent } from './stock-violations.component';
+import { StockTradingReviewComponent } from '../../stocks/stock-trading-review/stock-trading-review.component';
 import {stockOpenPositionExportLink} from "../../services/links.service";
 import {GlobalService} from "../../services/global.service";
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { NgClass } from '@angular/common';
 
 @Component({
     selector: 'app-stock-trading-dashboard',
     templateUrl: './stock-trading-dashboard.component.html',
     styleUrls: ['./stock-trading-dashboard.component.css'],
-    standalone: false
+    imports: [ErrorDisplayComponent, NgClass, RouterLink, StockTradingPositionsComponent, StockTradingSummaryComponent, StockTradingChartsComponent, StockViolationsComponent, StockTradingReviewComponent]
 })
 export class StockTradingDashboardComponent implements OnInit {
     private globalService = inject(GlobalService);

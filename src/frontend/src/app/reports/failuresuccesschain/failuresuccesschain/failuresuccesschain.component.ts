@@ -1,3 +1,4 @@
+import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import {Chain, StocksService} from 'src/app/services/stocks.service';
 
@@ -5,7 +6,7 @@ import {Chain, StocksService} from 'src/app/services/stocks.service';
     selector: 'app-failuresuccesschain',
     templateUrl: './failuresuccesschain.component.html',
     styleUrls: ['./failuresuccesschain.component.css'],
-    standalone: false
+    imports: [NgClass, CurrencyPipe, DatePipe]
 })
 export class FailuresuccesschainComponent implements OnInit {
     private service = inject(StocksService);

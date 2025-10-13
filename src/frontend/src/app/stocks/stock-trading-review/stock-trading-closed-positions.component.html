@@ -74,53 +74,74 @@
             </form>
         </section>
     </div>
-    <ng-template #splitOutcomeTemplate let-label="label" let-positions="positions">
-        <div class="col">
-            <h5>
-                {{ label }}: {{ positions.length }}
-                <span class="float-end">{{ getProfitSum(positions) | currency }}</span>
-            </h5>
-            @for (position of positions; track position) {
-                @if (matchesFilter(position)) {
-                    <div class="row" [ngClass]="{
-            'bg-success':position.grade === 'A',
-            'bg-warning':position.grade === 'C',
-            }">
-                        <div class="col">
-                            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
-                            <app-stock-link [ticker]="position.ticker"></app-stock-link>
-                        </div>
-                        <div class="col">{{ position.opened | date:'shortDate' }}</div>
-                        <div class="col">{{ position.closed | date:'shortDate' }}</div>
-                        <div class="col">{{ position.rr | number:'1.0-2' }}</div>
-                        <div class="col">{{ position.profit | currency }}</div>
-                        <div class="col">{{ position.grade }}</div>
-                    </div>
-                }
-            }
-        </div>
-    </ng-template>
+    
     @if (layout === LAYOUT_OPTION_SPLIT_OUTCOME) {
-        <div>
-            @for (group of groupedByMonth; track group) {
-                <div class="card mt-3 mb-3">
-                    <div class="card-body">
-                        <h4 class="card-title">
-                            {{ group.month }}
-                            <span
-                                class="float-end">Total: <strong>{{ getProfitSum(group.positions) | currency }}</strong></span>
-                        </h4>
-                        <div class="row mt-2">
-                            <ng-template
-                                *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.wins, label: 'Wins'}"></ng-template>
-                            <ng-template
-                                *ngTemplateOutlet="splitOutcomeTemplate; context: {positions: group.losses, label: 'Losses'}"></ng-template>
+    <div>
+        @for (group of groupedByMonth; track group) {
+            <div class="card mt-3 mb-3">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        {{ group.month }}
+                        <span
+                            class="float-end">Total: <strong>{{ getProfitSum(group.positions) | currency }}</strong></span>
+                    </h4>
+                    <div class="row mt-2">
+                        <!-- Wins column -->
+                        <div class="col">
+                            <h5>
+                                Wins: {{ group.wins.length }}
+                                <span class="float-end">{{ getProfitSum(group.wins) | currency }}</span>
+                            </h5>
+                            @for (position of group.wins; track position) {
+                                @if (matchesFilter(position)) {
+                                    <div class="row" [ngClass]="{
+                        'bg-success':position.grade === 'A',
+                        'bg-warning':position.grade === 'C',
+                        }">
+                                        <div class="col">
+                                            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+                                            <app-stock-link [ticker]="position.ticker"></app-stock-link>
+                                        </div>
+                                        <div class="col">{{ position.opened | date:'shortDate' }}</div>
+                                        <div class="col">{{ position.closed | date:'shortDate' }}</div>
+                                        <div class="col">{{ position.rr | number:'1.0-2' }}</div>
+                                        <div class="col">{{ position.profit | currency }}</div>
+                                        <div class="col">{{ position.grade }}</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <!-- Losses column -->
+                        <div class="col">
+                            <h5>
+                                Losses: {{ group.losses.length }}
+                                <span class="float-end">{{ getProfitSum(group.losses) | currency }}</span>
+                            </h5>
+                            @for (position of group.losses; track position) {
+                                @if (matchesFilter(position)) {
+                                    <div class="row" [ngClass]="{
+                        'bg-success':position.grade === 'A',
+                        'bg-warning':position.grade === 'C',
+                        }">
+                                        <div class="col">
+                                            <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
+                                            <app-stock-link [ticker]="position.ticker"></app-stock-link>
+                                        </div>
+                                        <div class="col">{{ position.opened | date:'shortDate' }}</div>
+                                        <div class="col">{{ position.closed | date:'shortDate' }}</div>
+                                        <div class="col">{{ position.rr | number:'1.0-2' }}</div>
+                                        <div class="col">{{ position.profit | currency }}</div>
+                                        <div class="col">{{ position.grade }}</div>
+                                    </div>
+                                }
+                            }
                         </div>
                     </div>
                 </div>
-            }
-        </div>
-    }
+            </div>
+        }
+    </div>
+}
     @if (layout === LAYOUT_OPTION_TABLE) {
         <div>
             @if (positions) {

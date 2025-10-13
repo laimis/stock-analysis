@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
     StockPosition,
     StockTradingPerformanceCollection,
@@ -7,12 +7,19 @@ import {
 } from 'src/app/services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
+import { LoadingComponent } from "src/app/shared/loading/loading.component";
+import { NgClass } from '@angular/common';
+import { StockTradingReviewComponent } from "./stock-trading-review.component";
+import { StockTradingStrategiesComponent } from "src/app/shared/stocks/stock-trading-strategies.component";
+import { StockTradingClosedPositionsComponent } from "./stock-trading-closed-positions.component";
+import { StockTradingPerformanceComponent } from "./stock-trading-performance.component";
 
 @Component({
     selector: 'app-stock-trading-review-dashboard',
     templateUrl: './stock-trading-review-dashboard.component.html',
     styleUrls: ['./stock-trading-review-dashboard.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [LoadingComponent, NgClass, RouterLink, StockTradingReviewComponent, StockTradingStrategiesComponent, StockTradingClosedPositionsComponent, StockTradingPerformanceComponent]
 })
 export class StockTradingReviewDashboardComponent implements OnInit {
     private route = inject(ActivatedRoute);

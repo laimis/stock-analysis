@@ -1,19 +1,21 @@
 import {Component, Input} from '@angular/core';
-import {TradingStrategyPerformance} from 'src/app/services/stocks.service';
+import {TradingStrategyPerformance} from '../../services/stocks.service';
+import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 
 @Component({
     selector: 'app-stock-trading-strategies',
     templateUrl: './stock-trading-strategies.component.html',
     styleUrls: ['./stock-trading-strategies.component.css'],
-    standalone: false
+    imports: [DecimalPipe, CurrencyPipe, PercentPipe],
+    standalone: true
 })
 export class StockTradingStrategiesComponent {
 
-    sortedResults: TradingStrategyPerformance[]
+    sortedResults: TradingStrategyPerformance[] = []
     private _sortDirection = 1
     private _sortProperty = "strategyName"
 
-    private _results: TradingStrategyPerformance[]
+    private _results: TradingStrategyPerformance[] = []
 
     @Input()
     set results(value: TradingStrategyPerformance[]) {
@@ -21,7 +23,7 @@ export class StockTradingStrategiesComponent {
         this.sortedResults = value
     }
 
-    sort(propertyName) {
+    sort(propertyName:string) {
         if (this._sortProperty == propertyName) {
             this._sortDirection *= -1
         } else {
@@ -34,7 +36,7 @@ export class StockTradingStrategiesComponent {
     }
 
     doSort() {
-        this.sortedResults = this._results.sort((a, b) => {
+        this.sortedResults = this._results.sort((a:any, b:any) => {
             let aVal = a[this._sortProperty]
             if (!aVal) {
                 aVal = a.performance[this._sortProperty]

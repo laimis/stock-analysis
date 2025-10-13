@@ -2,6 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import {openpositioncommand, StockPosition} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
+import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { LoadingComponent } from "src/app/shared/loading/loading.component";
+import { StockTradingNewPositionComponent } from "./stock-trading-new-position.component";
 
 class StockTransaction {
     numberOfShares: number
@@ -14,7 +19,7 @@ class StockTransaction {
     selector: 'app-stock-trading-simulation',
     templateUrl: './stock-trading-simulator.component.html',
     styleUrls: ['./stock-trading-simulator.component.css'],
-    standalone: false
+    imports: [CurrencyPipe, DecimalPipe, DatePipe, PercentPipe, FormsModule, ErrorDisplayComponent, LoadingComponent, StockTradingNewPositionComponent]
 })
 
 export class StockTradingSimulatorComponent implements OnInit {

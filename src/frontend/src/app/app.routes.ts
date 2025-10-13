@@ -51,8 +51,6 @@ import {TradesReportComponent} from "./reports/trades-report/trades-report.compo
 import {TrendsReportComponent} from "./reports/trends-report/trends-report.component";
 import {RoutineDashboardComponent} from "./routines/routines-dashboard.component";
 import {RoutineComponent} from "./routines/routines-routine.component";
-import {CryptoDashboardComponent} from "./cryptos/crypto-dashboard/crypto-dashboard.component";
-import {CryptoDetailsComponent} from "./cryptos/crypto-details/crypto-details.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
 
@@ -129,9 +127,6 @@ export const routes: Routes = [
     {path: 'routines', component: RoutineDashboardComponent, canActivate: [AuthGuard], title: 'Routines'},
     {path: 'routines/:id/:mode', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
     {path: 'routines/:id', component: RoutineComponent, canActivate: [AuthGuard], title: 'Routines'},
-
-    {path: 'cryptos', component: CryptoDashboardComponent, canActivate: [AuthGuard]},
-    {path: 'cryptos/:token', component: CryptoDetailsComponent, canActivate: [AuthGuard]},
 
     {path: '**', pathMatch: 'full', component: PageNotFoundComponent, canActivate: [WithLoginStatus]},
 ];

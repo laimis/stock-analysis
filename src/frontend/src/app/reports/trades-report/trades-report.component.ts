@@ -3,6 +3,9 @@ import {ActivatedRoute} from "@angular/router";
 import {OutcomesReport, StockAnalysisOutcome, StocksService, TickerOutcomes} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
 import {Title} from "@angular/platform-browser";
+import { OutcomesComponent } from "src/app/shared/reports/outcomes.component";
+import { LoadingComponent } from "src/app/shared/loading/loading.component";
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
 
 // this function will return tickers that match the new low trade candidates for buy side
 
@@ -332,7 +335,7 @@ function selectFunctionsToUse(screenerId: string) {
     selector: 'app-trades-report',
     templateUrl: './trades-report.component.html',
     styleUrl: './trades-report.component.css',
-    standalone: false
+    imports: [OutcomesComponent, LoadingComponent, ErrorDisplayComponent]
 })
 export class TradesReportComponent implements OnInit {
     private route = inject(ActivatedRoute);

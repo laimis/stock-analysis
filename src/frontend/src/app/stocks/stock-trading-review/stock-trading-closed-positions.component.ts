@@ -1,23 +1,27 @@
 import {Component, Input} from '@angular/core';
-import {StockPosition} from 'src/app/services/stocks.service';
+import {StockPosition} from "../../services/stocks.service";
 import {stockClosedPositionExportLink} from "../../services/links.service";
 import {GetStockStrategies} from "../../services/utils";
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
+import { TradingViewLinkComponent } from "src/app/shared/stocks/trading-view-link.component";
+import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
 
 
 @Component({
     selector: 'app-stock-trading-closed-positions',
     templateUrl: './stock-trading-closed-positions.component.html',
     styleUrls: ['./stock-trading-closed-positions.component.css'],
-    standalone: false
+    imports: [DatePipe, PercentPipe, CurrencyPipe, DecimalPipe, NgClass, TradingViewLinkComponent, StockLinkComponent],
+    standalone: true
 })
 export class StockTradingClosedPositionsComponent {
-    tickers: string[];
+    tickers: string[] = []
     groupedByMonth: {
         month: string,
         positions: StockPosition[],
         wins: StockPosition[],
         losses: StockPosition[]
-    }[]
+    }[] = []
     strategies: string[] = []
     sortColumn: string = 'closed'
     sortDirection: number = -1
@@ -31,7 +35,7 @@ export class StockTradingClosedPositionsComponent {
     LAYOUT_OPTION_SPLIT_OUTCOME: string = 'splitoutcome'
     layout: string = this.LAYOUT_OPTION_TABLE
 
-    private _positions: StockPosition[];
+    private _positions: StockPosition[] = []
 
     get positions(): StockPosition[] {
         return this._positions
@@ -50,11 +54,13 @@ export class StockTradingClosedPositionsComponent {
                 a.set(key, [])
             }
             let arr = a.get(key)
-            arr.push(b)
+            if (arr) {
+                arr.push(b)
+            }
             return a
         }, new Map<string, StockPosition[]>())
 
-        let groupedByMonthArray = []
+        let groupedByMonthArray : { month: string, positions: StockPosition[], wins: StockPosition[], losses: StockPosition[] }[] = []
         groupedByMonth.forEach((value, key) => {
             groupedByMonthArray.push(
                 {
@@ -77,6 +83,7 @@ export class StockTradingClosedPositionsComponent {
             }
         )
             .filter((v, i, a) => v !== null && a.indexOf(v) === i) // unique
+            .filter(v => v !== null) // remove nulls
             .forEach(s => this.strategies.push(s))
 
         GetStockStrategies().forEach(
@@ -212,7 +219,11 @@ export class StockTradingClosedPositionsComponent {
         }
         this.sortColumn = column
 
-        var finalFunc = (a, b) => {
+        var finalFunc = (a: StockPosition, b: StockPosition) => {
+            if (!func) {
+                return 0
+            }
+            
             var result = func(a, b)
             return result * this.sortDirection
         }

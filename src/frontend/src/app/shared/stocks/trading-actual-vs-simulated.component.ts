@@ -1,12 +1,15 @@
 import {Component, Input} from '@angular/core';
-import {TradingStrategyResult, TradingStrategyResults} from 'src/app/services/stocks.service';
+import {TradingStrategyResult, TradingStrategyResults} from "../../services/stocks.service";
+import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
+import { ParsedDatePipe } from 'src/app/services/parsedDate.filter';
 
 
 @Component({
     selector: 'app-trading-actual-vs-simulated',
     templateUrl: './trading-actual-vs-simulated.component.html',
     styleUrls: ['./trading-actual-vs-simulated.component.css'],
-    standalone: false
+    imports: [CurrencyPipe, DecimalPipe, ParsedDatePipe, NgClass, PercentPipe, DecimalPipe],
+    standalone: true
 })
 export class TradingActualVsSimulatedPositionComponent {
 
@@ -22,7 +25,7 @@ export class TradingActualVsSimulatedPositionComponent {
     }
 
     @Input()
-    simulationErrors: string[];
+    simulationErrors: string[] = []
 
     sortColumn: string = 'profit';
     sortDirection: string = 'desc';
@@ -47,7 +50,7 @@ export class TradingActualVsSimulatedPositionComponent {
 
     sortResults() {
         console.log('sortResults', this.sortColumn, this.sortDirection);
-        this.sortedResults = this.results.sort((a, b) => {
+        this.sortedResults = this.results.sort((a:any, b:any) => {
             
             // we either use a and b directory or .position on a and b
             // depending on the sort column

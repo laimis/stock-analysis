@@ -6,19 +6,37 @@ import {
     StockPosition,
     PriceFrequency,
     StocksService,
-    TradingStrategyResults
-} from 'src/app/services/stocks.service';
-import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
+    TradingStrategyResults,
+    StockQuote
+} from '../../services/stocks.service';
+import {GetErrors, toggleVisuallyHidden} from '../../services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {catchError, tap} from "rxjs/operators";
 import {concat} from "rxjs";
+import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
+import { CurrencyPipe } from '@angular/common';
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { LoadingComponent } from "src/app/shared/loading/loading.component";
+import { PriceChartComponent } from "src/app/shared/price-chart/price-chart.component";
+import { StockTradingPositionComponent } from "../stock-trading/stock-trading-position.component";
+import { TradingActualVsSimulatedPositionComponent } from "../../shared/stocks/trading-actual-vs-simulated.component"
+import { StockDailyScoresComponent } from "src/app/shared/stock-daily-scores/stock-daily-scores.component";
 
 
 @Component({
     selector: 'app-stock-trading-review',
     templateUrl: './stock-trading-review.component.html',
     styleUrls: ['./stock-trading-review.component.css'],
-    standalone: false
+    imports: [
+        StockLinkComponent,
+        CurrencyPipe,
+        ErrorDisplayComponent,
+        LoadingComponent,
+        PriceChartComponent,
+        StockTradingPositionComponent,
+        StockDailyScoresComponent,
+        TradingActualVsSimulatedPositionComponent
+    ]
 })
 export class StockTradingReviewComponent {
     private stockService = inject(StocksService);
@@ -26,15 +44,15 @@ export class StockTradingReviewComponent {
     private title = inject(Title);
 
 
-    currentPosition: StockPosition
-    simulationResults: TradingStrategyResults
-    simulationErrors: string[];
-    pricesErrors: string[]
-    positionChartInformation: PositionChartInformation;
+    currentPosition: StockPosition | null = null
+    simulationResults: TradingStrategyResults | null = null 
+    simulationErrors: string[] = []
+    pricesErrors: string[] = []
+    positionChartInformation: PositionChartInformation | null = null;
     @Input()
-    quotes: object
+    quotes: Map<string, StockQuote> | null = null
     @Input()
-    orders: BrokerageStockOrder[]
+    orders: BrokerageStockOrder[] | null = null
     @Output()
     positionChanged: EventEmitter<any> = new EventEmitter()
     private _index: number = 0
@@ -80,7 +98,7 @@ export class StockTradingReviewComponent {
 
     getQuote(position: StockPosition) {
         if (this.quotes && position.ticker in this.quotes) {
-            return this.quotes[position.ticker]
+            return this.quotes.get(position.ticker)
         }
         return null
     }
@@ -128,7 +146,7 @@ export class StockTradingReviewComponent {
         const simulationPromise = this.stockPositionsService.simulatePosition(positionId, true)
             .pipe(
                 tap(r => {
-                    this.simulationErrors = null
+                    this.simulationErrors = []
                     this.simulationResults = r
                 }),
                 catchError(e => {
@@ -144,10 +162,10 @@ export class StockTradingReviewComponent {
         this.stockService.getStockPrices(position.ticker, 365, PriceFrequency.Daily)
             .subscribe(
                 r => {
-                    this.pricesErrors = null
+                    this.pricesErrors = []
                     
-                    let buyOrders = []
-                    let sellOrders = []
+                    let buyOrders : number[] = []
+                    let sellOrders : number[] = []
                     
                     if (this.orders)
                     {

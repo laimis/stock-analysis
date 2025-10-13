@@ -1,7 +1,10 @@
-import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from '@angular/common';
 import { AfterViewInit, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import {AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { StockLinkAndTradingviewLinkComponent } from "../shared/stocks/stock-link-and-tradingview-link.component";
+import { RouterLink } from '@angular/router';
 
 
 type StockAlertGroup = {
@@ -15,7 +18,7 @@ type StockAlertGroup = {
     templateUrl: './alerts.component.html',
     styleUrls: ['./alerts.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    standalone: false
+    imports: [ErrorDisplayComponent, DatePipe, NgClass, StockLinkAndTradingviewLinkComponent, RouterLink]
 })
 export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     private stockService = inject(StocksService);

@@ -1,12 +1,17 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {Routine, StocksService} from '../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
+import { LoadingComponent } from "../shared/loading/loading.component";
+import { RoutinesActiveRoutineComponent } from "./routines-active-routine.component";
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-routines-dashboard',
     templateUrl: './routines-dashboard.component.html',
     styleUrls: ['./routines-dashboard.component.css'],
-    standalone: false
+    imports: [ErrorDisplayComponent, LoadingComponent, RoutinesActiveRoutineComponent, RouterLink],
+    standalone: true
 })
 
 export class RoutineDashboardComponent implements OnInit {
@@ -14,9 +19,9 @@ export class RoutineDashboardComponent implements OnInit {
 
 
 
-    routines: Routine[] = null
-    activeRoutine: Routine = null
-    errors: string[] = null
+    routines: Routine[] | null = null
+    activeRoutine: Routine | null = null
+    errors: string[] | null = null
 
 
     ngOnInit() {

@@ -1,5 +1,5 @@
 import { Component, Input, inject } from '@angular/core';
-import {GetErrors} from 'src/app/services/utils';
+import {GetErrors} from "../../services/utils";
 import {
     OutcomesReport,
     StockPosition, SimulationNotices,
@@ -11,12 +11,22 @@ import {
 import {catchError, finalize, map} from "rxjs/operators";
 import {concat, EMPTY} from "rxjs";
 import {StockPositionsService} from "../../services/stockpositions.service";
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { LoadingComponent } from "src/app/shared/loading/loading.component";
+import { OutcomesComponent } from "src/app/shared/reports/outcomes.component";
+import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
+import { NgClass } from '@angular/common';
+import { OutcomesAnalysisReportComponent } from "src/app/shared/reports/outcomes-analysis-report.component";
+import { GapsComponent } from "src/app/shared/reports/gaps.component";
+import { CorrelationsComponent } from "src/app/shared/reports/correlations.component";
+import { FundamentalsComponent } from "src/app/shared/reports/fundamentals/fundamentals.component";
 
 @Component({
     selector: 'app-stock-trading-outcomes-reports',
     templateUrl: './stock-trading-outcomes-reports.component.html',
     styleUrls: ['./stock-trading-outcomes-reports.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [ErrorDisplayComponent, LoadingComponent, OutcomesComponent, StockLinkAndTradingviewLinkComponent, NgClass, OutcomesAnalysisReportComponent, GapsComponent, CorrelationsComponent, FundamentalsComponent]
 })
 
 export class StockPositionReportsComponent {
@@ -24,14 +34,14 @@ export class StockPositionReportsComponent {
     private stockPositions = inject(StockPositionsService);
 
 
-    allBarsReport: OutcomesReport;
-    singleBarReportDaily: OutcomesReport;
-    singleBarReportWeekly: OutcomesReport;
-    positionsReport: OutcomesReport;
+    allBarsReport!: OutcomesReport;
+    singleBarReportDaily!: OutcomesReport;
+    singleBarReportWeekly!: OutcomesReport;
+    positionsReport!: OutcomesReport;
     gaps: StockGaps[] = [];
-    correlationReport: TickerCorrelation[];
-    fundamentalsReport: TickerFundamentals[];
-    tickerFilter: string;
+    correlationReport: TickerCorrelation[] = [];
+    fundamentalsReport: TickerFundamentals[] = [];
+    tickerFilter: string = '';
     daysForCorrelations = 60
     
     loading = {
@@ -70,8 +80,8 @@ export class StockPositionReportsComponent {
         }
     }
 
-    openSimulationNotices: SimulationNotices = null
-    openSimulationKeys: string[] = null
+    openSimulationNotices: SimulationNotices | null = null
+    openSimulationKeys: string[] | null = null
     expandedGroups: Set<string> = new Set();
 
     toggleNotices(group: string) {

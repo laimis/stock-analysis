@@ -1,13 +1,18 @@
+import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {OptionDefinition, OptionService, OptionSpread} from 'src/app/services/option.service';
 import {GetErrors} from 'src/app/services/utils';
-
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
+import { OptionSpreadsComponent } from "./option-spreads.component";
 @Component({
     selector: 'app-option-chain',
     templateUrl: './option-chain.component.html',
     styleUrls: ['./option-chain.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [ErrorDisplayComponent, StockLinkAndTradingviewLinkComponent, CurrencyPipe, PercentPipe, DecimalPipe, FormsModule, NgClass, OptionSpreadsComponent]
 })
 export class OptionChainComponent implements OnInit {
     private optionService = inject(OptionService);

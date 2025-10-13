@@ -5,8 +5,10 @@ import {
     BrokerageAccountSnapshot,
     StockPosition,
     StockQuote
-} from 'src/app/services/stocks.service';
-import {isLongTermStrategy, parseDate} from 'src/app/services/utils';
+} from "../../services/stocks.service";
+import {isLongTermStrategy, parseDate} from "../../services/utils";
+import { CurrencyPipe, PercentPipe } from '@angular/common';
+import { CanvasJSAngularChartsModule } from "@canvasjs/angular-charts";
 
 interface PositionGroup {
     strategy: string;
@@ -21,26 +23,26 @@ interface PositionGroup {
     selector: 'app-stock-trading-summary',
     templateUrl: './stock-trading-summary.component.html',
     styleUrls: ['./stock-trading-summary.component.css'],
-    standalone: false
+    imports: [CurrencyPipe, PercentPipe, CanvasJSAngularChartsModule]
 })
 export class StockTradingSummaryComponent {
 
-    positionGroups: PositionGroup[];
+    positionGroups: PositionGroup[] = [];
 
-    sortProperty: string;
-    sortDirection: number;
-    longPositions: StockPosition[];
-    shortPositions: StockPosition[];
-    totalLongCost: number;
-    totalShortCost: number;
-    totalProfit: number;
+    sortProperty: string = "";
+    sortDirection: number = 1;
+    longPositions: StockPosition[] = [];
+    shortPositions: StockPosition[] = [];
+    totalLongCost: number = 0;
+    totalShortCost: number = 0;
+    totalProfit: number = 0;
     @Input()
-    quotes: Map<string, StockQuote>
+    quotes: Map<string, StockQuote> = new Map<string, StockQuote>();
     @Input()
-    brokerageAccount: BrokerageAccount
+    brokerageAccount: BrokerageAccount | null = null;
     @Input()
-    userState: AccountStatus
-    chartOptionsArray: any[];
+    userState: AccountStatus | null = null;
+    chartOptionsArray: any[] = [];
 
     @Input()
     set positions(value: StockPosition[]) {
@@ -65,7 +67,7 @@ export class StockTradingSummaryComponent {
     }
 
     getUnrealizedProfit(position: StockPosition): number {
-        let quote = this.quotes[position.ticker]
+        let quote = this.quotes.get(position.ticker)
         return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profitWithoutDividendsAndFees : 0
     }
 
@@ -101,7 +103,7 @@ export class StockTradingSummaryComponent {
 
         if (!positions) return []
 
-        let strategyGroups = {}
+        let strategyGroups: { [key: string]: StockPosition[] } = {}
 
         // custom groups
         strategyGroups["allbutlongterm"] = positions.filter(p => !isLongTermStrategy(this.getStrategy(p)))

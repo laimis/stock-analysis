@@ -2,21 +2,26 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {
     BrokerageAccount,
     StockViolation
-} from 'src/app/services/stocks.service';
+} from "../../services/stocks.service";
 import {showElement, toggleVisuallyHidden} from "../../services/utils";
+import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
+import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
+import { StockTradingNewPositionComponent } from "./stock-trading-new-position.component";
+import { BrokerageOrdersComponent } from "src/app/brokerage/brokerage-orders.component";
+import { BrokerageNewOrderComponent } from "src/app/brokerage/brokerage-new-order.component";
 
 @Component({
     selector: 'app-stock-violations',
     templateUrl: './stock-violations.component.html',
     styleUrls: ['./stock-violations.component.css'],
-    standalone: false
+    imports: [CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, StockTradingNewPositionComponent, BrokerageOrdersComponent, BrokerageNewOrderComponent]
 })
 export class StockViolationsComponent {
 
     tickersInViolations: string[] = []
     
     @Input()
-    brokerageAccount: BrokerageAccount
+    brokerageAccount: BrokerageAccount | null = null 
     
     @Output()
     refreshRequested = new EventEmitter<string>()
@@ -38,7 +43,7 @@ export class StockViolationsComponent {
     }
 
     tickerHasOrders(ticker: string) {
-        return this.brokerageAccount.stockOrders.some(o => o.ticker == ticker)
+        return this.brokerageAccount?.stockOrders.some(o => o.ticker == ticker) ?? false
     }
 
     getDiffPrice(v: StockViolation) {

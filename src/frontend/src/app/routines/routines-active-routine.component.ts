@@ -1,16 +1,16 @@
 import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
-import {Routine} from "../services/stocks.service";
+import {Routine, RoutineStep} from "../services/stocks.service";
 
 @Component({
     selector: 'app-routines-active-routine',
     templateUrl: './routines-active-routine.component.html',
     styleUrls: ['./routines-active-routine.component.css'],
-    standalone: false
+    standalone: true
 })
 export class RoutinesActiveRoutineComponent {
 
-    activeRoutine: Routine = null
-    activeStep = null
+    activeRoutine: Routine | null = null
+    activeStep: RoutineStep | null = null
     currentStepIndex = 0
     @Output()
     routineDeactivated = new EventEmitter()
@@ -62,7 +62,7 @@ export class RoutinesActiveRoutineComponent {
             event.preventDefault();
         } else if (event.key === "Enter") {
             // open the url in the active step in a new tab
-            window.open(this.activeStep.url, "_blank");
+            window.open(this.activeStep!.url, "_blank");
             event.preventDefault();
         }
     }
@@ -77,12 +77,12 @@ export class RoutinesActiveRoutineComponent {
 
         if (index < 0) {
             return
-        } else if (index >= this.activeRoutine.steps.length) {
+        } else if (index >= this.activeRoutine!.steps.length) {
             return
         }
 
         this.currentStepIndex = index
-        this.activeStep = this.activeRoutine.steps[this.currentStepIndex];
+        this.activeStep = this.activeRoutine!.steps[this.currentStepIndex];
     }
 
 }

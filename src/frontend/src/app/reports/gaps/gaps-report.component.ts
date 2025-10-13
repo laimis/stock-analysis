@@ -2,12 +2,14 @@ import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {StockGaps, StocksService} from '../../services/stocks.service';
 import {GetErrors} from "../../services/utils";
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { GapsComponent } from "src/app/shared/reports/gaps.component";
 
 @Component({
     selector: 'app-gaps-report',
     templateUrl: './gaps-report.component.html',
     styleUrls: ['./gaps-report.component.css'],
-    standalone: false
+    imports: [ErrorDisplayComponent, GapsComponent]
 })
 export class GapsReportComponent implements OnInit {
     private stocksService = inject(StocksService);

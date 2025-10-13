@@ -1,13 +1,17 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {StockList, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-stock-lists-dashboard',
     templateUrl: './stock-lists-dashboard.component.html',
     styleUrls: ['./stock-lists-dashboard.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [ErrorDisplayComponent, FormsModule, RouterLink]
 })
 export class StockListsDashboardComponent implements OnInit {
     private stockService = inject(StocksService);

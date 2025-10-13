@@ -1,14 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {Monitor, StockList, StockListTicker, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
+import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
+import { TradingViewLinkComponent } from "src/app/shared/stocks/trading-view-link.component";
 
 @Component({
     selector: 'app-stock-list',
     templateUrl: './stock-list.component.html',
     styleUrls: ['./stock-list.component.css'],
-    standalone: false
+    imports: [ErrorDisplayComponent, TradingViewLinkComponent, RouterLink]
 })
 export class StockListComponent implements OnInit {
     private stockService = inject(StocksService);

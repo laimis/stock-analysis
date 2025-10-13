@@ -1,14 +1,17 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Location} from '@angular/common';
+import {Location, NgClass} from '@angular/common';
 import {GetErrors} from '../services/utils';
+import { FormsModule } from '@angular/forms';
+import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
 
 @Component({
     selector: 'app-profile-create',
     templateUrl: './profile-create.component.html',
     styleUrls: ['./profile-create.component.css'],
-    standalone: false
+    imports: [FormsModule, NgClass, ErrorDisplayComponent],
+    standalone: true
 })
 export class ProfileCreateComponent implements OnInit {
     private stockService = inject(StocksService);
