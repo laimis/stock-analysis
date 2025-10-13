@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
@@ -20,6 +20,8 @@ import { PriceChartComponent } from "../../shared/price-chart/price-chart.compon
   styleUrl: './option-contract-pricing.component.css'
 })
 export class OptionContractPricingComponent {
+    private optionService = inject(OptionService);
+
     dataPointContainers: DataPointContainer[];
     private cost: number;
     minPrice: number;
@@ -28,7 +30,10 @@ export class OptionContractPricingComponent {
     hasPrice: boolean = false;
     chartInfos: PositionChartInformation[] = [];
 
-    constructor(private optionService: OptionService) { }
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() { }
 
     private getOptionContractLabel(contract: OptionContract): string {
         return `${contract.isShort ? 'Short' : 'Long'} ${contract.optionType} ${contract.strikePrice} Exp: ${contract.expiration.split('T')[0]}`;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
     PendingStockPosition,
     PositionChartInformation,
@@ -54,6 +54,13 @@ import { MarketCapPipe } from "../../services/marketcap.filter";
     styleUrls: ['./stock-details.component.css']
 })
 export class StockDetailsComponent implements OnInit {
+    private stocks = inject(StocksService);
+    private optionService = inject(OptionService);
+    private stockPositions = inject(StockPositionsService);
+    private brokerage = inject(BrokerageService);
+    private route = inject(ActivatedRoute);
+    private title = inject(Title);
+
 
     ticker: string
     stock: StockDetails
@@ -85,13 +92,10 @@ export class StockDetailsComponent implements OnInit {
         pending: null
     }
 
-    constructor(
-        private stocks: StocksService,
-        private optionService: OptionService,
-        private stockPositions: StockPositionsService,
-        private brokerage: BrokerageService,
-        private route: ActivatedRoute,
-        private title: Title) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     AccountStatus,
@@ -21,6 +21,10 @@ import {GlobalService} from "../../services/global.service";
     standalone: false
 })
 export class StockTradingDashboardComponent implements OnInit {
+    private globalService = inject(GlobalService);
+    private stockService = inject(StockPositionsService);
+    private route = inject(ActivatedRoute);
+
     balances: BrokerageAccountSnapshot[]
     userState: AccountStatus
     positions: StockPosition[]
@@ -61,11 +65,10 @@ export class StockTradingDashboardComponent implements OnInit {
         {value: "daysHeld", name: "Days Held"},
     ]
 
-    constructor(
-        private globalService: GlobalService,
-        private stockService: StockPositionsService,
-        private route: ActivatedRoute
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

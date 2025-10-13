@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Observable} from 'rxjs';
 import {KeyValuePair, StockQuote, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
@@ -29,6 +29,10 @@ import { CurrencyPipe, NgClass } from "@angular/common";
 ]
 })
 export class BrokerageNewOrderComponent {
+    private brokerage = inject(BrokerageService);
+    private stockService = inject(StocksService);
+    private stockPositions = inject(StockPositionsService);
+
 
     brokerageOrderDuration: string
     brokerageOrderType: string
@@ -57,11 +61,10 @@ export class BrokerageNewOrderComponent {
 
     notesControl = new FormControl('')
 
-    constructor(
-        private brokerage: BrokerageService,
-        private stockService: StocksService,
-        private stockPositions: StockPositionsService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
         this.brokerageOrderType = BrokerageOrderType.Limit
         this.brokerageOrderTypeChanged()
     }

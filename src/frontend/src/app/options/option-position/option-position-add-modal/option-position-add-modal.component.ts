@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject } from '@angular/core';
 import { BrokerageService, OptionOrderCommand, OptionOrderInstruction, OptionOrderType } from 'src/app/services/brokerage.service';
 import { OptionPosition, OptionService } from 'src/app/services/option.service';
 import { GetErrors } from 'src/app/services/utils';
@@ -13,6 +13,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './option-position-add-modal.component.css'
 })
 export class OptionPositionAddModalComponent implements OnChanges {
+  private optionService = inject(OptionService);
+  private brokerageService = inject(BrokerageService);
+
   @Input() position: OptionPosition;
   @Input() isVisible: boolean = false;
   @Output() isVisibleChange = new EventEmitter<boolean>();
@@ -24,11 +27,11 @@ export class OptionPositionAddModalComponent implements OnChanges {
   quantity: number = 1;
   errors: string[] = [];
   spreadValues: { [key: string]: number } = {};
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
   
-  constructor(
-      private optionService: OptionService,
-      private brokerageService: BrokerageService
-  ) {}
+  constructor() {}
 
   @HostListener('document:keydown.escape')
   onEscape() {

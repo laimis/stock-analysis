@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OptionDefinition, OptionService, OptionSpread} from 'src/app/services/option.service';
 import {GetErrors} from 'src/app/services/utils';
@@ -10,6 +10,9 @@ import {GetErrors} from 'src/app/services/utils';
     standalone: false
 })
 export class OptionChainComponent implements OnInit {
+    private optionService = inject(OptionService);
+    private route = inject(ActivatedRoute);
+
     ticker: string;
 
     public options: OptionDefinition[]
@@ -39,9 +42,10 @@ export class OptionChainComponent implements OnInit {
     errors: string[] = [];
     selectedSpread: string = null
 
-    constructor(
-        private optionService: OptionService,
-        private route: ActivatedRoute) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

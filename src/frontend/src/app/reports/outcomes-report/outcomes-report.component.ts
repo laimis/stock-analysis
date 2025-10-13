@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import {OutcomesReport, StocksService, TickerCorrelation, TickerFundamentals, TickerOutcomes} from '../../services/stocks.service';
@@ -12,6 +12,9 @@ import {concat} from "rxjs";
     standalone: false
 })
 export class OutcomesReportComponent implements OnInit {
+    private stocksService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
     errors: string[] = null;
     startDate: string = null;
     endDate: string = null;
@@ -31,9 +34,10 @@ export class OutcomesReportComponent implements OnInit {
     fundamentalsReport: TickerFundamentals[]
     excludeEarningsTitle: string = "Exclude Earnings";
 
-    constructor(
-        private stocksService: StocksService,
-        private route: ActivatedRoute) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

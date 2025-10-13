@@ -1,12 +1,17 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
 import {BrokerageOptionOrder, OptionPosition} from "./option.service";
 
 @Injectable({providedIn: 'root'})
 export class StocksService {
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     // ----------------- misc ---------------------

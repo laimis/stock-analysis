@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AccountTransaction, StocksService} from "../services/stocks.service";
 import {ParsedDatePipe} from "../services/parsedDate.filter";
 import { CurrencyPipe, NgClass } from "@angular/common";
@@ -17,12 +17,17 @@ import {ErrorDisplayComponent} from "../shared/error-display/error-display.compo
     styleUrl: './account-transactions.component.css'
 })
 export class AccountTransactionsComponent implements OnInit {
+    private stocksService = inject(StocksService);
+
     transactions: AccountTransaction[] = [];
     sortColumn: keyof AccountTransaction = 'tradeDate';
     sortDirection: 'asc' | 'desc' = 'desc';
     errors = [];
 
-    constructor(private stocksService: StocksService) {}
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {}
     
     ngOnInit(): void {
         this.loadTransactions();

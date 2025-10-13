@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {BrokerageOptionOrder, OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -38,9 +38,12 @@ import { ParsedDatePipe } from "../../services/parsedDate.filter";
   styleUrl: './option-position.component.css'
 })
 export class OptionPositionComponent {
-    constructor(
-        private optionService: OptionService
-    ) {
+    private optionService = inject(OptionService);
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
     showAddLabelForm: boolean = false;
     newLabelKey: string;

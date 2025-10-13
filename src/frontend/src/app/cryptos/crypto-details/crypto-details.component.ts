@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {CryptoDetails, CryptoOwnership, StocksService} from '../../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {Title} from '@angular/platform-browser';
@@ -10,16 +10,20 @@ import {Title} from '@angular/platform-browser';
     standalone: false
 })
 export class CryptoDetailsComponent implements OnInit {
+    private stocks = inject(StocksService);
+    private route = inject(ActivatedRoute);
+    private title = inject(Title);
+
 
     token: string
     loaded: boolean = false
     crypto: CryptoDetails
     ownership: CryptoOwnership
 
-    constructor(
-        private stocks: StocksService,
-        private route: ActivatedRoute,
-        private title: Title) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

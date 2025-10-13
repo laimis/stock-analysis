@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Router} from '@angular/router';
 import {OwnedCrypto, StocksService} from '../../services/stocks.service';
 
@@ -10,6 +10,9 @@ import {OwnedCrypto, StocksService} from '../../services/stocks.service';
     standalone: false
 })
 export class CryptoDashboardComponent implements OnInit {
+    private stocks = inject(StocksService);
+    private router = inject(Router);
+
 
     owned: OwnedCrypto[]
     performance: any
@@ -24,7 +27,10 @@ export class CryptoDashboardComponent implements OnInit {
     sortColumn: string
     sortDirection: number = -1
 
-    constructor(private stocks: StocksService, private router: Router) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

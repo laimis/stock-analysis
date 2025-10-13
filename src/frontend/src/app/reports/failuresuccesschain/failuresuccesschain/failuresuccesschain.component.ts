@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Chain, StocksService} from 'src/app/services/stocks.service';
 
 @Component({
@@ -8,10 +8,15 @@ import {Chain, StocksService} from 'src/app/services/stocks.service';
     standalone: false
 })
 export class FailuresuccesschainComponent implements OnInit {
+    private service = inject(StocksService);
+
     chain: Chain;
     render: string = "all";
 
-    constructor(private service: StocksService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     toggle(identifier: string) {

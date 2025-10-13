@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import {Observable} from "rxjs";
 import {
@@ -17,8 +17,13 @@ import {
 
 @Injectable({providedIn: 'root'})
 export class StockPositionsService {
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     get(positionId: string): Observable<StockPosition> {

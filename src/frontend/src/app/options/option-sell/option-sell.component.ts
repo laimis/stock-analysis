@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {DatePipe, Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from 'src/app/services/utils';
@@ -12,6 +12,12 @@ import { OptionService } from 'src/app/services/option.service';
     standalone: false
 })
 export class OptionSellComponent implements OnInit {
+    private service = inject(OptionService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private datePipe = inject(DatePipe);
+    private location = inject(Location);
+
 
     errors: string[]
 
@@ -28,12 +34,10 @@ export class OptionSellComponent implements OnInit {
     notes: string
     protected readonly tick = tick;
 
-    constructor(
-        private service: OptionService,
-        private route: ActivatedRoute,
-        private router: Router,
-        private datePipe: DatePipe,
-        private location: Location) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

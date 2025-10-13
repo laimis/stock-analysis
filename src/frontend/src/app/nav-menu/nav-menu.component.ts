@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {GlobalService} from '../services/global.service';
 import {GetErrors} from "../services/utils";
@@ -10,6 +10,9 @@ import {GetErrors} from "../services/utils";
     standalone: false
 })
 export class NavMenuComponent {
+    globalService = inject(GlobalService);
+    private router = inject(Router);
+
     isLoggedIn = false
     errors: string[] = null
 
@@ -24,12 +27,12 @@ export class NavMenuComponent {
     // doesn't collapse automatically
     navbarSupportedContentId = 'navbarSupportedContent';
 
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
     // on mobile, when clicking a link, collapse the menu, it
 
-    constructor(
-        public globalService: GlobalService,
-        private router: Router
-    ) {
+    constructor() {
         this.globalService.accountStatusFeed.subscribe(
             (value) => {
                 this.isLoggedIn = value.loggedIn;

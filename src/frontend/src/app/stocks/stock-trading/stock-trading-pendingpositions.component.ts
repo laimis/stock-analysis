@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import {
     BrokerageAccount,
     BrokerageStockOrder,
@@ -30,6 +30,9 @@ import {FormsModule} from "@angular/forms";
     ]
 })
 export class StockTradingPendingPositionsComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private brokerage = inject(BrokerageService);
+
     errors: string[];
     account: BrokerageAccount;
     positions: PendingStockPosition[] = [];
@@ -40,10 +43,10 @@ export class StockTradingPendingPositionsComponent implements OnInit {
     @Output()
     pendingPositionClosed: EventEmitter<PendingStockPosition> = new EventEmitter<PendingStockPosition>()
 
-    constructor(
-        private stockService: StocksService,
-        private brokerage: BrokerageService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {OptionsContainer, OptionService} from "../../services/option.service";
@@ -30,6 +30,10 @@ import {OptionSpreadBuilderComponent} from "../option-spread-builder/option-spre
     styleUrls: ['./option-dashboard.component.css']
 })
 export class OptionsComponent implements OnInit {
+    private service = inject(OptionService);
+    private title = inject(Title);
+    private route = inject(ActivatedRoute);
+
 
     optionsContainer: OptionsContainer
 
@@ -38,13 +42,12 @@ export class OptionsComponent implements OnInit {
 
     activeTab: string = 'open'
     errors: string[] = null
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
 
-    constructor(
-        private service: OptionService,
-        private title: Title,
-        private route: ActivatedRoute
-    ) {
+    constructor() {
     }
 
     ngOnInit() {

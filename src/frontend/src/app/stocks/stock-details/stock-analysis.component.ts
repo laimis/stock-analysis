@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
-import {Component, Input} from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import {
     InflectionPointsReport,
     OutcomesReport,
@@ -44,6 +44,11 @@ import { LoadingComponent } from "../../shared/loading/loading.component";
 ]
 })
 export class StockAnalysisComponent {
+    private stockService = inject(StocksService);
+    private percentPipe = inject(PercentPipe);
+    private currencyPipe = inject(CurrencyPipe);
+    private decimalPipe = inject(DecimalPipe);
+
     multipleBarOutcomes: TickerOutcomes;
 
     dailyOutcomesReport: OutcomesReport;
@@ -54,13 +59,11 @@ export class StockAnalysisComponent {
     chartInfo: PositionChartInformation
     private _prices: Prices;
     inflectionPointsReport: InflectionPointsReport
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(
-        private stockService: StocksService,
-        private percentPipe: PercentPipe,
-        private currencyPipe: CurrencyPipe,
-        private decimalPipe: DecimalPipe
-    ) {
+    constructor() {
     }
     
     @Input()

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {DailyOutcomeScoresComponent} from "../reports/daily-outcome-scores.component";
 import { DatePipe } from "@angular/common";
 import {ErrorDisplayComponent} from "../error-display/error-display.component";
@@ -27,14 +27,19 @@ interface DailyScoresInput {
   styleUrl: './stock-daily-scores.component.css'
 })
 export class StockDailyScoresComponent {
+    private stockService = inject(StocksService);
+
 
     dailyBreakdowns: DailyPositionReport
     dailyBreakdownsLoading: boolean = true;
     dailyBreakdownErrors: string[] = [];
     selectedStartDate: Date = null;
     selectedEndDate: Date = null;
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(private stockService: StocksService) {
+    constructor() {
         this.selectedStartDate = new Date();
         this.selectedEndDate = new Date();
         this.selectedStartDate.setDate(this.selectedStartDate.getDate() - 365);

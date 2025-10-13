@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {toggleVisuallyHidden} from 'src/app/services/utils';
 import {BrokerageStockOrder, OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
@@ -12,6 +12,10 @@ import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
     standalone: false
 })
 export class StockTradingPositionsComponent {
+    private percentPipe = inject(PercentPipe);
+    private currencyPipe = inject(CurrencyPipe);
+    private decimalPipe = inject(DecimalPipe);
+
 
     @Input()
     metricFunc: (p: StockPosition) => any;
@@ -22,10 +26,10 @@ export class StockTradingPositionsComponent {
     @Output()
     positionChanged = new EventEmitter()
 
-    constructor(
-        private percentPipe: PercentPipe,
-        private currencyPipe: CurrencyPipe,
-        private decimalPipe: DecimalPipe) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     private _quotes: Map<string, StockQuote>;

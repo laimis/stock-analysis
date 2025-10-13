@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
-import {Component, Input} from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import {
     AnalysisOutcomeEvaluation,
     OutcomeValueTypeEnum,
@@ -21,6 +21,10 @@ import {StockLinkComponent} from "../stocks/stock-link.component";
 ]
 })
 export class OutcomesComponent {
+    private percentPipe = inject(PercentPipe);
+    private currencyPipe = inject(CurrencyPipe);
+    private decimalPipe = inject(DecimalPipe);
+
 
     @Input()
     title: string
@@ -36,10 +40,10 @@ export class OutcomesComponent {
     highlightColumn: string;
     sortDirection: number = -1
 
-    constructor(
-        private percentPipe: PercentPipe,
-        private currencyPipe: CurrencyPipe,
-        private decimalPipe: DecimalPipe) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     @Input()

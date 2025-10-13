@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
 import {
@@ -34,6 +34,9 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
 })
 
 export class OptionBrokerageOrdersComponent {
+    private service = inject(BrokerageService);
+    private optionService = inject(OptionService);
+
     activeFilter: string;
     errors: string[];
     private _orders: Map<string, BrokerageOptionOrder[]>;
@@ -65,10 +68,10 @@ export class OptionBrokerageOrdersComponent {
     ordersUpdated = new EventEmitter()
     selectedOrders: BrokerageOptionOrder[];
 
-    constructor(
-        private service: BrokerageService,
-        private optionService: OptionService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     cancelOrder(order: BrokerageOptionOrder) {

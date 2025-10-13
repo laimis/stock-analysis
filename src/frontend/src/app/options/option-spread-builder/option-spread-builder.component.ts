@@ -1,4 +1,4 @@
-import {Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, Input, inject } from '@angular/core';
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
@@ -43,11 +43,17 @@ enum SpreadType {
     styleUrl: './option-spread-builder.component.css'
 })
 export class OptionSpreadBuilderComponent implements OnInit {
+    private optionService = inject(OptionService);
+    private route = inject(ActivatedRoute);
+
     parseInt(input: string): number {
         return Number.parseInt(input);
     }
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(private optionService: OptionService, private route: ActivatedRoute) {
+    constructor() {
     }
     ngOnInit() {
         this.route.paramMap.subscribe(params => {

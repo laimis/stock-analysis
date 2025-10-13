@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {GetErrors} from '../services/utils';
 
@@ -9,15 +9,18 @@ import {GetErrors} from '../services/utils';
     standalone: false
 })
 export class ContactComponent {
+    private stockService = inject(StocksService);
+
 
     public saved: boolean = false
     public email: string
     public message: string
     public errors: string[]
 
-    constructor(
-        private stockService: StocksService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     sendMessage() {

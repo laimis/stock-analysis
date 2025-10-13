@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Routine, StocksService} from '../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 import {ActivatedRoute} from '@angular/router';
@@ -11,6 +11,9 @@ import {ActivatedRoute} from '@angular/router';
 })
 
 export class RoutineComponent implements OnInit {
+    private route = inject(ActivatedRoute);
+    private service = inject(StocksService);
+
 
 
     errors: string[] = null
@@ -18,10 +21,11 @@ export class RoutineComponent implements OnInit {
     activeRoutine: Routine = null;
     mode: string;
 
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
     // accept route service where I can extract current routine name from :name parameter
-    constructor(
-        private route: ActivatedRoute,
-        private service: StocksService) {
+    constructor() {
     }
 
     ngOnInit() {

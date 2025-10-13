@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     StockPosition,
@@ -67,16 +67,20 @@ function createProfitScatter(entries: StockPosition[], quotes: Map<string, Stock
 ]
 })
 export class PlaygroundComponent implements OnInit {
+    private stocks = inject(StocksService);
+    private stockPositions = inject(StockPositionsService);
+    private route = inject(ActivatedRoute);
+
     tickers: string[];
     errors: string[];
     status: string;
     testTicker: string;
     Infinity = Infinity
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(
-        private stocks: StocksService,
-        private stockPositions: StockPositionsService,
-        private route: ActivatedRoute) {
+    constructor() {
     }
 
     ngOnInit() {

@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import {Observable, of} from "rxjs";
 import {tap} from "rxjs/operators";
 import {BrokerageAccount} from "./stocks.service";
@@ -69,11 +69,16 @@ export interface OptionOrderCommand {
 
 @Injectable({providedIn: 'root'})
 export class BrokerageService {
+    private http = inject(HttpClient);
+
 
     // going out to get it itself
     private brokerageAccountData: BrokerageAccount = null
 
-    constructor(private http: HttpClient) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     buy(obj: BrokerageOrderCommand): Observable<any> {

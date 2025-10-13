@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Routine, StocksService} from '../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 
@@ -10,13 +10,18 @@ import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 })
 
 export class RoutineDashboardComponent implements OnInit {
+    private service = inject(StocksService);
+
 
 
     routines: Routine[] = null
     activeRoutine: Routine = null
     errors: string[] = null
 
-    constructor(private service: StocksService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

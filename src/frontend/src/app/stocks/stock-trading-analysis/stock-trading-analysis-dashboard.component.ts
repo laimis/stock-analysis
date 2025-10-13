@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {PortfolioHoldings, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 
@@ -9,13 +9,16 @@ import {GetErrors} from 'src/app/services/utils';
     standalone: false
 })
 export class StockTradingAnalysisDashboardComponent implements OnInit {
+    private stocksService = inject(StocksService);
+
 
     portfolioHoldings: PortfolioHoldings
     errors: string[]
 
-    constructor(
-        private stocksService: StocksService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

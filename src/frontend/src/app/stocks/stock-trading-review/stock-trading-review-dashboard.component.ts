@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     StockPosition,
@@ -15,6 +15,9 @@ import {GetErrors} from "../../services/utils";
     standalone: false
 })
 export class StockTradingReviewDashboardComponent implements OnInit {
+    private route = inject(ActivatedRoute);
+    private stockService = inject(StockPositionsService);
+
     activeTab: string = 'positions';
     past: StockPosition[];
     performance: StockTradingPerformanceCollection;
@@ -25,10 +28,10 @@ export class StockTradingReviewDashboardComponent implements OnInit {
         performance: true
     }
 
-    constructor(
-        private route: ActivatedRoute,
-        private stockService: StockPositionsService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

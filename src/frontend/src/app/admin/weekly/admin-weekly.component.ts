@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {StocksService} from 'src/app/services/stocks.service';
 
 @Component({
@@ -8,8 +8,13 @@ import {StocksService} from 'src/app/services/stocks.service';
     standalone: false
 })
 export class AdminWeeklyComponent {
+    private stockService = inject(StocksService);
 
-    constructor(private stockService: StocksService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     kickOff(everyone: boolean) {

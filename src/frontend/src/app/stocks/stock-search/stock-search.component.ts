@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {debounceTime, switchMap} from 'rxjs/operators';
 import {StockSearchResult, StocksService} from "../../services/stocks.service";
@@ -14,6 +14,8 @@ import {FormsModule} from "@angular/forms";
     styleUrls: ['./stock-search.component.css']
 })
 export class StockSearchComponent implements OnInit {
+    private stocks = inject(StocksService);
+
 
     @Input() label: string = "Search for securities using ticker or name"
     @Input() cssClass: string = "form-control"
@@ -29,9 +31,10 @@ export class StockSearchComponent implements OnInit {
     highlightedIndex = -1;
     private searchTerms = new Subject<string>();
 
-    constructor(
-        private stocks: StocksService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     @Input()

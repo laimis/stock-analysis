@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {OptionPosition, OptionService} from "../../services/option.service";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
@@ -17,6 +17,9 @@ import {GetErrors} from "../../services/utils";
     providers: [DatePipe]
 })
 export class StockOptionComponent implements OnInit {
+    private service = inject(OptionService);
+    private datePipe = inject(DatePipe);
+
 
     @Input()
     options: OptionPosition[]
@@ -39,9 +42,10 @@ export class StockOptionComponent implements OnInit {
     filled: string
     notes: string
 
-    constructor(
-        private service: OptionService,
-        private datePipe: DatePipe) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

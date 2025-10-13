@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     StockPosition,
@@ -19,6 +19,10 @@ import {forkJoin} from "rxjs";
 })
 
 export class StockTradingSimulationsComponent implements OnInit {
+    private stockPositions = inject(StockPositionsService);
+    private stocks = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
     results: TradingStrategyPerformance[];
     errors: string[];
     numberOfTrades: number = 40;
@@ -26,10 +30,10 @@ export class StockTradingSimulationsComponent implements OnInit {
     loading: boolean = false;
     benchmarks: {ticker: string, prices: PriceBar[] }[] = [];
 
-    constructor(
-        private stockPositions: StockPositionsService,
-        private stocks: StocksService,
-        private route: ActivatedRoute) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

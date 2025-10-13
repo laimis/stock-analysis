@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
 import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../services/option.service";
@@ -20,6 +20,8 @@ import { StockLinkComponent } from "../../shared/stocks/stock-link.component";
 })
 
 export class OptionPositionsComponent {
+    private router = inject(Router);
+
 
     protected readonly toggleVisuallyHidden = toggleVisuallyHidden;
     
@@ -28,8 +30,11 @@ export class OptionPositionsComponent {
     
     @Output() positionsChanged = new EventEmitter();
     @Output() errorOccurred = new EventEmitter<string[]>();
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(private router: Router) {
+    constructor() {
     }
 
     private _positions: OptionPosition[] = []

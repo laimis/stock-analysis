@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {StockList, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
@@ -10,15 +10,18 @@ import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
     standalone: false
 })
 export class StockListsDashboardComponent implements OnInit {
+    private stockService = inject(StocksService);
+
     newName: string
     newDescription: string
     lists: StockList[]
     filteredLists: StockList[] = []
     errors: string[] = []
 
-    constructor(
-        private stockService: StocksService
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

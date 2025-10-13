@@ -1,5 +1,5 @@
 import {CurrencyPipe, DecimalPipe, PercentPipe} from '@angular/common';
-import {AfterViewInit, Component, Input, OnDestroy, OnInit} from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import {AlertsContainer, OutcomeValueTypeEnum, StockAlert, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 
@@ -18,6 +18,11 @@ type StockAlertGroup = {
     standalone: false
 })
 export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
+    private stockService = inject(StocksService);
+    private percentPipe = inject(PercentPipe);
+    private currencyPipe = inject(CurrencyPipe);
+    private decimalPipe = inject(DecimalPipe);
+
     container: AlertsContainer;
     alertGroups: StockAlertGroup[];
     intervalId: any;
@@ -37,13 +42,11 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
     hideMessages: boolean = false;
     @Input()
     hideScheduling: boolean = false;
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(
-        private stockService: StocksService,
-        private percentPipe: PercentPipe,
-        private currencyPipe: CurrencyPipe,
-        private decimalPipe: DecimalPipe
-    ) {
+    constructor() {
     }
 
     ngAfterViewInit() {

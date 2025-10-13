@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, NgClass, PercentPipe } from '@angular/common';
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {
     MovingAverages,
     openpositioncommand,
@@ -36,6 +36,9 @@ import {StockAnalysisComponent} from "../stock-details/stock-analysis.component"
 ]
 })
 export class StockTradingNewPositionComponent {
+    private stockService = inject(StocksService);
+    private stockPositionsService = inject(StockPositionsService);
+
     strategies: { key: string; value: string; }[];
     prices: Prices;
     maxLoss = 60;
@@ -79,10 +82,12 @@ export class StockTradingNewPositionComponent {
     errors: string[] = []
     protected readonly atrMultiplier = 2;
 
-    constructor(
-        private stockService: StocksService,
-        private stockPositionsService: StockPositionsService,
-        globalService: GlobalService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
+        const globalService = inject(GlobalService);
+
         this.strategies = GetStockStrategies()
         globalService.accountStatusFeed.subscribe(value => {
             if (value.maxLoss) {

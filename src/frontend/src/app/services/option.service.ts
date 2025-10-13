@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {KeyValuePair, Note, Transaction} from './stocks.service';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
@@ -300,8 +300,13 @@ export interface OptionPricing {
     providedIn: 'root'
 })
 export class OptionService {
+    private http = inject(HttpClient);
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
     
-    constructor(private http : HttpClient) {
+    constructor() {
     }
     
     getOptionPricing(symbol: string): Observable<OptionPricing[]> {

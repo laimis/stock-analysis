@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {OutcomesReport, StockAnalysisOutcome, StocksService, TickerOutcomes} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
@@ -335,15 +335,19 @@ function selectFunctionsToUse(screenerId: string) {
     standalone: false
 })
 export class TradesReportComponent implements OnInit {
+    private route = inject(ActivatedRoute);
+    private service = inject(StocksService);
+    private title = inject(Title);
+
     tickers: string[];
     errors: string[];
     screenerId: string;
     tradeRecommendations: TradeRecommendation[] = []
 
-    constructor(
-        private route: ActivatedRoute,
-        private service: StocksService,
-        private title: Title) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

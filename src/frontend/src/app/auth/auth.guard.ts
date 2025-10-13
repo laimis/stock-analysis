@@ -1,14 +1,18 @@
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
-import {Injectable} from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {AccountStatus, StocksService} from '../services/stocks.service';
 import {GlobalService} from '../services/global.service';
 
 @Injectable({providedIn: 'root'})
 export class WithLoginStatus {
+    private globalService = inject(GlobalService);
+    private stocks = inject(StocksService);
 
-    constructor(
-        private globalService: GlobalService,
-        private stocks: StocksService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     async canActivate(): Promise<boolean> {
@@ -21,11 +25,15 @@ export class WithLoginStatus {
 
 @Injectable({providedIn: 'root'})
 export class AuthGuard {
+    private globalService = inject(GlobalService);
+    private stocks = inject(StocksService);
+    private router = inject(Router);
 
-    constructor(
-        private globalService: GlobalService,
-        private stocks: StocksService,
-        private router: Router) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
@@ -46,11 +54,15 @@ export class AuthGuard {
 
 @Injectable({providedIn: 'root'})
 export class AuthGuardUnverifiedAllowed {
+    private globalService = inject(GlobalService);
+    private stocks = inject(StocksService);
+    private router = inject(Router);
 
-    constructor(
-        private globalService: GlobalService,
-        private stocks: StocksService,
-        private router: Router) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     async canActivate(): Promise<boolean> {
@@ -67,11 +79,15 @@ export class AuthGuardUnverifiedAllowed {
 
 @Injectable({providedIn: 'root'})
 export class AuthGuardAdminOnly {
+    private globalService = inject(GlobalService);
+    private stocks = inject(StocksService);
+    private router = inject(Router);
 
-    constructor(
-        private globalService: GlobalService,
-        private stocks: StocksService,
-        private router: Router) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+
+    constructor() {
     }
 
     async canActivate(): Promise<boolean> {

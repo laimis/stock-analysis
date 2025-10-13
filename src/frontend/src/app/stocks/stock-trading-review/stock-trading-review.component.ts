@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
     BrokerageStockOrder,
@@ -21,6 +21,10 @@ import {concat} from "rxjs";
     standalone: false
 })
 export class StockTradingReviewComponent {
+    private stockService = inject(StocksService);
+    private stockPositionsService = inject(StockPositionsService);
+    private title = inject(Title);
+
 
     currentPosition: StockPosition
     simulationResults: TradingStrategyResults
@@ -35,10 +39,10 @@ export class StockTradingReviewComponent {
     positionChanged: EventEmitter<any> = new EventEmitter()
     private _index: number = 0
 
-    constructor(
-        private stockService: StocksService,
-        private stockPositionsService: StockPositionsService,
-        private title: Title) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     private _positions: StockPosition[] = [];

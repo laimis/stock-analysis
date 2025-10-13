@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 import {PortfolioHoldings, StocksService} from '../services/stocks.service';
@@ -11,6 +11,10 @@ import {PortfolioHoldings, StocksService} from '../services/stocks.service';
     standalone: false
 })
 export class DashboardComponent implements OnInit {
+    private stocks = inject(StocksService);
+    private router = inject(Router);
+    private title = inject(Title);
+
 
     dashboard: PortfolioHoldings
     loaded: boolean = false
@@ -28,10 +32,10 @@ export class DashboardComponent implements OnInit {
         {path: '/reports/trends', label: 'Trends'},
     ];
 
-    constructor(
-        private stocks: StocksService,
-        private router: Router,
-        private title: Title) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

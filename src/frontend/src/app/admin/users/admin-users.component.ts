@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from 'src/app/services/stocks.service';
 
 
@@ -9,10 +9,15 @@ import {StocksService} from 'src/app/services/stocks.service';
     standalone: false
 })
 export class AdminUsersComponent implements OnInit {
+    private stocks = inject(StocksService);
+
 
     public users: any
 
-    constructor(private stocks: StocksService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

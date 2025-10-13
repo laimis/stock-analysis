@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
@@ -19,10 +19,15 @@ import { OutcomesComponent } from "../../shared/reports/outcomes.component";
     styleUrl: './stock-trading-pendingposition-analysis.component.css'
 })
 export class StockTradingPendingpositionAnalysisComponent implements OnInit {
+    private stockService = inject(StocksService);
+
     report: OutcomesReport;
     loading = false;
     errors: string[];
-    constructor(private stockService:StocksService) { }
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+    constructor() { }
     
     ngOnInit() {
         this.loading = true;

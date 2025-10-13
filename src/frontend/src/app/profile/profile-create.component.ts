@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -11,6 +11,11 @@ import {GetErrors} from '../services/utils';
     standalone: false
 })
 export class ProfileCreateComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private router = inject(Router);
+    private location = inject(Location);
+    private route = inject(ActivatedRoute);
+
 
     firstname: string
     lastname: string
@@ -28,11 +33,10 @@ export class ProfileCreateComponent implements OnInit {
     private PLUS_PLAN: string = 'PLUS'
     private FULL_PLAN: string = 'FULL'
 
-    constructor(
-        private stockService: StocksService,
-        private router: Router,
-        private location: Location,
-        private route: ActivatedRoute) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

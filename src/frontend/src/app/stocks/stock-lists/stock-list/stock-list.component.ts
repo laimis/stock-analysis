@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {Monitor, StockList, StockListTicker, StocksService} from 'src/app/services/stocks.service';
@@ -11,6 +11,9 @@ import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
     standalone: false
 })
 export class StockListComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
     list: StockList;
     monitors: Monitor[];
     analysisLink: string;
@@ -20,10 +23,10 @@ export class StockListComponent implements OnInit {
     controlToHide: HTMLElement;
     errors: string[];
 
-    constructor(
-        private stockService: StocksService,
-        private route: ActivatedRoute
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

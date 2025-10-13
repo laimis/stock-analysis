@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject } from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {OptionContract, OptionPosition, OptionService} from "../../../services/option.service";
 import {
@@ -20,6 +20,9 @@ import { CurrencyPipe } from "@angular/common";
   styleUrl: './option-contract-close-modal.component.css'
 })
 export class OptionContractCloseModalComponent implements OnChanges {
+    private optionService = inject(OptionService);
+    private brokerageService = inject(BrokerageService);
+
     @Input() position: OptionPosition;
     @Input() contract: OptionContract;
     @Input() isVisible: boolean = false;
@@ -31,11 +34,11 @@ export class OptionContractCloseModalComponent implements OnChanges {
     price: number;
     quantity: number;
     costDrops: { [key: string]: number } = {};
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(
-        private optionService: OptionService,
-        private brokerageService: BrokerageService
-    ) {
+    constructor() {
     }
 
     ngOnChanges() {

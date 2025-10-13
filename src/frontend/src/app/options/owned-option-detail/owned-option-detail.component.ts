@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { DatePipe } from '@angular/common';
 import {Title} from '@angular/platform-browser';
@@ -20,20 +20,23 @@ import {concat} from "rxjs";
     providers: [DatePipe]
 })
 export class OwnedOptionComponent implements OnInit {
+    private optionService = inject(OptionService);
+    private brokerageService = inject(BrokerageService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private datePipe = inject(DatePipe);
+    private title = inject(Title);
+
     public position: OptionPosition;
     public orders: BrokerageOptionOrder[];
 
     public errors: string[]
     public filled: string
 
-    constructor(
-        private optionService: OptionService,
-        private brokerageService: BrokerageService,
-        private route: ActivatedRoute,
-        private router: Router,
-        private datePipe: DatePipe,
-        private title: Title
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

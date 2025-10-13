@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {BrokerageAccount, BrokerageStockOrder} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
@@ -27,12 +27,16 @@ import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.co
 ]
 })
 export class StockTradingPendingPositionsDashboardComponent implements OnInit {
+    private brokerage = inject(BrokerageService);
+    private route = inject(ActivatedRoute);
+
     feedbackMessage: string;
     account: BrokerageAccount;
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
-    constructor(
-        private brokerage: BrokerageService,
-        private route: ActivatedRoute) {
+    constructor() {
     }
 
     ngOnInit(): void {

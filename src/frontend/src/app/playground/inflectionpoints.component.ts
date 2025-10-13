@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     ChartType,
@@ -191,6 +191,9 @@ function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPo
 ]
 })
 export class InflectionPointsComponent implements OnInit {
+    private stocks = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
     tickers: string[];
     options: any;
     
@@ -207,9 +210,10 @@ export class InflectionPointsComponent implements OnInit {
 
     completeOBVDataSet: InflectionPointsReportDetails
 
-    constructor(
-        private stocks: StocksService,
-        private route: ActivatedRoute) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

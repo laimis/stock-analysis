@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
 import { CurrencyPipe } from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GetErrors, GetOptionStrategies} from "../../../services/utils";
@@ -15,10 +15,13 @@ import {BrokerageOptionPosition, OptionService} from "../../../services/option.s
   styleUrl: './option-position-create-modal.component.css'
 })
 export class OptionPositionCreateModalComponent {
+    private optionService = inject(OptionService);
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
     
-    constructor(
-        private optionService: OptionService
-    ) {
+    constructor() {
         this.optionStrategies = GetOptionStrategies()
     }
     

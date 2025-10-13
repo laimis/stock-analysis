@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {openpositioncommand, StockPosition} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
@@ -18,6 +18,8 @@ class StockTransaction {
 })
 
 export class StockTradingSimulatorComponent implements OnInit {
+    private stocks = inject(StockPositionsService);
+
 
     errors: string[] = []
     
@@ -51,7 +53,10 @@ export class StockTradingSimulatorComponent implements OnInit {
     positions: StockPosition[] = []
     filteredPositions: StockPosition[] = []
 
-    constructor(private stocks: StockPositionsService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

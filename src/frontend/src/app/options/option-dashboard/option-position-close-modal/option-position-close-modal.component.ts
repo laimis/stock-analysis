@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, OnChanges, Output} from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject } from '@angular/core';
 import { CurrencyPipe, PercentPipe } from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {OptionPosition, OptionService} from "../../../services/option.service";
@@ -17,10 +17,13 @@ import {BrokerageService, OptionOrderCommand, OptionOrderInstruction, OptionOrde
   styleUrl: './option-position-close-modal.component.css'
 })
 export class OptionPositionCloseModalComponent implements OnChanges {
-    constructor(
-        private brokerageService: BrokerageService,
-        private optionService: OptionService
-    ) {
+    private brokerageService = inject(BrokerageService);
+    private optionService = inject(OptionService);
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     @Input() position: OptionPosition;

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import {openpositioncommand, StockPosition, stocktransactioncommand} from '../../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
@@ -15,6 +15,9 @@ import {FormsModule} from "@angular/forms";
     providers: [DatePipe]
 })
 export class StockTransactionComponent implements OnInit {
+    private service = inject(StockPositionsService);
+    private datePipe = inject(DatePipe);
+
 
     @Input()
     position: StockPosition
@@ -38,11 +41,11 @@ export class StockTransactionComponent implements OnInit {
     positionType: string
     notes: string
 
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
 
-    constructor(
-        private service: StockPositionsService,
-        private datePipe: DatePipe
-    ) {
+
+    constructor() {
     }
 
     ngOnInit() {

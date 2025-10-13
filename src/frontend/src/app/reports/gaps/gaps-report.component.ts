@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {StockGaps, StocksService} from '../../services/stocks.service';
 import {GetErrors} from "../../services/utils";
@@ -10,13 +10,17 @@ import {GetErrors} from "../../services/utils";
     standalone: false
 })
 export class GapsReportComponent implements OnInit {
+    private stocksService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
 
     errors: string[] = null;
     gaps: StockGaps;
 
-    constructor(
-        private stocksService: StocksService,
-        private route: ActivatedRoute) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors} from "../services/utils";
@@ -10,13 +10,16 @@ import {GetErrors} from "../services/utils";
     standalone: false
 })
 export class EventsComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
     events: any[]
     errors = null
 
-    constructor(
-        private stockService: StocksService,
-        private route: ActivatedRoute
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {
     OutcomesReport,
@@ -20,6 +20,9 @@ import {StockPositionsService} from "../../services/stockpositions.service";
 })
 
 export class StockPositionReportsComponent {
+    private service = inject(StocksService);
+    private stockPositions = inject(StockPositionsService);
+
 
     allBarsReport: OutcomesReport;
     singleBarReportDaily: OutcomesReport;
@@ -52,7 +55,10 @@ export class StockPositionReportsComponent {
     }
     tickers: string[] = []
 
-    constructor(private service: StocksService, private stockPositions: StockPositionsService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     @Input()

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {BrokerageAccount, BrokerageStockOrder, stocktransactioncommand} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
@@ -29,6 +29,9 @@ let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
 ]
 })
 export class BrokerageOrdersComponent {
+    private brokerage = inject(BrokerageService);
+    private stocks = inject(StockPositionsService);
+
     groupedOrders: BrokerageStockOrder[][];
     isEmpty: boolean = false;
     errors: string[];
@@ -37,7 +40,10 @@ export class BrokerageOrdersComponent {
     @Input()
     positionId: string
 
-    constructor(private brokerage: BrokerageService, private stocks: StockPositionsService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     private _stockOrders: BrokerageStockOrder[] = [];

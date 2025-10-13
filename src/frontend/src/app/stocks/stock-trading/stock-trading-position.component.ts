@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {
     BrokerageAccount,
     BrokerageStockOrder, KeyValuePair,
@@ -39,6 +39,9 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
     styleUrls: ['./stock-trading-position.component.css']
 })
 export class StockTradingPositionComponent {
+    private stockService = inject(StockPositionsService);
+    private brokerageService = inject(BrokerageService);
+
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
     numberOfProfitPoints: number = 4
@@ -59,11 +62,11 @@ export class StockTradingPositionComponent {
     @Output()
     positionChanged = new EventEmitter()
 
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
     // constructor that takes stock service
-    constructor(
-        private stockService: StockPositionsService,
-        private brokerageService: BrokerageService
-    ) {
+    constructor() {
         this.strategies = GetStockStrategies()
     }
 

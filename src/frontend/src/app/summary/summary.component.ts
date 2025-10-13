@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {StockPosition, StocksService, WeeklyReport} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
@@ -10,6 +10,9 @@ import {GetErrors} from "../services/utils";
     standalone: false
 })
 export class SummaryComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private title = inject(Title);
+
     result: WeeklyReport
     loaded: boolean = false
     timePeriod: string = 'thisweek'
@@ -18,10 +21,10 @@ export class SummaryComponent implements OnInit {
     optionProfits: number;
     dividendProfits: number;
 
-    constructor(
-        private stockService: StocksService,
-        private title: Title
-    ) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {DataPointContainer, StocksService, TransactionsView} from '../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {Title} from '@angular/platform-browser';
@@ -7,10 +7,13 @@ import {GetErrors} from "../services/utils";
 @Component({
     selector: 'app-transactions',
     templateUrl: './transactions.component.html',
-    styleUrls: ['./transactions.component.css'],
-    standalone: false
+    styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+    private title = inject(Title);
+
     response: TransactionsView
     ticker: string = ""
     groupBy: string = "month"
@@ -19,13 +22,6 @@ export class TransactionsComponent implements OnInit {
     loading: boolean = true
     showDetails: string = ''
     errors: string[] = []
-
-    constructor(
-        private stockService: StocksService,
-        private route: ActivatedRoute,
-        private title: Title
-    ) {
-    }
 
     ngOnInit() {
         const ticker = this.route.snapshot.queryParamMap.get("ticker");

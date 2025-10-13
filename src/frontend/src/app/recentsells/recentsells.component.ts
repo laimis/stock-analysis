@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from 'src/app/services/stocks.service';
 
 @Component({
@@ -8,9 +8,14 @@ import {StocksService} from 'src/app/services/stocks.service';
     standalone: false
 })
 export class RecentSellsComponent implements OnInit {
+    private service = inject(StocksService);
+
     sells: any;
 
-    constructor(private service: StocksService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit(): void {

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
     ChartType,
     DataPoint,
@@ -38,6 +38,9 @@ import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.co
     styleUrl: './trends-report.component.css'
 })
 export class TrendsReportComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+
     trends: Trends;
     currentTrend: Trend;
     loading: boolean = false
@@ -52,9 +55,12 @@ export class TrendsReportComponent implements OnInit {
     dataPointContainers: DataPointContainer[] = []
     errors: string[];
     protected readonly TrendDirection = TrendDirection;
+
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
     
 
-    constructor(private stockService: StocksService, private route: ActivatedRoute) {
+    constructor() {
         // Set default values
         this.selectedStartDate = "10";
         this.selectedTrendType = TrendType.Ema20OverSma50

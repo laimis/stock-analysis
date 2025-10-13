@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Location} from '@angular/common';
@@ -12,6 +12,12 @@ import {GlobalService} from '../services/global.service';
     standalone: false
 })
 export class ProfileLoginComponent implements OnInit {
+    private stockService = inject(StocksService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private location = inject(Location);
+    private globalService = inject(GlobalService);
+
 
     public email: string
     public password: string
@@ -24,12 +30,10 @@ export class ProfileLoginComponent implements OnInit {
     public passwordRequestSuccess: boolean
     returnUrl: string;
 
-    constructor(
-        private stockService: StocksService,
-        private route: ActivatedRoute,
-        private router: Router,
-        private location: Location,
-        private globalService: GlobalService) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {

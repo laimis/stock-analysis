@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {AccountStatus, KeyValuePair, StocksService} from '../services/stocks.service';
 import {Router} from '@angular/router';
 import {GetErrors} from '../services/utils';
@@ -13,6 +13,11 @@ import {OptionService} from "../services/option.service";
     standalone: false
 })
 export class ProfileComponent implements OnInit {
+    private global = inject(GlobalService);
+    private service = inject(StocksService);
+    private optionService = inject(OptionService);
+    private router = inject(Router);
+
 
     profile: AccountStatus
 
@@ -27,11 +32,10 @@ export class ProfileComponent implements OnInit {
     errors: string[]
     protected readonly max = max;
 
-    constructor(
-        private global: GlobalService,
-        private service: StocksService,
-        private optionService: OptionService,
-        private router: Router) {
+    /** Inserted by Angular inject() migration for backwards compatibility */
+    constructor(...args: unknown[]);
+
+    constructor() {
     }
 
     ngOnInit() {
