@@ -15,37 +15,49 @@ type PriceMonitoringService(
     logger: ILogger) =
 
     let fetchChain (user:UserState) (p:OptionPositionState) = async {
-        let! chainResult = brokerage.GetOptionChain user OptionChainSource.SkipCache p.UnderlyingTicker |> Async.AwaitTask
-        match chainResult with
-        | Error e ->
-            logger.LogError($"Failed to get option chain for {p.UnderlyingTicker} for {p.Opened} to {p.Closed.Value}: {e.Message}")
+        try
+
+            let! chainResult = brokerage.GetOptionChain user SkipCache p.UnderlyingTicker |> Async.AwaitTask
+            match chainResult with
+            | Error e ->
+                let closedValue = match p.Closed with | Some d -> d.ToString() | None -> "N/A"
+                logger.LogError $"Failed to get option chain for {p.UnderlyingTicker} for {p.Opened} to {closedValue}: {e}"
+                return None
+            | Ok chain ->
+                return Some (p, chain)
+        with ex ->
+            logger.LogError $"Exception getting option chain for {p.UnderlyingTicker} opened on {p.Opened}: {ex}"
             return None
-        | Ok chain ->
-            return Some (p, chain)
     }
     
     let matchDetailWithContract (p:OptionPositionState, chain:OptionChain) =
-        let matchDetailWithContract (p:OptionPositionState,c:OptionContract, chain:OptionChain) =
-            let detail = chain.FindMatchingOption(c.Strike, c.Expiration, c.OptionType)
-            match detail with
-            | None ->
-                let closedValue = match p.Closed with | Some d -> d.ToString() | None -> "N/A"
-                logger.LogError($"Failed to find option contract for {c.Strike} {c.Expiration} {c.OptionType} in chain for {p.UnderlyingTicker} opened on {p.Opened} and closed {closedValue}")
-                None
-            | Some detail ->
-                Some (p, c, detail)
+        try
+
+            let matchDetailWithContract (p:OptionPositionState,c:OptionContract, chain:OptionChain) =
+                let detail = chain.FindMatchingOption(c.Strike, c.Expiration, c.OptionType)
+                match detail with
+                | None ->
+                    let closedValue = match p.Closed with | Some d -> d.ToString() | None -> "N/A"
+                    logger.LogError $"Failed to find option contract for {c.Strike} {c.Expiration} {c.OptionType} in chain for {p.UnderlyingTicker} opened on {p.Opened} and closed {closedValue}"
+                    None
+                | Some detail ->
+                    Some (p, c, detail)
+                    
+            let activeContracts =
+                p.Contracts.Keys
+                |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
+                |> Seq.choose id
                 
-        let activeContracts =
-            p.Contracts.Keys
-            |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
-            |> Seq.choose id
-            
-        let pendingContracts =
-            p.PendingContracts.Keys
-            |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
-            |> Seq.choose id
-            
-        Seq.append activeContracts pendingContracts
+            let pendingContracts =
+                p.PendingContracts.Keys
+                |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
+                |> Seq.choose id
+                
+            Seq.append activeContracts pendingContracts
+        with ex ->
+            let closedValue = match p.Closed with | Some d -> d.ToString() | None -> "N/A"
+            logger.LogError $"Exception matching option details with contracts for position on {p.UnderlyingTicker} opened on {p.Opened} and closed {closedValue}: {ex}"
+            Seq.empty
         
     let saveOptionPricing (userId:UserId) timestamp (position:OptionPositionState) (contract:OptionContract) (pricing:OptionDetail) = async {
         let pricing = {
@@ -96,7 +108,7 @@ type PriceMonitoringService(
                         // between saves as we go through the loop
                         // and also removing the milliseconds because it looks ridiculous in db, and doesn't really matter
                         let timestamp = System.DateTimeOffset.UtcNow
-                        let timestamp = timestamp.AddMilliseconds(-timestamp.Millisecond)
+                        let timestamp = timestamp.AddMilliseconds -timestamp.Millisecond
                         
                         let! positions = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
                         
