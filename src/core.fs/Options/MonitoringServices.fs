@@ -29,7 +29,8 @@ type PriceMonitoringService(
             let detail = chain.FindMatchingOption(c.Strike, c.Expiration, c.OptionType)
             match detail with
             | None ->
-                logger.LogError($"Failed to find option contract for {c.Strike} {c.Expiration} {c.OptionType} in chain for {p.UnderlyingTicker} for {p.Opened} to {p.Closed.Value}")
+                let closedValue = match p.Closed with | Some d -> d.ToString() | None -> "N/A"
+                logger.LogError($"Failed to find option contract for {c.Strike} {c.Expiration} {c.OptionType} in chain for {p.UnderlyingTicker} opened on {p.Opened} and closed {closedValue}")
                 None
             | Some detail ->
                 Some (p, c, detail)
