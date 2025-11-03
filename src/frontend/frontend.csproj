@@ -25,6 +25,9 @@
         <Message Importance="high" Text="Installing NPM packages..." />
         <Exec WorkingDirectory="$(SpaRoot)" Command="npm ci" />
 
+        <Message Importance="high" Text="Building Version File..." />
+        <Exec WorkingDirectory="$(SpaRoot)" Command="npm run prebuild" />
+
         <!-- Then build the Angular app -->
         <Message Importance="high" Text="Building Angular app..." />
         <Exec WorkingDirectory="$(SpaRoot)" Command="ng build --configuration production" />
