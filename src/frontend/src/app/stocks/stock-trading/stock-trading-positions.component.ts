@@ -44,14 +44,14 @@ export class StockTradingPositionsComponent {
     }
 
     getQuote(p: StockPosition) {
-        return this.quotes[p.ticker]
+        if (this.quotes) {
+            return this.quotes[p.ticker]
+        }
+        return null
     }
 
     getPrice(p: StockPosition) {
-        if (this.quotes) {
-            return this.quotes[p.ticker]?.price
-        }
-        return 0
+        return this.getQuote(p)?.price || 0
     }
 
     getMetricToRender(val: number) {
