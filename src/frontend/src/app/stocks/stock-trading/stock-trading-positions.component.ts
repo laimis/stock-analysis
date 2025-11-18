@@ -49,7 +49,7 @@ export class StockTradingPositionsComponent {
 
     getPrice(p: StockPosition) {
         if (this.quotes) {
-            return this.quotes.get(p.ticker)?.price
+            return this.quotes[p.ticker]?.price
         }
         return 0
     }
