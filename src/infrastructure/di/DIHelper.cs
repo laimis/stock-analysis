@@ -33,16 +33,15 @@ namespace di
             services.AddSingleton<core.fs.Adapters.Logging.ILogger, GenericLogger>();
 
             var marketCapToken = configuration.GetValue<string>("COINMARKETCAPToken");
-            if (!string.IsNullOrEmpty(marketCapToken))
-            {
-                services.AddSingleton(s =>
-                    new coinmarketcap.CoinMarketCapClient(
-                        s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
-                        marketCapToken
-                    )
-                );
-                services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>()!);
-            }
+            
+            services.AddSingleton<ICryptoService>(s =>
+                new coinmarketcap.CoinMarketCapClient(
+                    s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
+                    marketCapToken ?? "notset"
+                )
+            );
+            // services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>()!);
+            
 
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
             services.AddSingleton<ICSVParser, CSVParser>();
