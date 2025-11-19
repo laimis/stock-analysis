@@ -630,7 +630,12 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             match query.EndDate with
             | None -> DateTimeOffset.UtcNow |> Some
             | Some date when String.IsNullOrEmpty(date) -> DateTimeOffset.UtcNow |> Some
-            | Some date -> DateTimeOffset.Parse(date, CultureInfo.InvariantCulture) |> Some
+            | Some date -> 
+                DateTimeOffset.Parse(date, CultureInfo.InvariantCulture)
+                |> fun parsedDate -> parsedDate.AddDays 1.0 // include the end date by adding one day
+                |> Some
+
+        Console.WriteLine($"Generating daily ticker report for {query.Ticker.Value} from {start} to {end'}")
         
         let! user = accounts.GetUser query.UserId
         let ticker = query.Ticker

@@ -124,12 +124,16 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
     }
     
     member _.Handle (query:PricesQuery) = task {
+
+        Console.WriteLine($"Fetching prices for {query.Ticker.Value} from {query.Start} to {query.End} with frequency {query.Frequency}")
+
         let! user = accounts.GetUser(query.UserId)
         
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | Some user ->
-            let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker query.Frequency query.Start query.End
+            let endDate = query.End |> Option.map(fun dt -> dt.AddDays(1.0)) // include the end date by adding one day
+            let! priceResponse = brokerage.GetPriceHistory user.State query.Ticker query.Frequency query.Start endDate
             return priceResponse |> Result.map PricesView
     }
     
