@@ -15,9 +15,9 @@ function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDef
     let expirationMap = new Map<string, OptionDefinition[]>();
     options.forEach(function (value, index, arr) {
         if (!expirationMap.has(value.expiration)) {
-            expirationMap.set(value.expiration, [value])
+            expirationMap[value.expiration] = [value];
         } else {
-            const temp = expirationMap.get(value.expiration);
+            const temp = expirationMap[value.expiration];
             temp.push(value)
         }
     })
