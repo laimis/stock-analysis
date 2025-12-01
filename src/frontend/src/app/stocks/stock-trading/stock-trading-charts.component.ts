@@ -29,9 +29,9 @@ function createUnrealizedProfitChart(entries: StockPosition[], quotes: Map<strin
     const mapped = entries.map(p => {
         return {
             x: p.daysHeld,
-            y: unrealizedProfit(p, quotes.get(p.ticker)!),
+            y: unrealizedProfit(p, quotes[p.ticker]!),
             label: p.ticker,
-            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${unrealizedProfit(p, quotes.get(p.ticker)!)}.toFixed(2)}`,
+            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${unrealizedProfit(p, quotes[p.ticker]!).toFixed(2)}`,
             indexLabel: '{label}', // Add the ticker symbol as the index label
             indexLabelFontSize: 12, // Adjust the font size of the index label
             // indexLabelFontColor: "black" // Adjust the font color of the index label
@@ -73,7 +73,7 @@ function unrealizedRR(p: StockPosition, quote: StockQuote) {
 function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
     
     const chartData = positions.map(position => {
-        const unrealizedGainPercent = unrealizedGainPercentage(position, quotes.get(position.ticker)!);
+        const unrealizedGainPercent = unrealizedGainPercentage(position, quotes[position.ticker]!);
         return {
             x: position.daysHeld,
             y: unrealizedGainPercent,
@@ -114,7 +114,7 @@ function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Ma
 }
 
 function createProfitDistributionChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
-    const profitData = positions.map(position => unrealizedProfit(position, quotes.get(position.ticker)!));
+    const profitData = positions.map(position => unrealizedProfit(position, quotes[position.ticker]!));
 
     const [histogramData, min, max, interval] = generateHistogramData(profitData, 10)
 
@@ -214,7 +214,7 @@ function unrealizedGainPercentage(position: StockPosition, quote: StockQuote) {
 
 function createUnrealizedGainPercentageDistributionChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
     // Calculate unrealized gain percentage for each position
-    const gainPercentageData = positions.map(position => unrealizedGainPercentage(position, quotes.get(position.ticker)!));
+    const gainPercentageData = positions.map(position => unrealizedGainPercentage(position, quotes[position.ticker]!));
 
     const [histogramData, min, max, interval] = generateHistogramData(gainPercentageData, 10)
     
@@ -249,7 +249,7 @@ function createUnrealizedGainPercentageDistributionChart(positions: StockPositio
 
 function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
     // Calculate unrealized RR for each position
-    const rrData = positions.map(position => unrealizedRR(position, quotes.get(position.ticker)!));
+    const rrData = positions.map(position => unrealizedRR(position, quotes[position.ticker]!));
 
     const [histogramData, min, max, interval] = generateHistogramData(rrData, 10)
 
@@ -291,12 +291,12 @@ function stopPriceDistance(position: StockPosition, quote: StockQuote) {
 function createStopPriceDistanceChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
     // Calculate stop price distance and unrealized gain percentage for each position
     const scatterData = positions.map(position => ({
-        x: stopPriceDistance(position, quotes.get(position.ticker)!),
-        y: unrealizedGainPercentage(position, quotes.get(position.ticker)!),
+        x: stopPriceDistance(position, quotes[position.ticker]!),
+        y: unrealizedGainPercentage(position, quotes[position.ticker]!),
         label: position.ticker,
         indexLabel: '{label}', // Add the ticker symbol as the index label
         indexLabelFontSize: 12, // Adjust the font size of the index label
-        toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes.get(position.ticker)!).toFixed(2)}%<br/>Unrealized Gain %: ${unrealizedGainPercentage(position, quotes.get(position.ticker)!).toFixed(2)}%`
+        toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker]!).toFixed(2)}%<br/>Unrealized Gain %: ${unrealizedGainPercentage(position, quotes[position.ticker]!).toFixed(2)}%`
     }));
 
     return {
@@ -335,7 +335,7 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
     const labelCounts = new Map<string, number>();
     positions.forEach(position => {
         position.labels.forEach(label => {
-            const currentCount = labelCounts.get(label.value) || 0;
+            const currentCount = labelCounts[label.value] || 0;
             labelCounts.set(label.value, currentCount + 1);
         });
     });
@@ -367,7 +367,7 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
 function createRealizedVsUnrealizedProfitChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
     const chartData = positions.map(position => {
         const realizedProfit = position.profit;
-        const unrealizedProfitAmt = unrealizedProfit(position, quotes.get(position.ticker)!) - realizedProfit;
+        const unrealizedProfitAmt = unrealizedProfit(position, quotes[position.ticker]!) - realizedProfit;
         return {
             label: position.ticker,
             realized: realizedProfit,
@@ -448,7 +448,7 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Map<str
     // Calculate unrealized gains for each position and sort from smallest to largest
     const positionsWithGains = positions.map(position => ({
         ...position,
-        unrealizedGain: unrealizedProfit(position, quotes.get(position.ticker)!) - position.profit
+        unrealizedGain: unrealizedProfit(position, quotes[position.ticker]!) - position.profit
     }));
     const sortedPositions = [...positionsWithGains].sort((a, b) => a.unrealizedGain - b.unrealizedGain);
 
