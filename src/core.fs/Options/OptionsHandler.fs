@@ -407,7 +407,7 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
 
     member this.Handle(command: ExpireCommand) =
         task {
-            let data, _ =
+            let data, isAssignment =
                 match command with
                 | Expire data -> (data, false)
                 | Assign data -> (data, true)
@@ -419,13 +419,77 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
                 return
                     $"option for id {data.PositionId} not found"
                     |> ServiceError |> Error
-            | Some _ ->
-                // fail, need to implement
-                return "Not implemented" |> ServiceError |> Error
+            | Some opt when opt.IsClosed ->
+                return "Option is already closed" |> ServiceError |> Error
+            | Some opt ->
+                // Process expiration or assignment for all open contracts
+                let processedPosition =
+                    opt.Contracts
+                    |> Map.toSeq
+                    |> Seq.fold (fun position (contract, _) ->
+                        if isAssignment then
+                            position |> OptionPosition.assign contract.Expiration contract.Strike contract.OptionType
+                        else
+                            position |> OptionPosition.expire contract.Expiration contract.Strike contract.OptionType
+                    ) opt
+                
+                do! storage.SaveOptionPosition data.UserId option processedPosition
+                return OptionPositionView(processedPosition, None) |> Ok
         }
 
-    member this.Handle(_: ExpireViaLookupCommand) =
-        "Not implemented" |> ServiceError |> Error
+    member this.Handle(command: ExpireViaLookupCommand) = task {
+        let data, isAssignment =
+            match command with
+            | ExpireViaLookup data -> (data, false)
+            | AssignViaLookup data -> (data, true)
+        
+        let! options = storage.GetOptionPositions data.UserId
+        
+        let expiration = data.Expiration |> OptionExpiration.createFromDateTimeOffset
+        let optionType = 
+            // Infer option type from strike price relative to current price
+            // This is a heuristic; ideally the UI would specify the option type
+            if data.StrikePrice > 0m then OptionType.Put else OptionType.Call
+        
+        // Find matching open position(s)
+        let matchingPositions =
+            options
+            |> Seq.filter (fun opt -> 
+                opt.UnderlyingTicker = data.Ticker && 
+                opt.IsOpen &&
+                opt.Contracts.Keys |> Seq.exists (fun c -> 
+                    c.Expiration = expiration && 
+                    c.Strike = data.StrikePrice))
+            |> Seq.toList
+        
+        match matchingPositions with
+        | [] -> return "No matching open option positions found" |> ServiceError |> Error
+        | positions ->
+            let! processedPositions =
+                positions
+                |> Seq.map (fun opt -> task {
+                    let! user = data.UserId |> accounts.GetUser
+                    match user with
+                    | None -> return None
+                    | Some _ ->
+                        let contractToProcess = 
+                            opt.Contracts.Keys 
+                            |> Seq.find (fun c -> c.Expiration = expiration && c.Strike = data.StrikePrice)
+                        
+                        let processedPosition =
+                            if isAssignment then
+                                opt |> OptionPosition.assign contractToProcess.Expiration contractToProcess.Strike contractToProcess.OptionType
+                            else
+                                opt |> OptionPosition.expire contractToProcess.Expiration contractToProcess.Strike contractToProcess.OptionType
+                        
+                        do! storage.SaveOptionPosition data.UserId (Some opt) processedPosition
+                        return Some processedPosition
+                })
+                |> System.Threading.Tasks.Task.WhenAll
+            
+            let validPositions = processedPositions |> Array.choose id
+            return validPositions |> Array.map (fun p -> OptionPositionView(p, None)) |> Ok
+    }
 
     member this.Handle(command: DeleteOptionPositionCommand) =
         task {

@@ -55,6 +55,13 @@ public static class Jobs
                 options: rjo
             );
             
+            RecurringJob.AddOrUpdate<core.fs.Options.MonitoringServices.ExpirationMonitoringService>(
+                recurringJobId: nameof(core.fs.Options.MonitoringServices.ExpirationMonitoringService),
+                methodCall: service => service.Run(),
+                cronExpression: "5 16 * * 1-5", // 4:05pm Monday through Friday (after market close)
+                options: rjo
+            );
+            
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.StopLossMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.StopLossMonitoringService),
                 methodCall: service => service.RunStopLossMonitoring(),

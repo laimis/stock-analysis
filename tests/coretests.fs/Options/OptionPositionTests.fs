@@ -334,3 +334,86 @@ let ``Multi-leg option strategies calculate costs correctly``() =
     closedIronCondor.Cost |> should equal (Some -2.00m)       // Original net credit unchanged
     closedIronCondor.ClosingCost |> should equal (Some -1.00m) // Net debit of 1.00 (2.00 debit - 1.00 credit)
     closedIronCondor.Profit |> should equal 1.00m             // 2.00 - 1.00 = 1.00
+
+[<Fact>]
+let ``Expiring long call position loses premium paid``() =
+    // Buy a call option for premium, let it expire worthless
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen expiration 120m OptionType.Call 1 5.00m DateTimeOffset.UtcNow
+        |> OptionPosition.expire expiration 120m OptionType.Call
+    
+    position.IsClosed |> should equal true
+    position.Cost |> should equal (Some 5.00m)       // Paid 5.00 premium
+    position.Profit |> should equal -5.00m            // Lost entire premium
+    position.Contracts.Values |> Seq.head |> (fun (OpenedContractQuantityAndCost(_, q, _)) -> q) |> should equal 0
+
+[<Fact>]
+let ``Expiring short put position keeps premium collected``() =
+    // Sell a put option, collect premium, let it expire worthless
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.expire expiration 120m OptionType.Put
+    
+    position.IsClosed |> should equal true
+    position.Cost |> should equal (Some -6.05m)      // Received 6.05 credit (negative cost)
+    position.Profit |> should equal 6.05m            // Kept entire premium
+    position.Contracts.Values |> Seq.head |> (fun (OpenedContractQuantityAndCost(_, q, _)) -> q) |> should equal 0
+
+[<Fact>]
+let ``Expiring vertical spread calculates correct profit``() =
+    // Bull put spread: Sell 115 put, buy 110 put
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 115m OptionType.Put 1 4.20m DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen expiration 110m OptionType.Put 1 2.50m DateTimeOffset.UtcNow
+    
+    position.Cost |> should equal (Some -1.70m)  // Net credit of 1.70 (4.20 - 2.50)
+    
+    // Expire both legs
+    let expired =
+        position
+        |> OptionPosition.expire expiration 115m OptionType.Put
+        |> OptionPosition.expire expiration 110m OptionType.Put
+    
+    expired.IsClosed |> should equal true
+    expired.Profit |> should equal 1.70m  // Kept entire credit
+    expired.Contracts.Values |> Seq.forall (fun (OpenedContractQuantityAndCost(_, q, _)) -> q = 0) |> should equal true
+
+[<Fact>]
+let ``Expiring only one leg of multi-leg position does not close position``() =
+    // Open a spread
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 115m OptionType.Put 1 4.20m DateTimeOffset.UtcNow
+        |> OptionPosition.buyToOpen expiration 110m OptionType.Put 1 2.50m DateTimeOffset.UtcNow
+    
+    // Expire only one leg
+    let partiallyExpired =
+        position |> OptionPosition.expire expiration 115m OptionType.Put
+    
+    partiallyExpired.IsClosed |> should equal false  // Should still be open
+    partiallyExpired.IsOpen |> should equal true
+    partiallyExpired.Contracts.Count |> should equal 2
+    
+    // One contract should be zeroed, one should still have quantity
+    let quantities = 
+        partiallyExpired.Contracts.Values 
+        |> Seq.map (fun (OpenedContractQuantityAndCost(_, q, _)) -> q) 
+        |> Seq.toList
+    
+    quantities |> should contain 0
+    quantities |> should contain 1
+
+[<Fact>]
+let ``Assignment on short position closes it correctly``() =
+    // Short position gets assigned
+    let position =
+        OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+        |> OptionPosition.sellToOpen expiration 120m OptionType.Put 1 6.05m DateTimeOffset.UtcNow
+        |> OptionPosition.assign expiration 120m OptionType.Put
+    
+    position.IsClosed |> should equal true
+    position.Cost |> should equal (Some -6.05m)
+    position.Profit |> should equal 6.05m  // Same as expiration for short position

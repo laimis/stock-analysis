@@ -144,3 +144,71 @@ type PriceMonitoringService(
         
         return ()
     }
+
+type ExpirationMonitoringService(
+    accounts: IAccountStorage,
+    portfolio: IPortfolioStorage,
+    logger: ILogger) =
+    
+    interface IApplicationService
+    
+    member _.Run() = task {
+        logger.LogInformation("Starting option expiration monitoring")
+        
+        let! pairs = accounts.GetUserEmailIdPairs()
+        let today = System.DateTimeOffset.UtcNow.Date |> System.DateTimeOffset
+        
+        let! _ =
+            pairs
+            |> Seq.map (fun pair -> async {
+                try
+                    let! positions = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
+                    
+                    // Find all open positions with contracts expiring today or earlier
+                    let positionsWithExpiredContracts =
+                        positions
+                        |> Seq.filter (fun p -> p.IsOpen)
+                        |> Seq.filter (fun p -> 
+                            p.Contracts.Keys 
+                            |> Seq.exists (fun c -> c.Expiration.ToDateTimeOffset().Date <= today.Date))
+                        |> Seq.toList
+                    
+                    if positionsWithExpiredContracts.Length > 0 then
+                        logger.LogInformation($"Found {positionsWithExpiredContracts.Length} positions with expired contracts for {pair.Email}")
+                        
+                        // Process each position with expired contracts
+                        for position in positionsWithExpiredContracts do
+                            try
+                                let expiredContracts =
+                                    position.Contracts.Keys
+                                    |> Seq.filter (fun c -> c.Expiration.ToDateTimeOffset().Date <= today.Date)
+                                    |> Seq.toList
+                                
+                                // Expire each contract using fold
+                                let updatedPosition =
+                                    expiredContracts
+                                    |> List.fold (fun pos contract ->
+                                        try
+                                            logger.LogInformation($"Expiring contract {contract.Strike} {contract.OptionType} {contract.Expiration} for {position.UnderlyingTicker}")
+                                            pos |> OptionPosition.expire contract.Expiration contract.Strike contract.OptionType
+                                        with ex ->
+                                            logger.LogError($"Error expiring contract {contract.Strike} {contract.OptionType} {contract.Expiration} for position {position.PositionId}: {ex.Message}")
+                                            pos // Return unchanged position on error
+                                    ) position
+                                
+                                // Save the updated position
+                                do! portfolio.SaveOptionPosition pair.Id (Some position) updatedPosition |> Async.AwaitTask
+                                logger.LogInformation($"Successfully expired {expiredContracts.Length} contracts for position on {position.UnderlyingTicker}")
+                            with ex ->
+                                logger.LogError($"Error processing expired contracts for position {position.PositionId}: {ex.Message}")
+                    else
+                        logger.LogInformation($"No expired contracts found for {pair.Email}")
+                        
+                with ex ->
+                    logger.LogError($"Error processing expirations for user {pair.Email}: {ex.Message}")
+            })
+            |> Async.Sequential
+        
+        logger.LogInformation("Completed option expiration monitoring")
+        return ()
+    }

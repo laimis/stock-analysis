@@ -42,6 +42,7 @@ public class OwnedStock : Aggregate<OwnedStockState>
 - Events are persisted to `events` table in PostgreSQL via `PostgresAggregateStorage`
 - State is reconstructed by replaying events in aggregate constructors
 - Never modify state directly; always emit events through `Apply()`
+- When writing F# code, avoid using mutable state; prefer pure functions and immutable data structures
 
 **Mark F# DTOs with `[<CLIMutable>]`** for JSON serialization compatibility
 
