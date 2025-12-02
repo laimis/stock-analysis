@@ -30,7 +30,6 @@ namespace web
             using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.AddConsole());
             var logger = loggerFactory.CreateLogger(typeof(Program).FullName);
 
-            // Configure services (from Startup.ConfigureServices)
             AuthHelper.Configure(configuration, builder.Services);
             
             Jobs.AddJobs(configuration, builder.Services, logger);
@@ -79,7 +78,6 @@ namespace web
 
             var app = builder.Build();
 
-            // Configure middleware (from Startup.Configure)
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
