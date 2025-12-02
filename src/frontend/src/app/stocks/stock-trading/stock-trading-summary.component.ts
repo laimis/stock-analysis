@@ -67,7 +67,7 @@ export class StockTradingSummaryComponent {
     }
 
     getUnrealizedProfit(position: StockPosition): number {
-        let quote = this.quotes.get(position.ticker)
+        let quote = this.quotes[position.ticker]
         return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profitWithoutDividendsAndFees : 0
     }
 

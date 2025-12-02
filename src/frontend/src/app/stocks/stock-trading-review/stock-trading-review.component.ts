@@ -98,7 +98,7 @@ export class StockTradingReviewComponent {
 
     getQuote(position: StockPosition) {
         if (this.quotes && position.ticker in this.quotes) {
-            return this.quotes.get(position.ticker)
+            return this.quotes[position.ticker]
         }
         return null
     }
