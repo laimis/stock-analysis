@@ -3,7 +3,6 @@ namespace core.fs.Cryptos
     open System
     open System.ComponentModel.DataAnnotations
     open core.Cryptos
-    open core.Shared
     open core.fs
     open core.fs.Accounts
     open core.fs.Adapters.CSV
@@ -200,7 +199,7 @@ namespace core.fs.Cryptos
             let! prices = crypto.GetAll()
             return
                 match prices.TryGet(query.Token) with
-                | Some token -> CryptoDetailsView(query.Token, Price(token.quote.Value.USD.Value.price) |> Some) |> Ok
+                | Some token -> CryptoDetailsView(query.Token, core.fs.Price(token.quote.Value.USD.Value.price) |> Some) |> Ok
                 | None -> $"Price not found for {query.Token.ToString()}" |> ServiceError |> Error
         }
         

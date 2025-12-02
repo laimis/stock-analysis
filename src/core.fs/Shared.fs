@@ -10,6 +10,16 @@ type IApplicationService = interface end
 type ServiceError(message:string) =
     member this.Message = message
 
+[<Struct>]
+type Price =
+    val Amount: decimal
+    
+    new(amount: decimal) = { Amount = amount }
+    
+    member this.NotFound = this.Amount = 0m
+    
+    static member Failed = Price(0m)
+
 module CultureUtils =
     let DefaultCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US")
     
