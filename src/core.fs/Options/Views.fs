@@ -56,15 +56,9 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     
     let labels = state.Labels |> Seq.map id |> Seq.toArray
     let contracts =
-        match state.Contracts.Count with
-        | 0 ->
-            state.PendingContracts.Keys
-            |> Seq.map (fun k ->
-                let (PendingContractQuantity(longOrShort, quantity)) = state.PendingContracts[k]
-                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, 0m, None, chain)
-            )
-            |> Seq.toList
-        | _ ->
+        match state.Contracts.Count, state.ClosedContracts.Count, state.PendingContracts.Count with
+        // If we have active contracts, use those (open position)
+        | activeCount, _, _ when activeCount > 0 ->
             state.Contracts.Keys
             |> Seq.map (fun k ->
                 let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = state.Contracts[k]
@@ -75,6 +69,27 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
                 OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, perContractCost, None, chain)
             )
             |> Seq.toList
+        // If we have closed contracts but no active ones, use closed contracts (closed position)
+        | 0, closedCount, _ when closedCount > 0 ->
+            state.ClosedContracts.Keys
+            |> Seq.map (fun k ->
+                let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = state.ClosedContracts[k]
+                let perContractCost =
+                    match quantity with
+                    | 0 -> 0m
+                    | _ -> cost / decimal quantity |> abs
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, perContractCost, None, chain)
+            )
+            |> Seq.toList
+        // If no active or closed contracts, use pending contracts
+        | 0, 0, _ ->
+            state.PendingContracts.Keys
+            |> Seq.map (fun k ->
+                let (PendingContractQuantity(longOrShort, quantity)) = state.PendingContracts[k]
+                OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, 0m, None, chain)
+            )
+            |> Seq.toList
+        | _ -> []
         
     member this.PositionId = state.PositionId
     member this.UnderlyingTicker = state.UnderlyingTicker
