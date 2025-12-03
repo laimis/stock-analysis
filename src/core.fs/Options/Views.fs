@@ -154,7 +154,7 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
             match contract.IsShort with
             | true -> 
                 match contract.OptionType with
-                | Call -> Double.PositiveInfinity |> decimal
+                | Call -> Decimal.MaxValue
                 | Put -> contract.StrikePrice
             | false -> this.Cost
         | _ -> 0m
