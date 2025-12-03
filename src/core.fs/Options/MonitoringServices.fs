@@ -57,7 +57,7 @@ type PriceMonitoringService(
 
             let closedContracts =
                 p.ClosedContracts.Keys
-                |> Seq.filter (fun c -> c.Expiration.ToDateTimeOffset() <= System.DateTimeOffset.UtcNow)
+                |> Seq.filter (fun c -> c.Expiration.ToDateTimeOffset() > System.DateTimeOffset.UtcNow)
                 |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
                 |> Seq.choose id
                 
