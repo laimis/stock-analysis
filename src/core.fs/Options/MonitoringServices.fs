@@ -45,15 +45,23 @@ type PriceMonitoringService(
                     
             let activeContracts =
                 p.Contracts.Keys
+                |> Seq.filter (fun c -> c.Expiration.ToDateTimeOffset() > System.DateTimeOffset.UtcNow)
                 |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
                 |> Seq.choose id
                 
             let pendingContracts =
                 p.PendingContracts.Keys
+                |> Seq.filter (fun c -> c.Expiration.ToDateTimeOffset() > System.DateTimeOffset.UtcNow)
+                |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
+                |> Seq.choose id
+
+            let closedContracts =
+                p.ClosedContracts.Keys
+                |> Seq.filter (fun c -> c.Expiration.ToDateTimeOffset() <= System.DateTimeOffset.UtcNow)
                 |> Seq.map( fun c -> matchDetailWithContract (p, c, chain))
                 |> Seq.choose id
                 
-            Seq.append activeContracts pendingContracts
+            Seq.concat [activeContracts; pendingContracts; closedContracts]
         with ex ->
             let closedValue = match p.Closed with | Some d -> d.ToString() | None -> "N/A"
             logger.LogError $"Exception matching option details with contracts for position on {p.UnderlyingTicker} opened on {p.Opened} and closed {closedValue}: {ex}"
@@ -112,7 +120,7 @@ type PriceMonitoringService(
                         
                         let! positions = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
                         
-                        let closedPositionMonitoringThreshold = timestamp.AddDays(-30.)
+                        let closedPositionMonitoringThreshold = timestamp.AddDays -30.
                         
                         let positionsToMonitor =
                             positions
@@ -121,6 +129,7 @@ type PriceMonitoringService(
                                 positions
                                 |> Seq.filter (fun p -> p.IsClosed && p.Closed.Value > closedPositionMonitoringThreshold)
                             )
+                            |> Seq.filter (fun p -> p.HasNonExpiredContracts)
                         
                         // let's go out and get the latest price for each open position contracts
                         let! positionsWithChainOptions =

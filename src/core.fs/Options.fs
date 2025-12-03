@@ -106,6 +106,23 @@ type OptionPositionState =
             refDate.Subtract(opened).Days |> int |> Some
         | _ ->
             None
+
+    member this.HasNonExpiredContracts =
+        this.Contracts
+        |> Map.exists (fun contract _ ->
+            let expirationDate = contract.Expiration.ToDateTimeOffset()
+            expirationDate > DateTimeOffset.UtcNow
+        ) ||
+        this.PendingContracts
+        |> Map.exists (fun contract _ ->
+            let expirationDate = contract.Expiration.ToDateTimeOffset()
+            expirationDate > DateTimeOffset.UtcNow
+        ) ||
+        this.ClosedContracts
+        |> Map.exists (fun contract _ ->
+            let expirationDate = contract.Expiration.ToDateTimeOffset()
+            expirationDate > DateTimeOffset.UtcNow
+        )
     
     interface IAggregate with
         member this.Version = this.Version
