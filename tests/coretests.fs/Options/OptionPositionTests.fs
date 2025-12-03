@@ -62,13 +62,14 @@ let ``Basic operations work`` () =
     positionWithContractsClosed.IsOpen |> should equal false
     positionWithContractsClosed.IsPending |> should equal false
     positionWithContractsClosed.IsPendingClosed |> should equal false
-    positionWithContractsClosed.Contracts.Count |> should equal 2
-    positionWithContractsClosed.Contracts.Values
+    positionWithContractsClosed.Contracts.Count |> should equal 0  // Contracts moved to ClosedContracts
+    positionWithContractsClosed.ClosedContracts.Count |> should equal 2  // Both contracts are fully closed
+    positionWithContractsClosed.ClosedContracts.Values
         |> Seq.iter (fun quantityAndCost ->
             let contractQuantity =
                 match quantityAndCost with
                 | OpenedContractQuantityAndCost(_, q, _) -> q
-            contractQuantity |> abs |> should equal 0
+            contractQuantity |> abs |> should equal 0  // Closed contracts have 0 quantity
         )
     
 [<Fact>]
@@ -346,7 +347,7 @@ let ``Expiring long call position loses premium paid``() =
     position.IsClosed |> should equal true
     position.Cost |> should equal (Some 5.00m)       // Paid 5.00 premium
     position.Profit |> should equal -5.00m            // Lost entire premium
-    position.Contracts.Values |> Seq.head |> (fun (OpenedContractQuantityAndCost(_, q, _)) -> q) |> should equal 0
+    position.Contracts.Count |> should equal 0        // Expired contracts are removed from the map
 
 [<Fact>]
 let ``Expiring short put position keeps premium collected``() =
@@ -359,7 +360,7 @@ let ``Expiring short put position keeps premium collected``() =
     position.IsClosed |> should equal true
     position.Cost |> should equal (Some -6.05m)      // Received 6.05 credit (negative cost)
     position.Profit |> should equal 6.05m            // Kept entire premium
-    position.Contracts.Values |> Seq.head |> (fun (OpenedContractQuantityAndCost(_, q, _)) -> q) |> should equal 0
+    position.Contracts.Count |> should equal 0        // Expired contracts are removed from the map
 
 [<Fact>]
 let ``Expiring vertical spread calculates correct profit``() =
@@ -395,16 +396,15 @@ let ``Expiring only one leg of multi-leg position does not close position``() =
     
     partiallyExpired.IsClosed |> should equal false  // Should still be open
     partiallyExpired.IsOpen |> should equal true
-    partiallyExpired.Contracts.Count |> should equal 2
+    partiallyExpired.Contracts.Count |> should equal 1  // Only one contract remains (the non-expired one)
     
-    // One contract should be zeroed, one should still have quantity
+    // The remaining contract should have quantity 1
     let quantities = 
         partiallyExpired.Contracts.Values 
         |> Seq.map (fun (OpenedContractQuantityAndCost(_, q, _)) -> q) 
         |> Seq.toList
     
-    quantities |> should contain 0
-    quantities |> should contain 1
+    quantities |> should equal [1]
 
 [<Fact>]
 let ``Assignment on short position closes it correctly``() =

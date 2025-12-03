@@ -156,6 +156,17 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
     member this.Notes = state.Notes
     member this.Labels = labels
     member this.Contracts = contracts
+    member this.ClosedContracts =
+        state.ClosedContracts.Keys
+        |> Seq.map (fun k ->
+            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = state.ClosedContracts[k]
+            let perContractCost =
+                match quantity with
+                | 0 -> 0m
+                | _ -> cost / decimal quantity |> abs
+            OptionContractView(state.UnderlyingTicker, k.Expiration, k.Strike, k.OptionType, longOrShort, quantity, perContractCost, None, chain)
+        )
+        |> Seq.toList
     
 type OptionTradePerformanceMetrics = {
     // Basic statistics

@@ -88,6 +88,7 @@ type OptionPositionState =
         Profit: decimal
         Transactions: OptionTransaction list
         Contracts: Map<OptionContract, OpenedContractQuantityAndCost>
+        ClosedContracts: Map<OptionContract, OpenedContractQuantityAndCost>
         PendingContracts: Map<OptionContract, PendingContractQuantity>
         Notes: core.fs.Note list
         Labels: Dictionary<string, string>
@@ -217,6 +218,7 @@ module OptionPosition =
             Labels = Dictionary<string, string>()
             Transactions = []
             Contracts = Map.empty
+            ClosedContracts = Map.empty
             PendingContracts = Map.empty
             Events = [event]
         }
@@ -258,20 +260,36 @@ module OptionPosition =
             let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = x.Quantity; Debited = debit |> Some; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
-            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity + x.Quantity, cost - debit)
-            let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
+            let newQuantity = quantity + x.Quantity
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, newQuantity, cost - debit)
             let closingCost = (p.ClosingCost |> Option.defaultValue 0m) - debit |> Some
-            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
+            
+            // If contract is fully closed (quantity reaches 0), move to ClosedContracts
+            let (updatedContracts, updatedClosedContracts) =
+                if newQuantity = 0 then
+                    (p.Contracts |> Map.remove contract, p.ClosedContracts |> Map.add contract updatedQuantityAndCost)
+                else
+                    (p.Contracts |> Map.add contract updatedQuantityAndCost, p.ClosedContracts)
+            
+            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosedContracts = updatedClosedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionContractSoldToClose as x ->
             let credit = decimal x.Quantity * x.Price
             let transaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Credited = credit |> Some; Debited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
-            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, quantity - x.Quantity, cost - credit)
-            let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
+            let newQuantity = quantity - x.Quantity
+            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, newQuantity, cost - credit)
             let closingCost = (p.ClosingCost |> Option.defaultValue 0m) + credit |> Some
-            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
+            
+            // If contract is fully closed (quantity reaches 0), move to ClosedContracts
+            let (updatedContracts, updatedClosedContracts) =
+                if newQuantity = 0 then
+                    (p.Contracts |> Map.remove contract, p.ClosedContracts |> Map.add contract updatedQuantityAndCost)
+                else
+                    (p.Contracts |> Map.add contract updatedQuantityAndCost, p.ClosedContracts)
+            
+            { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosedContracts = updatedClosedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             
         | :? OptionPositionClosed as x ->
             let debits = p.Transactions |> List.map _.Debited |> List.choose id |> List.sum
@@ -283,14 +301,16 @@ module OptionPosition =
             let expirationTransaction = { EventId = x.Id; Expiration = x.Expiration |> OptionExpiration.create; Strike = x.Strike; OptionType = x.OptionType; Quantity = -1 * x.Quantity; Debited = None; Credited = None; When = x.When }
             let contract = { Expiration = OptionExpiration.create(x.Expiration); Strike = x.Strike; OptionType = x.OptionType |> OptionType.FromString }
             
-            // Update the contracts map to zero out the expired contracts
-            let (OpenedContractQuantityAndCost(longOrShort, quantity, cost)) = p.Contracts |> Map.find contract
-            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, 0, cost) // Set quantity to 0 for expired contracts
-            let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
+            // Move the expired contract to ClosedContracts for historical tracking
+            // Remove from active Contracts to prevent pricing calculation issues with calendar spreads
+            let contractInfo = p.Contracts |> Map.find contract
+            let updatedContracts = p.Contracts |> Map.remove contract
+            let updatedClosedContracts = p.ClosedContracts |> Map.add contract contractInfo
             
             { p with 
                 Transactions = p.Transactions @ [expirationTransaction]
-                Contracts = updatedContracts  // Add updated contracts map
+                Contracts = updatedContracts
+                ClosedContracts = updatedClosedContracts
                 Version = p.Version + 1
                 Events = p.Events @ [x] }
             
@@ -306,20 +326,22 @@ module OptionPosition =
                 When = x.When 
             }
             
-            // Update the contracts map to zero out the assigned contracts
+            // Move the assigned contract to ClosedContracts for historical tracking
+            // Remove from active Contracts to prevent pricing calculation issues with calendar spreads
             let contract = { 
                 Expiration = OptionExpiration.create(x.Expiration); 
                 Strike = x.Strike; 
                 OptionType = x.OptionType |> OptionType.FromString 
             }
             
-            let (OpenedContractQuantityAndCost(longOrShort, _, cost)) = p.Contracts |> Map.find contract
-            let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, 0, cost) // Set quantity to 0 for assigned contracts
-            let updatedContracts = p.Contracts |> Map.add contract updatedQuantityAndCost
+            let contractInfo = p.Contracts |> Map.find contract
+            let updatedContracts = p.Contracts |> Map.remove contract
+            let updatedClosedContracts = p.ClosedContracts |> Map.add contract contractInfo
             
             { p with 
                 Transactions = p.Transactions @ [assignmentTransaction]; 
                 Contracts = updatedContracts;
+                ClosedContracts = updatedClosedContracts;
                 Version = p.Version + 1; 
                 Events = p.Events @ [x] 
             }
