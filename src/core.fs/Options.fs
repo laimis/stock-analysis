@@ -281,12 +281,24 @@ module OptionPosition =
             let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, newQuantity, cost - debit)
             let closingCost = (p.ClosingCost |> Option.defaultValue 0m) - debit |> Some
             
-            // If contract is fully closed (quantity reaches 0), move to ClosedContracts
-            let (updatedContracts, updatedClosedContracts) =
+            // Track closed contracts: accumulate the closed amount to preserve original quantity
+            let existingClosed = p.ClosedContracts |> Map.tryFind contract
+            let closedAmount = x.Quantity  // Amount being closed in this transaction
+            let updatedClosedContracts = 
+                match existingClosed with
+                | Some (OpenedContractQuantityAndCost(_, existingQty, existingCost)) ->
+                    // Accumulate closed quantities and costs
+                    p.ClosedContracts |> Map.add contract (OpenedContractQuantityAndCost(longOrShort, existingQty + closedAmount, existingCost - debit))
+                | None ->
+                    // First close for this contract
+                    p.ClosedContracts |> Map.add contract (OpenedContractQuantityAndCost(longOrShort, closedAmount, -debit))
+            
+            // Remove from active Contracts only when fully closed (quantity reaches 0)
+            let updatedContracts =
                 if newQuantity = 0 then
-                    (p.Contracts |> Map.remove contract, p.ClosedContracts |> Map.add contract updatedQuantityAndCost)
+                    p.Contracts |> Map.remove contract
                 else
-                    (p.Contracts |> Map.add contract updatedQuantityAndCost, p.ClosedContracts)
+                    p.Contracts |> Map.add contract updatedQuantityAndCost
             
             { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosedContracts = updatedClosedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             
@@ -299,12 +311,24 @@ module OptionPosition =
             let updatedQuantityAndCost = OpenedContractQuantityAndCost(longOrShort, newQuantity, cost - credit)
             let closingCost = (p.ClosingCost |> Option.defaultValue 0m) + credit |> Some
             
-            // If contract is fully closed (quantity reaches 0), move to ClosedContracts
-            let updatedContracts, updatedClosedContracts =
+            // Track closed contracts: accumulate the closed amount to preserve original quantity
+            let existingClosed = p.ClosedContracts |> Map.tryFind contract
+            let closedAmount = x.Quantity  // Amount being closed in this transaction
+            let updatedClosedContracts = 
+                match existingClosed with
+                | Some (OpenedContractQuantityAndCost(_, existingQty, existingCost)) ->
+                    // Accumulate closed quantities and costs
+                    p.ClosedContracts |> Map.add contract (OpenedContractQuantityAndCost(longOrShort, existingQty + closedAmount, existingCost + credit))
+                | None ->
+                    // First close for this contract
+                    p.ClosedContracts |> Map.add contract (OpenedContractQuantityAndCost(longOrShort, closedAmount, credit))
+            
+            // Remove from active Contracts only when fully closed (quantity reaches 0)
+            let updatedContracts =
                 if newQuantity = 0 then
-                    p.Contracts |> Map.remove contract, p.ClosedContracts |> Map.add contract updatedQuantityAndCost
+                    p.Contracts |> Map.remove contract
                 else
-                    p.Contracts |> Map.add contract updatedQuantityAndCost, p.ClosedContracts
+                    p.Contracts |> Map.add contract updatedQuantityAndCost
             
             { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosedContracts = updatedClosedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             

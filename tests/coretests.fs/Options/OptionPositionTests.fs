@@ -69,7 +69,7 @@ let ``Basic operations work`` () =
             let contractQuantity =
                 match quantityAndCost with
                 | OpenedContractQuantityAndCost(_, q, _) -> q
-            contractQuantity |> abs |> should equal 0  // Closed contracts have 0 quantity
+            contractQuantity |> abs |> should equal 1
         )
     
 [<Fact>]
@@ -81,6 +81,8 @@ let ``Expire works``() =
         
     position.IsClosed |> should equal true
     position.IsOpen |> should equal false
+    position.Contracts.Count |> should equal 0
+    position.ClosedContracts.Count |> should equal 1
     
 [<Fact>]
 let ``Assign works``() =
@@ -91,6 +93,8 @@ let ``Assign works``() =
         
     position.IsClosed |> should equal true
     position.IsOpen |> should equal false
+    position.Contracts.Count |> should equal 0
+    position.ClosedContracts.Count |> should equal 1
 
 [<Fact>]
 let ``Version and events work``() =
@@ -291,6 +295,8 @@ let ``Buying multiple contracts at different quantities maintains accurate cost`
         quantity |> should equal 3
         cost |> should equal 4.35m
     
+    modifiedPosition.Contracts.Count |> should equal 1
+    modifiedPosition.ClosedContracts.Count |> should equal 0
 
 [<Fact>]
 let ``Opening up pending credit spread`` () =
@@ -323,6 +329,8 @@ let ``Multi-leg option strategies calculate costs correctly``() =
     
     ironCondor.Cost |> should equal (Some -2.00m)  // Net credit of 2.00 (4.00 credit - 2.00 debit)
     ironCondor.ClosingCost |> should equal None
+    ironCondor.Contracts.Count |> should equal 4
+    ironCondor.ClosedContracts.Count |> should equal 0
     
     // Close the position
     let closedIronCondor =
@@ -335,6 +343,57 @@ let ``Multi-leg option strategies calculate costs correctly``() =
     closedIronCondor.Cost |> should equal (Some -2.00m)       // Original net credit unchanged
     closedIronCondor.ClosingCost |> should equal (Some -1.00m) // Net debit of 1.00 (2.00 debit - 1.00 credit)
     closedIronCondor.Profit |> should equal 1.00m             // 2.00 - 1.00 = 1.00
+    closedIronCondor.Contracts.Count |> should equal 0
+    closedIronCondor.ClosedContracts.Count |> should equal 4
+
+    closedIronCondor.ClosedContracts.Values
+    |> Seq.iter (fun quantityAndCost ->
+        let contractQuantity =
+            match quantityAndCost with
+            | OpenedContractQuantityAndCost(_, q, _) -> q
+        contractQuantity |> abs |> should equal 1
+    )
+
+[<Fact>]
+let ``Open with multiple contracts and then close one by one, closed count is correct``() =
+    let position = OptionPosition.``open`` ticker DateTimeOffset.UtcNow
+    
+    let openedPosition =
+        position
+        |> OptionPosition.buyToOpen expiration 130m OptionType.Call 2 3.00m DateTimeOffset.UtcNow
+    
+    openedPosition.Contracts.Count |> should equal 1
+    openedPosition.ClosedContracts.Count |> should equal 0
+    
+    let afterFirstClose =
+        openedPosition
+        |> OptionPosition.sellToClose expiration 130m OptionType.Call 1 4.00m DateTimeOffset.UtcNow
+    
+    afterFirstClose.Contracts.Count |> should equal 1
+    afterFirstClose.ClosedContracts.Count |> should equal 1
+
+    afterFirstClose.ClosedContracts.Values
+    |> Seq.iter (fun quantityAndCost ->
+        let contractQuantity =
+            match quantityAndCost with
+            | OpenedContractQuantityAndCost(_, q, _) -> q
+        contractQuantity |> abs |> should equal 1
+    )
+    
+    let afterSecondClose =
+        afterFirstClose
+        |> OptionPosition.sellToClose expiration 130m OptionType.Call 1 4.50m DateTimeOffset.UtcNow
+    
+    afterSecondClose.Contracts.Count |> should equal 0
+    afterSecondClose.ClosedContracts.Count |> should equal 1  // Still only one contract type, but fully closed
+
+    afterSecondClose.ClosedContracts.Values
+    |> Seq.iter (fun quantityAndCost ->
+        let contractQuantity =
+            match quantityAndCost with
+            | OpenedContractQuantityAndCost(_, q, _) -> q
+        contractQuantity |> abs |> should equal 2
+    )
 
 [<Fact>]
 let ``Expiring long call position loses premium paid``() =
@@ -348,6 +407,15 @@ let ``Expiring long call position loses premium paid``() =
     position.Cost |> should equal (Some 5.00m)       // Paid 5.00 premium
     position.Profit |> should equal -5.00m            // Lost entire premium
     position.Contracts.Count |> should equal 0        // Expired contracts are removed from the map
+    position.ClosedContracts.Count |> should equal 1
+
+    position.ClosedContracts.Values
+    |> Seq.iter (fun quantityAndCost ->
+        let contractQuantity =
+            match quantityAndCost with
+            | OpenedContractQuantityAndCost(_, q, _) -> q
+        contractQuantity |> abs |> should equal 1
+    )
 
 [<Fact>]
 let ``Expiring short put position keeps premium collected``() =
@@ -361,6 +429,15 @@ let ``Expiring short put position keeps premium collected``() =
     position.Cost |> should equal (Some -6.05m)      // Received 6.05 credit (negative cost)
     position.Profit |> should equal 6.05m            // Kept entire premium
     position.Contracts.Count |> should equal 0        // Expired contracts are removed from the map
+    position.ClosedContracts.Count |> should equal 1
+    
+    position.ClosedContracts.Values
+    |> Seq.iter (fun quantityAndCost ->
+        let contractQuantity =
+            match quantityAndCost with
+            | OpenedContractQuantityAndCost(_, q, _) -> q
+        contractQuantity |> abs |> should equal 1
+    )
 
 [<Fact>]
 let ``Expiring vertical spread calculates correct profit``() =
