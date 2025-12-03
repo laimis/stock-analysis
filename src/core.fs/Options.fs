@@ -283,11 +283,11 @@ module OptionPosition =
             let closingCost = (p.ClosingCost |> Option.defaultValue 0m) + credit |> Some
             
             // If contract is fully closed (quantity reaches 0), move to ClosedContracts
-            let (updatedContracts, updatedClosedContracts) =
+            let updatedContracts, updatedClosedContracts =
                 if newQuantity = 0 then
-                    (p.Contracts |> Map.remove contract, p.ClosedContracts |> Map.add contract updatedQuantityAndCost)
+                    p.Contracts |> Map.remove contract, p.ClosedContracts |> Map.add contract updatedQuantityAndCost
                 else
-                    (p.Contracts |> Map.add contract updatedQuantityAndCost, p.ClosedContracts)
+                    p.Contracts |> Map.add contract updatedQuantityAndCost, p.ClosedContracts
             
             { p with Transactions = p.Transactions @ [transaction]; Contracts = updatedContracts; ClosedContracts = updatedClosedContracts; ClosingCost = closingCost; Version = p.Version + 1; Events = p.Events @ [x] }
             
