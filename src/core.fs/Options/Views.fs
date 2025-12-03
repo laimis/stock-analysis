@@ -273,7 +273,7 @@ module OptionPerformance =
             maxDrawdown, ulcerIndex
             
     let calculateRMultiple (trade: OptionPositionView) =
-        if trade.Risked <= 0m then 1m  // Default if risk can't be determined
+        if trade.Risked <= 0m || trade.Risked = Decimal.MaxValue then 1m  // Default if risk can't be determined
         else trade.Profit / trade.Risked
             
     let calculateReturns (trades: OptionPositionView list) =
@@ -369,8 +369,11 @@ module OptionPerformance =
                 if maxDrawdown = 0m then 0m
                 else totalProfit / maxDrawdown
                 
-            // Risk per trade
-            let avgRiskPerTrade = trades |> List.map (fun t -> t.Risked) |> List.average
+            // Risk per trade (exclude trades with invalid risk values)
+            let validRiskedTrades = trades |> List.filter (fun t -> t.Risked > 0m && t.Risked < Decimal.MaxValue)
+            let avgRiskPerTrade = 
+                if validRiskedTrades.IsEmpty then 0m
+                else validRiskedTrades |> List.averageBy (fun t -> t.Risked)
             
             // Days held
             let avgDaysHeld = 
@@ -426,9 +429,9 @@ module OptionPerformance =
                 if downsideDeviation = 0m then 0m
                 else avgReturnPct / downsideDeviation
                 
-            // Risk-adjusted return
+            // Risk-adjusted return (only for trades with valid risk values)
             let riskAdjustedReturn = 
-                if avgRiskPerTrade = 0m then 0m
+                if avgRiskPerTrade = 0m || validRiskedTrades.IsEmpty then 0m
                 else avgReturnPct / avgRiskPerTrade
                 
             // Strategy distribution
