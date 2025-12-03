@@ -290,6 +290,46 @@
           </div>
         }
 
+        <!-- Closed Contracts Table (for historical review) -->
+        @if (position.closedContracts && position.closedContracts.length > 0) {
+          <div class="row mt-4">
+            <div class="col">
+              <h4 class="mb-3">Closed/Expired Contracts</h4>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Type</th>
+                      <th>Strike</th>
+                      <th>Expiration</th>
+                      <th>Quantity Closed</th>
+                      <th>Cost Basis</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (contract of position.closedContracts; track contract) {
+                      <tr>
+                        <td>
+                          <span class="badge p-1 m-1" [ngClass]="{
+                              'bg-success-subtle text-success': contract.optionType.toLowerCase() === 'call',
+                              'bg-danger-subtle text-danger': contract.optionType.toLowerCase() === 'put'
+                          }">
+                            {{ contract.optionType }}
+                          </span>
+                        </td>
+                        <td>{{ contract.strikePrice | currency }}</td>
+                        <td>{{ contract.expiration }}</td>
+                        <td>{{ contract.quantity }}</td>
+                        <td>{{ contract.cost | currency }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
+
         <!-- Notes Section -->
         <div class="mt-4">
           <div class="card shadow-sm">
