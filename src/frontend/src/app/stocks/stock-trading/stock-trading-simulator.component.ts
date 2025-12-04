@@ -1,12 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {openpositioncommand, StockPosition} from '../../services/stocks.service';
+import {openpositioncommand, StockPosition, StocksService} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
 import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
 import { LoadingComponent } from "src/app/shared/loading/loading.component";
-import { StockTradingNewPositionComponent } from "./stock-trading-new-position.component";
+import { StockSearchComponent } from "../stock-search/stock-search.component";
 
 class StockTransaction {
     numberOfShares: number
@@ -19,14 +19,17 @@ class StockTransaction {
     selector: 'app-stock-trading-simulation',
     templateUrl: './stock-trading-simulator.component.html',
     styleUrls: ['./stock-trading-simulator.component.css'],
-    imports: [CurrencyPipe, DecimalPipe, DatePipe, PercentPipe, FormsModule, ErrorDisplayComponent, LoadingComponent, StockTradingNewPositionComponent]
+    imports: [CurrencyPipe, DecimalPipe, DatePipe, PercentPipe, FormsModule, ErrorDisplayComponent, LoadingComponent, StockSearchComponent]
 })
 
 export class StockTradingSimulatorComponent implements OnInit {
     private stocks = inject(StockPositionsService);
-
+    private stocksService = inject(StocksService);
 
     errors: string[] = []
+    searchedTicker: string = null
+    suggestedPrice: number = null
+    loadingPrice: boolean = false
     
     stopPrice: number | null = null
     transactions: StockTransaction[] = []
@@ -48,6 +51,8 @@ export class StockTradingSimulatorComponent implements OnInit {
     unrealizedRR: number = 0
     averageSaleCostPerShare: number = 0
     averageBuyCostPerShare: number = 0
+    realizedGainPerShare: number = 0
+    realizedGainPercent: number = 0
     r1: number = 0
     r2: number = 0
     r4: number = 0
@@ -73,13 +78,35 @@ export class StockTradingSimulatorComponent implements OnInit {
         }
     }
 
-    initialPosition(ticker: string, cmd: openpositioncommand) {
-        this.ticker = ticker
-        this.stopPrice = cmd.stopPrice
-        this.price = cmd.price
-        this.quantity = cmd.numberOfShares
-        this.date = cmd.date
-        this.addTransaction('buy')
+    onTickerSelected(ticker: string) {
+        this.searchedTicker = ticker.toUpperCase()
+        this.loadingPrice = true
+        this.suggestedPrice = null
+        
+        // Fetch current price for the selected ticker
+        this.stocksService.getStockQuote(ticker).subscribe(
+            quote => {
+                this.suggestedPrice = quote.lastPrice
+                this.price = quote.lastPrice
+                this.loadingPrice = false
+            },
+            error => {
+                this.loadingPrice = false
+                this.errors = GetErrors(error)
+            }
+        )
+    }
+
+    startSimulation() {
+        if (this.searchedTicker && this.price && this.quantity) {
+            this.ticker = this.searchedTicker
+            this.searchedTicker = null
+            this.addTransaction('buy')
+        }
+    }
+
+    setMaxQuantity() {
+        this.quantity = this.numberOfShares
     }
 
     buy() {
@@ -121,6 +148,10 @@ export class StockTradingSimulatorComponent implements OnInit {
         this.ticker = null
         this.stopPrice = null
         this.riskedAmount = null
+        this.searchedTicker = null
+        this.suggestedPrice = null
+        this.price = null
+        this.quantity = null
     }
 
     update() {
@@ -182,25 +213,14 @@ export class StockTradingSimulatorComponent implements OnInit {
         this.reset()
         var first = true;
         this.riskedAmount = p.riskedAmount
+        this.ticker = p.ticker
+        this.stopPrice = p.stopPrice
+        
         p.transactions.forEach(t => {
-            if (first) {
-                var cmd: openpositioncommand = {
-                    stopPrice: p.stopPrice,
-                    price: t.price,
-                    numberOfShares: t.numberOfShares,
-                    date: t.date,
-                    notes: null,
-                    ticker: p.ticker,
-                    strategy: null,
-                }
-                this.initialPosition(p.ticker, cmd)
-                first = false
-            } else {
-                this.price = t.price
-                this.quantity = t.numberOfShares
-                this.date = t.date
-                this.addTransaction(t.type)
-            }
+            this.price = t.price
+            this.quantity = t.numberOfShares
+            this.date = t.date
+            this.addTransaction(t.type)
         })
         this.updateRiskParameters()
         this.showExisting = false
@@ -250,6 +270,15 @@ export class StockTradingSimulatorComponent implements OnInit {
 
         this.averageSaleCostPerShare = totalSale / totalNumberOfSharesSold
         this.averageBuyCostPerShare = totalBuy / totalNumberOfSharesBought
+
+        // calculate realized gain/loss between average buy and sell prices
+        if (totalNumberOfSharesSold > 0 && totalNumberOfSharesBought > 0) {
+            this.realizedGainPerShare = this.averageSaleCostPerShare - this.averageBuyCostPerShare
+            this.realizedGainPercent = this.realizedGainPerShare / this.averageBuyCostPerShare
+        } else {
+            this.realizedGainPerShare = 0
+            this.realizedGainPercent = 0
+        }
 
         // unrealized profit is profit that is realized + unrealized
         if (this.numberOfShares > 0) {
