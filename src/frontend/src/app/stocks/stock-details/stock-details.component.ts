@@ -171,7 +171,7 @@ export class StockDetailsComponent implements OnInit {
         this.stocks.getStockDetails(this.ticker).subscribe(result => {
             this.loading.stock = false;
             this.stock = result;
-            this.title.setTitle(this.stock.ticker + " - Nightingale Trading")
+            this.title.setTitle(this.stock.ticker + " - " + this.stock.quote.lastPrice + " - Nightingale Trading")
         }, error => {
             this.errors.stock = GetErrors(error)
             this.loading.stock = false;
