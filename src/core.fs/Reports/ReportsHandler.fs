@@ -251,7 +251,6 @@ type InflectionPointsQuery =
     }
 
     member this.StartDate (marketHours:IMarketHours) =
-        System.Console.WriteLine($"Start date: {this.Start}")
         match this.Start with
         | Some date -> match DateTimeOffset.TryParse(date) with | true,dt -> marketHours.GetMarketStartOfDayTimeInUtc dt | false,_ -> DateTimeOffset.UtcNow.AddYears(-1)
         | None -> DateTimeOffset.UtcNow.AddYears(-1)
@@ -1078,11 +1077,11 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Fee", fee.NetAmount, fee.NetAmount, fee.Date, false)
             
         let toSharedTransactionForOption (o:OptionPositionState) =
-            let minStrike = o.Contracts |> Seq.minBy _.Key.Strike
-            let maxStrike = o.Contracts |> Seq.maxBy _.Key.Strike
+            let minStrike = o.ClosedContracts |> Seq.minBy _.Key.Strike
+            let maxStrike = o.ClosedContracts |> Seq.maxBy _.Key.Strike
             let spread = (maxStrike.Key.Strike - minStrike.Key.Strike) * 100m |> int
             let debitOrCredit = o.Cost |> Option.defaultValue 0m |> fun x -> if x > 0m then "Debit" else "Credit"
-            let callOrPut = o.Contracts |> Seq.head |> fun x -> if x.Key.OptionType = Call then "Call" else "Put"
+            let callOrPut = o.ClosedContracts |> Seq.head |> fun x -> if x.Key.OptionType = Call then "Call" else "Put"
             let spreadDescription =
                 match spread with
                 | x when x = 0 -> $"{callOrPut} option contract"
