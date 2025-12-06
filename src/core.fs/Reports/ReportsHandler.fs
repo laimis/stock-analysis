@@ -1068,7 +1068,8 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
     member _.Handle(query:TransactionsQuery) : Task<Result<TransactionsView, ServiceError>>  = task {
         
         let toSharedTransaction (stock:StockPositionWithCalculations) (plTransaction:PLTransaction) : Transaction =
-            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, $"{plTransaction.Type} {plTransaction.NumberOfShares} shares", plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
+            let avgCostPerShareFormatted = stock.AverageCostPerShare.ToString("C2", CultureInfo.InvariantCulture)
+            Transaction.PLTx(Guid.NewGuid(), stock.Ticker, $"{plTransaction.Type} {plTransaction.NumberOfShares} shares, avg cost: {avgCostPerShareFormatted}", plTransaction.BuyPrice, plTransaction.Profit, plTransaction.Date, false)
             
         let toSharedTransactionForDividend (stock:StockPositionWithCalculations) (dividend:StockPositionDividendTransaction) : Transaction =
             Transaction.PLTx(Guid.NewGuid(), stock.Ticker, "Dividend", dividend.NetAmount, dividend.NetAmount, dividend.Date, false)
