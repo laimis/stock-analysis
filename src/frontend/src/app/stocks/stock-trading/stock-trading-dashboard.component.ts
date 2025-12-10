@@ -224,7 +224,9 @@ export class StockTradingDashboardComponent implements OnInit {
 
     private loadEntries() {
         this.loading = true
-        this.stockService.getTradingEntries().subscribe((r: StockTradingPositions) => {
+        this.stockService.getTradingEntries().subscribe(
+            
+            (r: StockTradingPositions) => {
             this.positions = r.current
             this.violations = r.violations
             this.brokerageAccount = r.brokerageAccount
@@ -261,7 +263,8 @@ export class StockTradingDashboardComponent implements OnInit {
 
             this.updatePositions()
 
-        }, err => {
+        }, 
+        (err) => {
             this.loading = false
             this.loaded = true
             console.log(err)

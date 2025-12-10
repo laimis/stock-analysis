@@ -81,6 +81,7 @@
   }
   @if (isActive('positions') && positions) {
     <app-stock-trading-positions
+      [brokerageAccount]="brokerageAccount"
       [positions]=sortedPositions
       [metricFunc]="metricFunc"
       [metricType]="metricType"
