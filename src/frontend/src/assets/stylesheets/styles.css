@@ -154,3 +154,76 @@ section.card {
 .event-risk {
     background-color: #fbfaf8;
 }
+
+/* Modern Table Styles */
+.table-modern {
+    border-collapse: separate;
+    border-spacing: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.table-modern thead th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #dee2e6;
+    padding: 1rem;
+}
+
+.table-modern tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.table-modern tbody tr:hover:not(.table-active) {
+    background-color: rgba(13, 110, 253, 0.04);
+}
+
+.table-modern tbody td {
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+/* Expandable table details section */
+.table-modern .table-active td {
+    background-color: transparent !important;
+}
+
+.table-modern .details-row {
+    background-color: #f8f9fa !important;
+    border-radius: 4px;
+}
+
+/* Details toggle button */
+.btn-details {
+    border-radius: 6px;
+    padding: 0.375rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-details:hover {
+    transform: translateY(-1px);
+}
+
+.btn-details.btn-outline-info:hover {
+    box-shadow: 0 2px 4px rgba(13, 202, 240, 0.3);
+}
+
+.btn-details i {
+    margin-right: 0.25rem;
+    font-size: 0.75rem;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 768px) {
+    .table-modern thead th,
+    .table-modern tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+}

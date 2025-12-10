@@ -11,7 +11,7 @@ import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    imports: [StockTradingPositionComponent, StockLinkComponent, CurrencyPipe]
+    imports: [StockTradingPositionComponent, StockLinkComponent, CurrencyPipe, PercentPipe]
 })
 export class StockTradingPositionsComponent {
     private percentPipe = inject(PercentPipe);
@@ -31,6 +31,7 @@ export class StockTradingPositionsComponent {
     positionChanged = new EventEmitter()
 
     private _quotes: Map<string, StockQuote> = new Map<string, StockQuote>()
+    private _visibleDetails: Set<string> = new Set<string>();
 
     get quotes() {
         return this._quotes
@@ -77,6 +78,18 @@ export class StockTradingPositionsComponent {
             return [];
         }
         return this.brokerageAccount.stockOrders.filter(o => o.ticker === ticker);
+    }
+
+    toggleDetails(ticker: string) {
+        if (this._visibleDetails.has(ticker)) {
+            this._visibleDetails.delete(ticker);
+        } else {
+            this._visibleDetails.add(ticker);
+        }
+    }
+
+    isDetailsVisible(ticker: string): boolean {
+        return this._visibleDetails.has(ticker);
     }
 }
 
