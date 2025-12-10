@@ -219,6 +219,26 @@ section.card {
     font-size: 0.75rem;
 }
 
+/* Sortable table headers */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+.sortable i {
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+    opacity: 0.6;
+}
+
+.sortable:hover i {
+    opacity: 1;
+}
+
 /* Responsive table adjustments */
 @media (max-width: 768px) {
     .table-modern thead th,

@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { BrokerageAccount, OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
-import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 import {toggleVisuallyHidden} from "../../services/utils";
 import { StockTradingPositionComponent } from "./stock-trading-position.component";
 import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
+import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
 
 
 @Component({
@@ -11,7 +12,7 @@ import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    imports: [StockTradingPositionComponent, StockLinkComponent, CurrencyPipe, PercentPipe]
+    imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass]
 })
 export class StockTradingPositionsComponent {
     private percentPipe = inject(PercentPipe);
@@ -32,6 +33,8 @@ export class StockTradingPositionsComponent {
 
     private _quotes: Map<string, StockQuote> = new Map<string, StockQuote>()
     private _visibleDetails: Set<string> = new Set<string>();
+    sortColumn: string = '';
+    sortDirection: 'asc' | 'desc' = 'desc';
 
     get quotes() {
         return this._quotes
@@ -90,6 +93,62 @@ export class StockTradingPositionsComponent {
 
     isDetailsVisible(ticker: string): boolean {
         return this._visibleDetails.has(ticker);
+    }
+
+    sortBy(column: string) {
+        if (this.sortColumn === column) {
+            // Toggle direction if clicking same column
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            // New column, default to descending
+            this.sortColumn = column;
+            this.sortDirection = 'desc';
+        }
+
+        this.positions = [...this.positions].sort((a, b) => {
+            let aValue: any;
+            let bValue: any;
+
+            switch (column) {
+                case 'ticker':
+                    aValue = a.ticker;
+                    bValue = b.ticker;
+                    break;
+                case 'price':
+                    aValue = this.getPrice(a);
+                    bValue = this.getPrice(b);
+                    break;
+                case 'avgCost':
+                    aValue = a.averageCostPerShare;
+                    bValue = b.averageCostPerShare;
+                    break;
+                case 'gainLoss':
+                    aValue = a.gainPct;
+                    bValue = b.gainPct;
+                    break;
+                case 'cost':
+                    aValue = a.cost;
+                    bValue = b.cost;
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                const comparison = aValue.localeCompare(bValue);
+                return this.sortDirection === 'asc' ? comparison : -comparison;
+            } else {
+                const comparison = (aValue || 0) - (bValue || 0);
+                return this.sortDirection === 'asc' ? comparison : -comparison;
+            }
+        });
+    }
+
+    getSortIcon(column: string): string {
+        if (this.sortColumn !== column) {
+            return 'bi-chevron-expand';
+        }
+        return this.sortDirection === 'asc' ? 'bi-chevron-up' : 'bi-chevron-down';
     }
 }
 

@@ -4,11 +4,21 @@
             <table class="table table-modern table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col" class="ps-4">Ticker</th>
-                        <th scope="col" class="text-end">Price</th>
-                        <th scope="col" class="text-end">Avg Cost/Share</th>
-                        <th scope="col" class="text-end">Gain/Loss</th>
-                        <th scope="col" class="text-end">Cost</th>
+                        <th scope="col" class="ps-4 sortable" (click)="sortBy('ticker')" role="button">
+                            Ticker <i class="bi" [ngClass]="getSortIcon('ticker')"></i>
+                        </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('price')" role="button">
+                            Price <i class="bi" [ngClass]="getSortIcon('price')"></i>
+                        </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('avgCost')" role="button">
+                            Avg Cost/Share <i class="bi" [ngClass]="getSortIcon('avgCost')"></i>
+                        </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('gainLoss')" role="button">
+                            Gain/Loss <i class="bi" [ngClass]="getSortIcon('gainLoss')"></i>
+                        </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('cost')" role="button">
+                            Cost <i class="bi" [ngClass]="getSortIcon('cost')"></i>
+                        </th>
                         <th scope="col" class="text-center">Details</th>
                     </tr>
                 </thead>
@@ -16,7 +26,7 @@
                     @for (position of positions; track position.ticker) {
                         <tr>
                             <td class="ps-4 py-3">
-                                <app-stock-link [ticker]="position.ticker"></app-stock-link>
+                                <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
                             </td>
                             <td class="text-end py-3">
                                 <span class="fw-semibold">{{ getPrice(position) | currency }}</span>

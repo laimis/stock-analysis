@@ -110,68 +110,6 @@ export class StockTradingDashboardComponent implements OnInit {
         this.updatePositions()
     }
 
-    metricChanged(value: string) {
-
-        console.log("metric changed to " + value)
-        this.metricToRender = value
-
-        switch (value) {
-            case "pl":
-                this.metricFunc = (p: StockPosition) => p.profit
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break;
-            case "plPercent":
-                this.metricFunc = (p: StockPosition) => p.gainPct
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break;
-            case "plUnrealized":
-                this.metricFunc = (p: StockPosition) => p.numberOfShares * (this.getPrice(p) - p.averageCostPerShare) + p.profit
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break;
-            case "plUnrealizedPercent":
-                this.metricFunc = (p: StockPosition) => (this.getPrice(p) - p.averageCostPerShare) / p.averageCostPerShare
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break;
-            case "cost":
-                this.metricFunc = (p: StockPosition) => p.cost
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break;
-            case "ticker":
-                this.metricFunc = (p: StockPosition) => p.ticker
-                this.metricType = OutcomeValueTypeEnum.String
-                break
-            case "daysSinceLastTransaction":
-                this.metricFunc = (p: StockPosition) => p.daysSinceLastTransaction
-                this.metricType = OutcomeValueTypeEnum.Number
-                break
-            case "riskedAmount":
-                this.metricFunc = (p: StockPosition) => p.riskedAmount ? p.riskedAmount : 0
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break
-            case "riskedAmountFromStop":
-                this.metricFunc = (p: StockPosition) => (p.stopPrice - p.averageCostPerShare) * p.numberOfShares
-                this.metricType = OutcomeValueTypeEnum.Currency
-                break
-            case "daysHeld":
-                this.metricFunc = (p: StockPosition) => p.daysHeld
-                this.metricType = OutcomeValueTypeEnum.Number
-                break
-            case "unrealizedRR":
-                this.metricFunc = (p: StockPosition) => this.calculateUnrealizedRR(p)
-                this.metricType = OutcomeValueTypeEnum.Number
-                break
-            case "percentToStopFromCost":
-                this.metricFunc = (p: StockPosition) => p.percentToStopFromCost
-                this.metricType = OutcomeValueTypeEnum.Percentage
-                break
-            default:
-                this.metricFunc = (p: StockPosition) => p.rr
-                this.metricType = OutcomeValueTypeEnum.Number
-        }
-
-        this.updatePositions()
-    }
-
     getPrice(p: StockPosition) {
         if (this.quotes) {
             return this.quotes[p.ticker]?.price
@@ -258,8 +196,6 @@ export class StockTradingDashboardComponent implements OnInit {
             )
 
             this.metricToRender = this.UnrealizedRR
-
-            this.metricChanged(this.metricToRender)
 
             this.updatePositions()
 
