@@ -35,10 +35,6 @@
         (click)="activateTab('summary')">
         Overview
       </a>
-      <a class="tab" [routerLink]="" (click)="toggleVisuallyHidden(settingsDiv)"
-        [ngClass]="{'disabled': !isActive('positions') && !isActive('openreview') && !isActive('charts')}">
-        <i class="fas fa-filter"></i>
-      </a>
       <a class="tab" [routerLink]="" (click)="refresh()">
         @if (loading) {
           <div class="spinner-border text-info spinner-border-sm" role="status">
@@ -50,7 +46,7 @@
         }
       </a>
     </div>
-    <div class="row visually-hidden" #settingsDiv>
+    <div class="row" #settingsDiv>
       <div class="col">
         <a class="btn btn-link me-1" [href]="getOpenPositionExportLink()">Export</a>
       </div>
