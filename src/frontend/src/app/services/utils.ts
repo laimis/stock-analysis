@@ -75,6 +75,8 @@ export function GetStockStrategies(): { key: string, value: string }[] {
         {key: "shortweakness", value: "Short, Weakness"},
         {key: "weeklypullbreak", value: "Weekly Pull/Break"},
         {key: "weeklypullbreakdelayed", value: "Weekly Pull/Break Delayed"},
+        {key: "iofund", value: "IO Fund"},
+        {key: "itmp", value: "ITMP"},
     ]
 }
 
