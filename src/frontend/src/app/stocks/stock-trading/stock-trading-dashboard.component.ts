@@ -49,8 +49,7 @@ export class StockTradingDashboardComponent implements OnInit {
     metricType: OutcomeValueTypeEnum;
     invested: number = 0
     readonly toggleVisuallyHidden = toggleVisuallyHidden;
-    private NO_LONG_TERM_STRATEGY = "nolongterm"
-    strategyToFilter = this.NO_LONG_TERM_STRATEGY
+    strategyToFilter = "all"
     private NONE = ""
     private SHORTS = "shorts"
     private LONGS = "longs"
@@ -199,10 +198,6 @@ export class StockTradingDashboardComponent implements OnInit {
                     return this.strategyToFilter === this.NONE
                 }
 
-                if (this.strategyToFilter === this.NO_LONG_TERM_STRATEGY) {
-                    return !isLongTermStrategy(positionStrategy.value)
-                }
-
                 if (this.strategyToFilter === this.SHORTS) {
                     return p.isShort
                 }
@@ -248,22 +243,11 @@ export class StockTradingDashboardComponent implements OnInit {
             )
             this.strategies.push({key: "all", value: "All - " + this.positions.length})
 
-            let longTermPositions = this.positions.filter(
-                (p) => {
-                    let strategy = p.labels.find(l => l.key == 'strategy')
-                    return strategy && isLongTermStrategy(strategy.value)
-                }
-            )
-
             let shorts = this.positions.filter((p) => p.isShort)
             let longs = this.positions.filter((p) => !p.isShort)
 
             let noStrategy = this.positions.filter(i => this.matchesStrategyCheck(i, this.NONE))
 
-            this.strategies.push({
-                key: this.NO_LONG_TERM_STRATEGY,
-                value: "All minus long term - " + (this.positions.length - longTermPositions.length)
-            })
             this.strategies.push({key: this.LONGS, value: "Longs - " + longs.length})
             this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})
             this.strategies.push({key: this.NONE, value: "None - " + noStrategy.length})

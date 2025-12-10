@@ -10,7 +10,6 @@ import {
 import {GetErrors, GetStockStrategies, toggleVisuallyHidden} from 'src/app/services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {BrokerageService} from "../../services/brokerage.service";
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
@@ -40,25 +39,30 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
 })
 export class StockTradingPositionComponent {
     private stockService = inject(StockPositionsService);
-    private brokerageService = inject(BrokerageService);
 
     candidateRiskAmount: number = 0
     candidateStopPrice: number = 0
     numberOfProfitPoints: number = 4
     positionStrategy: string = null
-    positionOrders: BrokerageStockOrder[] = [];
-    brokerageAccount: BrokerageAccount;
-    strategies: { key: string; value: string; }[];
+    strategies: { key: string; value: string; }[]
     showOrderForm: boolean = false;
+    editingRisk: boolean = false;
+    editingStrategy: boolean = false;
+    eventsExpanded: boolean = false;
     gradingError: string = null
     gradingSuccess: string = null
     assignedGrade: string = null
     assignedNote: string = null
+    gradeNoteText: string = ''
     
     @Input()
     notesExpanded = false
     @Input()
     quote: StockQuote
+    @Input()
+    brokerageAccount: BrokerageAccount | null = null
+    @Input()
+    positionOrders: BrokerageStockOrder[] = []
     @Output()
     positionChanged = new EventEmitter()
 
@@ -78,35 +82,13 @@ export class StockTradingPositionComponent {
             this.positionProfitPoints = []
             this.assignedGrade = this._position.grade
             this.assignedNote = this._position.gradeNote
+            this.gradeNoteText = this._position.gradeNote || ''
             this.setCandidateValues()
-            if (v.isOpen) {
-                this.updatePositionOrders()
-            }
         }
     }
     
     toggleOrders() {
         this.showOrderForm = !this.showOrderForm
-        if (this.showOrderForm) {
-            this.updatePositionOrders()
-        }
-    }
-
-    updatePositionOrders() {
-        if (!this._position) {
-            return
-        }
-
-        this.brokerageService.brokerageAccount().subscribe(
-            account => {
-                this.brokerageAccount = account
-                this.positionOrders = this.brokerageAccount.stockOrders.filter(o => o.ticker == this._position.ticker)
-            },
-            err => {
-                let errors = GetErrors(err)
-                alert("Error fetching orders: " + errors.join(", "))
-            }
-        )
     }
 
     positionProfitPoints: StrategyProfitPoint[] = []
@@ -171,12 +153,11 @@ export class StockTradingPositionComponent {
         return false
     }
 
-    setRiskAmount(elementVisibilityToToggle: HTMLElement[]) {
+    setRiskAmount() {
         if (confirm("Are you sure you want to set the risk amount?")) {
             this.stockService.setRiskAmount(this._position.positionId, this.candidateRiskAmount).subscribe(
                 (_) => {
                     this._position.riskedAmount = this.candidateRiskAmount
-                    elementVisibilityToToggle.forEach(this.toggleVisibility)
                 },
                 error => {
                     let errors = GetErrors(error)
@@ -210,7 +191,7 @@ export class StockTradingPositionComponent {
         this.stockService.issueClosingOrders(this._position.positionId, closeReason)
             .subscribe(
                 (_) => {
-                    this.updatePositionOrders()
+                    this.positionChanged.emit()
                 },
                 err => {
                     let errors = GetErrors(err)
@@ -355,7 +336,7 @@ export class StockTradingPositionComponent {
         }
     }
 
-    clearStrategy(elementVisibilityToToggle: HTMLElement[]) {
+    clearStrategy() {
         if (!confirm("Are you sure you want to clear the strategy?")) {
             return false
         }
@@ -363,7 +344,6 @@ export class StockTradingPositionComponent {
         this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe(
             _ => {
                 this.positionStrategy = null
-                elementVisibilityToToggle.forEach(this.toggleVisibility)
             },
             (err) => {
                 const errors = GetErrors(err)
@@ -374,7 +354,7 @@ export class StockTradingPositionComponent {
         return false
     }
 
-    setStrategy(strategy: string, elementVisibilityToToggle: HTMLElement[]) {
+    setStrategy(strategy: string) {
         if (!strategy) {
             alert("Please select strategy")
             return
@@ -388,7 +368,6 @@ export class StockTradingPositionComponent {
         this.stockService.setLabel(this._position.positionId, label).subscribe(
             _ => {
                 this.positionStrategy = strategy
-                elementVisibilityToToggle.forEach(this.toggleVisibility)
             },
             (err) => {
                 const errors = GetErrors(err)

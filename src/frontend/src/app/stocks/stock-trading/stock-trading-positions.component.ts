@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
+import { BrokerageAccount, OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, PercentPipe} from "@angular/common";
 import {toggleVisuallyHidden} from "../../services/utils";
 import { StockTradingPositionComponent } from "./stock-trading-position.component";
@@ -25,6 +25,8 @@ export class StockTradingPositionsComponent {
     metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number;
     @Input()
     positions: StockPosition[] = [];
+    @Input()
+    brokerageAccount: BrokerageAccount | null = null;
     @Output()
     positionChanged = new EventEmitter()
 
@@ -68,6 +70,13 @@ export class StockTradingPositionsComponent {
         } else {
             return this.decimalPipe.transform(val)
         }
+    }
+
+    getOrdersForPosition(ticker: string) {
+        if (!this.brokerageAccount) {
+            return [];
+        }
+        return this.brokerageAccount.stockOrders.filter(o => o.ticker === ticker);
     }
 }
 

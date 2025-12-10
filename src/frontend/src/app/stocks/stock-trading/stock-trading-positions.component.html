@@ -25,6 +25,8 @@
                         <app-stock-trading-position
                             [position]="position"
                             [quote]="getQuote(position)"
+                            [brokerageAccount]="brokerageAccount"
+                            [positionOrders]="getOrdersForPosition(position.ticker)"
                             (positionChanged)="positionChanged.emit()"></app-stock-trading-position>
                     </div>
                 </div>

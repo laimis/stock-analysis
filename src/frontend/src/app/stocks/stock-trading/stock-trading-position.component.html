@@ -42,60 +42,62 @@
             </div>
           </div>
 
-          <div class="col-md-3" #riskReadonlyDiv>
-            <div class="stat-label">
-              Risk Amount
-              <span class="bi bi-pencil" role="button"
-              (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
-            </div>
-            <div>{{ candidateRiskAmount | currency }}</div>
-            <div>
-              <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
-            </div>
-          </div>
-          <div class="col-md-3 visually-hidden" #riskEditDiv>
-            <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
-            <span class="bi bi-x-circle ms-2" role="button"
-            (click)="toggleVisibility(riskReadonlyDiv); toggleVisibility(riskEditDiv)"></span>
-            <div class="input-group">
-              <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount"
-                type="number">
-                <button class="btn btn-outline-secondary" (click)="setRiskAmount([riskReadonlyDiv,riskEditDiv])">
-                  Update
-                </button>
-              </div>
-            </div>
-            <div class="col-md-3" #strategyReadonyDiv>
+          @if (!editingRisk) {
+            <div class="col-md-3">
               <div class="stat-label">
-                Strategy
-                <span class="bi bi-pencil" role="button"
-                (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
+                Risk Amount
+                <span class="bi bi-pencil" role="button" (click)="editingRisk = true"></span>
               </div>
-              <div>{{ positionStrategy }}</div>
-            </div>
-            <div class="col-md-3 visually-hidden" #strategyEditDiv>
-              <label class="form-label stat-label" for="strategyInput">Strategy</label>
-              <span class="bi bi-x-circle ms-2" role="button"
-              (click)="toggleVisibility(strategyReadonyDiv); toggleVisibility(strategyEditDiv)"></span>
-              <div class="input-group">
-                <select class="form-select" id="strategyInput" #strategyInput>
-                  <option value="">Choose...</option>
-                  @for (s of strategies; track s) {
-                    <option
-                      value="{{s.key}}" [selected]="positionStrategy === s.key">{{ s.value }}
-                    </option>
-                  }
-                </select>
-                <button class="btn btn-outline-secondary"
-                  (click)="setStrategy(strategyInput.value,[strategyReadonyDiv,strategyEditDiv])">Update
-                </button>
-              </div>
+              <div>{{ candidateRiskAmount | currency }}</div>
               <div>
-                <a href="#"
-                  (click)="strategyInput.value = ''; clearStrategy([strategyReadonyDiv,strategyEditDiv]);">Clear
-                Strategy</a>
+                <a href="#" (click)="recalculateRiskAmount()">Recalculate Risk</a>
               </div>
             </div>
+          } @else {
+            <div class="col-md-3">
+              <label class="form-label stat-label" for="candidateRiskAmount">Risk Amount</label>
+              <span class="bi bi-x-circle ms-2" role="button" (click)="editingRisk = false"></span>
+              <div class="input-group">
+                <input class="form-control" step="0.01" id="candidateRiskAmount" [(ngModel)]="candidateRiskAmount"
+                  type="number">
+                  <button class="btn btn-outline-secondary" (click)="setRiskAmount(); editingRisk = false">
+                    Update
+                  </button>
+                </div>
+              </div>
+            }
+            @if (!editingStrategy) {
+              <div class="col-md-3">
+                <div class="stat-label">
+                  Strategy
+                  <span class="bi bi-pencil" role="button" (click)="editingStrategy = true"></span>
+                </div>
+                <div>{{ positionStrategy }}</div>
+              </div>
+            } @else {
+              <div class="col-md-3">
+                <label class="form-label stat-label" for="strategyInput">Strategy</label>
+                <span class="bi bi-x-circle ms-2" role="button" (click)="editingStrategy = false"></span>
+                <div class="input-group">
+                  <select class="form-select" id="strategyInput" #strategyInput>
+                    <option value="">Choose...</option>
+                    @for (s of strategies; track s) {
+                      <option
+                        value="{{s.key}}" [selected]="positionStrategy === s.key">{{ s.value }}
+                      </option>
+                    }
+                  </select>
+                  <button class="btn btn-outline-secondary"
+                    (click)="setStrategy(strategyInput.value); editingStrategy = false">Update
+                  </button>
+                </div>
+                <div>
+                  <a href="#"
+                    (click)="strategyInput.value = ''; clearStrategy(); editingStrategy = false;">Clear
+                  Strategy</a>
+                </div>
+              </div>
+            }
           </div>
           <div class="row mt-3">
             <div class="col-md-3">
@@ -181,7 +183,7 @@
           <div class="col">
             <app-brokerage-new-order [ticker]="_position.ticker"
               [positionId]="_position.positionId"
-            (brokerageOrderEntered)="updatePositionOrders()"></app-brokerage-new-order>
+            (brokerageOrderEntered)="positionChanged.emit()"></app-brokerage-new-order>
           </div>
         </div>
       }
@@ -277,7 +279,7 @@
               </div>
             </div>
           }
-          <div [ngClass]="{'visually-hidden': !notesExpanded}">
+          @if (notesExpanded) {
             <div class="card-body">
               <div class="note-timeline mt-3">
                 @for (note of _position.notes; track note) {
@@ -290,8 +292,7 @@
                 }
               </div>
             </div>
-
-          </div>
+          }
         </div>
       </div>
     </div>
@@ -323,12 +324,18 @@
             </div>
             <div class="mb-3">
               <label for="notesInput" class="form-label">Notes</label>
-              <textarea #gradeNotes [ngClass]="assignedNote ? 'visually-hidden' : ''" class="form-control" id="notesInput" rows="3" [value]="assignedNote"></textarea>
-              <div #gradeLabel [ngClass]="assignedNote ? '' : 'visually-hidden'">{{gradeNotes.value}}</div>
+              @if (!assignedNote) {
+                <textarea class="form-control" id="notesInput" rows="3" [(ngModel)]="gradeNoteText"></textarea>
+              } @else {
+                <div>{{assignedNote}}</div>
+              }
             </div>
             <div class="d-grid gap-2">
-              <button [ngClass]="assignedNote ? 'visually-hidden' : ''" (click)="assignGrade(gradeNotes.value); toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-primary" #submitGradeButton>Submit Grade</button>
-              <button [ngClass]="assignedNote ? '' : 'visually-hidden'" (click)="toggleVisuallyHidden(gradeNotes); toggleVisuallyHidden(gradeLabel); toggleVisuallyHidden(submitGradeButton); toggleVisuallyHidden(editGradeButton)" class="btn btn-secondary" #editGradeButton>Edit Grade</button>
+              @if (!assignedNote) {
+                <button (click)="assignGrade(gradeNoteText)" class="btn btn-primary">Submit Grade</button>
+              } @else {
+                <button (click)="assignedNote = null; gradeNoteText = assignedNote" class="btn btn-secondary">Edit Grade</button>
+              }
             </div>
           </div>
         </div>
@@ -340,7 +347,7 @@
       <div class="col">
         <div class="card shadow-sm">
           <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 cursor-pointer hover-lighten"
-            (click)="toggleVisibility(eventContainer)">
+            (click)="eventsExpanded = !eventsExpanded">
             <div class="d-flex align-items-center">
               <i class="bi bi-calendar-event me-3 text-primary"></i>
               <h5 class="mb-0 d-flex align-items-center">
@@ -349,11 +356,11 @@
               </h5>
             </div>
             <i class="bi transition-transform"
-              [class.bi-chevron-down]="!eventContainer.classList.contains('visually-hidden')"
-            [class.bi-chevron-up]="eventContainer.classList.contains('visually-hidden')"></i>
+              [class.bi-chevron-down]="eventsExpanded"
+            [class.bi-chevron-up]="!eventsExpanded"></i>
           </div>
 
-          <div #eventContainer class="visually-hidden">
+          @if (eventsExpanded) {
             <div class="card-body p-0">
               <div class="table-responsive">
                 <table class="table table-hover mb-0">
@@ -392,7 +399,7 @@
                 </table>
               </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>
