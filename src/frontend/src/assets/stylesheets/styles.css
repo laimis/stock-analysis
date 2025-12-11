@@ -166,10 +166,9 @@ section.card {
 }
 
 .table-modern thead th {
-    font-weight: 600;
+    color: var(--bs-secondary);
     font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: normal;
     border-bottom: 2px solid #dee2e6;
     padding: 1rem;
 }

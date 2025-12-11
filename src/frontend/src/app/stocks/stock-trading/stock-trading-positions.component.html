@@ -4,22 +4,22 @@
             <table class="table table-modern table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col" class="ps-4 sortable" (click)="sortBy('ticker')" role="button">
+                        <th scope="col" class="ps-4 sortable" style="width: 120px;" (click)="sortBy('ticker')" role="button">
                             Ticker <i class="bi" [ngClass]="getSortIcon('ticker')"></i>
                         </th>
                         <th scope="col" class="text-end sortable" (click)="sortBy('price')" role="button">
                             Price <i class="bi" [ngClass]="getSortIcon('price')"></i>
                         </th>
                         <th scope="col" class="text-end sortable" (click)="sortBy('avgCost')" role="button">
-                            Avg Cost/Share <i class="bi" [ngClass]="getSortIcon('avgCost')"></i>
+                            Cost Basis <i class="bi" [ngClass]="getSortIcon('avgCost')"></i>
                         </th>
-                        <th scope="col" class="text-end sortable" (click)="sortBy('gainLoss')" role="button">
-                            Gain/Loss <i class="bi" [ngClass]="getSortIcon('gainLoss')"></i>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('unrealizedGainLoss')" role="button">
+                            Unrealized Gain/Loss <i class="bi" [ngClass]="getSortIcon('unrealizedGainLoss')"></i>
                         </th>
                         <th scope="col" class="text-end sortable" (click)="sortBy('cost')" role="button">
                             Cost <i class="bi" [ngClass]="getSortIcon('cost')"></i>
                         </th>
-                        <th scope="col" class="text-center">Details</th>
+                        <th scope="col" class="text-center" style="width: 60px;">Details</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,14 +29,17 @@
                                 <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
                             </td>
                             <td class="text-end py-3">
-                                <span class="fw-semibold">{{ getPrice(position) | currency }}</span>
+                                {{ getPrice(position) | currency }}
                             </td>
                             <td class="text-end py-3">
-                                {{ position.averageCostPerShare | currency }}
-                            </td>
-                            <td class="text-end py-3">
-                                <span [class.text-success]="position.gainPct > 0" [class.text-danger]="position.gainPct < 0" class="fw-semibold">
+                                <div>{{ position.averageCostPerShare | currency }}</div>
+                                <div class="small" [class.text-success]="position.gainPct > 0" [class.text-danger]="position.gainPct < 0">
                                     {{ position.gainPct | percent:'1.2-2' }}
+                                </div>
+                            </td>
+                            <td class="text-end py-3">
+                                <span [class.text-success]="getUnrealizedGainLoss(position) > 0" [class.text-danger]="getUnrealizedGainLoss(position) < 0">
+                                    {{ getUnrealizedGainLoss(position) | currency }}
                                 </span>
                             </td>
                             <td class="text-end py-3">

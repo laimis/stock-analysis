@@ -15,31 +15,20 @@ import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stoc
     imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass]
 })
 export class StockTradingPositionsComponent {
-    private percentPipe = inject(PercentPipe);
-    private currencyPipe = inject(CurrencyPipe);
-    private decimalPipe = inject(DecimalPipe);
-
-
+    
     @Input()
     positions: StockPosition[] = [];
     @Input()
     brokerageAccount: BrokerageAccount | null = null;
+    @Input()
+    quotes: Map<string, StockQuote> | null = null;
+    
     @Output()
     positionChanged = new EventEmitter()
 
-    private _quotes: Map<string, StockQuote> = new Map<string, StockQuote>()
     private _visibleDetails: Set<string> = new Set<string>();
     sortColumn: string = '';
     sortDirection: 'asc' | 'desc' = 'desc';
-
-    get quotes() {
-        return this._quotes
-    }
-
-    @Input()
-    set quotes(val: Map<string, StockQuote>) {
-        this._quotes = val
-    }
 
     toggleVisibility(elem: HTMLElement) {
         toggleVisuallyHidden(elem)
@@ -54,6 +43,22 @@ export class StockTradingPositionsComponent {
 
     getPrice(p: StockPosition) {
         return this.getQuote(p)?.price || 0
+    }
+
+    getUnrealizedGainLoss(p: StockPosition) {
+        const quote = this.getQuote(p);
+        if (quote) {
+            return (quote.price - p.averageCostPerShare) * p.numberOfShares + p.profitWithoutDividendsAndFees;
+        }
+        return 0;
+    }
+
+    getPercentGainLoss(p: StockPosition) {
+        const quote = this.getQuote(p);
+        if (quote) {
+            return (quote.price - p.averageCostPerShare) / p.averageCostPerShare;
+        }
+        return 0;
     }
 
     getOrdersForPosition(ticker: string) {
@@ -102,9 +107,9 @@ export class StockTradingPositionsComponent {
                     aValue = a.averageCostPerShare;
                     bValue = b.averageCostPerShare;
                     break;
-                case 'gainLoss':
-                    aValue = a.gainPct;
-                    bValue = b.gainPct;
+                case 'unrealizedGainLoss':
+                    aValue = this.getUnrealizedGainLoss(a);
+                    bValue = this.getUnrealizedGainLoss(b);
                     break;
                 case 'cost':
                     aValue = a.cost;
