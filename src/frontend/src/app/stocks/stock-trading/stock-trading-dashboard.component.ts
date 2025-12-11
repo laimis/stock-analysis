@@ -45,7 +45,6 @@ export class StockTradingDashboardComponent implements OnInit {
     quotes: Map<string, StockQuote>
     strategies: { key: string; value: string }[] = []
     metricToRender: string
-    metricFunc: (p: StockPosition) => any;
     metricType: OutcomeValueTypeEnum;
     invested: number = 0
     readonly toggleVisuallyHidden = toggleVisuallyHidden;
@@ -149,14 +148,6 @@ export class StockTradingDashboardComponent implements OnInit {
                 }
 
                 return positionStrategy.value === this.strategyToFilter
-            })
-            .sort((a, b) => {
-                if (Number.isFinite(this.metricFunc(a))) {
-                    const bNumber = this.metricFunc(b)
-                    const aNumber = this.metricFunc(a)
-                    return bNumber - aNumber
-                }
-                return String(this.metricFunc(a)).localeCompare(String(this.metricFunc(b)))
             })
     }
 

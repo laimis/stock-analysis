@@ -21,10 +21,6 @@ export class StockTradingPositionsComponent {
 
 
     @Input()
-    metricFunc: (p: StockPosition) => any | null = () => null;
-    @Input()
-    metricType: OutcomeValueTypeEnum = OutcomeValueTypeEnum.Number;
-    @Input()
     positions: StockPosition[] = [];
     @Input()
     brokerageAccount: BrokerageAccount | null = null;
@@ -58,22 +54,6 @@ export class StockTradingPositionsComponent {
 
     getPrice(p: StockPosition) {
         return this.getQuote(p)?.price || 0
-    }
-
-    getMetricToRender(val: number) {
-        if (Number.isFinite(val)) {
-            val = Math.round(val * 100) / 100
-        }
-
-        if (this.metricType === OutcomeValueTypeEnum.Percentage) {
-            return this.percentPipe.transform(val, '1.0-2')
-        } else if (this.metricType === OutcomeValueTypeEnum.Currency) {
-            return this.currencyPipe.transform(val)
-        } else if (this.metricType === OutcomeValueTypeEnum.String) {
-            return val
-        } else {
-            return this.decimalPipe.transform(val)
-        }
     }
 
     getOrdersForPosition(ticker: string) {

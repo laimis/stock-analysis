@@ -24,7 +24,7 @@
                 </thead>
                 <tbody>
                     @for (position of positions; track position.ticker) {
-                        <tr>
+                        <tr class="cursor-pointer" (click)="toggleDetails(position.ticker)">
                             <td class="ps-4 py-3">
                                 <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
                             </td>
@@ -43,13 +43,7 @@
                                 {{ position.cost | currency }}
                             </td>
                             <td class="text-center py-3">
-                                <button 
-                                    type="button" 
-                                    class="btn btn-sm btn-outline-info btn-details"
-                                    (click)="toggleDetails(position.ticker)">
-                                    <i class="bi" [class.bi-chevron-down]="!isDetailsVisible(position.ticker)" [class.bi-chevron-up]="isDetailsVisible(position.ticker)"></i>
-                                    Details
-                                </button>
+                                <i class="bi" [class.bi-chevron-down]="!isDetailsVisible(position.ticker)" [class.bi-chevron-up]="isDetailsVisible(position.ticker)"></i>
                             </td>
                         </tr>
                         @if (isDetailsVisible(position.ticker)) {
