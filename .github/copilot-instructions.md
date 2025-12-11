@@ -24,6 +24,13 @@ src/migrations     → F# database migration utilities
 
 ## Critical Patterns
 
+### UI Patterns
+
+- **HTML Structure**: Use Bootstrap 5 components for consistency
+- **CSS Classes**: Use as many built-in Bootstrap classes as possible
+- **Custom CSS**: Define in `styles.css`, avoid inline styles or component-specific styles that are located in component css files
+- **Component-specific styles**: Use sparingly, define in `styles.css` if absolutely necessary
+
 ### Event Sourcing Architecture
 - In C#, all domain entities inherit from `Aggregate<T>` (C#) and emit `AggregateEvent` objects:
 
@@ -57,12 +64,6 @@ public class OwnedStock : Aggregate<OwnedStockState>
 - Components use `inject()` function for dependency injection (Angular 14+ pattern)
 - API calls return Observables; use `.subscribe()` or `async` pipe
 - Chart.js for visualizations, Bootstrap 5 for styling
-
-### Important information on frontend styles
-
-- **CSS Classes**: Use as many built-in Bootstrap classes as possible
-- **Custom CSS**: Define in `styles.css`, avoid inline styles or component-specific styles that are located in component css files
-- **Component-specific styles**: Use sparingly, define in `styles.css` if necessary
 
 ## Developer Workflows
 
