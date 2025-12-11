@@ -45,7 +45,6 @@ export class StockTradingDashboardComponent implements OnInit {
     quotes: Map<string, StockQuote>
     strategies: { key: string; value: string }[] = []
     metricToRender: string
-    metricType: OutcomeValueTypeEnum;
     invested: number = 0
     readonly toggleVisuallyHidden = toggleVisuallyHidden;
     strategyToFilter = "all"

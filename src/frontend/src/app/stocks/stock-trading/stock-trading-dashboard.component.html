@@ -69,8 +69,7 @@
   @if (isActive('positions') && positions) {
     <app-stock-trading-positions
       [brokerageAccount]="brokerageAccount"
-      [positions]=sortedPositions
-      [metricType]="metricType"
+      [positions]="sortedPositions"
       [quotes]="quotes"
     (positionChanged)="refresh()"></app-stock-trading-positions>
   }
