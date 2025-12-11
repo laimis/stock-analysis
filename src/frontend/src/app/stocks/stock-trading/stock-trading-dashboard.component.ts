@@ -44,30 +44,13 @@ export class StockTradingDashboardComponent implements OnInit {
     errors: string[]
     quotes: Map<string, StockQuote>
     strategies: { key: string; value: string }[] = []
-    metricToRender: string
     invested: number = 0
     readonly toggleVisuallyHidden = toggleVisuallyHidden;
     strategyToFilter = "all"
     private NONE = ""
     private SHORTS = "shorts"
     private LONGS = "longs"
-    private RR = "rr"
-    private UnrealizedRR = "unrealizedRR"
-    sortOptions: { name: string; value: string }[] = [
-        {value: this.RR, name: "R/R"},
-        {value: this.UnrealizedRR, name: "Unrealized R/R"},
-        {value: "pl", name: "P/L"},
-        {value: "plPercent", name: "P/L %"},
-        {value: "plUnrealized", name: "Unrealized P/L"},
-        {value: "plUnrealizedPercent", name: "Unrealized P/L %"},
-        {value: "cost", name: "Cost"},
-        {value: "ticker", name: "Ticker"},
-        {value: "daysSinceLastTransaction", name: "Days Since Last Transaction"},
-        {value: "riskedAmount", name: "Risked Amount"},
-        {value: "riskedAmountFromStop", name: "Risked Amount from Stop"},
-        {value: "percentToStopFromCost", name: "% to Stop from Cost"},
-        {value: "daysHeld", name: "Days Held"},
-    ]
+    
 
     ngOnInit() {
         this.route.params.subscribe(param => {
@@ -120,8 +103,6 @@ export class StockTradingDashboardComponent implements OnInit {
     }
 
     updatePositions() {
-
-        console.log(this.metricToRender)
 
         this.sortedPositions = this.positions
             .filter(p => {
@@ -184,8 +165,6 @@ export class StockTradingDashboardComponent implements OnInit {
             this.strategies = this.strategies.concat(
                 stratsWithCounts
             )
-
-            this.metricToRender = this.UnrealizedRR
 
             this.updatePositions()
 
