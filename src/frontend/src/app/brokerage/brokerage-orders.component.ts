@@ -19,7 +19,6 @@ let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
 @Component({
     selector: 'app-brokerage-orders',
     templateUrl: './brokerage-orders.component.html',
-    styleUrls: ['./brokerage-orders.component.css'],
     imports: [
     NgClass,
     StockLinkAndTradingviewLinkComponent,
