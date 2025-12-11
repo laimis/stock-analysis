@@ -4,6 +4,8 @@ import {CurrencyPipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 import {toggleVisuallyHidden} from "../../services/utils";
 import { StockTradingPositionComponent } from "./stock-trading-position.component";
 import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
+import { TimeAgoPipe } from '../../services/time-ago.pipe';
+import { ParsedDatePipe } from '../../services/parsedDate.filter';
 
 
 @Component({
@@ -11,7 +13,7 @@ import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stoc
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass]
+    imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass, TimeAgoPipe, ParsedDatePipe]
 })
 export class StockTradingPositionsComponent {
     
@@ -125,6 +127,10 @@ export class StockTradingPositionsComponent {
                 case 'cost':
                     aValue = a.cost;
                     bValue = b.cost;
+                    break;
+                case 'lastTransaction':
+                    aValue = new Date(a.lastTransaction).getTime();
+                    bValue = new Date(b.lastTransaction).getTime();
                     break;
                 default:
                     return 0;

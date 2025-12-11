@@ -695,6 +695,11 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
             |> _.Date
                 
         DateTimeOffset.UtcNow.Subtract(date).TotalDays |> int
+
+    member this.LastTransaction =
+        match stockPosition.ShareTransactions with
+        | [] -> None
+        | _ -> stockPosition.ShareTransactions |> List.last |> fun x -> Some x.Date
         
     member this.Profit = profit + dividendTotal + feeTotal
     
