@@ -1,9 +1,8 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { BrokerageAccount, OutcomeValueTypeEnum, StockPosition, StockQuote} from '../../services/stocks.service';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { BrokerageAccount, StockPosition, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 import {toggleVisuallyHidden} from "../../services/utils";
 import { StockTradingPositionComponent } from "./stock-trading-position.component";
-import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
 import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
 
 
@@ -17,7 +16,15 @@ import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stoc
 export class StockTradingPositionsComponent {
     
     @Input()
-    positions: StockPosition[] = [];
+    set positions(value: StockPosition[]) {
+        this._positions = value;
+        this.applySorting();
+    }
+    get positions(): StockPosition[] {
+        return this._positions;
+    }
+    private _positions: StockPosition[] = [];
+    
     @Input()
     brokerageAccount: BrokerageAccount | null = null;
     @Input()
@@ -27,7 +34,7 @@ export class StockTradingPositionsComponent {
     positionChanged = new EventEmitter()
 
     private _visibleDetails: Set<string> = new Set<string>();
-    sortColumn: string = '';
+    sortColumn: string = 'cost';
     sortDirection: 'asc' | 'desc' = 'desc';
 
     toggleVisibility(elem: HTMLElement) {
@@ -90,11 +97,15 @@ export class StockTradingPositionsComponent {
             this.sortDirection = 'desc';
         }
 
-        this.positions = [...this.positions].sort((a, b) => {
+        this.applySorting();
+    }
+
+    private applySorting() {
+        this._positions = [...this._positions].sort((a, b) => {
             let aValue: any;
             let bValue: any;
 
-            switch (column) {
+            switch (this.sortColumn) {
                 case 'ticker':
                     aValue = a.ticker;
                     bValue = b.ticker;
