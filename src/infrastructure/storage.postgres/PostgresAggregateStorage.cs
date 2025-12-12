@@ -35,13 +35,49 @@ namespace storage.postgres
 
         public async Task DeleteAggregates(string entity, UserId userId, IDbTransaction? outsideTransaction = null)
         {
-            using var db = outsideTransaction?.Connection ?? GetConnection();
-            using var tx = outsideTransaction ?? db.BeginTransaction();
-            await db.ExecuteAsync(
-                @"DELETE FROM events WHERE entity = :entity AND userId = :userId",
-                new { userId = userId.Item, entity }
-            );
-            tx.Commit();
+            IDbConnection db;
+            IDbTransaction tx;
+            bool ownsConnection = outsideTransaction == null;
+            
+            if (outsideTransaction != null)
+            {
+                db = outsideTransaction.Connection!;
+                tx = outsideTransaction;
+            }
+            else
+            {
+                db = GetConnection();
+                tx = db.BeginTransaction();
+            }
+
+            try
+            {
+                await db.ExecuteAsync(
+                    @"DELETE FROM events WHERE entity = :entity AND userId = :userId",
+                    new { userId = userId.Item, entity }
+                );
+                
+                if (ownsConnection)
+                {
+                    tx.Commit();
+                }
+            }
+            catch
+            {
+                if (ownsConnection)
+                {
+                    tx?.Rollback();
+                }
+                throw;
+            }
+            finally
+            {
+                if (ownsConnection)
+                {
+                    tx?.Dispose();
+                    db?.Dispose();
+                }
+            }
         }
 
         public async Task DeleteAggregate(string entity, Guid aggregateId, UserId userId)
@@ -80,36 +116,70 @@ namespace storage.postgres
         private async Task SaveEventsAsyncInternal(IAggregate agg, int fromVersion, string entity, UserId userId,
             IDbTransaction? outsideTransaction = null)
         {
-            using var db = outsideTransaction?.Connection ?? GetConnection();
-            int version = fromVersion;
-
-            var eventsToBlast = new List<AggregateEvent>();
-
-            using var tx = outsideTransaction ?? db.BeginTransaction();
-            foreach (var e in agg.Events.Skip(fromVersion))
+            IDbConnection db;
+            IDbTransaction tx;
+            bool ownsConnection = outsideTransaction == null;
+            
+            if (outsideTransaction != null)
             {
-                var se = new StoredAggregateEvent
-                {
-                    Entity = entity,
-                    Event = e,
-                    Key = e.Id.ToString(),
-                    UserId = userId.Item,
-                    AggregateId = e.AggregateId.ToString(),
-                    Created = DateTimeOffset.UtcNow,
-                    Version = ++version
-                };
-
-                var query = @"INSERT INTO events (entity, key, aggregateid, userid, created, version, eventjson) VALUES
-						(@Entity, @Key, @AggregateId, @UserId, @Created, @Version, @EventJson)";
-
-                await db.ExecuteAsync(query, se);
-
-                eventsToBlast.Add(e);
+                db = outsideTransaction.Connection!;
+                tx = outsideTransaction;
+            }
+            else
+            {
+                db = GetConnection();
+                tx = db.BeginTransaction();
             }
 
-            await _outbox.AddEvents(eventsToBlast, tx);
+            try
+            {
+                int version = fromVersion;
+                var eventsToBlast = new List<AggregateEvent>();
 
-            tx.Commit();
+                foreach (var e in agg.Events.Skip(fromVersion))
+                {
+                    var se = new StoredAggregateEvent
+                    {
+                        Entity = entity,
+                        Event = e,
+                        Key = e.Id.ToString(),
+                        UserId = userId.Item,
+                        AggregateId = e.AggregateId.ToString(),
+                        Created = DateTimeOffset.UtcNow,
+                        Version = ++version
+                    };
+
+                    var query = @"INSERT INTO events (entity, key, aggregateid, userid, created, version, eventjson) VALUES
+						(@Entity, @Key, @AggregateId, @UserId, @Created, @Version, @EventJson)";
+
+                    await db.ExecuteAsync(query, se);
+
+                    eventsToBlast.Add(e);
+                }
+
+                await _outbox.AddEvents(eventsToBlast, tx);
+
+                if (ownsConnection)
+                {
+                    tx.Commit();
+                }
+            }
+            catch
+            {
+                if (ownsConnection)
+                {
+                    tx?.Rollback();
+                }
+                throw;
+            }
+            finally
+            {
+                if (ownsConnection)
+                {
+                    tx?.Dispose();
+                    db?.Dispose();
+                }
+            }
         }
 
         public Task SaveEventsAsync(IAggregate agg, string entity, UserId userId, IDbTransaction? outsideTransaction = null)

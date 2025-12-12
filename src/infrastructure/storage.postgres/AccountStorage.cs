@@ -55,11 +55,21 @@ namespace storage.postgres
             using var db = GetConnection();
             using var tx = db.BeginTransaction();
             
-            var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
+            try
+            {
+                var query = @"INSERT INTO users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING;";
 
-            await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
+                await db.ExecuteAsync(query, new {id = u.State.Id.ToString(), email = u.State.Email});
 
-            await SaveEventsAsync(u, _user_entity, UserId.NewUserId(u.State.Id), outsideTransaction: tx);
+                await SaveEventsAsync(u, _user_entity, UserId.NewUserId(u.State.Id), outsideTransaction: tx);
+                
+                tx.Commit();
+            }
+            catch
+            {
+                tx?.Rollback();
+                throw;
+            }
         }
 
         public async Task Delete(User user)
@@ -67,10 +77,20 @@ namespace storage.postgres
             using var db = GetConnection();
             using var tx = db.BeginTransaction();
             
-            var query = @"DELETE FROM users WHERE id = :id";
-            await db.ExecuteAsync(query, new {id = user.Id.ToString()});
-            
-            await DeleteAggregates(_user_entity, UserId.NewUserId(user.Id), outsideTransaction: tx);
+            try
+            {
+                var query = @"DELETE FROM users WHERE id = :id";
+                await db.ExecuteAsync(query, new {id = user.Id.ToString()});
+                
+                await DeleteAggregates(_user_entity, UserId.NewUserId(user.Id), outsideTransaction: tx);
+                
+                tx.Commit();
+            }
+            catch
+            {
+                tx?.Rollback();
+                throw;
+            }
         }
 
         public async Task SaveUserAssociation(ProcessIdToUserAssociation r)
@@ -217,27 +237,35 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
 
             using var tx = db.BeginTransaction();
             
-            foreach (var order in orders)
+            try
             {
-                await db.ExecuteAsync(query, new
+                foreach (var order in orders)
                 {
-                    orderid = order.OrderId,
-                    price = order.Price,
-                    quantity = order.Quantity,
-                    status = GetOrderStatusString(order.Status),
-                    ticker = order.Ticker.Value,
-                    ordertype = GetOrderTypeString(order.Type),
-                    instruction = GetOrderInstructionString(order.Instruction),
-                    assettype = GetAssetTypeString(AssetType.Equity),
-                    executiontime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExecutionTime) ? null : order.ExecutionTime.Value.ToString("u"),
-                    enteredtime = order.EnteredTime.ToString("u"),
-                    expirationtime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExpirationTime) ? null : order.ExpirationTime.Value.ToString("u"),
-                    canbecancelled = order.CanBeCancelled,
-                    userId = userId.Item,
-                    modified = DateTimeOffset.UtcNow
-                });
+                    await db.ExecuteAsync(query, new
+                    {
+                        orderid = order.OrderId,
+                        price = order.Price,
+                        quantity = order.Quantity,
+                        status = GetOrderStatusString(order.Status),
+                        ticker = order.Ticker.Value,
+                        ordertype = GetOrderTypeString(order.Type),
+                        instruction = GetOrderInstructionString(order.Instruction),
+                        assettype = GetAssetTypeString(AssetType.Equity),
+                        executiontime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExecutionTime) ? null : order.ExecutionTime.Value.ToString("u"),
+                        enteredtime = order.EnteredTime.ToString("u"),
+                        expirationtime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExpirationTime) ? null : order.ExpirationTime.Value.ToString("u"),
+                        canbecancelled = order.CanBeCancelled,
+                        userId = userId.Item,
+                        modified = DateTimeOffset.UtcNow
+                    });
+                }
+                tx.Commit();
             }
-            tx.Commit();
+            catch
+            {
+                tx?.Rollback();
+                throw;
+            }
         }
 
         public Task SaveAccountBrokerageOptionOrders(UserId userId, IEnumerable<OptionOrder> orders)
@@ -324,12 +352,20 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
         
             using var tx = db.BeginTransaction();
         
-            foreach (var transaction in transactions)
+            try
             {
-                await db.ExecuteAsync(query, ToAccountBrokerageTransactionRecord(userId, transaction));
+                foreach (var transaction in transactions)
+                {
+                    await db.ExecuteAsync(query, ToAccountBrokerageTransactionRecord(userId, transaction));
+                }
+            
+                tx.Commit();
             }
-        
-            tx.Commit();
+            catch
+            {
+                tx?.Rollback();
+                throw;
+            }
         }
         
         public async Task SaveAccountBrokerageTransactions(UserId userId, AccountTransaction[] transactions)
@@ -350,12 +386,20 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
         
             using var tx = db.BeginTransaction();
         
-            foreach (var transaction in transactions)
+            try
             {
-                await db.ExecuteAsync(query, ToAccountBrokerageTransactionRecord(userId, transaction));
+                foreach (var transaction in transactions)
+                {
+                    await db.ExecuteAsync(query, ToAccountBrokerageTransactionRecord(userId, transaction));
+                }
+            
+                tx.Commit();
             }
-        
-            tx.Commit();
+            catch
+            {
+                tx?.Rollback();
+                throw;
+            }
         }
         
         public async Task<IEnumerable<AccountTransaction>> GetAccountBrokerageTransactions(UserId userId)
