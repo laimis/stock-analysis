@@ -148,6 +148,7 @@
 }
 @if (stock && stockOwnership && isActive('stocks')) {
   <app-stock-ownership
+    [brokerageAccount]="account"
     [positions]=stockOwnership.positions
     [quote]="stock.quote"
     [positionChartInformation]="currentPositionChartInfo"
