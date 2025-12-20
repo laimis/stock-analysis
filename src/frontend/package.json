@@ -41,7 +41,7 @@
     "@angular/language-service": "^21.0.6",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@types/jasmine": "~5.1.0",
-    "angular-eslint": "21.0.1",
+    "angular-eslint": "21.1.0",
     "eslint": "^9.28.0",
     "jasmine-core": "~5.1.0",
     "jasmine-spec-reporter": "~5.0.0",
