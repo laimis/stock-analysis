@@ -407,20 +407,20 @@ function createStopPriceDistanceChart(positions: StockPosition[], quotes: Record
 }
 
 function createPositionLabelsPieChart(positions: StockPosition[]) {
-    // Count the frequency of each label with key "strategy"
-    const labelCounts = new Map<string, number>();
+    // Sum the cost for each strategy label
+    const strategyCosts = new Map<string, number>();
     positions.forEach(position => {
         position.labels
             .filter(label => label.key === "strategy")
             .forEach(label => {
-                const currentCount = labelCounts.get(label.value) || 0;
-                labelCounts.set(label.value, currentCount + 1);
+                const currentCost = strategyCosts.get(label.value) || 0;
+                strategyCosts.set(label.value, currentCost + Math.abs(position.cost));
             });
     });
 
-    const pieChartData = Array.from(labelCounts.entries()).map(([label, count]) => ({
+    const pieChartData = Array.from(strategyCosts.entries()).map(([label, cost]) => ({
         label: label,
-        y: count
+        y: cost
     }));
 
     return {
@@ -436,9 +436,77 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
                 type: "pie",
                 showInLegend: true,
                 legendText: "{label}",
-                indexLabel: "{label}: {y}",
+                indexLabel: "{label}: ${y}",
                 indexLabelPlacement: "outside",
                 dataPoints: pieChartData
+            }
+        ]
+    };
+}
+
+function createProfitByStrategyChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
+    // Group positions by strategy and calculate realized and unrealized profit
+    const strategyProfits = new Map<string, { realized: number, unrealized: number }>();
+    
+    positions.forEach(position => {
+        position.labels
+            .filter(label => label.key === "strategy")
+            .forEach(label => {
+                const current = strategyProfits.get(label.value) || { realized: 0, unrealized: 0 };
+                const quote = quotes[position.ticker];
+                const totalProfit = unrealizedProfit(position, quote);
+                const realizedProfit = position.profit;
+                const unrealizedProfitAmt = totalProfit - realizedProfit;
+                
+                strategyProfits.set(label.value, {
+                    realized: current.realized + realizedProfit,
+                    unrealized: current.unrealized + unrealizedProfitAmt
+                });
+            });
+    });
+
+    const chartData = Array.from(strategyProfits.entries())
+        .map(([strategy, profits]) => ({
+            label: strategy,
+            realized: profits.realized,
+            unrealized: profits.unrealized
+        }))
+        .sort((a, b) => (a.realized + a.unrealized) - (b.realized + b.unrealized));
+
+    return {
+        animationEnabled: false,
+        exportEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Profit by Strategy",
+            fontSize: 20
+        },
+        axisX: {
+            title: "Strategy",
+            labelAngle: -45,
+            interval: 1,
+            titleFontSize: 12,
+            labelFontSize: 10
+        },
+        axisY: {
+            title: "Profit",
+            gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
+            labelFormatter: function(e: any) {
+                return "$" + e.value.toFixed(2);
+            }
+        },
+        data: [
+            {
+                type: "stackedBar",
+                name: "Realized Profit",
+                dataPoints: chartData.map(data => ({ label: data.label, y: data.realized }))
+            },
+            {
+                type: "stackedBar",
+                name: "Unrealized Profit",
+                dataPoints: chartData.map(data => ({ label: data.label, y: data.unrealized }))
             }
         ]
     };
@@ -746,6 +814,7 @@ export class StockTradingChartsComponent {
                 createPositionMarketValuePieChart(filteredPositions, this._quotes),
                 createPositionsByMarketValueChart(filteredPositions, this._quotes),
                 createPositionLabelsPieChart(filteredPositions),
+                createProfitByStrategyChart(filteredPositions, this._quotes),
                 createUnrealizedProfitChart(filteredPositions, this._quotes),
                 createDaysHeldVsGainPercentChart(filteredPositions, this._quotes),
                 createStopPriceDistanceChart(filteredPositions, this._quotes),
