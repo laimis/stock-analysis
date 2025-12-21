@@ -30,7 +30,7 @@ export class StockTradingPositionsComponent {
     @Input()
     brokerageAccount: BrokerageAccount | null = null;
     @Input()
-    quotes: Map<string, StockQuote> | null = null;
+    quotes: Record<string, StockQuote> | null = null;
     
     @Output()
     positionChanged = new EventEmitter()

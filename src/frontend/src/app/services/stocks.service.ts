@@ -1015,7 +1015,7 @@ export interface StockTradingPositions {
     current: StockPosition[]
     violations: StockViolation[]
     brokerageAccount: BrokerageAccount
-    prices: Map<string, StockQuote>
+    prices: Record<string, StockQuote>
     dailyBalances: BrokerageAccountSnapshot[]
 }
 

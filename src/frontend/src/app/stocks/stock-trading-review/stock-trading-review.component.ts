@@ -50,7 +50,7 @@ export class StockTradingReviewComponent {
     pricesErrors: string[] = []
     positionChartInformation: PositionChartInformation | null = null;
     @Input()
-    quotes: Map<string, StockQuote> | null = null
+    quotes: Record<string, StockQuote> | null = null
     @Input()
     orders: BrokerageStockOrder[] | null = null
     @Output()

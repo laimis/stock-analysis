@@ -9,7 +9,7 @@ import {
     StockTradingPositions,
     StockViolation
 } from '../../services/stocks.service';
-import {GetErrors, GetStockStrategies, isLongTermStrategy, toggleVisuallyHidden} from "../../services/utils";
+import {GetErrors, GetStockStrategies, toggleVisuallyHidden} from "../../services/utils";
 import {StockPositionsService} from "../../services/stockpositions.service";
 import { StockTradingPositionsComponent } from './stock-trading-positions.component';
 import { StockTradingSummaryComponent } from './stock-trading-summary.component';
@@ -42,7 +42,7 @@ export class StockTradingDashboardComponent implements OnInit {
     violations: StockViolation[]
     brokerageAccount: BrokerageAccount
     errors: string[]
-    quotes: Map<string, StockQuote>
+    quotes: Record<string, StockQuote>
     strategies: { key: string; value: string }[] = []
     invested: number = 0
     readonly toggleVisuallyHidden = toggleVisuallyHidden;

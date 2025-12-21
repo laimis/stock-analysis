@@ -1,4 +1,21 @@
 <div class="container">
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <label for="excludedTickers" class="form-label">Exclude Tickers from Charts (comma-separated)</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="excludedTickers" 
+                        placeholder="e.g., USFR, SPY, AAPL"
+                        [(ngModel)]="excludedTickersInput"
+                        (input)="onExcludedTickersChange()">
+                    <small class="form-text text-muted">Enter ticker symbols separated by commas to exclude them from all charts</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @for (option of chartOptions; track option) {
         <div class="row">

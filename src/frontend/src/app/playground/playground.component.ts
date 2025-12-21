@@ -23,7 +23,7 @@ function unrealizedProfit(position: StockPosition, quote: StockQuote) {
     return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
 }
 
-function createProfitScatter(entries: StockPosition[], quotes: Map<string, StockQuote>) {
+function createProfitScatter(entries: StockPosition[], quotes: Record<string, StockQuote>) {
     const mapped = entries.map(p => {
         return {x: p.daysHeld, y: unrealizedProfit(p, quotes[p.ticker]), label: p.ticker}
     })

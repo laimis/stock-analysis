@@ -37,7 +37,7 @@ export class StockTradingSummaryComponent {
     totalShortCost: number = 0;
     totalProfit: number = 0;
     @Input()
-    quotes: Map<string, StockQuote> = new Map<string, StockQuote>();
+    quotes: Record<string, StockQuote> = {};
     @Input()
     brokerageAccount: BrokerageAccount | null = null;
     @Input()

@@ -2,10 +2,18 @@ import {Component, Input} from '@angular/core';
 import {StockPosition, StockQuote} from "../../services/stocks.service";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
+import {FormsModule} from '@angular/forms';
 
 const scatterPointMarkerSize = 12;
 
-function generateHistogramData(data: number[], numIntervals: number) {
+interface HistogramResult {
+    histogramData: Array<{x: number, y: number}>;
+    min: number;
+    max: number;
+    interval: number;
+}
+
+function generateHistogramData(data: number[], numIntervals: number): HistogramResult {
     const histogramData = [];
     const minPercentage = Math.min(...data);
     const maxPercentage = Math.max(...data);
@@ -18,27 +26,32 @@ function generateHistogramData(data: number[], numIntervals: number) {
         const count = data.filter(percentage => percentage >= lowerBound && percentage < upperBound).length;
         histogramData.push({ x: lowerBound, y: count });
     }
-    return [histogramData, minPercentage, maxPercentage, intervalSize];
+    return { histogramData, min: minPercentage, max: maxPercentage, interval: intervalSize };
 }
 
-function unrealizedProfit(position: StockPosition, quote: StockQuote) {
-    return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares
+function unrealizedProfit(position: StockPosition, quote: StockQuote | undefined): number {
+    if (!quote) {
+        return 0;
+    }
+    return position.profit + (quote.price - position.averageCostPerShare) * position.numberOfShares;
 }
 
-function createUnrealizedProfitChart(entries: StockPosition[], quotes: Map<string, StockQuote>) {
+function createUnrealizedProfitChart(entries: StockPosition[], quotes: Record<string, StockQuote>) {
     const mapped = entries.map(p => {
+        const quote = quotes[p.ticker];
+        const profit = unrealizedProfit(p, quote);
         return {
             x: p.daysHeld,
-            y: unrealizedProfit(p, quotes[p.ticker]!),
+            y: profit,
             label: p.ticker,
-            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${unrealizedProfit(p, quotes[p.ticker]!).toFixed(2)}`,
-            indexLabel: '{label}', // Add the ticker symbol as the index label
-            indexLabelFontSize: 12, // Adjust the font size of the index label
-            // indexLabelFontColor: "black" // Adjust the font color of the index label
-        }
-    })
+            toolTipContent: `<strong>${p.ticker}</strong><br/>Days Held: ${p.daysHeld}<br/>Unrealized Gain: $${profit.toFixed(2)}`,
+            indexLabel: '{label}',
+            indexLabelFontSize: 12,
+        };
+    });
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -47,7 +60,6 @@ function createUnrealizedProfitChart(entries: StockPosition[], quotes: Map<strin
         axisX: {
             title: "Days Held",
             gridThickness: 0.1,
-            
         },
         axisY: {
             title: "Profit",
@@ -63,28 +75,32 @@ function createUnrealizedProfitChart(entries: StockPosition[], quotes: Map<strin
                 dataPoints: mapped
             }
         ]
+    };
+}
+
+function unrealizedRR(p: StockPosition, quote: StockQuote | undefined): number {
+    if (!quote) {
+        return 0;
     }
+    return (p.profit + p.numberOfShares * (quote.price - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount);
 }
 
-function unrealizedRR(p: StockPosition, quote: StockQuote) {
-    return (p.profit + p.numberOfShares * (quote.price - p.averageCostPerShare)) / (p.riskedAmount === 0 ? 40 : p.riskedAmount)
-}
-
-function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
-    
+function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
     const chartData = positions.map(position => {
-        const unrealizedGainPercent = unrealizedGainPercentage(position, quotes[position.ticker]!);
+        const quote = quotes[position.ticker];
+        const unrealizedGainPercent = unrealizedGainPercentage(position, quote);
         return {
             x: position.daysHeld,
             y: unrealizedGainPercent,
             label: position.ticker,
-            indexLabel: '{label}', // Add the ticker symbol as the index label
-            indexLabelFontSize: 12, // Adjust the font size of the index label
+            indexLabel: '{label}',
+            indexLabelFontSize: 12,
             toolTipContent: `<strong>${position.ticker}</strong><br/>Days Held: ${position.daysHeld}<br/>Unrealized Gain: ${unrealizedGainPercent.toFixed(2)}%`
         };
     });
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -113,12 +129,13 @@ function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Ma
     };
 }
 
-function createProfitDistributionChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
-    const profitData = positions.map(position => unrealizedProfit(position, quotes[position.ticker]!));
+function createProfitDistributionChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
+    const profitData = positions.map(position => unrealizedProfit(position, quotes[position.ticker]));
 
-    const [histogramData, min, max, interval] = generateHistogramData(profitData, 10)
+    const { histogramData, min, max, interval } = generateHistogramData(profitData, 10);
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -148,13 +165,13 @@ function createProfitDistributionChart(positions: StockPosition[], quotes: Map<s
 }
 
 function createPositionSizePieChart(positions: StockPosition[]) {
-    
     const pieChartData = positions.map(position => ({
         y: Math.abs(position.cost),
         label: position.ticker
     })).sort((a, b) => b.y - a.y);
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -176,9 +193,10 @@ function createPositionSizePieChart(positions: StockPosition[]) {
 
 function createDaysHeldDistributionChart(positions: StockPosition[]) {
     const data = positions.map(position => position.daysHeld);
-    const [histogramData, min, max, interval] = generateHistogramData(data, 10)
+    const { histogramData, min, max, interval } = generateHistogramData(data, 10);
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -204,21 +222,26 @@ function createDaysHeldDistributionChart(positions: StockPosition[]) {
     };
 }
 
-function unrealizedGainPercentage(position: StockPosition, quote: StockQuote) {
+function unrealizedGainPercentage(position: StockPosition, quote: StockQuote | undefined): number {
+    if (!quote) {
+        return 0;
+    }
+
     // need abs for short positions
     return position.isShort ?
         (position.averageCostPerShare - quote.price) / position.averageCostPerShare * 100
         :
-        (quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100
+        (quote.price - position.averageCostPerShare) / position.averageCostPerShare * 100;
 }
 
-function createUnrealizedGainPercentageDistributionChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
+function createUnrealizedGainPercentageDistributionChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
     // Calculate unrealized gain percentage for each position
-    const gainPercentageData = positions.map(position => unrealizedGainPercentage(position, quotes[position.ticker]!));
+    const gainPercentageData = positions.map(position => unrealizedGainPercentage(position, quotes[position.ticker]));
 
-    const [histogramData, min, max, interval] = generateHistogramData(gainPercentageData, 10)
+    const { histogramData, min, max, interval } = generateHistogramData(gainPercentageData, 10);
     
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -247,13 +270,14 @@ function createUnrealizedGainPercentageDistributionChart(positions: StockPositio
     };
 }
 
-function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
+function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
     // Calculate unrealized RR for each position
-    const rrData = positions.map(position => unrealizedRR(position, quotes[position.ticker]!));
+    const rrData = positions.map(position => unrealizedRR(position, quotes[position.ticker]));
 
-    const [histogramData, min, max, interval] = generateHistogramData(rrData, 10)
+    const { histogramData, min, max, interval } = generateHistogramData(rrData, 10);
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -282,24 +306,33 @@ function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes:
     };
 }
 
-function stopPriceDistance(position: StockPosition, quote: StockQuote) {
-    let referencePrice = position.stopPrice ? position.stopPrice : position.averageCostPerShare;
+function stopPriceDistance(position: StockPosition, quote: StockQuote | undefined): number {
+    if (!quote) {
+        return 0;
+    }
+    const referencePrice = position.stopPrice ? position.stopPrice : position.averageCostPerShare;
     // need abs for short positions
     return Math.abs( ((quote.price - referencePrice) / quote.price) * 100 );
 }
 
-function createStopPriceDistanceChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
+function createStopPriceDistanceChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
     // Calculate stop price distance and unrealized gain percentage for each position
-    const scatterData = positions.map(position => ({
-        x: stopPriceDistance(position, quotes[position.ticker]!),
-        y: unrealizedGainPercentage(position, quotes[position.ticker]!),
-        label: position.ticker,
-        indexLabel: '{label}', // Add the ticker symbol as the index label
-        indexLabelFontSize: 12, // Adjust the font size of the index label
-        toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopPriceDistance(position, quotes[position.ticker]!).toFixed(2)}%<br/>Unrealized Gain %: ${unrealizedGainPercentage(position, quotes[position.ticker]!).toFixed(2)}%`
-    }));
+    const scatterData = positions.map(position => {
+        const quote = quotes[position.ticker];
+        const stopDist = stopPriceDistance(position, quote);
+        const gainPct = unrealizedGainPercentage(position, quote);
+        return {
+            x: stopDist,
+            y: gainPct,
+            label: position.ticker,
+            indexLabel: '{label}',
+            indexLabelFontSize: 12,
+            toolTipContent: `<strong>${position.ticker}</strong><br/>Stop Distance: ${stopDist.toFixed(2)}%<br/>Unrealized Gain %: ${gainPct.toFixed(2)}%`
+        };
+    });
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -335,7 +368,7 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
     const labelCounts = new Map<string, number>();
     positions.forEach(position => {
         position.labels.forEach(label => {
-            const currentCount = labelCounts[label.value] || 0;
+            const currentCount = labelCounts.get(label.value) || 0;
             labelCounts.set(label.value, currentCount + 1);
         });
     });
@@ -346,6 +379,7 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
     }));
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -364,10 +398,11 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
     };
 }
 
-function createRealizedVsUnrealizedProfitChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
+function createRealizedVsUnrealizedProfitChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
     const chartData = positions.map(position => {
         const realizedProfit = position.profit;
-        const unrealizedProfitAmt = unrealizedProfit(position, quotes[position.ticker]!) - realizedProfit;
+        const quote = quotes[position.ticker];
+        const unrealizedProfitAmt = unrealizedProfit(position, quote) - realizedProfit;
         return {
             label: position.ticker,
             realized: realizedProfit,
@@ -376,6 +411,7 @@ function createRealizedVsUnrealizedProfitChart(positions: StockPosition[], quote
     }).sort((a, b) => (a.realized + a.unrealized) - (b.realized + b.unrealized));
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -418,6 +454,7 @@ function createPositionsByCostChart(positions: StockPosition[]) {
     }));
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -444,12 +481,15 @@ function createPositionsByCostChart(positions: StockPosition[]) {
     };
 }
 
-function createPositionsByGainsChart(positions: StockPosition[], quotes: Map<string, StockQuote>) {
+function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
     // Calculate unrealized gains for each position and sort from smallest to largest
-    const positionsWithGains = positions.map(position => ({
-        ...position,
-        unrealizedGain: unrealizedProfit(position, quotes[position.ticker]!) - position.profit
-    }));
+    const positionsWithGains = positions.map(position => {
+        const quote = quotes[position.ticker];
+        return {
+            ...position,
+            unrealizedGain: unrealizedProfit(position, quote) - position.profit
+        };
+    });
     const sortedPositions = [...positionsWithGains].sort((a, b) => a.unrealizedGain - b.unrealizedGain);
 
     const chartData = sortedPositions.map(position => ({
@@ -458,6 +498,7 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Map<str
     }));
 
     return {
+        animationEnabled: false,
         exportEnabled: true,
         zoomEnabled: true,
         title: {
@@ -489,17 +530,20 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Map<str
     templateUrl: './stock-trading-charts.component.html',
     styleUrls: ['./stock-trading-charts.component.css'],
     imports: [
-        CanvasJSAngularChartsModule
+        CanvasJSAngularChartsModule,
+        FormsModule
     ]
 })
 export class StockTradingChartsComponent {
 
     chartOptions : any[] = []
+    excludedTickersInput: string = '';
+    private excludedTickers: Set<string> = new Set<string>();
     private _positions: StockPosition[] = [];
-    private _quotes: Map<string, StockQuote> = new Map<string, StockQuote>();
+    private _quotes: Record<string, StockQuote> = {};
     
     @Input()
-    set quotes(value: Map<string, StockQuote>) {
+    set quotes(value: Record<string, StockQuote>) {
         this._quotes = value
         this.generateChartOptions()
     }
@@ -510,21 +554,37 @@ export class StockTradingChartsComponent {
         this.generateChartOptions()
     }
 
+    onExcludedTickersChange() {
+        // Parse comma-separated tickers and normalize to uppercase
+        this.excludedTickers = new Set(
+            this.excludedTickersInput
+                .split(',')
+                .map(ticker => ticker.trim().toUpperCase())
+                .filter(ticker => ticker.length > 0)
+        );
+        this.generateChartOptions();
+    }
+
     private generateChartOptions() {
         if (this._positions && this._quotes) {
+            // Filter out excluded tickers
+            const filteredPositions = this._positions.filter(
+                position => !this.excludedTickers.has(position.ticker.toUpperCase())
+            );
+            
             this.chartOptions = [
-                createUnrealizedProfitChart(this._positions, this._quotes),
-                createDaysHeldVsGainPercentChart(this._positions, this._quotes),
-                createStopPriceDistanceChart(this._positions, this._quotes),
-                createPositionSizePieChart(this._positions),
-                createPositionsByCostChart(this._positions),
-                createPositionsByGainsChart(this._positions, this._quotes),
-                createPositionLabelsPieChart(this._positions),
-                createRealizedVsUnrealizedProfitChart(this._positions, this._quotes),
-                createUnrealizedGainPercentageDistributionChart(this._positions, this._quotes),
-                createUnrealizedRRDistributionChart(this._positions, this._quotes),
-                createProfitDistributionChart(this._positions, this._quotes),
-                createDaysHeldDistributionChart(this._positions),
+                createUnrealizedProfitChart(filteredPositions, this._quotes),
+                createDaysHeldVsGainPercentChart(filteredPositions, this._quotes),
+                createStopPriceDistanceChart(filteredPositions, this._quotes),
+                createPositionSizePieChart(filteredPositions),
+                createPositionsByCostChart(filteredPositions),
+                createPositionsByGainsChart(filteredPositions, this._quotes),
+                createPositionLabelsPieChart(filteredPositions),
+                createRealizedVsUnrealizedProfitChart(filteredPositions, this._quotes),
+                createUnrealizedGainPercentageDistributionChart(filteredPositions, this._quotes),
+                createUnrealizedRRDistributionChart(filteredPositions, this._quotes),
+                createProfitDistributionChart(filteredPositions, this._quotes),
+                createDaysHeldDistributionChart(filteredPositions),
             ]
         }
     }
