@@ -156,7 +156,7 @@ function createProfitDistributionChart(positions: StockPosition[], quotes: Recor
         },
         data: [
             {
-                type: "column",
+                type: "bar",
                 color: blue,
                 dataPoints: histogramData
             }
@@ -214,7 +214,7 @@ function createDaysHeldDistributionChart(positions: StockPosition[]) {
         },
         data: [
             {
-                type: "column",
+                type: "bar",
                 color: blue,
                 dataPoints: histogramData
             }
@@ -262,7 +262,7 @@ function createUnrealizedGainPercentageDistributionChart(positions: StockPositio
         },
         data: [
             {
-                type: "column",
+                type: "bar",
                 color: blue,
                 dataPoints: histogramData
             }
@@ -298,7 +298,7 @@ function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes:
         },
         data: [
             {
-                type: "column",
+                type: "bar",
                 color: blue,
                 dataPoints: histogramData
             }
@@ -474,7 +474,8 @@ function createPositionsByCostChart(positions: StockPosition[]) {
         },
         data: [
             {
-                type: "column",
+                type: "bar",
+                color: blue,
                 dataPoints: chartData
             }
         ]
@@ -518,7 +519,8 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<
         },
         data: [
             {
-                type: "column",
+                type: "bar",
+                color: blue,
                 dataPoints: chartData
             }
         ]
@@ -537,7 +539,7 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<
 export class StockTradingChartsComponent {
 
     chartOptions : any[] = []
-    excludedTickersInput: string = '';
+    allTickers: string[] = [];
     private excludedTickers: Set<string> = new Set<string>();
     private _positions: StockPosition[] = [];
     private _quotes: Record<string, StockQuote> = {};
@@ -551,18 +553,28 @@ export class StockTradingChartsComponent {
     @Input()
     set positions(positions: StockPosition[]) {
         this._positions = positions
+        this.updateAllTickers();
         this.generateChartOptions()
     }
 
-    onExcludedTickersChange() {
-        // Parse comma-separated tickers and normalize to uppercase
-        this.excludedTickers = new Set(
-            this.excludedTickersInput
-                .split(',')
-                .map(ticker => ticker.trim().toUpperCase())
-                .filter(ticker => ticker.length > 0)
-        );
+    private updateAllTickers() {
+        // Extract all unique tickers from positions and sort them
+        const tickerSet = new Set(this._positions.map(p => p.ticker.toUpperCase()));
+        this.allTickers = Array.from(tickerSet).sort();
+    }
+
+    toggleTicker(ticker: string) {
+        const upperTicker = ticker.toUpperCase();
+        if (this.excludedTickers.has(upperTicker)) {
+            this.excludedTickers.delete(upperTicker);
+        } else {
+            this.excludedTickers.add(upperTicker);
+        }
         this.generateChartOptions();
+    }
+
+    isTickerExcluded(ticker: string): boolean {
+        return this.excludedTickers.has(ticker.toUpperCase());
     }
 
     private generateChartOptions() {

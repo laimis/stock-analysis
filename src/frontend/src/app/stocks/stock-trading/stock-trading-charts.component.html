@@ -3,15 +3,23 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <label for="excludedTickers" class="form-label">Exclude Tickers from Charts (comma-separated)</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="excludedTickers" 
-                        placeholder="e.g., USFR, SPY, AAPL"
-                        [(ngModel)]="excludedTickersInput"
-                        (input)="onExcludedTickersChange()">
-                    <small class="form-text text-muted">Enter ticker symbols separated by commas to exclude them from all charts</small>
+                    <label class="form-label">Exclude Tickers from Charts</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        @for (ticker of allTickers; track ticker) {
+                            <button 
+                                type="button"
+                                class="btn btn-sm"
+                                [class.btn-outline-secondary]="!isTickerExcluded(ticker)"
+                                [class.btn-danger]="isTickerExcluded(ticker)"
+                                (click)="toggleTicker(ticker)">
+                                {{ ticker }}
+                                @if (isTickerExcluded(ticker)) {
+                                    <span>✕</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                    <small class="form-text text-muted">Click tickers to exclude/include them from all charts</small>
                 </div>
             </div>
         </div>
