@@ -56,14 +56,19 @@ function createUnrealizedProfitChart(entries: StockPosition[], quotes: Record<st
         zoomEnabled: true,
         title: {
             text: "Unrealized Profit vs Days Held",
+            fontSize: 20
         },
         axisX: {
             title: "Days Held",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         axisY: {
             title: "Profit",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         dataPointWidth: 10,
         data: [
@@ -105,15 +110,20 @@ function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Re
         zoomEnabled: true,
         title: {
             text: "Days Held vs. Unrealized Gain %",
+            fontSize: 20
         },
         dataPointWidth: 10,
         axisX: {
             title: "Days Held",
-            gridThickness: 0.1
+            gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         axisY: {
             title: "Unrealized Gain %",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
@@ -140,12 +150,15 @@ function createProfitDistributionChart(positions: StockPosition[], quotes: Recor
         zoomEnabled: true,
         title: {
             text: "Unrealized Profit Distribution",
+            fontSize: 20
         },
         axisX: {
             title: "Profit",
             minimum: min,
             maximum: max,
             interval: interval,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return "$" + e.value.toFixed(2);
             }
@@ -153,6 +166,8 @@ function createProfitDistributionChart(positions: StockPosition[], quotes: Recor
         axisY: {
             title: "Number of Positions",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         data: [
             {
@@ -165,10 +180,16 @@ function createProfitDistributionChart(positions: StockPosition[], quotes: Recor
 }
 
 function createPositionSizePieChart(positions: StockPosition[]) {
-    const pieChartData = positions.map(position => ({
-        y: Math.abs(position.cost),
-        label: position.ticker
-    })).sort((a, b) => b.y - a.y);
+    const totalCost = positions.reduce((sum, position) => sum + Math.abs(position.cost), 0);
+    
+    const pieChartData = positions.map(position => {
+        const absoluteCost = Math.abs(position.cost);
+        const percentage = Math.round((absoluteCost / totalCost) * 100);
+        return {
+            y: percentage,
+            label: position.ticker
+        };
+    }).sort((a, b) => b.y - a.y);
 
     return {
         animationEnabled: false,
@@ -176,15 +197,17 @@ function createPositionSizePieChart(positions: StockPosition[]) {
         zoomEnabled: true,
         title: {
             text: "Position Sizes",
+            fontSize: 20
         },
         data: [
             {
                 type: "pie",
                 showInLegend: true,
                 legendText: "{label}",
-                indexLabel: "{label}: {y}",
+                indexLabel: "{label}: {y}%",
                 indexLabelFontColor: "white",
                 indexLabelPlacement: "inside",
+                yValueFormatString: "#0.##",
                 dataPoints: pieChartData
             }
         ]
@@ -201,16 +224,21 @@ function createDaysHeldDistributionChart(positions: StockPosition[]) {
         zoomEnabled: true,
         title: {
             text: "Days Held Distribution",
+            fontSize: 20
         },
         axisX: {
             title: "Days Held",
             minimum: min,
             maximum: max,
-            interval: interval
+            interval: interval,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         axisY: {
             title: "Number of Positions",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         data: [
             {
@@ -246,12 +274,15 @@ function createUnrealizedGainPercentageDistributionChart(positions: StockPositio
         zoomEnabled: true,
         title: {
             text: "Unrealized Gain Percentage Distribution",
+            fontSize: 20
         },
         axisX: {
             title: "Gain Percentage",
             minimum: min,
             maximum: max,
             interval: interval,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
@@ -259,6 +290,8 @@ function createUnrealizedGainPercentageDistributionChart(positions: StockPositio
         axisY: {
             title: "Number of Positions",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         data: [
             {
@@ -282,12 +315,15 @@ function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes:
         zoomEnabled: true,
         title: {
             text: "Unrealized RR Distribution",
+            fontSize: 20
         },
         axisX: {
             title: "Risk-Reward Ratio",
             minimum: min,
             maximum: max,
             interval: interval,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2);
             }
@@ -295,6 +331,8 @@ function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes:
         axisY: {
             title: "Number of Positions",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         data: [
             {
@@ -337,17 +375,22 @@ function createStopPriceDistanceChart(positions: StockPosition[], quotes: Record
         zoomEnabled: true,
         title: {
             text: "Unrealized Gain % vs Stop Price Distance %",
+            fontSize: 20
         },
         dataPointWidth: 10,
         axisX: {
             title: "Stop Price Distance (%)",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
         },
         axisY: {
             title: "Unrealized Gain %",
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return e.value.toFixed(2) + "%";
             }
@@ -364,13 +407,15 @@ function createStopPriceDistanceChart(positions: StockPosition[], quotes: Record
 }
 
 function createPositionLabelsPieChart(positions: StockPosition[]) {
-    // Count the frequency of each label
+    // Count the frequency of each label with key "strategy"
     const labelCounts = new Map<string, number>();
     positions.forEach(position => {
-        position.labels.forEach(label => {
-            const currentCount = labelCounts.get(label.value) || 0;
-            labelCounts.set(label.value, currentCount + 1);
-        });
+        position.labels
+            .filter(label => label.key === "strategy")
+            .forEach(label => {
+                const currentCount = labelCounts.get(label.value) || 0;
+                labelCounts.set(label.value, currentCount + 1);
+            });
     });
 
     const pieChartData = Array.from(labelCounts.entries()).map(([label, count]) => ({
@@ -383,7 +428,8 @@ function createPositionLabelsPieChart(positions: StockPosition[]) {
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Position Labels",
+            text: "Positions by Strategy",
+            fontSize: 20
         },
         data: [
             {
@@ -416,15 +462,20 @@ function createRealizedVsUnrealizedProfitChart(positions: StockPosition[], quote
         zoomEnabled: true,
         title: {
             text: "Realized vs. Unrealized Profit",
+            fontSize: 20
         },
         axisX: {
             title: "Position",
             labelAngle: -45,
-            interval: 1
+            interval: 1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         axisY: {
             title: "Profit",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return "$" + e.value.toFixed(2);
             }
@@ -458,16 +509,116 @@ function createPositionsByCostChart(positions: StockPosition[]) {
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Positions by Cost (Smallest to Largest)",
+            text: "Positions by Cost",
+            fontSize: 20
         },
         axisX: {
             title: "Position",
             labelAngle: -45,
-            interval: 1
+            interval: 1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         axisY: {
             title: "Cost",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
+            labelFormatter: function(e: any) {
+                return "$" + e.value.toFixed(2);
+            }
+        },
+        data: [
+            {
+                type: "bar",
+                color: blue,
+                dataPoints: chartData
+            }
+        ]
+    };
+}
+
+function createPositionMarketValuePieChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
+    // Calculate current market value for each position
+    const positionsWithMarketValue = positions.map(position => {
+        const quote = quotes[position.ticker];
+        const currentMarketValue = quote ? (position.numberOfShares * quote.price) + position.profit : position.profit;
+        return {
+            ticker: position.ticker,
+            marketValue: currentMarketValue
+        };
+    });
+
+    const totalMarketValue = positionsWithMarketValue.reduce((sum, p) => sum + Math.abs(p.marketValue), 0);
+    
+    const pieChartData = positionsWithMarketValue.map(p => {
+        const percentage = Math.round((Math.abs(p.marketValue) / totalMarketValue) * 100);
+        return {
+            y: percentage,
+            label: p.ticker
+        };
+    }).sort((a, b) => b.y - a.y);
+
+    return {
+        animationEnabled: false,
+        exportEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Position Market Values",
+            fontSize: 20
+        },
+        data: [
+            {
+                type: "pie",
+                showInLegend: true,
+                legendText: "{label}",
+                indexLabel: "{label}: {y}%",
+                indexLabelFontColor: "white",
+                indexLabelPlacement: "inside",
+                yValueFormatString: "#0.##",
+                dataPoints: pieChartData
+            }
+        ]
+    };
+}
+
+function createPositionsByMarketValueChart(positions: StockPosition[], quotes: Record<string, StockQuote>) {
+    // Calculate current market value for each position and sort from smallest to largest
+    const positionsWithMarketValue = positions.map(position => {
+        const quote = quotes[position.ticker];
+        const currentMarketValue = quote ? (position.numberOfShares * quote.price) + position.profit : position.profit;
+        return {
+            ticker: position.ticker,
+            marketValue: currentMarketValue
+        };
+    });
+    const sortedPositions = [...positionsWithMarketValue].sort((a, b) => Math.abs(a.marketValue) - Math.abs(b.marketValue));
+
+    const chartData = sortedPositions.map(p => ({
+        label: p.ticker,
+        y: Math.abs(p.marketValue)
+    }));
+
+    return {
+        animationEnabled: false,
+        exportEnabled: true,
+        zoomEnabled: true,
+        title: {
+            text: "Positions by Market Value (Smallest to Largest)",
+            fontSize: 20
+        },
+        axisX: {
+            title: "Position",
+            labelAngle: -45,
+            interval: 1,
+            titleFontSize: 12,
+            labelFontSize: 10
+        },
+        axisY: {
+            title: "Market Value",
+            gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return "$" + e.value.toFixed(2);
             }
@@ -504,15 +655,20 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<
         zoomEnabled: true,
         title: {
             text: "Positions by Unrealized Gains (Smallest to Largest)",
+            fontSize: 20
         },
         axisX: {
             title: "Position",
             labelAngle: -45,
-            interval: 1
+            interval: 1,
+            titleFontSize: 12,
+            labelFontSize: 10
         },
         axisY: {
             title: "Unrealized Gain",
             gridThickness: 0.1,
+            titleFontSize: 12,
+            labelFontSize: 10,
             labelFormatter: function(e: any) {
                 return "$" + e.value.toFixed(2);
             }
@@ -540,7 +696,7 @@ export class StockTradingChartsComponent {
 
     chartOptions : any[] = []
     allTickers: string[] = [];
-    private excludedTickers: Set<string> = new Set<string>();
+    private excludedTickers: Set<string> = new Set<string>(['USFR']);
     private _positions: StockPosition[] = [];
     private _quotes: Record<string, StockQuote> = {};
     
@@ -585,13 +741,15 @@ export class StockTradingChartsComponent {
             );
             
             this.chartOptions = [
+                createPositionSizePieChart(filteredPositions),
+                createPositionsByCostChart(filteredPositions),
+                createPositionMarketValuePieChart(filteredPositions, this._quotes),
+                createPositionsByMarketValueChart(filteredPositions, this._quotes),
+                createPositionLabelsPieChart(filteredPositions),
                 createUnrealizedProfitChart(filteredPositions, this._quotes),
                 createDaysHeldVsGainPercentChart(filteredPositions, this._quotes),
                 createStopPriceDistanceChart(filteredPositions, this._quotes),
-                createPositionSizePieChart(filteredPositions),
-                createPositionsByCostChart(filteredPositions),
                 createPositionsByGainsChart(filteredPositions, this._quotes),
-                createPositionLabelsPieChart(filteredPositions),
                 createRealizedVsUnrealizedProfitChart(filteredPositions, this._quotes),
                 createUnrealizedGainPercentageDistributionChart(filteredPositions, this._quotes),
                 createUnrealizedRRDistributionChart(filteredPositions, this._quotes),
