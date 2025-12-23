@@ -19,6 +19,9 @@
                         <th scope="col" class="text-end sortable" (click)="sortBy('cost')" role="button">
                             Cost <i class="bi" [ngClass]="getSortIcon('cost')"></i>
                         </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('percentOfAccount')" role="button">
+                            % of Account <i class="bi" [ngClass]="getSortIcon('percentOfAccount')"></i>
+                        </th>
                         <th scope="col" class="text-end sortable pe-4" (click)="sortBy('lastTransaction')" role="button">
                             Last Transaction <i class="bi" [ngClass]="getSortIcon('lastTransaction')"></i>
                         </th>
@@ -48,6 +51,9 @@
                             <td class="text-end py-3">
                                 {{ position.cost | currency }}
                             </td>
+                            <td class="text-end py-3">
+                                <div>{{ getPercentOfAccount(position) | percent:'1.0' }}</div>
+                            </td>
                             <td class="text-end py-3 pe-4">
                                 <div>{{ position.lastTransaction | parsedDate }}</div>
                                 <div class="small text-muted">{{ position.lastTransaction | timeAgo }}</div>
@@ -58,7 +64,7 @@
                         </tr>
                         @if (isDetailsVisible(position.ticker)) {
                             <tr class="table-active">
-                                <td colspan="7" class="p-0">
+                                <td colspan="8" class="p-0">
                                     <div class="p-4 details-row border-top">
                                         <app-stock-trading-position
                                             [position]="position"

@@ -70,6 +70,26 @@ export class StockTradingPositionsComponent {
         return 0;
     }
 
+    getMarketValue(p: StockPosition) {
+        const quote = this.getQuote(p);
+        if (quote) {
+            return quote.price * p.numberOfShares;
+        }
+        return 0;
+    }
+
+    getTotalMarketValue() {
+        return this._positions.reduce((total, p) => total + this.getMarketValue(p), 0);
+    }
+
+    getPercentOfAccount(p: StockPosition) {
+        const totalValue = this.getTotalMarketValue();
+        if (totalValue === 0) {
+            return 0;
+        }
+        return this.getMarketValue(p) / totalValue;
+    }
+
     getOrdersForPosition(ticker: string) {
         if (!this.brokerageAccount) {
             return [];
@@ -131,6 +151,10 @@ export class StockTradingPositionsComponent {
                 case 'lastTransaction':
                     aValue = new Date(a.lastTransaction).getTime();
                     bValue = new Date(b.lastTransaction).getTime();
+                    break;
+                case 'percentOfAccount':
+                    aValue = this.getPercentOfAccount(a);
+                    bValue = this.getPercentOfAccount(b);
                     break;
                 default:
                     return 0;

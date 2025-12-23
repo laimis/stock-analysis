@@ -113,14 +113,9 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
         |> Seq.distinct
         |> Seq.sort
     member this.DaysLeft =
-        match contracts with
-        | [] -> None
-        | _ -> 
-            contracts
-            |> List.map (fun c -> c.Expiration.ToDateTimeOffset() - DateTimeOffset.UtcNow)
-            |> List.map (fun ts -> ts.TotalDays |> int) 
-            |> List.min 
-            |> Some
+        contracts
+        |> Seq.map (fun c -> c.Expiration.ToDateTimeOffset() - DateTimeOffset.UtcNow)
+        |> Seq.map (fun ts -> ts.TotalDays |> int)
     member this.Closed = state.Closed
     member this.IsClosed = state.IsClosed
     member this.IsOpen = state.IsOpen

@@ -56,7 +56,7 @@ export interface OptionPosition {
     profit: number
     gainPct: number
     daysHeld: number
-    daysLeft: number
+    daysLeft: number[]
     duration: number[]
     isOpen: boolean
     isClosed: boolean
