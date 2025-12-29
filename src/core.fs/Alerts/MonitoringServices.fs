@@ -680,7 +680,7 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
                 do!
                     pair.Value
                     |> generateEmailDataPayloadForAlertsWithGroupingFunction "NGTD: Weekly Patterns" marketHours [] (fun a -> "Weekly " + a.identifier)
-                    |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
+                    |> emails.SendAlerts recipient Sender.NoReply
                     |> Async.AwaitTask
             })
             |> Async.Sequential
@@ -779,7 +779,7 @@ type AlertEmailService(
             do!
                 alerts
                 |> generateEmailDataPayloadForAlerts "NGTD: Alerts" marketHours diffCount
-                |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
+                |> emails.SendAlerts recipient Sender.NoReply
                 |> Async.AwaitTask
     }
 

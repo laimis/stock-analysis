@@ -330,7 +330,7 @@ type AccountMonitoringService(
                     let recipient = Recipient(user.State.Email, user.State.Name)
                     let sender = Sender.Support
 
-                    let! _ = emailService.SendWithTemplate recipient sender EmailTemplate.BrokerageTransactions payload |> Async.AwaitTask
+                    let! _ = emailService.SendBrokerageTransactions recipient sender payload |> Async.AwaitTask
                     ()
                     
             })

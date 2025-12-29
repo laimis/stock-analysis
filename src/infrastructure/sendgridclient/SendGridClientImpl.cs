@@ -6,6 +6,7 @@ using SendGrid.Helpers.Mail;
 
 namespace sendgridclient
 {
+    
     public class SendGridClientImpl : IEmailService
     {
         private readonly SendGridClient _sendGridClient;
