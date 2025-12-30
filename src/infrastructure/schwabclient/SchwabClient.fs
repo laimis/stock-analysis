@@ -662,10 +662,15 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             | _ -> ()
                 
             if not response.IsSuccessStatusCode then
-                let error = JsonSerializer.Deserialize<ErrorResponse>(content)
-                match error.message with
-                | Some error -> return error |> ServiceError |> Error
-                | None -> return content |> ServiceError |> Error
+                try
+                    let error = JsonSerializer.Deserialize<ErrorResponse>(content)
+                    match error.message with
+                    | Some error -> return error |> ServiceError |> Error
+                    | None -> return content |> ServiceError |> Error
+                with
+                | :? JsonException ->
+                    logError "Failed to deserialize error response from {function}: {content}" [|resource; content|]
+                    return content |> ServiceError |> Error
             else
                 let deserialized = JsonSerializer.Deserialize<'T>(content)
                 return deserialized |> Ok
