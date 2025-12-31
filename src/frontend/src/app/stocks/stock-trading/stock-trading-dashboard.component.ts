@@ -145,6 +145,7 @@ export class StockTradingDashboardComponent implements OnInit {
             this.loaded = true
 
             // create an array of strategies where value is the stratey name and count of positions that match
+            this.strategies = []
 
             let stratsWithCounts = GetStockStrategies().map(
                 (s) => {
