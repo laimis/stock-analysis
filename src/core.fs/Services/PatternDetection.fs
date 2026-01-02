@@ -104,40 +104,6 @@ let gapUpName = "Gap Up"
 let gapDownName = "Gap Down"
 let gapDown = gap GapType.Down gapDownName SentimentType.Negative
 let gapUp = gap GapType.Up gapUpName SentimentType.Positive
-
-let private reversal (isReversal: PriceBar -> PriceBar -> bool) (sentimentType: SentimentType) (name: string) (bars: PriceBars) =
-    match bars.Length with
-    | 0 | 1 -> None
-    | _ ->
-        let current = bars.Last
-        let previous = bars.Bars[bars.Length - 2]
-
-        // reversal pattern detection
-        if isReversal current previous then
-            let volumeInfo = relativeVolume current bars |> toVolumeMultiplierString
-
-            {
-                date = current.Date
-                name = name
-                description = $"{name}{volumeInfo}"
-                value = current.Close
-                valueFormat = ValueFormat.Currency
-                sentimentType = sentimentType
-            } |> Some
-        else
-            None
-
-[<Literal>]
-let upsideReversalName = "Upside Reversal"
-let upsideReversal =
-    let isUpsideReversal (current:PriceBar) (previous:PriceBar) = current.Close > previous.High && current.Low < previous.Low
-    reversal isUpsideReversal SentimentType.Positive upsideReversalName
-
-[<Literal>]
-let downsideReversalName = "Downside Reversal"
-let downsideReversal =
-    let isDownsideReversal (current:PriceBar) (previous:PriceBar) = current.Close < previous.Low && current.High > previous.High
-    reversal isDownsideReversal SentimentType.Negative downsideReversalName
     
 [<Literal>]
 let highest1YearVolumeName = "Highest 1 year volume"
@@ -208,8 +174,6 @@ let highVolume (bars: PriceBars) =
 let patternGenerators =
     
     [
-        upsideReversalName, upsideReversal
-        downsideReversalName, downsideReversal
         highest1YearVolumeName, highest1YearVolume
         highVolumeName, highVolume
         gapUpName, gapUp
