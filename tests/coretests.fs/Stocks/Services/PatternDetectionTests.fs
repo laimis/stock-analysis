@@ -15,21 +15,6 @@ let ``Pattern detection with only one bar returns nothing`` () =
     |> PatternDetection.generate
     |> should be Empty
 
-
-// TODO: find the true upside reversal
-[<Fact(Skip="Needs to be re-implemented")>]
-let ``Pattern detection with ENPH finds upside reversal``() =
-    let patterns =
-        TestDataGenerator.ENPH
-        |> TestDataGenerator.PriceBars
-        |> PatternDetection.generate
-        
-    patterns |> should haveLength 1
-    
-    let pattern = patterns |> Seq.head
-    pattern.name |> should equal PatternDetection.upsideReversalName
-    pattern.description |> should contain ", volume x0.9"
-    
 [<Fact>]
 let ``Pattern detection with ENPH finds XVolume`` () =
     
