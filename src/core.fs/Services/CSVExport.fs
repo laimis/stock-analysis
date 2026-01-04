@@ -117,6 +117,7 @@ module CSVExport =
             Grade:string
             EntryNote:string
             GradeNote:string
+            LastTransactionDate:string
         }
         
     type StockListRecord =
@@ -160,6 +161,7 @@ module CSVExport =
             Grade = if t.Grade.IsSome then t.Grade.Value.Value else ""
             GradeNote = t.GradeNote |> Option.defaultValue ""
             EntryNote = t.Notes |> List.tryHead |> Option.map(_.content) |> Option.defaultValue ""
+            LastTransactionDate = t.LastTransaction |> dateOption
         }
         
     let strategyPerformance (culture:IFormatProvider) (writer:ICSVWriter) (strategies:seq<TradingStrategyPerformance>) =
