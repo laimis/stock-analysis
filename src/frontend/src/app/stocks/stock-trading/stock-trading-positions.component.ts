@@ -90,6 +90,18 @@ export class StockTradingPositionsComponent {
         return this.getMarketValue(p) / totalValue;
     }
 
+    getTotalCost() {
+        return this._positions.reduce((total, p) => total + p.cost, 0);
+    }
+
+    getPercentOfTotalCost(p: StockPosition) {
+        const totalCost = this.getTotalCost();
+        if (totalCost === 0) {
+            return 0;
+        }
+        return p.cost / totalCost;
+    }
+
     getOrdersForPosition(ticker: string) {
         if (!this.brokerageAccount) {
             return [];
@@ -147,6 +159,10 @@ export class StockTradingPositionsComponent {
                 case 'cost':
                     aValue = a.cost;
                     bValue = b.cost;
+                    break;
+                case 'marketValue':
+                    aValue = this.getMarketValue(a);
+                    bValue = this.getMarketValue(b);
                     break;
                 case 'lastTransaction':
                     aValue = new Date(a.lastTransaction).getTime();

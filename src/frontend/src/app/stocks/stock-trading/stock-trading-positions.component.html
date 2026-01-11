@@ -19,8 +19,8 @@
                         <th scope="col" class="text-end sortable" (click)="sortBy('cost')" role="button">
                             Cost <i class="bi" [ngClass]="getSortIcon('cost')"></i>
                         </th>
-                        <th scope="col" class="text-end sortable" (click)="sortBy('percentOfAccount')" role="button">
-                            % of Account <i class="bi" [ngClass]="getSortIcon('percentOfAccount')"></i>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('marketValue')" role="button">
+                            Market Value <i class="bi" [ngClass]="getSortIcon('marketValue')"></i>
                         </th>
                         <th scope="col" class="text-end sortable pe-4" (click)="sortBy('lastTransaction')" role="button">
                             Last Transaction <i class="bi" [ngClass]="getSortIcon('lastTransaction')"></i>
@@ -49,10 +49,12 @@
                                 </span>
                             </td>
                             <td class="text-end py-3">
-                                {{ position.cost | currency }}
+                                <div>{{ position.cost | currency }}</div>
+                                <div class="small text-muted">{{ getPercentOfTotalCost(position) | percent:'1.0' }}</div>
                             </td>
                             <td class="text-end py-3">
-                                <div>{{ getPercentOfAccount(position) | percent:'1.0' }}</div>
+                                <div>{{ getMarketValue(position) | currency }}</div>
+                                <div class="small text-muted">{{ getPercentOfAccount(position) | percent:'1.0' }}</div>
                             </td>
                             <td class="text-end py-3 pe-4">
                                 <div>{{ position.lastTransaction | parsedDate }}</div>
