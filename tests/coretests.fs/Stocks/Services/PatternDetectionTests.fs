@@ -15,7 +15,6 @@ let ``Pattern detection with only one bar returns nothing`` () =
     |> PatternDetection.generate
     |> should be Empty
 
-    
 [<Fact>]
 let ``Pattern detection with ENPH finds XVolume`` () =
     

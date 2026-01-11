@@ -12,8 +12,7 @@ import { ParsedDatePipe } from '../../services/parsedDate.filter';
     selector: 'app-stock-trading-positions',
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
-    providers: [PercentPipe, CurrencyPipe, DecimalPipe],
-    imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass, TimeAgoPipe, ParsedDatePipe]
+    imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass, TimeAgoPipe, ParsedDatePipe, DecimalPipe]
 })
 export class StockTradingPositionsComponent {
     
@@ -90,6 +89,29 @@ export class StockTradingPositionsComponent {
         return this.getMarketValue(p) / totalValue;
     }
 
+    getTotalCost() {
+        return this._positions.reduce((total, p) => total + p.cost, 0);
+    }
+
+    getPercentOfTotalCost(p: StockPosition) {
+        const totalCost = this.getTotalCost();
+        if (totalCost === 0) {
+            return 0;
+        }
+        return p.cost / totalCost;
+    }
+
+    getTotalReturn(p: StockPosition) {
+        return p.profit + this.getUnrealizedGainLoss(p);
+    }
+
+    getTotalReturnPercent(p: StockPosition) {
+        if (p.cost === 0) {
+            return 0;
+        }
+        return this.getTotalReturn(p) / p.cost;
+    }
+
     getOrdersForPosition(ticker: string) {
         if (!this.brokerageAccount) {
             return [];
@@ -132,6 +154,10 @@ export class StockTradingPositionsComponent {
                     aValue = a.ticker;
                     bValue = b.ticker;
                     break;
+                case 'shares':
+                    aValue = a.numberOfShares;
+                    bValue = b.numberOfShares;
+                    break;
                 case 'price':
                     aValue = this.getPrice(a);
                     bValue = this.getPrice(b);
@@ -147,6 +173,18 @@ export class StockTradingPositionsComponent {
                 case 'cost':
                     aValue = a.cost;
                     bValue = b.cost;
+                    break;
+                case 'marketValue':
+                    aValue = this.getMarketValue(a);
+                    bValue = this.getMarketValue(b);
+                    break;
+                case 'totalReturn':
+                    aValue = this.getTotalReturn(a);
+                    bValue = this.getTotalReturn(b);
+                    break;
+                case 'daysHeld':
+                    aValue = a.daysHeld;
+                    bValue = b.daysHeld;
                     break;
                 case 'lastTransaction':
                     aValue = new Date(a.lastTransaction).getTime();
