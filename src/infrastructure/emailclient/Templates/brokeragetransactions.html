@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brokerage Transaction Summary</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
+                            <h1 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 600;">
+                                Brokerage Transaction Summary
+                            </h1>
+                            <p style="margin: 8px 0 0; color: #6b7280; font-size: 16px;">
+                                Recent Activity from Your Brokerage Account
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            
+                            {{if appliedDividends.size > 0}}
+                            <div style="margin-bottom: 32px;">
+                                <h2 style="margin: 0 0 16px; color: #059669; font-size: 20px; font-weight: 600;">
+                                    💰 Dividends Received ({{appliedDividends.size}})
+                                </h2>
+                                {{for dividend in appliedDividends}}
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #d1fae5; border-radius: 6px; background-color: #f0fdf4;">
+                                    <tr>
+                                        <td style="padding: 16px;">
+                                            <div style="margin-bottom: 4px;">
+                                                <span style="font-size: 18px; font-weight: 600; color: #1f2937;">{{dividend.ticker}}</span>
+                                                <span style="font-size: 18px; font-weight: 700; color: #059669; float: right;">${{dividend.amount}}</span>
+                                            </div>
+                                            <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">
+                                                {{dividend.date}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                {{end}}
+                            </div>
+                            {{end}}
+                            
+                            {{if appliedInterest.size > 0}}
+                            <div style="margin-bottom: 32px;">
+                                <h2 style="margin: 0 0 16px; color: #2563eb; font-size: 20px; font-weight: 600;">
+                                    💵 Interest Earned ({{appliedInterest.size}})
+                                </h2>
+                                {{for interest in appliedInterest}}
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #bfdbfe; border-radius: 6px; background-color: #eff6ff;">
+                                    <tr>
+                                        <td style="padding: 16px;">
+                                            <div style="margin-bottom: 4px;">
+                                                <span style="font-size: 16px; font-weight: 600; color: #1f2937;">Interest Payment</span>
+                                                <span style="font-size: 18px; font-weight: 700; color: #2563eb; float: right;">${{interest.amount}}</span>
+                                            </div>
+                                            <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">
+                                                {{interest.date}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                {{end}}
+                            </div>
+                            {{end}}
+                            
+                            {{if appliedCashTransfers.size > 0}}
+                            <div style="margin-bottom: 32px;">
+                                <h2 style="margin: 0 0 16px; color: #7c3aed; font-size: 20px; font-weight: 600;">
+                                    🔄 Cash Transfers ({{appliedCashTransfers.size}})
+                                </h2>
+                                {{for transfer in appliedCashTransfers}}
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #e9d5ff; border-radius: 6px; background-color: #faf5ff;">
+                                    <tr>
+                                        <td style="padding: 16px;">
+                                            <div style="margin-bottom: 4px;">
+                                                <span style="font-size: 16px; font-weight: 600; color: #1f2937;">{{transfer.type}}</span>
+                                                <span style="font-size: 18px; font-weight: 700; color: #7c3aed; float: right;">${{transfer.amount}}</span>
+                                            </div>
+                                            <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">
+                                                {{transfer.date}}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                {{end}}
+                            </div>
+                            {{end}}
+                            
+                            {{if failures.size > 0}}
+                            <div style="margin-top: 32px; padding: 16px; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 6px;">
+                                <h3 style="margin: 0 0 12px; color: #991b1b; font-size: 16px; font-weight: 600;">
+                                    ⚠️ Processing Issues ({{failures.size}})
+                                </h3>
+                                {{for failure in failures}}
+                                <p style="margin: 4px 0; color: #7f1d1d; font-size: 14px;">
+                                    • {{failure}}
+                                </p>
+                                {{end}}
+                            </div>
+                            {{end}}
+                            
+                            <div style="margin-top: 24px; padding: 16px; background-color: #eff6ff; border-left: 4px solid #2563eb; border-radius: 4px;">
+                                <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 20px;">
+                                    <strong>Note:</strong> These transactions have been synchronized with your Nightingale Trading portfolio.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #6b7280; font-size: 14px; text-align: center;">
+                                &copy; 2026 Nightingale Trading. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
