@@ -7,6 +7,9 @@
                         <th scope="col" class="ps-4 sortable" style="width: 120px;" (click)="sortBy('ticker')" role="button">
                             Ticker <i class="bi" [ngClass]="getSortIcon('ticker')"></i>
                         </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('shares')" role="button">
+                            Shares <i class="bi" [ngClass]="getSortIcon('shares')"></i>
+                        </th>
                         <th scope="col" class="text-end sortable" (click)="sortBy('price')" role="button">
                             Price <i class="bi" [ngClass]="getSortIcon('price')"></i>
                         </th>
@@ -22,6 +25,12 @@
                         <th scope="col" class="text-end sortable" (click)="sortBy('marketValue')" role="button">
                             Market Value <i class="bi" [ngClass]="getSortIcon('marketValue')"></i>
                         </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('totalReturn')" role="button">
+                            Total Return <i class="bi" [ngClass]="getSortIcon('totalReturn')"></i>
+                        </th>
+                        <th scope="col" class="text-end sortable" (click)="sortBy('daysHeld')" role="button">
+                            Days Held <i class="bi" [ngClass]="getSortIcon('daysHeld')"></i>
+                        </th>
                         <th scope="col" class="text-end sortable pe-4" (click)="sortBy('lastTransaction')" role="button">
                             Last Transaction <i class="bi" [ngClass]="getSortIcon('lastTransaction')"></i>
                         </th>
@@ -33,6 +42,9 @@
                         <tr class="cursor-pointer" (click)="toggleDetails(position.ticker)">
                             <td class="ps-4 py-3">
                                 <app-stock-link-and-tradingview-link [ticker]="position.ticker"></app-stock-link-and-tradingview-link>
+                            </td>
+                            <td class="text-end py-3">
+                                {{ position.numberOfShares | number:'1.0-1' }}
                             </td>
                             <td class="text-end py-3">
                                 {{ getPrice(position) | currency }}
@@ -56,6 +68,17 @@
                                 <div>{{ getMarketValue(position) | currency }}</div>
                                 <div class="small text-muted">{{ getPercentOfAccount(position) | percent:'1.0' }}</div>
                             </td>
+                            <td class="text-end py-3">
+                                <div [class.text-success]="getTotalReturn(position) > 0" [class.text-danger]="getTotalReturn(position) < 0">
+                                    {{ getTotalReturn(position) | currency }}
+                                </div>
+                                <div class="small" [class.text-success]="getTotalReturnPercent(position) > 0" [class.text-danger]="getTotalReturnPercent(position) < 0">
+                                    {{ getTotalReturnPercent(position) | percent:'1.2-2' }}
+                                </div>
+                            </td>
+                            <td class="text-end py-3">
+                                {{ position.daysHeld }}
+                            </td>
                             <td class="text-end py-3 pe-4">
                                 <div>{{ position.lastTransaction | parsedDate }}</div>
                                 <div class="small text-muted">{{ position.lastTransaction | timeAgo }}</div>
@@ -66,7 +89,7 @@
                         </tr>
                         @if (isDetailsVisible(position.ticker)) {
                             <tr class="table-active">
-                                <td colspan="8" class="p-0">
+                                <td colspan="11" class="p-0">
                                     <div class="p-4 details-row border-top">
                                         <app-stock-trading-position
                                             [position]="position"
