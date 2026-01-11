@@ -8,9 +8,9 @@
     <ProjectReference Include="..\securityutils\securityutils.csproj" />
     <ProjectReference Include="..\storage.shared\storage.shared.csproj" />
     <ProjectReference Include="..\timezonesupport\timezonesupport.csproj" />
-    <ProjectReference Include="..\sendgridclient\sendgridclient.csproj" />
     <ProjectReference Include="..\twilioclient\twilioclient.csproj" />
     <ProjectReference Include="..\schwabclient\schwabclient.fsproj" />
+    <ProjectReference Include="..\emailclient\emailclient.fsproj" />
     <ProjectReference Include="..\storage.memory\storage.memory.csproj" />
     <ProjectReference Include="..\storage.postgres\storage.postgres.csproj" />
   </ItemGroup>

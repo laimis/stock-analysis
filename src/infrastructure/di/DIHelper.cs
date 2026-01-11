@@ -70,11 +70,11 @@ namespace di
             }
 
             services.AddSingleton<IEmailService>(s => 
-                new sendgridclient.SendGridClientImpl(
-                    configuration.GetValue<string>("SENDGRID_API_KEY"),
-                    s.GetService<ILogger<sendgridclient.SendGridClientImpl>>()
-                )
-            );
+                new emailclient.SESEmailService(
+                    configuration.GetValue<string>("AWS_ACCESS_KEY_ID") ?? "notset",
+                    configuration.GetValue<string>("AWS_SECRET_ACCESS_KEY") ?? "notset",
+                    configuration.GetValue<string>("AWS_REGION") ?? "us-east-1"
+                ));
 
             services.AddSingleton<ISMSClient>(s => 
                 new twilioclient.TwilioClientWrapper(

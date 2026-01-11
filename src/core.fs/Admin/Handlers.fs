@@ -57,11 +57,10 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
         let! user = sendWelcome.userId |> storage.GetUser 
         match user with
         | Some user ->
-            do! email.SendWithTemplate
+            do! email.SendWelcome
                     (Recipient(email=user.State.Email, name=user.State.Name))
                     Sender.Support
-                    EmailTemplate.NewUserWelcome
-                    (System.Object())
+                    {||}
                     
             return Ok ()
             

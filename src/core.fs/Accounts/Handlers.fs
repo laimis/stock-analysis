@@ -306,10 +306,8 @@ namespace core.fs.Accounts
                 user.Delete(command.Feedback)
                 do! storage.Save(user)
                 
-                // TODO: technically it would be better to mark the user as deleted and then have a background process
-                // to send emails, delete the actual user record, and delete portfolio data
                 let properties = {|feedback = command.Feedback; email = user.State.Email;|}
-                do! email.SendWithTemplate (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply EmailTemplate.AdminUserDeleted properties
+                do! email.SendUserDeleted (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply properties
                     
                     
                 do! storage.Delete(user)
@@ -330,23 +328,22 @@ namespace core.fs.Accounts
                     | true -> return "Confirmation link is expired. Please request a new one." |> ServiceError |> Error
                     | false ->
                         user.Confirm()
-                        do! storage.Save(user)
-                        do! email.SendWithTemplate (Recipient(email = user.State.Email, name = user.State.Name)) Sender.Support EmailTemplate.NewUserWelcome {||}
+                        do! storage.Save user
+                        do! email.SendWelcome (Recipient(email = user.State.Email, name = user.State.Name)) Sender.Support {||}
                         return user |> success
         }
     
         member this.Handle (command:Contact) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
-            do! email.SendWithTemplate
+            do! email.SendContactUs
                     (Recipient(email=roles.GetAdminEmail(), name=null))
                     Sender.NoReply
-                    EmailTemplate.AdminContact
                     {|message = command.Message; email = command.Email|}
             return Ok ()
         }
         
         member this.Handle (command:CreateAccount) = task {
             
-            let! exists = storage.GetUserByEmail(command.UserInfo.Email)
+            let! exists = storage.GetUserByEmail command.UserInfo.Email
             match exists with
             | Some _ -> return $"Account with {command.UserInfo.Email} already exists" |> ServiceError |> Error
             | None ->
@@ -356,7 +353,7 @@ namespace core.fs.Accounts
                 
                 u.SetPassword hashAndSalt.Hash hashAndSalt.Salt
             
-                do! storage.Save(u)
+                do! storage.Save u
             
                 return u |> success
         }
@@ -398,8 +395,8 @@ namespace core.fs.Accounts
                 
                 let confirmUrl = $"{EmailSettings.ConfirmAccountUrl}/{request.Id}"
                 
-                do! email.SendWithTemplate (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply EmailTemplate.ConfirmAccount {|confirmurl = confirmUrl|}
-                do! email.SendWithTemplate (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply EmailTemplate.AdminNewUser {|email = user.State.Email; |}
+                do! email.SendVerify (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply {|confirmurl = confirmUrl|}
+                do! email.Send (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply "New User" $"New user: {user.State.Email}" ""
                 
                 return Ok ()
         }
@@ -416,7 +413,7 @@ namespace core.fs.Accounts
                 
                 let resetUrl = $"{EmailSettings.PasswordResetUrl}/{association.Id}"
                 
-                do! email.SendWithTemplate (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply EmailTemplate.PasswordReset {|reseturl = resetUrl|}
+                do! email.SendPasswordReset (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply {|reseturl = resetUrl|}
                 
                 return ()
         }
