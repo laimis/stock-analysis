@@ -104,7 +104,6 @@ let gapUpName = "Gap Up"
 let gapDownName = "Gap Down"
 let gapDown = gap GapType.Down gapDownName SentimentType.Negative
 let gapUp = gap GapType.Up gapUpName SentimentType.Positive
-
 [<Literal>]
 let highest1YearVolumeName = "Highest 1 year volume"
 let highest1YearVolume (bars: PriceBars) =

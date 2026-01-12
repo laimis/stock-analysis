@@ -115,13 +115,18 @@ type PortfolioAnalysisService(
                                 Ticker = t.Ticker.Value
                                 Date = t.Date
                                 Price = t.Price
-                                NUmberOfShares = t.NumberOfShares
+                                NumberOfShares = t.NumberOfShares
                             |}
                         )
                         
                     if Seq.isEmpty sellsOfInterest |> not then
                         let recipient = Recipient(email = pair.Email, name = "")
-                        do! emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.SellAlert {| sells = sellsOfInterest |} |> Async.AwaitTask
+                        let! emailResult = emails.SendSellAlert recipient Sender.NoReply {| sells = sellsOfInterest |} |> Async.AwaitTask
+                        match emailResult with
+                        | Error err ->
+                            logger.LogError $"Thirty day sell alert email to {recipient} failed: {err}"
+                        | Ok _ ->
+                            logger.LogInformation $"Thirty day sell alert email to {recipient} sent successfully"
                         
             })
             |> Async.Sequential
@@ -216,7 +221,7 @@ type PortfolioAnalysisService(
                             )
                             |> Seq.sum
                             
-                        (days, profitForHoldingDay)
+                        days, profitForHoldingDay
                     )
                  
                 let sortedProfitData =
@@ -239,7 +244,7 @@ type PortfolioAnalysisService(
                         {| days = days; profit = profit; percentage = percentage; isNegative=isNegative |}
                     )
                     
-                let actualProfitPercentOfMax = Math.Round((actualProfit / maxProfit) * 100m, 0)
+                let actualProfitPercentOfMax = Math.Round(actualProfit / maxProfit * 100m, 0)
                 let actualData = {| profit = actualProfit; days = actualDaysHeld; percentage = actualProfitPercentOfMax; numberOfPositions = numberOfPositions |}
                 
                 let payload =
@@ -247,9 +252,15 @@ type PortfolioAnalysisService(
 
                 // // email the user with the max profit and the day it was held
                 let recipient = Recipient(email = user.State.Email, name = "")
-                do! emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.MaxProfits payload |> Async.AwaitTask
+                let! emailResult = emails.SendMaxProfits recipient Sender.NoReply payload |> Async.AwaitTask
                 
-                logger.LogInformation($"Max profit for {user.State.Email} is {maxProfit} when held for {maxProfitDays} days")
+                match emailResult with
+                | Error err ->
+                    logger.LogError $"Max profits email to {recipient} failed: {err}"
+                | Ok _ ->
+                    logger.LogInformation $"Max profits email to {recipient} sent successfully"
+                
+                logger.LogInformation $"Max profit for {user.State.Email} is {maxProfit} when held for {maxProfitDays} days"
                 ()
                 
             })

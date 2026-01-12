@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Alerts</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
+                            <h1 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 600;">
+                                {{title}}
+                            </h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            {{for group in alertGroups}}
+                            <div style="margin-bottom: 32px;">
+                                <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
+                                    {{group.identifier}}
+                                    <span style="color: #6b7280; font-size: 16px; font-weight: normal;">
+                                        ({{group.alertCount}} alert{{if group.alertCount > 1}}s{{end}})
+                                    </span>
+                                </h2>
+                                
+                                {{for alert in group.alerts}}
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                    <tr>
+                                        <td style="padding: 16px; background-color: #f9fafb;">
+                                            <div style="margin-bottom: 8px;">
+                                                <span style="font-size: 18px; font-weight: 600; color: #1f2937;">{{alert.ticker}}</span>
+                                                <span style="margin-left: 12px; font-size: 16px; color: #2563eb; font-weight: 600;">{{alert.value}}</span>
+                                                <span style="margin-left: 12px; font-size: 14px; color: #6b7280;">{{alert.time}}</span>
+                                            </div>
+                                            <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
+                                                {{alert.description}}
+                                            </p>
+                                            {{if alert.sourceLists.size > 0}}
+                                            <p style="margin: 8px 0 0; color: #6b7280; font-size: 13px;">
+                                                Lists: {{for list in alert.sourceLists}}{{list}}{{if !for.last}}, {{end}}{{end}}
+                                            </p>
+                                            {{end}}
+                                        </td>
+                                    </tr>
+                                </table>
+                                {{end}}
+                            </div>
+                            {{end}}
+                            
+                            {{if alertDiffs.size > 0}}
+                            <div style="margin-top: 32px; padding: 16px; background-color: #eff6ff; border: 1px solid #93c5fd; border-radius: 6px;">
+                                <h3 style="margin: 0 0 12px; color: #1e40af; font-size: 16px; font-weight: 600;">
+                                    Changes Since Last Alert
+                                </h3>
+                                {{for diff in alertDiffs}}
+                                <p style="margin: 4px 0; color: #1e3a8a; font-size: 14px;">
+                                    <strong>{{diff.identifier}}:</strong> 
+                                    {{if diff.change > 0}}+{{end}}{{diff.change}} 
+                                    (was {{diff.previous}}, now {{diff.current}})
+                                </p>
+                                {{end}}
+                            </div>
+                            {{end}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0; color: #6b7280; font-size: 14px; text-align: center;">
+                                &copy; 2026 Nightingale Trading. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

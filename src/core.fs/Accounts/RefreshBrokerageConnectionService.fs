@@ -35,7 +35,12 @@ type RefreshBrokerageConnectionService(accounts:IAccountStorage,brokerage:IBroke
                     
                     let emailInput = {EmailInput.PlainBody = null; HtmlBody = message; From = Sender.NoReply.Email; Subject = "Refresh Brokerage Account"; To = user.State.Email; FromName = Sender.NoReply.Name }
                     
-                    do! email.SendWithInput emailInput
+                    let! emailResult = email.SendWithInput emailInput
+
+                    match emailResult with
+                    | Error err -> logger.LogError $"Failed to send brokerage refresh email to user {userId}: {err}"
+                    | Ok () -> logger.LogInformation $"Sent brokerage refresh email to user {userId}."
+                    
                 | false ->
                     logger.LogInformation $"Brokerage connection for user {userId} is valid until {user.State.BrokerageRefreshTokenExpires}. Skipping refresh."  
     }

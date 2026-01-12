@@ -107,8 +107,11 @@ module ImportTransactions =
                 match records with
                 | Error err -> return Error err
                 | Ok records ->
-                    do! sendEmail user "Started importing transactions" ""
-                    
+                    let! emailResponse = sendEmail user "Started importing transactions" "Email will follow when complete."
+
+                    match emailResponse with
+                    | Error err -> return ServiceError err |> Error
+                    | Ok () ->
                     
                     let! processed =
                         records
@@ -146,8 +149,10 @@ module ImportTransactions =
                     
                     match okOrError with
                     | Ok _ -> 
-                        do! sendEmail user "Finished importing transactions" ""
-                        return Ok ()
+                        let! emailResult = sendEmail user "Finished importing transactions" "Finished importing your transactions."
+                        match emailResult with
+                        | Error err -> return ServiceError err |> Error
+                        | Ok () -> return Ok ()
                     | Error err ->
                         return $"Failed to import transactions: {err.Message}" |> ServiceError |> Error
         }

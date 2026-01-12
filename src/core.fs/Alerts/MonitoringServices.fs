@@ -677,11 +677,17 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
 
                 let recipient = Recipient(email=pair.Key.Email, name=pair.Key.Name)
 
-                do!
+                let payload =
                     pair.Value
                     |> generateEmailDataPayloadForAlertsWithGroupingFunction "NGTD: Weekly Patterns" marketHours [] (fun a -> "Weekly " + a.identifier)
-                    |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
-                    |> Async.AwaitTask
+
+                let! emailResult = emails.SendAlerts recipient Sender.NoReply payload |> Async.AwaitTask
+                match emailResult with
+                | Error err ->
+                    logger.LogError $"Weekly pattern check email to {recipient} failed: {err}"
+                | Ok _ ->
+                    logger.LogInformation $"Weekly pattern check email to {recipient} sent successfully"
+
             })
             |> Async.Sequential
 
@@ -775,12 +781,19 @@ type AlertEmailService(
         if marketHours.IsMarketOpen(DateTimeOffset.UtcNow) |> not then
             let recipient = Recipient(email=user.State.Email, name=user.State.Name)
             
-            logger.LogInformation($"Sending {alerts |> Seq.length} alerts to {recipient}")
-            do!
-                alerts
-                |> generateEmailDataPayloadForAlerts "NGTD: Alerts" marketHours diffCount
-                |> emails.SendWithTemplate recipient Sender.NoReply EmailTemplate.Alerts
+            logger.LogInformation $"Sending {alerts |> Seq.length} alerts to {recipient}"
+            let payload = alerts |> generateEmailDataPayloadForAlerts "NGTD: Alerts" marketHours diffCount
+
+            let! emailResult =
+                payload
+                |> emails.SendAlerts recipient Sender.NoReply
                 |> Async.AwaitTask
+
+            match emailResult with
+            | Error err ->
+                logger.LogError $"Alert email to {recipient} failed: {err}"
+            | Ok _ ->
+                logger.LogInformation $"Alert email to {recipient} sent successfully"
     }
 
     interface IApplicationService
