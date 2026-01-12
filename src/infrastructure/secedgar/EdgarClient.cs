@@ -16,7 +16,7 @@ public class EdgarClient : ISECFilings
     public EdgarClient(ILogger<EdgarClient>? logger, string userAgent)
     {
         _logger = logger;
-        SecRequestManager.Instance.UserAgent = userAgent;
+        // TODO: set user agent in EdgarSearch somewhere
     }
         
 
