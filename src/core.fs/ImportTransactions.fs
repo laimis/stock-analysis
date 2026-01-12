@@ -107,7 +107,7 @@ module ImportTransactions =
                 match records with
                 | Error err -> return Error err
                 | Ok records ->
-                    let! emailResponse = sendEmail user "Started importing transactions" ""
+                    let! emailResponse = sendEmail user "Started importing transactions" "Email will follow when complete."
 
                     match emailResponse with
                     | Error err -> return ServiceError err |> Error
