@@ -149,7 +149,7 @@ module ImportTransactions =
                     
                     match okOrError with
                     | Ok _ -> 
-                        let! emailResult = sendEmail user "Finished importing transactions" ""
+                        let! emailResult = sendEmail user "Finished importing transactions" "Finished importing your transactions."
                         match emailResult with
                         | Error err -> return ServiceError err |> Error
                         | Ok () -> return Ok ()
