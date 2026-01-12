@@ -121,7 +121,12 @@ type PortfolioAnalysisService(
                         
                     if Seq.isEmpty sellsOfInterest |> not then
                         let recipient = Recipient(email = pair.Email, name = "")
-                        do! emails.SendSellAlert recipient Sender.NoReply {| sells = sellsOfInterest |} |> Async.AwaitTask
+                        let! emailResult = emails.SendSellAlert recipient Sender.NoReply {| sells = sellsOfInterest |} |> Async.AwaitTask
+                        match emailResult with
+                        | Error err ->
+                            logger.LogError $"Thirty day sell alert email to {recipient} failed: {err}"
+                        | Ok _ ->
+                            logger.LogInformation $"Thirty day sell alert email to {recipient} sent successfully"
                         
             })
             |> Async.Sequential
@@ -247,7 +252,13 @@ type PortfolioAnalysisService(
 
                 // // email the user with the max profit and the day it was held
                 let recipient = Recipient(email = user.State.Email, name = "")
-                do! emails.SendMaxProfits recipient Sender.NoReply payload |> Async.AwaitTask
+                let! emailResult = emails.SendMaxProfits recipient Sender.NoReply payload |> Async.AwaitTask
+                
+                match emailResult with
+                | Error err ->
+                    logger.LogError $"Max profits email to {recipient} failed: {err}"
+                | Ok _ ->
+                    logger.LogInformation $"Max profits email to {recipient} sent successfully"
                 
                 logger.LogInformation $"Max profit for {user.State.Email} is {maxProfit} when held for {maxProfitDays} days"
                 ()

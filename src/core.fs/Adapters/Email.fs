@@ -38,14 +38,14 @@ module EmailSettings =
     let ConfirmAccountUrl = "https://www.nightingaletrading.com/api/account/confirm"
     
 type IEmailService =
-    abstract SendUserDeleted : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendWelcome : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendContactUs : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendVerify : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendPasswordReset : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendAlerts : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendBrokerageTransactions : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendSellAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract SendMaxProfits : recipient:Recipient -> sender:Sender -> properties:obj -> Task
-    abstract Send : recipient:Recipient -> sender:Sender -> subject:string -> plainTextBody:string -> htmlBody:string -> Task
-    abstract SendWithInput : input:EmailInput -> Task
+    abstract SendUserDeleted : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendWelcome : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendContactUs : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendVerify : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendPasswordReset : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendAlerts : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendBrokerageTransactions : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendSellAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendMaxProfits : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract Send : recipient:Recipient -> sender:Sender -> subject:string -> plainTextBody:string -> htmlBody:string -> Task<Result<unit, string>>
+    abstract SendWithInput : input:EmailInput -> Task<Result<unit, string>>

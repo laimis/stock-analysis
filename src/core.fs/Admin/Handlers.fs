@@ -49,20 +49,20 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
     interface IApplicationService
     
     member _.Handle (cmd:SendEmail) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
-        do! cmd.input |> email.SendWithInput
-        return Ok()
+        let! emailResult = cmd.input |> email.SendWithInput
+        match emailResult with
+        | Ok () -> return Ok ()
+        | Error err -> return ServiceError err |> Error
     }
     
     member _.Handle sendWelcome : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
         let! user = sendWelcome.userId |> storage.GetUser 
         match user with
         | Some user ->
-            do! email.SendWelcome
-                    (Recipient(email=user.State.Email, name=user.State.Name))
-                    Sender.Support
-                    {||}
-                    
-            return Ok ()
+            let! emailResult = email.SendWelcome (Recipient(email=user.State.Email, name=user.State.Name)) Sender.Support {||}
+            match emailResult with
+            | Ok () -> return Ok ()
+            | Error err -> return ServiceError err |> Error
             
         | None -> return "User not found" |> ServiceError |> Error
         

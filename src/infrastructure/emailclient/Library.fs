@@ -20,26 +20,22 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
             return Error ex.Message
     }
 
-    let supportSender = "noreply@nightingaletrading.com"
-    let alertsSender = "alerts@nightingaletrading.com"
-    let senderName = "Nightingale Trading"
-
     let toGenericList (list: string list) = 
         new System.Collections.Generic.List<string>(list)
 
     /// Send email using template with rendering
-    let sendWithTemplate (recipient: Recipient) (senderEmail: string) (templateName: string) (subject: string) (payload: obj) = task {
+    let sendWithTemplate (recipient: Recipient) (sender: Sender) (templateName: string) (subject: string) (payload: obj) = task {
         
         let! renderedContentResult = EmailTemplateManager.processTemplate templateName payload
 
         match renderedContentResult with
         | Error err ->
-            failwith err
+            return Error err
         
         | Ok content ->
         
             let request = SendEmailRequest()
-            request.Source <- $"{senderName} <{senderEmail}>"
+            request.Source <- $"{sender.Name} <{sender.Email}>"
             
             let destination = Destination()
             destination.ToAddresses <- [recipient.Email] |> toGenericList
@@ -61,9 +57,7 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
             request.Message <- message
             
             let! result = genericSend request
-            match result with
-            | Ok () -> return ()
-            | Error err -> failwith err
+            return result
     }
 
     /// Send raw email (text and/or HTML)
@@ -71,70 +65,70 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
         
         // Validate that at least one body type is provided
         if System.String.IsNullOrWhiteSpace(html) && System.String.IsNullOrWhiteSpace(plainText) then
-            failwith "Email must have either HTML or plain text body"
-        
-        let request = SendEmailRequest()
-        request.Source <- $"{sender.Name} <{sender.Email}>"
-        
-        let destination = Destination()
-        destination.ToAddresses <- [recipient.Email] |> toGenericList
-        request.Destination <- destination
-        
-        let messageContent = Content()
-        messageContent.Data <- subject
-        
-        let message = Message()
-        message.Subject <- messageContent
-        
-        let body = Body()
-        
-        if not (System.String.IsNullOrWhiteSpace(html)) then
-            let htmlContent = Content()
-            htmlContent.Data <- html
-            body.Html <- htmlContent
-        
-        if not (System.String.IsNullOrWhiteSpace(plainText)) then
-            let textContent = Content()
-            textContent.Data <- plainText
-            body.Text <- textContent
-        
-        message.Body <- body
-        request.Message <- message
-        
-        let! result = genericSend request
-        match result with
-        | Ok () -> return ()
-        | Error err -> failwith err
+            return Error "Email must have either HTML or plain text body"
+        else
+            let request = SendEmailRequest()
+            request.Source <- $"{sender.Name} <{sender.Email}>"
+            
+            let destination = Destination()
+            destination.ToAddresses <- [recipient.Email] |> toGenericList
+            request.Destination <- destination
+            
+            let messageContent = Content()
+            messageContent.Data <- subject
+            
+            let message = Message()
+            message.Subject <- messageContent
+            
+            let body = Body()
+            
+            if not (System.String.IsNullOrWhiteSpace(html)) then
+                let htmlContent = Content()
+                htmlContent.Data <- html
+                body.Html <- htmlContent
+            
+            if not (System.String.IsNullOrWhiteSpace(plainText)) then
+                let textContent = Content()
+                textContent.Data <- plainText
+                body.Text <- textContent
+            
+            message.Body <- body
+            request.Message <- message
+            
+            let! result = genericSend request
+            match result with
+            | Ok () -> return Ok ()
+            | Error err -> return Error err
     }
 
     interface IEmailService with
         
         member _.SendUserDeleted recipient sender properties =
-            sendWithTemplate recipient supportSender "userdeleted" "Account Deleted" properties
+            sendWithTemplate recipient sender "userdeleted" "Account Deleted" properties
         
         member _.SendWelcome recipient sender properties =
-            sendWithTemplate recipient supportSender "welcome" "Welcome to Nightingale Trading!" properties
+            sendWithTemplate recipient sender "welcome" "Welcome to Nightingale Trading!" properties
         
         member _.SendContactUs recipient sender properties =
-            sendWithTemplate recipient supportSender "contactus" "Thank you for contacting us" properties
+            sendWithTemplate recipient sender "contactus" "Thank you for contacting us" properties
         
         member _.SendVerify recipient sender properties =
-            sendWithTemplate recipient supportSender "verify" "Verify your account" properties
+            sendWithTemplate recipient sender "verify" "Verify your account" properties
         
         member _.SendPasswordReset recipient sender properties =
-            sendWithTemplate recipient supportSender "passwordreset" "Password Reset Instructions" properties
+            sendWithTemplate recipient sender "passwordreset" "Password Reset Instructions" properties
         
         member _.SendAlerts recipient sender properties =
-            sendWithTemplate recipient alertsSender "alerts" "Stock Alerts" properties
+            sendWithTemplate recipient sender "alerts" "Stock Alerts" properties
         
         member _.SendBrokerageTransactions recipient sender properties =
-            sendWithTemplate recipient supportSender "brokeragetransactions" "Brokerage Transaction Summary" properties
+            sendWithTemplate recipient sender "brokeragetransactions" "Brokerage Transaction Summary" properties
         
         member _.SendSellAlert recipient sender properties =
-            sendWithTemplate recipient alertsSender "sellalert" "Sell Alert" properties
+            sendWithTemplate recipient sender "sellalert" "Sell Alert" properties
         
         member _.SendMaxProfits recipient sender properties =
-            sendWithTemplate recipient alertsSender "maxprofits" "Maximum Profit Achieved" properties
+            sendWithTemplate recipient sender "maxprofits" "Maximum Profit Achieved" properties
         
         member _.Send recipient sender subject plainTextBody htmlBody =
             sendRaw recipient sender subject plainTextBody htmlBody

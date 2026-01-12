@@ -8,6 +8,7 @@ namespace core.fs.Accounts
     open core.fs.Adapters.Brokerage
     open core.fs.Adapters.Email
     open core.fs.Adapters.Storage
+    open core.fs.Adapters.Logging
     
     type AccountStatusView =
         {
@@ -236,7 +237,8 @@ namespace core.fs.Accounts
         storage:IAccountStorage,
         hashProvider:IPasswordHashProvider,
         portfolioStorage:IPortfolioStorage,
-        roles:IRoleService) =
+        roles:IRoleService,
+        logger:ILogger) =
         let INVALID_EMAIL_PASSWORD = "Invalid email/password combination"
     
         let success (user:User) =
@@ -307,19 +309,21 @@ namespace core.fs.Accounts
                 do! storage.Save(user)
                 
                 let properties = {|feedback = command.Feedback; email = user.State.Email;|}
-                do! email.SendUserDeleted (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply properties
-                    
+                let! emailResult = email.SendUserDeleted (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply properties
+                match emailResult with
+                | Error err -> logger.LogWarning $"Failed to send user deletion email: {err}"
+                | Ok () -> ()
                     
                 do! storage.Delete(user)
                 do! portfolioStorage.Delete(user.Id |> UserId)
                 return Ok ()
         }
         member this.Handle (command:Confirm) = task {
-            let! association = storage.GetUserAssociation(command.Id)
+            let! association = storage.GetUserAssociation command.Id
             match association with
             | None -> return "Invalid confirmation identifier." |> ServiceError |> Error
             | Some association ->
-                let! user = storage.GetUser(association.UserId)
+                let! user = storage.GetUser association.UserId
                 match user with
                 | None -> return "User not found" |> ServiceError |> Error
                 | Some user ->
@@ -329,16 +333,18 @@ namespace core.fs.Accounts
                     | false ->
                         user.Confirm()
                         do! storage.Save user
-                        do! email.SendWelcome (Recipient(email = user.State.Email, name = user.State.Name)) Sender.Support {||}
+                        let! emailResult = email.SendWelcome (Recipient(email = user.State.Email, name = user.State.Name)) Sender.Support {||}
+                        match emailResult with
+                        | Error err -> logger.LogWarning $"Failed to send welcome email: {err}"
+                        | Ok () -> ()
                         return user |> success
         }
     
         member this.Handle (command:Contact) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
-            do! email.SendContactUs
-                    (Recipient(email=roles.GetAdminEmail(), name=null))
-                    Sender.NoReply
-                    {|message = command.Message; email = command.Email|}
-            return Ok ()
+            let! emailResult = email.SendContactUs (Recipient(email=roles.GetAdminEmail(), name=null)) Sender.NoReply {|message = command.Message; email = command.Email|}
+            match emailResult with
+            | Error err -> return err |> ServiceError |> Error
+            | Ok () -> return Ok ()
         }
         
         member this.Handle (command:CreateAccount) = task {
@@ -391,14 +397,20 @@ namespace core.fs.Accounts
             | Some user ->
                 let request = ProcessIdToUserAssociation(createNotifications.UserId, createNotifications.Created)
                 
-                do! storage.SaveUserAssociation(request)
+                do! storage.SaveUserAssociation request
                 
                 let confirmUrl = $"{EmailSettings.ConfirmAccountUrl}/{request.Id}"
                 
-                do! email.SendVerify (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply {|confirmurl = confirmUrl|}
-                do! email.Send (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply "New User" $"New user: {user.State.Email}" ""
+                let! verifyEmailResult = email.SendVerify (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply {|confirmurl = confirmUrl|}
+                match verifyEmailResult with
+                | Error err -> return $"Failed to send verification email: {err}" |> ServiceError |> Error
+                | Ok () ->
+                    let! adminEmailResult = email.Send (Recipient(email=roles.GetAdminEmail(), name="Admin")) Sender.NoReply "New User" $"New user: {user.State.Email}" ""
+                    match adminEmailResult with
+                    | Error err -> logger.LogWarning $"Failed to send new user notification email to admin: {err}"
+                    | Ok () -> ()
                 
-                return Ok ()
+                    return Ok ()
         }
     
         member this.Handle (request:RequestPasswordReset) = task {
@@ -413,7 +425,11 @@ namespace core.fs.Accounts
                 
                 let resetUrl = $"{EmailSettings.PasswordResetUrl}/{association.Id}"
                 
-                do! email.SendPasswordReset (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply {|reseturl = resetUrl|}
+                let! resetEmailResult = email.SendPasswordReset (Recipient(email=user.State.Email, name=user.State.Name)) Sender.NoReply {|reseturl = resetUrl|}
+                
+                match resetEmailResult with
+                | Error err -> logger.LogWarning $"Failed to send password reset email: {err}"
+                | Ok () -> ()
                 
                 return ()
         }
