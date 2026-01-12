@@ -25,7 +25,8 @@ export class AdminEmailComponent {
             from: this.from,
             fromName: this.fromName,
             subject: this.subject,
-            body: this.body
+            htmlBody: this.body,  // Map body to htmlBody for backend
+            plainBody: null
         }
 
         this.stockService.sendEmail(obj).subscribe(

@@ -33,7 +33,7 @@ export class StocksService {
         return this.http.get<Monitor[]>('/api/alerts/monitors')
     }
 
-    sendEmail(obj: { to: string; from: string; subject: string; body: string; }) {
+    sendEmail(obj: { to: string; from: string; subject: string; plainBody: string; htmlBody: string}) {
         return this.http.post<object>('/api/admin/email', obj)
     }
 

@@ -69,6 +69,10 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
     /// Send raw email (text and/or HTML)
     let sendRaw (recipient: Recipient) (sender: Sender) (subject: string) (plainText: string) (html: string) = task {
         
+        // Validate that at least one body type is provided
+        if System.String.IsNullOrWhiteSpace(html) && System.String.IsNullOrWhiteSpace(plainText) then
+            failwith "Email must have either HTML or plain text body"
+        
         let request = SendEmailRequest()
         request.Source <- $"{sender.Name} <{sender.Email}>"
         
