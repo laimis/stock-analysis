@@ -763,6 +763,11 @@ module TradingStrategyFactory =
                 | Short -> 1m + percentage
                 | Long -> 1m - percentage
             costPerShare * multiplier
+
+        let firstStopValue = 
+            match actualTrade with
+            | Some trade -> trade |> firstStop
+            | None -> 0m
             
         [
             createProfitPointsBasedOnPctGainTrade 0.07m 3
@@ -778,13 +783,15 @@ module TradingStrategyFactory =
             createTrailingStop "20%" 0.20m None
             if actualTrade.IsSome then
                 createLastSellStrategy actualTrade.Value
-                createCloseAfterFixedNumberOfDaysWithStop "first stop" 30 (actualTrade.Value |> firstStop)
                 createCloseAfterFixedNumberOfDaysWithStop "5%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.05m)
                 createCloseAfterFixedNumberOfDaysWithStop "10%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.10m)
                 createCloseAfterFixedNumberOfDaysWithStop "20%" 30 (actualTrade.Value |> percentStopBasedOnCostPerShare 0.20m)
-                createTrailingStop "5% w/ first stop" 0.05m (actualTrade.Value |> firstStop |> Some)
-                createTrailingStop "10% w/ first stop" 0.10m (actualTrade.Value |> firstStop |> Some)
-                createTrailingStop "20% w/ first stop" 0.20m (actualTrade.Value |> firstStop |> Some)
+                
+                if firstStopValue <> 0m then
+                    createCloseAfterFixedNumberOfDaysWithStop "first stop" 30 firstStopValue
+                    createTrailingStop "5% w/ first stop" 0.05m (firstStopValue |> Some)
+                    createTrailingStop "10% w/ first stop" 0.10m (firstStopValue |> Some)
+                    createTrailingStop "20% w/ first stop" 0.20m (firstStopValue |> Some)
                 
             // createCloseAfterFixedNumberOfDays 15 - retired, consistently underperforms
             // createProfitPointsTrade 3 - retired, consistently underperforms            
