@@ -125,8 +125,6 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
     
     member _.Handle (query:PricesQuery) = task {
 
-        Console.WriteLine($"Fetching prices for {query.Ticker.Value} from {query.Start} to {query.End} with frequency {query.Frequency}")
-
         let! user = accounts.GetUser(query.UserId)
         
         match user with

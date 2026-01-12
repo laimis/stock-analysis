@@ -634,8 +634,6 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
                 |> fun parsedDate -> parsedDate.AddDays 1.0 // include the end date by adding one day
                 |> Some
 
-        Console.WriteLine($"Generating daily ticker report for {query.Ticker.Value} from {start} to {end'}")
-        
         let! user = accounts.GetUser query.UserId
         let ticker = query.Ticker
                 
