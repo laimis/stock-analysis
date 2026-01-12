@@ -7,7 +7,8 @@ import {
     PriceFrequency,
     StocksService,
     TradingStrategyResults,
-    StockQuote
+    StockQuote,
+    BrokerageAccount
 } from '../../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../../services/utils';
 import {StockPositionsService} from "../../services/stockpositions.service";
@@ -52,7 +53,7 @@ export class StockTradingReviewComponent {
     @Input()
     quotes: Record<string, StockQuote> | null = null
     @Input()
-    orders: BrokerageStockOrder[] | null = null
+    brokerageAccount: BrokerageAccount | null = null
     @Output()
     positionChanged: EventEmitter<any> = new EventEmitter()
     private _index: number = 0
@@ -167,14 +168,14 @@ export class StockTradingReviewComponent {
                     let buyOrders : number[] = []
                     let sellOrders : number[] = []
                     
-                    if (this.orders)
+                    if (this.brokerageAccount && this.brokerageAccount.stockOrders)
                     {
                         buyOrders =
-                            this.orders.filter(o => o.isBuyOrder && o.isActive && o.ticker === position.ticker)
+                            this.brokerageAccount.stockOrders.filter(o => o.isBuyOrder && o.isActive && o.ticker === position.ticker)
                                 .map(o => o.price)
 
                         sellOrders =
-                            this.orders.filter(o => !o.isBuyOrder && o.isActive && o.ticker === position.ticker)
+                            this.brokerageAccount.stockOrders.filter(o => !o.isBuyOrder && o.isActive && o.ticker === position.ticker)
                                 .map(o => o.price)
 
                     }

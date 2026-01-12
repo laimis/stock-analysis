@@ -74,7 +74,7 @@
     (positionChanged)="refresh()"></app-stock-trading-positions>
   }
   @if (isActive('openreview')) {
-    <app-stock-trading-review [orders]="brokerageAccount?.stockOrders" [positions]=sortedPositions [quotes]="quotes"
+    <app-stock-trading-review [brokerageAccount]="brokerageAccount" [positions]=sortedPositions [quotes]="quotes"
     (positionChanged)="refresh()"></app-stock-trading-review>
   }
   @if (isActive('violations')) {

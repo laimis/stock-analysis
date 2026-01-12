@@ -17,6 +17,7 @@ namespace storage.postgres
     {
         private readonly string _cnn;
         private readonly IOutbox _outbox;
+        private readonly NpgsqlDataSource _dataSource;
 
         public PostgresAggregateStorage(
             IOutbox outbox,
@@ -24,13 +25,12 @@ namespace storage.postgres
         {
             _cnn = cnn;
             _outbox = outbox;
+            _dataSource = new NpgsqlDataSourceBuilder(_cnn).Build();
         }
 
         protected IDbConnection GetConnection()
         {
-            var cnn = new NpgsqlConnection(_cnn);
-            cnn.Open();
-            return cnn; 
+            return _dataSource.OpenConnection();
         }
 
         public async Task DeleteAggregates(string entity, UserId userId, IDbTransaction? outsideTransaction = null)

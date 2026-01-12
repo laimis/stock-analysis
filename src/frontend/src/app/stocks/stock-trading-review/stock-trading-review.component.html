@@ -73,6 +73,7 @@
       [position]="currentPosition"
       [quote]="getQuote(currentPosition)"
       [notesExpanded]="true"
+      [brokerageAccount]="brokerageAccount"
       (positionChanged)="positionChanged.emit()"
     ></app-stock-trading-position>
   </section>
