@@ -172,7 +172,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
 
     public Task SaveStockPriceAlert(StockPriceAlert alert)
     {
-        if (_stockPriceAlerts.ContainsKey(alert.UserId) == false)
+        if (!_stockPriceAlerts.ContainsKey(alert.UserId))
         {
             _stockPriceAlerts[alert.UserId] = [];
         }
