@@ -120,6 +120,12 @@ public class AlertsController(Handler handler) : ControllerBase
         [FromServices] MonitoringServices.PriceAlertMonitoringService priceAlerts)
         => priceAlerts.Execute();
     
+    [HttpGet("triggerNearTriggerPriceAlerts")]
+    [Authorize("admin")]
+    public Task TriggerNearTriggerPriceAlerts(
+        [FromServices] MonitoringServices.PriceAlertNearTriggerMonitoringService nearTriggerAlerts)
+        => nearTriggerAlerts.Execute();
+    
     // Stock Price Alerts CRUD
     [HttpGet("price")]
     public Task<ActionResult> GetStockPriceAlerts() =>
