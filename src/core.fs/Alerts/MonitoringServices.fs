@@ -1093,6 +1093,7 @@ type PriceAlertNearTriggerMonitoringService(
     let sendNearTriggerEmail (user:UserState) (nearTriggerAlerts:NearTriggerAlert list) : Async<unit> = async {
         try
             let recipient = Recipient(email=user.Email, name=user.Name)
+            let checkTime = marketHours.ToMarketTime(DateTimeOffset.UtcNow).ToString("yyyy-MM-dd HH:mm") + " ET"
             
             let alertsData = 
                 nearTriggerAlerts 
@@ -1104,7 +1105,6 @@ type PriceAlertNearTriggerMonitoringService(
                         alert_type = alert.alertType
                         percentage_away = alert.percentageAway.ToString("N1")
                         note = alert.note
-                        time = marketHours.ToMarketTime(DateTimeOffset.UtcNow).ToString("yyyy-MM-dd HH:mm") + " ET"
                     |}
                 )
             
@@ -1112,6 +1112,7 @@ type PriceAlertNearTriggerMonitoringService(
                 alerts = alertsData
                 alert_count = nearTriggerAlerts.Length
                 title = "NGTD: Price Alerts - Close to Triggering"
+                time = checkTime
             |}
             
             let! emailResult = emails.SendNearTriggerPriceAlerts recipient Sender.NoReply (box payload) |> Async.AwaitTask
