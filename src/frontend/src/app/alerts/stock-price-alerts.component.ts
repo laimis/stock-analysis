@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StocksService, StockPriceAlert } from '../services/stocks.service';
 import { GetErrors } from '../services/utils';
+import { StockSearchComponent } from '../stocks/stock-search/stock-search.component';
 
 @Component({
   selector: 'app-stock-price-alerts',
   templateUrl: './stock-price-alerts.component.html',
   styleUrls: ['./stock-price-alerts.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, StockSearchComponent]
 })
 export class StockPriceAlertsComponent implements OnInit {
   private stocksService = inject(StocksService);
@@ -24,7 +25,7 @@ export class StockPriceAlertsComponent implements OnInit {
   newAlert = {
     ticker: '',
     priceLevel: null as number | null,
-    alertType: 'above',
+    alertType: 'below',
     note: ''
   };
 
@@ -77,11 +78,15 @@ export class StockPriceAlertsComponent implements OnInit {
     }
   }
 
+  onTickerSelected(ticker: string) {
+    this.newAlert.ticker = ticker;
+  }
+
   resetForm() {
     this.newAlert = {
       ticker: '',
       priceLevel: null,
-      alertType: 'above',
+      alertType: 'below',
       note: ''
     };
     this.editingAlert = null;

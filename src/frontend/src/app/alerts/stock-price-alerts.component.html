@@ -32,18 +32,18 @@
       <div class="card-body">
         <form (ngSubmit)="editingAlert ? updateAlert() : createAlert()">
           <div class="row">
-            <div class="col-md-3 mb-3">
-              <label for="ticker" class="form-label">Ticker</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                id="ticker" 
-                [(ngModel)]="newAlert.ticker" 
-                name="ticker"
-                [disabled]="!!editingAlert"
-                required
-                placeholder="AAPL"
-                style="text-transform: uppercase">
+            <div class="col-md-4 mb-3">
+              @if (!editingAlert) {
+                <app-stock-search
+                  label="Ticker"
+                  placeholder="Search for stock symbol"
+                  [ticker]="newAlert.ticker"
+                  (tickerSelected)="onTickerSelected($event)">
+                </app-stock-search>
+              } @else {
+                <label class="form-label">Ticker</label>
+                <div class="form-control-plaintext"><strong>{{ newAlert.ticker }}</strong></div>
+              }
             </div>
             <div class="col-md-3 mb-3">
               <label for="priceLevel" class="form-label">Price Level</label>
