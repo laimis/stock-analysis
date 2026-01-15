@@ -114,6 +114,12 @@ public class AlertsController(Handler handler) : ControllerBase
         [FromServices] core.fs.Options.MonitoringServices.PriceMonitoringService optionPricing)
         => optionPricing.Run();
     
+    [HttpGet("triggerPriceAlerts")]
+    [Authorize("admin")]
+    public Task TriggerPriceAlerts(
+        [FromServices] MonitoringServices.PriceAlertMonitoringService priceAlerts)
+        => priceAlerts.Execute();
+    
     // Stock Price Alerts CRUD
     [HttpGet("price")]
     public Task<ActionResult> GetStockPriceAlerts() =>
