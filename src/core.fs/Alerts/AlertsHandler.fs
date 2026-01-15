@@ -84,18 +84,19 @@ namespace core.fs.Alerts
             return Ok ()
         }
         
-        member this.Handle (query:GetStockPriceAlerts) : System.Threading.Tasks.Task<Result<StockPriceAlert seq, ServiceError>> = task {
+        member this.Handle (query:GetStockPriceAlerts) : System.Threading.Tasks.Task<Result<StockPriceAlertDto seq, ServiceError>> = task {
             let! alerts = accountStorage.GetStockPriceAlerts(query.UserId)
-            return Ok alerts
+            let dtos = alerts |> Seq.map StockPriceAlertDto.fromDomain
+            return Ok dtos
         }
         
-        member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<Guid, ServiceError>> = task {
+        member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<string, ServiceError>> = task {
             try
                 let alertId = Guid.NewGuid()
                 let ticker = Ticker(command.Ticker)
                 let alertType = PriceAlertType.fromString(command.AlertType)
                 
-                let alert = {
+                let alert: StockPriceAlert = {
                     AlertId = alertId
                     UserId = command.UserId
                     Ticker = ticker
@@ -109,7 +110,7 @@ namespace core.fs.Alerts
                 }
                 
                 do! accountStorage.SaveStockPriceAlert(alert)
-                return Ok alertId
+                return Ok (alertId.ToString())
             with
             | ex ->
                 logger.LogError($"Error creating stock price alert: {ex.Message}")

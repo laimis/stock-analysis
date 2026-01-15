@@ -63,3 +63,34 @@ module StockPriceAlert =
             TriggeredAt = None
             LastResetAt = Some DateTimeOffset.UtcNow
         }
+
+// DTO for API serialization (using strings instead of discriminated unions)
+[<CLIMutable>]
+type StockPriceAlertDto = {
+    AlertId: string
+    UserId: string
+    Ticker: string
+    PriceLevel: decimal
+    AlertType: string
+    Note: string
+    State: string
+    CreatedAt: DateTimeOffset
+    TriggeredAt: DateTimeOffset option
+    LastResetAt: DateTimeOffset option
+}
+
+module StockPriceAlertDto =
+    let fromDomain (alert: StockPriceAlert): StockPriceAlertDto =
+        let (UserId userId) = alert.UserId
+        {
+            AlertId = alert.AlertId.ToString()
+            UserId = userId.ToString()
+            Ticker = alert.Ticker.Value
+            PriceLevel = alert.PriceLevel
+            AlertType = PriceAlertType.toString alert.AlertType
+            Note = alert.Note
+            State = PriceAlertState.toString alert.State
+            CreatedAt = alert.CreatedAt
+            TriggeredAt = alert.TriggeredAt
+            LastResetAt = alert.LastResetAt
+        }

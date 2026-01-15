@@ -33,6 +33,23 @@ export class StocksService {
         return this.http.get<Monitor[]>('/api/alerts/monitors')
     }
 
+    // ----------------- stock price alerts ---------------------
+    getStockPriceAlerts(): Observable<StockPriceAlert[]> {
+        return this.http.get<StockPriceAlert[]>('/api/alerts/price')
+    }
+
+    createStockPriceAlert(ticker: string, priceLevel: number, alertType: string, note: string): Observable<string> {
+        return this.http.post<string>('/api/alerts/price', {ticker, priceLevel, alertType, note})
+    }
+
+    updateStockPriceAlert(alertId: string, priceLevel: number, alertType: string, note: string, state: string): Observable<void> {
+        return this.http.put<void>(`/api/alerts/price/${alertId}`, {priceLevel, alertType, note, state})
+    }
+
+    deleteStockPriceAlert(alertId: string): Observable<void> {
+        return this.http.delete<void>(`/api/alerts/price/${alertId}`)
+    }
+
     sendEmail(obj: { to: string; from: string; subject: string; plainBody: string; htmlBody: string}) {
         return this.http.post<object>('/api/admin/email', obj)
     }
@@ -1318,4 +1335,17 @@ export interface InflectionPointsReportDetails {
 export interface InflectionPointsReport {
     onBalanceVolume: InflectionPointsReportDetails;
     price: InflectionPointsReportDetails;
+}
+
+export interface StockPriceAlert {
+    alertId: string;
+    userId: string;
+    ticker: string;
+    priceLevel: number;
+    alertType: string; // "above" or "below"
+    note: string;
+    state: string; // "active", "triggered", or "disabled"
+    createdAt: string;
+    triggeredAt?: string;
+    lastResetAt?: string;
 }
