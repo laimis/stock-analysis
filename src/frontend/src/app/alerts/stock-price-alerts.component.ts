@@ -30,6 +30,8 @@ export class StockPriceAlertsComponent implements OnInit {
   };
 
   editingAlert: StockPriceAlert | null = null;
+  currentPrice: number | null = null;
+  priceLoading = false;
 
   ngOnInit() {
     this.loadAlerts();
@@ -80,6 +82,38 @@ export class StockPriceAlertsComponent implements OnInit {
 
   onTickerSelected(ticker: string) {
     this.newAlert.ticker = ticker;
+    this.fetchCurrentPrice(ticker);
+  }
+
+  fetchCurrentPrice(ticker: string) {
+    this.priceLoading = true;
+    this.currentPrice = null;
+    this.errors = [];
+
+    this.stocksService.getStockQuote(ticker).subscribe({
+      next: (quote) => {
+        this.currentPrice = quote.price || quote.mark || quote.lastPrice;
+        this.priceLoading = false;
+      },
+      error: (error) => {
+        this.errors = GetErrors(error);
+        this.priceLoading = false;
+      }
+    });
+  }
+
+  setPriceLevelPercentage(percentage: number) {
+    if (this.currentPrice !== null) {
+      const multiplier = 1 + (percentage / 100);
+      this.newAlert.priceLevel = Math.round(this.currentPrice * multiplier * 100) / 100;
+    }
+  }
+
+  get pricePercentageDiff(): number | null {
+    if (this.currentPrice !== null && this.newAlert.priceLevel !== null) {
+      return ((this.newAlert.priceLevel - this.currentPrice) / this.currentPrice) * 100;
+    }
+    return null;
   }
 
   resetForm() {
@@ -90,6 +124,8 @@ export class StockPriceAlertsComponent implements OnInit {
       note: ''
     };
     this.editingAlert = null;
+    this.currentPrice = null;
+    this.priceLoading = false;
   }
 
   createAlert() {
@@ -128,6 +164,7 @@ export class StockPriceAlertsComponent implements OnInit {
       alertType: alert.alertType,
       note: alert.note
     };
+    this.fetchCurrentPrice(alert.ticker);
   }
 
   updateAlert() {

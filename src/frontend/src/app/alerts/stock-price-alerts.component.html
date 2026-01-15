@@ -46,7 +46,15 @@
               }
             </div>
             <div class="col-md-3 mb-3">
-              <label for="priceLevel" class="form-label">Price Level</label>
+              <label for="priceLevel" class="form-label">
+                Price Level
+                @if (currentPrice !== null && !priceLoading) {
+                  <span class="text-muted ms-2">(Current: ${{ currentPrice | number:'1.2-2' }})</span>
+                }
+                @if (priceLoading) {
+                  <span class="spinner-border spinner-border-sm ms-2" role="status"></span>
+                }
+              </label>
               <input 
                 type="number" 
                 class="form-control" 
@@ -55,7 +63,24 @@
                 name="priceLevel"
                 step="0.01"
                 required
-                placeholder="150.00">
+                placeholder="">
+              @if (currentPrice !== null && !priceLoading) {
+                <div class="mt-1">
+                  <small class="text-muted">
+                    Quick fill: 
+                    <a href="javascript:void(0)" class="ms-1" (click)="setPriceLevelPercentage(-30)">-30%</a>
+                    <a href="javascript:void(0)" class="ms-1" (click)="setPriceLevelPercentage(-60)">-60%</a>
+                    <a href="javascript:void(0)" class="ms-1" (click)="setPriceLevelPercentage(-70)">-70%</a>
+                  </small>
+                </div>
+              }
+              @if (pricePercentageDiff !== null) {
+                <div class="mt-1">
+                  <small [class]="pricePercentageDiff >= 0 ? 'text-success' : 'text-danger'">
+                    {{ pricePercentageDiff >= 0 ? '+' : '' }}{{ pricePercentageDiff | number:'1.1-1' }}% from current
+                  </small>
+                </div>
+              }
             </div>
             <div class="col-md-3 mb-3">
               <label for="alertType" class="form-label">Alert When</label>
