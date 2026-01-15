@@ -23,12 +23,12 @@
                     <tr>
                         <td style="padding: 32px 40px;">
                             
-                            {{if appliedDividends.size > 0}}
+                            {{if applied_dividends.size > 0}}
                             <div style="margin-bottom: 32px;">
                                 <h2 style="margin: 0 0 16px; color: #059669; font-size: 20px; font-weight: 600;">
-                                    💰 Dividends Received ({{appliedDividends.size}})
+                                    💰 Dividends Received ({{applied_dividends.size}})
                                 </h2>
-                                {{for dividend in appliedDividends}}
+                                {{for dividend in applied_dividends}}
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #d1fae5; border-radius: 6px; background-color: #f0fdf4;">
                                     <tr>
                                         <td style="padding: 16px;">
@@ -46,12 +46,12 @@
                             </div>
                             {{end}}
                             
-                            {{if appliedInterest.size > 0}}
+                            {{if applied_interest.size > 0}}
                             <div style="margin-bottom: 32px;">
                                 <h2 style="margin: 0 0 16px; color: #2563eb; font-size: 20px; font-weight: 600;">
-                                    💵 Interest Earned ({{appliedInterest.size}})
+                                    💵 Interest Earned ({{applied_interest.size}})
                                 </h2>
-                                {{for interest in appliedInterest}}
+                                {{for interest in applied_interest}}
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #bfdbfe; border-radius: 6px; background-color: #eff6ff;">
                                     <tr>
                                         <td style="padding: 16px;">
@@ -69,12 +69,12 @@
                             </div>
                             {{end}}
                             
-                            {{if appliedCashTransfers.size > 0}}
+                            {{if applied_cash_transfers.size > 0}}
                             <div style="margin-bottom: 32px;">
                                 <h2 style="margin: 0 0 16px; color: #7c3aed; font-size: 20px; font-weight: 600;">
-                                    🔄 Cash Transfers ({{appliedCashTransfers.size}})
+                                    🔄 Cash Transfers ({{applied_cash_transfers.size}})
                                 </h2>
-                                {{for transfer in appliedCashTransfers}}
+                                {{for transfer in applied_cash_transfers}}
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #e9d5ff; border-radius: 6px; background-color: #faf5ff;">
                                     <tr>
                                         <td style="padding: 16px;">

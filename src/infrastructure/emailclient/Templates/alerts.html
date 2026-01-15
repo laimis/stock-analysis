@@ -19,12 +19,12 @@
                     </tr>
                     <tr>
                         <td style="padding: 32px 40px;">
-                            {{for group in alertGroups}}
+                            {{for group in alert_groups}}
                             <div style="margin-bottom: 32px;">
                                 <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
                                     {{group.identifier}}
                                     <span style="color: #6b7280; font-size: 16px; font-weight: normal;">
-                                        ({{group.alertCount}} alert{{if group.alertCount > 1}}s{{end}})
+                                        ({{group.alert_count}} alert{{if group.alert_count > 1}}s{{end}})
                                     </span>
                                 </h2>
                                 
@@ -40,9 +40,9 @@
                                             <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
                                                 {{alert.description}}
                                             </p>
-                                            {{if alert.sourceLists.size > 0}}
+                                            {{if alert.source_lists.size > 0}}
                                             <p style="margin: 8px 0 0; color: #6b7280; font-size: 13px;">
-                                                Lists: {{for list in alert.sourceLists}}{{list}}{{if !for.last}}, {{end}}{{end}}
+                                                Lists: {{for list in alert.source_lists}}{{list}}{{if !for.last}}, {{end}}{{end}}
                                             </p>
                                             {{end}}
                                         </td>
@@ -52,12 +52,12 @@
                             </div>
                             {{end}}
                             
-                            {{if alertDiffs.size > 0}}
+                            {{if alert_diffs.size > 0}}
                             <div style="margin-top: 32px; padding: 16px; background-color: #eff6ff; border: 1px solid #93c5fd; border-radius: 6px;">
                                 <h3 style="margin: 0 0 12px; color: #1e40af; font-size: 16px; font-weight: 600;">
                                     Changes Since Last Alert
                                 </h3>
-                                {{for diff in alertDiffs}}
+                                {{for diff in alert_diffs}}
                                 <p style="margin: 4px 0; color: #1e3a8a; font-size: 14px;">
                                     <strong>{{diff.identifier}}:</strong> 
                                     {{if diff.change > 0}}+{{end}}{{diff.change}} 

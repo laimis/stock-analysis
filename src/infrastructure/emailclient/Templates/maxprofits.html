@@ -23,7 +23,7 @@
                     <tr>
                         <td style="padding: 32px 40px;">
                             <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 24px;">
-                                Based on {{actualData.numberOfPositions}} closed positions, here's how your actual performance compares to optimal hold times:
+                                Based on {{actual_data.number_of_positions}} closed positions, here's how your actual performance compares to optimal hold times:
                             </p>
                             
                             <!-- Actual Performance -->
@@ -35,19 +35,19 @@
                                     <tr>
                                         <td style="padding: 8px 0;">
                                             <span style="color: #1e40af; font-size: 16px; font-weight: 600;">Profit:</span>
-                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">${{actualData.profit}}</span>
+                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">${{actual_data.profit}}</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0;">
                                             <span style="color: #1e40af; font-size: 16px; font-weight: 600;">Average Hold Days:</span>
-                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actualData.days}}</span>
+                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actual_data.days}}</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0;">
                                             <span style="color: #1e40af; font-size: 16px; font-weight: 600;">Efficiency:</span>
-                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actualData.percentage}}%</span>
+                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actual_data.percentage}}%</span>
                                         </td>
                                     </tr>
                                 </table>
@@ -61,7 +61,7 @@
                                 Shows what your profit would have been if you held all positions for specific durations:
                             </p>
                             
-                            {{for item in profitData}}
+                            {{for item in profit_data}}
                             <div style="margin-bottom: 12px; padding: 16px; background-color: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
                                 <div style="margin-bottom: 8px;">
                                     <span style="color: #1f2937; font-size: 16px; font-weight: 600;">{{item.days}} days</span>
@@ -81,7 +81,7 @@
                                 Ranked by maximum potential profit:
                             </p>
                             
-                            {{for item in sortedProfitData}}
+                            {{for item in sorted_profit_data}}
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
                                 <tr>
                                     <td style="padding: 12px; background-color: {{if for.first}}#dcfce7{{else}}#ffffff{{end}};">
