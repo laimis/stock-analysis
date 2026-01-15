@@ -113,7 +113,7 @@ type PortfolioAnalysisService(
                         |> Seq.map (fun t ->
                             {|
                                 Ticker = t.Ticker.Value
-                                Date = t.Date
+                                Date = t.Date.ToString "yyyy-MM-dd"
                                 Price = t.Price
                                 NumberOfShares = t.NumberOfShares
                             |}

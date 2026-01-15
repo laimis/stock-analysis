@@ -59,6 +59,11 @@ public class AlertsController(Handler handler) : ControllerBase
     [Authorize("admin")]
     public Task TriggerMaxProfit(
         [FromServices] core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService service) => service.ReportOnMaxProfitBasedOnDaysHeld();
+    
+    [HttpGet("triggerThirtyDayTransactions")]
+    [Authorize("admin")]
+    public Task TriggerThirtyDayTransactions(
+        [FromServices] core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService service) => service.ReportOnThirtyDayTransactions();
         
     [HttpGet("triggerDaily")]
     [Authorize("admin")]

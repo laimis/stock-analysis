@@ -11,43 +11,43 @@
             <td align="center" style="padding: 40px 20px;">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <tr>
-                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb; background-color: #fef3c7;">
-                            <h1 style="margin: 0; color: #92400e; font-size: 24px; font-weight: 600;">
-                                ⚠️ Sell Alert
+                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb; background-color: #f0f9ff;">
+                            <h1 style="margin: 0; color: #1e40af; font-size: 24px; font-weight: 600;">
+                                📊 Sell Tracking Report
                             </h1>
-                            <p style="margin: 8px 0 0; color: #78350f; font-size: 16px;">
-                                The following positions may warrant review
+                            <p style="margin: 8px 0 0; color: #1e3a8a; font-size: 16px;">
+                                Performance tracking for positions sold approximately 30 days ago
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding: 32px 40px;">
                             <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 24px;">
-                                These positions have triggered sell conditions based on your criteria:
+                                The following positions were sold approximately 30 days ago. Review their current performance to analyze the timing and effectiveness of these sell decisions:
                             </p>
                             
                             {{for sell in sells}}
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
                                 <tr>
-                                    <td style="padding: 16px; background-color: #fef3c7;">
+                                    <td style="padding: 16px; background-color: #f9fafb;">
                                         <div style="margin-bottom: 8px;">
-                                            <span style="font-size: 20px; font-weight: 600; color: #1f2937;">{{sell.Ticker}}</span>
-                                            <span style="margin-left: 12px; font-size: 18px; color: #dc2626; font-weight: 600;">${{sell.Price}}</span>
+                                            <span style="font-size: 20px; font-weight: 600; color: #1f2937;">{{sell.ticker}}</span>
+                                            <span style="margin-left: 12px; font-size: 18px; color: #374151; font-weight: 600;">${{sell.price}}</span>
                                         </div>
                                         <p style="margin: 4px 0; color: #4b5563; font-size: 14px;">
-                                            <strong>Shares:</strong> {{sell.NumberOfShares}}
+                                            <strong>Shares:</strong> {{sell.number_of_shares}}
                                         </p>
                                         <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
-                                            <strong>Date:</strong> {{sell.Date}}
+                                            <strong>Date:</strong> {{sell.date}}
                                         </p>
                                     </td>
                                 </tr>
                             </table>
                             {{end}}
                             
-                            <div style="margin-top: 24px; padding: 16px; background-color: #eff6ff; border-left: 4px solid #2563eb; border-radius: 4px;">
-                                <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 20px;">
-                                    <strong>Note:</strong> This is an automated alert. Please review each position and make decisions based on your investment strategy.
+                            <div style="margin-top: 24px; padding: 16px; background-color: #f3f4f6; border-left: 4px solid #6b7280; border-radius: 4px;">
+                                <p style="margin: 0; color: #374151; font-size: 14px; line-height: 20px;">
+                                    <strong>Purpose:</strong> This report helps you evaluate the performance of your sell decisions over time. Compare current prices against your sell prices to assess timing and identify patterns in your trading strategy.
                                 </p>
                             </div>
                         </td>
