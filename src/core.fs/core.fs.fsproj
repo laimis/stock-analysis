@@ -65,8 +65,4 @@
         <ProjectReference Include="..\core\core.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="10.0.101" />
-    </ItemGroup>
-
 </Project>

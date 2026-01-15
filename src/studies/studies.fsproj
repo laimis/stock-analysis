@@ -25,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="10.0.101" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="XPlot.Plotly" Version="4.1.0" />
   </ItemGroup>
