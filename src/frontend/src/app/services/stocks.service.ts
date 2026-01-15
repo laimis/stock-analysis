@@ -38,8 +38,8 @@ export class StocksService {
         return this.http.get<StockPriceAlert[]>('/api/alerts/price')
     }
 
-    createStockPriceAlert(ticker: string, priceLevel: number, alertType: string, note: string): Observable<string> {
-        return this.http.post<string>('/api/alerts/price', {ticker, priceLevel, alertType, note})
+    createStockPriceAlert(ticker: string, priceLevel: number, alertType: string, note: string): Observable<{alertId: string}> {
+        return this.http.post<{alertId: string}>('/api/alerts/price', {ticker, priceLevel, alertType, note})
     }
 
     updateStockPriceAlert(alertId: string, priceLevel: number, alertType: string, note: string, state: string): Observable<void> {

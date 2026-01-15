@@ -23,6 +23,8 @@ namespace core.fs.Alerts
     // Stock Price Alert Commands
     type GetStockPriceAlerts = {UserId:UserId}
     type CreateStockPriceAlert = {UserId:UserId; Ticker:string; PriceLevel:decimal; AlertType:string; Note:string}
+    [<CLIMutable>]
+    type CreateStockPriceAlertResponse = {AlertId:string}
     type UpdateStockPriceAlert = {UserId:UserId; AlertId:Guid; PriceLevel:decimal; AlertType:string; Note:string; State:string}
     type DeleteStockPriceAlert = {AlertId:Guid}
     
@@ -90,7 +92,7 @@ namespace core.fs.Alerts
             return Ok dtos
         }
         
-        member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<string, ServiceError>> = task {
+        member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<CreateStockPriceAlertResponse, ServiceError>> = task {
             try
                 let alertId = Guid.NewGuid()
                 let ticker = Ticker(command.Ticker)
@@ -110,7 +112,7 @@ namespace core.fs.Alerts
                 }
                 
                 do! accountStorage.SaveStockPriceAlert(alert)
-                return Ok (alertId.ToString())
+                return Ok ({AlertId = alertId.ToString()} : CreateStockPriceAlertResponse)
             with
             | ex ->
                 logger.LogError($"Error creating stock price alert: {ex.Message}")
