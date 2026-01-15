@@ -1,27 +1,4 @@
-.table-responsive {
-  overflow-x: auto;
-}
-
-.btn-group-sm .btn {
-  padding: 0.25rem 0.5rem;
-}
-
-.card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-.form-select.w-auto {
-  max-width: 250px;
-}
-
-thead th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.alert {
-  margin-bottom: 1rem;
-}
+/* Intentionally left blank.
+ * Styles for stock price alerts should be expressed via Bootstrap 5 utility
+ * classes and, if needed, centralized in the global styles.css file rather
+ * than in a component-specific stylesheet. */
