@@ -1,4 +1,4 @@
-<div class="search-container">
+<div class="position-relative">
     @if (label) {
         <label for="ticker" class="form-label">{{ label }}</label>
     }
@@ -14,34 +14,41 @@
                placeholder="{{placeholder}}"
                type="text"/>
         @if (loading) {
-            <span
-                class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto opacity-50"
-                role="status"
-                aria-hidden="true"></span>
+            <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                  role="status"
+                  aria-hidden="true"></span>
         }
     </div>
     @if (searchResultsSubscribedArray.length > 0) {
-        <div class="search-results shadow rounded">
-            @for (r of searchResultsSubscribedArray; track r; let i = $index) {
-                <div class="row"
-                     [class.highlighted]="i === highlightedIndex"
-                     (click)="clicked(r.symbol)">
-                    <div class="col ms-2 mb-2">{{ r.symbol }}</div>
-                    @if (justTickers === false) {
-                        <div class="col-10">{{ r.securityName }}</div>
-                    }
-                </div>
-            }
+        <div class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm" style="z-index: 1000; max-height: 400px; overflow-y: auto;">
+            <div class="list-group list-group-flush">
+                @for (r of searchResultsSubscribedArray; track r; let i = $index) {
+                    <button type="button"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-start text-start border-0"
+                            [class.active]="i === highlightedIndex"
+                            (click)="clicked(r.symbol)">
+                        <div class="w-100">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <span class="fw-bold">{{ r.symbol }}</span>
+                                @if (justTickers === false && r.securityName) {
+                                    <small class="text-muted text-end ms-2 text-truncate" style="max-width: 70%;">{{ r.securityName }}</small>
+                                }
+                            </div>
+                        </div>
+                    </button>
+                }
+            </div>
         </div>
     }
     @if (errors.length > 0) {
-        <div class="search-results shadow rounded text-danger">
-            @for (error of errors; track error; let i = $index) {
-                <div class="row"
-                >
-                    <div class="col">{{ error }}</div>
-                </div>
-            }
+        <div class="position-absolute w-100 mt-1 bg-white border border-danger rounded shadow-sm" style="z-index: 1000;">
+            <div class="list-group list-group-flush">
+                @for (error of errors; track error; let i = $index) {
+                    <div class="list-group-item border-0 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                    </div>
+                }
+            </div>
         </div>
     }
 </div>
