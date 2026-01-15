@@ -1,11 +1,13 @@
 namespace core.fs.Alerts
 
+    open System
     open core.Shared
     open core.Stocks
     open core.fs
     open core.fs.Accounts
     open core.fs.Adapters.Logging
     open core.fs.Adapters.SMS
+    open core.fs.Adapters.Storage
     open core.fs.Alerts.MonitoringServices
 
     
@@ -18,7 +20,13 @@ namespace core.fs.Alerts
     type SMSStatus = struct end
     type RunEmailJob = struct end
     
-    type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger) =
+    // Stock Price Alert Commands
+    type GetStockPriceAlerts = {UserId:UserId}
+    type CreateStockPriceAlert = {UserId:UserId; Ticker:string; PriceLevel:decimal; AlertType:string; Note:string}
+    type UpdateStockPriceAlert = {UserId:UserId; AlertId:Guid; PriceLevel:decimal; AlertType:string; Note:string; State:string}
+    type DeleteStockPriceAlert = {AlertId:Guid}
+    
+    type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger,accountStorage:IAccountStorage) =
     
         let deregisterStopPriceMonitoring userId ticker =
             container.Deregister ticker Constants.StopLossIdentifier userId
@@ -74,4 +82,77 @@ namespace core.fs.Alerts
         member this.Handle (_:RunEmailJob) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
             do! alertEmailService.Execute() |> Async.AwaitTask
             return Ok ()
+        }
+        
+        member this.Handle (query:GetStockPriceAlerts) : System.Threading.Tasks.Task<Result<StockPriceAlert seq, ServiceError>> = task {
+            let! alerts = accountStorage.GetStockPriceAlerts(query.UserId)
+            return Ok alerts
+        }
+        
+        member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<Guid, ServiceError>> = task {
+            try
+                let alertId = Guid.NewGuid()
+                let ticker = Ticker(command.Ticker)
+                let alertType = PriceAlertType.fromString(command.AlertType)
+                
+                let alert = {
+                    AlertId = alertId
+                    UserId = command.UserId
+                    Ticker = ticker
+                    PriceLevel = command.PriceLevel
+                    AlertType = alertType
+                    Note = command.Note
+                    State = PriceAlertState.Active
+                    CreatedAt = System.DateTimeOffset.UtcNow
+                    TriggeredAt = None
+                    LastResetAt = None
+                }
+                
+                do! accountStorage.SaveStockPriceAlert(alert)
+                return Ok alertId
+            with
+            | ex ->
+                logger.LogError($"Error creating stock price alert: {ex.Message}")
+                return Error (ServiceError(ex.Message))
+        }
+        
+        member this.Handle (command:UpdateStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
+            try
+                // We need to get the existing alert first to preserve some fields
+                let! allAlerts = accountStorage.GetStockPriceAlerts(command.UserId)
+                let existingAlert = 
+                    allAlerts 
+                    |> Seq.tryFind (fun a -> a.AlertId = command.AlertId)
+                
+                match existingAlert with
+                | Some existing ->
+                    let alertType = PriceAlertType.fromString(command.AlertType)
+                    let state = PriceAlertState.fromString(command.State)
+                    
+                    let updatedAlert = {
+                        existing with
+                            PriceLevel = command.PriceLevel
+                            AlertType = alertType
+                            Note = command.Note
+                            State = state
+                    }
+                    
+                    do! accountStorage.SaveStockPriceAlert(updatedAlert)
+                    return Ok ()
+                | None ->
+                    return Error (ServiceError("Alert not found"))
+            with
+            | ex ->
+                logger.LogError($"Error updating stock price alert: {ex.Message}")
+                return Error (ServiceError(ex.Message))
+        }
+        
+        member this.Handle (command:DeleteStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
+            try
+                do! accountStorage.DeleteStockPriceAlert(command.AlertId)
+                return Ok ()
+            with
+            | ex ->
+                logger.LogError($"Error deleting stock price alert: {ex.Message}")
+                return Error (ServiceError(ex.Message))
         }

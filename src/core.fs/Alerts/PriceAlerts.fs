@@ -49,3 +49,17 @@ type StockPriceAlert = {
     TriggeredAt: DateTimeOffset option
     LastResetAt: DateTimeOffset option
 }
+
+module StockPriceAlert =
+    let trigger (alert: StockPriceAlert) =
+        { alert with 
+            State = PriceAlertState.Triggered
+            TriggeredAt = Some DateTimeOffset.UtcNow 
+        }
+    
+    let reset (alert: StockPriceAlert) =
+        { alert with 
+            State = PriceAlertState.Active
+            TriggeredAt = None
+            LastResetAt = Some DateTimeOffset.UtcNow
+        }

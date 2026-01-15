@@ -184,4 +184,4 @@ CREATE TABLE stockpricealerts (
     lastresetat TIMESTAMP WITH TIME ZONE
 );
 CREATE INDEX stockpricealerts_userid ON stockpricealerts(userid);
-ALTER TABLE optionpricings OWNER TO stocks;
+ALTER TABLE stockpricealerts OWNER TO stockanalysis;

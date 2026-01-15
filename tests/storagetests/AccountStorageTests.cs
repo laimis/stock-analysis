@@ -5,6 +5,7 @@ using core.Account;
 using core.fs.Adapters.Storage;
 using core.fs.Accounts;
 using core.fs.Adapters.Brokerage;
+using core.fs.Alerts;
 using core.Shared;
 using Microsoft.FSharp.Core;
 using storage.postgres;
@@ -193,6 +194,80 @@ namespace storagetests
             Assert.Equal(transaction.Description, fromDbTransaction.Description);
             Assert.Equal(transaction.InferredTicker.Value, fromDbTransaction.InferredTicker.Value);
             Assert.Equal(transaction.InferredType, fromDbTransaction.InferredType);
+        }
+        
+        [Fact]
+        public async Task StockPriceAlertsWork()
+        {
+            var storage = GetStorage();
+            
+            var userId = UserId.NewUserId(Guid.NewGuid());
+            var alertId = Guid.NewGuid();
+            var ticker = new Ticker("AAPL");
+
+            var alert = new StockPriceAlert
+            {
+                AlertId = alertId,
+                UserId = userId,
+                Ticker = ticker,
+                PriceLevel = 150.50m,
+                AlertType = PriceAlertType.PriceGoesAbove,
+                Note = "Buy signal if price breaks above",
+                State = PriceAlertState.Active,
+                CreatedAt = DateTimeOffset.UtcNow,
+                TriggeredAt = FSharpOption<DateTimeOffset>.None,
+                LastResetAt = FSharpOption<DateTimeOffset>.None
+            };
+            
+            // Save new alert
+            await storage.SaveStockPriceAlert(alert);
+            
+            // Retrieve alerts
+            var fromDb = await storage.GetStockPriceAlerts(userId);
+            
+            Assert.Single(fromDb);
+            
+            var fromDbAlert = fromDb.First();
+            
+            Assert.Equal(alert.AlertId, fromDbAlert.AlertId);
+            Assert.Equal(alert.UserId.Item, fromDbAlert.UserId.Item);
+            Assert.Equal(alert.Ticker.Value, fromDbAlert.Ticker.Value);
+            Assert.Equal(alert.PriceLevel, fromDbAlert.PriceLevel);
+            Assert.Equal(alert.AlertType, fromDbAlert.AlertType);
+            Assert.Equal(alert.Note, fromDbAlert.Note);
+            Assert.Equal(alert.State, fromDbAlert.State);
+            Assert.Equal(alert.CreatedAt, fromDbAlert.CreatedAt, TimeSpan.FromSeconds(1));
+            Assert.True(FSharpOption<DateTimeOffset>.get_IsNone(fromDbAlert.TriggeredAt));
+            Assert.True(FSharpOption<DateTimeOffset>.get_IsNone(fromDbAlert.LastResetAt));
+            
+            // Update alert to triggered state
+            var updatedAlert = new StockPriceAlert
+            {
+                AlertId = alertId,
+                UserId = userId,
+                Ticker = ticker,
+                PriceLevel = 150.50m,
+                AlertType = PriceAlertType.PriceGoesAbove,
+                Note = "Buy signal if price breaks above",
+                State = PriceAlertState.Triggered,
+                CreatedAt = alert.CreatedAt,
+                TriggeredAt = FSharpOption<DateTimeOffset>.Some(DateTimeOffset.UtcNow),
+                LastResetAt = FSharpOption<DateTimeOffset>.None
+            };
+            
+            await storage.SaveStockPriceAlert(updatedAlert);
+            
+            var updatedFromDb = (await storage.GetStockPriceAlerts(userId)).First();
+            
+            Assert.Equal(PriceAlertState.Triggered, updatedFromDb.State);
+            Assert.False(FSharpOption<DateTimeOffset>.get_IsNone(updatedFromDb.TriggeredAt));
+            
+            // Delete alert
+            await storage.DeleteStockPriceAlert(alertId);
+            
+            var afterDelete = await storage.GetStockPriceAlerts(userId);
+            
+            Assert.Empty(afterDelete);
         }
     }
 }
