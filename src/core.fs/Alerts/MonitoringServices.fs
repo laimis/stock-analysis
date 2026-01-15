@@ -1006,3 +1006,168 @@ type AlertEmailService(
 
             container.AddNotice "Emails sent"
         }
+
+[<Struct>]
+type private NearTriggerAlert = {
+    ticker: string
+    currentPrice: decimal
+    alertLevel: decimal
+    alertType: string
+    percentageAway: decimal
+    note: string
+}
+
+type PriceAlertNearTriggerMonitoringService(
+    accounts:IAccountStorage,
+    brokerage:IBrokerage,
+    emails:IEmailService,
+    marketHours:IMarketHours,
+    logger:ILogger) =
+
+    let calculatePercentageAway (currentPrice:decimal) (alertLevel:decimal) (alertType:PriceAlertType) =
+        match alertType with
+        | PriceAlertType.PriceGoesAbove -> 
+            // For above alerts, we want to know how much higher the price needs to go
+            ((alertLevel - currentPrice) / currentPrice) * 100m
+        | PriceAlertType.PriceGoesBelow -> 
+            // For below alerts, we want to know how much lower the price needs to go
+            ((currentPrice - alertLevel) / currentPrice) * 100m
+
+    let isNearTrigger (currentPrice:decimal) (alertLevel:decimal) (alertType:PriceAlertType) : bool =
+        let percentageAway = calculatePercentageAway currentPrice alertLevel alertType
+        percentageAway > 0m && percentageAway <= 5m
+
+    let checkNearTriggerAlertsForUser (user:UserState) (alerts:StockPriceAlert seq) : Async<NearTriggerAlert list> = async {
+        try
+            let alertsByTicker = alerts |> Seq.groupBy _.Ticker |> Seq.toList
+            
+            if alertsByTicker.IsEmpty then
+                return []
+            else
+                let tickers = alertsByTicker |> Seq.map fst
+                
+                logger.LogInformation($"Checking near-trigger for {alerts |> Seq.length} alerts for user {user.Id}")
+                
+                let! quotesResult = brokerage.GetQuotes user tickers |> Async.AwaitTask
+                
+                match quotesResult with
+                | Error err ->
+                    logger.LogError($"Failed to get quotes for near-trigger check user {user.Id}: {err.Message}")
+                    return []
+                | Ok quotes ->
+                    let nearTriggerAlerts =
+                        alertsByTicker
+                        |> Seq.collect (fun (ticker, tickerAlerts) ->
+                            match quotes.TryGetValue(ticker) with
+                            | true, quote ->
+                                tickerAlerts
+                                |> Seq.filter (fun alert -> isNearTrigger quote.Price alert.PriceLevel alert.AlertType)
+                                |> Seq.map (fun alert ->
+                                    let percentAway = calculatePercentageAway quote.Price alert.PriceLevel alert.AlertType
+                                    let alertTypeText = 
+                                        match alert.AlertType with
+                                        | PriceAlertType.PriceGoesAbove -> "above"
+                                        | PriceAlertType.PriceGoesBelow -> "below"
+                                    {
+                                        ticker = alert.Ticker.Value
+                                        currentPrice = quote.Price
+                                        alertLevel = alert.PriceLevel
+                                        alertType = alertTypeText
+                                        percentageAway = percentAway
+                                        note = alert.Note
+                                    }
+                                )
+                            | false, _ ->
+                                logger.LogWarning($"No quote found for near-trigger check {ticker.Value}")
+                                Seq.empty
+                        )
+                        |> Seq.toList
+                    
+                    return nearTriggerAlerts
+        with
+        | ex ->
+            logger.LogError($"Error checking near-trigger alerts for user {user.Id}: {ex.Message}")
+            return []
+    }
+
+    let sendNearTriggerEmail (user:UserState) (nearTriggerAlerts:NearTriggerAlert list) : Async<unit> = async {
+        try
+            let recipient = Recipient(email=user.Email, name=user.Name)
+            
+            let alertsData = 
+                nearTriggerAlerts 
+                |> List.map (fun alert -> 
+                    {|
+                        ticker = alert.ticker
+                        current_price = alert.currentPrice.ToString("N2")
+                        alert_level = alert.alertLevel.ToString("N2")
+                        alert_type = alert.alertType
+                        percentage_away = alert.percentageAway.ToString("N1")
+                        note = alert.note
+                        time = marketHours.ToMarketTime(DateTimeOffset.UtcNow).ToString("yyyy-MM-dd HH:mm") + " ET"
+                    |}
+                )
+            
+            let payload = {|
+                alerts = alertsData
+                alert_count = nearTriggerAlerts.Length
+                title = "NGTD: Price Alerts - Close to Triggering"
+            |}
+            
+            let! emailResult = emails.SendNearTriggerPriceAlerts recipient Sender.NoReply (box payload) |> Async.AwaitTask
+            
+            match emailResult with
+            | Error err -> 
+                logger.LogError($"Failed to send near-trigger email to {user.Email}: {err}")
+                return ()
+            | Ok _ -> 
+                logger.LogInformation($"Near-trigger email sent to {user.Email} with {nearTriggerAlerts.Length} alerts")
+                return ()
+        with
+        | ex ->
+            logger.LogError($"Error sending near-trigger email: {ex.Message}")
+            return ()
+    }
+
+    interface IApplicationService
+
+    member _.Execute() = task {
+        try
+            // Only run after market close
+            if marketHours.IsMarketOpen(DateTimeOffset.UtcNow) then
+                logger.LogInformation("Market is open, skipping near-trigger check")
+            else
+                logger.LogInformation("Starting near-trigger price alert check")
+                
+                let! users = accounts.GetUserEmailIdPairs()
+                
+                do!
+                    users
+                    |> Seq.map (fun emailIdPair -> async {
+                        let! user = accounts.GetUser emailIdPair.Id |> Async.AwaitTask
+                        
+                        match user with
+                        | None -> 
+                            logger.LogWarning($"User {emailIdPair.Id} not found")
+                        | Some user when not user.State.ConnectedToBrokerage ->
+                            logger.LogInformation($"User {emailIdPair.Id} not connected to brokerage, skipping")
+                        | Some user ->
+                            let! allAlerts = accounts.GetStockPriceAlerts(emailIdPair.Id) |> Async.AwaitTask
+                            let activeAlerts = allAlerts |> Seq.filter (fun a -> a.State = PriceAlertState.Active) |> Seq.toList
+                            
+                            if activeAlerts.IsEmpty then
+                                ()
+                            else
+                                let! nearTriggerAlerts = checkNearTriggerAlertsForUser user.State activeAlerts
+                                
+                                if not nearTriggerAlerts.IsEmpty then
+                                    do! sendNearTriggerEmail user.State nearTriggerAlerts
+                    })
+                    |> Async.Sequential
+                    |> Async.Ignore
+                
+                logger.LogInformation("Near-trigger price alert check completed")
+        with
+        | ex ->
+            logger.LogError($"Error in near-trigger monitoring service: {ex.Message}")
+    }

@@ -133,6 +133,9 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
         member _.SendPriceAlert recipient sender properties =
             sendWithTemplate recipient sender "pricealert" "Price Alert Triggered" properties
         
+        member _.SendNearTriggerPriceAlerts recipient sender properties =
+            sendWithTemplate recipient sender "neartriggerpricealerts" "Price Alerts - Close to Triggering" properties
+        
         member _.Send recipient sender subject plainTextBody htmlBody =
             sendRaw recipient sender subject plainTextBody htmlBody
         

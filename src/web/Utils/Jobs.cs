@@ -76,6 +76,13 @@ public static class Jobs
                 options: rjo
             );
             
+            RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PriceAlertNearTriggerMonitoringService>(
+                recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PriceAlertNearTriggerMonitoringService),
+                methodCall: service => service.Execute(),
+                cronExpression: "0 14 * * 1-5",  // 2pm ET weekdays after market close
+                options: rjo
+            );
+            
             RecurringJob.AddOrUpdate<core.fs.Brokerage.MonitoringServices.AccountMonitoringService>(
                 recurringJobId: nameof(core.fs.Brokerage.MonitoringServices.AccountMonitoringService),
                 methodCall: service => service.RunAccountValueOrderAndTransactionSync(),
