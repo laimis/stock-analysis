@@ -770,23 +770,21 @@ type PriceAlertMonitoringService(
                 let recipient = Recipient(email=user.Email, name=user.Name)
                 let alertTypeText = 
                     match alert.AlertType with
-                    | PriceAlertType.PriceGoesAbove -> "went above"
-                    | PriceAlertType.PriceGoesBelow -> "went below"
+                    | PriceAlertType.PriceGoesAbove -> "Price went above"
+                    | PriceAlertType.PriceGoesBelow -> "Price went below"
                 
-                let subject = $"Price Alert: {alert.Ticker.Value} {alertTypeText} ${alert.PriceLevel}"
                 let triggeredTime = (DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))
-                let plainBody = $"Price Alert Triggered: {alert.Ticker.Value} at ${currentPrice:N2} (target: ${alert.PriceLevel:N2}). Note: {alert.Note}"
-                let htmlBody = $"""
-                    <h2>Price Alert Triggered</h2>
-                    <p><strong>Ticker:</strong> {alert.Ticker.Value}</p>
-                    <p><strong>Current Price:</strong> ${currentPrice:N2}</p>
-                    <p><strong>Alert Level:</strong> ${alert.PriceLevel:N2}</p>
-                    <p><strong>Alert Type:</strong> Price {alertTypeText} ${alert.PriceLevel:N2}</p>
-                    <p><strong>Note:</strong> {alert.Note}</p>
-                    <p><strong>Triggered At:</strong> {triggeredTime} UTC</p>
-                """
                 
-                let! emailResult = emails.Send recipient Sender.NoReply subject plainBody htmlBody |> Async.AwaitTask
+                let properties = {|
+                    ticker = alert.Ticker.Value
+                    current_price = currentPrice.ToString("N2")
+                    alert_level = alert.PriceLevel.ToString("N2")
+                    alert_type = alertTypeText + " $" + alert.PriceLevel.ToString("N2")
+                    triggered_at = triggeredTime + " UTC"
+                    note = alert.Note
+                |}
+                
+                let! emailResult = (emails.SendPriceAlert recipient Sender.NoReply (box properties)) |> Async.AwaitTask
                 match emailResult with
                 | Error err -> logger.LogError($"Failed to send price alert email for {alert.Ticker.Value}: {err}")
                 | Ok _ -> logger.LogInformation($"Price alert email sent for {alert.Ticker.Value}")
