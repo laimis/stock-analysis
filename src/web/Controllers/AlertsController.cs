@@ -113,4 +113,44 @@ public class AlertsController(Handler handler) : ControllerBase
     public Task TriggerOptionPricing(
         [FromServices] core.fs.Options.MonitoringServices.PriceMonitoringService optionPricing)
         => optionPricing.Run();
+    
+    [HttpGet("triggerPriceAlerts")]
+    [Authorize("admin")]
+    public Task TriggerPriceAlerts(
+        [FromServices] MonitoringServices.PriceAlertMonitoringService priceAlerts)
+        => priceAlerts.Execute();
+    
+    // Stock Price Alerts CRUD
+    [HttpGet("price")]
+    public Task<ActionResult> GetStockPriceAlerts() =>
+        this.OkOrError(handler.Handle(new GetStockPriceAlerts(User.Identifier())));
+    
+    [HttpPost("price")]
+    public Task<ActionResult> CreateStockPriceAlert([FromBody] CreateStockPriceAlertRequest request) =>
+        this.OkOrError(handler.Handle(new CreateStockPriceAlert(
+            userId: User.Identifier(),
+            ticker: request.Ticker,
+            priceLevel: request.PriceLevel,
+            alertType: request.AlertType,
+            note: request.Note
+        )));
+    
+    [HttpPut("price/{alertId}")]
+    public Task<ActionResult> UpdateStockPriceAlert([FromRoute] System.Guid alertId, [FromBody] UpdateStockPriceAlertRequest request) =>
+        this.OkOrError(handler.Handle(new UpdateStockPriceAlert(
+            userId: User.Identifier(),
+            alertId: alertId,
+            priceLevel: request.PriceLevel,
+            alertType: request.AlertType,
+            note: request.Note,
+            state: request.State
+        )));
+    
+    [HttpDelete("price/{alertId}")]
+    public Task<ActionResult> DeleteStockPriceAlert([FromRoute] System.Guid alertId) =>
+        this.OkOrError(handler.Handle(new DeleteStockPriceAlert(alertId)));
 }
+
+// Request DTOs for API
+public record CreateStockPriceAlertRequest(string Ticker, decimal PriceLevel, string AlertType, string Note);
+public record UpdateStockPriceAlertRequest(decimal PriceLevel, string AlertType, string Note, string State);

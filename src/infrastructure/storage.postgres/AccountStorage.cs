@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using core.fs.Accounts;
 using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.Storage;
+using core.fs.Alerts;
 using core.fs.Options;
 using core.Shared;
 using Dapper;
@@ -551,6 +552,85 @@ VALUES (:userid, :optionpositionid, :underlyingticker, :symbol, :expiration, :st
                     : (decimal?)pricing.UnderlyingPrice.Value,
                 timestamp = pricing.Timestamp
             });
+        }
+
+        public async Task<IEnumerable<StockPriceAlert>> GetStockPriceAlerts(UserId userId)
+        {
+            using var db = GetConnection();
+
+            const string query = @"SELECT * FROM stockpricealerts WHERE userid = :userId ORDER BY createdat DESC";
+            
+            var reader = await db.ExecuteReaderAsync(query, new { userId = userId.Item });
+            
+            var result = new List<StockPriceAlert>();
+            
+            while (reader.Read())
+            {
+                var alert = new StockPriceAlert(
+                    alertId: reader.GetGuid(reader.GetOrdinal("alertid")),
+                    userId: UserId.NewUserId(reader.GetGuid(reader.GetOrdinal("userid"))),
+                    ticker: new Ticker(reader.GetString(reader.GetOrdinal("ticker"))),
+                    priceLevel: reader.GetDecimal(reader.GetOrdinal("pricelevel")),
+                    alertType: PriceAlertTypeModule.fromString(reader.GetString(reader.GetOrdinal("alerttype"))),
+                    note: reader.GetString(reader.GetOrdinal("note")),
+                    state: PriceAlertStateModule.fromString(reader.GetString(reader.GetOrdinal("state"))),
+                    createdAt: new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("createdat"))),
+                    triggeredAt: reader.IsDBNull(reader.GetOrdinal("triggeredat")) 
+                        ? FSharpOption<DateTimeOffset>.None 
+                        : FSharpOption<DateTimeOffset>.Some(new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("triggeredat")))),
+                    lastResetAt: reader.IsDBNull(reader.GetOrdinal("lastresetat")) 
+                        ? FSharpOption<DateTimeOffset>.None 
+                        : FSharpOption<DateTimeOffset>.Some(new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("lastresetat"))))
+                );
+                
+                result.Add(alert);
+            }
+
+            return result;
+        }
+
+        public async Task SaveStockPriceAlert(StockPriceAlert alert)
+        {
+            using var db = GetConnection();
+
+            var query = @"
+INSERT INTO stockpricealerts (alertid, userid, ticker, pricelevel, alerttype, note, state, createdat, triggeredat, lastresetat)
+VALUES (:alertid, :userid, :ticker, :pricelevel, :alerttype, :note, :state, :createdat, :triggeredat, :lastresetat)
+ON CONFLICT (alertid) DO UPDATE SET
+    pricelevel = EXCLUDED.pricelevel,
+    alerttype = EXCLUDED.alerttype,
+    note = EXCLUDED.note,
+    state = EXCLUDED.state,
+    triggeredat = EXCLUDED.triggeredat,
+    lastresetat = EXCLUDED.lastresetat
+            ";
+            
+            await db.ExecuteAsync(query, new
+            {
+                alertid = alert.AlertId,
+                userid = alert.UserId.Item,
+                ticker = alert.Ticker.Value,
+                pricelevel = alert.PriceLevel,
+                alerttype = PriceAlertTypeModule.toString(alert.AlertType),
+                note = alert.Note,
+                state = PriceAlertStateModule.toString(alert.State),
+                createdat = alert.CreatedAt,
+                triggeredat = FSharpOption<DateTimeOffset>.get_IsNone(alert.TriggeredAt) 
+                    ? null 
+                    : (DateTimeOffset?)alert.TriggeredAt.Value,
+                lastresetat = FSharpOption<DateTimeOffset>.get_IsNone(alert.LastResetAt) 
+                    ? null 
+                    : (DateTimeOffset?)alert.LastResetAt.Value
+            });
+        }
+
+        public async Task DeleteStockPriceAlert(Guid alertId)
+        {
+            using var db = GetConnection();
+
+            const string query = @"DELETE FROM stockpricealerts WHERE alertid = :alertid";
+            
+            await db.ExecuteAsync(query, new { alertid = alertId });
         }
     }
 }

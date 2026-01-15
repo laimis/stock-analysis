@@ -1,0 +1,4 @@
+/* Intentionally left blank.
+ * Styles for stock price alerts should be expressed via Bootstrap 5 utility
+ * classes and, if needed, centralized in the global styles.css file rather
+ * than in a component-specific stylesheet. */

@@ -130,6 +130,9 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
         member _.SendMaxProfits recipient sender properties =
             sendWithTemplate recipient sender "maxprofits" "Maximum Profit Achieved" properties
         
+        member _.SendPriceAlert recipient sender properties =
+            sendWithTemplate recipient sender "pricealert" "Price Alert Triggered" properties
+        
         member _.Send recipient sender subject plainTextBody htmlBody =
             sendRaw recipient sender subject plainTextBody htmlBody
         

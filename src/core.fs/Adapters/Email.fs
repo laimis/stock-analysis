@@ -47,5 +47,6 @@ type IEmailService =
     abstract SendBrokerageTransactions : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendSellAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendMaxProfits : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendPriceAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract Send : recipient:Recipient -> sender:Sender -> subject:string -> plainTextBody:string -> htmlBody:string -> Task<Result<unit, string>>
     abstract SendWithInput : input:EmailInput -> Task<Result<unit, string>>

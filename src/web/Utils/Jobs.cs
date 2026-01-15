@@ -69,6 +69,13 @@ public static class Jobs
                 options: rjo
             );
             
+            RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.PriceAlertMonitoringService>(
+                recurringJobId: nameof(core.fs.Alerts.MonitoringServices.PriceAlertMonitoringService),
+                methodCall: service => service.Execute(),
+                cronExpression: "*/5 6-13 * * 1-5",  // every 5 minutes from 6am to 1pm
+                options: rjo
+            );
+            
             RecurringJob.AddOrUpdate<core.fs.Brokerage.MonitoringServices.AccountMonitoringService>(
                 recurringJobId: nameof(core.fs.Brokerage.MonitoringServices.AccountMonitoringService),
                 methodCall: service => service.RunAccountValueOrderAndTransactionSync(),

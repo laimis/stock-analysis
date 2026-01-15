@@ -24,6 +24,7 @@ export class NavMenuComponent {
         {path: '/stocks/positions', label: 'Stocks'},
         {path: '/options', label: 'Options'},
         {path: '/stocks/newposition', label: 'Trade'},
+        {path: '/alerts/price', label: 'Price Alerts'},
         {path: '/routines', label: 'Routines'},
         {path: '/profile', label: 'Profile'}
     ];

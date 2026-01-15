@@ -19,6 +19,7 @@ import {OptionSellComponent} from "./options/option-sell/option-sell.component";
 import {OptionChainComponent} from "./options/option-chain/option-chain.component";
 import {OwnedOptionComponent} from "./options/owned-option-detail/owned-option-detail.component";
 import {AlertsComponent} from "./alerts/alerts.component";
+import {StockPriceAlertsComponent} from "./alerts/stock-price-alerts.component";
 import {SummaryComponent} from "./summary/summary.component";
 import {PlaygroundComponent} from "./playground/playground.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
@@ -82,6 +83,7 @@ export const routes: Routes = [
     {path: 'optiondetails/:id', component: OwnedOptionComponent, canActivate: [AuthGuard]},
 
     {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
+    {path: 'alerts/price', component: StockPriceAlertsComponent, canActivate: [AuthGuard]},
 
     {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
 

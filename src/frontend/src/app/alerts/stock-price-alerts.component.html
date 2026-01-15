@@ -1,0 +1,199 @@
+<div class="container-fluid mt-3">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <h3>Stock Price Alerts</h3>
+    </div>
+    <div class="col-md-6 text-end">
+      <button class="btn btn-primary" (click)="toggleForm()">
+        <i class="fas" [ngClass]="{'fa-plus': !showForm, 'fa-times': showForm}"></i>
+        {{ showForm ? 'Cancel' : 'New Alert' }}
+      </button>
+      <button class="btn btn-secondary ms-2" (click)="loadAlerts()" [disabled]="loading">
+        <i class="fas fa-sync" [ngClass]="{'fa-spin': loading}"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (errors.length > 0) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      @for (error of errors; track error) {
+        <div>{{ error }}</div>
+      }
+      <button type="button" class="btn-close" (click)="errors = []"></button>
+    </div>
+  }
+
+  @if (showForm) {
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5>{{ editingAlert ? 'Edit' : 'Create' }} Alert</h5>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="editingAlert ? updateAlert() : createAlert()">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label for="ticker" class="form-label">Ticker</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="ticker" 
+                [(ngModel)]="newAlert.ticker" 
+                name="ticker"
+                [disabled]="!!editingAlert"
+                required
+                placeholder="AAPL"
+                style="text-transform: uppercase">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="priceLevel" class="form-label">Price Level</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="priceLevel" 
+                [(ngModel)]="newAlert.priceLevel" 
+                name="priceLevel"
+                step="0.01"
+                required
+                placeholder="150.00">
+            </div>
+            <div class="col-md-3 mb-3">
+              <label for="alertType" class="form-label">Alert When</label>
+              <select 
+                class="form-select" 
+                id="alertType" 
+                [(ngModel)]="newAlert.alertType" 
+                name="alertType"
+                required>
+                <option value="above">Price Goes Above</option>
+                <option value="below">Price Goes Below</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="note" class="form-label">Note</label>
+            <textarea 
+              class="form-control" 
+              id="note" 
+              [(ngModel)]="newAlert.note" 
+              name="note"
+              rows="2"
+              placeholder="Why are you creating this alert?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-success" [disabled]="loading">
+            {{ editingAlert ? 'Update' : 'Create' }} Alert
+          </button>
+          <button type="button" class="btn btn-secondary ms-2" (click)="toggleForm()">
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="mb-3">
+    <label for="filterState" class="form-label me-2">Filter by State:</label>
+    <select 
+      id="filterState" 
+      class="form-select d-inline-block w-auto" 
+      [(ngModel)]="filterState" 
+      (change)="onFilterChange()">
+      <option value="all">All ({{ alerts.length }})</option>
+      <option value="active">Active</option>
+      <option value="triggered">Triggered</option>
+      <option value="disabled">Disabled</option>
+    </select>
+  </div>
+
+  @if (loading && alerts.length === 0) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  }
+
+  @if (filteredAlerts.length === 0 && !loading) {
+    <div class="alert alert-info">
+      No alerts found. Create your first alert to get started!
+    </div>
+  }
+
+  @if (filteredAlerts.length > 0) {
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Price Level</th>
+            <th>Alert Type</th>
+            <th>Note</th>
+            <th>State</th>
+            <th>Created</th>
+            <th>Triggered</th>
+            <th>Last Reset</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (alert of filteredAlerts; track alert.alertId) {
+            <tr>
+              <td>
+                <strong>{{ alert.ticker }}</strong>
+              </td>
+              <td>
+                ${{ alert.priceLevel | number:'1.2-2' }}
+              </td>
+              <td>
+                <span [class]="alert.alertType === 'above' ? 'text-success' : 'text-danger'">
+                  {{ getAlertTypeDisplay(alert.alertType) }}
+                </span>
+              </td>
+              <td>
+                <small>{{ alert.note || '-' }}</small>
+              </td>
+              <td>
+                <span [class]="getStateClass(alert.state)">
+                  {{ alert.state }}
+                </span>
+              </td>
+              <td>
+                <small>{{ alert.createdAt | date:'short' }}</small>
+              </td>
+              <td>
+                <small>{{ alert.triggeredAt ? (alert.triggeredAt | date:'short') : '-' }}</small>
+              </td>
+              <td>
+                <small>{{ alert.lastResetAt ? (alert.lastResetAt | date:'short') : '-' }}</small>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button 
+                    class="btn btn-outline-primary" 
+                    (click)="editAlert(alert)"
+                    title="Edit">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  @if (alert.state === 'triggered') {
+                    <button 
+                      class="btn btn-outline-success" 
+                      (click)="resetAlertState(alert)"
+                      title="Reset to Active">
+                      <i class="fas fa-redo"></i>
+                    </button>
+                  }
+                  <button 
+                    class="btn btn-outline-danger" 
+                    (click)="deleteAlert(alert)"
+                    title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

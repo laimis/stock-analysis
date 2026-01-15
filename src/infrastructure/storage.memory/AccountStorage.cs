@@ -1,6 +1,7 @@
 ﻿using core.fs.Accounts;
 using core.fs.Adapters.Brokerage;
 using core.fs.Adapters.Storage;
+using core.fs.Alerts;
 using core.fs.Options;
 using Microsoft.FSharp.Core;
 using storage.shared;
@@ -16,6 +17,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, List<StockOrder>> _stockOrders = new();
     private static readonly Dictionary<UserId, List<OptionOrder>> _optionOrders = new();
     private static readonly Dictionary<UserId, List<OptionPricing>> _optionPricings = new();
+    private static readonly Dictionary<UserId, List<StockPriceAlert>> _stockPriceAlerts = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -158,6 +160,37 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         }
         
         _optionOrders[userId].AddRange(orders);
+        return Task.CompletedTask;
+    }
+
+    public Task<IEnumerable<StockPriceAlert>> GetStockPriceAlerts(UserId userId)
+    {
+        return Task.FromResult<IEnumerable<StockPriceAlert>>(
+            _stockPriceAlerts.GetValueOrDefault(userId, []).OrderByDescending(a => a.CreatedAt)
+        );
+    }
+
+    public Task SaveStockPriceAlert(StockPriceAlert alert)
+    {
+        if (!_stockPriceAlerts.ContainsKey(alert.UserId))
+        {
+            _stockPriceAlerts[alert.UserId] = [];
+        }
+        
+        // Remove existing alert with same ID if present (for updates)
+        _stockPriceAlerts[alert.UserId].RemoveAll(a => a.AlertId == alert.AlertId);
+        _stockPriceAlerts[alert.UserId].Add(alert);
+        
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteStockPriceAlert(Guid alertId)
+    {
+        foreach (var alerts in _stockPriceAlerts.Values)
+        {
+            alerts.RemoveAll(a => a.AlertId == alertId);
+        }
+        
         return Task.CompletedTask;
     }
 }

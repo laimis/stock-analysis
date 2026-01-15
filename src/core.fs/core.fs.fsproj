@@ -15,6 +15,7 @@
         <Compile Include="Adapters\Stocks.fs" />
         <Compile Include="Adapters\Options.fs" />
         <Compile Include="Adapters\Brokerage.fs" />
+        <Compile Include="Alerts\PriceAlerts.fs" />
         <Compile Include="Adapters\IAccountStorage.fs" />
         <Compile Include="Adapters\IPortfolioStorage.fs" />
         <Compile Include="Adapters\Logging.fs" />

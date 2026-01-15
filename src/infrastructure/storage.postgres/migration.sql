@@ -171,3 +171,18 @@ CREATE INDEX optionpricings_userid ON optionpricings(userid);
 CREATE INDEX optionpricings_optionpositionid ON optionpricings(optionpositionid);
 CREATE INDEX optionpricings_symbol ON optionpricings(symbol);
 ALTER TABLE optionpricings OWNER TO stocks;
+
+CREATE TABLE stockpricealerts (
+    alertid uuid PRIMARY KEY,
+    userid uuid NOT NULL,
+    ticker TEXT NOT NULL,
+    pricelevel DECIMAL NOT NULL,
+    alerttype TEXT NOT NULL,
+    note TEXT NOT NULL,
+    state TEXT NOT NULL,
+    createdat TIMESTAMP WITH TIME ZONE NOT NULL,
+    triggeredat TIMESTAMP WITH TIME ZONE,
+    lastresetat TIMESTAMP WITH TIME ZONE
+);
+CREATE INDEX stockpricealerts_userid ON stockpricealerts(userid);
+ALTER TABLE stockpricealerts OWNER TO stockanalysis;

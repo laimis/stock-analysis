@@ -745,6 +745,193 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
             marketHours.ToUniversalTime(nextSaturday)
 
 
+type PriceAlertMonitoringService(
+    accounts:IAccountStorage,
+    brokerage:IBrokerage,
+    emails:IEmailService,
+    logger:ILogger) =
+
+    let checkAlert (user:UserState) (alert:StockPriceAlert) (currentPrice:decimal) = async {
+        try
+            let shouldTrigger =
+                match alert.State, alert.AlertType with
+                | PriceAlertState.Active, PriceAlertType.PriceGoesAbove when currentPrice >= alert.PriceLevel -> true
+                | PriceAlertState.Active, PriceAlertType.PriceGoesBelow when currentPrice <= alert.PriceLevel -> true
+                | _ -> false
+
+            if shouldTrigger then
+                logger.LogInformation($"Alert {alert.AlertId} triggered for {alert.Ticker.Value} at ${currentPrice} (target: ${alert.PriceLevel})")
+                
+                // Trigger the alert
+                let triggeredAlert = StockPriceAlert.trigger alert
+                do! accounts.SaveStockPriceAlert(triggeredAlert) |> Async.AwaitTask
+                
+                // Send email notification
+                let recipient = Recipient(email=user.Email, name=user.Name)
+                let alertTypeText = 
+                    match alert.AlertType with
+                    | PriceAlertType.PriceGoesAbove -> "Price went above"
+                    | PriceAlertType.PriceGoesBelow -> "Price went below"
+                
+                let triggeredTime = (DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))
+                
+                let properties = {|
+                    ticker = alert.Ticker.Value
+                    current_price = currentPrice.ToString("N2")
+                    alert_level = alert.PriceLevel.ToString("N2")
+                    alert_type = alertTypeText + " $" + alert.PriceLevel.ToString("N2")
+                    triggered_at = triggeredTime + " UTC"
+                    note = alert.Note
+                |}
+                
+                let! emailResult = (emails.SendPriceAlert recipient Sender.NoReply (box properties)) |> Async.AwaitTask
+                match emailResult with
+                | Error err -> logger.LogError($"Failed to send price alert email for {alert.Ticker.Value}: {err}")
+                | Ok _ -> logger.LogInformation($"Price alert email sent for {alert.Ticker.Value}")
+                
+                return Some alert.AlertId
+            else
+                return None
+        with
+        | ex ->
+            logger.LogError($"Error checking alert {alert.AlertId}: {ex.Message}")
+            return None
+    }
+
+    let checkAlertsForUser (user:UserState) (alerts:StockPriceAlert seq) = async {
+        try
+            // Group alerts by ticker to minimize API calls
+            let alertsByTicker = alerts |> Seq.groupBy _.Ticker |> Seq.toList
+            
+            if alertsByTicker.IsEmpty then
+                return []
+            else
+                let tickers = alertsByTicker |> Seq.map fst
+                
+                logger.LogInformation($"Checking {alerts |> Seq.length} alerts for user {user.Id} across {Seq.length tickers} tickers")
+                
+                // Get all quotes at once
+                let! quotesResult = brokerage.GetQuotes user tickers |> Async.AwaitTask
+                
+                match quotesResult with
+                | Error err ->
+                    logger.LogError($"Failed to get quotes for user {user.Id}: {err.Message}")
+                    return []
+                | Ok quotes ->
+                    let! triggeredAlertIds =
+                        alertsByTicker
+                        |> Seq.map (fun (ticker, tickerAlerts) ->
+                            async {
+                                match quotes.TryGetValue(ticker) with
+                                | true, quote ->
+                                    let! results =
+                                        tickerAlerts
+                                        |> Seq.map (fun alert -> checkAlert user alert quote.Price)
+                                        |> Async.Sequential
+                                    return results |> Seq.choose id |> Seq.toList
+                                | false, _ ->
+                                    logger.LogWarning($"No quote found for {ticker.Value}")
+                                    return []
+                            }
+                        )
+                        |> Async.Sequential
+                    
+                    return triggeredAlertIds |> Seq.concat |> Seq.toList
+        with
+        | ex ->
+            logger.LogError($"Error checking alerts for user {user.Id}: {ex.Message}")
+            return []
+    }
+
+    let resetOldTriggeredAlerts() = task {
+        try
+            logger.LogInformation("Checking for triggered alerts to reset (older than 12 hours)")
+            
+            let! users = accounts.GetUserEmailIdPairs()
+            let cutoffTime = DateTimeOffset.UtcNow.AddHours(-12.0)
+            
+            let! resetCounts =
+                users
+                |> Seq.map (fun emailIdPair -> task {
+                    let! alerts = accounts.GetStockPriceAlerts(emailIdPair.Id)
+                    
+                    let alertsToReset =
+                        alerts
+                        |> Seq.filter (fun a -> 
+                            a.State = PriceAlertState.Triggered &&
+                            a.TriggeredAt.IsSome &&
+                            a.TriggeredAt.Value < cutoffTime)
+                        |> Seq.toList
+                    
+                    if not alertsToReset.IsEmpty then
+                        logger.LogInformation($"Resetting {alertsToReset.Length} alerts for user {emailIdPair.Id}")
+                        
+                        for alert in alertsToReset do
+                            let resetAlert = StockPriceAlert.reset alert
+                            do! accounts.SaveStockPriceAlert(resetAlert)
+                    
+                    return alertsToReset.Length
+                })
+                |> System.Threading.Tasks.Task.WhenAll
+            
+            let totalReset = resetCounts |> Seq.sum
+            if totalReset > 0 then
+                logger.LogInformation($"Reset {totalReset} triggered alerts")
+            
+        with
+        | ex ->
+            logger.LogError($"Error resetting triggered alerts: {ex.Message}")
+    }
+
+    interface IApplicationService
+
+    member _.Execute() = task {
+        try
+            logger.LogInformation("Starting price alert monitoring service")
+            
+            // First, reset any old triggered alerts
+            do! resetOldTriggeredAlerts()
+            
+            // Get all users
+            let! users = accounts.GetUserEmailIdPairs()
+            
+            // Check alerts for each user
+            let! allTriggeredCounts =
+                users
+                |> Seq.map (fun emailIdPair -> async {
+                    // Get user to check if connected to brokerage
+                    let! user = accounts.GetUser emailIdPair.Id |> Async.AwaitTask
+                    
+                    match user with
+                    | None ->
+                        logger.LogWarning($"User {emailIdPair.Id} not found")
+                        return 0
+                    | Some user when not user.State.ConnectedToBrokerage ->
+                        logger.LogInformation($"User {emailIdPair.Id} not connected to brokerage, skipping")
+                        return 0
+                    | Some user ->
+                        // Get active alerts for this user
+                        let! allAlerts = accounts.GetStockPriceAlerts(emailIdPair.Id) |> Async.AwaitTask
+                        let activeAlerts = allAlerts |> Seq.filter (fun a -> a.State = PriceAlertState.Active) |> Seq.toList
+                        
+                        if activeAlerts.IsEmpty then
+                            return 0
+                        else
+                            let! triggeredIds = checkAlertsForUser user.State activeAlerts
+                            return triggeredIds.Length
+                })
+                |> Async.Sequential
+                |> Async.StartAsTask
+            
+            let totalTriggered = allTriggeredCounts |> Seq.sum
+            logger.LogInformation($"Price alert monitoring completed. Triggered {totalTriggered} alerts")
+            
+        with
+        | ex ->
+            logger.LogError($"Error in price alert monitoring service: {ex.Message}")
+    }
+
+
 type AlertEmailService(
         accounts:IAccountStorage,
         blobStorage:IBlobStorage,
