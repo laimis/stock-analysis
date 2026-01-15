@@ -20,6 +20,7 @@ export class StockPriceAlertsComponent implements OnInit {
   loading = false;
   showForm = false;
   filterState = 'all'; // 'all', 'active', 'triggered', 'disabled'
+  filterTicker = ''; // Search by ticker
 
   // Form fields
   newAlert = {
@@ -55,14 +56,21 @@ export class StockPriceAlertsComponent implements OnInit {
   }
 
   applyFilter() {
-    if (this.filterState === 'all') {
-      this.filteredAlerts = [...this.alerts];
-    } else {
-      this.filteredAlerts = this.alerts.filter(a => a.state === this.filterState);
+    let filtered = [...this.alerts];
+    
+    // Filter by state
+    if (this.filterState !== 'all') {
+      filtered = filtered.filter(a => a.state === this.filterState);
+    }
+    
+    // Filter by ticker (case-insensitive)
+    if (this.filterTicker && this.filterTicker.trim()) {
+      const searchTerm = this.filterTicker.trim().toLowerCase();
+      filtered = filtered.filter(a => a.ticker.toLowerCase().includes(searchTerm));
     }
     
     // Sort by ticker, then by price level
-    this.filteredAlerts.sort((a, b) => {
+    this.filteredAlerts = filtered.sort((a, b) => {
       const tickerCompare = a.ticker.localeCompare(b.ticker);
       if (tickerCompare !== 0) return tickerCompare;
       return a.priceLevel - b.priceLevel;

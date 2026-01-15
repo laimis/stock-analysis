@@ -116,18 +116,26 @@
     </div>
   }
 
-  <div class="mb-3">
-    <label for="filterState" class="form-label me-2">Filter by State:</label>
+  <div class="mb-3 d-flex align-items-center justify-content-between">
     <select 
       id="filterState" 
-      class="form-select d-inline-block w-auto" 
+      class="form-select w-auto" 
       [(ngModel)]="filterState" 
       (change)="onFilterChange()">
-      <option value="all">All ({{ alerts.length }})</option>
+      <option value="all">All States ({{ alerts.length }})</option>
       <option value="active">Active</option>
       <option value="triggered">Triggered</option>
       <option value="disabled">Disabled</option>
     </select>
+    
+    <input 
+      type="text" 
+      id="filterTicker" 
+      class="form-control" 
+      placeholder="Search by ticker..." 
+      [(ngModel)]="filterTicker" 
+      (input)="onFilterChange()"
+      style="width: 200px;">
   </div>
 
   @if (loading && alerts.length === 0) {
