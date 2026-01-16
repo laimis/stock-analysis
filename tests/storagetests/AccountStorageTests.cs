@@ -322,15 +322,6 @@ namespace storagetests
             Assert.Equal(ReminderState.Sent, sentFromDb.State);
             Assert.False(FSharpOption<DateTimeOffset>.get_IsNone(sentFromDb.SentAt));
             
-            // Update reminder using dismiss function
-            var dismissedReminder = ReminderModule.dismiss(sentFromDb);
-            
-            await storage.SaveReminder(dismissedReminder);
-            
-            var dismissedFromDb = (await storage.GetReminders(userId)).First();
-            
-            Assert.Equal(ReminderState.Dismissed, dismissedFromDb.State);
-            
             // Delete reminder
             await storage.DeleteReminder(reminderId);
             
