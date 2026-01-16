@@ -281,38 +281,38 @@ type AccountMonitoringService(
                 // send a list of applied transactions to the user
                 let appliedDividendsMapped =
                     appliedDividends
-                    |> Seq.map (fun t -> {|ticker = t |> getTickerOrBlank; netAmount = t.NetAmount; description = t.Description |})
+                    |> Seq.map (fun t -> {|ticker = t |> getTickerOrBlank; amount = t.NetAmount; date = t.TradeDate.ToString("MMMM dd, yyyy") |})
                     |> Seq.toArray
                     
                 let appliedInterestMapped =
                     appliedInterest
-                    |> Seq.map (fun t -> {|description = t.Description; netAmount = t.NetAmount|})
+                    |> Seq.map (fun t -> {|amount = t.NetAmount; date = t.TradeDate.ToString("MMMM dd, yyyy")|})
                     |> Seq.toArray
                     
                 let appliedCashTransfersMapped =
                     appliedCashTransfers
-                    |> Seq.map (fun t -> {|description = t.Description; netAmount = t.NetAmount|})
+                    |> Seq.map (fun t -> {|``type`` = t.Description; amount = t.NetAmount; date = t.TradeDate.ToString("MMMM dd, yyyy")|})
                     |> Seq.toArray
                     
                 // now combine all failed results and send them to the user
                 let failedResults =
                     failedToResolveTypes
-                    |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to resolve type: {t.Description}"|})
+                    |> Seq.map (fun t -> $"Failed to resolve type: {t.Description} (${t.NetAmount})")
                     |> Seq.append
                         (failedToResolveTickers
-                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to resolve ticker for {t.Description}"|})
+                        |> Seq.map (fun t -> $"Failed to resolve ticker for {t.Description} (${t.NetAmount})")
                         )
                     |> Seq.append
                         (failedToApplyDividends
-                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply dividend: {t.Description}"|})
+                        |> Seq.map (fun t -> $"Failed to apply dividend: {t.Description} (${t.NetAmount})")
                         )
                     |> Seq.append 
                         (failedToApplyInterest
-                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply interest: {t.Description}"|})
+                        |> Seq.map (fun t -> $"Failed to apply interest: {t.Description} (${t.NetAmount})")
                         )
                     |> Seq.append
                         (failedToApplyCashTransfers
-                        |> Seq.map (fun t -> {|netAmount = t.NetAmount; description = $"Failed to apply cash transfer: {t.Description}"|})
+                        |> Seq.map (fun t -> $"Failed to apply cash transfer: {t.Description} (${t.NetAmount})")
                         )
                     |> Seq.toArray
                     
