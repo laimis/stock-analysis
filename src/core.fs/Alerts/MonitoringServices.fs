@@ -868,7 +868,7 @@ type PriceAlertMonitoringService(
                         
                         for alert in alertsToReset do
                             let resetAlert = StockPriceAlert.reset alert
-                            do! accounts.SaveStockPriceAlert(resetAlert)
+                            do! accounts.SaveStockPriceAlert resetAlert
                     
                     return alertsToReset.Length
                 })

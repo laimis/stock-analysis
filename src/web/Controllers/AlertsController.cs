@@ -152,6 +152,13 @@ public class AlertsController(Handler handler) : ControllerBase
             state: request.State
         )));
     
+    [HttpPost("price/{alertId}/reset")]
+    public Task<ActionResult> ResetStockPriceAlert([FromRoute] System.Guid alertId) =>
+        this.OkOrError(handler.Handle(new ResetStockPriceAlert(
+            userId: User.Identifier(),
+            alertId: alertId
+        )));
+    
     [HttpDelete("price/{alertId}")]
     public Task<ActionResult> DeleteStockPriceAlert([FromRoute] System.Guid alertId) =>
         this.OkOrError(handler.Handle(new DeleteStockPriceAlert(alertId)));

@@ -26,6 +26,7 @@ namespace core.fs.Alerts
     [<CLIMutable>]
     type CreateStockPriceAlertResponse = {AlertId:string}
     type UpdateStockPriceAlert = {UserId:UserId; AlertId:Guid; PriceLevel:decimal; AlertType:string; Note:string; State:string}
+    type ResetStockPriceAlert = {UserId:UserId; AlertId:Guid}
     type DeleteStockPriceAlert = {AlertId:Guid}
     
     type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger,accountStorage:IAccountStorage) =
@@ -141,6 +142,26 @@ namespace core.fs.Alerts
             with
             | ex ->
                 logger.LogError($"Error updating stock price alert: {ex.Message}")
+                return Error (ServiceError(ex.Message))
+        }
+        
+        member this.Handle (command:ResetStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
+            try
+                let! allAlerts = accountStorage.GetStockPriceAlerts(command.UserId)
+                let existingAlert = 
+                    allAlerts 
+                    |> Seq.tryFind (fun a -> a.AlertId = command.AlertId)
+                
+                match existingAlert with
+                | Some existing ->
+                    let resetAlert = StockPriceAlert.reset existing
+                    do! accountStorage.SaveStockPriceAlert(resetAlert)
+                    return Ok ()
+                | None ->
+                    return Error (ServiceError("Alert not found"))
+            with
+            | ex ->
+                logger.LogError($"Error resetting stock price alert: {ex.Message}")
                 return Error (ServiceError(ex.Message))
         }
         

@@ -46,6 +46,10 @@ export class StocksService {
         return this.http.put<void>(`/api/alerts/price/${alertId}`, {priceLevel, alertType, note, state})
     }
 
+    resetStockPriceAlert(alertId: string): Observable<void> {
+        return this.http.post<void>(`/api/alerts/price/${alertId}/reset`, {})
+    }
+    
     deleteStockPriceAlert(alertId: string): Observable<void> {
         return this.http.delete<void>(`/api/alerts/price/${alertId}`)
     }

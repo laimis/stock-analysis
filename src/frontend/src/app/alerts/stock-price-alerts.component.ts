@@ -232,13 +232,7 @@ export class StockPriceAlertsComponent implements OnInit {
     this.loading = true;
     this.errors = [];
 
-    this.stocksService.updateStockPriceAlert(
-      alert.alertId,
-      alert.priceLevel,
-      alert.alertType,
-      alert.note,
-      'active'
-    ).subscribe({
+    this.stocksService.resetStockPriceAlert(alert.alertId).subscribe({
       next: () => {
         this.loadAlerts();
         this.loading = false;
