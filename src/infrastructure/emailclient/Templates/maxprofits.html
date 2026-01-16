@@ -27,26 +27,26 @@
                             </p>
                             
                             <!-- Actual Performance -->
-                            <div style="margin-bottom: 32px; padding: 20px; background-color: #eff6ff; border-radius: 8px; border: 2px solid #3b82f6;">
-                                <h2 style="margin: 0 0 16px; color: #1e40af; font-size: 20px; font-weight: 600;">
+                            <div style="margin-bottom: 32px; padding: 20px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
                                     Your Actual Performance
                                 </h2>
                                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td style="padding: 8px 0;">
-                                            <span style="color: #1e40af; font-size: 16px; font-weight: 600;">Profit:</span>
+                                            <span style="color: #6b7280; font-size: 14px;">Profit:</span>
                                             <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">${{actual_data.profit}}</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0;">
-                                            <span style="color: #1e40af; font-size: 16px; font-weight: 600;">Average Hold Days:</span>
+                                            <span style="color: #6b7280; font-size: 14px;">Average Hold Days:</span>
                                             <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actual_data.days}}</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0;">
-                                            <span style="color: #1e40af; font-size: 16px; font-weight: 600;">Efficiency:</span>
+                                            <span style="color: #6b7280; font-size: 14px;">Efficiency:</span>
                                             <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actual_data.percentage}}%</span>
                                         </td>
                                     </tr>
@@ -68,7 +68,7 @@
                                     <span style="color: #059669; font-size: 18px; font-weight: 700; float: right;">${{item.profit}}</span>
                                 </div>
                                 <div style="background-color: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                    <div style="background-color: #3b82f6; height: 100%; width: {{item.percentage}}%;"></div>
+                                    <div style="background-color: #2563eb; height: 100%; width: {{item.percentage}}%;"></div>
                                 </div>
                             </div>
                             {{end}}
@@ -84,7 +84,7 @@
                             {{for item in sorted_profit_data}}
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
                                 <tr>
-                                    <td style="padding: 12px; background-color: {{if for.first}}#dcfce7{{else}}#ffffff{{end}};">
+                                    <td style="padding: 12px; background-color: {{if for.first}}#f9fafb{{else}}#ffffff{{end}};">
                                         <span style="color: #1f2937; font-size: 15px; font-weight: 600;">
                                             {{for.index + 1}}. Hold for {{item.days}} days
                                         </span>
@@ -96,9 +96,10 @@
                             </table>
                             {{end}}
                             
-                            <div style="margin-top: 24px; padding: 16px; background-color: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
-                                <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 20px;">
-                                    <strong>Insight:</strong> This analysis shows the historical optimal hold times for your closed positions. Use this data to inform future trading decisions, but remember past performance doesn't guarantee future results.
+                            <div style="margin-top: 24px; padding: 16px; background-color: #f9fafb; border-left: 3px solid #2563eb; border-radius: 4px;">
+                                <p style="margin: 0; color: #1f2937; font-size: 13px; font-weight: 600;">Insight:</p>
+                                <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
+                                    This analysis shows the historical optimal hold times for your closed positions. Use this data to inform future trading decisions, but remember past performance doesn't guarantee future results.
                                 </p>
                             </div>
                         </td>
