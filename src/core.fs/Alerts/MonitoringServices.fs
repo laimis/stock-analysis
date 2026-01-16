@@ -1220,7 +1220,7 @@ type ReminderMonitoringService(
                                         try
                                             // Send email notification
                                             let recipient = Recipient(email=user.State.Email, name=user.State.Name)
-                                            let dateFormatted = reminder.Date.ToString("yyyy-MM-dd HH:mm")
+                                            let dateFormatted = reminder.Date.ToUniversalTime().ToString("yyyy-MM-dd HH:mm 'UTC'")
                                             
                                             let properties = {|
                                                 date = dateFormatted
