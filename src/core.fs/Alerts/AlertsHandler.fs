@@ -148,8 +148,8 @@ namespace core.fs.Alerts
                     return Error (ServiceError("Alert not found"))
             with
             | ex ->
-                logger.LogError($"Error updating stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error updating stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:ResetStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
@@ -168,8 +168,8 @@ namespace core.fs.Alerts
                     return Error (ServiceError("Alert not found"))
             with
             | ex ->
-                logger.LogError($"Error resetting stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error resetting stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:DeleteStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
@@ -178,7 +178,7 @@ namespace core.fs.Alerts
                 return Ok ()
             with
             | ex ->
-                logger.LogError $"Error deleting stock price alert: {ex.Message}"
+                logger.LogError $"Error deleting stock price alert: {ex}"
                 return Error (ServiceError ex.Message)
         }
         
@@ -239,8 +239,8 @@ namespace core.fs.Alerts
                     return Error (ServiceError("Reminder not found"))
             with
             | ex ->
-                logger.LogError($"Error updating reminder: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error updating reminder: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:DeleteReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
@@ -249,6 +249,6 @@ namespace core.fs.Alerts
                 return Ok ()
             with
             | ex ->
-                logger.LogError($"Error deleting reminder: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error deleting reminder: {ex}"
+                return Error (ServiceError ex.Message)
         }
