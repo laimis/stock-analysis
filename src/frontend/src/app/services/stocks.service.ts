@@ -67,6 +67,10 @@ export class StocksService {
         return this.http.put<void>(`/api/alerts/reminders/${reminderId}`, {date, message, ticker: ticker || null, state})
     }
     
+    dismissReminder(reminderId: string): Observable<void> {
+        return this.http.post<void>(`/api/alerts/reminders/${reminderId}/dismiss`, {})
+    }
+    
     deleteReminder(reminderId: string): Observable<void> {
         return this.http.delete<void>(`/api/alerts/reminders/${reminderId}`)
     }

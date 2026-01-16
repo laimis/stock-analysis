@@ -178,13 +178,7 @@ export class RemindersComponent implements OnInit {
     this.loading = true;
     this.errors = [];
 
-    this.stocksService.updateReminder(
-      reminder.reminderId,
-      new Date(reminder.date).toISOString(),
-      reminder.message,
-      reminder.ticker,
-      'dismissed'
-    ).subscribe({
+    this.stocksService.dismissReminder(reminder.reminderId).subscribe({
       next: () => {
         this.loadReminders();
         this.loading = false;
