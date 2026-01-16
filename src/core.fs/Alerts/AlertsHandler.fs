@@ -98,20 +98,14 @@ namespace core.fs.Alerts
                 let ticker = Ticker(command.Ticker)
                 let alertType = PriceAlertType.fromString(command.AlertType)
                 
-                let alert: StockPriceAlert = {
-                    AlertId = alertId
-                    UserId = command.UserId
-                    Ticker = ticker
-                    PriceLevel = command.PriceLevel
-                    AlertType = alertType
-                    Note = command.Note
-                    State = PriceAlertState.Active
-                    CreatedAt = System.DateTimeOffset.UtcNow
-                    TriggeredAt = None
-                    LastResetAt = None
-                }
+                let alert = StockPriceAlert.create 
+                                command.UserId 
+                                ticker 
+                                alertType 
+                                command.PriceLevel 
+                                command.Note
                 
-                do! accountStorage.SaveStockPriceAlert(alert)
+                do! accountStorage.SaveStockPriceAlert alert
                 return Ok ({AlertId = alertId.ToString()} : CreateStockPriceAlertResponse)
             with
             | ex ->

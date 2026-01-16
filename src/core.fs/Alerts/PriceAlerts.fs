@@ -64,6 +64,24 @@ module StockPriceAlert =
             LastResetAt = Some DateTimeOffset.UtcNow
         }
 
+    let create userId ticker alertType priceLevel note =
+        let alertId = Guid.NewGuid()
+        
+        let alert: StockPriceAlert = {
+            AlertId = alertId
+            UserId = userId
+            Ticker = ticker
+            PriceLevel = priceLevel
+            AlertType = alertType
+            Note = note
+            State = Active
+            CreatedAt = DateTimeOffset.UtcNow
+            TriggeredAt = None
+            LastResetAt = None
+        }
+
+        alert
+
 // DTO for API serialization (using strings instead of discriminated unions)
 [<CLIMutable>]
 type StockPriceAlertDto = {

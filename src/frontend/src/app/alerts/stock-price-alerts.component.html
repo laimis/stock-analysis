@@ -164,7 +164,6 @@
             <th>State</th>
             <th>Created</th>
             <th>Triggered</th>
-            <th>Last Reset</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -172,7 +171,7 @@
           @for (alert of filteredAlerts; track alert.alertId) {
             <tr>
               <td>
-                <strong>{{ alert.ticker }}</strong>
+                <strong><app-stock-link-and-tradingview-link [ticker]="alert.ticker"></app-stock-link-and-tradingview-link></strong>
               </td>
               <td>
                 ${{ alert.priceLevel | number:'1.2-2' }}
@@ -195,9 +194,6 @@
               </td>
               <td>
                 <small>{{ alert.triggeredAt ? (alert.triggeredAt | date:'short') : '-' }}</small>
-              </td>
-              <td>
-                <small>{{ alert.lastResetAt ? (alert.lastResetAt | date:'short') : '-' }}</small>
               </td>
               <td>
                 <div class="btn-group btn-group-sm" role="group">

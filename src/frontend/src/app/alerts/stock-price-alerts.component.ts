@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { StocksService, StockPriceAlert } from '../services/stocks.service';
 import { GetErrors } from '../services/utils';
 import { StockSearchComponent } from '../stocks/stock-search/stock-search.component';
+import { StockLinkAndTradingviewLinkComponent } from "../shared/stocks/stock-link-and-tradingview-link.component";
 
 @Component({
   selector: 'app-stock-price-alerts',
   templateUrl: './stock-price-alerts.component.html',
   styleUrls: ['./stock-price-alerts.component.css'],
-  imports: [CommonModule, FormsModule, StockSearchComponent]
+  imports: [CommonModule, FormsModule, StockSearchComponent, StockLinkAndTradingviewLinkComponent]
 })
 export class StockPriceAlertsComponent implements OnInit {
   private stocksService = inject(StocksService);
