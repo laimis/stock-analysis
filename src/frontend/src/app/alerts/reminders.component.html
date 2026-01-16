@@ -33,17 +33,12 @@
         <form (ngSubmit)="editingReminder ? updateReminder() : createReminder()">
           <div class="row">
             <div class="col-md-4 mb-3">
-              @if (!editingReminder) {
-                <app-stock-search
-                  label="Ticker (Optional)"
-                  placeholder="Search for stock symbol"
-                  [ticker]="newReminder.ticker"
-                  (tickerSelected)="onTickerSelected($event)">
-                </app-stock-search>
-              } @else {
-                <label class="form-label">Ticker</label>
-                <div class="form-control-plaintext"><strong>{{ newReminder.ticker || '—' }}</strong></div>
-              }
+              <app-stock-search
+                label="Ticker (Optional)"
+                placeholder="Search for stock symbol"
+                [ticker]="newReminder.ticker"
+                (tickerSelected)="onTickerSelected($event)">
+              </app-stock-search>
             </div>
             <div class="col-md-4 mb-3">
               <label for="reminderDate" class="form-label">Date</label>
