@@ -685,16 +685,16 @@ ON CONFLICT (reminderid) DO UPDATE SET
             {
                 reminderid = reminder.ReminderId,
                 userid = reminder.UserId.Item,
-                date = reminder.Date,
+                date = reminder.Date.ToUniversalTime(),
                 message = reminder.Message,
                 ticker = FSharpOption<Ticker>.get_IsNone(reminder.Ticker)
                     ? null
                     : reminder.Ticker.Value.Value,
                 state = ReminderStateModule.toString(reminder.State),
-                createdat = reminder.CreatedAt,
+                createdat = reminder.CreatedAt.ToUniversalTime(),
                 sentat = FSharpOption<DateTimeOffset>.get_IsNone(reminder.SentAt)
                     ? null
-                    : (DateTimeOffset?)reminder.SentAt.Value
+                    : (DateTimeOffset?)reminder.SentAt.Value.ToUniversalTime()
             });
         }
 

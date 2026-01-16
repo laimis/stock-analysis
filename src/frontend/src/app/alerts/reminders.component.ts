@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { StocksService, Reminder } from '../services/stocks.service';
 import { GetErrors } from '../services/utils';
 import { StockLinkAndTradingviewLinkComponent } from "../shared/stocks/stock-link-and-tradingview-link.component";
+import { StockSearchComponent } from '../stocks/stock-search/stock-search.component';
 
 @Component({
   selector: 'app-reminders',
   templateUrl: './reminders.component.html',
   styleUrls: ['./reminders.component.css'],
-  imports: [CommonModule, FormsModule, StockLinkAndTradingviewLinkComponent]
+  imports: [CommonModule, FormsModule, StockLinkAndTradingviewLinkComponent, StockSearchComponent]
 })
 export class RemindersComponent implements OnInit {
   private stocksService = inject(StocksService);
@@ -20,6 +21,7 @@ export class RemindersComponent implements OnInit {
   loading = false;
   showForm = false;
   filterState = 'all'; // 'all', 'pending', 'sent', 'dismissed'
+  searchText = ''; // Search by ticker or message
 
   // Form fields
   newReminder = {
@@ -60,6 +62,15 @@ export class RemindersComponent implements OnInit {
       filtered = filtered.filter(r => r.state === this.filterState);
     }
     
+    // Filter by search text (ticker or message)
+    if (this.searchText && this.searchText.trim()) {
+      const searchTerm = this.searchText.trim().toLowerCase();
+      filtered = filtered.filter(r => 
+        (r.ticker && r.ticker.toLowerCase().includes(searchTerm)) ||
+        r.message.toLowerCase().includes(searchTerm)
+      );
+    }
+    
     // Sort by date ascending (soonest first)
     this.filteredReminders = filtered.sort((a, b) => {
       return new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -75,6 +86,10 @@ export class RemindersComponent implements OnInit {
     if (!this.showForm) {
       this.resetForm();
     }
+  }
+
+  onTickerSelected(ticker: string) {
+    this.newReminder.ticker = ticker;
   }
 
   resetForm() {
@@ -196,17 +211,6 @@ export class RemindersComponent implements OnInit {
         this.errors = GetErrors(error);
         this.loading = false;
       }
-    });
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
     });
   }
 
