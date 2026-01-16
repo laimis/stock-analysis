@@ -108,6 +108,11 @@ export class RemindersComponent implements OnInit {
       return;
     }
 
+    if (this.newReminder.date < this.today) {
+      this.errors = ['Reminder date cannot be in the past'];
+      return;
+    }
+
     this.loading = true;
     this.errors = [];
 
@@ -145,6 +150,11 @@ export class RemindersComponent implements OnInit {
 
     if (!this.newReminder.date || !this.newReminder.message.trim()) {
       this.errors = ['Date and message are required'];
+      return;
+    }
+
+    if (this.newReminder.date < this.today) {
+      this.errors = ['Reminder date cannot be in the past'];
       return;
     }
 
