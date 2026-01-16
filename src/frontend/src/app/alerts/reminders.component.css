@@ -1,0 +1,21 @@
+.table-warning {
+    background-color: #fff3cd !important;
+}
+
+.btn-group-sm .btn {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.card-title {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}

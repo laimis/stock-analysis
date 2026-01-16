@@ -1172,3 +1172,88 @@ type PriceAlertNearTriggerMonitoringService(
         | ex ->
             logger.LogError($"Error in near-trigger monitoring service: {ex.Message}")
     }
+
+type ReminderMonitoringService(
+    accounts:IAccountStorage,
+    emails:IEmailService,
+    logger:ILogger) =
+    
+    interface IApplicationService
+    
+    member this.Execute() : System.Threading.Tasks.Task<unit> = task {
+        try
+            logger.LogInformation("Starting reminder monitoring service")
+            
+            // Get all users
+            let! users = accounts.GetUserEmailIdPairs()
+            
+            if users |> Seq.isEmpty then
+                logger.LogInformation("No users found for reminder check")
+            else
+                // Check reminders for each user
+                do! users
+                    |> Seq.map (fun userPair -> async {
+                        try
+                            let userId = userPair.Id
+                            
+                            // Get user details
+                            let! userOpt = accounts.GetUser(userId) |> Async.AwaitTask
+                            
+                            match userOpt with
+                            | None ->
+                                logger.LogWarning($"User {userId |> IdentifierHelper.getUserId} not found")
+                            | Some user ->
+                                // Get pending reminders for this user
+                                let! reminders = accounts.GetReminders(userId) |> Async.AwaitTask
+                                
+                                let pendingReminders =
+                                    reminders
+                                    |> Seq.filter (fun r -> r.State = ReminderState.Pending)
+                                    |> Seq.filter (fun r -> r.Date <= DateTimeOffset.UtcNow)
+                                    |> Seq.toList
+                                
+                                if not pendingReminders.IsEmpty then
+                                    logger.LogInformation($"Found {pendingReminders.Length} due reminders for user {user.State.Email}")
+                                    
+                                    // Process each reminder
+                                    for reminder in pendingReminders do
+                                        try
+                                            // Send email notification
+                                            let recipient = Recipient(email=user.State.Email, name=user.State.Name)
+                                            let dateFormatted = reminder.Date.ToString("yyyy-MM-dd HH:mm")
+                                            
+                                            let properties = {|
+                                                date = dateFormatted
+                                                message = reminder.Message
+                                                ticker = reminder.Ticker |> Option.map (fun t -> t.Value) |> Option.defaultValue ""
+                                                has_ticker = reminder.Ticker.IsSome
+                                            |}
+                                            
+                                            let! emailResult = (emails.SendReminder recipient Sender.NoReply (box properties)) |> Async.AwaitTask
+                                            
+                                            match emailResult with
+                                            | Error err ->
+                                                logger.LogError($"Failed to send reminder email for reminder {reminder.ReminderId}: {err}")
+                                            | Ok _ ->
+                                                logger.LogInformation($"Reminder email sent for reminder {reminder.ReminderId}")
+                                                
+                                                // Mark reminder as sent
+                                                let sentReminder = Reminder.send reminder
+                                                do! accounts.SaveReminder(sentReminder) |> Async.AwaitTask
+                                                
+                                                logger.LogInformation($"Reminder {reminder.ReminderId} marked as sent")
+                                        with
+                                        | ex ->
+                                            logger.LogError($"Error processing reminder {reminder.ReminderId}: {ex.Message}")
+                        with
+                        | ex ->
+                            logger.LogError($"Error checking reminders for user: {ex.Message}")
+                    })
+                    |> Async.Sequential
+                    |> Async.Ignore
+                
+                logger.LogInformation("Reminder monitoring service completed")
+        with
+        | ex ->
+            logger.LogError($"Error in reminder monitoring service: {ex.Message}")
+    }

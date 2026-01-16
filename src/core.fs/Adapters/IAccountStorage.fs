@@ -30,3 +30,6 @@ type IAccountStorage =
     abstract member GetStockPriceAlerts: userId:UserId -> Task<StockPriceAlert seq>
     abstract member SaveStockPriceAlert: alert:StockPriceAlert -> Task
     abstract member DeleteStockPriceAlert: alertId:Guid -> Task
+    abstract member GetReminders: userId:UserId -> Task<Reminder seq>
+    abstract member SaveReminder: reminder:Reminder -> Task
+    abstract member DeleteReminder: reminderId:Guid -> Task

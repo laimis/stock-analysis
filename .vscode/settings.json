@@ -5,6 +5,7 @@
     "dotnet.defaultSolution": "tradewatch.sln",
     "FSharp.inlayHints.typeAnnotations": false,
     "chat.tools.terminal.autoApprove": {
-      "dotnet build": true
+      "dotnet build": true,
+      "dotnet test": true
     }
   }

@@ -20,6 +20,7 @@ import {OptionChainComponent} from "./options/option-chain/option-chain.componen
 import {OwnedOptionComponent} from "./options/owned-option-detail/owned-option-detail.component";
 import {AlertsComponent} from "./alerts/alerts.component";
 import {StockPriceAlertsComponent} from "./alerts/stock-price-alerts.component";
+import {RemindersComponent} from "./alerts/reminders.component";
 import {SummaryComponent} from "./summary/summary.component";
 import {PlaygroundComponent} from "./playground/playground.component";
 import {InflectionPointsComponent} from "./playground/inflectionpoints.component";
@@ -84,6 +85,7 @@ export const routes: Routes = [
 
     {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
     {path: 'alerts/price', component: StockPriceAlertsComponent, canActivate: [AuthGuard]},
+    {path: 'alerts/reminders', component: RemindersComponent, canActivate: [AuthGuard]},
 
     {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
 

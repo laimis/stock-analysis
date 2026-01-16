@@ -269,5 +269,74 @@ namespace storagetests
             
             Assert.Empty(afterDelete);
         }
+
+        [Fact]
+        public async Task RemindersWork()
+        {
+            var storage = GetStorage();
+            
+            var userId = UserId.NewUserId(Guid.NewGuid());
+            var reminderId = Guid.NewGuid();
+            var ticker = new Ticker("TSLA");
+            var reminderDate = DateTimeOffset.UtcNow.AddDays(7);
+
+            var reminder = new Reminder
+            {
+                ReminderId = reminderId,
+                UserId = userId,
+                Date = reminderDate,
+                Message = "Review TSLA position before earnings",
+                Ticker = FSharpOption<Ticker>.Some(ticker),
+                State = ReminderState.Pending,
+                CreatedAt = DateTimeOffset.UtcNow,
+                SentAt = FSharpOption<DateTimeOffset>.None
+            };
+            
+            // Save new reminder
+            await storage.SaveReminder(reminder);
+            
+            // Retrieve reminders
+            var fromDb = await storage.GetReminders(userId);
+            
+            Assert.Single(fromDb);
+            
+            var fromDbReminder = fromDb.First();
+            
+            Assert.Equal(reminder.ReminderId, fromDbReminder.ReminderId);
+            Assert.Equal(reminder.UserId.Item, fromDbReminder.UserId.Item);
+            Assert.Equal(reminder.Date, fromDbReminder.Date, TimeSpan.FromSeconds(1));
+            Assert.Equal(reminder.Message, fromDbReminder.Message);
+            Assert.False(FSharpOption<Ticker>.get_IsNone(fromDbReminder.Ticker));
+            Assert.Equal(ticker.Value, fromDbReminder.Ticker.Value.Value);
+            Assert.Equal(reminder.State, fromDbReminder.State);
+            Assert.Equal(reminder.CreatedAt, fromDbReminder.CreatedAt, TimeSpan.FromSeconds(1));
+            Assert.True(FSharpOption<DateTimeOffset>.get_IsNone(fromDbReminder.SentAt));
+            
+            // Update reminder using send function
+            var sentReminder = ReminderModule.send(fromDbReminder);
+            
+            await storage.SaveReminder(sentReminder);
+            
+            var sentFromDb = (await storage.GetReminders(userId)).First();
+            
+            Assert.Equal(ReminderState.Sent, sentFromDb.State);
+            Assert.False(FSharpOption<DateTimeOffset>.get_IsNone(sentFromDb.SentAt));
+            
+            // Update reminder using dismiss function
+            var dismissedReminder = ReminderModule.dismiss(sentFromDb);
+            
+            await storage.SaveReminder(dismissedReminder);
+            
+            var dismissedFromDb = (await storage.GetReminders(userId)).First();
+            
+            Assert.Equal(ReminderState.Dismissed, dismissedFromDb.State);
+            
+            // Delete reminder
+            await storage.DeleteReminder(reminderId);
+            
+            var afterDelete = await storage.GetReminders(userId);
+            
+            Assert.Empty(afterDelete);
+        }
     }
 }

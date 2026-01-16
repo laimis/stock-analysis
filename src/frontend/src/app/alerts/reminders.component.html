@@ -1,0 +1,167 @@
+<div class="container-fluid mt-3">
+  <h2>Reminders</h2>
+
+  <div *ngIf="errors.length > 0" class="alert alert-danger">
+    <ul class="mb-0">
+      <li *ngFor="let error of errors">{{ error }}</li>
+    </ul>
+  </div>
+
+  <div class="mb-3">
+    <button class="btn btn-primary" (click)="toggleForm()">
+      {{ showForm ? 'Cancel' : '+ New Reminder' }}
+    </button>
+  </div>
+
+  <div *ngIf="showForm" class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">{{ editingReminder ? 'Edit Reminder' : 'Create New Reminder' }}</h5>
+      
+      <div class="mb-3">
+        <label for="reminderDate" class="form-label">Date & Time</label>
+        <input 
+          type="datetime-local" 
+          class="form-control" 
+          id="reminderDate" 
+          [(ngModel)]="newReminder.date"
+          required>
+      </div>
+
+      <div class="mb-3">
+        <label for="reminderMessage" class="form-label">Message</label>
+        <textarea 
+          class="form-control" 
+          id="reminderMessage" 
+          rows="3" 
+          [(ngModel)]="newReminder.message"
+          placeholder="Enter reminder message..."
+          required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="reminderTicker" class="form-label">Ticker (Optional)</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="reminderTicker" 
+          [(ngModel)]="newReminder.ticker"
+          placeholder="e.g., AAPL"
+          maxlength="10"
+          style="text-transform: uppercase;">
+        <small class="form-text text-muted">
+          Optional: Associate this reminder with a stock ticker
+        </small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button 
+          class="btn btn-primary" 
+          (click)="editingReminder ? updateReminder() : createReminder()"
+          [disabled]="loading || !newReminder.date || !newReminder.message.trim()">
+          {{ editingReminder ? 'Update' : 'Create' }} Reminder
+        </button>
+        <button class="btn btn-secondary" (click)="toggleForm()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Filter by Status:</label>
+    <div class="btn-group" role="group">
+      <input type="radio" class="btn-check" name="filterState" id="filterAll" value="all" 
+             [(ngModel)]="filterState" (change)="onFilterChange()">
+      <label class="btn btn-outline-primary" for="filterAll">All</label>
+
+      <input type="radio" class="btn-check" name="filterState" id="filterPending" value="pending" 
+             [(ngModel)]="filterState" (change)="onFilterChange()">
+      <label class="btn btn-outline-warning" for="filterPending">Pending</label>
+
+      <input type="radio" class="btn-check" name="filterState" id="filterSent" value="sent" 
+             [(ngModel)]="filterState" (change)="onFilterChange()">
+      <label class="btn btn-outline-success" for="filterSent">Sent</label>
+
+      <input type="radio" class="btn-check" name="filterState" id="filterDismissed" value="dismissed" 
+             [(ngModel)]="filterState" (change)="onFilterChange()">
+      <label class="btn btn-outline-secondary" for="filterDismissed">Dismissed</label>
+    </div>
+  </div>
+
+  <div *ngIf="loading && !showForm" class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && filteredReminders.length === 0" class="alert alert-info">
+    No reminders found{{ filterState !== 'all' ? ' with status "' + filterState + '"' : '' }}.
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover" *ngIf="filteredReminders.length > 0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Message</th>
+          <th>Ticker</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reminder of filteredReminders" 
+            [class.table-warning]="isOverdue(reminder)">
+          <td>
+            <strong>{{ formatDate(reminder.date) }}</strong>
+            <span *ngIf="isOverdue(reminder)" class="badge bg-danger ms-2">Overdue</span>
+          </td>
+          <td>{{ reminder.message }}</td>
+          <td>
+            <app-stock-link-and-tradingview-link 
+              *ngIf="reminder.ticker" 
+              [ticker]="reminder.ticker">
+            </app-stock-link-and-tradingview-link>
+            <span *ngIf="!reminder.ticker" class="text-muted">—</span>
+          </td>
+          <td>
+            <span [class]="getStateBadgeClass(reminder.state)">
+              {{ reminder.state }}
+            </span>
+            <div *ngIf="reminder.sentAt" class="small text-muted">
+              Sent: {{ formatDate(reminder.sentAt) }}
+            </div>
+          </td>
+          <td class="small text-muted">
+            {{ formatDate(reminder.createdAt) }}
+          </td>
+          <td>
+            <div class="btn-group btn-group-sm" role="group">
+              <button 
+                *ngIf="reminder.state === 'pending'" 
+                class="btn btn-outline-primary" 
+                (click)="editReminder(reminder)"
+                title="Edit">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button 
+                *ngIf="reminder.state === 'pending'" 
+                class="btn btn-outline-secondary" 
+                (click)="dismissReminder(reminder)"
+                title="Dismiss">
+                <i class="bi bi-x-circle"></i> Dismiss
+              </button>
+              <button 
+                class="btn btn-outline-danger" 
+                (click)="deleteReminder(reminder)"
+                title="Delete">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

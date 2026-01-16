@@ -54,6 +54,23 @@ export class StocksService {
         return this.http.delete<void>(`/api/alerts/price/${alertId}`)
     }
 
+    // ----------------- reminders ---------------------
+    getReminders(): Observable<Reminder[]> {
+        return this.http.get<Reminder[]>('/api/alerts/reminders')
+    }
+
+    createReminder(date: string, message: string, ticker?: string): Observable<{reminderId: string}> {
+        return this.http.post<{reminderId: string}>('/api/alerts/reminders', {date, message, ticker: ticker || null})
+    }
+
+    updateReminder(reminderId: string, date: string, message: string, ticker: string | undefined, state: string): Observable<void> {
+        return this.http.put<void>(`/api/alerts/reminders/${reminderId}`, {date, message, ticker: ticker || null, state})
+    }
+    
+    deleteReminder(reminderId: string): Observable<void> {
+        return this.http.delete<void>(`/api/alerts/reminders/${reminderId}`)
+    }
+
     sendEmail(obj: { to: string; from: string; subject: string; plainBody: string; htmlBody: string}) {
         return this.http.post<object>('/api/admin/email', obj)
     }
@@ -1352,4 +1369,15 @@ export interface StockPriceAlert {
     createdAt: string;
     triggeredAt?: string;
     lastResetAt?: string;
+}
+
+export interface Reminder {
+    reminderId: string;
+    userId: string;
+    date: string;
+    message: string;
+    ticker?: string;
+    state: string; // "pending", "sent", or "dismissed"
+    createdAt: string;
+    sentAt?: string;
 }

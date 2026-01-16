@@ -186,3 +186,18 @@ CREATE TABLE stockpricealerts (
 );
 CREATE INDEX stockpricealerts_userid ON stockpricealerts(userid);
 ALTER TABLE stockpricealerts OWNER TO stockanalysis;
+
+CREATE TABLE reminders (
+    reminderid uuid PRIMARY KEY,
+    userid uuid NOT NULL,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    message TEXT NOT NULL,
+    ticker TEXT,
+    state TEXT NOT NULL,
+    createdat TIMESTAMP WITH TIME ZONE NOT NULL,
+    sentat TIMESTAMP WITH TIME ZONE
+);
+CREATE INDEX reminders_userid ON reminders(userid);
+CREATE INDEX reminders_date ON reminders(date);
+CREATE INDEX reminders_state ON reminders(state);
+ALTER TABLE reminders OWNER TO stockanalysis;
