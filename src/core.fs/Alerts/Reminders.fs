@@ -8,18 +8,15 @@ open core.Shared
 type ReminderState =
     | Pending
     | Sent
-    | Dismissed
 
 module ReminderState =
     let toString = function
         | Pending -> "pending"
         | Sent -> "sent"
-        | Dismissed -> "dismissed"
     
     let fromString = function
         | "pending" -> Pending
         | "sent" -> Sent
-        | "dismissed" -> Dismissed
         | _ -> failwith "Invalid reminder state"
 
 [<CLIMutable>]
@@ -39,11 +36,6 @@ module Reminder =
         { reminder with 
             State = ReminderState.Sent
             SentAt = Some DateTimeOffset.UtcNow 
-        }
-    
-    let dismiss (reminder: Reminder) =
-        { reminder with 
-            State = ReminderState.Dismissed
         }
 
     let create userId date message ticker =

@@ -20,7 +20,7 @@ export class RemindersComponent implements OnInit {
   errors: string[] = [];
   loading = false;
   showForm = false;
-  filterState = 'all'; // 'all', 'pending', 'sent', 'dismissed'
+  filterState = 'all'; // 'all', 'pending', 'sent'
   searchText = ''; // Search by ticker or message
 
   // Form fields
@@ -172,24 +172,6 @@ export class RemindersComponent implements OnInit {
     });
   }
 
-  dismissReminder(reminder: Reminder) {
-    if (!confirm('Dismiss this reminder?')) return;
-
-    this.loading = true;
-    this.errors = [];
-
-    this.stocksService.dismissReminder(reminder.reminderId).subscribe({
-      next: () => {
-        this.loadReminders();
-        this.loading = false;
-      },
-      error: (error) => {
-        this.errors = GetErrors(error);
-        this.loading = false;
-      }
-    });
-  }
-
   deleteReminder(reminder: Reminder) {
     if (!confirm(`Delete reminder "${reminder.message}"?`)) return;
 
@@ -216,7 +198,6 @@ export class RemindersComponent implements OnInit {
     switch(state) {
       case 'pending': return 'badge bg-warning text-dark';
       case 'sent': return 'badge bg-success';
-      case 'dismissed': return 'badge bg-secondary';
       default: return 'badge bg-light text-dark';
     }
   }

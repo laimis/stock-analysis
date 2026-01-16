@@ -35,7 +35,6 @@ namespace core.fs.Alerts
     [<CLIMutable>]
     type CreateReminderResponse = {ReminderId:string}
     type UpdateReminder = {UserId:UserId; ReminderId:Guid; Date:string; Message:string; Ticker:string option; State:string}
-    type DismissReminder = {UserId:UserId; ReminderId:Guid}
     type DeleteReminder = {ReminderId:Guid}
     
     type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger,accountStorage:IAccountStorage) =
@@ -243,26 +242,6 @@ namespace core.fs.Alerts
             with
             | ex ->
                 logger.LogError($"Error updating reminder: {ex.Message}")
-                return Error (ServiceError(ex.Message))
-        }
-        
-        member this.Handle (command:DismissReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
-            try
-                let! allReminders = accountStorage.GetReminders(command.UserId)
-                let existingReminder = 
-                    allReminders 
-                    |> Seq.tryFind (fun r -> r.ReminderId = command.ReminderId)
-                
-                match existingReminder with
-                | Some existing ->
-                    let dismissedReminder = Reminder.dismiss existing
-                    do! accountStorage.SaveReminder(dismissedReminder)
-                    return Ok ()
-                | None ->
-                    return Error (ServiceError("Reminder not found"))
-            with
-            | ex ->
-                logger.LogError($"Error dismissing reminder: {ex.Message}")
                 return Error (ServiceError(ex.Message))
         }
         

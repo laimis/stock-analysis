@@ -87,7 +87,6 @@
       <option value="all">All States ({{ reminders.length }})</option>
       <option value="pending">Pending</option>
       <option value="sent">Sent</option>
-      <option value="dismissed">Dismissed</option>
     </select>
     
     <input 
@@ -167,12 +166,6 @@
                       (click)="editReminder(reminder)"
                       title="Edit">
                       <i class="fas fa-edit"></i>
-                    </button>
-                    <button 
-                      class="btn btn-outline-secondary" 
-                      (click)="dismissReminder(reminder)"
-                      title="Dismiss">
-                      <i class="fas fa-x-circle"></i>
                     </button>
                   }
                   <button 

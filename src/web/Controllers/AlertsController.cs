@@ -196,13 +196,6 @@ public class AlertsController(Handler handler) : ControllerBase
             state: request.State
         )));
     
-    [HttpPost("reminders/{reminderId}/dismiss")]
-    public Task<ActionResult> DismissReminder([FromRoute] System.Guid reminderId) =>
-        this.OkOrError(handler.Handle(new DismissReminder(
-            userId: User.Identifier(),
-            reminderId: reminderId
-        )));
-    
     [HttpDelete("reminders/{reminderId}")]
     public Task<ActionResult> DeleteReminder([FromRoute] System.Guid reminderId) =>
         this.OkOrError(handler.Handle(new DeleteReminder(reminderId)));
