@@ -115,50 +115,52 @@
 
   @if (filteredReminders.length > 0) {
     <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
+      <table class="table table-modern table-hover align-middle">
+        <thead class="table-light">
           <tr>
-            <th>Date</th>
-            <th>Message</th>
-            <th>Ticker</th>
-            <th>State</th>
-            <th>Created</th>
-            <th>Actions</th>
+            <th scope="col" class="ps-4" style="width: 140px;">Date</th>
+            <th scope="col">Message</th>
+            <th scope="col" style="width: 120px;">Ticker</th>
+            <th scope="col" style="width: 100px;">State</th>
+            <th scope="col" style="width: 130px;">Created</th>
+            <th scope="col" class="text-center pe-4" style="width: 120px;">Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (reminder of filteredReminders; track reminder.reminderId) {
             <tr [class.table-warning]="isOverdue(reminder)">
-              <td>
-                <strong>{{ reminder.date | date:'mediumDate' }}</strong>
+              <td class="ps-4 py-3">
+                <div>{{ reminder.date | date:'mediumDate' }}</div>
                 @if (isOverdue(reminder)) {
-                  <span class="badge bg-danger ms-2">Overdue</span>
+                  <span class="badge bg-danger">Overdue</span>
                 }
               </td>
-              <td>
-                <small>{{ reminder.message }}</small>
+              <td class="py-3">
+                {{ reminder.message }}
               </td>
-              <td>
+              <td class="py-3">
                 @if (reminder.ticker) {
                   <app-stock-link-and-tradingview-link [ticker]="reminder.ticker"></app-stock-link-and-tradingview-link>
                 } @else {
                   <span class="text-muted">—</span>
                 }
               </td>
-              <td>
-                <span [class]="getStateBadgeClass(reminder.state)">
-                  {{ reminder.state }}
-                </span>
+              <td class="py-3">
+                <div>
+                  <span [class]="getStateBadgeClass(reminder.state)">
+                    {{ reminder.state }}
+                  </span>
+                </div>
                 @if (reminder.sentAt) {
                   <div class="small text-muted">
-                    Sent: {{ reminder.sentAt | date:'short' }}
+                    {{ reminder.sentAt | date:'short' }}
                   </div>
                 }
               </td>
-              <td>
-                <small>{{ reminder.createdAt | date:'short' }}</small>
+              <td class="py-3">
+                <div>{{ reminder.createdAt | date:'short' }}</div>
               </td>
-              <td>
+              <td class="text-center py-3 pe-4">
                 <div class="btn-group btn-group-sm" role="group">
                   @if (reminder.state === 'pending') {
                     <button 
