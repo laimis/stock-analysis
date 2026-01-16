@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using web.Utils;
 
+#nullable enable
+
 namespace web.Controllers;
 
 [ApiController]
@@ -126,6 +128,12 @@ public class AlertsController(Handler handler) : ControllerBase
         [FromServices] MonitoringServices.PriceAlertNearTriggerMonitoringService nearTriggerAlerts)
         => nearTriggerAlerts.Execute();
     
+    [HttpGet("triggerReminders")]
+    [Authorize("admin")]
+    public Task TriggerReminders(
+        [FromServices] MonitoringServices.ReminderMonitoringService reminderService)
+        => reminderService.Execute();
+    
     // Stock Price Alerts CRUD
     [HttpGet("price")]
     public Task<ActionResult> GetStockPriceAlerts() =>
@@ -162,8 +170,39 @@ public class AlertsController(Handler handler) : ControllerBase
     [HttpDelete("price/{alertId}")]
     public Task<ActionResult> DeleteStockPriceAlert([FromRoute] System.Guid alertId) =>
         this.OkOrError(handler.Handle(new DeleteStockPriceAlert(alertId)));
+    
+    // Reminders CRUD
+    [HttpGet("reminders")]
+    public Task<ActionResult> GetReminders() =>
+        this.OkOrError(handler.Handle(new GetReminders(User.Identifier())));
+    
+    [HttpPost("reminders")]
+    public Task<ActionResult> CreateReminder([FromBody] CreateReminderRequest request) =>
+        this.OkOrError(handler.Handle(new CreateReminder(
+            userId: User.Identifier(),
+            date: request.Date,
+            message: request.Message,
+            ticker: request.Ticker
+        )));
+    
+    [HttpPut("reminders/{reminderId}")]
+    public Task<ActionResult> UpdateReminder([FromRoute] System.Guid reminderId, [FromBody] UpdateReminderRequest request) =>
+        this.OkOrError(handler.Handle(new UpdateReminder(
+            userId: User.Identifier(),
+            reminderId: reminderId,
+            date: request.Date,
+            message: request.Message,
+            ticker: request.Ticker,
+            state: request.State
+        )));
+    
+    [HttpDelete("reminders/{reminderId}")]
+    public Task<ActionResult> DeleteReminder([FromRoute] System.Guid reminderId) =>
+        this.OkOrError(handler.Handle(new DeleteReminder(reminderId)));
 }
 
 // Request DTOs for API
 public record CreateStockPriceAlertRequest(string Ticker, decimal PriceLevel, string AlertType, string Note);
 public record UpdateStockPriceAlertRequest(decimal PriceLevel, string AlertType, string Note, string State);
+public record CreateReminderRequest(string Date, string Message, string? Ticker);
+public record UpdateReminderRequest(string Date, string Message, string? Ticker, string State);

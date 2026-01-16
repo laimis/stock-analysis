@@ -1,0 +1,183 @@
+<div class="container-fluid mt-3">
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <h3>Reminders</h3>
+    </div>
+    <div class="col-md-6 text-end">
+      <button class="btn btn-primary" (click)="toggleForm()">
+        <i class="fas" [ngClass]="{'fa-plus': !showForm, 'fa-times': showForm}"></i>
+        {{ showForm ? 'Cancel' : 'New Reminder' }}
+      </button>
+      <button class="btn btn-secondary ms-2" (click)="loadReminders()" [disabled]="loading">
+        <i class="fas fa-sync" [ngClass]="{'fa-spin': loading}"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (errors.length > 0) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      @for (error of errors; track error) {
+        <div>{{ error }}</div>
+      }
+      <button type="button" class="btn-close" (click)="errors = []"></button>
+    </div>
+  }
+
+  @if (showForm) {
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5>{{ editingReminder ? 'Edit' : 'Create' }} Reminder</h5>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="editingReminder ? updateReminder() : createReminder()">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <app-stock-search
+                label="Ticker (Optional)"
+                placeholder="Search for stock symbol"
+                [ticker]="newReminder.ticker"
+                (tickerSelected)="onTickerSelected($event)">
+              </app-stock-search>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="reminderDate" class="form-label">Date</label>
+              <input 
+                type="date" 
+                class="form-control" 
+                id="reminderDate" 
+                [(ngModel)]="newReminder.date"
+                name="reminderDate"
+                [min]="today"
+                required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="reminderMessage" class="form-label">Message</label>
+            <textarea 
+              class="form-control" 
+              id="reminderMessage" 
+              rows="3" 
+              [(ngModel)]="newReminder.message"
+              name="reminderMessage"
+              placeholder="Enter reminder message..."
+              required></textarea>
+          </div>
+          <button type="submit" class="btn btn-success" [disabled]="loading || !newReminder.date || !newReminder.message.trim()">
+            {{ editingReminder ? 'Update' : 'Create' }} Reminder
+          </button>
+          <button type="button" class="btn btn-secondary ms-2" (click)="toggleForm()">
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="mb-3 d-flex align-items-center justify-content-between">
+    <select 
+      id="filterState" 
+      class="form-select w-auto" 
+      [(ngModel)]="filterState" 
+      (change)="onFilterChange()">
+      <option value="all">All States ({{ reminders.length }})</option>
+      <option value="pending">Pending</option>
+      <option value="sent">Sent</option>
+    </select>
+    
+    <input 
+      type="text" 
+      id="searchText" 
+      class="form-control" 
+      placeholder="Search by ticker or message..." 
+      [(ngModel)]="searchText" 
+      (input)="onFilterChange()"
+      style="width: 300px;">
+  </div>
+
+  @if (loading && reminders.length === 0) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  }
+
+  @if (filteredReminders.length === 0 && !loading) {
+    <div class="alert alert-info">
+      No reminders found. Create your first reminder to get started!
+    </div>
+  }
+
+  @if (filteredReminders.length > 0) {
+    <div class="table-responsive">
+      <table class="table table-modern table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4" style="width: 140px;">Date</th>
+            <th scope="col">Message</th>
+            <th scope="col" style="width: 120px;">Ticker</th>
+            <th scope="col" style="width: 100px;">State</th>
+            <th scope="col" style="width: 130px;">Created</th>
+            <th scope="col" class="text-center pe-4" style="width: 120px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reminder of filteredReminders; track reminder.reminderId) {
+            <tr [class.table-warning]="isOverdue(reminder)">
+              <td class="ps-4 py-3">
+                <div>{{ reminder.date | date:'mediumDate' }}</div>
+                @if (isOverdue(reminder)) {
+                  <span class="badge bg-danger">Overdue</span>
+                }
+              </td>
+              <td class="py-3">
+                {{ reminder.message }}
+              </td>
+              <td class="py-3">
+                @if (reminder.ticker) {
+                  <app-stock-link-and-tradingview-link [ticker]="reminder.ticker"></app-stock-link-and-tradingview-link>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+              <td class="py-3">
+                <div>
+                  <span [class]="getStateBadgeClass(reminder.state)">
+                    {{ reminder.state }}
+                  </span>
+                </div>
+                @if (reminder.sentAt) {
+                  <div class="small text-muted">
+                    {{ reminder.sentAt | date:'short' }}
+                  </div>
+                }
+              </td>
+              <td class="py-3">
+                <div>{{ reminder.createdAt | date:'short' }}</div>
+              </td>
+              <td class="text-center py-3 pe-4">
+                <div class="btn-group btn-group-sm" role="group">
+                  @if (reminder.state === 'pending') {
+                    <button 
+                      class="btn btn-outline-primary" 
+                      (click)="editReminder(reminder)"
+                      title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  }
+                  <button 
+                    class="btn btn-outline-danger" 
+                    (click)="deleteReminder(reminder)"
+                    title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

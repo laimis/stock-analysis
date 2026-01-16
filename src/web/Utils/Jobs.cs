@@ -83,6 +83,13 @@ public static class Jobs
                 options: rjo
             );
             
+            RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.ReminderMonitoringService>(
+                recurringJobId: nameof(core.fs.Alerts.MonitoringServices.ReminderMonitoringService),
+                methodCall: service => service.Execute(),
+                cronExpression: "0 9 * * *",  // 9am daily
+                options: rjo
+            );
+            
             RecurringJob.AddOrUpdate<core.fs.Brokerage.MonitoringServices.AccountMonitoringService>(
                 recurringJobId: nameof(core.fs.Brokerage.MonitoringServices.AccountMonitoringService),
                 methodCall: service => service.RunAccountValueOrderAndTransactionSync(),

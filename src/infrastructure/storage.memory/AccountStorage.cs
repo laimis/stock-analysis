@@ -18,6 +18,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, List<OptionOrder>> _optionOrders = new();
     private static readonly Dictionary<UserId, List<OptionPricing>> _optionPricings = new();
     private static readonly Dictionary<UserId, List<StockPriceAlert>> _stockPriceAlerts = new();
+    private static readonly Dictionary<UserId, List<Reminder>> _reminders = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -189,6 +190,37 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         foreach (var alerts in _stockPriceAlerts.Values)
         {
             alerts.RemoveAll(a => a.AlertId == alertId);
+        }
+        
+        return Task.CompletedTask;
+    }
+
+    public Task<IEnumerable<Reminder>> GetReminders(UserId userId)
+    {
+        return Task.FromResult<IEnumerable<Reminder>>(
+            _reminders.GetValueOrDefault(userId, []).OrderBy(r => r.Date)
+        );
+    }
+
+    public Task SaveReminder(Reminder reminder)
+    {
+        if (!_reminders.ContainsKey(reminder.UserId))
+        {
+            _reminders[reminder.UserId] = [];
+        }
+        
+        // Remove existing reminder with same ID if present (for updates)
+        _reminders[reminder.UserId].RemoveAll(r => r.ReminderId == reminder.ReminderId);
+        _reminders[reminder.UserId].Add(reminder);
+        
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteReminder(Guid reminderId)
+    {
+        foreach (var reminders in _reminders.Values)
+        {
+            reminders.RemoveAll(r => r.ReminderId == reminderId);
         }
         
         return Task.CompletedTask;

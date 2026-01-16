@@ -29,6 +29,14 @@ namespace core.fs.Alerts
     type ResetStockPriceAlert = {UserId:UserId; AlertId:Guid}
     type DeleteStockPriceAlert = {AlertId:Guid}
     
+    // Reminder Commands
+    type GetReminders = {UserId:UserId}
+    type CreateReminder = {UserId:UserId; Date:string; Message:string; Ticker:string option}
+    [<CLIMutable>]
+    type CreateReminderResponse = {ReminderId:string}
+    type UpdateReminder = {UserId:UserId; ReminderId:Guid; Date:string; Message:string; Ticker:string option; State:string}
+    type DeleteReminder = {ReminderId:Guid}
+    
     type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger,accountStorage:IAccountStorage) =
     
         let deregisterStopPriceMonitoring userId ticker =
@@ -95,9 +103,8 @@ namespace core.fs.Alerts
         
         member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<CreateStockPriceAlertResponse, ServiceError>> = task {
             try
-                let alertId = Guid.NewGuid()
-                let ticker = Ticker(command.Ticker)
-                let alertType = PriceAlertType.fromString(command.AlertType)
+                let ticker = Ticker command.Ticker
+                let alertType = PriceAlertType.fromString command.AlertType
                 
                 let alert = StockPriceAlert.create 
                                 command.UserId 
@@ -107,11 +114,11 @@ namespace core.fs.Alerts
                                 command.Note
                 
                 do! accountStorage.SaveStockPriceAlert alert
-                return Ok ({AlertId = alertId.ToString()} : CreateStockPriceAlertResponse)
+                return Ok ({AlertId = alert.AlertId.ToString()} : CreateStockPriceAlertResponse)
             with
             | ex ->
-                logger.LogError($"Error creating stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error creating stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:UpdateStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
@@ -141,8 +148,8 @@ namespace core.fs.Alerts
                     return Error (ServiceError("Alert not found"))
             with
             | ex ->
-                logger.LogError($"Error updating stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error updating stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:ResetStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
@@ -161,16 +168,87 @@ namespace core.fs.Alerts
                     return Error (ServiceError("Alert not found"))
             with
             | ex ->
-                logger.LogError($"Error resetting stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error resetting stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:DeleteStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
             try
-                do! accountStorage.DeleteStockPriceAlert(command.AlertId)
+                do! accountStorage.DeleteStockPriceAlert command.AlertId
                 return Ok ()
             with
             | ex ->
-                logger.LogError($"Error deleting stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error deleting stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
+        }
+        
+        // Reminder Handlers
+        member this.Handle (query:GetReminders) : System.Threading.Tasks.Task<Result<ReminderDto seq, ServiceError>> = task {
+            let! reminders = accountStorage.GetReminders(query.UserId)
+            let dtos = reminders |> Seq.map ReminderDto.fromReminder
+            return Ok dtos
+        }
+        
+        member this.Handle (command:CreateReminder) : System.Threading.Tasks.Task<Result<CreateReminderResponse, ServiceError>> = task {
+            try
+                let date = DateTimeOffset.Parse command.Date
+                let ticker = 
+                    command.Ticker 
+                    |> Option.map (fun t -> Ticker t)
+                
+                let reminder = Reminder.create 
+                                command.UserId 
+                                date
+                                command.Message
+                                ticker
+                
+                do! accountStorage.SaveReminder reminder
+                return Ok ({ReminderId = reminder.ReminderId.ToString()} : CreateReminderResponse)
+            with
+            | ex ->
+                logger.LogError $"Error creating reminder: {ex}"
+                return Error (ServiceError ex.Message)
+        }
+        
+        member this.Handle (command:UpdateReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
+            try
+                let! allReminders = accountStorage.GetReminders(command.UserId)
+                let existingReminder = 
+                    allReminders 
+                    |> Seq.tryFind (fun r -> r.ReminderId = command.ReminderId)
+                
+                match existingReminder with
+                | Some existing ->
+                    let date = DateTimeOffset.Parse(command.Date)
+                    let ticker = 
+                        command.Ticker 
+                        |> Option.map (fun t -> Ticker(t))
+                    let state = ReminderState.fromString(command.State)
+                    
+                    let updatedReminder = {
+                        existing with
+                            Date = date
+                            Message = command.Message
+                            Ticker = ticker
+                            State = state
+                    }
+                    
+                    do! accountStorage.SaveReminder(updatedReminder)
+                    return Ok ()
+                | None ->
+                    return Error (ServiceError("Reminder not found"))
+            with
+            | ex ->
+                logger.LogError $"Error updating reminder: {ex}"
+                return Error (ServiceError ex.Message)
+        }
+        
+        member this.Handle (command:DeleteReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
+            try
+                do! accountStorage.DeleteReminder(command.ReminderId)
+                return Ok ()
+            with
+            | ex ->
+                logger.LogError $"Error deleting reminder: {ex}"
+                return Error (ServiceError ex.Message)
         }

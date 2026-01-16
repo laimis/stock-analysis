@@ -632,5 +632,79 @@ ON CONFLICT (alertid) DO UPDATE SET
             
             await db.ExecuteAsync(query, new { alertid = alertId });
         }
+
+        public async Task<IEnumerable<Reminder>> GetReminders(UserId userId)
+        {
+            using var db = GetConnection();
+
+            const string query = @"SELECT * FROM reminders WHERE userid = :userId ORDER BY date ASC";
+            
+            var reader = await db.ExecuteReaderAsync(query, new { userId = userId.Item });
+            
+            var result = new List<Reminder>();
+            
+            while (reader.Read())
+            {
+                var reminder = new Reminder(
+                    reminderId: reader.GetGuid(reader.GetOrdinal("reminderid")),
+                    userId: UserId.NewUserId(reader.GetGuid(reader.GetOrdinal("userid"))),
+                    date: new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("date"))),
+                    message: reader.GetString(reader.GetOrdinal("message")),
+                    ticker: reader.IsDBNull(reader.GetOrdinal("ticker"))
+                        ? FSharpOption<Ticker>.None
+                        : FSharpOption<Ticker>.Some(new Ticker(reader.GetString(reader.GetOrdinal("ticker")))),
+                    state: ReminderStateModule.fromString(reader.GetString(reader.GetOrdinal("state"))),
+                    createdAt: new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("createdat"))),
+                    sentAt: reader.IsDBNull(reader.GetOrdinal("sentat"))
+                        ? FSharpOption<DateTimeOffset>.None
+                        : FSharpOption<DateTimeOffset>.Some(new DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("sentat"))))
+                );
+                
+                result.Add(reminder);
+            }
+
+            return result;
+        }
+
+        public async Task SaveReminder(Reminder reminder)
+        {
+            using var db = GetConnection();
+
+            var query = @"
+INSERT INTO reminders (reminderid, userid, date, message, ticker, state, createdat, sentat)
+VALUES (:reminderid, :userid, :date, :message, :ticker, :state, :createdat, :sentat)
+ON CONFLICT (reminderid) DO UPDATE SET
+    date = EXCLUDED.date,
+    message = EXCLUDED.message,
+    ticker = EXCLUDED.ticker,
+    state = EXCLUDED.state,
+    sentat = EXCLUDED.sentat
+            ";
+            
+            await db.ExecuteAsync(query, new
+            {
+                reminderid = reminder.ReminderId,
+                userid = reminder.UserId.Item,
+                date = reminder.Date.ToUniversalTime(),
+                message = reminder.Message,
+                ticker = FSharpOption<Ticker>.get_IsNone(reminder.Ticker)
+                    ? null
+                    : reminder.Ticker.Value.Value,
+                state = ReminderStateModule.toString(reminder.State),
+                createdat = reminder.CreatedAt.ToUniversalTime(),
+                sentat = FSharpOption<DateTimeOffset>.get_IsNone(reminder.SentAt)
+                    ? null
+                    : (DateTimeOffset?)reminder.SentAt.Value.ToUniversalTime()
+            });
+        }
+
+        public async Task DeleteReminder(Guid reminderId)
+        {
+            using var db = GetConnection();
+
+            const string query = @"DELETE FROM reminders WHERE reminderid = :reminderid";
+            
+            await db.ExecuteAsync(query, new { reminderid = reminderId });
+        }
     }
 }

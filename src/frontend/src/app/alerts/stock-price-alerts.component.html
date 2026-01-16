@@ -154,48 +154,48 @@
 
   @if (filteredAlerts.length > 0) {
     <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
+      <table class="table table-modern table-hover align-middle">
+        <thead class="table-light">
           <tr>
-            <th>Ticker</th>
-            <th>Price Level</th>
-            <th>Alert Type</th>
-            <th>Note</th>
-            <th>State</th>
-            <th>Created</th>
-            <th>Triggered</th>
-            <th>Actions</th>
+            <th scope="col" class="ps-4" style="width: 120px;">Ticker</th>
+            <th scope="col" style="width: 120px;">Price Level</th>
+            <th scope="col" style="width: 120px;">Alert Type</th>
+            <th scope="col">Note</th>
+            <th scope="col" style="width: 100px;">State</th>
+            <th scope="col" style="width: 130px;">Created</th>
+            <th scope="col" style="width: 130px;">Triggered</th>
+            <th scope="col" class="text-center pe-4" style="width: 140px;">Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (alert of filteredAlerts; track alert.alertId) {
             <tr>
-              <td>
-                <strong><app-stock-link-and-tradingview-link [ticker]="alert.ticker"></app-stock-link-and-tradingview-link></strong>
+              <td class="ps-4 py-3">
+                <app-stock-link-and-tradingview-link [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
               </td>
-              <td>
+              <td class="py-3">
                 ${{ alert.priceLevel | number:'1.2-2' }}
               </td>
-              <td>
+              <td class="py-3">
                 <span [class]="alert.alertType === 'above' ? 'text-success' : 'text-danger'">
                   {{ getAlertTypeDisplay(alert.alertType) }}
                 </span>
               </td>
-              <td>
-                <small>{{ alert.note || '-' }}</small>
+              <td class="py-3">
+                {{ alert.note || '-' }}
               </td>
-              <td>
+              <td class="py-3">
                 <span [class]="getStateClass(alert.state)">
                   {{ alert.state }}
                 </span>
               </td>
-              <td>
-                <small>{{ alert.createdAt | date:'short' }}</small>
+              <td class="py-3">
+                <div>{{ alert.createdAt | date:'short' }}</div>
               </td>
-              <td>
-                <small>{{ alert.triggeredAt ? (alert.triggeredAt | date:'short') : '-' }}</small>
+              <td class="py-3">
+                <div>{{ alert.triggeredAt ? (alert.triggeredAt | date:'short') : '-' }}</div>
               </td>
-              <td>
+              <td class="text-center py-3 pe-4">
                 <div class="btn-group btn-group-sm" role="group">
                   <button 
                     class="btn btn-outline-primary" 
