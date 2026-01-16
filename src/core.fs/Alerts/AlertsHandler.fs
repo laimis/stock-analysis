@@ -174,12 +174,12 @@ namespace core.fs.Alerts
         
         member this.Handle (command:DeleteStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
             try
-                do! accountStorage.DeleteStockPriceAlert(command.AlertId)
+                do! accountStorage.DeleteStockPriceAlert command.AlertId
                 return Ok ()
             with
             | ex ->
-                logger.LogError($"Error deleting stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error deleting stock price alert: {ex.Message}"
+                return Error (ServiceError ex.Message)
         }
         
         // Reminder Handlers
