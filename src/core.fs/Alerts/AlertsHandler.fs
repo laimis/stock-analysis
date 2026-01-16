@@ -103,9 +103,8 @@ namespace core.fs.Alerts
         
         member this.Handle (command:CreateStockPriceAlert) : System.Threading.Tasks.Task<Result<CreateStockPriceAlertResponse, ServiceError>> = task {
             try
-                let alertId = Guid.NewGuid()
-                let ticker = Ticker(command.Ticker)
-                let alertType = PriceAlertType.fromString(command.AlertType)
+                let ticker = Ticker command.Ticker
+                let alertType = PriceAlertType.fromString command.AlertType
                 
                 let alert = StockPriceAlert.create 
                                 command.UserId 
@@ -115,11 +114,11 @@ namespace core.fs.Alerts
                                 command.Note
                 
                 do! accountStorage.SaveStockPriceAlert alert
-                return Ok ({AlertId = alertId.ToString()} : CreateStockPriceAlertResponse)
+                return Ok ({AlertId = alert.AlertId.ToString()} : CreateStockPriceAlertResponse)
             with
             | ex ->
-                logger.LogError($"Error creating stock price alert: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error creating stock price alert: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:UpdateStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
@@ -192,11 +191,10 @@ namespace core.fs.Alerts
         
         member this.Handle (command:CreateReminder) : System.Threading.Tasks.Task<Result<CreateReminderResponse, ServiceError>> = task {
             try
-                let reminderId = Guid.NewGuid()
-                let date = DateTimeOffset.Parse(command.Date)
+                let date = DateTimeOffset.Parse command.Date
                 let ticker = 
                     command.Ticker 
-                    |> Option.map (fun t -> Ticker(t))
+                    |> Option.map (fun t -> Ticker t)
                 
                 let reminder = Reminder.create 
                                 command.UserId 
@@ -205,11 +203,11 @@ namespace core.fs.Alerts
                                 ticker
                 
                 do! accountStorage.SaveReminder reminder
-                return Ok ({ReminderId = reminderId.ToString()} : CreateReminderResponse)
+                return Ok ({ReminderId = reminder.ReminderId.ToString()} : CreateReminderResponse)
             with
             | ex ->
-                logger.LogError($"Error creating reminder: {ex.Message}")
-                return Error (ServiceError(ex.Message))
+                logger.LogError $"Error creating reminder: {ex}"
+                return Error (ServiceError ex.Message)
         }
         
         member this.Handle (command:UpdateReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
