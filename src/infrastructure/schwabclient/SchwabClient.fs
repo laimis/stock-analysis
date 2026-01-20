@@ -403,6 +403,17 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 | false -> value
             )
         | _ -> (fun _ value -> value)
+
+    let safeParseDate (str:string option) = 
+        match str with
+        | None -> None
+        | Some str ->
+            match DateTimeOffset.TryParse str with
+            | true, dt -> Some dt
+            | _ -> None
+    
+    let safeParseDateString (str:string) = 
+        safeParseDate (Some str)
     
     let refreshAccessTokenInternal (user: UserState) (fullRefresh: bool) = task {
         let postData =
@@ -541,9 +552,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             Type = o.orderType |> parseStockOrderType
             Instruction = l.instruction |> parseStockOrderInstruction
             Ticker = Ticker l.instrument.symbol
-            ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
+            ExecutionTime = o.closeTime |> safeParseDate
             EnteredTime = o.enteredTime |> DateTimeOffset.Parse
-            ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
+            ExpirationTime = o.cancelTime |> safeParseDate
             OrderId = o.orderId.ToString()
             CanBeCancelled = o.cancelable
         }
@@ -555,8 +566,8 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             Status = o.status |> parseOrderStatus
             Type = o.orderType |> parseOptionOrderType
             EnteredTime = o.enteredTime |> DateTimeOffset.Parse
-            ExecutionTime = o.closeTime |> Option.map DateTimeOffset.Parse
-            ExpirationTime = o.cancelTime |> Option.map DateTimeOffset.Parse
+            ExecutionTime = o.closeTime |> safeParseDate
+            ExpirationTime = o.cancelTime |> safeParseDate
             OrderId = o.orderId.ToString()
             CanBeCancelled = o.cancelable
             Contracts = o.orderLegCollection.Value |> Array.map(fun l ->
