@@ -16,16 +16,12 @@
                                 Sell Tracking Report
                             </h1>
                             <p style="margin: 8px 0 0; color: #6b7280; font-size: 14px;">
-                                Performance tracking for positions sold approximately 30 days ago
+                                Sell transactions that have occurred in your account around 30 days ago
                             </p>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding: 32px 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 24px;">
-                                The following positions were sold approximately 30 days ago. Review their current performance to analyze the timing and effectiveness of these sell decisions:
-                            </p>
-                            
                             {{for sell in sells}}
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
                                 <tr>
@@ -44,13 +40,7 @@
                                 </tr>
                             </table>
                             {{end}}
-                            
-                            <div style="margin-top: 24px; padding: 16px; background-color: #f9fafb; border-left: 3px solid #2563eb; border-radius: 4px;">
-                                <p style="margin: 0; color: #1f2937; font-size: 13px; font-weight: 600;">Purpose:</p>
-                                <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
-                                    This report helps you evaluate the performance of your sell decisions over time. Compare current prices against your sell prices to assess timing and identify patterns in your trading strategy.
-                                </p>
-                            </div>
+                        
                         </td>
                     </tr>
                     <tr>
