@@ -577,6 +577,9 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 // so we need to extract the expiration date and the strike price using regex
                 let rm = System.Text.RegularExpressions.Regex.Match(l.instrument.description, @"(\d{1,2}/\d{1,2}/\d{4}) \$?(\d{1,3}\.?\d{0,2}) (Put|Call)")
                 
+                if not rm.Success then
+                    failwith $"Could not parse option description format: {l.instrument.description}"
+                
                 let expirationString = rm.Groups[1].Value
 
                 match DateTimeOffset.TryParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None) with
