@@ -34,7 +34,7 @@ let createTestData() =
             ExecutionTime = None
             OrderId = "orderId"
             CanBeCancelled = true
-            EnteredTime = DateTimeOffset.UtcNow
+            EnteredTime = Some DateTimeOffset.UtcNow
             ExpirationTime = None 
         }
     |]
