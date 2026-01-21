@@ -990,6 +990,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         let brokergeOptionOrders =
                             orders
                             |> Array.filter (fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.exists(fun l -> l.instrument.assetType |> isStockType |> not))
+                            |> Array.filter (fun o -> o.orderLegCollection.IsSome && o.orderLegCollection.Value |> Array.exists(fun l -> System.String.IsNullOrWhiteSpace l.instrument.description |> not))
                             |> Array.map(mapOptionOrder)
 
                         let resource = $"/accounts/{accountId}?fields=positions" |> TraderApiUrl
