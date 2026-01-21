@@ -153,7 +153,7 @@ namespace storagetests
             Assert.Equal(order.Status, fromDbOrder.Status);
             Assert.Equal(order.Ticker.Value, fromDbOrder.Ticker.Value);
             Assert.Equal(order.Type, fromDbOrder.Type);
-            Assert.Equal(order.Value.EnteredTime, fromDbOrder.Value.EnteredTime, TimeSpan.FromSeconds(1));
+            Assert.Equal(order.EnteredTime.Value, fromDbOrder.EnteredTime.Value, TimeSpan.FromSeconds(1));
             Assert.Equal(order.ExpirationTime.Value, fromDbOrder.ExpirationTime.Value, TimeSpan.FromSeconds(1));
             Assert.Equal(order.ExecutionTime, fromDbOrder.ExecutionTime);
             Assert.Equal(order.OrderId, fromDbOrder.OrderId);
