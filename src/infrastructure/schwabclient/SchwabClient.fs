@@ -328,6 +328,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
         | "ETF" -> true
         | "COLLECTIVE_INVESTMENT" -> true
         | _ -> false
+
+    let isOptionType assetType =
+        match assetType with
+        | "OPTION" -> true
+        | _ -> false
     
     static let _retryPolicy =
         Policy
@@ -997,7 +1002,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                             
                         let brokergeOptionOrders =
                             orders
-                            |> Array.filter (fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.exists(fun l -> l.instrument.assetType |> isStockType |> not))
+                            |> Array.filter (fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.exists(fun l -> l.instrument.assetType |> isOptionType))
                             |> Array.map(mapOptionOrder)
 
                         let resource = $"/accounts/{accountId}?fields=positions" |> TraderApiUrl
