@@ -117,7 +117,7 @@ type OptionOrder = {
     Status : OrderStatus
     Type : OptionOrderType
     ExecutionTime : DateTimeOffset option
-    EnteredTime: DateTimeOffset
+    EnteredTime: DateTimeOffset option
     ExpirationTime: DateTimeOffset option
     CanBeCancelled : bool
     Contracts : OptionLeg []

@@ -565,7 +565,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             Quantity = o.quantity |> decimal
             Status = o.status |> parseOrderStatus
             Type = o.orderType |> parseOptionOrderType
-            EnteredTime = o.enteredTime |> DateTimeOffset.Parse
+            EnteredTime = o.enteredTime |> safeParseDateString
             ExecutionTime = o.closeTime |> safeParseDate
             ExpirationTime = o.cancelTime |> safeParseDate
             OrderId = o.orderId.ToString()
