@@ -553,7 +553,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
             Instruction = l.instruction |> parseStockOrderInstruction
             Ticker = Ticker l.instrument.symbol
             ExecutionTime = o.closeTime |> safeParseDate
-            EnteredTime = o.enteredTime |> DateTimeOffset.Parse
+            EnteredTime = o.enteredTime |> safeParseDateString
             ExpirationTime = o.cancelTime |> safeParseDate
             OrderId = o.orderId.ToString()
             CanBeCancelled = o.cancelable
@@ -578,6 +578,11 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                 let rm = System.Text.RegularExpressions.Regex.Match(l.instrument.description, @"(\d{1,2}/\d{1,2}/\d{4}) \$?(\d{1,3}\.?\d{0,2}) (Put|Call)")
                 
                 let expirationString = rm.Groups[1].Value
+
+                match DateTimeOffset.TryParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                | false, _ -> failwith $"Could not parse option expiration date from string: {expirationString} for {l.instrument.description}"
+                | true, _ -> ()
+
                 let expiration = DateTimeOffset.ParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture) |> OptionExpiration.createFromDateTimeOffset
                 let strikePrice = rm.Groups[2].Value |> decimal
                 let instruction = l.instruction |> parseOptionOrderInstruction
@@ -990,7 +995,6 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         let brokergeOptionOrders =
                             orders
                             |> Array.filter (fun o -> o.orderLegCollection |> Option.defaultValue [||] |> Array.exists(fun l -> l.instrument.assetType |> isStockType |> not))
-                            |> Array.filter (fun o -> o.orderLegCollection.IsSome && o.orderLegCollection.Value |> Array.exists(fun l -> System.String.IsNullOrWhiteSpace l.instrument.description |> not))
                             |> Array.map(mapOptionOrder)
 
                         let resource = $"/accounts/{accountId}?fields=positions" |> TraderApiUrl
