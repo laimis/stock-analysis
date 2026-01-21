@@ -253,7 +253,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = :price, quantity = :quantity
                         instruction = GetOrderInstructionString(order.Instruction),
                         assettype = GetAssetTypeString(AssetType.Equity),
                         executiontime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExecutionTime) ? null : order.ExecutionTime.Value.ToString("u"),
-                        enteredtime = order.EnteredTime.ToString("u"),
+                        enteredtime = FSharpOption<DateTimeOffset>.get_IsNone(order.EnteredTime) ? null : order.EnteredTime.Value.ToString("u"),
                         expirationtime = FSharpOption<DateTimeOffset>.get_IsNone(order.ExpirationTime) ? null : order.ExpirationTime.Value.ToString("u"),
                         canbecancelled = order.CanBeCancelled,
                         userId = userId.Item,
