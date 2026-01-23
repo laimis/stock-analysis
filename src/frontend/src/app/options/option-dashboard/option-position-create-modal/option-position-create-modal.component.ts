@@ -16,10 +16,6 @@ import {BrokerageOptionPosition, OptionService} from "../../../services/option.s
 })
 export class OptionPositionCreateModalComponent {
     private optionService = inject(OptionService);
-
-    constructor() {
-        this.optionStrategies = GetOptionStrategies()
-    }
     
     @Input() selectedOption: BrokerageOptionPosition;
     @Input() isVisible: boolean = false;
@@ -29,7 +25,7 @@ export class OptionPositionCreateModalComponent {
 
     positionNotes: string;
     positionStrategy: string;
-    optionStrategies: { key: string, value: string }[] = []
+    optionStrategies: { key: string, value: string }[] = GetOptionStrategies()
 
     @HostListener('document:keydown.escape')
     onEscape() {
