@@ -228,7 +228,7 @@ type PortfolioAnalysisService(
                     profitsByPeriod
                     |> List.sortByDescending snd
                     |> List.truncate topDaysOfInterest
-                    |> List.map (fun (days, profit) -> {| days = days; profit = profit |})
+                    |> List.map (fun (days, profit) -> {| days = days; profit = Math.Round(profit, 2) |})
                     
                 let maxProfitEntry = profitsByPeriod |> List.maxBy snd
                 
@@ -241,7 +241,7 @@ type PortfolioAnalysisService(
                         // negative profit needs a flag so that the email template can use simple if boolean check
                         // to render different style
                         let isNegative = profit < 0m
-                        {| days = days; profit = profit; percentage = percentage; isNegative=isNegative |}
+                        {| days = days; profit = Math.Round(profit, 2); percentage = percentage; isNegative=isNegative |}
                     )
                     
                 let actualProfitPercentOfMax = Math.Round(actualProfit / maxProfit * 100m, 0)
