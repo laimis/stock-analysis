@@ -50,6 +50,11 @@
                 name="reminderDate"
                 [min]="today"
                 required>
+              <div class="form-text">
+                <a href="javascript:void(0)" (click)="setDateToTomorrow()" class="text-decoration-none me-2">Tomorrow</a>
+                <a href="javascript:void(0)" (click)="setDateToNextWeek()" class="text-decoration-none me-2">Next Week</a>
+                <a href="javascript:void(0)" (click)="setDateToNextMonth()" class="text-decoration-none">Next Month</a>
+              </div>
             </div>
           </div>
           <div class="mb-3">
@@ -80,8 +85,8 @@
       class="form-select w-auto" 
       [(ngModel)]="filterState" 
       (change)="onFilterChange()">
-      <option value="all">All States ({{ reminders.length }})</option>
-      <option value="pending">Pending</option>
+      <option value="all">All Reminders ({{ reminders.length }})</option>
+      <option value="pending">Upcoming</option>
       <option value="sent">Sent</option>
     </select>
     
@@ -117,8 +122,6 @@
             <th scope="col" class="ps-4" style="width: 140px;">Date</th>
             <th scope="col">Message</th>
             <th scope="col" style="width: 120px;">Ticker</th>
-            <th scope="col" style="width: 100px;">State</th>
-            <th scope="col" style="width: 130px;">Created</th>
             <th scope="col" class="text-center pe-4" style="width: 120px;">Actions</th>
           </tr>
         </thead>
@@ -130,6 +133,9 @@
                 @if (isOverdue(reminder)) {
                   <span class="badge bg-danger">Overdue</span>
                 }
+                @if (reminder.state === 'sent') {
+                  <span class="badge bg-success">Sent</span>
+                }
               </td>
               <td class="py-3">
                 {{ reminder.message }}
@@ -140,21 +146,6 @@
                 } @else {
                   <span class="text-muted">—</span>
                 }
-              </td>
-              <td class="py-3">
-                <div>
-                  <span [class]="getStateBadgeClass(reminder.state)">
-                    {{ reminder.state }}
-                  </span>
-                </div>
-                @if (reminder.sentAt) {
-                  <div class="small text-muted">
-                    {{ reminder.sentAt | date:'short' }}
-                  </div>
-                }
-              </td>
-              <td class="py-3">
-                <div>{{ reminder.createdAt | date:'short' }}</div>
               </td>
               <td class="text-center py-3 pe-4">
                 <div class="btn-group btn-group-sm" role="group">

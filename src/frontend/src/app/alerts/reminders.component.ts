@@ -211,4 +211,22 @@ export class RemindersComponent implements OnInit {
       default: return 'badge bg-light text-dark';
     }
   }
+
+  setDateToTomorrow() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.newReminder.date = tomorrow.toISOString().split('T')[0];
+  }
+
+  setDateToNextWeek() {
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    this.newReminder.date = nextWeek.toISOString().split('T')[0];
+  }
+
+  setDateToNextMonth() {
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    this.newReminder.date = nextMonth.toISOString().split('T')[0];
+  }
 }
