@@ -201,3 +201,12 @@ CREATE INDEX reminders_userid ON reminders(userid);
 CREATE INDEX reminders_date ON reminders(date);
 CREATE INDEX reminders_state ON reminders(state);
 ALTER TABLE reminders OWNER TO stockanalysis;
+
+CREATE TABLE tickercik (
+    ticker TEXT PRIMARY KEY,
+    cik TEXT NOT NULL,
+    title TEXT NOT NULL,
+    lastupdated TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX tickercik_cik ON tickercik(cik);
+ALTER TABLE tickercik OWNER TO stockanalysis;

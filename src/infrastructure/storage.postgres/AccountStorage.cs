@@ -706,5 +706,65 @@ ON CONFLICT (reminderid) DO UPDATE SET
             
             await db.ExecuteAsync(query, new { reminderid = reminderId });
         }
+
+        public async Task<FSharpOption<TickerCikMapping>> GetTickerCik(string ticker)
+        {
+            using var db = GetConnection();
+
+            const string query = @"SELECT ticker, cik, title, lastupdated FROM tickercik WHERE ticker = :ticker";
+            
+            var result = await db.QuerySingleOrDefaultAsync<TickerCikMapping>(query, new { ticker = ticker.ToUpperInvariant() });
+            
+            return result == null ? FSharpOption<TickerCikMapping>.None : FSharpOption<TickerCikMapping>.Some(result);
+        }
+
+        public async Task SaveTickerCikMappings(IEnumerable<TickerCikMapping> mappings)
+        {
+            using var db = GetConnection();
+            using var tx = db.BeginTransaction();
+
+            try
+            {
+                const string query = @"
+INSERT INTO tickercik (ticker, cik, title, lastupdated)
+VALUES (:ticker, :cik, :title, :lastupdated)
+ON CONFLICT (ticker) DO UPDATE SET
+    cik = EXCLUDED.cik,
+    title = EXCLUDED.title,
+    lastupdated = EXCLUDED.lastupdated
+                ";
+                
+                await db.ExecuteAsync(query, mappings, transaction: tx);
+                
+                tx.Commit();
+            }
+            catch
+            {
+                tx?.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<TickerCikMapping>> GetAllTickerCikMappings()
+        {
+            using var db = GetConnection();
+
+            const string query = @"SELECT ticker, cik, title, lastupdated FROM tickercik ORDER BY ticker";
+            
+            return await db.QueryAsync<TickerCikMapping>(query);
+        }
+
+        public async Task<FSharpOption<DateTimeOffset>> GetTickerCikLastUpdated()
+        {
+            using var db = GetConnection();
+
+            const string query = @"SELECT MAX(lastupdated) FROM tickercik";
+            
+            var result = await db.QuerySingleOrDefaultAsync<DateTimeOffset?>(query);
+            
+            return result.HasValue 
+                ? FSharpOption<DateTimeOffset>.Some(result.Value) 
+                : FSharpOption<DateTimeOffset>.None;
+        }
     }
 }

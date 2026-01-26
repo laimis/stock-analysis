@@ -37,6 +37,7 @@
         <Compile Include="Services\InflectionPoints.fs" />
         <Compile Include="Services\Trends.fs" />
         <Compile Include="Services\PendingPositionAnalysis.fs" />
+        <Compile Include="Services\SECTickerSyncService.fs" />
         <Compile Include="Options\Views.fs"/>
         <Compile Include="Options\OptionsHandler.fs" />
         <Compile Include="Options\Import.fs"/>

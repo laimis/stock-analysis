@@ -137,6 +137,13 @@ public static class Jobs
                 cronExpression: Cron.Weekly(DayOfWeek.Saturday, 10),
                 options: rjo
             );
+            
+            RecurringJob.AddOrUpdate<core.fs.Services.SECTickerSyncService.SECTickerSyncService>(
+                recurringJobId: nameof(core.fs.Services.SECTickerSyncService.SECTickerSyncService),
+                methodCall: service => service.Execute(),
+                cronExpression: Cron.Weekly(DayOfWeek.Saturday, 9), // 9am Saturday
+                options: rjo
+            );
 
             RecurringJob.AddOrUpdate<core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService>(
                 recurringJobId: nameof(core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService.ReportOnMaxProfitBasedOnDaysHeld),

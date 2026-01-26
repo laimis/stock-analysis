@@ -77,5 +77,13 @@ namespace web.Controllers
                 new Export()
             )
         );
+
+        [HttpGet("sec/ticker-sync")]
+        public Task<ActionResult> TriggerSECTickerSync() =>
+            this.OkOrError(
+                handler.Handle(
+                    new TriggerSECTickerSync()
+                )
+            );
     }
 }

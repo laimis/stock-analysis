@@ -49,7 +49,16 @@ namespace di
             services.AddSingleton<StockAlertContainer>();
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
-            services.AddSingleton<ISECFilings, EdgarClient>();
+            services.AddSingleton<ISECFilings>(s => 
+                new EdgarClient(
+                    s.GetService<ILogger<EdgarClient>>(),
+                    s.GetService<IAccountStorage>()
+                ));
+            services.AddSingleton<EdgarClient>(s => 
+                new EdgarClient(
+                    s.GetService<ILogger<EdgarClient>>(),
+                    s.GetService<IAccountStorage>()
+                ));
 
             // go over all types in core.fs assembly, find any inner classes and register any type that implements IApplicationService
             // interface as a singleton
