@@ -46,6 +46,7 @@
         <Compile Include="Admin\Handlers.fs"/>
         <Compile Include="Alerts\Types.fs" />
         <Compile Include="Alerts\MonitoringServices.fs" />
+        <Compile Include="Alerts\SECFilingsMonitoringService.fs" />
         <Compile Include="Alerts\AlertsHandler.fs"/>
         <Compile Include="Brokerage\Handlers.fs"/>
         <Compile Include="Brokerage\MonitoringServices.fs" />
