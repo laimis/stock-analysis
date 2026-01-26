@@ -6,11 +6,14 @@ open System.Threading.Tasks
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
 open core.fs.Adapters.SEC
+open core.fs
 
 type SECTickerSyncService(
     accountStorage: IAccountStorage,
     secFilingsClient: ISECFilings,
     logger: ILogger) =
+
+    interface IApplicationService
     
     member _.Execute() = task {
         try

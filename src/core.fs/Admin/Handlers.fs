@@ -7,11 +7,14 @@ open core.fs.Adapters.Email
 open core.fs.Adapters.Storage
 open core.fs.Options
 open core.fs.Services
+open core.fs.Services.SECTickerSyncService
 open core.fs.Stocks
 
 type Query = {
     everyone: bool
 }
+
+type TriggerSECTickerSync = struct end
         
 type QueryResponse(user:User, stocks:StockPositionState seq, options:OptionPositionState seq) =
     let stockLength = stocks |> Seq.length
@@ -35,7 +38,7 @@ type SendEmail = {
     input:EmailInput
 }
         
-type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioStorage, csvWriter:ICSVWriter) =
+type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioStorage, csvWriter:ICSVWriter, secTickerSync:SECTickerSyncService) =
             
     let buildQueryResponse userId =
         async {
@@ -97,4 +100,9 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
         let filename = CSVExport.generateFilename "users"
         
         return ExportResponse(filename, CSVExport.users csvWriter users)
+    }
+    
+    member _.Handle (_:TriggerSECTickerSync) : System.Threading.Tasks.Task<Result<Unit,ServiceError>> = task {
+        do! secTickerSync.Execute()
+        return Ok ()
     }
