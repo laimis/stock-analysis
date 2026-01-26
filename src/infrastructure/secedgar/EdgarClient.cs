@@ -9,7 +9,7 @@ using core.fs.Adapters.Storage;
 
 namespace secedgar;
 
-public class EdgarClient : ISECFilings, ISECTickerData
+public class EdgarClient : ISECFilings
 {
     private readonly ILogger<EdgarClient>? _logger;
     private readonly IAccountStorage? _accountStorage;

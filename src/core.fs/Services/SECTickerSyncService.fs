@@ -9,7 +9,7 @@ open core.fs.Adapters.SEC
 
 type SECTickerSyncService(
     accountStorage: IAccountStorage,
-    tickerDataClient: ISECTickerData,
+    secFilingsClient: ISECFilings,
     logger: ILogger) =
     
     member _.Execute() = task {
@@ -35,7 +35,7 @@ type SECTickerSyncService(
             
             if shouldUpdate then
                 // Fetch latest company tickers from SEC
-                let! companyTickers = tickerDataClient.FetchCompanyTickers()
+                let! companyTickers = secFilingsClient.FetchCompanyTickers()
                 
                 logger.LogInformation($"Fetched {companyTickers.Count} company tickers from SEC")
                 

@@ -42,6 +42,4 @@ type CompanyTickerEntry = {
 
 type ISECFilings =
  abstract GetFilings : ticker:Ticker  -> Task<Result<CompanyFilings,ServiceError>>
-
-type ISECTickerData =
  abstract FetchCompanyTickers : unit -> Task<System.Collections.Generic.Dictionary<string, CompanyTickerEntry>>
