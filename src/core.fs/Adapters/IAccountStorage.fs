@@ -8,6 +8,15 @@ open core.fs.Adapters.Brokerage
 open core.fs.Options
 open core.fs.Alerts
 
+[<CLIMutable>]
+type TickerCikMapping = 
+    {
+        Ticker: string
+        Cik: string
+        Title: string
+        LastUpdated: DateTimeOffset
+    }
+
 type IAccountStorage =
     
     abstract member GetUserByEmail: emailAddress:string -> Task<User option>
@@ -33,3 +42,7 @@ type IAccountStorage =
     abstract member GetReminders: userId:UserId -> Task<Reminder seq>
     abstract member SaveReminder: reminder:Reminder -> Task
     abstract member DeleteReminder: reminderId:Guid -> Task
+    abstract member GetTickerCik: ticker:string -> Task<TickerCikMapping option>
+    abstract member SaveTickerCikMappings: mappings:TickerCikMapping seq -> Task
+    abstract member GetAllTickerCikMappings: unit -> Task<TickerCikMapping seq>
+    abstract member GetTickerCikLastUpdated: unit -> Task<DateTimeOffset option>

@@ -8,11 +8,17 @@ namespace secedgartests;
 [Trait("Category", "Integration")]
 public class EdgarClientTests
 {
-    [Fact]
-    public async Task TestAsync()
+    [Theory]
+    [InlineData("AAPL")]
+    [InlineData("MSFT")]
+    [InlineData("1736297")]
+    public async Task TestAsync(string ticker)
     {
         var client = new EdgarClient(null);
-        var response = await client.GetFilings(new Ticker("TTD"));
+        var response = await client.GetFilings(new Ticker(ticker));
+
+        // make sure it is not an error
+        Assert.True(response.IsOk);
         Assert.NotEmpty(response.ResultValue.Filings);
     }
 }

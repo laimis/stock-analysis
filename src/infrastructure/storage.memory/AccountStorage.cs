@@ -225,4 +225,29 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         
         return Task.CompletedTask;
     }
+
+    // Ticker-CIK mapping methods (in-memory stubs)
+    public Task<FSharpOption<TickerCikMapping>> GetTickerCik(string ticker)
+    {
+        // Memory storage doesn't persist ticker-CIK mappings
+        return Task.FromResult(FSharpOption<TickerCikMapping>.None);
+    }
+
+    public Task SaveTickerCikMappings(IEnumerable<TickerCikMapping> mappings)
+    {
+        // Memory storage doesn't persist ticker-CIK mappings
+        return Task.CompletedTask;
+    }
+
+    public Task<IEnumerable<TickerCikMapping>> GetAllTickerCikMappings()
+    {
+        // Memory storage doesn't persist ticker-CIK mappings
+        return Task.FromResult(Enumerable.Empty<TickerCikMapping>());
+    }
+
+    public Task<FSharpOption<DateTimeOffset>> GetTickerCikLastUpdated()
+    {
+        // Memory storage doesn't persist ticker-CIK mappings
+        return Task.FromResult(FSharpOption<DateTimeOffset>.None);
+    }
 }
