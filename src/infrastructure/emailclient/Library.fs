@@ -139,8 +139,8 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
         member _.SendReminder recipient sender properties =
             sendWithTemplate recipient sender "reminder" "Reminder" properties
         
-        member _.SendSECFilings recipient sender properties =
-            sendWithTemplate recipient sender "secfilings" "SEC Filings Update" properties
+        member _.SendSECFilings recipient sender subject properties =
+            sendWithTemplate recipient sender "secfilings" subject properties
         
         member _.Send recipient sender subject plainTextBody htmlBody =
             sendRaw recipient sender subject plainTextBody htmlBody

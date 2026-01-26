@@ -158,7 +158,7 @@ type SECFilingsMonitoringService(
                 $"SEC Filings for {tickerFilings.Length} Stocks ({totalFilings} total)"
 
         try
-            let! result = emails.SendSECFilings recipient sender emailData
+            let! result = emails.SendSECFilings recipient sender subject emailData
             match result with
             | Ok _ -> 
                 logger.LogInformation($"SEC filings email sent successfully to {user.State.Email}")
