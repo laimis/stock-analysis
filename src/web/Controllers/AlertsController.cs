@@ -134,6 +134,12 @@ public class AlertsController(Handler handler) : ControllerBase
         [FromServices] MonitoringServices.ReminderMonitoringService reminderService)
         => reminderService.Execute();
     
+    [HttpGet("triggerSECFilings")]
+    [Authorize("admin")]
+    public Task TriggerSECFilings(
+        [FromServices] SECFilingsMonitoring.SECFilingsMonitoringService secFilingsService)
+        => secFilingsService.Execute();
+    
     // Stock Price Alerts CRUD
     [HttpGet("price")]
     public Task<ActionResult> GetStockPriceAlerts() =>
