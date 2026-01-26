@@ -9,14 +9,7 @@ using core.fs.Adapters.Storage;
 
 namespace secedgar;
 
-public class CompanyTickerEntry
-{
-    public string cik_str { get; set; } = string.Empty;
-    public string ticker { get; set; } = string.Empty;
-    public string title { get; set; } = string.Empty;
-}
-
-public class EdgarClient : ISECFilings
+public class EdgarClient : ISECFilings, ISECTickerData
 {
     private readonly ILogger<EdgarClient>? _logger;
     private readonly IAccountStorage? _accountStorage;

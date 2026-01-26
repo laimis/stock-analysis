@@ -54,6 +54,11 @@ namespace di
                     s.GetService<ILogger<EdgarClient>>(),
                     s.GetService<IAccountStorage>()
                 ));
+            services.AddSingleton<ISECTickerData>(s => 
+                new EdgarClient(
+                    s.GetService<ILogger<EdgarClient>>(),
+                    s.GetService<IAccountStorage>()
+                ));
             services.AddSingleton<EdgarClient>(s => 
                 new EdgarClient(
                     s.GetService<ILogger<EdgarClient>>(),

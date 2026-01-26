@@ -32,5 +32,16 @@ type CompanyFilings(ticker:Ticker, filings:seq<CompanyFiling>) =
     member _.Filings = filings
 
 
+[<Struct>]
+[<CLIMutable>]
+type CompanyTickerEntry = {
+    cik_str: string
+    ticker: string
+    title: string
+}
+
 type ISECFilings =
  abstract GetFilings : ticker:Ticker  -> Task<Result<CompanyFilings,ServiceError>>
+
+type ISECTickerData =
+ abstract FetchCompanyTickers : unit -> Task<System.Collections.Generic.Dictionary<string, CompanyTickerEntry>>

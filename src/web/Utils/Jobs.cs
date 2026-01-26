@@ -138,8 +138,8 @@ public static class Jobs
                 options: rjo
             );
             
-            RecurringJob.AddOrUpdate<web.Utils.SECTickerSyncService>(
-                recurringJobId: nameof(web.Utils.SECTickerSyncService),
+            RecurringJob.AddOrUpdate<core.fs.Services.SECTickerSyncService.SECTickerSyncService>(
+                recurringJobId: nameof(core.fs.Services.SECTickerSyncService.SECTickerSyncService),
                 methodCall: service => service.Execute(),
                 cronExpression: Cron.Weekly(DayOfWeek.Saturday, 9), // 9am Saturday
                 options: rjo
