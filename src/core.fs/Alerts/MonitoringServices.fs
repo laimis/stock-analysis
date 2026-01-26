@@ -48,7 +48,7 @@ let private toEmailData (marketHours:IMarketHours) (alert:TriggeredAlert) =
             ticker = alert.ticker.Value
             value = alert.triggeredValue |> formattedValue alert.valueFormat
             description = alert.description
-            sourceLists = alert.sourceLists
+            sourceLists = alert.sourceLists |> List.toArray // might need this for scriban templates
             sourceList = alert.sourceLists.Head
             time = alert.``when`` |> marketHours.ToMarketTime |> fun x -> x.ToString("HH:mm") + " ET"
         |}
