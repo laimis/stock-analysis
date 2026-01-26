@@ -21,34 +21,38 @@
                         <td style="padding: 32px 40px;">
                             {{for group in alert_groups}}
                             <div style="margin-bottom: 32px;">
-                                <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
+                                <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 20px; font-weight: 600;">
                                     {{group.identifier}}
                                     <span style="color: #6b7280; font-size: 16px; font-weight: normal;">
                                         ({{group.alert_count}} alert{{if group.alert_count > 1}}s{{end}})
                                     </span>
                                 </h2>
                                 
-                                {{for alert in group.alerts}}
-                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
-                                    <tr>
-                                        <td style="padding: 16px; background-color: #f9fafb;">
-                                            <div style="margin-bottom: 8px;">
+                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                    {{for alert in group.alerts}}
+                                    <tr style="{{if !for.first}}border-top: 1px solid #e5e7eb;{{end}}">
+                                        <td style="padding: 12px 16px; background-color: #ffffff;">
+                                            <div style="margin-bottom: 4px;">
                                                 <span style="font-size: 18px; font-weight: 600; color: #1f2937;">{{alert.ticker}}</span>
                                                 <span style="margin-left: 12px; font-size: 16px; color: #2563eb; font-weight: 600;">{{alert.value}}</span>
-                                                <span style="margin-left: 12px; font-size: 14px; color: #6b7280;">{{alert.time}}</span>
                                             </div>
-                                            <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
+                                            <p style="margin: 4px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
                                                 {{alert.description}}
                                             </p>
                                             {{if alert.source_lists.size > 0}}
-                                            <p style="margin: 8px 0 0; color: #6b7280; font-size: 13px;">
+                                            <p style="margin: 4px 0 0; color: #6b7280; font-size: 13px;">
                                                 Lists: {{for list in alert.source_lists}}{{list}}{{if !for.last}}, {{end}}{{end}}
                                             </p>
                                             {{end}}
+                                            <p style="margin: 4px 0 0; font-size: 12px;">
+                                                <a href="https://app.nightingaletrading.com/stocks/{{alert.ticker}}" style="color: #2563eb; text-decoration: none;">Dashboard</a>
+                                                <span style="color: #d1d5db; margin: 0 6px;">|</span>
+                                                <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{alert.ticker}}" style="color: #2563eb; text-decoration: none;">Chart</a>
+                                            </p>
                                         </td>
                                     </tr>
+                                    {{end}}
                                 </table>
-                                {{end}}
                             </div>
                             {{end}}
                             
