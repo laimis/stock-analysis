@@ -825,28 +825,31 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                         match results.instruments with
                         | Some instruments -> instruments
                         | None -> [||])
-                    |> Result.map(fun instruments ->
-                        let fundamentals =
-                            match instruments[0].fundamental with
-                            | Some f ->
-                                let keyValuePairs =
-                                    f
-                                    |> Seq.map (fun kvp -> KeyValuePair<string,string>(kvp.Key, kvp.Value.ToString()))
-                                Dictionary<string, string>(keyValuePairs)
-                            | None -> Dictionary<string, string>()
-                        let data = instruments[0]
+                    |> Result.bind(fun instruments ->
+                        if instruments.Length = 0 then
+                            $"No instrument found for ticker {ticker.Value}" |> ServiceError |> Error
+                        else
+                            let fundamentals =
+                                match instruments[0].fundamental with
+                                | Some f ->
+                                    let keyValuePairs =
+                                        f
+                                        |> Seq.map (fun kvp -> KeyValuePair<string,string>(kvp.Key, kvp.Value.ToString()))
+                                    Dictionary<string, string>(keyValuePairs)
+                                | None -> Dictionary<string, string>()
+                            let data = instruments[0]
 
-                        let mapped : StockProfile = {
-                            Symbol = data.symbol
-                            Description = data.description
-                            SecurityName = data.description
-                            Exchange = data.exchange
-                            Cusip = data.cusip
-                            IssueType = data.assetType
-                            Fundamentals = fundamentals
-                        }
-                        
-                        mapped
+                            let mapped : StockProfile = {
+                                Symbol = data.symbol
+                                Description = data.description
+                                SecurityName = data.description
+                                Exchange = data.exchange
+                                Cusip = data.cusip
+                                IssueType = data.assetType
+                                Fundamentals = fundamentals
+                            }
+                            
+                            mapped |> Ok
                     )
             }
             
