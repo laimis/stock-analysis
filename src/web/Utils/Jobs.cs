@@ -86,7 +86,7 @@ public static class Jobs
             RecurringJob.AddOrUpdate<core.fs.Alerts.SECFilingsMonitoring.SECFilingsMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.SECFilingsMonitoring.SECFilingsMonitoringService),
                 methodCall: service => service.Execute(),
-                cronExpression: "30 8 * * 1-5",  // 8:30am ET weekdays, couple hours after market opens
+                cronExpression: "30 8 * * 1-5",  // 8:30am PT (11:30am ET) weekdays, couple hours after market opens
                 options: rjo
             );
             
