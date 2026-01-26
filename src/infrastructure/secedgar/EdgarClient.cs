@@ -10,13 +10,18 @@ public class EdgarClient : ISECFilings
 {
     private readonly ILogger<EdgarClient>? _logger;
 
-    public EdgarClient(ILogger<EdgarClient>? logger) : this(logger, "NGTD/1.0"){}
+    public EdgarClient(ILogger<EdgarClient>? logger) : this(logger, "TradeWatch", "1.0", "support@tradewatch.io"){}
     
 
-    public EdgarClient(ILogger<EdgarClient>? logger, string userAgent)
+    public EdgarClient(ILogger<EdgarClient>? logger, string appName, string appVersion, string email)
     {
         _logger = logger;
-        // TODO: set user agent in EdgarSearch somewhere
+        
+        // SEC requires all automated tools to identify themselves via User-Agent
+        // This must be set before any EdgarSearch calls
+        IdentificationManager.Instance.AppName = appName;
+        IdentificationManager.Instance.AppVersion = appVersion;
+        IdentificationManager.Instance.Email = email;
     }
         
 

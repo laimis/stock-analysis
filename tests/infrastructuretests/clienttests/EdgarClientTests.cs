@@ -11,8 +11,8 @@ public class EdgarClientTests
     [Fact]
     public async Task TestAsync()
     {
-        var client = new EdgarClient(null, "NGTD/1.0");
-        var response = await client.GetFilings(new Ticker("AAPL"));
+        var client = new EdgarClient(null);
+        var response = await client.GetFilings(new Ticker("TTD"));
         Assert.NotEmpty(response.ResultValue.Filings);
     }
 }
