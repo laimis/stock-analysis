@@ -9,6 +9,9 @@ namespace secedgar;
 public class EdgarClient : ISECFilings
 {
     private readonly ILogger<EdgarClient>? _logger;
+    private static readonly SemaphoreSlim _rateLimitSemaphore = new SemaphoreSlim(1, 1);
+    private static DateTime _lastRequestTime = DateTime.MinValue;
+    private static readonly TimeSpan _minimumRequestInterval = TimeSpan.FromMilliseconds(500); // Max 2 requests per second
 
     public EdgarClient(ILogger<EdgarClient>? logger) : this(logger, "TradeWatch", "1.0", "support@tradewatch.io"){}
     
@@ -29,6 +32,24 @@ public class EdgarClient : ISECFilings
     {
         try
         {
+            // Rate limiting: ensure no more than 2 requests per second
+            await _rateLimitSemaphore.WaitAsync();
+            try
+            {
+                var timeSinceLastRequest = DateTime.UtcNow - _lastRequestTime;
+                if (timeSinceLastRequest < _minimumRequestInterval)
+                {
+                    var delay = _minimumRequestInterval - timeSinceLastRequest;
+                    _logger?.LogDebug("Rate limiting SEC Edgar request for {symbol}, delaying {ms}ms", symbol, delay.TotalMilliseconds);
+                    await Task.Delay(delay);
+                }
+                _lastRequestTime = DateTime.UtcNow;
+            }
+            finally
+            {
+                _rateLimitSemaphore.Release();
+            }
+
             var results = await EdgarSearch.CreateAsync(
                 stock_symbol: symbol.Value,
                 results_per_page: EdgarSearchResultsPerPage.Entries10
