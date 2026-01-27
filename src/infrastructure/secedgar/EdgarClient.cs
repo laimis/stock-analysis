@@ -3,11 +3,60 @@ using core.fs.Adapters.SEC;
 using core.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
-using SecuritiesExchangeCommission.Edgar;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using core.fs.Adapters.Storage;
 
 namespace secedgar;
+
+// SEC Submissions API response models
+public class SECRecentFilings
+{
+    [JsonPropertyName("accessionNumber")]
+    public string[] AccessionNumber { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("filingDate")]
+    public string[] FilingDate { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("reportDate")]
+    public string[] ReportDate { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("acceptanceDateTime")]
+    public string[] AcceptanceDateTime { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("form")]
+    public string[] Form { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("primaryDocument")]
+    public string[] PrimaryDocument { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("primaryDocDescription")]
+    public string[] PrimaryDocDescription { get; set; } = Array.Empty<string>();
+}
+
+public class SECFilingsContainer
+{
+    [JsonPropertyName("recent")]
+    public SECRecentFilings Recent { get; set; } = new();
+}
+
+public class SECSubmissionsResponse
+{
+    [JsonPropertyName("cik")]
+    public string Cik { get; set; } = string.Empty;
+    
+    [JsonPropertyName("entityType")]
+    public string EntityType { get; set; } = string.Empty;
+    
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+    
+    [JsonPropertyName("tickers")]
+    public string[] Tickers { get; set; } = Array.Empty<string>();
+    
+    [JsonPropertyName("filings")]
+    public SECFilingsContainer Filings { get; set; } = new();
+}
 
 public class EdgarClient : ISECFilings
 {
@@ -32,12 +81,6 @@ public class EdgarClient : ISECFilings
         _appVersion = appVersion;
         _email = email;
         
-        // SEC requires all automated tools to identify themselves via User-Agent
-        // This must be set before any EdgarSearch calls
-        IdentificationManager.Instance.AppName = appName;
-        IdentificationManager.Instance.AppVersion = appVersion;
-        IdentificationManager.Instance.Email = email;
-        
         ConfigureHttpClient();
     }
     
@@ -48,12 +91,6 @@ public class EdgarClient : ISECFilings
         _appName = appName;
         _appVersion = appVersion;
         _email = email;
-        
-        // SEC requires all automated tools to identify themselves via User-Agent
-        // This must be set before any EdgarSearch calls
-        IdentificationManager.Instance.AppName = appName;
-        IdentificationManager.Instance.AppVersion = appVersion;
-        IdentificationManager.Instance.Email = email;
         
         ConfigureHttpClient();
     }
@@ -70,22 +107,31 @@ public class EdgarClient : ISECFilings
     {
         try
         {
-            // Try to resolve ticker to CIK if we have account storage
-            string searchIdentifier = symbol.Value;
+            // Resolve ticker to CIK
+            string? cik = null;
             
             if (_accountStorage != null)
             {
                 var tickerMapping = await _accountStorage.GetTickerCik(symbol.Value);
                 if (FSharpOption<TickerCikMapping>.get_IsSome(tickerMapping))
                 {
-                    // Use CIK for more reliable lookup
-                    searchIdentifier = tickerMapping.Value.Cik;
-                    _logger?.LogDebug("Resolved ticker {ticker} to CIK {cik}", symbol.Value, searchIdentifier);
+                    cik = tickerMapping.Value.Cik;
+                    _logger?.LogDebug("Resolved ticker {ticker} to CIK {cik}", symbol.Value, cik);
                 }
                 else
                 {
-                    _logger?.LogWarning("No CIK mapping found for ticker {ticker}, attempting direct lookup", symbol.Value);
+                    _logger?.LogWarning("No CIK mapping found for ticker {ticker}", symbol.Value);
+                    return FSharpResult<CompanyFilings, ServiceError>.NewError(
+                        new ServiceError($"No CIK mapping found for ticker {symbol.Value}. Please sync ticker data first.")
+                    );
                 }
+            }
+            else
+            {
+                _logger?.LogError("Account storage not available for CIK lookup");
+                return FSharpResult<CompanyFilings, ServiceError>.NewError(
+                    new ServiceError("Account storage not configured")
+                );
             }
             
             // Rate limiting: ensure no more than 2 requests per second
@@ -96,7 +142,7 @@ public class EdgarClient : ISECFilings
                 if (timeSinceLastRequest < _minimumRequestInterval)
                 {
                     var delay = _minimumRequestInterval - timeSinceLastRequest;
-                    _logger?.LogDebug("Rate limiting SEC Edgar request for {symbol}, delaying {ms}ms", symbol, delay.TotalMilliseconds);
+                    _logger?.LogDebug("Rate limiting SEC API request for {symbol}, delaying {ms}ms", symbol, delay.TotalMilliseconds);
                     await Task.Delay(delay);
                 }
                 _lastRequestTime = DateTime.UtcNow;
@@ -106,33 +152,82 @@ public class EdgarClient : ISECFilings
                 _rateLimitSemaphore.Release();
             }
 
-            var results = await EdgarSearch.CreateAsync(
-                stock_symbol: searchIdentifier,
-                results_per_page: EdgarSearchResultsPerPage.Entries10
-            );
-
-            var filings = new List<CompanyFiling>();
-
-            foreach(var r in results.Results)
+            // Fetch from SEC Submissions API
+            var url = $"https://data.sec.gov/submissions/CIK{cik}.json";
+            _logger?.LogInformation("Fetching SEC filings from {url}", url);
+            
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            
+            var json = await response.Content.ReadAsStringAsync();
+            var submissions = JsonSerializer.Deserialize<SECSubmissionsResponse>(json);
+            
+            if (submissions?.Filings?.Recent == null)
             {
-                var filing = new CompanyFiling(r.Description,
-                    r.DocumentsUrl,
-                    r.FilingDate,
-                    r.Filing,
-                    r.InteractiveDataUrl
+                _logger?.LogWarning("No filings data returned for {ticker} (CIK {cik})", symbol.Value, cik);
+                return FSharpResult<CompanyFilings, ServiceError>.NewOk(
+                    new CompanyFilings(symbol, Array.Empty<CompanyFiling>())
                 );
-
-                filings.Add(filing);
             }
 
+            var recent = submissions.Filings.Recent;
+            var filings = new List<CompanyFiling>();
+
+            // Parse parallel arrays - all arrays have the same length
+            for (int i = 0; i < recent.AccessionNumber.Length && i < 100; i++) // Limit to 100 most recent
+            {
+                try
+                {
+                    var filingDate = DateTime.Parse(recent.FilingDate[i]);
+                    var acceptanceDate = !string.IsNullOrEmpty(recent.AcceptanceDateTime[i]) 
+                        ? DateTime.Parse(recent.AcceptanceDateTime[i]) 
+                        : filingDate;
+                    
+                    // Build URLs using SEC's standard structure
+                    var accessionNumber = recent.AccessionNumber[i]; // e.g., "0002107261-26-000002"
+                    var accessionNumberNoHyphens = accessionNumber.Replace("-", ""); // e.g., "000210726126000002"
+                    var primaryDoc = recent.PrimaryDocument[i];
+                    var cikNumber = cik.TrimStart('0'); // Remove leading zeros for URLs
+                    
+                    // Filing URL: https://www.sec.gov/Archives/edgar/data/{cik}/{accessionNumberNoHyphens}/{accessionNumber}-index.html
+                    var filingUrl = $"https://www.sec.gov/Archives/edgar/data/{cikNumber}/{accessionNumberNoHyphens}/{accessionNumber}-index.html";
+                    
+                    // Document URL: https://www.sec.gov/Archives/edgar/data/{cik}/{accessionNumberNoHyphens}/{primaryDocument}
+                    var documentUrl = $"https://www.sec.gov/Archives/edgar/data/{cikNumber}/{accessionNumberNoHyphens}/{primaryDoc}";
+
+                    var filing = new CompanyFiling
+                    {
+                        Description = recent.PrimaryDocDescription[i],
+                        DocumentUrl = documentUrl,
+                        FilingDate = filingDate,
+                        Filing = recent.Form[i],
+                        FilingUrl = filingUrl
+                    };
+
+                    filings.Add(filing);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "Error parsing filing at index {index} for {ticker}", i, symbol.Value);
+                    // Continue processing other filings
+                }
+            }
+
+            _logger?.LogInformation("Retrieved {count} filings for {ticker}", filings.Count, symbol.Value);
             var result = new CompanyFilings(symbol, filings);
 
             return FSharpResult<CompanyFilings, ServiceError>.NewOk(result);
         }
+        catch (HttpRequestException ex)
+        {
+            _logger?.LogError(ex, "HTTP error getting SEC filings for {symbol}: {status}", symbol, ex.Message);
+            return FSharpResult<CompanyFilings, ServiceError>.NewError(
+                new ServiceError($"Failed to fetch filings from SEC: {ex.Message}")
+            );
+        }
         catch (Exception ex)
         {
             _logger?.LogError(ex, "Error getting SEC filings for {symbol}", symbol);
-
             return FSharpResult<CompanyFilings, ServiceError>.NewError(
                 new ServiceError(ex.Message)
             );

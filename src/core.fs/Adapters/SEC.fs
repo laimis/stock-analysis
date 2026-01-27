@@ -14,13 +14,14 @@ type FilingDetails =
     }
 
 [<Struct>]
+[<CLIMutable>]
 type CompanyFiling =
     {
         Description: string
-        DocumentsUrl: string
+        DocumentUrl: string
         FilingDate: System.DateTime
         Filing: string
-        InteractiveDataUrl: string
+        FilingUrl: string
     }
     
     with

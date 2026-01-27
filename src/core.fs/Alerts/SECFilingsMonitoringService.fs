@@ -22,10 +22,10 @@ type SECFilingEmailData =
 and [<CLIMutable>] SECFilingForEmail =
     {
         description: string
-        documentsUrl: string
+        documentUrl: string
         filingDate: string
         filing: string
-        interactiveDataUrl: string
+        filingUrl: string
     }
 
 [<CLIMutable>]
@@ -97,10 +97,10 @@ type SECFilingsMonitoringService(
             |> Seq.map (fun f -> 
                 {
                     description = f.Description
-                    documentsUrl = f.DocumentsUrl
+                    documentUrl = f.DocumentUrl
                     filingDate = f.FilingDate.ToString("MMMM dd, yyyy")
                     filing = f.Filing
-                    interactiveDataUrl = f.InteractiveDataUrl
+                    filingUrl = f.FilingUrl
                 })
             |> Seq.toArray
 

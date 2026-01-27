@@ -822,11 +822,11 @@ export interface StockDetails {
 
 export interface SECFiling {
     description: string
-    documentsUrl: string
+    documentUrl: string
     filingDate: string
     isNew: boolean
     filing: string
-    interactiveDataUrl: string
+    filingUrl: string
 }
 
 export interface SECFilings {
