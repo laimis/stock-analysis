@@ -9,8 +9,8 @@ namespace secedgartests;
 public class EdgarClientTests
 {
     [Theory]
-    // [InlineData("AAPL")]
-    // [InlineData("MSFT")]
+    [InlineData("AAPL")]
+    [InlineData("MSFT")]
     [InlineData("DOCN")]
     public async Task TestAsync(string ticker)
     {
