@@ -186,14 +186,25 @@ public class EdgarClient : ISECFilings
                     // Build URLs using SEC's standard structure
                     var accessionNumber = recent.AccessionNumber[i]; // e.g., "0002107261-26-000002"
                     var accessionNumberNoHyphens = accessionNumber.Replace("-", ""); // e.g., "000210726126000002"
-                    var primaryDoc = recent.PrimaryDocument[i];
                     var cikNumber = cik.TrimStart('0'); // Remove leading zeros for URLs
                     
                     // Filing URL: https://www.sec.gov/Archives/edgar/data/{cik}/{accessionNumberNoHyphens}/{accessionNumber}-index.html
                     var filingUrl = $"https://www.sec.gov/Archives/edgar/data/{cikNumber}/{accessionNumberNoHyphens}/{accessionNumber}-index.html";
                     
                     // Document URL: https://www.sec.gov/Archives/edgar/data/{cik}/{accessionNumberNoHyphens}/{primaryDocument}
-                    var documentUrl = $"https://www.sec.gov/Archives/edgar/data/{cikNumber}/{accessionNumberNoHyphens}/{primaryDoc}";
+                    // Use primary document if present; otherwise fall back to the filing index URL to avoid malformed URLs
+                    string documentUrl;
+                    if (recent.PrimaryDocument != null
+                        && i < recent.PrimaryDocument.Length
+                        && !string.IsNullOrWhiteSpace(recent.PrimaryDocument[i]))
+                    {
+                        var primaryDoc = recent.PrimaryDocument[i];
+                        documentUrl = $"https://www.sec.gov/Archives/edgar/data/{cikNumber}/{accessionNumberNoHyphens}/{primaryDoc}";
+                    }
+                    else
+                    {
+                        documentUrl = filingUrl;
+                    }
 
                     var filing = new CompanyFiling
                     {
