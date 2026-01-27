@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\secedgar\secedgar.csproj" />
+    <ProjectReference Include="..\secedgar.fs\secedgar.fs.fsproj" />
     <ProjectReference Include="..\csvparser\csvparser.csproj" />
     <ProjectReference Include="..\coinmarketcap\coinmarketcap.csproj" />
     <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />

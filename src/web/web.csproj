@@ -21,7 +21,6 @@
         <ProjectReference Include="..\infrastructure\storage.memory\storage.memory.csproj" />
         <ProjectReference Include="..\infrastructure\twilioclient\twilioclient.csproj" />
         <ProjectReference Include="..\infrastructure\timezonesupport\timezonesupport.csproj" />
-        <ProjectReference Include="..\infrastructure\secedgar\secedgar.csproj" />
         <ProjectReference Include="..\infrastructure\securityutils\securityutils.csproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\schwabclient\schwabclient.fsproj" />

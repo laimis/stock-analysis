@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
-using secedgar;
 using securityutils;
 using storage.shared;
 
@@ -50,16 +49,11 @@ namespace di
             services.AddSingleton<IPasswordHashProvider, PasswordHashProvider>();
             services.AddSingleton<ICSVWriter, CsvWriterImpl>();
             services.AddSingleton<ISECFilings>(s => 
-                new EdgarClient(
-                    s.GetService<ILogger<EdgarClient>>(),
-                    s.GetService<IAccountStorage>()
+                new secedgar.fs.EdgarClient(
+                    FSharpOption<ILogger<secedgar.fs.EdgarClient>>.Some(s.GetService<ILogger<secedgar.fs.EdgarClient>>()!),
+                    FSharpOption<IAccountStorage>.Some(s.GetService<IAccountStorage>()!)
                 ));
-            services.AddSingleton<EdgarClient>(s => 
-                new EdgarClient(
-                    s.GetService<ILogger<EdgarClient>>(),
-                    s.GetService<IAccountStorage>()
-                ));
-
+            
             // go over all types in core.fs assembly, find any inner classes and register any type that implements IApplicationService
             // interface as a singleton
             var markerInterface = typeof(IApplicationService);

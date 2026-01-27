@@ -31,9 +31,9 @@
     <ProjectReference Include="..\..\..\src\core\core.csproj" />
     <ProjectReference Include="..\..\..\src\infrastructure\coinmarketcap\coinmarketcap.csproj" />
     <ProjectReference Include="..\..\..\src\infrastructure\schwabclient\schwabclient.fsproj" />
-    <ProjectReference Include="..\..\..\src\infrastructure\secedgar\secedgar.csproj" />
     <ProjectReference Include="..\..\..\src\infrastructure\storage.memory\storage.memory.csproj" />
     <ProjectReference Include="..\..\testutils\testutils.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\secedgar.fs\secedgar.fs.fsproj" />
   </ItemGroup>
 
 </Project>
