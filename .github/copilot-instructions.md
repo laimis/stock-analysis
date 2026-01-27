@@ -1,7 +1,7 @@
-# TradeWatch - AI Coding Agent Instructions
+# NGTDTrading - AI Coding Agent Instructions
 
 ## Project Overview
-TradeWatch is a stock, options, and crypto portfolio tracking application built with a **hybrid F#/C# architecture**. The system uses **event sourcing** for data persistence and supports both PostgreSQL and in-memory storage. The goal is to eventually eliminate the C# components, migrating all business logic to F# for improved type safety and maintainability. All new code should be written in F# unless there is a compelling reason to use C#.
+Nightingale Trading (aka NGTDTrading) is a stock, options, and crypto portfolio tracking application built with a **hybrid F#/C# architecture**. The system uses **event sourcing** for data persistence and supports both PostgreSQL and in-memory storage. The goal is to eventually eliminate the C# components, migrating all business logic to F# for improved type safety and maintainability. All new code should be written in F# unless there is a compelling reason to use C#.
 
 ## Architecture
 
@@ -14,12 +14,13 @@ TradeWatch is a stock, options, and crypto portfolio tracking application built 
 ### Key Projects
 ```
 src/core           → C# domain aggregates (OwnedStock, StockList, etc.)
-src/core.fs        → F# domain aggregates, business logic and handlers
+src/core.fs        → F# domain aggregates, business logic and handlers, app services
 src/web            → ASP.NET Core API and hosting
 src/frontend       → Angular SPA
-src/infrastructure → External service integrations (storage, APIs, messaging)
+src/infrastructure → External service integrations (storage, APIs, messaging, emails)
 src/studies        → F# data analysis and backtesting scripts
 src/migrations     → F# database migration utilities
+tests/*            → xUnit test projects for C# and F# code
 ```
 
 ## Critical Patterns
@@ -104,8 +105,7 @@ dotnet watch run --project src/web/web.csproj
 ## External Integrations
 
 ### Stock Market Data
-- **IEX Cloud API**: Stock prices, profiles, fundamentals (adapter in `core.fs/Adapters/Stocks.fs`)
-- Token required in `IEXToken` config
+- **Schwab API**: Stock prices, profiles, fundamentals (adapter in `core.fs/Adapters/Stocks.fs`)
 
 ### Brokerage
 - **Schwab API**: Account sync, positions, orders (F# client in `infrastructure/schwabclient`)
@@ -116,7 +116,7 @@ dotnet watch run --project src/web/web.csproj
 - Token required in `COINMARKETCAPToken` config
 
 ### Notifications
-- **SendGrid**: Email alerts (wrapper in `infrastructure/sendgridclient`)
+- **AmazonSES**: Email alerts (wrapper in `infrastructure/emailclient`)
 - **Twilio**: SMS notifications (wrapper in `infrastructure/twilioclient`)
 - Alert system in `core.fs/Alerts/MonitoringServices.fs`
 
@@ -148,8 +148,7 @@ dotnet watch run --project src/web/web.csproj
 2. **F# project order matters**: `core.fs.fsproj` must reference `core.csproj` before compilation
 3. **Postgres vs Memory storage**: Switch via `storage` env var; Postgres requires `DB_CNN`
 4. **Hangfire needs Postgres**: Background jobs won't run with in-memory storage
-5. **API rate limits**: IEX and CoinMarketCap have usage quotas; check logs for 429 errors
-6. **Time zones**: Market hours logic in `infrastructure/timezonesupport` handles NYSE/NASDAQ calendars
+5. **Time zones**: Market hours logic in `infrastructure/timezonesupport` handles NYSE/NASDAQ calendars
 
 ## Getting Oriented Quickly
 - **Domain logic**: Start in `src/core.fs/{Stocks,Options,Portfolio}/`
