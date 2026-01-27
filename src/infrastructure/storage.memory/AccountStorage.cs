@@ -19,6 +19,7 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     private static readonly Dictionary<UserId, List<OptionPricing>> _optionPricings = new();
     private static readonly Dictionary<UserId, List<StockPriceAlert>> _stockPriceAlerts = new();
     private static readonly Dictionary<UserId, List<Reminder>> _reminders = new();
+    private static readonly List<TickerCikMapping> _tickerCikMappings = new();
 
     public AccountStorage(IOutbox outbox) : base(outbox)
     {
@@ -229,31 +230,49 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
     // Ticker-CIK mapping methods (in-memory stubs)
     public Task<FSharpOption<TickerCikMapping>> GetTickerCik(string ticker)
     {
-        // Memory storage doesn't persist ticker-CIK mappings
+        var mapping = _tickerCikMappings.FirstOrDefault(m => m.Ticker.Equals(ticker, StringComparison.OrdinalIgnoreCase));
+        if (mapping != null)
+        {
+            return Task.FromResult(FSharpOption<TickerCikMapping>.Some(mapping));
+        }
         return Task.FromResult(FSharpOption<TickerCikMapping>.None);
     }
 
     public Task SaveTickerCikMappings(IEnumerable<TickerCikMapping> mappings)
     {
-        // Memory storage doesn't persist ticker-CIK mappings
+        // add only those mappings that do not already exist
+        foreach (var mapping in mappings)
+        {
+            if (!_tickerCikMappings.Any(m => m.Ticker.Equals(mapping.Ticker, StringComparison.OrdinalIgnoreCase)))
+            {
+                _tickerCikMappings.Add(mapping);
+            }
+        }
         return Task.CompletedTask;
     }
 
     public Task<IEnumerable<TickerCikMapping>> GetAllTickerCikMappings()
     {
-        // Memory storage doesn't persist ticker-CIK mappings
-        return Task.FromResult(Enumerable.Empty<TickerCikMapping>());
+        return Task.FromResult<IEnumerable<TickerCikMapping>>(_tickerCikMappings);
     }
 
     public Task<FSharpOption<DateTimeOffset>> GetTickerCikLastUpdated()
     {
-        // Memory storage doesn't persist ticker-CIK mappings
-        return Task.FromResult(FSharpOption<DateTimeOffset>.None);
+        if (_tickerCikMappings.Count == 0)
+        {
+            return Task.FromResult(FSharpOption<DateTimeOffset>.None);
+        }
+        
+        var lastUpdated = _tickerCikMappings.Max(m => m.LastUpdated);
+        return Task.FromResult(FSharpOption<DateTimeOffset>.Some(lastUpdated));
     }
 
     public Task<IEnumerable<TickerCikMapping>> SearchTickerCik(string query)
     {
-        // Memory storage doesn't persist ticker-CIK mappings
-        return Task.FromResult(Enumerable.Empty<TickerCikMapping>());
+        var results = _tickerCikMappings
+            .Where(m => m.Ticker.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                        m.Title.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        return Task.FromResult<IEnumerable<TickerCikMapping>>(results);
     }
 }
