@@ -84,7 +84,7 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                 return Error (ServiceError($"No CIK mapping found for ticker {ticker.Value}. Please sync ticker data first."))
     }
 
-    static let httpClient = new HttpClient()
+    let httpClient = new HttpClient()
     
     do
         // Configure HttpClient with proper User-Agent for SEC API calls
