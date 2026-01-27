@@ -55,6 +55,7 @@ import {RoutineDashboardComponent} from "./routines/routines-dashboard.component
 import {RoutineComponent} from "./routines/routines-routine.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
+import {SecFilingsComponent} from "./sec/sec-filings.component";
 
 export const routes: Routes = [
     {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -86,6 +87,8 @@ export const routes: Routes = [
     {path: 'alerts', component: AlertsComponent, canActivate: [AuthGuardAdminOnly]},
     {path: 'alerts/price', component: StockPriceAlertsComponent, canActivate: [AuthGuard]},
     {path: 'alerts/reminders', component: RemindersComponent, canActivate: [AuthGuard]},
+
+    {path: 'sec', component: SecFilingsComponent, canActivate: [AuthGuard], title: 'SEC Filings'},
 
     {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
 

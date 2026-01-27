@@ -766,5 +766,21 @@ ON CONFLICT (ticker) DO UPDATE SET
                 ? FSharpOption<DateTimeOffset>.Some(result.Value) 
                 : FSharpOption<DateTimeOffset>.None;
         }
+
+        public async Task<IEnumerable<TickerCikMapping>> SearchTickerCik(string query)
+        {
+            using var db = GetConnection();
+
+            const string sql = @"
+                SELECT ticker, cik, title, lastupdated 
+                FROM tickercik 
+                WHERE UPPER(ticker) LIKE UPPER(:query) OR UPPER(title) LIKE UPPER(:query)
+                ORDER BY ticker
+                LIMIT 50
+            ";
+            
+            var searchPattern = $"%{query}%";
+            return await db.QueryAsync<TickerCikMapping>(sql, new { query = searchPattern });
+        }
     }
 }

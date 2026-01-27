@@ -271,6 +271,59 @@ namespace storagetests
         }
 
         [Fact]
+        public async Task TickerCikMappingWorks()
+        {
+            var storage = GetStorage();
+
+            // for memory storage initialize some mappings
+            if (storage is storage.memory.AccountStorage memStorage)
+            {
+                var aaplMapping = new TickerCikMapping
+                {
+                    Ticker = "AAPL",
+                    Cik = "0000320193",
+                    Title = "Apple Inc.",
+                    LastUpdated = DateTimeOffset.UtcNow.AddDays(-1)
+                };
+                var msftMapping = new TickerCikMapping
+                {
+                    Ticker = "MSFT",
+                    Cik = "0000789019",
+                    Title = "Microsoft Corp",
+                    LastUpdated = DateTimeOffset.UtcNow.AddDays(-2)
+                };
+                var docnMapping = new TickerCikMapping
+                {
+                    Ticker = "DOCN",
+                    Cik = "0001582961",
+                    Title = "DigitalOcean Holdings Inc.",
+                    LastUpdated = DateTimeOffset.UtcNow.AddDays(-3)
+                };
+                await memStorage.SaveTickerCikMappings([aaplMapping, msftMapping, docnMapping]);
+            }
+            
+            var allMappings = await storage.GetAllTickerCikMappings();
+            
+            Assert.NotEmpty(allMappings);
+            
+            foreach (var mapping in allMappings.Take(5))
+            {
+                var fromDbOption = await storage.GetTickerCik(mapping.Ticker);
+                
+                Assert.True(FSharpOption<TickerCikMapping>.get_IsSome(fromDbOption));
+                
+                var fromDb = fromDbOption.Value;
+                
+                Assert.Equal(mapping.Ticker, fromDb.Ticker);
+                Assert.Equal(mapping.Cik, fromDb.Cik);
+            }
+            
+            var searchResults = await storage.SearchTickerCik("AAP");
+            
+            Assert.Contains(allMappings.Single(m => m.Ticker == "AAPL"), searchResults);
+        }
+
+        [Fact]
         public async Task RemindersWork()
         {
             var storage = GetStorage();

@@ -8,9 +8,9 @@ open core.fs
 type FilingDetails =
     {
         Form: string
-        FilingDate: System.DateTime
-        AcceptedDate: System.DateTime
-        PeriodOfReport: System.DateTime
+        FilingDate: System.DateTimeOffset
+        AcceptedDate: System.DateTimeOffset
+        PeriodOfReport: System.DateTimeOffset
     }
 
 [<Struct>]
@@ -19,14 +19,14 @@ type CompanyFiling =
     {
         Description: string
         DocumentUrl: string
-        FilingDate: System.DateTime
-        ReportDate: System.DateTime
+        FilingDate: System.DateTimeOffset
+        ReportDate: System.DateTimeOffset
         Filing: string
         FilingUrl: string
     }
     
     with
-        member this.IsNew = this.FilingDate > System.DateTime.Now.AddDays(-7)
+        member this.IsNew = this.FilingDate > System.DateTimeOffset.Now.AddDays -7
 
 [<Struct>]
 type CompanyFilings(ticker:Ticker, filings:seq<CompanyFiling>) =

@@ -37,7 +37,7 @@ let private outputToCsv (outputFilename:string) (trends:Trends) =
         
     let csv = new TrendCsv(rows)
     
-    csv.Save(outputFilename)
+    csv.Save outputFilename
     
 let private outputToConsole (trends:Trends) =
     // describe the trends

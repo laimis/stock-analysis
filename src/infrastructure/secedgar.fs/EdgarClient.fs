@@ -86,10 +86,10 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
 
     let parseFiling(recent: SECRecentFilings) (index: int) (cik: string) (ticker: Ticker) =
         try
-            let filingDate = DateTime.ParseExact(recent.filingDate.[index], "yyyy-MM-dd", null)
+            let filingDate = DateTimeOffset.ParseExact(recent.filingDate.[index], "yyyy-MM-dd", null)
             let reportDate = 
                 if String.IsNullOrEmpty(recent.reportDate.[index]) then filingDate
-                else DateTime.ParseExact(recent.reportDate.[index], "yyyy-MM-dd", null)
+                else DateTimeOffset.ParseExact(recent.reportDate.[index], "yyyy-MM-dd", null)
             
             // Build URLs using SEC's standard structure
             let accessionNumber = recent.accessionNumber.[index] // e.g., "0002107261-26-000002"
