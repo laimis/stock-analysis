@@ -258,6 +258,7 @@ export class StockDetailsComponent implements OnInit {
         this.loading.secFilings = true
         this.stocks.getStockSECFilings(this.ticker).subscribe({
             next: result => {
+                this.errors.secFilings = null
                 this.secFilings = result
                 this.groupFilingsByYearMonth(result.filings)
                 this.loading.secFilings = false
