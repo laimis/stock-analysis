@@ -182,9 +182,6 @@ public class EdgarClient : ISECFilings
                     var reportDate = !string.IsNullOrEmpty(recent.ReportDate[i])
                         ? DateTime.ParseExact(recent.ReportDate[i], "yyyy-MM-dd", null)
                         : filingDate;
-                    var acceptanceDate = !string.IsNullOrEmpty(recent.AcceptanceDateTime[i]) 
-                        ? DateTime.Parse(recent.AcceptanceDateTime[i]) 
-                        : filingDate;
                     
                     // Build URLs using SEC's standard structure
                     var accessionNumber = recent.AccessionNumber[i]; // e.g., "0002107261-26-000002"
