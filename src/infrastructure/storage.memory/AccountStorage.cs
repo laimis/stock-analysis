@@ -250,4 +250,10 @@ public class AccountStorage : MemoryAggregateStorage, IAccountStorage
         // Memory storage doesn't persist ticker-CIK mappings
         return Task.FromResult(FSharpOption<DateTimeOffset>.None);
     }
+
+    public Task<IEnumerable<TickerCikMapping>> SearchTickerCik(string query)
+    {
+        // Memory storage doesn't persist ticker-CIK mappings
+        return Task.FromResult(Enumerable.Empty<TickerCikMapping>());
+    }
 }

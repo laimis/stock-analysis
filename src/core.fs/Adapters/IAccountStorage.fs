@@ -46,3 +46,4 @@ type IAccountStorage =
     abstract member SaveTickerCikMappings: mappings:TickerCikMapping seq -> Task
     abstract member GetAllTickerCikMappings: unit -> Task<TickerCikMapping seq>
     abstract member GetTickerCikLastUpdated: unit -> Task<DateTimeOffset option>
+    abstract member SearchTickerCik: query:string -> Task<TickerCikMapping seq>

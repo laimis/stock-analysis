@@ -63,6 +63,7 @@ public class FakeAccountStorageForEdgarTests : IAccountStorage
     public Task SaveTickerCikMappings(IEnumerable<TickerCikMapping> mappings) => throw new NotImplementedException();
     public Task<IEnumerable<TickerCikMapping>> GetAllTickerCikMappings() => throw new NotImplementedException();
     public Task<FSharpOption<DateTimeOffset>> GetTickerCikLastUpdated() => throw new NotImplementedException();
+    public Task<IEnumerable<TickerCikMapping>> SearchTickerCik(string query) => throw new NotImplementedException();
 }
 
 [Trait("Category", "Integration")]
