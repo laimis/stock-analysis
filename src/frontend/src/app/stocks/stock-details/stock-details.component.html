@@ -177,7 +177,7 @@
       </div>
     }
 
-    @if (errors.secFilings) {
+    @if (errors.secFilings?.length > 0) {
       <div class="alert alert-danger" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         <strong>Error loading SEC filings:</strong>
@@ -226,10 +226,10 @@
                         </td>
                         <td class="text-muted">{{ row.filing.description || 'N/A' }}</td>
                         <td class="text-end text-muted">
-                          <a [href]="row.filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index">
+                          <a [href]="row.filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index" rel="noopener noreferrer">
                             <i class="bi bi-file-earmark-text"></i> Filing
                           </a>
-                          <a [href]="row.filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document">
+                          <a [href]="row.filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document" rel="noopener noreferrer">
                             <i class="bi bi-file-earmark-pdf"></i> Document
                           </a>
                         </td>
