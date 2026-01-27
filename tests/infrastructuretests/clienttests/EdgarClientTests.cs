@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
+using core.fs.Adapters.SEC;
 using core.Shared;
-using secedgar;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace secedgartests;
@@ -14,7 +15,10 @@ public class EdgarClientTests
     [InlineData("DOCN")]
     public async Task TestAsync(string ticker)
     {
-        var client = new EdgarClient(null);
+        var client = new secedgar.fs.EdgarClient(
+            FSharpOption<Microsoft.Extensions.Logging.ILogger<secedgar.fs.EdgarClient>>.None
+        ) as ISECFilings;
+        
         var response = await client.GetFilings(new Ticker(ticker));
 
         // make sure it is not an error
