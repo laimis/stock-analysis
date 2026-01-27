@@ -274,6 +274,33 @@ namespace storagetests
         public async Task TickerCikMappingWorks()
         {
             var storage = GetStorage();
+
+            // for memory storage initialize some mappings
+            if (storage is storage.memory.AccountStorage memStorage)
+            {
+                var aaplMapping = new TickerCikMapping
+                {
+                    Ticker = "AAPL",
+                    Cik = "0000320193",
+                    Title = "Apple Inc.",
+                    LastUpdated = DateTimeOffset.UtcNow.AddDays(-1)
+                };
+                var msftMapping = new TickerCikMapping
+                {
+                    Ticker = "MSFT",
+                    Cik = "0000789019",
+                    Title = "Microsoft Corp",
+                    LastUpdated = DateTimeOffset.UtcNow.AddDays(-2)
+                };
+                var docnMapping = new TickerCikMapping
+                {
+                    Ticker = "DOCN",
+                    Cik = "0001582961",
+                    Title = "DigitalOcean Holdings Inc.",
+                    LastUpdated = DateTimeOffset.UtcNow.AddDays(-3)
+                };
+                await memStorage.SaveTickerCikMappings([aaplMapping, msftMapping, docnMapping]);
+            }
             
             var allMappings = await storage.GetAllTickerCikMappings();
             
