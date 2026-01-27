@@ -144,7 +144,7 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
     
     interface ISECFilings with
         member this.GetFilings(ticker: Ticker) = 
-            async {
+            task {
                 try
                     // Resolve ticker to CIK
                     let! cikResult = resolveCikAsync ticker
@@ -157,10 +157,10 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                         let url = $"https://data.sec.gov/submissions/CIK{cik}.json"
                         logger |> Option.iter (fun l -> l.LogInformation("Fetching SEC filings from {url}", url))
                         
-                        let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+                        let! response = httpClient.GetAsync url
                         response.EnsureSuccessStatusCode() |> ignore
                         
-                        let! json = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+                        let! json = response.Content.ReadAsStringAsync()
                         let submissions = JsonSerializer.Deserialize<SECSubmissionsResponse>(json)
                         
                         if isNull submissions || isNull submissions.filings || isNull submissions.filings.recent then
@@ -185,47 +185,41 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                     logger |> Option.iter (fun l -> l.LogError(ex, "Error getting SEC filings for {symbol}", ticker.Value))
                     return Error (ServiceError(ex.Message))
             }
-            |> Async.StartAsTask
         
         /// Fetches the company_tickers.json file from SEC with proper rate limiting and User-Agent.
         /// Returns a dictionary mapping ticker symbol to CompanyTickerEntry.
         member this.FetchCompanyTickers() = 
-            async {
-                try
-                    // Rate limiting
-                    do! rateLimitAsync()
-                    
-                    let url = "https://www.sec.gov/files/company_tickers.json"
-                    logger |> Option.iter (fun l -> l.LogInformation("Fetching company tickers from {url}", url))
-                    
-                    let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-                    response.EnsureSuccessStatusCode() |> ignore
-                    
-                    let! json = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-                    
-                    // The JSON structure is: { "0": {...}, "1": {...}, ... }
-                    use doc = JsonDocument.Parse(json)
-                    let result = Dictionary<string, CompanyTickerEntry>(StringComparer.OrdinalIgnoreCase)
-                    
-                    for element in doc.RootElement.EnumerateObject() do
-                        let entry = {
-                            cik_str = element.Value.GetProperty("cik_str").GetInt32().ToString()
-                            ticker = 
-                                let tickerProp = element.Value.GetProperty("ticker")
-                                if tickerProp.ValueKind = JsonValueKind.String then tickerProp.GetString() else ""
-                            title = 
-                                let titleProp = element.Value.GetProperty("title")
-                                if titleProp.ValueKind = JsonValueKind.String then titleProp.GetString() else ""
-                        }
-                        
-                        if not (String.IsNullOrEmpty(entry.ticker)) then
-                            result.[entry.ticker] <- entry
-                    
-                    logger |> Option.iter (fun l -> l.LogInformation("Successfully fetched {count} company ticker mappings", result.Count))
-                    return result
+            task {
                 
-                with ex ->
-                    logger |> Option.iter (fun l -> l.LogError(ex, "Error fetching company tickers from SEC"))
-                    return raise ex
+                // Rate limiting
+                do! rateLimitAsync()
+                
+                let url = "https://www.sec.gov/files/company_tickers.json"
+                logger |> Option.iter (fun l -> l.LogInformation("Fetching company tickers from {url}", url))
+                
+                let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+                response.EnsureSuccessStatusCode() |> ignore
+                
+                let! json = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+                
+                // The JSON structure is: { "0": {...}, "1": {...}, ... }
+                use doc = JsonDocument.Parse(json)
+                let result = Dictionary<string, CompanyTickerEntry>(StringComparer.OrdinalIgnoreCase)
+                
+                for element in doc.RootElement.EnumerateObject() do
+                    let entry = {
+                        cik_str = element.Value.GetProperty("cik_str").GetInt32().ToString()
+                        ticker = 
+                            let tickerProp = element.Value.GetProperty("ticker")
+                            if tickerProp.ValueKind = JsonValueKind.String then tickerProp.GetString() else ""
+                        title = 
+                            let titleProp = element.Value.GetProperty("title")
+                            if titleProp.ValueKind = JsonValueKind.String then titleProp.GetString() else ""
+                    }
+                    
+                    if not (String.IsNullOrEmpty(entry.ticker)) then
+                        result.[entry.ticker] <- entry
+                
+                logger |> Option.iter (fun l -> l.LogInformation("Successfully fetched {count} company ticker mappings", result.Count))
+                return result
             }
-            |> Async.StartAsTask
