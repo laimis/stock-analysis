@@ -152,7 +152,7 @@ type StocksHandler(accounts:IAccountStorage,brokerage:IBrokerage,secFilings:ISEC
     
     member _.Handle (query:CompanyFilingsQuery) = task {
         let! response = secFilings.GetFilings(query.Ticker)
-        return response |> Result.map (_.Filings)
+        return response
     }
     
     

@@ -7,7 +7,7 @@ import {
     Prices,
     StockDetails,
     StockOwnership,
-    StocksService, BrokerageAccount
+    StocksService, BrokerageAccount, SECFilings, SECFiling
 } from '../../services/stocks.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -74,13 +74,16 @@ export class StockDetailsComponent implements OnInit {
     activeTab: string = ''
     startDate: string
     endDate: string
+    secFilings: SECFilings | null = null
+    filingsByYearMonth: Map<string, SECFiling[]> = new Map()
 
     loading = {
         stock: false,
         ownership: false,
         options: false,
         orders: false,
-        pending: false
+        pending: false,
+        secFilings: false
     }
 
     errors = {
@@ -89,7 +92,8 @@ export class StockDetailsComponent implements OnInit {
         options: null,
         notes: null,
         orders: null,
-        pending: null
+        pending: null,
+        secFilings: null
     }
 
     ngOnInit(): void {
@@ -243,6 +247,65 @@ export class StockDetailsComponent implements OnInit {
 
     activateTab(tabName: string) {
         this.activeTab = tabName
+        
+        // Load SEC filings when the SEC tab is activated
+        if (tabName === 'sec' && !this.secFilings) {
+            this.loadSecFilings()
+        }
+    }
+
+    loadSecFilings() {
+        this.loading.secFilings = true
+        this.stocks.getStockSECFilings(this.ticker).subscribe({
+            next: result => {
+                this.errors.secFilings = null
+                this.secFilings = result
+                this.groupFilingsByYearMonth(result.filings)
+                this.loading.secFilings = false
+            },
+            error: err => {
+                this.errors.secFilings = GetErrors(err)
+                this.loading.secFilings = false
+            }
+        })
+    }
+
+    getFlatFilingsWithGroups() {
+        // Returns an array like:
+        // [{ isGroup: true, yearMonth: '2024-01', key: '2024-01' }, { isGroup: false, filing: ..., key: ... }, ...]
+        const result: any[] = [];
+        if (!this.filingsByYearMonth) return result;
+        for (const yearMonth of this.getYearMonthKeys()) {
+            result.push({ isGroup: true, yearMonth, key: 'group-' + yearMonth });
+            for (const filing of this.filingsByYearMonth.get(yearMonth) ?? []) {
+            result.push({ isGroup: false, filing, key: filing.filingUrl });
+            }
+        }
+        return result;
+    }
+
+    groupFilingsByYearMonth(filings: SECFiling[]) {
+        this.filingsByYearMonth.clear()
+        
+        filings.forEach(filing => {
+            const date = new Date(filing.filingDate)
+            const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+            
+            if (!this.filingsByYearMonth.has(yearMonth)) {
+                this.filingsByYearMonth.set(yearMonth, [])
+            }
+            this.filingsByYearMonth.get(yearMonth)!.push(filing)
+        })
+    }
+
+    getYearMonthKeys(): string[] {
+        return Array.from(this.filingsByYearMonth.keys()).sort().reverse()
+    }
+
+    formatYearMonth(yearMonth: string): string {
+        const [year, month] = yearMonth.split('-')
+        const date = new Date(parseInt(year), parseInt(month) - 1)
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
     }
 
     closePendingPosition(pendingPosition: PendingStockPosition) {
