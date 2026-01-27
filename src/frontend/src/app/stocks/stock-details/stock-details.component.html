@@ -71,6 +71,9 @@
   class="tab">
   Fundamentals
 </a>
+<a (click)="activateTab('sec')" [ngClass]="{'is-active': isActive('sec')}" [routerLink]="" class="tab">
+  SEC Filings
+</a>
 </div>
 
 @if (stock && isActive('trade')) {
@@ -163,4 +166,88 @@
 }
 @if (isActive('analysis') && stock) {
   <app-stock-analysis [ticker]=stock.ticker [prices]="prices" [startDate]="startDate" [endDate]="endDate"></app-stock-analysis>
+}
+@if (isActive('sec') && stock) {
+  <div class="mt-3">
+    @if (loading.secFilings) {
+      <div class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading SEC filings...</span>
+        </div>
+      </div>
+    }
+    
+    @if (errors.secFilings) {
+      <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Error loading SEC filings:</strong>
+        <ul class="mb-0 mt-2">
+          @for (error of errors.secFilings; track error) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      </div>
+    }
+    
+    @if (secFilings && !loading.secFilings) {
+      @if (secFilings.filings.length === 0) {
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          No SEC filings found for {{ stock.ticker }}.
+        </div>
+      } @else {
+        <div class="mb-3">
+          <h4>SEC Filings for {{ stock.ticker }}</h4>
+          <p class="text-muted">Total filings: {{ secFilings.filings.length }}</p>
+        </div>
+        
+        @for (yearMonth of getYearMonthKeys(); track yearMonth) {
+          <div class="card shadow-sm mb-3">
+            <div class="card-header bg-light">
+              <h5 class="mb-0">
+                <i class="bi bi-calendar3 me-2"></i>
+                {{ formatYearMonth(yearMonth) }}
+                <span class="badge bg-secondary ms-2">{{ filingsByYearMonth.get(yearMonth)?.length }} filing(s)</span>
+              </h5>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Filing Date</th>
+                      <th>Report Date</th>
+                      <th>Form</th>
+                      <th>Description</th>
+                      <th>Links</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (filing of filingsByYearMonth.get(yearMonth); track filing.filingUrl) {
+                      <tr>
+                        <td>{{ filing.filingDate | date:'mediumDate' }}</td>
+                        <td>{{ filing.reportDate | date:'mediumDate' }}</td>
+                        <td>
+                          <span class="badge bg-primary">{{ filing.filing }}</span>
+                        </td>
+                        <td>{{ filing.description || 'N/A' }}</td>
+                        <td>
+                          <a [href]="filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index">
+                            <i class="bi bi-file-earmark-text"></i> Filing
+                          </a>
+                          <a [href]="filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document">
+                            <i class="bi bi-file-earmark-pdf"></i> Document
+                          </a>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
+      }
+    }
+  </div>
 }

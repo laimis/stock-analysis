@@ -1382,3 +1382,24 @@ export interface Reminder {
     createdAt: string;
     sentAt?: string;
 }
+
+export interface CompanyFiling {
+    description: string;
+    documentUrl: string;
+    filingDate: string;
+    reportDate: string;
+    filing: string;
+    filingUrl: string;
+}
+
+export interface CompanyFilings {
+    ticker: string;
+    filings: CompanyFiling[];
+}
+
+export interface FilingsByYearMonth {
+    yearMonth: string;
+    year: number;
+    month: number;
+    filings: CompanyFiling[];
+}
