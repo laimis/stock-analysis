@@ -112,8 +112,7 @@ type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioSto
             |> Seq.distinct
             |> Seq.toArray
         
-        // Get filings for each ticker from the last 2 days
-        let twoDaysAgo = DateTimeOffset.UtcNow.Date.AddDays -2
+        let timeLimit = DateTimeOffset.UtcNow.Date.AddDays -1
         
         let getRecentFilingsForTicker (ticker: Ticker) = async {
             try
@@ -124,7 +123,7 @@ type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioSto
                 | Ok companyFilings ->
                     let recentFilings = 
                         companyFilings.Filings
-                        |> Seq.filter (fun f -> f.FilingDate.Date >= twoDaysAgo)
+                        |> Seq.filter (fun f -> f.FilingDate.Date >= timeLimit.Date)
                         |> Seq.toArray
                     
                     if recentFilings.Length > 0 then
