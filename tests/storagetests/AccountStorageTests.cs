@@ -271,6 +271,32 @@ namespace storagetests
         }
 
         [Fact]
+        public async Task TickerCikMappingWorks()
+        {
+            var storage = GetStorage();
+            
+            var allMappings = await storage.GetAllTickerCikMappings();
+            
+            Assert.NotEmpty(allMappings);
+            
+            foreach (var mapping in allMappings.Take(5))
+            {
+                var fromDbOption = await storage.GetTickerCik(mapping.Ticker);
+                
+                Assert.True(FSharpOption<TickerCikMapping>.get_IsSome(fromDbOption));
+                
+                var fromDb = fromDbOption.Value;
+                
+                Assert.Equal(mapping.Ticker, fromDb.Ticker);
+                Assert.Equal(mapping.Cik, fromDb.Cik);
+            }
+            
+            var searchResults = await storage.SearchTickerCik("AAP");
+            
+            Assert.Contains(allMappings.Single(m => m.Ticker == "AAPL"), searchResults);
+        }
+
+        [Fact]
         public async Task RemindersWork()
         {
             var storage = GetStorage();

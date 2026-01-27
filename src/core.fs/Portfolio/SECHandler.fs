@@ -6,6 +6,7 @@ open core.fs.Accounts
 open core.Shared
 open core.fs.Adapters.Storage
 open core.fs.Adapters.SEC
+open core.fs.Adapters.Logging
 
 type SearchCompanies = {Query:string}
 type GetFilingsForTicker = {Ticker:string}
@@ -43,7 +44,7 @@ type PortfolioFilingsDto =
         tickerFilings: CompanyFilingsDto array
     }
 
-type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioStorage, secFilings: ISECFilings) =
+type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioStorage, secFilings: ISECFilings, logger: ILogger) =
 
     let toFilingDto (filing: CompanyFiling) : FilingDto =
         {
@@ -131,7 +132,9 @@ type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioSto
                     else
                         return None
             with
-            | _ -> return None
+            | ex -> 
+                logger.LogError $"Error getting recent filings for {ticker.Value}: {ex}"
+                return None
         }
         
         let! results = 
