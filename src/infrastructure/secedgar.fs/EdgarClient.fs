@@ -68,6 +68,22 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
             rateLimitSemaphore.Release() |> ignore
     }
 
+    let resolveCikAsync (ticker: Ticker) = async {
+        match accountStorage with
+        | None ->
+            logger |> Option.iter (fun l -> l.LogError("Account storage not available for CIK lookup"))
+            return Error (ServiceError("Account storage not configured"))
+        | Some storage ->
+            let! tickerMapping = storage.GetTickerCik(ticker.Value) |> Async.AwaitTask
+            match tickerMapping with
+            | Some mapping ->
+                logger |> Option.iter (fun l -> l.LogDebug("Resolved ticker {ticker} to CIK {cik}", ticker.Value, mapping.Cik))
+                return Ok mapping.Cik
+            | None ->
+                logger |> Option.iter (fun l -> l.LogWarning("No CIK mapping found for ticker {ticker}", ticker.Value))
+                return Error (ServiceError($"No CIK mapping found for ticker {ticker.Value}. Please sync ticker data first."))
+    }
+
     static let httpClient = new HttpClient()
     
     do
@@ -85,22 +101,6 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
     new(logger: ILogger<EdgarClient> option, appName: string, appVersion: string, email: string) = 
         EdgarClient(logger, None, appName, appVersion, email)
     
-    /// Resolve ticker to CIK using account storage
-    member private _.ResolveCikAsync(ticker: Ticker) = async {
-        match accountStorage with
-        | None ->
-            logger |> Option.iter (fun l -> l.LogError("Account storage not available for CIK lookup"))
-            return Error (ServiceError("Account storage not configured"))
-        | Some storage ->
-            let! tickerMapping = storage.GetTickerCik(ticker.Value) |> Async.AwaitTask
-            match tickerMapping with
-            | Some mapping ->
-                logger |> Option.iter (fun l -> l.LogDebug("Resolved ticker {ticker} to CIK {cik}", ticker.Value, mapping.Cik))
-                return Ok mapping.Cik
-            | None ->
-                logger |> Option.iter (fun l -> l.LogWarning("No CIK mapping found for ticker {ticker}", ticker.Value))
-                return Error (ServiceError($"No CIK mapping found for ticker {ticker.Value}. Please sync ticker data first."))
-    }
     
     /// Parse a single filing from parallel arrays
     member private _.ParseFiling(recent: SECRecentFilings, index: int, cik: string, ticker: Ticker) =
@@ -147,11 +147,10 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
             async {
                 try
                     // Resolve ticker to CIK
-                    let! cikResult = this.ResolveCikAsync(ticker)
+                    let! cikResult = resolveCikAsync ticker
                     match cikResult with
                     | Error err -> return Error err
                     | Ok cik ->
-                        // Rate limiting: ensure no more than 2 requests per second
                         do! rateLimitAsync()
                         
                         // Fetch from SEC Submissions API
