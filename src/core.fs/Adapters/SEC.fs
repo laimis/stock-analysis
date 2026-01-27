@@ -20,6 +20,7 @@ type CompanyFiling =
         Description: string
         DocumentUrl: string
         FilingDate: System.DateTime
+        ReportDate: System.DateTime
         Filing: string
         FilingUrl: string
     }

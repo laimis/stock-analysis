@@ -824,6 +824,7 @@ export interface SECFiling {
     description: string
     documentUrl: string
     filingDate: string
+    reportDate: string
     isNew: boolean
     filing: string
     filingUrl: string

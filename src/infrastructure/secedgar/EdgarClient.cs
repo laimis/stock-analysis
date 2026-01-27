@@ -178,7 +178,10 @@ public class EdgarClient : ISECFilings
             {
                 try
                 {
-                    var filingDate = DateTime.Parse(recent.FilingDate[i]);
+                    var filingDate = DateTime.ParseExact(recent.FilingDate[i], "yyyy-MM-dd", null);
+                    var reportDate = !string.IsNullOrEmpty(recent.ReportDate[i])
+                        ? DateTime.ParseExact(recent.ReportDate[i], "yyyy-MM-dd", null)
+                        : filingDate;
                     var acceptanceDate = !string.IsNullOrEmpty(recent.AcceptanceDateTime[i]) 
                         ? DateTime.Parse(recent.AcceptanceDateTime[i]) 
                         : filingDate;
@@ -211,6 +214,7 @@ public class EdgarClient : ISECFilings
                         Description = recent.PrimaryDocDescription[i],
                         DocumentUrl = documentUrl,
                         FilingDate = filingDate,
+                        ReportDate = reportDate,
                         Filing = recent.Form[i],
                         FilingUrl = filingUrl
                     };
