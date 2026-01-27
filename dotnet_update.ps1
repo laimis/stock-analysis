@@ -8,7 +8,7 @@ if ($null -eq $toolInstalled) {
     dotnet tool install --global dotnet-outdated-tool
 }
 
-# get list of outdated packages
+# get list of outdated packages (capture to check for updates)
 $outdatedOutput = dotnet outdated
 
 # check if there are any outdated packages (look for lines with version arrows ->)
@@ -21,7 +21,10 @@ if ($null -eq $hasUpdates) {
 }
 
 Write-Host "There are updates available:"
-Write-Host $outdatedOutput
+Write-Host ""
+# Run again without capturing to display properly formatted output
+dotnet outdated
+Write-Host ""
 
 # use voice to tell that there are updates available
 $voice = New-Object -ComObject Sapi.spvoice
