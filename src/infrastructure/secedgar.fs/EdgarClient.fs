@@ -53,26 +53,9 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
     
     static let rateLimitSemaphore = new SemaphoreSlim(1, 1)
     static let mutable lastRequestTime = DateTime.MinValue
-    static let minimumRequestInterval = TimeSpan.FromMilliseconds(500.0) // Max 2 requests per second
-    static let httpClient = new HttpClient()
-    
-    do
-        // Configure HttpClient with proper User-Agent for SEC API calls
-        httpClient.DefaultRequestHeaders.Clear()
-        httpClient.DefaultRequestHeaders.Add("User-Agent", $"{appName}/{appVersion} ({email})")
-    
-    // Convenience constructors
-    new(logger: ILogger<EdgarClient> option) = 
-        EdgarClient(logger, None, "TradeWatch", "1.0", "support@tradewatch.io")
-    
-    new(logger: ILogger<EdgarClient> option, accountStorage: IAccountStorage option) = 
-        EdgarClient(logger, accountStorage, "TradeWatch", "1.0", "support@tradewatch.io")
-    
-    new(logger: ILogger<EdgarClient> option, appName: string, appVersion: string, email: string) = 
-        EdgarClient(logger, None, appName, appVersion, email)
-    
-    /// Rate limit SEC API requests to max 2 per second
-    member private _.RateLimitAsync() = async {
+    static let minimumRequestInterval = TimeSpan.FromMilliseconds 200.0
+
+    let rateLimitAsync() = async {
         do! rateLimitSemaphore.WaitAsync() |> Async.AwaitTask
         try
             let timeSinceLastRequest = DateTime.UtcNow - lastRequestTime
@@ -84,6 +67,23 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
         finally
             rateLimitSemaphore.Release() |> ignore
     }
+
+    static let httpClient = new HttpClient()
+    
+    do
+        // Configure HttpClient with proper User-Agent for SEC API calls
+        httpClient.DefaultRequestHeaders.Clear()
+        httpClient.DefaultRequestHeaders.Add("User-Agent", $"{appName}/{appVersion} ({email})")
+    
+    // Convenience constructors
+    new(logger: ILogger<EdgarClient> option) = 
+        EdgarClient(logger, None, "NGTDTrading", "1.0", "secclient@nightingaletrading.com")
+    
+    new(logger: ILogger<EdgarClient> option, accountStorage: IAccountStorage option) = 
+        EdgarClient(logger, accountStorage, "NGTDTrading", "1.0", "secclient@nightingaletrading.com")
+    
+    new(logger: ILogger<EdgarClient> option, appName: string, appVersion: string, email: string) = 
+        EdgarClient(logger, None, appName, appVersion, email)
     
     /// Resolve ticker to CIK using account storage
     member private _.ResolveCikAsync(ticker: Ticker) = async {
@@ -152,7 +152,7 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                     | Error err -> return Error err
                     | Ok cik ->
                         // Rate limiting: ensure no more than 2 requests per second
-                        do! this.RateLimitAsync()
+                        do! rateLimitAsync()
                         
                         // Fetch from SEC Submissions API
                         let url = $"https://data.sec.gov/submissions/CIK{cik}.json"
@@ -194,7 +194,7 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
             async {
                 try
                     // Rate limiting
-                    do! this.RateLimitAsync()
+                    do! rateLimitAsync()
                     
                     let url = "https://www.sec.gov/files/company_tickers.json"
                     logger |> Option.iter (fun l -> l.LogInformation("Fetching company tickers from {url}", url))
