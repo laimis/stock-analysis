@@ -220,14 +220,14 @@ public class EdgarClient : ISECFilings
         }
         catch (HttpRequestException ex)
         {
-            _logger?.LogError(ex, "HTTP error getting SEC filings for {symbol}: {status}", symbol, ex.Message);
+            _logger?.LogError(ex, "HTTP error getting SEC filings for {symbol}: {message}", symbol.Value, ex.Message);
             return FSharpResult<CompanyFilings, ServiceError>.NewError(
                 new ServiceError($"Failed to fetch filings from SEC: {ex.Message}")
             );
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error getting SEC filings for {symbol}", symbol);
+            _logger?.LogError(ex, "Error getting SEC filings for {symbol}", symbol.Value);
             return FSharpResult<CompanyFilings, ServiceError>.NewError(
                 new ServiceError(ex.Message)
             );
