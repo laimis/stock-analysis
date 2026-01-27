@@ -176,7 +176,7 @@
         </div>
       </div>
     }
-    
+
     @if (errors.secFilings) {
       <div class="alert alert-danger" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -188,7 +188,7 @@
         </ul>
       </div>
     }
-    
+
     @if (secFilings && !loading.secFilings) {
       @if (secFilings.filings.length === 0) {
         <div class="alert alert-info">
@@ -196,57 +196,51 @@
           No SEC filings found for {{ stock.ticker }}.
         </div>
       } @else {
-        <div class="mb-3">
-          <h4>SEC Filings for {{ stock.ticker }}</h4>
-          <p class="text-muted">Total filings: {{ secFilings.filings.length }}</p>
-        </div>
-        
-        @for (yearMonth of getYearMonthKeys(); track yearMonth) {
-          <div class="card shadow-sm mb-3">
-            <div class="card-header bg-light">
-              <h5 class="mb-0">
-                <i class="bi bi-calendar3 me-2"></i>
-                {{ formatYearMonth(yearMonth) }}
-                <span class="badge bg-secondary ms-2">{{ filingsByYearMonth.get(yearMonth)?.length }} filing(s)</span>
-              </h5>
-            </div>
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Filing Date</th>
-                      <th>Report Date</th>
-                      <th>Form</th>
-                      <th>Description</th>
-                      <th>Links</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (filing of filingsByYearMonth.get(yearMonth); track filing.filingUrl) {
+        <div class="card shadow-sm mb-3">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-modern table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Filing Date</th>
+                    <th scope="col">Report Date</th>
+                    <th scope="col">Form</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" class="text-end">Links</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of getFlatFilingsWithGroups(); track row.key) {
+                    @if (row.isGroup) {
                       <tr>
-                        <td>{{ filing.filingDate | date:'mediumDate' }}</td>
-                        <td>{{ filing.reportDate | date:'mediumDate' }}</td>
-                        <td>
-                          <span class="badge bg-primary">{{ filing.filing }}</span>
+                        <td colspan="5" class="bg-white fw-normal small border-top">
+                          {{ formatYearMonth(row.yearMonth) }}
                         </td>
-                        <td>{{ filing.description || 'N/A' }}</td>
+                      </tr>
+                    } @else {
+                      <tr >
+                        <td class="text-muted">{{ row.filing.filingDate | date:'mediumDate' }}</td>
+                        <td class="text-muted">{{ row.filing.reportDate | date:'mediumDate' }}</td>
                         <td>
-                          <a [href]="filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index">
+                          <span class="badge bg-primary">{{ row.filing.filing }}</span>
+                        </td>
+                        <td class="text-muted">{{ row.filing.description || 'N/A' }}</td>
+                        <td class="text-end text-muted">
+                          <a [href]="row.filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index">
                             <i class="bi bi-file-earmark-text"></i> Filing
                           </a>
-                          <a [href]="filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document">
+                          <a [href]="row.filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document">
                             <i class="bi bi-file-earmark-pdf"></i> Document
                           </a>
                         </td>
                       </tr>
                     }
-                  </tbody>
-                </table>
-              </div>
+                  }
+                </tbody>
+              </table>
             </div>
           </div>
-        }
+        </div>
       }
     }
   </div>

@@ -269,6 +269,20 @@ export class StockDetailsComponent implements OnInit {
         })
     }
 
+    getFlatFilingsWithGroups() {
+        // Returns an array like:
+        // [{ isGroup: true, yearMonth: '2024-01', key: '2024-01' }, { isGroup: false, filing: ..., key: ... }, ...]
+        const result: any[] = [];
+        if (!this.filingsByYearMonth) return result;
+        for (const yearMonth of this.getYearMonthKeys()) {
+            result.push({ isGroup: true, yearMonth, key: 'group-' + yearMonth });
+            for (const filing of this.filingsByYearMonth.get(yearMonth) ?? []) {
+            result.push({ isGroup: false, filing, key: filing.filingUrl });
+            }
+        }
+        return result;
+    }
+
     groupFilingsByYearMonth(filings: SECFiling[]) {
         this.filingsByYearMonth.clear()
         
