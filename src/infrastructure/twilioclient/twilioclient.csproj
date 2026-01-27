@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />
-    <PackageReference Include="Twilio" Version="7.14.1" />
+    <PackageReference Include="Twilio" Version="7.14.2" />
   </ItemGroup>
 
   <PropertyGroup>
