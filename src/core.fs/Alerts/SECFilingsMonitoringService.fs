@@ -103,13 +103,13 @@ type SECFilingsMonitoringService(
                     reportDate = f.ReportDate
                     filing = f.Filing
                     filingUrl = f.FilingUrl
-                })
+                } : SECFilingForEmail)
             |> Seq.toArray
 
         {
             ticker = ticker.Value
             filings = emailFilings
-        }
+        } : SECFilingEmailData
 
     let processUserFilings (user: User) = task {
         logger.LogInformation($"Checking SEC filings for user {user.State.Email}")

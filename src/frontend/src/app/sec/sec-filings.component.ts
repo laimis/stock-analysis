@@ -5,11 +5,12 @@ import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { SECService, CompanySearchResult, CompanyFilings, Filing } from '../services/sec.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
+import { SecFilingsTableComponent } from '../shared/sec/sec-filings-table.component';
 
 @Component({
   selector: 'app-sec-filings',
   standalone: true,
-  imports: [CommonModule, FormsModule, StockLinkAndTradingviewLinkComponent],
+  imports: [CommonModule, FormsModule, StockLinkAndTradingviewLinkComponent, SecFilingsTableComponent],
   templateUrl: './sec-filings.component.html'
 })
 export class SecFilingsComponent implements OnInit {
@@ -146,33 +147,5 @@ export class SecFilingsComponent implements OnInit {
     this.selectedFilings = null;
     this.searchQuery = '';
     this.searchResults = [];
-  }
-
-  formatDate(dateString: string): Date {
-    return new Date(dateString);
-  }
-
-  groupFilingsByMonth(filings: Filing[]): { yearMonth: string; filings: Filing[] }[] {
-    const groups = new Map<string, Filing[]>();
-    
-    filings.forEach(filing => {
-      const date = new Date(filing.filingDate);
-      const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      
-      if (!groups.has(yearMonth)) {
-        groups.set(yearMonth, []);
-      }
-      groups.get(yearMonth)!.push(filing);
-    });
-    
-    return Array.from(groups.entries())
-      .map(([yearMonth, filings]) => ({ yearMonth, filings }))
-      .sort((a, b) => b.yearMonth.localeCompare(a.yearMonth));
-  }
-
-  formatYearMonth(yearMonth: string): string {
-    const [year, month] = yearMonth.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   }
 }

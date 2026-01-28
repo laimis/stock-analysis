@@ -31,6 +31,7 @@ import { TradingViewLinkComponent } from "../../shared/stocks/trading-view-link.
 import { MarketCapPipe } from "../../services/marketcap.filter";
 import { ReminderFormComponent } from '../../alerts/reminder-form.component';
 import { ReminderListComponent } from '../../alerts/reminder-list.component';
+import { SecFilingsTableComponent } from '../../shared/sec/sec-filings-table.component';
 
 @Component({
     selector: 'app-stock-details',
@@ -53,7 +54,8 @@ import { ReminderListComponent } from '../../alerts/reminder-list.component';
     RouterLink,
     TradingViewLinkComponent,
     ReminderFormComponent,
-    ReminderListComponent
+    ReminderListComponent,
+    SecFilingsTableComponent
 ],
     styleUrls: ['./stock-details.component.css']
 })
@@ -79,7 +81,6 @@ export class StockDetailsComponent implements OnInit {
     startDate: string
     endDate: string
     secFilings: SECFilings | null = null
-    filingsByYearMonth: Map<string, SECFiling[]> = new Map()
     reminders: Reminder[] = []
     showReminderForm = false
     editingReminder: Reminder | null = null
@@ -274,7 +275,6 @@ export class StockDetailsComponent implements OnInit {
             next: result => {
                 this.errors.secFilings = null
                 this.secFilings = result
-                this.groupFilingsByYearMonth(result.filings)
                 this.loading.secFilings = false
             },
             error: err => {
@@ -282,44 +282,6 @@ export class StockDetailsComponent implements OnInit {
                 this.loading.secFilings = false
             }
         })
-    }
-
-    getFlatFilingsWithGroups() {
-        // Returns an array like:
-        // [{ isGroup: true, yearMonth: '2024-01', key: '2024-01' }, { isGroup: false, filing: ..., key: ... }, ...]
-        const result: any[] = [];
-        if (!this.filingsByYearMonth) return result;
-        for (const yearMonth of this.getYearMonthKeys()) {
-            result.push({ isGroup: true, yearMonth, key: 'group-' + yearMonth });
-            for (const filing of this.filingsByYearMonth.get(yearMonth) ?? []) {
-            result.push({ isGroup: false, filing, key: filing.filingUrl });
-            }
-        }
-        return result;
-    }
-
-    groupFilingsByYearMonth(filings: SECFiling[]) {
-        this.filingsByYearMonth.clear()
-        
-        filings.forEach(filing => {
-            const date = new Date(filing.filingDate)
-            const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-            
-            if (!this.filingsByYearMonth.has(yearMonth)) {
-                this.filingsByYearMonth.set(yearMonth, [])
-            }
-            this.filingsByYearMonth.get(yearMonth)!.push(filing)
-        })
-    }
-
-    getYearMonthKeys(): string[] {
-        return Array.from(this.filingsByYearMonth.keys()).sort().reverse()
-    }
-
-    formatYearMonth(yearMonth: string): string {
-        const [year, month] = yearMonth.split('-')
-        const date = new Date(parseInt(year), parseInt(month) - 1)
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
     }
 
     closePendingPosition(pendingPosition: PendingStockPosition) {

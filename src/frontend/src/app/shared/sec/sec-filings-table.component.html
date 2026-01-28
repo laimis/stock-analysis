@@ -1,0 +1,62 @@
+@if (loading) {
+  <div class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading SEC filings...</span>
+    </div>
+  </div>
+}
+
+@if (!loading && filings.length === 0) {
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    {{ emptyMessage }}
+  </div>
+}
+
+@if (!loading && filings.length > 0) {
+  <div class="card shadow-sm mb-3">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-modern table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Filing Date</th>
+              <th scope="col">Report Date</th>
+              <th scope="col">Form</th>
+              <th scope="col">Description</th>
+              <th scope="col" class="text-end">Links</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of getFlatFilingsWithGroups(); track row.key) {
+              @if (row.isGroup) {
+                <tr>
+                  <td colspan="5" class="bg-white fw-normal small border-top">
+                    {{ formatYearMonth(row.yearMonth!) }}
+                  </td>
+                </tr>
+              } @else {
+                <tr>
+                  <td class="text-muted">{{ row.filing!.filingDate | date:'mediumDate' }}</td>
+                  <td class="text-muted">{{ row.filing!.reportDate ? (row.filing!.reportDate | date:'mediumDate') : 'N/A' }}</td>
+                  <td>
+                    <span class="badge bg-primary">{{ row.filing!.filing }}</span>
+                  </td>
+                  <td class="text-muted">{{ row.filing!.description || 'N/A' }}</td>
+                  <td class="text-end text-muted">
+                    <a [href]="row.filing!.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index" rel="noopener noreferrer">
+                      <i class="bi bi-file-earmark-text"></i> Filing
+                    </a>
+                    <a [href]="row.filing!.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document" rel="noopener noreferrer">
+                      <i class="bi bi-file-earmark-pdf"></i> Document
+                    </a>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}

@@ -100,62 +100,11 @@
           </button>
         </div>
         <div class="card-body">
-          @if (loading.filings) {
-            <div class="text-center py-5">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading filings...</span>
-              </div>
-            </div>
-          }
-
-          @if (selectedFilings && !loading.filings) {
-            @if (selectedFilings.filings.length === 0) {
-              <div class="alert alert-info">
-                No SEC filings found for {{ selectedCompany.ticker }}.
-              </div>
-            } @else {
-              <div class="table-responsive">
-                <table class="table table-modern table-hover align-middle mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th scope="col">Filing Date</th>
-                      <th scope="col">Report Date</th>
-                      <th scope="col">Form</th>
-                      <th scope="col">Description</th>
-                      <th scope="col" class="text-end">Links</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (group of groupFilingsByMonth(selectedFilings.filings); track group.yearMonth) {
-                      <tr>
-                        <td colspan="5" class="bg-white fw-normal small border-top">
-                          {{ formatYearMonth(group.yearMonth) }}
-                        </td>
-                      </tr>
-                      @for (filing of group.filings; track filing.filingUrl) {
-                        <tr>
-                          <td class="text-muted">{{ formatDate(filing.filingDate) | date:'mediumDate' }}</td>
-                          <td class="text-muted">{{ filing.reportDate ? (formatDate(filing.reportDate) | date:'mediumDate') : 'N/A' }}</td>
-                          <td>
-                            <span class="badge bg-primary">{{ filing.filing }}</span>
-                          </td>
-                          <td class="text-muted">{{ filing.description || 'N/A' }}</td>
-                          <td class="text-end text-muted">
-                            <a [href]="filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index" rel="noopener noreferrer">
-                              <i class="bi bi-file-earmark-text"></i> Filing
-                            </a>
-                            <a [href]="filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document" rel="noopener noreferrer">
-                              <i class="bi bi-file-earmark-pdf"></i> Document
-                            </a>
-                          </td>
-                        </tr>
-                      }
-                    }
-                  </tbody>
-                </table>
-              </div>
-            }
-          }
+          <app-sec-filings-table 
+            [filings]="selectedFilings?.filings || []"
+            [loading]="loading.filings"
+            [emptyMessage]="'No SEC filings found for ' + selectedCompany.ticker + '.'">
+          </app-sec-filings-table>
         </div>
       </div>
     }
@@ -186,39 +135,11 @@
             </h5>
           </div>
           <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-modern table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th scope="col">Filing Date</th>
-                    <th scope="col">Report Date</th>
-                    <th scope="col">Form</th>
-                    <th scope="col">Description</th>
-                    <th scope="col" class="text-end">Links</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (filing of tickerFiling.filings; track filing.filingUrl) {
-                    <tr>
-                      <td class="text-muted">{{ formatDate(filing.filingDate) | date:'mediumDate' }}</td>
-                      <td class="text-muted">{{ filing.reportDate ? (formatDate(filing.reportDate) | date:'mediumDate') : 'N/A' }}</td>
-                      <td>
-                        <span class="badge bg-primary">{{ filing.filing }}</span>
-                      </td>
-                      <td class="text-muted">{{ filing.description || 'N/A' }}</td>
-                      <td class="text-end text-muted">
-                        <a [href]="filing.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index" rel="noopener noreferrer">
-                          <i class="bi bi-file-earmark-text"></i> Filing
-                        </a>
-                        <a [href]="filing.documentUrl" target="_blank" class="btn btn-sm btn-outline-secondary" title="View document" rel="noopener noreferrer">
-                          <i class="bi bi-file-earmark-pdf"></i> Document
-                        </a>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
+            <app-sec-filings-table 
+              [filings]="tickerFiling.filings"
+              [loading]="false"
+              [emptyMessage]="'No recent filings for ' + tickerFiling.ticker">
+            </app-sec-filings-table>
           </div>
         </div>
       }
