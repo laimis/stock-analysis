@@ -1,14 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-export interface SECFiling {
-  filing: string;
-  filingDate: string;
-  reportDate: string | null;
-  description: string | null;
-  filingUrl: string;
-  documentUrl: string;
-}
+import { SECFiling } from 'src/app/services/sec.service';
 
 interface FilingRow {
   isGroup: boolean;

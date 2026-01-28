@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
-import { SECService, CompanySearchResult, CompanyFilings, Filing } from '../services/sec.service';
+import { SECService, CompanySearchResult, SECFilings } from '../services/sec.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
 import { SecFilingsTableComponent } from '../shared/sec/sec-filings-table.component';
 
@@ -20,8 +20,8 @@ export class SecFilingsComponent implements OnInit {
   searchQuery = '';
   searchResults: CompanySearchResult[] = [];
   selectedCompany: CompanySearchResult | null = null;
-  selectedFilings: CompanyFilings | null = null;
-  portfolioFilings: CompanyFilings[] = [];
+  selectedFilings: SECFilings | null = null;
+  portfolioFilings: SECFilings[] = [];
   highlightedIndex = -1;
   
   loading = {

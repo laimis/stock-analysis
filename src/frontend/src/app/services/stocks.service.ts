@@ -204,10 +204,6 @@ export class StocksService {
         return this.http.get<StockDetails>(`/api/stocks/${symbol}`)
     }
 
-    getStockSECFilings(symbol: string): Observable<SECFilings> {
-        return this.http.get<SECFilings>(`/api/stocks/${symbol}/secfilings`)
-    }
-
     getStockPrice(symbol: string): Observable<number> {
         return this.http.get<number>(`/api/stocks/${symbol}/price`)
     }
@@ -818,22 +814,6 @@ export interface StockDetails {
     ticker: string
     quote: StockQuote
     profile: StockProfile
-}
-
-
-//TODO: remove these!
-export interface SECFiling {
-    description: string
-    documentUrl: string
-    filingDate: string
-    reportDate: string | null
-    filing: string
-    filingUrl: string
-}
-
-export interface SECFilings {
-    ticker: string
-    filings: SECFiling[]
 }
 
 export interface StockProfile {

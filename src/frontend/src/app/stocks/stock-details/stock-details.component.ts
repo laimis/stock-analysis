@@ -7,7 +7,7 @@ import {
     Prices,
     StockDetails,
     StockOwnership,
-    StocksService, BrokerageAccount, SECFilings, SECFiling, Reminder
+    StocksService, BrokerageAccount, Reminder
 } from '../../services/stocks.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -32,6 +32,7 @@ import { MarketCapPipe } from "../../services/marketcap.filter";
 import { ReminderFormComponent } from '../../alerts/reminder-form.component';
 import { ReminderListComponent } from '../../alerts/reminder-list.component';
 import { SecFilingsTableComponent } from '../../shared/sec/sec-filings-table.component';
+import { SECFilings, SECService } from 'src/app/services/sec.service';
 
 @Component({
     selector: 'app-stock-details',
@@ -61,6 +62,7 @@ import { SecFilingsTableComponent } from '../../shared/sec/sec-filings-table.com
 })
 export class StockDetailsComponent implements OnInit {
     private stocks = inject(StocksService);
+    private secService = inject(SECService);
     private optionService = inject(OptionService);
     private stockPositions = inject(StockPositionsService);
     private brokerage = inject(BrokerageService);
@@ -271,7 +273,7 @@ export class StockDetailsComponent implements OnInit {
 
     loadSecFilings() {
         this.loading.secFilings = true
-        this.stocks.getStockSECFilings(this.ticker).subscribe({
+        this.secService.getFilings(this.ticker).subscribe({
             next: result => {
                 this.errors.secFilings = null
                 this.secFilings = result

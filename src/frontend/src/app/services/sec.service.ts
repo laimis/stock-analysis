@@ -8,22 +8,22 @@ export interface CompanySearchResult {
   companyName: string;
 }
 
-export interface Filing {
-  description: string;
-  documentUrl: string;
-  filingDate: string;
-  reportDate: string | null;
-  filing: string;
-  filingUrl: string;
+export interface SECFiling {
+    description: string
+    documentUrl: string
+    filingDate: string
+    reportDate: string | null
+    filing: string
+    filingUrl: string
 }
 
-export interface CompanyFilings {
-  ticker: string;
-  filings: Filing[];
+export interface SECFilings {
+    ticker: string
+    filings: SECFiling[]
 }
 
 export interface PortfolioFilings {
-  tickerFilings: CompanyFilings[];
+  tickerFilings: SECFilings[];
 }
 
 @Injectable({providedIn: 'root'})
@@ -34,8 +34,8 @@ export class SECService {
     return this.http.get<CompanySearchResult[]>(`/api/sec/search?query=${encodeURIComponent(query)}`);
   }
 
-  getFilings(ticker: string): Observable<CompanyFilings> {
-    return this.http.get<CompanyFilings>(`/api/sec/filings/${ticker}`);
+  getFilings(ticker: string): Observable<SECFilings> {
+    return this.http.get<SECFilings>(`/api/sec/filings/${ticker}`);
   }
 
   getPortfolioFilings(): Observable<PortfolioFilings> {
