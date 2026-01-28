@@ -124,8 +124,8 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
         member _.SendBrokerageTransactions recipient sender properties =
             sendWithTemplate recipient sender "brokeragetransactions" "Brokerage Transaction Summary" properties
         
-        member _.SendSellAlert recipient sender properties =
-            sendWithTemplate recipient sender "sellalert" "Sell Alert" properties
+        member _.SendSellAlert recipient sender subject properties =
+            sendWithTemplate recipient sender "sellalert" subject properties
         
         member _.SendMaxProfits recipient sender properties =
             sendWithTemplate recipient sender "maxprofits" "Maximum Profit Analysis" properties

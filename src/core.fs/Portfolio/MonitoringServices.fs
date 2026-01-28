@@ -121,7 +121,8 @@ type PortfolioAnalysisService(
                         
                     if Seq.isEmpty sellsOfInterest |> not then
                         let recipient = Recipient(email = pair.Email, name = "")
-                        let! emailResult = emails.SendSellAlert recipient Sender.NoReply {| sells = sellsOfInterest |} |> Async.AwaitTask
+                        let subject = "Sell Tracking Report"
+                        let! emailResult = emails.SendSellAlert recipient Sender.NoReply subject {| sells = sellsOfInterest |} |> Async.AwaitTask
                         match emailResult with
                         | Error err ->
                             logger.LogError $"Thirty day sell alert email to {recipient} failed: {err}"

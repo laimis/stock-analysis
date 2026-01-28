@@ -45,7 +45,7 @@ type IEmailService =
     abstract SendPasswordReset : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendAlerts : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendBrokerageTransactions : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
-    abstract SendSellAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendSellAlert : recipient:Recipient -> sender:Sender -> subject:string -> properties:obj -> Task<Result<unit, string>>
     abstract SendMaxProfits : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendPriceAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendNearTriggerPriceAlerts : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
