@@ -1,0 +1,62 @@
+<div class="card mb-3 shadow-sm">
+  <div class="card-header">
+    <h5>{{ editingReminder ? 'Edit' : 'Create' }} Reminder</h5>
+  </div>
+  <div class="card-body">
+    @if (errors.length > 0) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @for (error of errors; track error) {
+          <div>{{ error }}</div>
+        }
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="row">
+        @if (showTickerField) {
+          <div class="col-md-4 mb-3">
+            <app-stock-search
+              label="Ticker (Optional)"
+              placeholder="Search for stock symbol"
+              [ticker]="reminderData.ticker"
+              (tickerSelected)="onTickerSelected($event)">
+            </app-stock-search>
+          </div>
+        }
+        <div [class]="showTickerField ? 'col-md-4 mb-3' : 'col-md-6 mb-3'">
+          <label for="reminderDate" class="form-label">Date</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            id="reminderDate" 
+            [(ngModel)]="reminderData.date"
+            name="reminderDate"
+            [min]="today"
+            required>
+          <div class="form-text">
+            <a href="javascript:void(0)" (click)="setDateToTomorrow()" class="text-decoration-none me-2">Tomorrow</a>
+            <a href="javascript:void(0)" (click)="setDateToNextWeek()" class="text-decoration-none me-2">Next Week</a>
+            <a href="javascript:void(0)" (click)="setDateToNextMonth()" class="text-decoration-none">Next Month</a>
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="reminderMessage" class="form-label">Message</label>
+        <textarea 
+          class="form-control" 
+          id="reminderMessage" 
+          rows="3" 
+          [(ngModel)]="reminderData.message"
+          name="reminderMessage"
+          placeholder="Enter reminder message..."
+          required></textarea>
+      </div>
+      <button type="submit" class="btn btn-success" [disabled]="loading || !reminderData.date || !reminderData.message.trim()">
+        {{ editingReminder ? 'Update' : 'Create' }} Reminder
+      </button>
+      <button type="button" class="btn btn-secondary ms-2" (click)="onCancel()">
+        Cancel
+      </button>
+    </form>
+  </div>
+</div>

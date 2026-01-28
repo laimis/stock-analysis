@@ -7,7 +7,7 @@ import {
     Prices,
     StockDetails,
     StockOwnership,
-    StocksService, BrokerageAccount, SECFilings, SECFiling
+    StocksService, BrokerageAccount, SECFilings, SECFiling, Reminder
 } from '../../services/stocks.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -29,6 +29,8 @@ import { StockOwnershipComponent } from "./stock-ownership.component";
 import { StockTransactionComponent } from "./stock-transaction.component";
 import { TradingViewLinkComponent } from "../../shared/stocks/trading-view-link.component";
 import { MarketCapPipe } from "../../services/marketcap.filter";
+import { ReminderFormComponent } from '../../alerts/reminder-form.component';
+import { ReminderListComponent } from '../../alerts/reminder-list.component';
 
 @Component({
     selector: 'app-stock-details',
@@ -49,7 +51,9 @@ import { MarketCapPipe } from "../../services/marketcap.filter";
     StockTransactionComponent,
     NgClass,
     RouterLink,
-    TradingViewLinkComponent
+    TradingViewLinkComponent,
+    ReminderFormComponent,
+    ReminderListComponent
 ],
     styleUrls: ['./stock-details.component.css']
 })
@@ -76,6 +80,9 @@ export class StockDetailsComponent implements OnInit {
     endDate: string
     secFilings: SECFilings | null = null
     filingsByYearMonth: Map<string, SECFiling[]> = new Map()
+    reminders: Reminder[] = []
+    showReminderForm = false
+    editingReminder: Reminder | null = null
 
     loading = {
         stock: false,
@@ -83,7 +90,8 @@ export class StockDetailsComponent implements OnInit {
         options: false,
         orders: false,
         pending: false,
-        secFilings: false
+        secFilings: false,
+        reminders: false
     }
 
     errors = {
@@ -93,7 +101,8 @@ export class StockDetailsComponent implements OnInit {
         notes: null,
         orders: null,
         pending: null,
-        secFilings: null
+        secFilings: null,
+        reminders: null
     }
 
     ngOnInit(): void {
@@ -252,6 +261,11 @@ export class StockDetailsComponent implements OnInit {
         if (tabName === 'sec' && !this.secFilings) {
             this.loadSecFilings()
         }
+        
+        // Load reminders when the reminders tab is activated
+        if (tabName === 'reminders') {
+            this.loadReminders()
+        }
     }
 
     loadSecFilings() {
@@ -333,5 +347,100 @@ export class StockDetailsComponent implements OnInit {
         if (psRatio < 1) return 'metric-low';
         if (psRatio > 5) return 'metric-high';
         return 'metric-normal';
+    }
+
+    loadReminders() {
+        this.loading.reminders = true
+        this.errors.reminders = null
+        
+        this.stocks.getReminders().subscribe({
+            next: (reminders) => {
+                // Filter reminders for this ticker
+                this.reminders = reminders
+                    .filter(r => r.ticker === this.ticker)
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                this.loading.reminders = false
+            },
+            error: (error) => {
+                this.errors.reminders = GetErrors(error)
+                this.loading.reminders = false
+            }
+        })
+    }
+
+    toggleReminderForm() {
+        this.showReminderForm = !this.showReminderForm
+        if (!this.showReminderForm) {
+            this.resetReminderForm()
+        }
+    }
+
+    resetReminderForm() {
+        this.editingReminder = null
+        this.errors.reminders = null
+    }
+
+    onReminderSave(data: { date: string; message: string; ticker?: string }) {
+        this.loading.reminders = true
+        this.errors.reminders = null
+
+        if (this.editingReminder) {
+            // Update existing reminder
+            this.stocks.updateReminder(
+                this.editingReminder.reminderId,
+                data.date,
+                data.message,
+                this.ticker,
+                this.editingReminder.state
+            ).subscribe({
+                next: () => {
+                    this.loadReminders()
+                    this.toggleReminderForm()
+                    this.loading.reminders = false
+                },
+                error: (error) => {
+                    this.errors.reminders = GetErrors(error)
+                    this.loading.reminders = false
+                }
+            })
+        } else {
+            // Create new reminder
+            this.stocks.createReminder(
+                data.date,
+                data.message,
+                this.ticker
+            ).subscribe({
+                next: () => {
+                    this.loadReminders()
+                    this.toggleReminderForm()
+                    this.loading.reminders = false
+                },
+                error: (error) => {
+                    this.errors.reminders = GetErrors(error)
+                    this.loading.reminders = false
+                }
+            })
+        }
+    }
+
+    editReminder(reminder: Reminder) {
+        this.editingReminder = reminder
+        this.showReminderForm = true
+    }
+
+    deleteReminder(reminder: Reminder) {
+        this.loading.reminders = true
+        this.errors.reminders = null
+
+        this.stocks.deleteReminder(reminder.reminderId).subscribe({
+            next: () => {
+                this.loadReminders()
+                this.loading.reminders = false
+            },
+            error: (error) => {
+                this.errors.reminders = GetErrors(error)
+                this.loading.reminders = false
+            }
+        })
     }
 }
