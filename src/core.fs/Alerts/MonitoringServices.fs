@@ -1220,16 +1220,22 @@ type ReminderMonitoringService(
                                         try
                                             // Send email notification
                                             let recipient = Recipient(email=user.State.Email, name=user.State.Name)
-                                            let dateFormatted = reminder.Date.ToUniversalTime().ToString("yyyy-MM-dd HH:mm 'UTC'")
+                                            let tickerValue = reminder.Ticker |> Option.map (fun t -> t.Value) |> Option.defaultValue ""
+                                            let hasTicker = reminder.Ticker.IsSome
+
+                                            let subject =
+                                                if hasTicker then
+                                                    $"Reminder for {tickerValue}"
+                                                else
+                                                    "Reminder"
                                             
                                             let properties = {|
-                                                date = dateFormatted
                                                 message = reminder.Message
-                                                ticker = reminder.Ticker |> Option.map (fun t -> t.Value) |> Option.defaultValue ""
-                                                has_ticker = reminder.Ticker.IsSome
+                                                ticker = tickerValue
+                                                has_ticker = hasTicker
                                             |}
                                             
-                                            let! emailResult = (emails.SendReminder recipient Sender.NoReply (box properties)) |> Async.AwaitTask
+                                            let! emailResult = (emails.SendReminder recipient Sender.NoReply subject (box properties)) |> Async.AwaitTask
                                             
                                             match emailResult with
                                             | Error err ->

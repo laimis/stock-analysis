@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reminder</title>
+    <title>{{if has_ticker}}Reminder for {{ticker}}{{else}}Reminder{{end}}</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -13,67 +13,36 @@
                     <tr>
                         <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
                             <h1 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 600;">
-                                Reminder
+                                {{if has_ticker}}Reminder for {{ticker}}{{else}}Reminder{{end}}
                             </h1>
                             <p style="margin: 8px 0 0; color: #6b7280; font-size: 14px;">
                                 You have a scheduled reminder
                             </p>
+                            {{if has_ticker}}
+                            <p style="margin: 8px 0 0; font-size: 12px;">
+                                <a href="https://app.nightingaletrading.com/stocks/{{ticker}}" style="color: #2563eb; text-decoration: none;">Dashboard</a>
+                                <span style="color: #d1d5db; margin: 0 6px;">|</span>
+                                <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{ticker}}" style="color: #2563eb; text-decoration: none;">Chart</a>
+                            </p>
+                            {{end}}
                         </td>
                     </tr>
                     <tr>
                         <td style="padding: 32px 40px;">
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                                <tr>
-                                    <td style="padding: 24px; background-color: #f9fafb;">
-                                        <table role="presentation" width="100%" cellpadding="8" cellspacing="0">
-                                            <tr>
-                                                <td style="padding: 8px; color: #6b7280; font-size: 14px;">Date:</td>
-                                                <td style="padding: 8px; text-align: right; color: #1f2937; font-size: 14px; font-weight: 600;">{{date}}</td>
-                                            </tr>
-                                            {{#if has_ticker}}
-                                            <tr>
-                                                <td style="padding: 8px; color: #6b7280; font-size: 14px;">Related Stock:</td>
-                                                <td style="padding: 8px; text-align: right; color: #2563eb; font-size: 16px; font-weight: 600;">{{ticker}}</td>
-                                            </tr>
-                                            {{/if}}
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                            
                             <div style="margin-bottom: 24px; padding: 16px; background-color: #f9fafb; border-left: 3px solid #2563eb; border-radius: 4px;">
                                 <p style="margin: 0; color: #1f2937; font-size: 13px; font-weight: 600;">Your Message:</p>
                                 <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
                                     {{message}}
                                 </p>
                             </div>
-                            
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
-                                <tr>
-                                    <td style="padding: 0;" align="center">
-                                        <a href="https://app.nightingaletrading.com/alerts/reminders" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #ffffff; text-decoration: none; text-align: center; border-radius: 6px; font-size: 14px; font-weight: 600;">
-                                            View All Reminders
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            {{#if has_ticker}}
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td style="padding: 0 4px 0 0;" width="50%">
-                                        <a href="https://app.nightingaletrading.com/stocks/{{ticker}}" style="display: block; padding: 12px 16px; background-color: #2563eb; color: #ffffff; text-decoration: none; text-align: center; border-radius: 6px; font-size: 14px; font-weight: 600;">
-                                            View on Dashboard
-                                        </a>
-                                    </td>
-                                    <td style="padding: 0 0 0 4px;" width="50%">
-                                        <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{ticker}}" style="display: block; padding: 12px 16px; background-color: #1f2937; color: #ffffff; text-decoration: none; text-align: center; border-radius: 6px; font-size: 14px; font-weight: 600;">
-                                            View Chart
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                            {{/if}}
+
+                            <p style="margin: 0; font-size: 12px; text-align: center;">
+                                <a href="https://app.nightingaletrading.com/alerts/reminders" style="color: #2563eb; text-decoration: none;">View reminders</a>
+                                {{if has_ticker}}
+                                <span style="color: #d1d5db; margin: 0 6px;">|</span>
+                                <a href="https://app.nightingaletrading.com/stocks/{{ticker}}" style="color: #2563eb; text-decoration: none;">Stock</a>
+                                {{end}}
+                            </p>
                         </td>
                     </tr>
                     <tr>

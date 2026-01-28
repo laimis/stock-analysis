@@ -116,7 +116,7 @@ dotnet watch run --project src/web/web.csproj
 - Token required in `COINMARKETCAPToken` config
 
 ### Notifications
-- **AmazonSES**: Email alerts (wrapper in `infrastructure/emailclient`)
+- **AmazonSES**: Email alerts (wrapper in `infrastructure/emailclient`), email templates use scriban templates
 - **Twilio**: SMS notifications (wrapper in `infrastructure/twilioclient`)
 - Alert system in `core.fs/Alerts/MonitoringServices.fs`
 

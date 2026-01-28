@@ -49,7 +49,7 @@ type IEmailService =
     abstract SendMaxProfits : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendPriceAlert : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
     abstract SendNearTriggerPriceAlerts : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
-    abstract SendReminder : recipient:Recipient -> sender:Sender -> properties:obj -> Task<Result<unit, string>>
+    abstract SendReminder : recipient:Recipient -> sender:Sender -> subject:string -> properties:obj -> Task<Result<unit, string>>
     abstract SendSECFilings : recipient:Recipient -> sender:Sender -> subject:string -> properties:obj -> Task<Result<unit, string>>
     abstract Send : recipient:Recipient -> sender:Sender -> subject:string -> plainTextBody:string -> htmlBody:string -> Task<Result<unit, string>>
     abstract SendWithInput : input:EmailInput -> Task<Result<unit, string>>
