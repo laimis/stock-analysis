@@ -11,6 +11,7 @@ open core.fs.Adapters.SEC
 open core.fs.Adapters.Storage
 open core.fs.Services
 open core.Shared
+open core.fs.Adapters.Brokerage
 
 [<CLIMutable>]
 type SECFilingEmailData = 
@@ -41,13 +42,12 @@ type SECFilingsMonitoringService(
     portfolio: IPortfolioStorage,
     secFilings: ISECFilings,
     emails: IEmailService,
+    marketHours: IMarketHours,
     logger: ILogger) =
 
     let isRecentFiling (filing: CompanyFiling) =
-        let today = DateTime.UtcNow.Date
-        let yesterday = today.AddDays(-1)
-        let filingDate = filing.FilingDate.Date
-        filingDate = today || filingDate = yesterday
+        let today = marketHours.ToMarketTime DateTimeOffset.UtcNow
+        today.Date |> DateOnly.FromDateTime |> filing.IsRecentFor
 
     let getUserTickers (userId: UserId) = task {
         let! stocks = portfolio.GetStockPositions userId
@@ -99,8 +99,8 @@ type SECFilingsMonitoringService(
                 {
                     description = f.Description
                     documentUrl = f.DocumentUrl
-                    filingDate = f.FilingDate.ToString("MMMM dd, yyyy")
-                    reportDate = f.ReportDate.ToString("MMMM dd, yyyy")
+                    filingDate = f.FilingDate
+                    reportDate = f.ReportDate
                     filing = f.Filing
                     filingUrl = f.FilingUrl
                 })

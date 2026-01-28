@@ -7,6 +7,7 @@ open core.Shared
 open core.fs.Adapters.Storage
 open core.fs.Adapters.SEC
 open core.fs.Adapters.Logging
+open core.fs.Adapters.Brokerage
 
 type SearchCompanies = {Query:string}
 type GetFilingsForTicker = {Ticker:string}
@@ -25,8 +26,8 @@ type FilingDto =
     {
         description: string
         documentUrl: string
-        filingDate: DateTimeOffset
-        reportDate: DateTimeOffset
+        filingDate: string
+        reportDate: string
         filing: string
         filingUrl: string
     }
@@ -44,7 +45,7 @@ type PortfolioFilingsDto =
         tickerFilings: CompanyFilingsDto array
     }
 
-type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioStorage, secFilings: ISECFilings, logger: ILogger) =
+type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioStorage, secFilings: ISECFilings, marketHours: IMarketHours, logger: ILogger) =
 
     let toFilingDto (filing: CompanyFiling) : FilingDto =
         {
@@ -112,7 +113,11 @@ type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioSto
             |> Seq.distinct
             |> Seq.toArray
         
-        let timeLimit = DateTimeOffset.UtcNow.Date.AddDays -1
+        let referenceDate = 
+            DateTimeOffset.UtcNow
+            |> marketHours.ToMarketTime 
+            |> fun x -> x.Date
+            |> DateOnly.FromDateTime
         
         let getRecentFilingsForTicker (ticker: Ticker) = async {
             try
@@ -123,7 +128,7 @@ type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioSto
                 | Ok companyFilings ->
                     let recentFilings = 
                         companyFilings.Filings
-                        |> Seq.filter (fun f -> f.FilingDate.Date >= timeLimit.Date)
+                        |> Seq.filter (fun f -> referenceDate |> f.IsRecentFor)
                         |> Seq.toArray
                     
                     if recentFilings.Length > 0 then

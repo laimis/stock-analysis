@@ -19,14 +19,17 @@ type CompanyFiling =
     {
         Description: string
         DocumentUrl: string
-        FilingDate: System.DateTimeOffset
-        ReportDate: System.DateTimeOffset
+        FilingDate: string
+        ReportDate: string
         Filing: string
         FilingUrl: string
     }
-    
-    with
-        member this.IsNew = this.FilingDate > System.DateTimeOffset.Now.AddDays -7
+
+    member this.IsRecentFor (referenceDate: System.DateOnly) =
+        let dateFormat = "yyyy-MM-dd"
+        let todayString = referenceDate.ToString dateFormat
+        let yesterdayString = referenceDate.AddDays(-1).ToString dateFormat
+        this.FilingDate = todayString || this.FilingDate = yesterdayString
 
 [<Struct>]
 type CompanyFilings(ticker:Ticker, filings:seq<CompanyFiling>) =
