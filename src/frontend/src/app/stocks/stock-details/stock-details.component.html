@@ -200,7 +200,7 @@
         [loading]="loading.reminders"
         [errors]="errors.reminders || []"
         (save)="onReminderSave($event)"
-        (cancel)="toggleReminderForm()">
+        (cancelled)="toggleReminderForm()">
       </app-reminder-form>
     }
 

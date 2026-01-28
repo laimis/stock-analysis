@@ -18,7 +18,7 @@ export class ReminderFormComponent implements OnChanges {
   @Input() errors: string[] = [];
   
   @Output() save = new EventEmitter<{ date: string; message: string; ticker?: string }>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
   reminderData = {
     date: '',
@@ -64,7 +64,7 @@ export class ReminderFormComponent implements OnChanges {
 
   onCancel() {
     this.reset();
-    this.cancel.emit();
+    this.cancelled.emit();
   }
 
   reset() {
