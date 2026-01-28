@@ -12,7 +12,7 @@ export interface Filing {
   description: string;
   documentUrl: string;
   filingDate: string;
-  reportDate: string;
+  reportDate: string | null;
   filing: string;
   filingUrl: string;
 }

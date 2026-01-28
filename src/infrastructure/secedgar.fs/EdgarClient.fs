@@ -111,7 +111,7 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                 Description = recent.primaryDocDescription.[index]
                 DocumentUrl = documentUrl
                 FilingDate = filingDate
-                ReportDate = reportDate
+                ReportDate = if String.IsNullOrWhiteSpace(reportDate) then None else Some reportDate
                 Filing = recent.form.[index]
                 FilingUrl = filingUrl
             }

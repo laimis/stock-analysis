@@ -135,7 +135,7 @@
                       @for (filing of group.filings; track filing.filingUrl) {
                         <tr>
                           <td class="text-muted">{{ formatDate(filing.filingDate) | date:'mediumDate' }}</td>
-                          <td class="text-muted">{{ formatDate(filing.reportDate) | date:'mediumDate' }}</td>
+                          <td class="text-muted">{{ filing.reportDate ? (formatDate(filing.reportDate) | date:'mediumDate') : 'N/A' }}</td>
                           <td>
                             <span class="badge bg-primary">{{ filing.filing }}</span>
                           </td>
@@ -201,7 +201,7 @@
                   @for (filing of tickerFiling.filings; track filing.filingUrl) {
                     <tr>
                       <td class="text-muted">{{ formatDate(filing.filingDate) | date:'mediumDate' }}</td>
-                      <td class="text-muted">{{ formatDate(filing.reportDate) | date:'mediumDate' }}</td>
+                      <td class="text-muted">{{ filing.reportDate ? (formatDate(filing.reportDate) | date:'mediumDate') : 'N/A' }}</td>
                       <td>
                         <span class="badge bg-primary">{{ filing.filing }}</span>
                       </td>

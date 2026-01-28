@@ -267,7 +267,7 @@
                     } @else {
                       <tr >
                         <td class="text-muted">{{ row.filing.filingDate | date:'mediumDate' }}</td>
-                        <td class="text-muted">{{ row.filing.reportDate | date:'mediumDate' }}</td>
+                        <td class="text-muted">{{ row.filing.reportDate ? (row.filing.reportDate | date:'mediumDate') : 'N/A' }}</td>
                         <td>
                           <span class="badge bg-primary">{{ row.filing.filing }}</span>
                         </td>

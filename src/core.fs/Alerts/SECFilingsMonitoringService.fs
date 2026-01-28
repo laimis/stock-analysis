@@ -25,7 +25,7 @@ and [<CLIMutable>] SECFilingForEmail =
         description: string
         documentUrl: string
         filingDate: string
-        reportDate: string
+        reportDate: string option
         filing: string
         filingUrl: string
     }

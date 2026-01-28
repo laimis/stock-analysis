@@ -820,11 +820,13 @@ export interface StockDetails {
     profile: StockProfile
 }
 
+
+//TODO: remove these!
 export interface SECFiling {
     description: string
     documentUrl: string
     filingDate: string
-    reportDate: string
+    reportDate: string | null
     filing: string
     filingUrl: string
 }

@@ -20,7 +20,7 @@ type CompanyFiling =
         Description: string
         DocumentUrl: string
         FilingDate: string
-        ReportDate: string
+        ReportDate: string option
         Filing: string
         FilingUrl: string
     }
