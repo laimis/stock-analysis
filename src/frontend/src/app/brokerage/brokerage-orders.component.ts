@@ -47,6 +47,12 @@ export class BrokerageOrdersComponent {
 
     @Input()
     set account(value: BrokerageAccount) {
+        if (!value) {
+            this._stockOrders = [];
+            this._optionOrders = [];
+            this.groupAndRenderOrders();
+            return;
+        }
         this._stockOrders = value.stockOrders
         this._optionOrders = value.optionOrders
         console.log("Option orders: " + this.optionOrders)
