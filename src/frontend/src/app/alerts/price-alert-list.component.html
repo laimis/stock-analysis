@@ -67,21 +67,24 @@
                     <button 
                       class="btn btn-outline-primary" 
                       (click)="onEdit(alert)"
-                      title="Edit">
+                      title="Edit"
+                      aria-label="Edit alert for {{ alert.ticker }} at ${{ alert.priceLevel | number:'1.2-2' }}">
                       <i class="fas fa-edit"></i>
                     </button>
                     @if (alert.state === 'triggered') {
                       <button 
                         class="btn btn-outline-success" 
                         (click)="onReset(alert)"
-                        title="Reset to Active">
+                        title="Reset to Active"
+                        aria-label="Reset alert for {{ alert.ticker }} at ${{ alert.priceLevel | number:'1.2-2' }} to Active">
                         <i class="fas fa-redo"></i>
                       </button>
                     }
                     <button 
                       class="btn btn-outline-danger" 
                       (click)="onDelete(alert)"
-                      title="Delete">
+                      title="Delete"
+                      aria-label="Delete alert for {{ alert.ticker }} at ${{ alert.priceLevel | number:'1.2-2' }}">
                       <i class="fas fa-trash"></i>
                     </button>
                   </div>
