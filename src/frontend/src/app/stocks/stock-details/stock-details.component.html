@@ -258,7 +258,7 @@
       [emptyMessage]="'No price alerts found for ' + stock?.ticker + '. Create your first price alert to get started!'"
       (edit)="editPriceAlert($event)"
       (delete)="deletePriceAlert($event)"
-      (reset)="resetPriceAlert($event)">
+      (resetAlert)="resetPriceAlert($event)">
     </app-price-alert-list>
   </div>
 }

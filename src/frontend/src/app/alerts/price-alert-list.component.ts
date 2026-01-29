@@ -17,7 +17,7 @@ export class PriceAlertListComponent {
   
   @Output() edit = new EventEmitter<StockPriceAlert>();
   @Output() delete = new EventEmitter<StockPriceAlert>();
-  @Output() reset = new EventEmitter<StockPriceAlert>();
+  @Output() resetAlert = new EventEmitter<StockPriceAlert>();
 
   onEdit(alert: StockPriceAlert) {
     this.edit.emit(alert);
@@ -31,7 +31,7 @@ export class PriceAlertListComponent {
 
   onReset(alert: StockPriceAlert) {
     if (confirm(`Reset alert for ${alert.ticker} at $${alert.priceLevel}?`)) {
-      this.reset.emit(alert);
+      this.resetAlert.emit(alert);
     }
   }
 
