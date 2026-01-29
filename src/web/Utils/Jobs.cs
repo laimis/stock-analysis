@@ -17,10 +17,10 @@ public static class Jobs
         {
             logger.LogInformation("Backend jobs turned on");
             
-            var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
+            var pacificTmz = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
             var rjo = new RecurringJobOptions
             {
-                TimeZone = tz
+                TimeZone = pacificTmz
             };
 
             RecurringJob.AddOrUpdate<core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService>(
