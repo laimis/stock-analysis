@@ -93,7 +93,7 @@ public static class Jobs
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.ReminderMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.ReminderMonitoringService),
                 methodCall: service => service.Execute(),
-                cronExpression: "0 9 * * *",  // 9am daily
+                cronExpression: "0 6 * * *",  // 6am daily
                 options: rjo
             );
             
