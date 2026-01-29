@@ -7,7 +7,7 @@ import {
     Prices,
     StockDetails,
     StockOwnership,
-    StocksService, BrokerageAccount, Reminder
+    StocksService, BrokerageAccount, Reminder, StockPriceAlert
 } from '../../services/stocks.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -31,6 +31,8 @@ import { TradingViewLinkComponent } from "../../shared/stocks/trading-view-link.
 import { MarketCapPipe } from "../../services/marketcap.filter";
 import { ReminderFormComponent } from '../../alerts/reminder-form.component';
 import { ReminderListComponent } from '../../alerts/reminder-list.component';
+import { PriceAlertFormComponent } from '../../alerts/price-alert-form.component';
+import { PriceAlertListComponent } from '../../alerts/price-alert-list.component';
 import { SecFilingsTableComponent } from '../../shared/sec/sec-filings-table.component';
 import { SECFilings, SECService } from 'src/app/services/sec.service';
 
@@ -56,6 +58,8 @@ import { SECFilings, SECService } from 'src/app/services/sec.service';
     TradingViewLinkComponent,
     ReminderFormComponent,
     ReminderListComponent,
+    PriceAlertFormComponent,
+    PriceAlertListComponent,
     SecFilingsTableComponent
 ],
     styleUrls: ['./stock-details.component.css']
@@ -86,6 +90,9 @@ export class StockDetailsComponent implements OnInit {
     reminders: Reminder[] = []
     showReminderForm = false
     editingReminder: Reminder | null = null
+    priceAlerts: StockPriceAlert[] = []
+    showPriceAlertForm = false
+    editingPriceAlert: StockPriceAlert | null = null
 
     loading = {
         stock: false,
@@ -94,7 +101,8 @@ export class StockDetailsComponent implements OnInit {
         orders: false,
         pending: false,
         secFilings: false,
-        reminders: false
+        reminders: false,
+        priceAlerts: false
     }
 
     errors = {
@@ -105,7 +113,8 @@ export class StockDetailsComponent implements OnInit {
         orders: null,
         pending: null,
         secFilings: null,
-        reminders: null
+        reminders: null,
+        priceAlerts: null
     }
 
     ngOnInit(): void {
@@ -141,6 +150,7 @@ export class StockDetailsComponent implements OnInit {
         this.loadOptionOwnership()
         this.loadOrders()
         this.loadPendingPosition()
+        this.loadPriceAlerts()
     }
 
     loadOrders() {
@@ -269,6 +279,8 @@ export class StockDetailsComponent implements OnInit {
         if (tabName === 'reminders') {
             this.loadReminders()
         }
+        
+        // Price alerts are already loaded on page load for badge count
     }
 
     loadSecFilings() {
@@ -311,6 +323,10 @@ export class StockDetailsComponent implements OnInit {
         if (psRatio < 1) return 'metric-low';
         if (psRatio > 5) return 'metric-high';
         return 'metric-normal';
+    }
+
+    get activePriceAlertsCount(): number {
+        return this.priceAlerts.filter(a => a.state === 'active' || a.state === 'triggered').length;
     }
 
     loadReminders() {
@@ -404,6 +420,118 @@ export class StockDetailsComponent implements OnInit {
             error: (error) => {
                 this.errors.reminders = GetErrors(error)
                 this.loading.reminders = false
+            }
+        })
+    }
+
+    loadPriceAlerts() {
+        this.loading.priceAlerts = true
+        this.errors.priceAlerts = null
+        
+        this.stocks.getStockPriceAlerts().subscribe({
+            next: (alerts) => {
+                // Filter alerts for this ticker
+                this.priceAlerts = alerts
+                    .filter(a => a.ticker === this.ticker)
+                    .sort((a, b) => a.priceLevel - b.priceLevel)
+                this.loading.priceAlerts = false
+            },
+            error: (error) => {
+                this.errors.priceAlerts = GetErrors(error)
+                this.loading.priceAlerts = false
+            }
+        })
+    }
+
+    togglePriceAlertForm() {
+        this.showPriceAlertForm = !this.showPriceAlertForm
+        if (!this.showPriceAlertForm) {
+            this.resetPriceAlertForm()
+        }
+    }
+
+    resetPriceAlertForm() {
+        this.editingPriceAlert = null
+        this.errors.priceAlerts = null
+    }
+
+    onPriceAlertSave(data: { ticker?: string; priceLevel: number; alertType: string; note: string }) {
+        this.loading.priceAlerts = true
+        this.errors.priceAlerts = null
+
+        if (this.editingPriceAlert) {
+            // Update existing alert
+            this.stocks.updateStockPriceAlert(
+                this.editingPriceAlert.alertId,
+                data.priceLevel,
+                data.alertType,
+                data.note,
+                this.editingPriceAlert.state
+            ).subscribe({
+                next: () => {
+                    this.loadPriceAlerts()
+                    this.togglePriceAlertForm()
+                    this.loading.priceAlerts = false
+                },
+                error: (error) => {
+                    this.errors.priceAlerts = GetErrors(error)
+                    this.loading.priceAlerts = false
+                }
+            })
+        } else {
+            // Create new alert - always use this.ticker, not data.ticker
+            this.stocks.createStockPriceAlert(
+                this.ticker,
+                data.priceLevel,
+                data.alertType,
+                data.note
+            ).subscribe({
+                next: () => {
+                    this.loadPriceAlerts()
+                    this.togglePriceAlertForm()
+                    this.loading.priceAlerts = false
+                },
+                error: (error) => {
+                    this.errors.priceAlerts = GetErrors(error)
+                    this.loading.priceAlerts = false
+                }
+            })
+        }
+    }
+
+    editPriceAlert(alert: StockPriceAlert) {
+        this.editingPriceAlert = alert
+        this.showPriceAlertForm = true
+    }
+
+    deletePriceAlert(alert: StockPriceAlert) {
+        this.loading.priceAlerts = true
+        this.errors.priceAlerts = null
+
+        this.stocks.deleteStockPriceAlert(alert.alertId).subscribe({
+            next: () => {
+                this.loadPriceAlerts()
+                this.loading.priceAlerts = false
+            },
+            error: (error) => {
+                this.errors.priceAlerts = GetErrors(error)
+                this.loading.priceAlerts = false
+            }
+        })
+    }
+
+    resetPriceAlert(alert: StockPriceAlert) {
+        this.loading.priceAlerts = true
+        this.errors.priceAlerts = null
+
+        this.stocks.resetStockPriceAlert(alert.alertId).subscribe({
+            next: () => {
+                this.loadPriceAlerts()
+                this.loading.priceAlerts = false
+            },
+            error: (error) => {
+                this.errors.priceAlerts = GetErrors(error)
+                this.loading.priceAlerts = false
             }
         })
     }

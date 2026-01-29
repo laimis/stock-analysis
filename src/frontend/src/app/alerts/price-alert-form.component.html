@@ -1,0 +1,99 @@
+<div class="card mb-3 shadow-sm">
+  <div class="card-header">
+    <h5>{{ editingAlert ? 'Edit' : 'Create' }} Price Alert</h5>
+  </div>
+  <div class="card-body">
+    @if (errors.length > 0) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @for (error of errors; track error) {
+          <div>{{ error }}</div>
+        }
+      </div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="row">
+        @if (showTickerField) {
+          <div class="col-md-4 mb-3">
+            @if (!editingAlert) {
+              <app-stock-search
+                label="Ticker"
+                placeholder="Search for stock symbol"
+                [ticker]="alertData.ticker"
+                (tickerSelected)="onTickerSelected($event)">
+              </app-stock-search>
+            } @else {
+              <label class="form-label">Ticker</label>
+              <div class="form-control-plaintext"><strong>{{ alertData.ticker }}</strong></div>
+            }
+          </div>
+        }
+        <div [class]="showTickerField ? 'col-md-3 mb-3' : 'col-md-4 mb-3'">
+          <label for="priceLevel" class="form-label">
+            Price Level
+            @if (currentPrice !== null && !priceLoading) {
+              <span class="text-muted ms-2">(Current: ${{ currentPrice | number:'1.2-2' }})</span>
+            }
+            @if (priceLoading) {
+              <span class="spinner-border spinner-border-sm ms-2" role="status"></span>
+            }
+          </label>
+          <input 
+            type="number" 
+            class="form-control" 
+            id="priceLevel" 
+            [(ngModel)]="alertData.priceLevel" 
+            name="priceLevel"
+            step="0.01"
+            required
+            placeholder="Enter price level">
+          @if (currentPrice !== null && !priceLoading) {
+            <div class="mt-1">
+              <small class="text-muted">
+                Quick fill: 
+                <button type="button" class="btn btn-link btn-sm p-0 ms-1" (click)="setPriceLevelPercentage(-30)">-30%</button>
+                <button type="button" class="btn btn-link btn-sm p-0 ms-1" (click)="setPriceLevelPercentage(-60)">-60%</button>
+                <button type="button" class="btn btn-link btn-sm p-0 ms-1" (click)="setPriceLevelPercentage(-70)">-70%</button>
+              </small>
+            </div>
+          }
+          @if (pricePercentageDiff !== null) {
+            <div class="mt-1">
+              <small [class]="pricePercentageDiff >= 0 ? 'text-success' : 'text-danger'">
+                {{ pricePercentageDiff >= 0 ? '+' : '' }}{{ pricePercentageDiff | number:'1.1-1' }}% from current
+              </small>
+            </div>
+          }
+        </div>
+        <div [class]="showTickerField ? 'col-md-3 mb-3' : 'col-md-4 mb-3'">
+          <label for="alertType" class="form-label">Alert When</label>
+          <select 
+            class="form-select" 
+            id="alertType" 
+            [(ngModel)]="alertData.alertType" 
+            name="alertType"
+            required>
+            <option value="above">Price Goes Above</option>
+            <option value="below">Price Goes Below</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="note" class="form-label">Note</label>
+        <textarea 
+          class="form-control" 
+          id="note" 
+          [(ngModel)]="alertData.note" 
+          name="note"
+          rows="2"
+          placeholder="Why are you creating this alert?"></textarea>
+      </div>
+      <button type="submit" class="btn btn-success" [disabled]="loading || !alertData.priceLevel">
+        {{ editingAlert ? 'Update' : 'Create' }} Alert
+      </button>
+      <button type="button" class="btn btn-secondary ms-2" (click)="onCancel()">
+        Cancel
+      </button>
+    </form>
+  </div>
+</div>

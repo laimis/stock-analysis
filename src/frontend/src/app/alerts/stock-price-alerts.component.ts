@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StocksService, StockPriceAlert } from '../services/stocks.service';
 import { GetErrors } from '../services/utils';
-import { StockSearchComponent } from '../stocks/stock-search/stock-search.component';
-import { StockLinkAndTradingviewLinkComponent } from "../shared/stocks/stock-link-and-tradingview-link.component";
+import { PriceAlertFormComponent } from './price-alert-form.component';
+import { PriceAlertListComponent } from './price-alert-list.component';
 
 @Component({
   selector: 'app-stock-price-alerts',
   templateUrl: './stock-price-alerts.component.html',
   styleUrls: ['./stock-price-alerts.component.css'],
-  imports: [CommonModule, FormsModule, StockSearchComponent, StockLinkAndTradingviewLinkComponent]
+  imports: [CommonModule, FormsModule, PriceAlertFormComponent, PriceAlertListComponent]
 })
 export class StockPriceAlertsComponent implements OnInit {
   private stocksService = inject(StocksService);
@@ -23,17 +23,7 @@ export class StockPriceAlertsComponent implements OnInit {
   filterState = 'all'; // 'all', 'active', 'triggered', 'disabled'
   filterTicker = ''; // Search by ticker
 
-  // Form fields
-  newAlert = {
-    ticker: '',
-    priceLevel: null as number | null,
-    alertType: 'below',
-    note: ''
-  };
-
   editingAlert: StockPriceAlert | null = null;
-  currentPrice: number | null = null;
-  priceLoading = false;
 
   ngOnInit() {
     this.loadAlerts();
@@ -89,126 +79,67 @@ export class StockPriceAlertsComponent implements OnInit {
     }
   }
 
-  onTickerSelected(ticker: string) {
-    this.newAlert.ticker = ticker;
-    this.fetchCurrentPrice(ticker);
-  }
-
-  fetchCurrentPrice(ticker: string) {
-    this.priceLoading = true;
-    this.currentPrice = null;
-    this.errors = [];
-
-    this.stocksService.getStockQuote(ticker).subscribe({
-      next: (quote) => {
-        this.currentPrice = quote.price || quote.mark || quote.lastPrice;
-        this.priceLoading = false;
-      },
-      error: (error) => {
-        this.errors = GetErrors(error);
-        this.priceLoading = false;
-      }
-    });
-  }
-
-  setPriceLevelPercentage(percentage: number) {
-    if (this.currentPrice !== null) {
-      const multiplier = 1 + (percentage / 100);
-      this.newAlert.priceLevel = Math.round(this.currentPrice * multiplier * 100) / 100;
-    }
-  }
-
-  get pricePercentageDiff(): number | null {
-    if (this.currentPrice !== null && this.newAlert.priceLevel !== null) {
-      return ((this.newAlert.priceLevel - this.currentPrice) / this.currentPrice) * 100;
-    }
-    return null;
-  }
-
   resetForm() {
-    this.newAlert = {
-      ticker: '',
-      priceLevel: null,
-      alertType: 'below',
-      note: ''
-    };
     this.editingAlert = null;
-    this.currentPrice = null;
-    this.priceLoading = false;
+    this.errors = [];
   }
 
-  createAlert() {
-    if (!this.newAlert.ticker || !this.newAlert.priceLevel) {
-      this.errors = ['Ticker and price level are required'];
-      return;
-    }
-
+  onPriceAlertSave(data: { ticker?: string; priceLevel: number; alertType: string; note: string }) {
     this.loading = true;
     this.errors = [];
 
-    this.stocksService.createStockPriceAlert(
-      this.newAlert.ticker.toUpperCase(),
-      this.newAlert.priceLevel,
-      this.newAlert.alertType,
-      this.newAlert.note
-    ).subscribe({
-      next: () => {
-        this.loadAlerts();
-        this.toggleForm();
+    if (this.editingAlert) {
+      // Update existing alert
+      this.stocksService.updateStockPriceAlert(
+        this.editingAlert.alertId,
+        data.priceLevel,
+        data.alertType,
+        data.note,
+        this.editingAlert.state
+      ).subscribe({
+        next: () => {
+          this.loadAlerts();
+          this.toggleForm();
+          this.loading = false;
+        },
+        error: (error) => {
+          this.errors = GetErrors(error);
+          this.loading = false;
+        }
+      });
+    } else {
+      // Create new alert
+      if (!data.ticker) {
+        this.errors = ['Ticker is required'];
         this.loading = false;
-      },
-      error: (error) => {
-        this.errors = GetErrors(error);
-        this.loading = false;
+        return;
       }
-    });
+
+      this.stocksService.createStockPriceAlert(
+        data.ticker.toUpperCase(),
+        data.priceLevel,
+        data.alertType,
+        data.note
+      ).subscribe({
+        next: () => {
+          this.loadAlerts();
+          this.toggleForm();
+          this.loading = false;
+        },
+        error: (error) => {
+          this.errors = GetErrors(error);
+          this.loading = false;
+        }
+      });
+    }
   }
 
   editAlert(alert: StockPriceAlert) {
-    this.editingAlert = { ...alert };
+    this.editingAlert = alert;
     this.showForm = true;
-    this.newAlert = {
-      ticker: alert.ticker,
-      priceLevel: alert.priceLevel,
-      alertType: alert.alertType,
-      note: alert.note
-    };
-    this.fetchCurrentPrice(alert.ticker);
-  }
-
-  updateAlert() {
-    if (!this.editingAlert || !this.newAlert.priceLevel) {
-      this.errors = ['Invalid alert or price level'];
-      return;
-    }
-
-    this.loading = true;
-    this.errors = [];
-
-    this.stocksService.updateStockPriceAlert(
-      this.editingAlert.alertId,
-      this.newAlert.priceLevel,
-      this.newAlert.alertType,
-      this.newAlert.note,
-      this.editingAlert.state
-    ).subscribe({
-      next: () => {
-        this.loadAlerts();
-        this.toggleForm();
-        this.loading = false;
-      },
-      error: (error) => {
-        this.errors = GetErrors(error);
-        this.loading = false;
-      }
-    });
   }
 
   deleteAlert(alert: StockPriceAlert) {
-    if (!confirm(`Delete alert for ${alert.ticker} at $${alert.priceLevel}?`)) {
-      return;
-    }
-
     this.loading = true;
     this.errors = [];
 
@@ -225,10 +156,6 @@ export class StockPriceAlertsComponent implements OnInit {
   }
 
   resetAlertState(alert: StockPriceAlert) {
-    if (!confirm(`Reset alert for ${alert.ticker}?`)) {
-      return;
-    }
-
     this.loading = true;
     this.errors = [];
 
@@ -242,18 +169,5 @@ export class StockPriceAlertsComponent implements OnInit {
         this.loading = false;
       }
     });
-  }
-
-  getStateClass(state: string): string {
-    switch (state) {
-      case 'active': return 'badge bg-success';
-      case 'triggered': return 'badge bg-warning text-dark';
-      case 'disabled': return 'badge bg-secondary';
-      default: return 'badge bg-secondary';
-    }
-  }
-
-  getAlertTypeDisplay(alertType: string): string {
-    return alertType === 'above' ? '↑ Above' : '↓ Below';
   }
 }
