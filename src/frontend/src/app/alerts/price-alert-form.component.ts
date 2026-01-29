@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges, inject } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { StockPriceAlert, StocksService } from '../services/stocks.service';
 import { StockSearchComponent } from '../stocks/stock-search/stock-search.component';
 
@@ -10,8 +11,9 @@ import { StockSearchComponent } from '../stocks/stock-search/stock-search.compon
   styleUrls: ['./price-alert-form.component.css'],
   imports: [CommonModule, FormsModule, StockSearchComponent, DecimalPipe]
 })
-export class PriceAlertFormComponent implements OnChanges {
+export class PriceAlertFormComponent implements OnChanges, OnDestroy {
   private stocksService = inject(StocksService);
+  private priceSubscription?: Subscription;
 
   @Input() editingAlert: StockPriceAlert | null = null;
   @Input() presetTicker?: string;  // Pre-fill ticker (e.g., from stock-details page)
@@ -57,10 +59,16 @@ export class PriceAlertFormComponent implements OnChanges {
   fetchCurrentPrice(ticker: string) {
     if (!ticker) return;
     
+    // Unsubscribe from any previous pending request
+    if (this.priceSubscription) {
+      this.priceSubscription.unsubscribe();
+      this.priceSubscription = undefined;
+    }
+    
     this.priceLoading = true;
     this.currentPrice = null;
 
-    this.stocksService.getStockQuote(ticker).subscribe({
+    this.priceSubscription = this.stocksService.getStockQuote(ticker).subscribe({
       next: (quote) => {
         this.currentPrice = quote.price || quote.mark || quote.lastPrice;
         this.priceLoading = false;
@@ -70,6 +78,14 @@ export class PriceAlertFormComponent implements OnChanges {
         this.priceLoading = false;
       }
     });
+  }
+
+  ngOnDestroy() {
+    // Clean up subscription when component is destroyed
+    if (this.priceSubscription) {
+      this.priceSubscription.unsubscribe();
+      this.priceSubscription = undefined;
+    }
   }
 
   setPriceLevelPercentage(percentage: number) {
@@ -113,6 +129,12 @@ export class PriceAlertFormComponent implements OnChanges {
   }
 
   reset() {
+    // Cancel any pending price fetch request
+    if (this.priceSubscription) {
+      this.priceSubscription.unsubscribe();
+      this.priceSubscription = undefined;
+    }
+    
     this.alertData = {
       ticker: this.presetTicker || '',
       priceLevel: null,
