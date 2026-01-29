@@ -1,0 +1,96 @@
+@if (loading) {
+  <div class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading price alerts...</span>
+    </div>
+  </div>
+}
+
+@if (alerts.length === 0 && !loading) {
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    {{ emptyMessage }}
+  </div>
+}
+
+@if (alerts.length > 0 && !loading) {
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-modern table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              @if (showTickerColumn) {
+                <th scope="col" class="ps-4" style="width: 120px;">Ticker</th>
+              }
+              <th scope="col" style="width: 120px;">Price Level</th>
+              <th scope="col" style="width: 120px;">Alert Type</th>
+              <th scope="col">Note</th>
+              <th scope="col" style="width: 100px;">State</th>
+              <th scope="col" style="width: 130px;">Created</th>
+              <th scope="col" style="width: 130px;">Triggered</th>
+              <th scope="col" class="text-center pe-4" style="width: 140px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (alert of alerts; track alert.alertId) {
+              <tr>
+                @if (showTickerColumn) {
+                  <td class="ps-4 py-3">
+                    <app-stock-link-and-tradingview-link [ticker]="alert.ticker"></app-stock-link-and-tradingview-link>
+                  </td>
+                }
+                <td [class]="showTickerColumn ? 'py-3' : 'ps-4 py-3'">
+                  ${{ alert.priceLevel | number:'1.2-2' }}
+                </td>
+                <td class="py-3">
+                  <span [class]="getAlertTypeClass(alert.alertType)">
+                    {{ getAlertTypeDisplay(alert.alertType) }}
+                  </span>
+                </td>
+                <td class="py-3">
+                  {{ alert.note || '-' }}
+                </td>
+                <td class="py-3">
+                  <span [class]="getStateClass(alert.state)">
+                    {{ alert.state }}
+                  </span>
+                </td>
+                <td class="py-3">
+                  <div>{{ alert.createdAt | date:'short' }}</div>
+                </td>
+                <td class="py-3">
+                  <div>{{ alert.triggeredAt ? (alert.triggeredAt | date:'short') : '-' }}</div>
+                </td>
+                <td class="text-center py-3 pe-4">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button 
+                      class="btn btn-outline-primary" 
+                      (click)="onEdit(alert)"
+                      title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    @if (alert.state === 'triggered') {
+                      <button 
+                        class="btn btn-outline-success" 
+                        (click)="onReset(alert)"
+                        title="Reset to Active">
+                        <i class="fas fa-redo"></i>
+                      </button>
+                    }
+                    <button 
+                      class="btn btn-outline-danger" 
+                      (click)="onDelete(alert)"
+                      title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+}

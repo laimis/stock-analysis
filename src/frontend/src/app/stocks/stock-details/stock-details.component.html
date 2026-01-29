@@ -77,6 +77,12 @@
   <span class="badge rounded-pill bg-info">{{ reminders.length }}</span>
 }
 </a>
+<a (click)="activateTab('priceAlerts')" [ngClass]="{'is-active': isActive('priceAlerts')}" [routerLink]=""
+  class="tab">
+  Price Alerts @if (activePriceAlertsCount > 0) {
+  <span class="badge rounded-pill bg-info">{{ activePriceAlertsCount }}</span>
+}
+</a>
 <a (click)="activateTab('sec')" [ngClass]="{'is-active': isActive('sec')}" [routerLink]="" class="tab">
   SEC Filings
 </a>
@@ -212,6 +218,48 @@
       (edit)="editReminder($event)"
       (delete)="deleteReminder($event)">
     </app-reminder-list>
+  </div>
+}
+@if (isActive('priceAlerts')) {
+  <div class="mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Price Alerts for {{ stock?.ticker }}</h4>
+      <button class="btn btn-primary btn-sm" (click)="togglePriceAlertForm()">
+        <i class="bi" [ngClass]="{'bi-plus': !showPriceAlertForm, 'bi-x': showPriceAlertForm}"></i>
+        {{ showPriceAlertForm ? 'Cancel' : 'New Price Alert' }}
+      </button>
+    </div>
+
+    @if (errors.priceAlerts?.length > 0) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @for (error of errors.priceAlerts; track error) {
+          <div>{{ error }}</div>
+        }
+        <button type="button" class="btn-close" (click)="errors.priceAlerts = []"></button>
+      </div>
+    }
+
+    @if (showPriceAlertForm) {
+      <app-price-alert-form
+        [editingAlert]="editingPriceAlert"
+        [presetTicker]="stock?.ticker"
+        [showTickerField]="false"
+        [loading]="loading.priceAlerts"
+        [errors]="errors.priceAlerts || []"
+        (save)="onPriceAlertSave($event)"
+        (cancelled)="togglePriceAlertForm()">
+      </app-price-alert-form>
+    }
+
+    <app-price-alert-list
+      [alerts]="priceAlerts"
+      [loading]="loading.priceAlerts"
+      [showTickerColumn]="false"
+      [emptyMessage]="'No price alerts found for ' + stock?.ticker + '. Create your first price alert to get started!'"
+      (edit)="editPriceAlert($event)"
+      (delete)="deletePriceAlert($event)"
+      (reset)="resetPriceAlert($event)">
+    </app-price-alert-list>
   </div>
 }
 @if (isActive('sec') && stock) {
