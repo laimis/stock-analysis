@@ -62,6 +62,7 @@ export class PriceAlertFormComponent implements OnChanges, OnDestroy {
     // Unsubscribe from any previous pending request
     if (this.priceSubscription) {
       this.priceSubscription.unsubscribe();
+      this.priceSubscription = undefined;
     }
     
     this.priceLoading = true;
@@ -83,6 +84,7 @@ export class PriceAlertFormComponent implements OnChanges, OnDestroy {
     // Clean up subscription when component is destroyed
     if (this.priceSubscription) {
       this.priceSubscription.unsubscribe();
+      this.priceSubscription = undefined;
     }
   }
 
@@ -127,6 +129,12 @@ export class PriceAlertFormComponent implements OnChanges, OnDestroy {
   }
 
   reset() {
+    // Cancel any pending price fetch request
+    if (this.priceSubscription) {
+      this.priceSubscription.unsubscribe();
+      this.priceSubscription = undefined;
+    }
+    
     this.alertData = {
       ticker: this.presetTicker || '',
       priceLevel: null,
