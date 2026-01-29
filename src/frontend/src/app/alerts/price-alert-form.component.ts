@@ -3,7 +3,6 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StockPriceAlert, StocksService } from '../services/stocks.service';
 import { StockSearchComponent } from '../stocks/stock-search/stock-search.component';
-import { GetErrors } from '../services/utils';
 
 @Component({
   selector: 'app-price-alert-form',
