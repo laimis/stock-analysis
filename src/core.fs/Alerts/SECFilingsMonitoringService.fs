@@ -25,7 +25,7 @@ and [<CLIMutable>] SECFilingForEmail =
         description: string
         documentUrl: string
         filingDate: string
-        reportDate: string option
+        reportDate: string
         filing: string
         filingUrl: string
     }
@@ -100,7 +100,7 @@ type SECFilingsMonitoringService(
                     description = f.Description
                     documentUrl = f.DocumentUrl
                     filingDate = f.FilingDate
-                    reportDate = f.ReportDate
+                    reportDate = f.ReportDate |> Option.defaultValue ""
                     filing = f.Filing
                     filingUrl = f.FilingUrl
                 } : SECFilingForEmail)
