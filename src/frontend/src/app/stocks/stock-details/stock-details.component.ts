@@ -150,6 +150,7 @@ export class StockDetailsComponent implements OnInit {
         this.loadOptionOwnership()
         this.loadOrders()
         this.loadPendingPosition()
+        this.loadPriceAlerts()
     }
 
     loadOrders() {
@@ -279,10 +280,7 @@ export class StockDetailsComponent implements OnInit {
             this.loadReminders()
         }
         
-        // Load price alerts when the price alerts tab is activated
-        if (tabName === 'priceAlerts') {
-            this.loadPriceAlerts()
-        }
+        // Price alerts are already loaded on page load for badge count
     }
 
     loadSecFilings() {
