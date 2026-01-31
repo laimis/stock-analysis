@@ -22,14 +22,14 @@ type AccountMonitoringService(
     // in the db, so I maintain a list of common mappings hardcoded here
     let hardcodedQueryToTickerMapping =
         [
-            ("WISDOMTREE FLOATING RATETREASRY ETF", "USFR")
-            ("WISDOMTREE FLOATING RTETREAS ETF IV", "USFR")
-            ("NEWMONT CORP", "NEM")
-            ("GLOBAL PAYMENTS INC", "GPN")
-            ("SOUTHWEST AIRLINES", "LUV")
-            ("WILEY & SONS INC JOHN CLASS A", "WLY")
-            ("KAISER ALUMINUM CORP", "KALU")
-            ("AMERICAN STATES WTR", "AWR")
+            "WISDOMTREE FLOATING RATETREASRY ETF", "USFR"
+            "WISDOMTREE FLOATING RTETREAS ETF IV", "USFR"
+            "NEWMONT CORP", "NEM"
+            "GLOBAL PAYMENTS INC", "GPN"
+            "SOUTHWEST AIRLINES", "LUV"
+            "WILEY & SONS INC JOHN CLASS A", "WLY"
+            "KAISER ALUMINUM CORP", "KALU"
+            "AMERICAN STATES WTR", "AWR"
         ]
         
     let resolveType (t:AccountTransaction) =
@@ -38,12 +38,13 @@ type AccountMonitoringService(
             | "TRADE" -> Trade
             | "DIVIDEND_OR_INTEREST" ->
                 match t.Description with
-                | x when x.Contains("Dividend~") -> AccountTransactionType.Dividend
-                | x when x.Contains("Dividend Short Sale~") -> AccountTransactionType.Dividend
-                | x when x.Contains("ADR Fees~") -> AccountTransactionType.Fee
-                | x when x.Contains("Foreign Tax Withheld~") -> AccountTransactionType.Fee
-                | x when x.Contains(" Interest ") -> Interest
-                | x when x.Contains("SCHWAB1 INT ") -> Interest
+                | x when x.Contains "Dividend~" -> AccountTransactionType.Dividend
+                | x when x.Contains "Dividend Short Sale~" -> AccountTransactionType.Dividend
+                | x when x.Contains "ADR Fees~" -> AccountTransactionType.Fee
+                | x when x.Contains "Foreign Tax Withheld~" -> AccountTransactionType.Fee
+                | x when x.Contains " Interest " -> Interest
+                | x when x.Contains "SCHWAB1 INT " -> Interest
+                | x when x.Contains "SCHWAB PRIME ADVANTAGE MONEY INVESTOR" -> Interest
                 | _ -> AccountTransactionType.Dividend
             | "ACH_RECEIPT" -> Transfer
             | "ACH_DISBURSEMENT" -> Transfer
