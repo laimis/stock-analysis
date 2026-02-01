@@ -62,6 +62,7 @@ type DailyPositionBreakdown =
         DailyGainPct: ChartDataPointContainer<decimal>
         DailyObv: ChartDataPointContainer<decimal>
         DailyClose: ChartDataPointContainer<decimal>
+        DailyAd: ChartDataPointContainer<decimal>
     }
 
 type Pattern = 

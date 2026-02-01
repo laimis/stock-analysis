@@ -355,6 +355,7 @@ module PositionAnalysis =
         let profit = ChartDataPointContainer<decimal>("Profit", DataPointChartType.Line, zeroLine)
         let gainPct = ChartDataPointContainer<decimal>("Gain %", DataPointChartType.Line, zeroLine)
         let obv = ChartDataPointContainer<decimal>("OBV", DataPointChartType.Line, zeroLine)
+        let ad = ChartDataPointContainer<decimal>("A/D", DataPointChartType.Line, zeroLine)
         
         for i in firstBar..lastBar do
             let bar = bars.Bars[i]
@@ -373,14 +374,31 @@ module PositionAnalysis =
                     | true -> lastObvValue + decimal bar.Volume
                     | false -> lastObvValue - decimal bar.Volume
             
+            let adValue =
+                let lastAdValue =
+                    match ad.Data.Count with
+                    | 0 -> 0.0m
+                    | _ -> ad.Data[ad.Data.Count - 1].Value
+                
+                let moneyFlowMultiplier =
+                    let range = bar.High - bar.Low
+                    match range with
+                    | 0m -> 0m
+                    | _ -> ((bar.Close - bar.Low) - (bar.High - bar.Close)) / range
+                
+                let moneyFlowVolume = moneyFlowMultiplier * (decimal bar.Volume)
+                lastAdValue + moneyFlowVolume
+            
             close.Add(bar.Date, currentClose)
             profit.Add(bar.Date, currentProfit)
             gainPct.Add(bar.Date, currentGainPct)
             obv.Add(bar.Date, obvValue)
+            ad.Add(bar.Date, adValue)
         
         {
             DailyProfit = profit
             DailyGainPct = gainPct
             DailyObv = obv
             DailyClose = close
+            DailyAd = ad
         }

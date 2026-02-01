@@ -871,6 +871,7 @@ export interface DailyPositionReport {
     dailyGainPct: DataPointContainer
     dailyObv: DataPointContainer
     dailyClose: DataPointContainer
+    dailyAd: DataPointContainer
 }
 
 export interface TickerCountPair {
@@ -1338,6 +1339,7 @@ export interface InflectionPointsReportDetails {
 export interface InflectionPointsReport {
     onBalanceVolume: InflectionPointsReportDetails;
     price: InflectionPointsReportDetails;
+    accumulationDistribution: InflectionPointsReportDetails;
 }
 
 export interface StockPriceAlert {

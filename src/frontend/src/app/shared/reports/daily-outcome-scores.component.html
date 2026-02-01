@@ -1,5 +1,35 @@
 @if (obvAndCloseOptions) {
-  <canvasjs-chart [options]="obvAndCloseOptions"></canvasjs-chart>
+  <div class="mb-3">
+    <div class="d-flex justify-content-end gap-2 mb-2">
+      <button 
+        class="btn btn-sm" 
+        [ngClass]="{'btn-primary': showClose, 'btn-outline-secondary': !showClose}"
+        (click)="toggleClose()"
+        title="Price line">
+        <i class="bi" [ngClass]="{'bi-eye': showClose, 'bi-eye-slash': !showClose}"></i>
+        Price
+      </button>
+      <button 
+        class="btn btn-sm" 
+        [ngClass]="{'btn-success': showObv, 'btn-outline-secondary': !showObv}"
+        (click)="toggleObv()"
+        title="On Balance Volume">
+        <i class="bi" [ngClass]="{'bi-eye': showObv, 'bi-eye-slash': !showObv}"></i>
+        OBV
+      </button>
+      <button 
+        class="btn btn-sm" 
+        [ngClass]="{'btn-info': showAd, 'btn-outline-secondary': !showAd}"
+        (click)="toggleAd()"
+        title="Accumulation/Distribution">
+        <i class="bi" [ngClass]="{'bi-eye': showAd, 'bi-eye-slash': !showAd}"></i>
+        A/D
+      </button>
+    </div>
+    @for (item of [chartKey]; track item) {
+      <canvasjs-chart [options]="obvAndCloseOptions"></canvasjs-chart>
+    }
+  </div>
 }
 
 <div class="row">
