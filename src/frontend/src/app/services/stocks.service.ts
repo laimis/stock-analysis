@@ -871,6 +871,7 @@ export interface DailyPositionReport {
     dailyGainPct: DataPointContainer
     dailyObv: DataPointContainer
     dailyClose: DataPointContainer
+    dailyAd: DataPointContainer
 }
 
 export interface TickerCountPair {

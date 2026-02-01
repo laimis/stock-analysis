@@ -2,11 +2,12 @@ import {Component, Input} from '@angular/core';
 import {DailyPositionReport, DataPointContainer} from '../../services/stocks.service';
 import {LineChartComponent} from "../line-chart/line-chart.component";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
+import {NgClass} from '@angular/common';
 
 import {parse} from "date-fns";
 import {parseDate} from "../../services/utils";
 
-function createData(container: DataPointContainer, useY2: boolean) {
+function createData(container: DataPointContainer, useY2: boolean, color: string) {
     return {
         type: "line",
         dataPoints: container.data.map(d => {
@@ -15,30 +16,39 @@ function createData(container: DataPointContainer, useY2: boolean) {
         }),
         showInLegend: true,
         name: container.label,
-        axisYType: useY2 ? "secondary" : "primary"
+        axisYType: useY2 ? "secondary" : "primary",
+        visible: true,
+        color: color,
+        lineThickness: 2
     }
 }
 
-function createCombinedDailyChart(report:DailyPositionReport) {
-    console.log(report)
-    const data = [
-        createData(report.dailyClose, false),
-        createData(report.dailyObv, true)
-    ]
+function createCombinedDailyChart(report:DailyPositionReport, showClose: boolean, showObv: boolean, showAd: boolean) {
+    const data = []
+    
+    if (showClose) {
+        data.push(createData(report.dailyClose, false, '#0d6efd')) // Bootstrap primary blue
+    }
+    if (showObv) {
+        data.push(createData(report.dailyObv, true, '#198754')) // Bootstrap success green
+    }
+    if (showAd) {
+        data.push(createData(report.dailyAd, true, '#0dcaf0')) // Bootstrap info cyan
+    }
 
     return {
         exportEnabled: true,
         zoomEnabled: true,
         title: {
-            text: "Daily Close / OBV",
+            text: "Price / Volume Indicators",
         },
         axisX: {
             title: "Date",
             valueFormatString: "YYYY-MM-DD",
             gridThickness: 0.1,
         },
-        axisY: {title: "Close", gridThickness: 0.1},
-        axisY2: {title: "OBV", gridThickness: 0.1},
+        axisY: {title: "Price", gridThickness: 0.1},
+        axisY2: {title: "Volume Indicators", gridThickness: 0.1},
         data: data
     }
 }
@@ -49,7 +59,8 @@ function createCombinedDailyChart(report:DailyPositionReport) {
     styleUrls: ['./daily-outcome-scores.component.css'],
     imports: [
     LineChartComponent,
-    CanvasJSAngularChartsModule
+    CanvasJSAngularChartsModule,
+    NgClass
 ]
 })
 export class DailyOutcomeScoresComponent {
@@ -58,6 +69,12 @@ export class DailyOutcomeScoresComponent {
     profitContainer: DataPointContainer
     
     obvAndCloseOptions: any
+    private currentReport: DailyPositionReport
+    chartKey: number = 0 // Force chart re-render
+    
+    showClose: boolean = true
+    showObv: boolean = true
+    showAd: boolean = true
     
     @Input()
     showProfit: boolean = false
@@ -66,11 +83,36 @@ export class DailyOutcomeScoresComponent {
     set report(value: DailyPositionReport) {
         if (!value) throw new Error('report is required')
         
+        this.currentReport = value
         this.gainContainer = value.dailyGainPct
         this.profitContainer = value.dailyProfit
         
-        // obv and close will be rendered on the same chart with
-        // different axis
-        this.obvAndCloseOptions = createCombinedDailyChart(value)
+        this.updateChart()
+    }
+    
+    updateChart() {
+        // Increment key to force chart destruction and recreation
+        this.chartKey++
+        this.obvAndCloseOptions = createCombinedDailyChart(
+            this.currentReport, 
+            this.showClose, 
+            this.showObv, 
+            this.showAd
+        )
+    }
+    
+    toggleClose() {
+        this.showClose = !this.showClose
+        this.updateChart()
+    }
+    
+    toggleObv() {
+        this.showObv = !this.showObv
+        this.updateChart()
+    }
+    
+    toggleAd() {
+        this.showAd = !this.showAd
+        this.updateChart()
     }
 }
