@@ -707,7 +707,25 @@ let getCompleteTrendAnalysis (priceBars:PriceBar[]) =
             LatestTrend = latestObvTrendAnalysis
         |}
 
+    // let's now also do A/D analysis
+    let ad = Analysis.MultipleBarPriceAnalysis.Indicators.accumulationDistribution priceBars
+    let normalizedAd = Analysis.DataPointHelpers.normalize ad
+    let normalizedAdAsBars = Analysis.DataPointHelpers.toPriceBars normalizedAd
+
+    let adInflectionPoints = calculateInflectionPoints normalizedAdAsBars
+    let adTrendAnalysis = inflectionPointAnalysis adInflectionPoints
+    let latestAdTrendAnalysis = latestPriceAnalysis adInflectionPoints (normalizedAdAsBars.[normalizedAdAsBars.Length - 1])
+
+    let accumulationDistribution =
+        {|
+            Data = normalizedAdAsBars
+            InflectionPoints = adInflectionPoints
+            EstablishedTrend = adTrendAnalysis
+            LatestTrend = latestAdTrendAnalysis
+        |}
+
     {|
         Price = price
         OnBalanceVolume = obv
+        AccumulationDistribution = accumulationDistribution
     |}

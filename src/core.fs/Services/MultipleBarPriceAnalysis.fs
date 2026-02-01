@@ -31,6 +31,7 @@ module MultipleBarPriceAnalysis =
         let GreenStreak = "GreenStreak"
         let GapPercentage = "GapPercentage"
         let OnBalanceVolume = "OBV"
+        let AccumulationDistribution = "A/D"
         
         let private MovingAverage interval exponential =
             let ``type`` = match exponential with | true -> "ema" | false -> "sma"
@@ -81,17 +82,39 @@ module MultipleBarPriceAnalysis =
                 
                 let obv =
                     match i with
-                    | 0 -> 0L
+                    | 0 -> 0m
                     | _ ->
                         let previousBar = prices[i - 1]
                         prevObv + match currentBar.Close with
-                                  | close when close > previousBar.Close -> currentBar.Volume
-                                  | close when close < previousBar.Close -> -currentBar.Volume
-                                  | _ -> 0L
+                                  | close when close > previousBar.Close -> decimal currentBar.Volume
+                                  | close when close < previousBar.Close -> -(decimal currentBar.Volume)
+                                  | _ -> 0m
                 
                 let result = DataPoint<decimal>(currentBar.Date, obv)
                 result, obv
-            ) 0L
+            ) 0m
+            |> fst
+            
+        let accumulationDistribution (prices:PriceBar[]) =
+            
+            [|0..prices.Length - 1|]
+            |> Array.mapFold (fun prevAd i ->
+                
+                let currentBar = prices[i]
+                
+                let moneyFlowMultiplier =
+                    let range = currentBar.High - currentBar.Low
+                    match range with
+                    | 0m -> 0m
+                    | _ -> ((currentBar.Close - currentBar.Low) - (currentBar.High - currentBar.Close)) / range
+                
+                let moneyFlowVolume = moneyFlowMultiplier * (decimal currentBar.Volume)
+                
+                let ad = prevAd + moneyFlowVolume
+                
+                let result = DataPoint<decimal>(currentBar.Date, ad)
+                result, ad
+            ) 0m
             |> fst
                 
     module MovingAveragesAnalysis =
@@ -478,6 +501,18 @@ module MultipleBarPriceAnalysis =
                 message = $"On Balance Volume: {obv}"
             )
             
+        let private generateAccumulationDistributionOutcome (prices:PriceBars) =
+            
+            let ad = Indicators.accumulationDistribution prices.Bars |> Array.last |> _.Value
+            
+            AnalysisOutcome(
+                key = MultipleBarOutcomeKeys.AccumulationDistribution,
+                outcomeType = OutcomeType.Neutral,
+                value = ad,
+                valueType = ValueFormat.Number,
+                message = $"Accumulation/Distribution: {ad:N0}"
+            )
+            
         let generate (prices: PriceBars) =
             
             let atrOutcome = prices |> generateAverageTrueRangeOutcome
@@ -500,6 +535,7 @@ module MultipleBarPriceAnalysis =
                 prices |> generateGapOutcome
                 prices |> generateGreenStreakOutcome
                 prices |> generateOnBalanceVolumeOutcome
+                prices |> generateAccumulationDistributionOutcome
             ]
     
     let run prices =

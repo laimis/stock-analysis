@@ -1338,6 +1338,7 @@ export interface InflectionPointsReportDetails {
 export interface InflectionPointsReport {
     onBalanceVolume: InflectionPointsReportDetails;
     price: InflectionPointsReportDetails;
+    accumulationDistribution: InflectionPointsReportDetails;
 }
 
 export interface StockPriceAlert {

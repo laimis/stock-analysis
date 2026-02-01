@@ -74,6 +74,12 @@ type PricesView(prices:PriceBars) =
         obvContainer |> Array.iter container.Add
         container
         
+    member _.AD =
+        let adContainer = prices.Bars |> MultipleBarPriceAnalysis.Indicators.accumulationDistribution
+        let container = ChartDataPointContainer<decimal>($"A/D", DataPointChartType.Line)
+        adContainer |> Array.iter container.Add
+        container
+        
 type QuoteQuery =
     {
         Ticker:Ticker
