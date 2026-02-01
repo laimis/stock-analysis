@@ -94,5 +94,9 @@ let ``On Balance Volume is present and matches`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.OnBalanceVolume |> should equal 41298923m
     
 [<Fact>]
+let ``Accumulation Distribution is present and matches`` () =
+    firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AccumulationDistribution |> rounded 0 |> should equal 155462544m
+    
+[<Fact>]
 let ``Average True Range Percentage is present and matches`` () =
     firstOutcome MultipleBarPriceAnalysis.MultipleBarOutcomeKeys.AverageTrueRangePercentage |> rounded 2 |> should equal 0.08m
