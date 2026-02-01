@@ -497,8 +497,8 @@ module MultipleBarPriceAnalysis =
                 key = MultipleBarOutcomeKeys.OnBalanceVolume,
                 outcomeType = OutcomeType.Neutral,
                 value = obv,
-                valueType = ValueFormat.Currency,
-                message = $"On Balance Volume: {obv}"
+                valueType = ValueFormat.Number,
+                message = $"On Balance Volume: {obv:N0}"
             )
             
         let private generateAccumulationDistributionOutcome (prices:PriceBars) =
