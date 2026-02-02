@@ -194,6 +194,10 @@ export class StockTradingPositionsComponent {
                     aValue = this.getPercentOfAccount(a);
                     bValue = this.getPercentOfAccount(b);
                     break;
+                case 'percentGainLoss':
+                    aValue = this.getPercentGainLoss(a);
+                    bValue = this.getPercentGainLoss(b);
+                    break;
                 default:
                     return 0;
             }
