@@ -54,14 +54,12 @@
                 }
                 <td class="text-center py-3 pe-4">
                   <div class="btn-group btn-group-sm" role="group">
-                    @if (reminder.state === 'pending') {
-                      <button 
-                        class="btn btn-outline-primary" 
-                        (click)="onEdit(reminder)"
-                        title="Edit">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                    }
+                    <button 
+                      class="btn btn-outline-primary" 
+                      (click)="onEdit(reminder)"
+                      title="Edit">
+                      <i class="bi bi-pencil"></i>
+                    </button>
                     <button 
                       class="btn btn-outline-danger" 
                       (click)="onDelete(reminder)"

@@ -212,18 +212,18 @@ namespace core.fs.Alerts
         
         member this.Handle (command:UpdateReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
             try
-                let! allReminders = accountStorage.GetReminders(command.UserId)
+                let! allReminders = accountStorage.GetReminders command.UserId
                 let existingReminder = 
                     allReminders 
                     |> Seq.tryFind (fun r -> r.ReminderId = command.ReminderId)
                 
                 match existingReminder with
                 | Some existing ->
-                    let date = DateTimeOffset.Parse(command.Date)
+                    let date = DateTimeOffset.Parse command.Date
                     let ticker = 
                         command.Ticker 
                         |> Option.map (fun t -> Ticker(t))
-                    let state = ReminderState.fromString(command.State)
+                    let state = ReminderState.fromString command.State
                     
                     let updatedReminder = {
                         existing with
