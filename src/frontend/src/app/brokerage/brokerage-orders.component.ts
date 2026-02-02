@@ -7,6 +7,7 @@ import { CurrencyPipe, DatePipe, NgClass } from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../shared/stocks/stock-link-and-tradingview-link.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
 import {BrokerageOptionOrder} from "../services/option.service";
+import {formatDistance} from "date-fns";
 
 let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
     let tickerComparison = a.ticker.localeCompare(b.ticker)
@@ -77,11 +78,21 @@ export class BrokerageOrdersComponent {
         let isTickerVisible = (ticker: string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
 
         if (this._stockOrders) {
-            const buys = this._stockOrders.filter(o => o.isBuyOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const sells = this._stockOrders.filter(o => o.isSellOrder && o.isActive && isTickerVisible(o.ticker)).sort(orderBy);
-            const filled = this._stockOrders.filter(o => !o.isActive && !o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
-            const cancelled = this._stockOrders.filter(o => o.isCancelledOrRejected && isTickerVisible(o.ticker)).sort(orderBy);
-            this.groupedOrders = [buys, sells, filled, cancelled]
+            // Active orders (buy and sell together, sorted by entry time)
+            const activeOrders = this._stockOrders
+                .filter(o => o.isActive && isTickerVisible(o.ticker))
+                .sort((a, b) => new Date(b.enteredTime).getTime() - new Date(a.enteredTime).getTime());
+            
+            // Completed orders (filled, cancelled, rejected - sorted chronologically, newest first)
+            const completedOrders = this._stockOrders
+                .filter(o => !o.isActive && isTickerVisible(o.ticker))
+                .sort((a, b) => {
+                    const aTime = a.executionTime || a.enteredTime;
+                    const bTime = b.executionTime || b.enteredTime;
+                    return new Date(bTime).getTime() - new Date(aTime).getTime();
+                });
+            
+            this.groupedOrders = [activeOrders, completedOrders]
             this.isEmpty = this.groupedOrders.every(o => o.length == 0)
         }
         
@@ -132,5 +143,10 @@ export class BrokerageOrdersComponent {
         return orders
             .filter(o => o.status !== 'CANCELED')
             .reduce((total, order) => total + order.price * order.quantity, 0)
+    }
+
+    getRelativeTime(date: string | Date): string {
+        if (!date) return '';
+        return formatDistance(new Date(date), new Date(), { addSuffix: true });
     }
 }
