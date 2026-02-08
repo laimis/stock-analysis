@@ -78,7 +78,7 @@ let ``Alert email template renders with source lists`` () =
         // Verify links are present
         Assert.Contains("https://app.nightingaletrading.com/stocks/AAPL", html)
         Assert.Contains("https://www.tradingview.com/chart/kQn4rgoA/?symbol=AAPL", html)
-        Assert.Contains("Dashboard", html)
+        Assert.Contains("View on NGTD", html)
         Assert.Contains("Chart", html)
         
         // Verify descriptions
