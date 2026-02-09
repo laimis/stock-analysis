@@ -1,9 +1,22 @@
 <div class="container-fluid mt-3">
   <div class="row mb-3">
-    <div class="col-md-8">
+    <div class="col-md-6">
       <h3>SEC Filing Center</h3>
     </div>
-    <div class="col-md-4 text-end">
+    <div class="col-md-6 text-end d-flex justify-content-end align-items-center gap-2">
+      <div class="d-flex align-items-center">
+        <label for="filingFilter" class="form-label me-2 mb-0 text-nowrap">Filter by:</label>
+        <select 
+          id="filingFilter" 
+          class="form-select form-select-sm" 
+          style="width: auto; min-width: 180px;"
+          [(ngModel)]="selectedFilter"
+          (ngModelChange)="onFilterChange()">
+          @for (category of filterCategories; track category.value) {
+            <option [value]="category.value">{{ category.label }}</option>
+          }
+        </select>
+      </div>
       @if (activeTab === 'portfolio') {
         <button class="btn btn-secondary" (click)="loadPortfolioFilings()" [disabled]="loading.portfolio">
           <i class="fas fa-sync" [ngClass]="{'fa-spin': loading.portfolio}"></i>
@@ -93,15 +106,18 @@
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">
             <app-stock-link-and-tradingview-link [ticker]="selectedCompany.ticker"></app-stock-link-and-tradingview-link>
-            <span class="ms-2 text-muted">{{ selectedCompany.companyName }}</span>
-          </h5>
+            <span class="ms-2 text-muted">{{ selectedCompany.companyName }}</span>            @if (selectedFilings && selectedFilter !== 'all') {
+              <span class="badge bg-secondary ms-2">
+                {{ getFilteredCount(selectedFilings.filings) }} of {{ selectedFilings.filings.length }}
+              </span>
+            }          </h5>
           <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()">
             <i class="fas fa-times"></i> Clear
           </button>
         </div>
         <div class="card-body">
           <app-sec-filings-table 
-            [filings]="selectedFilings?.filings || []"
+            [filings]="filterFilings(selectedFilings?.filings || [])"
             [loading]="loading.filings"
             [emptyMessage]="'No SEC filings found for ' + selectedCompany.ticker + '.'">
           </app-sec-filings-table>
@@ -126,22 +142,37 @@
       </div>
     }
 
+    @if (!loading.portfolio && portfolioFilings.length > 0 && selectedFilter !== 'all') {
+      <div class="alert alert-info d-flex align-items-center justify-content-between">
+        <span>
+          <i class="fas fa-filter me-2"></i>
+          Showing <strong>{{ getFilteredPortfolioFilingsCount() }}</strong> of <strong>{{ getTotalPortfolioFilingsCount() }}</strong> filings
+        </span>
+        <button class="btn btn-sm btn-outline-primary" (click)="selectedFilter = 'all'; onFilterChange()">
+          Clear Filter
+        </button>
+      </div>
+    }
+
     @if (!loading.portfolio && portfolioFilings.length > 0) {
       @for (tickerFiling of portfolioFilings; track tickerFiling.ticker) {
-        <div class="card mb-3">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <app-stock-link-and-tradingview-link [ticker]="tickerFiling.ticker"></app-stock-link-and-tradingview-link>
-            </h5>
+        @let filteredFilings = filterFilings(tickerFiling.filings);
+        @if (filteredFilings.length > 0) {
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <app-stock-link-and-tradingview-link [ticker]="tickerFiling.ticker"></app-stock-link-and-tradingview-link>
+              </h5>
+            </div>
+            <div class="card-body p-0">
+              <app-sec-filings-table 
+                [filings]="filteredFilings"
+                [loading]="false"
+                [emptyMessage]="'No recent filings for ' + tickerFiling.ticker">
+              </app-sec-filings-table>
+            </div>
           </div>
-          <div class="card-body p-0">
-            <app-sec-filings-table 
-              [filings]="tickerFiling.filings"
-              [loading]="false"
-              [emptyMessage]="'No recent filings for ' + tickerFiling.ticker">
-            </app-sec-filings-table>
-          </div>
-        </div>
+        }
       }
     }
   }
