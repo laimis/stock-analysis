@@ -23,7 +23,6 @@ export class SecFilingsComponent implements OnInit {
   selectedFilings: SECFilings | null = null;
   portfolioFilings: SECFilings[] = [];
   highlightedIndex = -1;
-  selectedFilter: string = 'all';
   
   loading = {
     search: false,
@@ -33,15 +32,6 @@ export class SecFilingsComponent implements OnInit {
   
   errors: string[] = [];
   activeTab: 'search' | 'portfolio' = 'search';
-
-  filterCategories = [
-    { value: 'all', label: 'All Filings' },
-    { value: 'insider', label: 'Insider Trading' },
-    { value: 'financial', label: 'Financial Reports (10-Q, 10-K, 8-K)' },
-    { value: 'ownership', label: 'Ownership Disclosures' },
-    { value: 'proxy', label: 'Proxy Materials' },
-    { value: 'registration', label: 'Registrations' }
-  ];
 
   ngOnInit() {
     this.loadPortfolioFilings();
@@ -157,56 +147,5 @@ export class SecFilingsComponent implements OnInit {
     this.selectedFilings = null;
     this.searchQuery = '';
     this.searchResults = [];
-  }
-
-  onFilterChange() {
-    // Trigger re-filtering by component template
-  }
-
-  filterFilings(filings: any[]): any[] {
-    if (this.selectedFilter === 'all') {
-      return filings;
-    }
-
-    return filings.filter(filing => this.matchesFilter(filing.filing));
-  }
-
-  private matchesFilter(filingType: string): boolean {
-    const normalized = filingType.trim().toUpperCase();
-
-    switch (this.selectedFilter) {
-      case 'insider':
-        return ['3', '4', '5', '144'].includes(normalized);
-      
-      case 'financial':
-        return ['10-Q', '10-K', '8-K'].includes(normalized);
-      
-      case 'ownership':
-        return normalized.includes('13D') || 
-               normalized.includes('13G') || 
-               normalized.includes('13F');
-      
-      case 'proxy':
-        return normalized.includes('14A');
-      
-      case 'registration':
-        return ['S-1', 'S-8', 'ARS'].includes(normalized) ||
-               normalized.startsWith('S-');
-      
-      default:
-        return true;
-    }
-  }
-
-  getFilteredCount(filings: any[]): number {
-    return this.filterFilings(filings).length;
-  }
-
-  getTotalPortfolioFilingsCount(): number {
-    return this.portfolioFilings.reduce((sum, ticker) => sum + ticker.filings.length, 0);
-  }
-
-  getFilteredPortfolioFilingsCount(): number {
-    return this.portfolioFilings.reduce((sum, ticker) => sum + this.getFilteredCount(ticker.filings), 0);
   }
 }
