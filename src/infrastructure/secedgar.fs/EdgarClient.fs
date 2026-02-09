@@ -107,12 +107,17 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                 else
                     filingUrl
             
+            // Get best description (user-friendly fallback if SEC description is poor)
+            let filingType = recent.form.[index]
+            let rawDescription = recent.primaryDocDescription.[index]
+            let description = FilingDescriptions.getBestDescription rawDescription filingType
+            
             let filing = {
-                Description = recent.primaryDocDescription.[index]
+                Description = description
                 DocumentUrl = documentUrl
                 FilingDate = filingDate
                 ReportDate = if String.IsNullOrWhiteSpace(reportDate) then None else Some reportDate
-                Filing = recent.form.[index]
+                Filing = filingType
                 FilingUrl = filingUrl
             }
             

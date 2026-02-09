@@ -48,3 +48,34 @@ type CompanyTickerEntry = {
 type ISECFilings =
  abstract GetFilings : ticker:Ticker  -> Task<Result<CompanyFilings,ServiceError>>
  abstract FetchCompanyTickers : unit -> Task<System.Collections.Generic.Dictionary<string, CompanyTickerEntry>>
+
+module FilingDescriptions =
+    
+    /// Returns a user-friendly description for common SEC filing types
+    let getFriendlyDescription (filingType: string) : string option =
+        match filingType.Trim().ToUpperInvariant() with
+        | "3" -> Some "Initial insider ownership filing"
+        | "4" -> Some "Insider buying, selling, or awards"
+        | "5" -> Some "Insider annual transaction summary"
+        | "8-K" -> Some "Material corporate update"
+        | "10-Q" -> Some "Quarterly financial report"
+        | "10-K" -> Some "Annual financial report"
+        | "144" -> Some "Planned insider sale"
+        | "ARS" -> Some "Shareholder annual report"
+        | "S-1" -> Some "Initial public offering registration"
+        | "S-8" -> Some "Employee equity compensation registration"
+        | "SCHEDULE 13D" | "SC 13D" -> Some "Active or activist ownership disclosure"
+        | "SCHEDULE 13D/A" | "SC 13D/A" -> Some "Active or activist ownership disclosure - Amendment"
+        | "SCHEDULE 13G" | "SC 13G" -> Some "Passive large-shareholder disclosure"
+        | "SCHEDULE 13G/A" | "SC 13G/A" -> Some "Passive large-shareholder disclosure - Amendment"
+        | "SCHEDULE 13F" | "13F-HR" | "13F-HR/A" -> Some "Quarterly holdings of large investment managers"
+        | "DEF 14A" -> Some "Annual meeting and voting details"
+        | "DEFA14A" -> Some "Supplemental shareholder voting information"
+        | "PRE 14A" -> Some "Draft proxy statement (not final)"
+        | _ -> None
+    
+    /// Gets the best description: uses existing if meaningful, otherwise returns friendly fallback
+    let getBestDescription (existingDescription: string) (filingType: string) : string =
+        match getFriendlyDescription filingType with
+        | Some friendly -> friendly
+        | None -> existingDescription // Keep original if no friendly version available
