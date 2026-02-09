@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Hangfire" Version="1.8.22" />
-        <PackageReference Include="Hangfire.PostgreSql" Version="1.20.13" />
+        <PackageReference Include="Hangfire" Version="1.8.23" />
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.21.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.2" />
     </ItemGroup>
 
