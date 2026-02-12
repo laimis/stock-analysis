@@ -149,6 +149,10 @@ namespace di
             services.AddSingleton<IBlobStorage>(s =>
                 new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IOutbox>())
             );
+
+            services.AddSingleton<ISECFilingStorage>(s =>
+                new storage.memory.SECFilingStorage()
+            );
         }
 
         private static void RegisterPostgresImplementations(IConfiguration configuration, IServiceCollection services)
@@ -161,6 +165,7 @@ namespace di
             services.AddSingleton<IAccountStorage>(s => new storage.postgres.AccountStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IBlobStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
             services.AddSingleton<IAggregateStorage>(s => new storage.postgres.PostgresAggregateStorage(s.GetRequiredService<IOutbox>(), cnn));
+            services.AddSingleton<ISECFilingStorage>(s => new storage.postgres.SECFilingStorage(cnn));
         }
     }
 }

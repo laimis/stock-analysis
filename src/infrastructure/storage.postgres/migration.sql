@@ -210,3 +210,21 @@ CREATE TABLE tickercik (
 );
 CREATE INDEX tickercik_cik ON tickercik(cik);
 ALTER TABLE tickercik OWNER TO stockanalysis;
+
+CREATE TABLE sec_filings (
+    id uuid PRIMARY KEY,
+    ticker TEXT NOT NULL,
+    cik TEXT NOT NULL,
+    form_type TEXT NOT NULL,
+    filing_date TEXT NOT NULL,
+    report_date TEXT,
+    description TEXT NOT NULL,
+    filing_url TEXT NOT NULL,
+    document_url TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE UNIQUE INDEX sec_filings_filing_url ON sec_filings(filing_url);
+CREATE INDEX sec_filings_ticker ON sec_filings(ticker);
+CREATE INDEX sec_filings_ticker_filing_date ON sec_filings(ticker, filing_date DESC);
+CREATE INDEX sec_filings_form_type ON sec_filings(form_type);
+ALTER TABLE sec_filings OWNER TO stockanalysis;
