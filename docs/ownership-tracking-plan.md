@@ -10,10 +10,10 @@ Add database backing for SEC filings and implement ownership tracking to monitor
 - ✅ EDGAR client for fetching filings
 - ✅ Email alerts for new filings
 - ✅ UI for viewing filings (search + portfolio view)
-- ❌ No persistence (refetch every time)
-- ❌ No deduplication (can send duplicate emails)
-- ❌ No historical tracking
-- ❌ No structured data extraction from forms
+- ✅ **Database persistence** for all SEC filings (Phase 1 - Feb 12, 2026)
+- ✅ **Deduplication** - no duplicate emails sent (Phase 1 - Feb 12, 2026)
+- ✅ **Historical tracking** - all filings stored in database (Phase 1 - Feb 12, 2026)
+- ❌ No structured data extraction from forms (Phase 2 - planned)
 
 ## Goal
 Track insider and institutional ownership changes to:
@@ -27,36 +27,6 @@ Track insider and institutional ownership changes to:
 ## Phase 1: Foundation & Deduplication
 **Goal**: Add database backing, eliminate duplicate emails, enable historical queries  
 **Status**: ✅ **COMPLETED** (February 12, 2026)
-
-### Tasks
-- [x] **Database Schema**
-  - [x] Create `sec_filings` table
-    - Columns: id, ticker, cik, form_type, filing_date, report_date, description, filing_url, document_url, created_at
-    - Unique constraint on filing_url (natural deduplication)
-    - Index on ticker + filing_date
-  
-- [x] **Storage Layer** (F#)
-  - [x] Create `ISECFilingStorage` interface in `core.fs/Adapters/ISECFilingStorage.fs`
-  - [x] Implement PostgreSQL storage in `infrastructure/storage.postgres/SECFilingStorage.cs`
-  - [x] Implement in-memory storage in `infrastructure/storage.memory/SECFilingStorage.cs`
-  - [x] Add to DI registration in `DIHelper.cs`
-
-- [x] **Monitoring Service Updates**
-  - [x] Modify `SECFilingsMonitoringService.fs`:
-    - Check database for existing filings before sending emails
-    - Store new filings to database
-    - Only send email for truly new filings (not in DB)
-    - Get CIK from ticker mapping
-
-- [ ] **API Endpoints** (optional for Phase 1)
-  - [ ] GET `/api/sec/filings/{ticker}` - get stored filings for ticker
-  - [ ] GET `/api/sec/filings/recent` - recent filings across all tickers
-
-### Success Criteria
-- ✅ No duplicate filing emails sent (deduplication via database)
-- ✅ Historical filings queryable from database
-- ✅ Monitoring service uses database as cache
-- ✅ Tests pass (unit + integration) - Build successful
 
 ---
 
@@ -250,5 +220,18 @@ Track insider and institutional ownership changes to:
 
 ## Current Phase: **Phase 2** 🚀
 **Status**: Ready to start  
-**Previous Phase**: Phase 1 Complete  
+**Previous Phase**: Phase 1 Complete (Feb 12, 2026)  
+**Git Commit**: "add persistance to cik documents"  
 **Next Steps**: Design ownership_events schema and build Form 4 parser
+
+### Implementation Notes from Phase 1:
+
+1. **Deduplication Strategy**: Uses database unique constraint on `filing_url` rather than application-level checks. The `SaveFilings` method returns count of actually inserted records.
+
+2. **Email Logic**: Monitoring service now only sends emails for filings that were successfully saved (i.e., new filings not already in database). This eliminates duplicate notifications.
+
+3. **CIK Resolution**: Leverages existing `tickercik` table to get CIK for each ticker. Falls back to "unknown" if mapping not found.
+
+4. **API Endpoints**: Phase 1 storage layer is complete, but API endpoints for querying stored filings were deferred (marked optional). Can be added when needed for UI integration.
+
+5. **Performance**: Indexes on `ticker`, `form_type`, and `ticker + filing_date` enable fast queries. Unique index on `filing_url` provides both deduplication and fast lookup.
