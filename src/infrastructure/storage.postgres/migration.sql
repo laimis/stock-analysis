@@ -228,3 +228,58 @@ CREATE INDEX sec_filings_ticker ON sec_filings(ticker);
 CREATE INDEX sec_filings_ticker_filing_date ON sec_filings(ticker, filing_date DESC);
 CREATE INDEX sec_filings_form_type ON sec_filings(form_type);
 ALTER TABLE sec_filings OWNER TO stockanalysis;
+
+CREATE TABLE ownership_entities (
+    id uuid PRIMARY KEY,
+    name TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    cik TEXT UNIQUE,
+    first_seen TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_seen TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX ownership_entities_name ON ownership_entities(name);
+CREATE INDEX ownership_entities_cik ON ownership_entities(cik);
+ALTER TABLE ownership_entities OWNER TO stockanalysis;
+
+CREATE TABLE ownership_entity_company_roles (
+    id uuid PRIMARY KEY,
+    entity_id uuid NOT NULL REFERENCES ownership_entities(id),
+    company_ticker TEXT NOT NULL,
+    company_cik TEXT NOT NULL,
+    relationship_type TEXT NOT NULL,
+    title TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    first_seen TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_seen TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX ownership_entity_company_roles_entity ON ownership_entity_company_roles(entity_id);
+CREATE INDEX ownership_entity_company_roles_company ON ownership_entity_company_roles(company_ticker);
+CREATE UNIQUE INDEX ownership_entity_company_roles_unique ON ownership_entity_company_roles(entity_id, company_ticker, relationship_type) WHERE is_active = true;
+ALTER TABLE ownership_entity_company_roles OWNER TO stockanalysis;
+
+CREATE TABLE ownership_events (
+    id uuid PRIMARY KEY,
+    entity_id uuid NOT NULL REFERENCES ownership_entities(id),
+    company_ticker TEXT NOT NULL,
+    company_cik TEXT NOT NULL,
+    filing_id uuid REFERENCES sec_filings(id),
+    event_type TEXT NOT NULL,
+    transaction_type TEXT,
+    shares_before BIGINT,
+    shares_transacted BIGINT,
+    shares_after BIGINT NOT NULL,
+    percent_of_class DECIMAL,
+    price_per_share DECIMAL,
+    total_value DECIMAL,
+    transaction_date TEXT NOT NULL,
+    filing_date TEXT NOT NULL,
+    is_direct BOOLEAN DEFAULT true,
+    ownership_nature TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+CREATE INDEX ownership_events_entity ON ownership_events(entity_id);
+CREATE INDEX ownership_events_company ON ownership_events(company_ticker);
+CREATE INDEX ownership_events_company_date ON ownership_events(company_ticker, transaction_date DESC);
+CREATE INDEX ownership_events_filing ON ownership_events(filing_id);
+ALTER TABLE ownership_events OWNER TO stockanalysis;

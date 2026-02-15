@@ -31,7 +31,26 @@ Track insider and institutional ownership changes to:
 ---
 
 ## Phase 2: Ownership Tracking & Parsing
-**Goal**: Extract structured ownership data from specific form types
+**Goal**: Extract structured ownership data from specific form types  
+**Status**: 🚧 **IN PROGRESS** (Started February 15, 2026)
+
+### Database Schema ✅ **COMPLETED**
+- ✅ Created `ownership_entities` table
+  - Stores entities (institutions, individuals, directors, etc.)
+  - CIK is optional but unique when present
+  - Supports entity type classification
+- ✅ Created `ownership_entity_company_roles` table
+  - Normalized entity-company relationships
+  - Handles executives at multiple companies
+  - Tracks active/inactive roles
+- ✅ Created `ownership_events` table
+  - Stores ownership transactions and position updates
+  - Linked to SEC filings
+  - Tracks direct/indirect ownership
+- ✅ F# types and interfaces in `IOwnershipStorage.fs`
+- ✅ PostgreSQL implementation in `storage.postgres/OwnershipStorage.cs`
+- ✅ In-memory implementation in `storage.memory/OwnershipStorage.cs`
+- ✅ DI registration in `DIHelper.cs`
 
 ### Priority Form Types (in order)
 1. **Form 4** - Insider transactions (after-the-fact)
@@ -44,17 +63,14 @@ Track insider and institutional ownership changes to:
    - Important but harder to parse consistently
 
 ### Tasks
-- [ ] **Database Schema**
-  - [ ] Create `ownership_events` table
-    - Columns: id, filing_id (FK), ticker, entity_name, entity_type, transaction_type, shares, price_per_share, total_value, transaction_date, filing_date, created_at
-    - entity_type: 'insider', 'institution', 'large_holder'
-    - transaction_type: 'purchase', 'sale', 'holding'
-    - Index on ticker + transaction_date
-    - Index on entity_name
-  
-  - [ ] Create `ownership_entities` table (normalized)
-    - Columns: id, name, entity_type, cik, first_seen, last_seen
-    - Deduplicate similar entity names
+- [x] **Database Schema** ✅ **COMPLETED** (February 15, 2026)
+  - [x] Create `ownership_events` table
+  - [x] Create `ownership_entities` table (normalized)
+  - [x] Create `ownership_entity_company_roles` table
+  - [x] F# types and interfaces
+  - [x] PostgreSQL storage implementation
+  - [x] In-memory storage implementation
+  - [x] DI registration
 
 - [ ] **Form Parsers** (F#)
   - [ ] Create `core.fs/SEC/FormParsers.fs` module
@@ -75,10 +91,10 @@ Track insider and institutional ownership changes to:
     - Stores extracted ownership events
     - Marks filing as processed
 
-- [ ] **Storage Layer**
-  - [ ] Add ownership event storage methods to storage interface
-  - [ ] Implement PostgreSQL storage
-  - [ ] Implement in-memory storage
+- [x] **Storage Layer** ✅ **COMPLETED** (February 15, 2026)
+  - [x] Add ownership event storage methods to storage interface
+  - [x] Implement PostgreSQL storage
+  - [x] Implement in-memory storage
 
 ### Success Criteria
 - ✅ Form 4 transactions extracted with >90% accuracy

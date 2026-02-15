@@ -25,6 +25,7 @@
         <Compile Include="Adapters\Email.fs" />
         <Compile Include="Adapters\SEC.fs" />
         <Compile Include="Adapters\ISECFilingStorage.fs" />
+        <Compile Include="Adapters\IOwnershipStorage.fs" />
         <Compile Include="Adapters\SMS.fs" />
         <Compile Include="Adapters\Authentication.fs" />
         <Compile Include="Services\Trading.fs" />
