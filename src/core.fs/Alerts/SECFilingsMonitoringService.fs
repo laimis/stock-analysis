@@ -100,6 +100,7 @@ type SECFilingsMonitoringService(
                     // Save filings to database (ignores duplicates)
                     let! savedCount = secFilingStorage.SaveFilings filingRecords |> Async.AwaitTask
                     
+                    // TODO: using saved count to determine which filings are new is not ideal - we should ideally return the saved records with their IDs from the storage layer
                     if savedCount > 0 then
                         logger.LogInformation($"Saved {savedCount} new filing(s) for {ticker} (out of {recentFilings.Length} recent)")
                         
