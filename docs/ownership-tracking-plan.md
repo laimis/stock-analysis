@@ -22,7 +22,7 @@ Track insider and institutional ownership changes to:
 - Identify significant buying/selling patterns
 - Monitor institutional position changes
 - Provide historical ownership timelines
-- Analyze ownership concentration and changes over time
+- Track ownership concentration and changes over time
 
 ---
 
@@ -122,9 +122,9 @@ Track insider and institutional ownership changes to:
 
 ---
 
-## Phase 3: UI & Analytics
+## Phase 3: UI
 **Goal**: Surface ownership insights to users  
-**Status**: ✅ **UI COMPLETED** (February 16, 2026)
+**Status**: ✅ **COMPLETED** (February 16, 2026)
 
 ### UI Implementation ✅ **COMPLETED** (February 16, 2026)
 - ✅ **Angular Service** (`ownership.service.ts`)
@@ -182,30 +182,10 @@ Track insider and institutional ownership changes to:
   - [x] Relative time display with TimeAgoPipe
   - [x] Calculated ownership percentages
 
-- [ ] **Analytics** - NOT STARTED
-  - [ ] Correlate insider buying with future price movement (backtesting)
-  - [ ] Track "smart money" institutions (best performing)
-  - [ ] Identify stocks with increasing institutional interest
-
 ### Success Criteria
 - ✅ Users can view ownership timeline for any ticker
 - ✅ Users can manually enter ownership events
 - ✅ UI performs well with modern styling
-- ⏳ Analytics provide actionable insights (pending implementation)
-
----
-
-## Phase 4: Advanced Features (Future)
-**Goal**: Leverage ownership data for trading signals and analysis
-
-### Potential Features
-- [ ] Insider buying/selling screener
-- [ ] Institutional ownership momentum screen
-- [ ] Form 4 sentiment score (aggregate insider activity)
-- [ ] Ownership pattern recognition (pre-earnings buying, etc.)
-- [ ] Whale watching (track specific funds/insiders across all stocks)
-- [ ] Ownership concentration analysis
-- [ ] Historical ownership charts (Chart.js visualizations)
 
 ---
 
