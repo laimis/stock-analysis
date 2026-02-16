@@ -175,7 +175,7 @@ namespace storage.postgres
                 ORDER BY name";
 
             var searchPattern = $"%{name}%";
-            var rows = await db.QueryAsync(query, new { Name = $"%{name}%" });
+            var rows = await db.QueryAsync(query, new { Name = searchPattern });
             return rows.Select(MapToOwnershipEntity);
         }
 
