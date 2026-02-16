@@ -7,7 +7,7 @@
     <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\securityutils.fs\securityutils.fs.fsproj" />
     <ProjectReference Include="..\storage.shared.fs\storage.shared.fs.fsproj" />
-    <ProjectReference Include="..\timezonesupport\timezonesupport.csproj" />
+    <ProjectReference Include="..\timezonesupport.fs\timezonesupport.fs.fsproj" />
     <ProjectReference Include="..\twilioclient.fs\twilioclient.fs.fsproj" />
     <ProjectReference Include="..\schwabclient\schwabclient.fsproj" />
     <ProjectReference Include="..\emailclient\emailclient.fsproj" />
