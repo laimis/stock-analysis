@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OwnershipService, OwnershipSummary, OwnershipEvent } from '../services/ownership.service';
-import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
 
 @Component({
   selector: 'app-ownership-by-ticker',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, StockLinkAndTradingviewLinkComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './ownership-by-ticker.component.html'
 })
 export class OwnershipByTickerComponent implements OnInit {

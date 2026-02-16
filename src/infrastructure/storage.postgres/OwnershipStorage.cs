@@ -24,6 +24,17 @@ namespace storage.postgres
             return new NpgsqlConnection(_connectionString);
         }
 
+        // Helper methods to convert F# options to nullable types for Dapper
+        private static T? ToNullable<T>(FSharpOption<T> option) where T : struct
+        {
+            return OptionModule.IsSome(option) ? (T?)option.Value : null;
+        }
+
+        private static string? ToNullableString(FSharpOption<string> option)
+        {
+            return OptionModule.ToObj(option);
+        }
+
         // Entity Management
 
         public async Task<FSharpOption<OwnershipEntity>> FindEntityByCik(string cik)
@@ -78,7 +89,7 @@ namespace storage.postgres
                 Id = entity.Id,
                 Name = entity.Name,
                 EntityType = entity.EntityType,
-                Cik = entity.Cik,
+                Cik = ToNullableString(entity.Cik),
                 FirstSeen = entity.FirstSeen,
                 LastSeen = entity.LastSeen,
                 CreatedAt = entity.CreatedAt
@@ -159,7 +170,7 @@ namespace storage.postgres
                 CompanyTicker = role.CompanyTicker,
                 CompanyCik = role.CompanyCik,
                 RelationshipType = role.RelationshipType,
-                Title = role.Title,
+                Title = ToNullableString(role.Title),
                 IsActive = role.IsActive,
                 FirstSeen = role.FirstSeen,
                 LastSeen = role.LastSeen
@@ -205,19 +216,19 @@ namespace storage.postgres
                 EntityId = ownershipEvent.EntityId,
                 CompanyTicker = ownershipEvent.CompanyTicker,
                 CompanyCik = ownershipEvent.CompanyCik,
-                FilingId = ownershipEvent.FilingId,
+                FilingId = ToNullable(ownershipEvent.FilingId),
                 EventType = ownershipEvent.EventType,
-                TransactionType = ownershipEvent.TransactionType,
-                SharesBefore = ownershipEvent.SharesBefore,
-                SharesTransacted = ownershipEvent.SharesTransacted,
+                TransactionType = ToNullableString(ownershipEvent.TransactionType),
+                SharesBefore = ToNullable(ownershipEvent.SharesBefore),
+                SharesTransacted = ToNullable(ownershipEvent.SharesTransacted),
                 SharesAfter = ownershipEvent.SharesAfter,
-                PercentOfClass = ownershipEvent.PercentOfClass,
-                PricePerShare = ownershipEvent.PricePerShare,
-                TotalValue = ownershipEvent.TotalValue,
+                PercentOfClass = ToNullable(ownershipEvent.PercentOfClass),
+                PricePerShare = ToNullable(ownershipEvent.PricePerShare),
+                TotalValue = ToNullable(ownershipEvent.TotalValue),
                 TransactionDate = ownershipEvent.TransactionDate,
                 FilingDate = ownershipEvent.FilingDate,
                 IsDirect = ownershipEvent.IsDirect,
-                OwnershipNature = ownershipEvent.OwnershipNature,
+                OwnershipNature = ToNullableString(ownershipEvent.OwnershipNature),
                 CreatedAt = ownershipEvent.CreatedAt
             });
 
