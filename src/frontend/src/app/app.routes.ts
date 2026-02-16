@@ -56,6 +56,10 @@ import {RoutineComponent} from "./routines/routines-routine.component";
 import {PageNotFoundComponent} from "./page-not-found/page-not-found.component";
 import {OptionSpreadBuilderComponent} from "./options/option-spread-builder/option-spread-builder.component";
 import {SecFilingsComponent} from "./sec/sec-filings.component";
+import {OwnershipHomeComponent} from "./ownership/ownership-home.component";
+import {OwnershipByTickerComponent} from "./ownership/ownership-by-ticker.component";
+import {OwnershipByEntityComponent} from "./ownership/ownership-by-entity.component";
+import {AddOwnershipEventComponent} from "./ownership/add-ownership-event.component";
 
 export const routes: Routes = [
     {path: '', redirectTo: '/dashboard', pathMatch: 'full'},
@@ -89,6 +93,12 @@ export const routes: Routes = [
     {path: 'alerts/reminders', component: RemindersComponent, canActivate: [AuthGuard]},
 
     {path: 'sec', component: SecFilingsComponent, canActivate: [AuthGuard], title: 'SEC Filings'},
+
+    {path: 'ownership', component: OwnershipHomeComponent, canActivate: [AuthGuard], title: 'Ownership Tracking'},
+    {path: 'ownership/ticker/:ticker', component: OwnershipByTickerComponent, canActivate: [AuthGuard], title: 'Ownership by Ticker'},
+    {path: 'ownership/entity/:entityId', component: OwnershipByEntityComponent, canActivate: [AuthGuard], title: 'Entity Holdings'},
+    {path: 'ownership/add-event', component: AddOwnershipEventComponent, canActivate: [AuthGuard], title: 'Add Ownership Event'},
+    {path: 'ownership/add-event/:ticker', component: AddOwnershipEventComponent, canActivate: [AuthGuard], title: 'Add Ownership Event'},
 
     {path: 'summary', component: SummaryComponent, canActivate: [AuthGuard]},
 

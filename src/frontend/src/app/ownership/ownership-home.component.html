@@ -1,0 +1,76 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Ownership Tracking</h1>
+      <p class="lead">Track institutional investors, executives, and large shareholders across companies.</p>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h4>Search by Ticker</h4>
+            </div>
+            <div class="card-body">
+              <p>View who owns shares in a specific company.</p>
+              <div class="input-group">
+                <input type="text" class="form-control" 
+                       [(ngModel)]="tickerSearch" 
+                       placeholder="Enter ticker (e.g., AAPL)"
+                       (keyup.enter)="searchByTicker()">
+                <button class="btn btn-primary" type="button" (click)="searchByTicker()">
+                  Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h4>Search by Entity</h4>
+            </div>
+            <div class="card-body">
+              <p>View what companies an entity owns shares in.</p>
+              <div class="input-group">
+                <input type="text" class="form-control" 
+                       [(ngModel)]="entitySearch"
+                       (input)="onEntitySearchChange()"
+                       placeholder="Search investor, executive, or firm">
+              </div>
+              
+              @if (entitySearchResults.length > 0) {
+                <div class="list-group mt-3" style="max-height: 400px; overflow-y: auto;">
+                  @for (entity of entitySearchResults; track entity.id) {
+                    <a [routerLink]="['/ownership/entity', entity.id]" 
+                       class="list-group-item list-group-item-action">
+                      <div>
+                        <strong>{{ entity.name }}</strong>
+                        <span class="badge bg-secondary ms-2">{{ entity.entityType }}</span>
+                      </div>
+                      <small class="text-muted">CIK: {{ entity.cik || 'N/A' }}</small>
+                    </a>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Quick Actions</h4>
+            </div>
+            <div class="card-body">
+              <a routerLink="/ownership/add-event" class="btn btn-primary me-2">Add Ownership Event</a>
+              <a routerLink="/ownership/create-entity" class="btn btn-secondary">Create New Entity</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
