@@ -8,7 +8,8 @@ open studies
 
 let initServiceHelper args =
     let myConfiguration = Dictionary<string, string>()
-    myConfiguration.Add("storage", "memory")
+    myConfiguration.Add("storage", "postgres")
+    myConfiguration.Add("DB_CNN", "Server=test;Database=test;User id=test;password=test")
     
     let configuration =
         ConfigurationBuilder()
