@@ -27,7 +27,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>Entity</th>
+                  <th>Owner</th>
                   <th>Type</th>
                   <th>Shares</th>
                   <th>% of Class</th>
@@ -80,7 +80,7 @@
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Entity</th>
+                  <th>Owner</th>
                   <th>Event Type</th>
                   <th>Transaction</th>
                   <th>Shares Before</th>
@@ -93,7 +93,11 @@
                 @for (event of timeline; track event.id) {
                   <tr>
                     <td>{{ event.transactionDate | date }}</td>
-                    <td><a [routerLink]="['/ownership/entity', event.entityId]">View Entity</a></td>
+                    <td>
+                      <a [routerLink]="['/ownership/entity', event.entityId]">
+                        {{ getEntityName(event.entityId) }}
+                      </a>
+                    </td>
                     <td><span class="badge bg-info">{{ event.eventType }}</span></td>
                     <td>
                       @if (event.transactionType) {
