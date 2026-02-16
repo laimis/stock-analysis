@@ -27,6 +27,7 @@ export class NavMenuComponent {
         {path: '/alerts/price', label: 'Price Alerts'},
         {path: '/alerts/reminders', label: 'Reminders'},
         {path: '/sec', label: 'SEC Filings'},
+        {path: '/ownership', label: 'Ownership'},
         {path: '/routines', label: 'Routines'},
         {path: '/profile', label: 'Profile'}
     ];

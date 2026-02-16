@@ -41,6 +41,7 @@ type SECFilingsMonitoringService(
     accounts: IAccountStorage,
     portfolio: IPortfolioStorage,
     secFilings: ISECFilings,
+    secFilingStorage: ISECFilingStorage,
     emails: IEmailService,
     marketHours: IMarketHours,
     logger: ILogger) =
@@ -83,8 +84,38 @@ type SECFilingsMonitoringService(
                     |> Seq.toArray
 
                 if recentFilings.Length > 0 then
-                    logger.LogInformation($"Found {recentFilings.Length} recent filing(s) for {ticker}")
-                    return Some (ticker, recentFilings)
+                    // Get CIK for this ticker
+                    let! cikMapping = accounts.GetTickerCik(ticker.Value) |> Async.AwaitTask
+                    let cik = 
+                        match cikMapping with
+                        | Some mapping -> mapping.Cik
+                        | None -> "unknown" // Fallback if CIK not found
+                    
+                    // Convert to storage records
+                    let filingRecords = 
+                        recentFilings
+                        |> Seq.map (SECFilingRecord.fromCompanyFiling ticker cik)
+                        |> Seq.toArray
+                    
+                    // Save filings to database (ignores duplicates)
+                    let! savedCount = secFilingStorage.SaveFilings filingRecords |> Async.AwaitTask
+                    
+                    // TODO: using saved count to determine which filings are new is not ideal - we should ideally return the saved records with their IDs from the storage layer
+                    if savedCount > 0 then
+                        logger.LogInformation($"Saved {savedCount} new filing(s) for {ticker} (out of {recentFilings.Length} recent)")
+                        
+                        // Return only the new filings that were saved
+                        let newFilings = 
+                            filingRecords
+                            |> Seq.zip recentFilings
+                            |> Seq.take savedCount
+                            |> Seq.map fst
+                            |> Seq.toArray
+                        
+                        return Some (ticker, newFilings)
+                    else
+                        logger.LogInformation($"No new filings for {ticker} (all {recentFilings.Length} already in database)")
+                        return None
                 else
                     return None
         with ex ->

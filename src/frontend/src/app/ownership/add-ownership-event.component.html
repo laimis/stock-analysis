@@ -1,0 +1,336 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <h2>Add Ownership Event</h2>
+      
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+      @if (success) {
+        <div class="alert alert-success">{{ success }}</div>
+      }
+
+      <form (ngSubmit)="onSubmit()" #ownershipForm="ngForm">
+        <!-- Entity Selection/Creation -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h5>1. Select or Create Entity</h5>
+          </div>
+          <div class="card-body">
+            <!-- Entity Search -->
+            <div class="mb-3">
+              <label class="form-label">Search Existing Entity</label>
+              <div class="position-relative">
+                <input type="text" class="form-control pe-5" 
+                       [(ngModel)]="entitySearchQuery" 
+                       name="entitySearch"
+                       (input)="onEntitySearchChange()"
+                       (keydown)="onEntityKeyDown($event)"
+                       (blur)="onEntityBlur()"
+                       placeholder="Search by entity name..."
+                       autocomplete="off">
+                @if (loading.entitySearch) {
+                  <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                        role="status"
+                        aria-hidden="true"></span>
+                }
+              </div>
+              
+              @if (entitySearchResults.length > 0) {
+                <div class="position-absolute bg-white border rounded shadow-sm mt-1" style="z-index: 1000; max-height: 300px; overflow-y: auto; width: calc(100% - 48px);">
+                  <div class="list-group list-group-flush">
+                    @for (entity of entitySearchResults; track entity.id; let i = $index) {
+                      <button type="button" class="list-group-item list-group-item-action border-0" 
+                              [class.active]="i === highlightedEntityIndex"
+                              (click)="selectEntity(entity)">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{{ entity.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ getEntityTypeDisplay(entity.entityType) }} | CIK: {{ entity.cik || 'N/A' }}</small>
+                          </div>
+                          @if (selectedEntity?.id === entity.id) {
+                            <span class="badge bg-primary">Selected</span>
+                          }
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Create New Entity -->
+            <div class="border-top pt-3">
+              <label class="form-label">Or Create New Entity</label>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="position-relative">
+                    <input type="text" class="form-control mb-2 pe-5" 
+                           [(ngModel)]="newEntity.name" 
+                           name="entityName"
+                           (ngModelChange)="onEntityCikSearchChange()"
+                           (keydown)="onCikKeyDown($event)"
+                           (blur)="onCikBlur()"
+                           placeholder="Entity Name"
+                           autocomplete="off">
+                    @if (loading.cikSearch) {
+                      <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 my-2 me-3"
+                            role="status"
+                            aria-hidden="true"></span>
+                    }
+                    
+                    @if (entityCikSearchResults.length > 0) {
+                      <div class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm" style="z-index: 1000; max-height: 300px; overflow-y: auto;">
+                        <div class="list-group list-group-flush">
+                          @for (result of entityCikSearchResults; track result.cik; let i = $index) {
+                            <button 
+                              type="button"
+                              class="list-group-item list-group-item-action text-start border-0"
+                              [class.active]="i === highlightedCikIndex"
+                              (click)="selectEntityCik(result)">
+                              <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ result.ticker }}</span>
+                                <small class="text-muted ms-2">CIK: {{ result.cik }}</small>
+                              </div>
+                              <small class="text-muted">{{ result.companyName }}</small>
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select mb-2" 
+                          [(ngModel)]="newEntity.entityType" 
+                          name="entityType">
+                    <option value="">Select Type</option>
+                    <option value="IA">IA - Investment Adviser</option>
+                    <option value="IC">IC - Investment Company</option>
+                    <option value="BD">BD - Broker Dealer</option>
+                    <option value="IN">IN - Insurance Company</option>
+                    <option value="HC">HC - Holding Company</option>
+                    <option value="FI">FI - Financial Institution</option>
+                    <option value="EP">EP - Employee</option>
+                    <option value="OO">OO - Officer/Director</option>
+                    <option value="individual">Individual</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <input type="text" class="form-control mb-2" 
+                         [(ngModel)]="newEntity.cik" 
+                         name="entityCik"
+                         placeholder="CIK"
+                         readonly
+                         [class.bg-light]="newEntity.cik">
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" 
+                      (click)="createEntity()"
+                      [disabled]="!newEntity.name || !newEntity.entityType">
+                Create Entity
+              </button>
+            </div>
+
+            @if (selectedEntity) {
+              <div class="alert alert-info mt-3">
+                <strong>Selected:</strong> {{ selectedEntity.name }} ({{ getEntityTypeDisplay(selectedEntity.entityType) }})
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Company/Ticker Information -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h5>2. Company Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <label class="form-label">Ticker <span class="text-danger">*</span></label>
+                <div class="position-relative">
+                  <input type="text" class="form-control pe-5" 
+                         [(ngModel)]="event.companyTicker" 
+                         name="companyTicker"
+                         (ngModelChange)="onCompanyTickerChange()"
+                         (keydown)="onCompanyKeyDown($event)"
+                         (blur)="onCompanyBlur()"
+                         required
+                         placeholder="AAPL"
+                         autocomplete="off">
+                  @if (loading.companySearch) {
+                    <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                          role="status"
+                          aria-hidden="true"></span>
+                  }
+                  
+                  @if (companySearchResults.length > 0) {
+                    <div class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm" style="z-index: 1000; max-height: 300px; overflow-y: auto;">
+                      <div class="list-group list-group-flush">
+                        @for (result of companySearchResults; track result.cik; let i = $index) {
+                          <button 
+                            type="button"
+                            class="list-group-item list-group-item-action text-start border-0"
+                            [class.active]="i === highlightedCompanyIndex"
+                            (click)="selectCompany(result)">
+                            <div class="d-flex justify-content-between align-items-center">
+                              <span class="fw-bold">{{ result.ticker }}</span>
+                              <small class="text-muted ms-2">CIK: {{ result.cik }}</small>
+                            </div>
+                            <small class="text-muted">{{ result.companyName }}</small>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Company CIK <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" 
+                       [(ngModel)]="event.companyCik" 
+                       name="companyCik"
+                       required
+                       placeholder="0000320193"
+                       readonly
+                       [class.bg-light]="event.companyCik">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ownership Event Details -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h5>3. Ownership Event Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Event Type <span class="text-danger">*</span></label>
+                <select class="form-select" [(ngModel)]="event.eventType" name="eventType" required>
+                  <option value="">Select...</option>
+                  <option value="transaction">Transaction</option>
+                  <option value="position_disclosure">Position Disclosure</option>
+                  <option value="beneficial_ownership_update">Beneficial Ownership Update</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Transaction Type</label>
+                <select class="form-select" [(ngModel)]="event.transactionType" name="transactionType">
+                  <option value="">None</option>
+                  <option value="purchase">Purchase</option>
+                  <option value="sale">Sale</option>
+                  <option value="grant">Grant</option>
+                  <option value="exercise">Exercise</option>
+                  <option value="gift">Gift</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Shares Before</label>
+                <input type="number" class="form-control" 
+                       [(ngModel)]="event.sharesBefore" 
+                       name="sharesBefore"
+                       placeholder="0">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Shares Transacted</label>
+                <input type="number" class="form-control" 
+                       [(ngModel)]="event.sharesTransacted" 
+                       name="sharesTransacted"
+                       placeholder="0">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Shares After <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" 
+                       [(ngModel)]="event.sharesAfter" 
+                       name="sharesAfter"
+                       required
+                       placeholder="0">
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Percent of Class</label>
+                <input type="number" class="form-control" 
+                       [(ngModel)]="event.percentOfClass" 
+                       name="percentOfClass"
+                       step="0.01"
+                       placeholder="5.25">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Price Per Share</label>
+                <input type="number" class="form-control" 
+                       [(ngModel)]="event.pricePerShare" 
+                       name="pricePerShare"
+                       step="0.01"
+                       placeholder="150.00">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Total Value</label>
+                <input type="number" class="form-control" 
+                       [(ngModel)]="event.totalValue" 
+                       name="totalValue"
+                       step="0.01"
+                       placeholder="1500000.00">
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Transaction Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" 
+                       [(ngModel)]="event.transactionDate" 
+                       name="transactionDate"
+                       required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Filing Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" 
+                       [(ngModel)]="event.filingDate" 
+                       name="filingDate"
+                       required>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" 
+                         [(ngModel)]="event.isDirect" 
+                         name="isDirect"
+                         id="isDirectCheck">
+                  <label class="form-check-label" for="isDirectCheck">
+                    Direct Ownership
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Ownership Nature</label>
+                <input type="text" class="form-control" 
+                       [(ngModel)]="event.ownershipNature" 
+                       name="ownershipNature"
+                       placeholder="Sole voting power">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" (click)="goBack()">Cancel</button>
+          <button type="submit" class="btn btn-primary" 
+                  [disabled]="!ownershipForm.valid || !selectedEntity || submitting">
+            {{ submitting ? 'Saving...' : 'Save Ownership Event' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Entity Holdings</h2>
+      
+      @if (loading) {
+        <div class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      }
+
+      @if (error) {
+        <div class="alert alert-danger">
+          {{ error }}
+        </div>
+      }
+
+      <!-- Entity Information -->
+      @if (entity) {
+        <div class="card mb-4">
+          <div class="card-header">
+            <h4>{{ entity.name }}</h4>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Entity Type:</strong> <span class="badge bg-secondary">{{ getEntityTypeDisplay(entity.entityType) }}</span></p>
+                <p><strong>CIK:</strong> {{ entity.cik || 'N/A' }}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>First Seen:</strong> {{ entity.firstSeen | date:'short' }}</p>
+                <p><strong>Last Seen:</strong> {{ entity.lastSeen | date:'short' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Company Roles -->
+      @if (roles.length > 0) {
+        <div class="card mb-4">
+          <div class="card-header">
+            <h4>Company Relationships</h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Relationship</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>First Seen</th>
+                  <th>Last Seen</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (role of roles; track role.id) {
+                  <tr [class.table-secondary]="!role.isActive">
+                    <td>
+                      <app-stock-link-and-tradingview-link [ticker]="role.companyTicker"></app-stock-link-and-tradingview-link>
+                    </td>
+                    <td><span class="badge bg-info">{{ role.relationshipType }}</span></td>
+                    <td>{{ role.title || 'N/A' }}</td>
+                    <td>
+                      <span class="badge" [class.bg-success]="role.isActive" [class.bg-secondary]="!role.isActive">
+                        {{ role.isActive ? 'Active' : 'Inactive' }}
+                      </span>
+                    </td>
+                    <td>{{ role.firstSeen | date }}</td>
+                    <td>{{ role.lastSeen | date }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- Holdings/Events -->
+      @if (events.length > 0) {
+        <div class="card">
+          <div class="card-header">
+            <h4>Holdings History</h4>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Company</th>
+                  <th>Event Type</th>
+                  <th>Transaction</th>
+                  <th>Shares Before</th>
+                  <th>Shares Transacted</th>
+                  <th>Shares After</th>
+                  <th>% of Class</th>
+                  <th>Price/Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (event of events; track event.id) {
+                  <tr>
+                    <td>{{ event.transactionDate | date }}</td>
+                    <td>
+                      <app-stock-link-and-tradingview-link [ticker]="event.companyTicker"></app-stock-link-and-tradingview-link>
+                    </td>
+                    <td><span class="badge bg-info">{{ event.eventType }}</span></td>
+                    <td>
+                      @if (event.transactionType) {
+                        <span class="badge" 
+                              [class.bg-success]="event.transactionType === 'purchase'"
+                              [class.bg-danger]="event.transactionType === 'sale'">
+                          {{ event.transactionType }}
+                        </span>
+                      }
+                    </td>
+                    <td>{{ event.sharesBefore !== null ? (event.sharesBefore | number) : 'N/A' }}</td>
+                    <td>{{ event.sharesTransacted !== null ? (event.sharesTransacted | number) : 'N/A' }}</td>
+                    <td>{{ event.sharesAfter | number }}</td>
+                    <td>{{ event.percentOfClass !== null ? (event.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</td>
+                    <td>{{ event.pricePerShare !== null ? ('$' + (event.pricePerShare | number:'1.2-2')) : 'N/A' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      @if (!loading && entity && roles.length === 0 && events.length === 0) {
+        <div class="alert alert-info">
+          No holdings or role data available for this entity.
+        </div>
+      }
+    </div>
+  </div>
+</div>
