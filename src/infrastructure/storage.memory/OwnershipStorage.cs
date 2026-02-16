@@ -18,6 +18,16 @@ namespace storage.memory
 
         // Entity Management
 
+        public Task<FSharpOption<OwnershipEntity>> GetEntityById(Guid entityId)
+        {
+            lock (_lock)
+            {
+                _entitiesById.TryGetValue(entityId, out var entity);
+                var result = entity != null ? FSharpOption<OwnershipEntity>.Some(entity) : FSharpOption<OwnershipEntity>.None;
+                return Task.FromResult(result);
+            }
+        }
+
         public Task<FSharpOption<OwnershipEntity>> FindEntityByCik(string cik)
         {
             lock (_lock)

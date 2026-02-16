@@ -126,6 +126,24 @@ namespace storage.postgres
 
         // Entity Management
 
+        public async Task<FSharpOption<OwnershipEntity>> GetEntityById(Guid entityId)
+        {
+            using var db = GetConnection();
+            
+            var query = @"
+                SELECT id, name, entity_type, cik,
+                       first_seen, last_seen, created_at
+                FROM ownership_entities
+                WHERE id = @EntityId";
+
+            var row = await db.QueryFirstOrDefaultAsync(query, new { EntityId = entityId });
+            if (row == null)
+                return FSharpOption<OwnershipEntity>.None;
+
+            var entity = MapToOwnershipEntity(row);
+            return FSharpOption<OwnershipEntity>.Some(entity);
+        }
+
         public async Task<FSharpOption<OwnershipEntity>> FindEntityByCik(string cik)
         {
             using var db = GetConnection();

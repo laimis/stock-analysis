@@ -70,6 +70,9 @@ type OwnershipSummary =
 type IOwnershipStorage =
     // Entity Management
     
+    /// Get an entity by ID
+    abstract member GetEntityById : entityId:Guid -> Task<OwnershipEntity option>
+    
     /// Find an entity by CIK (unique identifier)
     abstract member FindEntityByCik : cik:string -> Task<OwnershipEntity option>
     

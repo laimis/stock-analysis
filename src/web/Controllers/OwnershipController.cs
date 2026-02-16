@@ -65,7 +65,7 @@ public class OwnershipController(IOwnershipStorage storage) : ControllerBase
     [HttpGet("entity/{entityId}")]
     public async Task<ActionResult> GetEntity([FromRoute] Guid entityId)
     {
-        var entity = await storage.FindEntityByCik(entityId.ToString());
+        var entity = await storage.GetEntityById(entityId);
         if (Microsoft.FSharp.Core.OptionModule.IsNone(entity))
         {
             return NotFound();
