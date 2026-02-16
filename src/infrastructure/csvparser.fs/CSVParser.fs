@@ -41,5 +41,3 @@ type CSVParser() =
             | :? HeaderValidationException as ex ->
                 let error = "Header validation failed: " + ex.Message
                 Error (ServiceError(error))
-            | ex ->
-                Error (ServiceError(ex.Message))
