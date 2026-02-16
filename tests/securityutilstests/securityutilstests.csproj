@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\infrastructure\securityutils\securityutils.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\securityutils.fs\securityutils.fs.fsproj" />
   </ItemGroup>
 
 </Project>
