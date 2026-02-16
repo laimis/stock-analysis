@@ -73,7 +73,7 @@ module MigrateFromV2ToV3 =
                                 x |> StockPosition.assignGrade toMigrate.Grade.Value gradeNote toMigrate.GradeDate.Value
                             | false -> x
                             
-                    do! storage.SaveStockPosition(userId, None , migratedPosition) |> Async.AwaitTask
+                    do! storage.SaveStockPosition userId None migratedPosition |> Async.AwaitTask
                     
                     return migratedPosition
                 }
