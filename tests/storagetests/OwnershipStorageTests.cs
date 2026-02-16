@@ -77,7 +77,9 @@ namespace storagetests
         public async Task SaveAndRetrieveEntityById()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Warren Buffett", "individual", Some("0000315066"));
+            // Use unique CIK to avoid conflicts in repeated test runs
+            var uniqueCik = $"{Guid.NewGuid().ToString("N").Substring(0, 10)}";
+            var entity = CreateEntity("Warren Buffett", "individual", Some(uniqueCik));
 
             await storage.SaveEntity(entity);
 
@@ -96,7 +98,7 @@ namespace storagetests
         public async Task FindEntityByCik()
         {
             var storage = GetStorage();
-            var cik = "0001234567";
+            var cik = $"{Guid.NewGuid().ToString("N").Substring(0, 10)}";
             var entity = CreateEntity("Test Institution", "institution", Some(cik));
 
             await storage.SaveEntity(entity);
@@ -126,7 +128,7 @@ namespace storagetests
         {
             var storage = GetStorage();
             var uniqueName = $"Vanguard Group {Guid.NewGuid()}";
-            var entity = CreateEntity(uniqueName, "institution", Some("0001234567"));
+            var entity = CreateEntity(uniqueName, "institution", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
 
             await storage.SaveEntity(entity);
 
@@ -140,7 +142,7 @@ namespace storagetests
         public async Task UpdateEntityLastSeen()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Test Entity", "individual", Some("9999999999"));
+            var entity = CreateEntity("Test Entity", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
 
             await storage.SaveEntity(entity);
 
@@ -157,7 +159,7 @@ namespace storagetests
         public async Task SaveAndRetrieveEntityCompanyRole()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Jane Doe", "individual", Some("1111111111"));
+            var entity = CreateEntity("Jane Doe", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var role = CreateRole(entity.Id, "AAPL", "0000320193", "officer", Some("CFO"));
@@ -181,7 +183,7 @@ namespace storagetests
         public async Task RoleWithNullTitleHandling()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("John Smith", "individual", Some("2222222222"));
+            var entity = CreateEntity("John Smith", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var role = CreateRole(entity.Id, "TSLA", "0001318605", "beneficial_owner", FSharpOption<string>.None);
@@ -200,8 +202,8 @@ namespace storagetests
             var storage = GetStorage();
             var ticker = new Ticker($"TEST{Guid.NewGuid().ToString().Substring(0, 4)}");
             
-            var entity1 = CreateEntity("Director 1", "individual", Some("3333333333"));
-            var entity2 = CreateEntity("Director 2", "individual", Some("4444444444"));
+            var entity1 = CreateEntity("Director 1", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
+            var entity2 = CreateEntity("Director 2", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity1);
             await storage.SaveEntity(entity2);
 
@@ -219,7 +221,7 @@ namespace storagetests
         public async Task DeactivateRole()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Former CEO", "individual", Some("5555555555"));
+            var entity = CreateEntity("Former CEO", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var role = CreateRole(entity.Id, "NVDA", "0001045810", "officer", Some("CEO"));
@@ -236,10 +238,10 @@ namespace storagetests
         public async Task SaveAndRetrieveOwnershipEvent()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Insider Trader", "individual", Some("6666666666"));
+            var entity = CreateEntity("Insider Trader", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
-            var ownershipEvent = CreateEvent(entity.Id, "MSFT", "0000789019", Some(Guid.NewGuid()), "transaction",
+            var ownershipEvent = CreateEvent(entity.Id, "MSFT", "0000789019", FSharpOption<Guid>.None, "transaction",
                 Some("purchase"), Some(10000L), Some(5000L), 15000L, Some(0.01m), Some(150.50m), Some(752500m),
                 "2024-01-15", "2024-01-16", true, Some("sole voting power"));
 
@@ -272,7 +274,7 @@ namespace storagetests
         public async Task OwnershipEventWithNullableFieldsHandling()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Simplified Reporter", "individual", Some("7777777777"));
+            var entity = CreateEntity("Simplified Reporter", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var ownershipEvent = CreateEvent(entity.Id, "GOOG", "0001652044", FSharpOption<Guid>.None, "position_disclosure",
@@ -300,7 +302,7 @@ namespace storagetests
         public async Task SaveMultipleEvents()
         {
             var storage = GetStorage();
-            var entity = CreateEntity("Bulk Trader", "individual", Some("8888888888"));
+            var entity = CreateEntity("Bulk Trader", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var events = Enumerable.Range(0, 5).Select(i =>
@@ -324,8 +326,8 @@ namespace storagetests
             var storage = GetStorage();
             var ticker = new Ticker($"EVT{Guid.NewGuid().ToString().Substring(0, 4)}");
             
-            var entity1 = CreateEntity("Trader A", "individual", Some("9999990001"));
-            var entity2 = CreateEntity("Trader B", "individual", Some("9999990002"));
+            var entity1 = CreateEntity("Trader A", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
+            var entity2 = CreateEntity("Trader B", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity1);
             await storage.SaveEntity(entity2);
 
@@ -349,7 +351,7 @@ namespace storagetests
         {
             var storage = GetStorage();
             var ticker = new Ticker($"RNG{Guid.NewGuid().ToString().Substring(0, 4)}");
-            var entity = CreateEntity("Date Range Trader", "individual", Some("9999990003"));
+            var entity = CreateEntity("Date Range Trader", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             // Create events across different dates
@@ -379,7 +381,7 @@ namespace storagetests
         {
             var storage = GetStorage();
             var ticker = new Ticker($"LAT{Guid.NewGuid().ToString().Substring(0, 4)}");
-            var entity = CreateEntity("Latest Tracker", "individual", Some("9999990004"));
+            var entity = CreateEntity("Latest Tracker", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var event1 = CreateEvent(entity.Id, ticker.Value, "3333333333", FSharpOption<Guid>.None, "transaction",
@@ -405,7 +407,7 @@ namespace storagetests
             var storage = GetStorage();
             var ticker = new Ticker($"SUM{Guid.NewGuid().ToString().Substring(0, 4)}");
             
-            var entity = CreateEntity("Summary Entity", "institution", Some("9999990005"));
+            var entity = CreateEntity("Summary Entity", "institution", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var role = CreateRole(entity.Id, ticker.Value, "4444444444", "institutional_holder", Some("Fund Manager"));
@@ -433,7 +435,7 @@ namespace storagetests
         {
             var storage = GetStorage();
             var ticker = new Ticker($"TML{Guid.NewGuid().ToString().Substring(0, 4)}");
-            var entity = CreateEntity("Timeline Entity", "individual", Some("9999990006"));
+            var entity = CreateEntity("Timeline Entity", "individual", Some($"{Guid.NewGuid().ToString("N").Substring(0, 10)}"));
             await storage.SaveEntity(entity);
 
             var today = DateTimeOffset.UtcNow.ToString("yyyy-MM-dd");
@@ -468,7 +470,7 @@ namespace storagetests
         public async Task EntityUpsertBehavior()
         {
             var storage = GetStorage();
-            var cik = "0001111111";
+            var cik = $"{Guid.NewGuid().ToString("N").Substring(0, 10)}";
             var entity = CreateEntity("Original Name", "individual", Some(cik));
 
             // First save
