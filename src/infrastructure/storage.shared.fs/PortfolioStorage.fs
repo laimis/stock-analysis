@@ -23,7 +23,7 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
     let _pending_stock_position_entity = "pendingstockposition"
     let _stock_position_entity = "stockposition"
     let _option_position_entity = "optionposition"
-    let _note_entity = "note3" // used to be used for stocks but it was modeled "weirdly" and ditched with of the software
+    let _note_entity = "note3" // used to be used for stocks but it was modeled "weirdly" and ditched
     
     member private _.Save(agg: IAggregate, entityName: string, userId: UserId) : Task =
         aggregateStorage.SaveEventsAsync(agg, entityName, userId, null)
