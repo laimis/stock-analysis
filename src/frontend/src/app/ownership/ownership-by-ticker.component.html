@@ -40,7 +40,7 @@
                 @for (summary of ownershipSummary; track summary.entity.id) {
                   <tr>
                     <td>{{ summary.entity.name }}</td>
-                    <td><span class="badge bg-secondary">{{ summary.entity.entityType }}</span></td>
+                    <td><span class="badge bg-secondary">{{ getEntityTypeDisplay(summary.entity.entityType) }}</span></td>
                     <td>{{ summary.currentShares | number }}</td>
                     <td>{{ summary.percentOfClass !== null ? (summary.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</td>
                     <td>

@@ -6,6 +6,8 @@ import { OwnershipService, CreateOwnershipEventRequest, OwnershipEntity } from '
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
+const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
+
 @Component({
   selector: 'app-add-ownership-event',
   standalone: true,
@@ -43,6 +45,7 @@ export class AddOwnershipEventComponent implements OnInit {
   submitting = false;
   error = '';
   success = '';
+  getEntityTypeDisplay = getEntityTypeDisplay;
 
   ngOnInit() {
     this.route.params.subscribe(params => {

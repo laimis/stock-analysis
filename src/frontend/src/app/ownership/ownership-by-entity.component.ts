@@ -5,6 +5,8 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OwnershipService, OwnershipEntity, OwnershipEntityCompanyRole, OwnershipEvent } from '../services/ownership.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
 
+const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
+
 @Component({
   selector: 'app-ownership-by-entity',
   standalone: true,
@@ -21,6 +23,7 @@ export class OwnershipByEntityComponent implements OnInit {
   events: OwnershipEvent[] = [];
   loading = false;
   error = '';
+  getEntityTypeDisplay = getEntityTypeDisplay;
 
   ngOnInit() {
     this.route.params.subscribe(params => {

@@ -90,6 +90,23 @@ export interface CreateOwnershipEventRequest {
 export class OwnershipService {
     private http = inject(HttpClient);
 
+    // Helper function to display entity type with friendly names
+    static getEntityTypeDisplay(entityType: string): string {
+        const typeMap: { [key: string]: string } = {
+            'IA': 'Investment Adviser (IA)',
+            'IC': 'Investment Company (IC)',
+            'BD': 'Broker Dealer (BD)',
+            'IN': 'Insurance Company (IN)',
+            'HC': 'Holding Company (HC)',
+            'FI': 'Financial Institution (FI)',
+            'EP': 'Employee (EP)',
+            'OO': 'Officer/Director (OO)',
+            'individual': 'Individual',
+            'other': 'Other'
+        };
+        return typeMap[entityType] || entityType;
+    }
+
     // Get ownership by ticker
     getOwnershipByTicker(ticker: string): Observable<OwnershipSummary[]> {
         return this.http.get<OwnershipSummary[]>(`/api/ownership/ticker/${ticker}`);

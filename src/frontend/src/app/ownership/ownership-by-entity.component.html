@@ -26,7 +26,7 @@
           <div class="card-body">
             <div class="row">
               <div class="col-md-6">
-                <p><strong>Entity Type:</strong> <span class="badge bg-secondary">{{ entity.entityType }}</span></p>
+                <p><strong>Entity Type:</strong> <span class="badge bg-secondary">{{ getEntityTypeDisplay(entity.entityType) }}</span></p>
                 <p><strong>CIK:</strong> {{ entity.cik || 'N/A' }}</p>
               </div>
               <div class="col-md-6">

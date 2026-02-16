@@ -6,6 +6,8 @@ import { OwnershipService, OwnershipEntity } from '../services/ownership.service
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
+const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
+
 @Component({
   selector: 'app-ownership-home',
   standalone: true,
@@ -20,6 +22,7 @@ export class OwnershipHomeComponent {
   tickerSearch = '';
   entitySearch = '';
   entitySearchResults: OwnershipEntity[] = [];
+  getEntityTypeDisplay = getEntityTypeDisplay;
 
   constructor() {
     this.setupEntitySearch();

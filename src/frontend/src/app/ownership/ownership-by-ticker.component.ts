@@ -5,6 +5,8 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OwnershipService, OwnershipSummary, OwnershipEvent } from '../services/ownership.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
 
+const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
+
 @Component({
   selector: 'app-ownership-by-ticker',
   standalone: true,
@@ -20,6 +22,7 @@ export class OwnershipByTickerComponent implements OnInit {
   timeline: OwnershipEvent[] = [];
   loading = false;
   error = '';
+  getEntityTypeDisplay = getEntityTypeDisplay;
   timelineDays = 365;
 
   ngOnInit() {

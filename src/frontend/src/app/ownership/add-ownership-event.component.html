@@ -35,7 +35,7 @@
                         <div>
                           <strong>{{ entity.name }}</strong>
                           <br>
-                          <small class="text-muted">Type: {{ entity.entityType }} | CIK: {{ entity.cik || 'N/A' }}</small>
+                          <small class="text-muted">{{ getEntityTypeDisplay(entity.entityType) }} | CIK: {{ entity.cik || 'N/A' }}</small>
                         </div>
                         @if (selectedEntity?.id === entity.id) {
                           <span class="badge bg-primary">Selected</span>
@@ -90,7 +90,7 @@
 
             @if (selectedEntity) {
               <div class="alert alert-info mt-3">
-                <strong>Selected:</strong> {{ selectedEntity.name }} ({{ selectedEntity.entityType }})
+                <strong>Selected:</strong> {{ selectedEntity.name }} ({{ getEntityTypeDisplay(selectedEntity.entityType) }})
               </div>
             }
           </div>
