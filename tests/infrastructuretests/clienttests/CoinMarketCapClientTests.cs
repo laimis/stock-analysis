@@ -32,7 +32,7 @@ namespace clienttests
             var listings = await client.GetAll();
 
             Assert.NotNull(listings);
-            Assert.True(listings.data.Count > 0);
+            Assert.True(listings.data.Length > 0);
 
             var btcOption = listings.TryGet("BTC");
             Assert.True(FSharpOption<Datum>.get_IsSome(btcOption));
