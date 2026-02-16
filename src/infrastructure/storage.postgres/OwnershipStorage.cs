@@ -505,6 +505,7 @@ namespace storage.postgres
                 // Use the mapper for the entity portion
                 var entity = MapToOwnershipEntity(row);
 
+                // TODO: eliminate this db look up in a loop
                 // Get roles for this entity
                 var roles = await GetRolesByEntity(entity.Id);
                 var rolesAsFSharpList = Microsoft.FSharp.Collections.ListModule.OfSeq(roles);
