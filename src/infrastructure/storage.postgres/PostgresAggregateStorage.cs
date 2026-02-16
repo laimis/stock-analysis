@@ -99,7 +99,7 @@ namespace storage.postgres
                 new { entity, userId = userId.Item }
             );
 
-            return list.Select(e => e.Event);
+            return list.Select(e => StoredAggregateEventModule.deserializeEvent(e.EventJson));
         }
         
         public async Task<IEnumerable<AggregateEvent>> GetEventsAsync(string entity, Guid aggregateId, UserId userId)
@@ -110,7 +110,7 @@ namespace storage.postgres
                 new { entity, userId = userId.Item, aggregateId = aggregateId.ToString() }
             );
 
-            return list.Select(e => e.Event);
+            return list.Select(e => StoredAggregateEventModule.deserializeEvent(e.EventJson));
         }
 
         private async Task SaveEventsAsyncInternal(IAggregate agg, int fromVersion, string entity, UserId userId,
@@ -138,16 +138,15 @@ namespace storage.postgres
 
                 foreach (var e in agg.Events.Skip(fromVersion))
                 {
-                    var se = new StoredAggregateEvent
-                    {
-                        Entity = entity,
-                        Event = e,
-                        Key = e.Id.ToString(),
-                        UserId = userId.Item,
-                        AggregateId = e.AggregateId.ToString(),
-                        Created = DateTimeOffset.UtcNow,
-                        Version = ++version
-                    };
+                    var se = StoredAggregateEventModule.create(
+                        entity,
+                        userId.Item,
+                        e.AggregateId.ToString(),
+                        e.Id.ToString(),
+                        DateTimeOffset.UtcNow,
+                        ++version,
+                        e
+                    );
 
                     var query = @"INSERT INTO events (entity, key, aggregateid, userid, created, version, eventjson) VALUES
 						(@Entity, @Key, @AggregateId, @UserId, @Created, @Version, @EventJson)";
