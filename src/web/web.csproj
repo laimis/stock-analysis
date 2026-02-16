@@ -5,6 +5,7 @@
         <IsPackable>false</IsPackable>
         <LangVersion>Latest</LangVersion>
         <InvariantGlobalization>false</InvariantGlobalization>
+        <NoWarn>$(NoWarn);NU1605</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +18,7 @@
         <ProjectReference Include="..\core\core.csproj" />
         <ProjectReference Include="..\infrastructure\storage.postgres\storage.postgres.csproj" />
         <ProjectReference Include="..\infrastructure\csvparser\csvparser.csproj" />
-        <ProjectReference Include="..\infrastructure\coinmarketcap\coinmarketcap.csproj" />
+        <ProjectReference Include="..\infrastructure\coinmarketcap.fs\coinmarketcap.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\securityutils.fs\securityutils.fs.fsproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\schwabclient\schwabclient.fsproj" />
