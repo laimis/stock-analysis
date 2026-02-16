@@ -10,11 +10,19 @@ open core.fs.Adapters.Cryptos
 
 type CoinMarketCapClient(logger: ILogger<CoinMarketCapClient> option, accessToken: string) =
     
-    static let httpClient = new HttpClient()
+    static let mutable httpClientInstance : HttpClient option = None
+    static let lockObj = obj()
     
-    do
-        if not (httpClient.DefaultRequestHeaders.Contains("X-CMC_PRO_API_KEY")) then
-            httpClient.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", accessToken)
+    let httpClient = 
+        lock lockObj (fun () ->
+            match httpClientInstance with
+            | Some client -> client
+            | None ->
+                let client = new HttpClient()
+                client.DefaultRequestHeaders.Add("X-CMC_PRO_API_KEY", accessToken)
+                httpClientInstance <- Some client
+                client
+        )
     
     member _.GetAll() : Task<Listings> =
         task {
