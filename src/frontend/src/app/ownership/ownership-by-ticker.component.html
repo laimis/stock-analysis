@@ -38,14 +38,17 @@
                     <th scope="col" class="text-end">Shares</th>
                     <th scope="col" class="text-end">% Ownership</th>
                     <th scope="col">Roles</th>
-                    <th scope="col" class="text-end">Last Updated</th>
-                    <th scope="col" class="text-center pe-4">Actions</th>
+                    <th scope="col" class="text-end pe-4">Last Updated</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (summary of ownershipSummary; track summary.entity.id) {
                     <tr>
-                      <td class="ps-4 py-3">{{ summary.entity.name }}</td>
+                      <td class="ps-4 py-3">
+                        <a [routerLink]="['/ownership/entity', summary.entity.id]">
+                          {{ summary.entity.name }}
+                        </a>
+                      </td>
                       <td class="py-3"><span class="badge bg-secondary">{{ getEntityTypeDisplay(summary.entity.entityType) }}</span></td>
                       <td class="text-end py-3">{{ summary.currentShares | number }}</td>
                       <td class="text-end py-3">
@@ -65,14 +68,9 @@
                           </span>
                         }
                       </td>
-                      <td class="text-end py-3">
+                      <td class="text-end py-3 pe-4">
                         <div>{{ summary.lastUpdated | timeAgo }}</div>
                         <div class="small text-muted">{{ summary.lastUpdated | date:'short' }}</div>
-                      </td>
-                      <td class="text-center py-3 pe-4">
-                        <a [routerLink]="['/ownership/entity', summary.entity.id]" class="btn btn-sm btn-outline-primary">
-                          View Details
-                        </a>
                       </td>
                     </tr>
                   }
@@ -89,7 +87,7 @@
                         <div>{{ totalPercentOfClass | number:'1.2-2' }}%</div>
                       }
                     </td>
-                    <td colspan="3" class="pe-4"></td>
+                    <td colspan="2" class="pe-4"></td>
                   </tr>
                 </tfoot>
               </table>
