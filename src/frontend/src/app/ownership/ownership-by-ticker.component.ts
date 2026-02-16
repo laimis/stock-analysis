@@ -88,4 +88,12 @@ export class OwnershipByTickerComponent implements OnInit {
   getEntityName(entityId: string): string {
     return this.entityNameMap.get(entityId) || entityId;
   }
+
+  get totalShares(): number {
+    return this.ownershipSummary.reduce((sum, s) => sum + s.currentShares, 0);
+  }
+
+  get totalPercentOfClass(): number {
+    return this.ownershipSummary.reduce((sum, s) => sum + (s.percentOfClass || 0), 0);
+  }
 }

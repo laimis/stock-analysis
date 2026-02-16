@@ -59,6 +59,14 @@
                   </tr>
                 }
               </tbody>
+              <tfoot>
+                <tr class="table-secondary fw-bold">
+                  <td colspan="2">Total</td>
+                  <td>{{ totalShares | number }}</td>
+                  <td>{{ totalPercentOfClass | number:'1.2-2' }}%</td>
+                  <td colspan="3"></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
