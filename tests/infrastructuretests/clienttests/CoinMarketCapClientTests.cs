@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using coinmarketcap;
 using core.fs.Adapters.Cryptos;
+using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
 using testutils;
 using Xunit;
@@ -11,15 +12,13 @@ namespace clienttests
     public class CoinMarketCapClientTests
     {
         private static readonly CoinMarketCapClient client = new(
-            null,
+            FSharpOption<ILogger<CoinMarketCapClient>>.None,
             CredsHelper.GetCoinMarketCapToken());
         
 
-        private void VerifyBTC(FSharpOption<Datum> btcDataOption)
+        private void VerifyBTC(Datum? btcData)
         {
-            Assert.NotNull(btcDataOption);
-            
-            var btcData = btcDataOption.Value;
+            Assert.NotNull(btcData);
             
             Assert.True(btcData.quote.Value.USD.Value.price > 0);
             Assert.Equal(1, btcData.cmc_rank);
@@ -33,9 +32,11 @@ namespace clienttests
             var listings = await client.GetAll();
 
             Assert.NotNull(listings);
-            Assert.True(listings.data.Length > 0);
+            Assert.True(listings.data.Count > 0);
 
-            VerifyBTC(listings.TryGet("BTC"));
+            var btcOption = listings.TryGet("BTC");
+            Assert.True(FSharpOption<Datum>.get_IsSome(btcOption));
+            VerifyBTC(btcOption.Value);
         }
         
         [Fact]
@@ -43,7 +44,8 @@ namespace clienttests
         {
             var btcDataOption = await client.Get("BTC");
             
-            VerifyBTC(btcDataOption);
+            Assert.True(FSharpOption<Datum>.get_IsSome(btcDataOption));
+            VerifyBTC(btcDataOption.Value);
         }
         
         [Fact]

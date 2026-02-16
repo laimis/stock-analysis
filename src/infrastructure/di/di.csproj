@@ -3,7 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\secedgar.fs\secedgar.fs.fsproj" />
     <ProjectReference Include="..\csvparser\csvparser.csproj" />
-    <ProjectReference Include="..\coinmarketcap\coinmarketcap.csproj" />
+    <ProjectReference Include="..\coinmarketcap.fs\coinmarketcap.fs.fsproj" />
     <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\securityutils.fs\securityutils.fs.fsproj" />
     <ProjectReference Include="..\storage.shared.fs\storage.shared.fs.fsproj" />
