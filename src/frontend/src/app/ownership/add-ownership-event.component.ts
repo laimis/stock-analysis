@@ -290,9 +290,8 @@ export class AddOwnershipEventComponent implements OnInit {
     }).subscribe({
       next: (result) => {
         // After creating, fetch the entity to get the full object
-        this.ownershipService.searchEntities(this.newEntity.name).subscribe({
-          next: (entities) => {
-            const created = entities.find(e => e.name === this.newEntity.name);
+        this.ownershipService.getEntity(result.id).subscribe({
+          next: (created) => {
             if (created) {
               this.selectEntity(created);
               this.success = 'Entity created successfully!';
