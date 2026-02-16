@@ -45,6 +45,32 @@ namespace storage.postgres
             throw new InvalidCastException($"Cannot convert {value.GetType()} to DateTimeOffset");
         }
 
+        // Helper to convert OwnershipEvent to Dapper-compatible parameter object
+        private static object ToEventParameters(OwnershipEvent ownershipEvent)
+        {
+            return new
+            {
+                Id = ownershipEvent.Id,
+                EntityId = ownershipEvent.EntityId,
+                CompanyTicker = ownershipEvent.CompanyTicker,
+                CompanyCik = ownershipEvent.CompanyCik,
+                FilingId = ToNullable(ownershipEvent.FilingId),
+                EventType = ownershipEvent.EventType,
+                TransactionType = ToNullableString(ownershipEvent.TransactionType),
+                SharesBefore = ToNullable(ownershipEvent.SharesBefore),
+                SharesTransacted = ToNullable(ownershipEvent.SharesTransacted),
+                SharesAfter = ownershipEvent.SharesAfter,
+                PercentOfClass = ToNullable(ownershipEvent.PercentOfClass),
+                PricePerShare = ToNullable(ownershipEvent.PricePerShare),
+                TotalValue = ToNullable(ownershipEvent.TotalValue),
+                TransactionDate = ownershipEvent.TransactionDate,
+                FilingDate = ownershipEvent.FilingDate,
+                IsDirect = ownershipEvent.IsDirect,
+                OwnershipNature = ToNullableString(ownershipEvent.OwnershipNature),
+                CreatedAt = ownershipEvent.CreatedAt
+            };
+        }
+
         // Helper methods to map dynamic database rows to F# types
         private static OwnershipEntity MapToOwnershipEntity(dynamic row)
         {
@@ -321,27 +347,7 @@ namespace storage.postgres
                         @FilingDate, @IsDirect, @OwnershipNature, @CreatedAt)
                 RETURNING id";
 
-            var result = await db.QuerySingleAsync<Guid>(query, new
-            {
-                Id = ownershipEvent.Id,
-                EntityId = ownershipEvent.EntityId,
-                CompanyTicker = ownershipEvent.CompanyTicker,
-                CompanyCik = ownershipEvent.CompanyCik,
-                FilingId = ToNullable(ownershipEvent.FilingId),
-                EventType = ownershipEvent.EventType,
-                TransactionType = ToNullableString(ownershipEvent.TransactionType),
-                SharesBefore = ToNullable(ownershipEvent.SharesBefore),
-                SharesTransacted = ToNullable(ownershipEvent.SharesTransacted),
-                SharesAfter = ownershipEvent.SharesAfter,
-                PercentOfClass = ToNullable(ownershipEvent.PercentOfClass),
-                PricePerShare = ToNullable(ownershipEvent.PricePerShare),
-                TotalValue = ToNullable(ownershipEvent.TotalValue),
-                TransactionDate = ownershipEvent.TransactionDate,
-                FilingDate = ownershipEvent.FilingDate,
-                IsDirect = ownershipEvent.IsDirect,
-                OwnershipNature = ToNullableString(ownershipEvent.OwnershipNature),
-                CreatedAt = ownershipEvent.CreatedAt
-            });
+            var result = await db.QuerySingleAsync<Guid>(query, ToEventParameters(ownershipEvent));
 
             return result;
         }
@@ -361,7 +367,9 @@ namespace storage.postgres
                         @PercentOfClass, @PricePerShare, @TotalValue, @TransactionDate,
                         @FilingDate, @IsDirect, @OwnershipNature, @CreatedAt)";
 
-            var eventsArray = events.ToArray();
+            // Convert F# option types to nullable CLR types for Dapper
+            var eventsArray = events.Select(ToEventParameters).ToArray();
+            
             var rowsAffected = await db.ExecuteAsync(query, eventsArray);
 
             return rowsAffected;
