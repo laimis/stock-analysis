@@ -10,9 +10,6 @@ type MarketHours() =
     let startTime = TimeSpan(9, 30, 0)
     let endTime = TimeSpan(16, 0, 0)
     
-    let convertToEastern (time: DateTimeOffset) =
-        TimeZoneInfo.ConvertTimeFromUtc(time.DateTime, easternZoneId)
-    
     member _.IsMarketOpen(utc: DateTimeOffset) : bool =
         let eastern = TimeZoneInfo.ConvertTimeFromUtc(utc.DateTime, easternZoneId)
         
@@ -23,7 +20,8 @@ type MarketHours() =
             timeOfDay >= startTime && timeOfDay <= endTime
     
     member _.ToMarketTime(utc: DateTimeOffset) : DateTimeOffset =
-        DateTimeOffset(convertToEastern utc)
+        let eastern = TimeZoneInfo.ConvertTimeFromUtc(utc.DateTime, easternZoneId)
+        DateTimeOffset(eastern)
     
     member _.ToUniversalTime(eastern: DateTimeOffset) : DateTimeOffset =
         DateTimeOffset(TimeZoneInfo.ConvertTimeToUtc(eastern.DateTime, easternZoneId))
