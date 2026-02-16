@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OwnershipService, OwnershipSummary, OwnershipEvent } from '../services/ownership.service';
+import { StocksService } from '../services/stocks.service';
 import { TimeAgoPipe } from '../services/time-ago.pipe';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
@@ -15,6 +16,7 @@ const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
 })
 export class OwnershipByTickerComponent implements OnInit {
   private ownershipService = inject(OwnershipService);
+  private stocksService = inject(StocksService);
   private route = inject(ActivatedRoute);
 
   ticker = '';
@@ -25,6 +27,7 @@ export class OwnershipByTickerComponent implements OnInit {
   getEntityTypeDisplay = getEntityTypeDisplay;
   timelineDays = 365;
   entityNameMap = new Map<string, string>();
+  sharesOutstanding: number | null = null;
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -36,6 +39,24 @@ export class OwnershipByTickerComponent implements OnInit {
   loadData() {
     this.loadOwnershipSummary();
     this.loadTimeline(this.timelineDays);
+    this.loadSharesOutstanding();
+  }
+
+  loadSharesOutstanding() {
+    this.stocksService.reportFundamentals([this.ticker]).subscribe({
+      next: (fundamentals) => {
+        if (fundamentals.length > 0) {
+          const tickerFundamentals = fundamentals[0];
+          const sharesOutstandingStr = tickerFundamentals.fundamentals['sharesOutstanding'];
+          if (sharesOutstandingStr) {
+            this.sharesOutstanding = parseFloat(sharesOutstandingStr);
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load shares outstanding:', err);
+      }
+    });
   }
 
   loadOwnershipSummary() {
@@ -90,11 +111,25 @@ export class OwnershipByTickerComponent implements OnInit {
     return this.entityNameMap.get(entityId) || entityId;
   }
 
+  calculateOwnershipPercent(shares: number): number {
+    if (!this.sharesOutstanding || this.sharesOutstanding === 0) {
+      return 0;
+    }
+    return (shares / this.sharesOutstanding) * 100;
+  }
+
   get totalShares(): number {
     return this.ownershipSummary.reduce((sum, s) => sum + s.currentShares, 0);
   }
 
   get totalPercentOfClass(): number {
     return this.ownershipSummary.reduce((sum, s) => sum + (s.percentOfClass || 0), 0);
+  }
+
+  get totalOwnershipCoverage(): number {
+    if (!this.sharesOutstanding || this.sharesOutstanding === 0) {
+      return 0;
+    }
+    return (this.totalShares / this.sharesOutstanding) * 100;
   }
 }
