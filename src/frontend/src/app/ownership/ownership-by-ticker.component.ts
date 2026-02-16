@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OwnershipService, OwnershipSummary, OwnershipEvent } from '../services/ownership.service';
+import { TimeAgoPipe } from '../services/time-ago.pipe';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
 
 @Component({
   selector: 'app-ownership-by-ticker',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TimeAgoPipe],
   templateUrl: './ownership-by-ticker.component.html'
 })
 export class OwnershipByTickerComponent implements OnInit {

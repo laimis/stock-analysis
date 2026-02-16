@@ -24,50 +24,55 @@
             <h4>Current Ownership</h4>
           </div>
           <div class="card-body">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Owner</th>
-                  <th>Type</th>
-                  <th>Shares</th>
-                  <th>% of Class</th>
-                  <th>Roles</th>
-                  <th>Last Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (summary of ownershipSummary; track summary.entity.id) {
+            <div class="table-responsive">
+              <table class="table table-modern table-hover align-middle">
+                <thead class="table-light">
                   <tr>
-                    <td>{{ summary.entity.name }}</td>
-                    <td><span class="badge bg-secondary">{{ getEntityTypeDisplay(summary.entity.entityType) }}</span></td>
-                    <td>{{ summary.currentShares | number }}</td>
-                    <td>{{ summary.percentOfClass !== null ? (summary.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</td>
-                    <td>
-                      @for (role of summary.roles; track role.id) {
-                        <span class="badge bg-info me-1">
-                          {{ role.relationshipType }}
-                        </span>
-                      }
-                    </td>
-                    <td>{{ summary.lastUpdated | date:'short' }}</td>
-                    <td>
-                      <a [routerLink]="['/ownership/entity', summary.entity.id]" class="btn btn-sm btn-outline-primary">
-                        View Details
-                      </a>
-                    </td>
+                    <th scope="col" class="ps-4">Owner</th>
+                    <th scope="col">Type</th>
+                    <th scope="col" class="text-end">Shares</th>
+                    <th scope="col" class="text-end">% of Class</th>
+                    <th scope="col">Roles</th>
+                    <th scope="col" class="text-end">Last Updated</th>
+                    <th scope="col" class="text-center pe-4">Actions</th>
                   </tr>
-                }
-              </tbody>
-              <tfoot>
-                <tr class="table-secondary fw-bold">
-                  <td colspan="2">Total</td>
-                  <td>{{ totalShares | number }}</td>
-                  <td>{{ totalPercentOfClass | number:'1.2-2' }}%</td>
-                  <td colspan="3"></td>
-                </tr>
-              </tfoot>
-            </table>
+                </thead>
+                <tbody>
+                  @for (summary of ownershipSummary; track summary.entity.id) {
+                    <tr>
+                      <td class="ps-4 py-3">{{ summary.entity.name }}</td>
+                      <td class="py-3"><span class="badge bg-secondary">{{ getEntityTypeDisplay(summary.entity.entityType) }}</span></td>
+                      <td class="text-end py-3">{{ summary.currentShares | number }}</td>
+                      <td class="text-end py-3">{{ summary.percentOfClass !== null ? (summary.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</td>
+                      <td class="py-3">
+                        @for (role of summary.roles; track role.id) {
+                          <span class="badge bg-info me-1">
+                            {{ role.relationshipType }}
+                          </span>
+                        }
+                      </td>
+                      <td class="text-end py-3">
+                        <div>{{ summary.lastUpdated | timeAgo }}</div>
+                        <div class="small text-muted">{{ summary.lastUpdated | date:'short' }}</div>
+                      </td>
+                      <td class="text-center py-3 pe-4">
+                        <a [routerLink]="['/ownership/entity', summary.entity.id]" class="btn btn-sm btn-outline-primary">
+                          View Details
+                        </a>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr class="table-secondary fw-bold">
+                    <td colspan="2" class="ps-4">Total</td>
+                    <td class="text-end">{{ totalShares | number }}</td>
+                    <td class="text-end">{{ totalPercentOfClass | number:'1.2-2' }}%</td>
+                    <td colspan="3" class="pe-4"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
         </div>
       }
@@ -84,46 +89,51 @@
             </div>
           </div>
           <div class="card-body">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Owner</th>
-                  <th>Event Type</th>
-                  <th>Transaction</th>
-                  <th>Shares Before</th>
-                  <th>Shares Transacted</th>
-                  <th>Shares After</th>
-                  <th>% of Class</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (event of timeline; track event.id) {
+            <div class="table-responsive">
+              <table class="table table-modern table-hover align-middle">
+                <thead class="table-light">
                   <tr>
-                    <td>{{ event.transactionDate | date }}</td>
-                    <td>
-                      <a [routerLink]="['/ownership/entity', event.entityId]">
-                        {{ getEntityName(event.entityId) }}
-                      </a>
-                    </td>
-                    <td><span class="badge bg-info">{{ event.eventType }}</span></td>
-                    <td>
-                      @if (event.transactionType) {
-                        <span class="badge" 
-                              [class.bg-success]="event.transactionType === 'purchase'"
-                              [class.bg-danger]="event.transactionType === 'sale'">
-                          {{ event.transactionType }}
-                        </span>
-                      }
-                    </td>
-                    <td>{{ event.sharesBefore !== null ? (event.sharesBefore | number) : 'N/A' }}</td>
-                    <td>{{ event.sharesTransacted !== null ? (event.sharesTransacted | number) : 'N/A' }}</td>
-                    <td>{{ event.sharesAfter | number }}</td>
-                    <td>{{ event.percentOfClass !== null ? (event.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</td>
+                    <th scope="col" class="ps-4">Date</th>
+                    <th scope="col">Owner</th>
+                    <th scope="col">Event Type</th>
+                    <th scope="col">Transaction</th>
+                    <th scope="col" class="text-end">Shares Before</th>
+                    <th scope="col" class="text-end">Shares Transacted</th>
+                    <th scope="col" class="text-end">Shares After</th>
+                    <th scope="col" class="text-end pe-4">% of Class</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (event of timeline; track event.id) {
+                    <tr>
+                      <td class="ps-4 py-3">
+                        <div>{{ event.transactionDate | timeAgo }}</div>
+                        <div class="small text-muted">{{ event.transactionDate | date }}</div>
+                      </td>
+                      <td class="py-3">
+                        <a [routerLink]="['/ownership/entity', event.entityId]">
+                          {{ getEntityName(event.entityId) }}
+                        </a>
+                      </td>
+                      <td class="py-3"><span class="badge bg-info">{{ event.eventType }}</span></td>
+                      <td class="py-3">
+                        @if (event.transactionType) {
+                          <span class="badge" 
+                                [class.bg-success]="event.transactionType === 'purchase'"
+                                [class.bg-danger]="event.transactionType === 'sale'">
+                            {{ event.transactionType }}
+                          </span>
+                        }
+                      </td>
+                      <td class="text-end py-3">{{ event.sharesBefore !== null ? (event.sharesBefore | number) : 'N/A' }}</td>
+                      <td class="text-end py-3">{{ event.sharesTransacted !== null ? (event.sharesTransacted | number) : 'N/A' }}</td>
+                      <td class="text-end py-3">{{ event.sharesAfter | number }}</td>
+                      <td class="text-end py-3 pe-4">{{ event.percentOfClass !== null ? (event.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       }
