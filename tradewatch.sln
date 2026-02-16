@@ -65,6 +65,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "emailclient", "src\infrastr
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "emailtests", "tests\infrastructuretests\emailtests\emailtests.fsproj", "{7222A9A7-CE4F-4A76-9419-59AB163D5B6F}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "securityutils.fs", "src\infrastructure\securityutils.fs\securityutils.fs.fsproj", "{D7B71713-4817-4F9E-9645-2C2AEB1A928D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -399,6 +401,18 @@ Global
 		{7222A9A7-CE4F-4A76-9419-59AB163D5B6F}.Release|x64.Build.0 = Release|Any CPU
 		{7222A9A7-CE4F-4A76-9419-59AB163D5B6F}.Release|x86.ActiveCfg = Release|Any CPU
 		{7222A9A7-CE4F-4A76-9419-59AB163D5B6F}.Release|x86.Build.0 = Release|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Debug|x64.Build.0 = Debug|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Debug|x86.Build.0 = Debug|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Release|x64.ActiveCfg = Release|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Release|x64.Build.0 = Release|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -433,5 +447,6 @@ Global
 		{E3D59C1A-4F39-4E5E-A808-65F83F0327A2} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{72AE09A2-5E30-488D-832F-62E04778D131} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{7222A9A7-CE4F-4A76-9419-59AB163D5B6F} = {E32D8CC2-C013-4386-BDAF-840EC6AE86F5}
+		{D7B71713-4817-4F9E-9645-2C2AEB1A928D} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 	EndGlobalSection
 EndGlobal
