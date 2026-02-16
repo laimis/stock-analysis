@@ -54,8 +54,8 @@ namespace storage.postgres
                 Id = (Guid)rowDict["id"],
                 Name = (string)rowDict["name"],
                 EntityType = (string)rowDict["entity_type"],
-                Cik = rowDict["cik"] != null 
-                    ? FSharpOption<string>.Some((string)rowDict["cik"]) 
+                Cik = rowDict["cik"] is string cik
+                    ? FSharpOption<string>.Some(cik) 
                     : FSharpOption<string>.None,
                 FirstSeen = ToDateTimeOffset(rowDict["first_seen"]),
                 LastSeen = ToDateTimeOffset(rowDict["last_seen"]),
@@ -73,8 +73,8 @@ namespace storage.postgres
                 CompanyTicker = (string)rowDict["company_ticker"],
                 CompanyCik = (string)rowDict["company_cik"],
                 RelationshipType = (string)rowDict["relationship_type"],
-                Title = rowDict["title"] != null 
-                    ? FSharpOption<string>.Some((string)rowDict["title"]) 
+                Title = rowDict["title"] is string title
+                    ? FSharpOption<string>.Some(title) 
                     : FSharpOption<string>.None,
                 IsActive = (bool)rowDict["is_active"],
                 FirstSeen = ToDateTimeOffset(rowDict["first_seen"]),
@@ -91,34 +91,34 @@ namespace storage.postgres
                 EntityId = (Guid)rowDict["entity_id"],
                 CompanyTicker = (string)rowDict["company_ticker"],
                 CompanyCik = (string)rowDict["company_cik"],
-                FilingId = rowDict["filing_id"] != null 
-                    ? FSharpOption<Guid>.Some((Guid)rowDict["filing_id"]) 
+                FilingId = rowDict["filing_id"] is Guid filingId
+                    ? FSharpOption<Guid>.Some(filingId) 
                     : FSharpOption<Guid>.None,
                 EventType = (string)rowDict["event_type"],
-                TransactionType = rowDict["transaction_type"] != null 
-                    ? FSharpOption<string>.Some((string)rowDict["transaction_type"]) 
+                TransactionType = rowDict["transaction_type"] is string transactionType
+                    ? FSharpOption<string>.Some(transactionType) 
                     : FSharpOption<string>.None,
-                SharesBefore = rowDict["shares_before"] != null 
-                    ? FSharpOption<long>.Some((long)rowDict["shares_before"]) 
+                SharesBefore = rowDict["shares_before"] is long sharesBefore
+                    ? FSharpOption<long>.Some(sharesBefore) 
                     : FSharpOption<long>.None,
-                SharesTransacted = rowDict["shares_transacted"] != null 
-                    ? FSharpOption<long>.Some((long)rowDict["shares_transacted"]) 
+                SharesTransacted = rowDict["shares_transacted"] is long sharesTransacted
+                    ? FSharpOption<long>.Some(sharesTransacted) 
                     : FSharpOption<long>.None,
                 SharesAfter = (long)rowDict["shares_after"],
-                PercentOfClass = rowDict["percent_of_class"] != null 
-                    ? FSharpOption<decimal>.Some((decimal)rowDict["percent_of_class"]) 
+                PercentOfClass = rowDict["percent_of_class"] is decimal percentOfClass
+                    ? FSharpOption<decimal>.Some(percentOfClass) 
                     : FSharpOption<decimal>.None,
-                PricePerShare = rowDict["price_per_share"] != null 
-                    ? FSharpOption<decimal>.Some((decimal)rowDict["price_per_share"]) 
+                PricePerShare = rowDict["price_per_share"] is decimal pricePerShare
+                    ? FSharpOption<decimal>.Some(pricePerShare) 
                     : FSharpOption<decimal>.None,
-                TotalValue = rowDict["total_value"] != null 
-                    ? FSharpOption<decimal>.Some((decimal)rowDict["total_value"]) 
+                TotalValue = rowDict["total_value"] is decimal totalValue
+                    ? FSharpOption<decimal>.Some(totalValue) 
                     : FSharpOption<decimal>.None,
                 TransactionDate = (string)rowDict["transaction_date"],
                 FilingDate = (string)rowDict["filing_date"],
                 IsDirect = (bool)rowDict["is_direct"],
-                OwnershipNature = rowDict["ownership_nature"] != null 
-                    ? FSharpOption<string>.Some((string)rowDict["ownership_nature"]) 
+                OwnershipNature = rowDict["ownership_nature"] is string ownershipNature
+                    ? FSharpOption<string>.Some(ownershipNature) 
                     : FSharpOption<string>.None,
                 CreatedAt = ToDateTimeOffset(rowDict["created_at"])
             };
@@ -509,9 +509,8 @@ namespace storage.postgres
                 var roles = await GetRolesByEntity(entity.Id);
                 var rolesAsFSharpList = Microsoft.FSharp.Collections.ListModule.OfSeq(roles);
                 
-                var percentOfClassValue = rowDict["percent_of_class"];
-                var percentOption = percentOfClassValue != null
-                    ? FSharpOption<decimal>.Some((decimal)percentOfClassValue) 
+                var percentOption = rowDict["percent_of_class"] is decimal percentOfClass
+                    ? FSharpOption<decimal>.Some(percentOfClass) 
                     : FSharpOption<decimal>.None;
 
                 summaries.Add(new OwnershipSummary(
