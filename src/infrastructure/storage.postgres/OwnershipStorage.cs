@@ -61,13 +61,14 @@ namespace storage.postgres
         {
             using var db = GetConnection();
             
-            // Upsert: If CIK exists, update last_seen; otherwise insert new
+            // Upsert: If ID exists, update last_seen; otherwise insert new
             var query = @"
                 INSERT INTO ownership_entities (id, name, entity_type, cik, first_seen, last_seen, created_at)
                 VALUES (@Id, @Name, @EntityType, @Cik, @FirstSeen, @LastSeen, @CreatedAt)
-                ON CONFLICT (cik) WHERE cik IS NOT NULL
+                ON CONFLICT (id)
                 DO UPDATE SET 
                     name = EXCLUDED.name,
+                    cik = EXCLUDED.cik,
                     entity_type = EXCLUDED.entity_type,
                     last_seen = EXCLUDED.last_seen
                 RETURNING id";

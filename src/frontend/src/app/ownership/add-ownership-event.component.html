@@ -20,29 +20,42 @@
             <!-- Entity Search -->
             <div class="mb-3">
               <label class="form-label">Search Existing Entity</label>
-              <input type="text" class="form-control" 
-                     [(ngModel)]="entitySearchQuery" 
-                     name="entitySearch"
-                     (input)="onEntitySearchChange()"
-                     placeholder="Search by entity name...">
+              <div class="position-relative">
+                <input type="text" class="form-control pe-5" 
+                       [(ngModel)]="entitySearchQuery" 
+                       name="entitySearch"
+                       (input)="onEntitySearchChange()"
+                       (keydown)="onEntityKeyDown($event)"
+                       (blur)="onEntityBlur()"
+                       placeholder="Search by entity name..."
+                       autocomplete="off">
+                @if (loading.entitySearch) {
+                  <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                        role="status"
+                        aria-hidden="true"></span>
+                }
+              </div>
               
               @if (entitySearchResults.length > 0) {
-                <div class="list-group mt-2">
-                  @for (entity of entitySearchResults; track entity.id) {
-                    <button type="button" class="list-group-item list-group-item-action" 
-                            (click)="selectEntity(entity)">
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                          <strong>{{ entity.name }}</strong>
-                          <br>
-                          <small class="text-muted">{{ getEntityTypeDisplay(entity.entityType) }} | CIK: {{ entity.cik || 'N/A' }}</small>
+                <div class="position-absolute bg-white border rounded shadow-sm mt-1" style="z-index: 1000; max-height: 300px; overflow-y: auto; width: calc(100% - 48px);">
+                  <div class="list-group list-group-flush">
+                    @for (entity of entitySearchResults; track entity.id; let i = $index) {
+                      <button type="button" class="list-group-item list-group-item-action border-0" 
+                              [class.active]="i === highlightedEntityIndex"
+                              (click)="selectEntity(entity)">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{{ entity.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ getEntityTypeDisplay(entity.entityType) }} | CIK: {{ entity.cik || 'N/A' }}</small>
+                          </div>
+                          @if (selectedEntity?.id === entity.id) {
+                            <span class="badge bg-primary">Selected</span>
+                          }
                         </div>
-                        @if (selectedEntity?.id === entity.id) {
-                          <span class="badge bg-primary">Selected</span>
-                        }
-                      </div>
-                    </button>
-                  }
+                      </button>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -52,10 +65,41 @@
               <label class="form-label">Or Create New Entity</label>
               <div class="row">
                 <div class="col-md-6">
-                  <input type="text" class="form-control mb-2" 
-                         [(ngModel)]="newEntity.name" 
-                         name="entityName"
-                         placeholder="Entity Name">
+                  <div class="position-relative">
+                    <input type="text" class="form-control mb-2 pe-5" 
+                           [(ngModel)]="newEntity.name" 
+                           name="entityName"
+                           (ngModelChange)="onEntityCikSearchChange()"
+                           (keydown)="onCikKeyDown($event)"
+                           (blur)="onCikBlur()"
+                           placeholder="Entity Name"
+                           autocomplete="off">
+                    @if (loading.cikSearch) {
+                      <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 my-2 me-3"
+                            role="status"
+                            aria-hidden="true"></span>
+                    }
+                    
+                    @if (entityCikSearchResults.length > 0) {
+                      <div class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm" style="z-index: 1000; max-height: 300px; overflow-y: auto;">
+                        <div class="list-group list-group-flush">
+                          @for (result of entityCikSearchResults; track result.cik; let i = $index) {
+                            <button 
+                              type="button"
+                              class="list-group-item list-group-item-action text-start border-0"
+                              [class.active]="i === highlightedCikIndex"
+                              (click)="selectEntityCik(result)">
+                              <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">{{ result.ticker }}</span>
+                                <small class="text-muted ms-2">CIK: {{ result.cik }}</small>
+                              </div>
+                              <small class="text-muted">{{ result.companyName }}</small>
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
                 </div>
                 <div class="col-md-3">
                   <select class="form-select mb-2" 
@@ -78,7 +122,9 @@
                   <input type="text" class="form-control mb-2" 
                          [(ngModel)]="newEntity.cik" 
                          name="entityCik"
-                         placeholder="CIK (optional)">
+                         placeholder="CIK"
+                         readonly
+                         [class.bg-light]="newEntity.cik">
                 </div>
               </div>
               <button type="button" class="btn btn-secondary btn-sm" 
@@ -105,12 +151,42 @@
             <div class="row">
               <div class="col-md-6">
                 <label class="form-label">Ticker <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" 
-                       [(ngModel)]="event.companyTicker" 
-                       name="companyTicker"
-                       [value]="ticker"
-                       required
-                       placeholder="AAPL">
+                <div class="position-relative">
+                  <input type="text" class="form-control pe-5" 
+                         [(ngModel)]="event.companyTicker" 
+                         name="companyTicker"
+                         (ngModelChange)="onCompanyTickerChange()"
+                         (keydown)="onCompanyKeyDown($event)"
+                         (blur)="onCompanyBlur()"
+                         required
+                         placeholder="AAPL"
+                         autocomplete="off">
+                  @if (loading.companySearch) {
+                    <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                          role="status"
+                          aria-hidden="true"></span>
+                  }
+                  
+                  @if (companySearchResults.length > 0) {
+                    <div class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm" style="z-index: 1000; max-height: 300px; overflow-y: auto;">
+                      <div class="list-group list-group-flush">
+                        @for (result of companySearchResults; track result.cik; let i = $index) {
+                          <button 
+                            type="button"
+                            class="list-group-item list-group-item-action text-start border-0"
+                            [class.active]="i === highlightedCompanyIndex"
+                            (click)="selectCompany(result)">
+                            <div class="d-flex justify-content-between align-items-center">
+                              <span class="fw-bold">{{ result.ticker }}</span>
+                              <small class="text-muted ms-2">CIK: {{ result.cik }}</small>
+                            </div>
+                            <small class="text-muted">{{ result.companyName }}</small>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Company CIK <span class="text-danger">*</span></label>
@@ -118,7 +194,9 @@
                        [(ngModel)]="event.companyCik" 
                        name="companyCik"
                        required
-                       placeholder="0000320193">
+                       placeholder="0000320193"
+                       readonly
+                       [class.bg-light]="event.companyCik">
               </div>
             </div>
           </div>
