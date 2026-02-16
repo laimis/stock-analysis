@@ -127,7 +127,8 @@ namespace di
                 logger.LogCritical("Invalid storage configuration: {storage}", storage);
 
                 throw new InvalidOperationException(
-                    $"configuration 'storage' has value '{storage}', only 'postgres' is supported"
+                    $"configuration 'storage' has value '{storage}'. Only 'postgres' is supported. " +
+                    "Please set the 'storage' environment variable to 'postgres' and ensure DB_CNN is configured."
                 );
             }
         }
