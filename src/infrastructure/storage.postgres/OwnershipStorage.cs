@@ -361,7 +361,29 @@ namespace storage.postgres
                         @PercentOfClass, @PricePerShare, @TotalValue, @TransactionDate,
                         @FilingDate, @IsDirect, @OwnershipNature, @CreatedAt)";
 
-            var eventsArray = events.ToArray();
+            // Convert F# option types to nullable CLR types for Dapper
+            var eventsArray = events.Select(ownershipEvent => new
+            {
+                Id = ownershipEvent.Id,
+                EntityId = ownershipEvent.EntityId,
+                CompanyTicker = ownershipEvent.CompanyTicker,
+                CompanyCik = ownershipEvent.CompanyCik,
+                FilingId = ToNullable(ownershipEvent.FilingId),
+                EventType = ownershipEvent.EventType,
+                TransactionType = ToNullableString(ownershipEvent.TransactionType),
+                SharesBefore = ToNullable(ownershipEvent.SharesBefore),
+                SharesTransacted = ToNullable(ownershipEvent.SharesTransacted),
+                SharesAfter = ownershipEvent.SharesAfter,
+                PercentOfClass = ToNullable(ownershipEvent.PercentOfClass),
+                PricePerShare = ToNullable(ownershipEvent.PricePerShare),
+                TotalValue = ToNullable(ownershipEvent.TotalValue),
+                TransactionDate = ownershipEvent.TransactionDate,
+                FilingDate = ownershipEvent.FilingDate,
+                IsDirect = ownershipEvent.IsDirect,
+                OwnershipNature = ToNullableString(ownershipEvent.OwnershipNature),
+                CreatedAt = ownershipEvent.CreatedAt
+            }).ToArray();
+            
             var rowsAffected = await db.ExecuteAsync(query, eventsArray);
 
             return rowsAffected;
