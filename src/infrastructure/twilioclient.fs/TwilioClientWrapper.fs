@@ -15,7 +15,7 @@ type TwilioClientWrapper(
     toPhoneNumber: string option) =
     
     let mutable isOn = false
-    let configured, fromPhone, toPhone =
+    let configuredData =
         match accountSid, authToken, fromPhoneNumber, toPhoneNumber with
         | Some sid, Some token, Some fromNum, Some toNum when 
             not (System.String.IsNullOrEmpty(sid)) &&
@@ -24,8 +24,8 @@ type TwilioClientWrapper(
             not (System.String.IsNullOrEmpty(toNum)) ->
             TwilioClient.Init(sid, token)
             isOn <- true
-            (true, Some (PhoneNumber(fromNum)), Some (PhoneNumber(toNum)))
-        | _ -> (false, None, None)
+            Some (PhoneNumber(fromNum), PhoneNumber(toNum))
+        | _ -> None
     
     member _.IsOn with get() = isOn
     
@@ -34,19 +34,20 @@ type TwilioClientWrapper(
     member _.TurnOn() = isOn <- true
     
     member _.SendSMS(message: string) : Task =
-        if configured && isOn then
-            logger.LogInformation($"Sending SMS to {toPhone.Value}: {message}")
+        match configuredData with
+        | Some (fromPhone, toPhone) when isOn ->
+            logger.LogInformation($"Sending SMS to {toPhone}: {message}")
             
             let response = 
                 MessageResource.Create(
                     body = message,
-                    from = fromPhone.Value,
-                    ``to`` = toPhone.Value
+                    from = fromPhone,
+                    ``to`` = toPhone
                 )
             
             logger.LogInformation("Response from twilio: " + response.ToString())
             Task.CompletedTask
-        else
+        | _ ->
             logger.LogInformation($"Sending SMS: {message}")
             Task.CompletedTask
     
