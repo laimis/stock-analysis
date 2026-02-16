@@ -65,6 +65,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "twilioclient.fs", "src\infr
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "timezonesupport.fs", "src\infrastructure\timezonesupport.fs\timezonesupport.fs.fsproj", "{D9BF5FD7-16F4-4DEC-8E6A-CA858159B18B}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "csvparser.fs", "src\infrastructure\csvparser.fs\csvparser.fs.fsproj", "{ECC4F95F-4B0E-43F9-B598-8A414191943F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -399,6 +401,18 @@ Global
 		{D9BF5FD7-16F4-4DEC-8E6A-CA858159B18B}.Release|x64.Build.0 = Release|Any CPU
 		{D9BF5FD7-16F4-4DEC-8E6A-CA858159B18B}.Release|x86.ActiveCfg = Release|Any CPU
 		{D9BF5FD7-16F4-4DEC-8E6A-CA858159B18B}.Release|x86.Build.0 = Release|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Debug|x64.Build.0 = Debug|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Debug|x86.Build.0 = Debug|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Release|x64.ActiveCfg = Release|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Release|x64.Build.0 = Release|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Release|x86.ActiveCfg = Release|Any CPU
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -433,5 +447,6 @@ Global
 		{1C9512A8-3FAE-4C8A-B940-40666F3981D7} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{D9BF5FD7-16F4-4DEC-8E6A-CA858159B18B} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
+		{ECC4F95F-4B0E-43F9-B598-8A414191943F} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 	EndGlobalSection
 EndGlobal
