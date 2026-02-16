@@ -18,7 +18,6 @@
         <ProjectReference Include="..\infrastructure\storage.postgres\storage.postgres.csproj" />
         <ProjectReference Include="..\infrastructure\csvparser\csvparser.csproj" />
         <ProjectReference Include="..\infrastructure\coinmarketcap\coinmarketcap.csproj" />
-        <ProjectReference Include="..\infrastructure\storage.memory\storage.memory.csproj" />
         <ProjectReference Include="..\infrastructure\twilioclient\twilioclient.csproj" />
         <ProjectReference Include="..\infrastructure\timezonesupport\timezonesupport.csproj" />
         <ProjectReference Include="..\infrastructure\securityutils\securityutils.csproj" />

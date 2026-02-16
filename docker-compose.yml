@@ -7,6 +7,6 @@ services:
     environment:
       GoogleClientId: google client id
       GoogleSecret: google secret
-      storage: postgres (you can also use 'memory' but data will be gone on restarts)
+      storage: postgres
       DB_CNN: postgres connection string
       SENDGRID_API_KEY: api key from send grid
