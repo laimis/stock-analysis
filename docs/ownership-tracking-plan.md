@@ -51,7 +51,6 @@ Track insider and institutional ownership changes to:
   - Tracks direct/indirect ownership
 - ✅ F# types and interfaces in `IOwnershipStorage.fs`
 - ✅ PostgreSQL implementation in `storage.postgres/OwnershipStorage.cs` (16 methods)
-- ✅ In-memory implementation in `storage.memory/OwnershipStorage.cs`
 - ✅ DI registration in `DIHelper.cs`
 - ✅ Backend API controller with 10 endpoints (`OwnershipController.cs`)
 
@@ -85,7 +84,6 @@ Track insider and institutional ownership changes to:
   - [x] Create `ownership_entity_company_roles` table
   - [x] F# types and interfaces
   - [x] PostgreSQL storage implementation
-  - [x] In-memory storage implementation
   - [x] DI registration
   - [x] Backend API controller with 10 endpoints
 
@@ -111,7 +109,6 @@ Track insider and institutional ownership changes to:
 - [x] **Storage Layer** ✅ **COMPLETED** (February 15, 2026)
   - [x] Add ownership event storage methods to storage interface
   - [x] Implement PostgreSQL storage (16 methods with F# option type interop)
-  - [x] Implement in-memory storage
   - [x] Backend API with full CRUD operations
 
 ### Success Criteria
@@ -261,7 +258,7 @@ Track insider and institutional ownership changes to:
 
 ### Phase 2 (Partial)
 - ✅ Ownership database schema designed and implemented
-- ✅ Storage layer with 16 methods (PostgreSQL + in-memory)
+- ✅ Storage layer with 16 methods (PostgreSQL)
 - ✅ Backend API with 10 endpoints
 - ⏳ >90% parsing accuracy for Form 4 (pending parser implementation)
 - ⏳ >95% successful entity extraction (pending parser implementation)

@@ -1,7 +1,7 @@
 # NGTDTrading - AI Coding Agent Instructions
 
 ## Project Overview
-Nightingale Trading (aka NGTDTrading) is a stock, options, and crypto portfolio tracking application built with a **hybrid F#/C# architecture**. The system uses **event sourcing** for data persistence and supports both PostgreSQL and in-memory storage. The goal is to eventually eliminate the C# components, migrating all business logic to F# for improved type safety and maintainability. All new code should be written in F# unless there is a compelling reason to use C#.
+Nightingale Trading (aka NGTDTrading) is a stock, options, and crypto portfolio tracking application built with a **hybrid F#/C# architecture**. The system uses **event sourcing** for data persistence with PostgreSQL. The goal is to eventually eliminate the C# components, migrating all business logic to F# for improved type safety and maintainability. All new code should be written in F# unless there is a compelling reason to use C#.
 
 ## Architecture
 
@@ -56,7 +56,7 @@ public class OwnedStock : Aggregate<OwnedStockState>
 
 ### Dependency Injection (src/infrastructure/di/DIHelper.cs)
 - Central DI registration in `DIHelper.RegisterServices()`
-- Storage mode controlled by environment variable `storage` ("postgres" or "memory")
+- Storage requires environment variable `storage` set to "postgres"
 - External API keys loaded from configuration (IEX, CoinMarketCap, Schwab, etc.)
 - F# services registered alongside C# infrastructure services
 
@@ -85,13 +85,13 @@ dotnet watch run --project src/web/web.csproj
 ### Running Locally
 1. **Set environment variables** (see `dev.bat` or create `dev_secret.bat`):
    ```bat
-   set storage=memory
+   set storage=postgres
+   set DB_CNN=Server=...;Database=...;User id=...;password=...
    set IEXToken=your_token_here
    set COINMARKETCAPToken=your_token_here
    ```
-2. **For Postgres**: Set `DB_CNN` connection string and `storage=postgres`
-3. **Run**: `dotnet run --project src/web/web.csproj`
-4. Frontend served from `wwwroot/` (build Angular separately if developing UI)
+2. **Run**: `dotnet run --project src/web/web.csproj`
+3. Frontend served from `wwwroot/` (build Angular separately if developing UI)
 
 ### Deployment Workflow
 - **Production release**: `.\release_prod.ps1 "commit message"`
@@ -146,8 +146,8 @@ dotnet watch run --project src/web/web.csproj
 ## Common Gotchas
 1. **Always rebuild Angular before Docker**: Use `ng build --configuration production` in `src/frontend`
 2. **F# project order matters**: `core.fs.fsproj` must reference `core.csproj` before compilation
-3. **Postgres vs Memory storage**: Switch via `storage` env var; Postgres requires `DB_CNN`
-4. **Hangfire needs Postgres**: Background jobs won't run with in-memory storage
+3. **Postgres required**: Application requires `DB_CNN` connection string and `storage=postgres`
+4. **Hangfire needs Postgres**: Background jobs require Postgres connection
 5. **Time zones**: Market hours logic in `infrastructure/timezonesupport` handles NYSE/NASDAQ calendars
 
 ## Getting Oriented Quickly

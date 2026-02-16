@@ -122,41 +122,15 @@ namespace di
             {
                 RegisterPostgresImplementations(configuration, services);
             }
-            else if (storage == "memory")
-            {
-                RegisterMemoryImplementations(services);
-            }
             else
             {
                 logger.LogCritical("Invalid storage configuration: {storage}", storage);
 
                 throw new InvalidOperationException(
-                    $"configuration 'storage' has value '{storage}', only 'postgres' or 'memory' is supported"
+                    $"configuration 'storage' has value '{storage}'. Only 'postgres' is supported. " +
+                    "Please set the 'storage' environment variable to 'postgres' and ensure DB_CNN is configured."
                 );
             }
-        }
-
-        private static void RegisterMemoryImplementations(IServiceCollection services)
-        {
-            services.AddSingleton<IAccountStorage>(s =>
-                new storage.memory.AccountStorage(s.GetRequiredService<IOutbox>())
-            );
-
-            services.AddSingleton<IAggregateStorage>(s =>
-                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IOutbox>())
-            );
-
-            services.AddSingleton<IBlobStorage>(s =>
-                new storage.memory.MemoryAggregateStorage(s.GetRequiredService<IOutbox>())
-            );
-
-            services.AddSingleton<ISECFilingStorage>(s =>
-                new storage.memory.SECFilingStorage()
-            );
-            
-            services.AddSingleton<IOwnershipStorage>(s =>
-                new storage.memory.OwnershipStorage()
-            );
         }
 
         private static void RegisterPostgresImplementations(IConfiguration configuration, IServiceCollection services)
