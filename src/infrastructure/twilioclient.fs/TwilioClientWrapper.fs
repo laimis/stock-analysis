@@ -35,7 +35,7 @@ type TwilioClientWrapper(
     
     member _.SendSMS(message: string) : Task =
         if configured && isOn then
-            logger.LogInformation($"Sending SMS to {toPhone}: {message}")
+            logger.LogInformation($"Sending SMS to {toPhone.Value}: {message}")
             
             let response = 
                 MessageResource.Create(
