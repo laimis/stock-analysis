@@ -35,6 +35,95 @@ namespace storage.postgres
             return OptionModule.ToObj(option);
         }
 
+        // Helper to convert DateTime (from Postgres) to DateTimeOffset
+        private static DateTimeOffset ToDateTimeOffset(object value)
+        {
+            if (value is DateTimeOffset dto)
+                return dto;
+            if (value is DateTime dt)
+                return new DateTimeOffset(dt, TimeSpan.Zero); // Postgres returns UTC
+            throw new InvalidCastException($"Cannot convert {value.GetType()} to DateTimeOffset");
+        }
+
+        // Helper methods to map dynamic database rows to F# types
+        private static OwnershipEntity MapToOwnershipEntity(dynamic row)
+        {
+            var rowDict = (IDictionary<string, object>)row;
+            return new OwnershipEntity
+            {
+                Id = (Guid)rowDict["id"],
+                Name = (string)rowDict["name"],
+                EntityType = (string)rowDict["entity_type"],
+                Cik = rowDict["cik"] != null 
+                    ? FSharpOption<string>.Some((string)rowDict["cik"]) 
+                    : FSharpOption<string>.None,
+                FirstSeen = ToDateTimeOffset(rowDict["first_seen"]),
+                LastSeen = ToDateTimeOffset(rowDict["last_seen"]),
+                CreatedAt = ToDateTimeOffset(rowDict["created_at"])
+            };
+        }
+
+        private static OwnershipEntityCompanyRole MapToOwnershipEntityCompanyRole(dynamic row)
+        {
+            var rowDict = (IDictionary<string, object>)row;
+            return new OwnershipEntityCompanyRole
+            {
+                Id = (Guid)rowDict["id"],
+                EntityId = (Guid)rowDict["entity_id"],
+                CompanyTicker = (string)rowDict["company_ticker"],
+                CompanyCik = (string)rowDict["company_cik"],
+                RelationshipType = (string)rowDict["relationship_type"],
+                Title = rowDict["title"] != null 
+                    ? FSharpOption<string>.Some((string)rowDict["title"]) 
+                    : FSharpOption<string>.None,
+                IsActive = (bool)rowDict["is_active"],
+                FirstSeen = ToDateTimeOffset(rowDict["first_seen"]),
+                LastSeen = ToDateTimeOffset(rowDict["last_seen"])
+            };
+        }
+
+        private static OwnershipEvent MapToOwnershipEvent(dynamic row)
+        {
+            var rowDict = (IDictionary<string, object>)row;
+            return new OwnershipEvent
+            {
+                Id = (Guid)rowDict["id"],
+                EntityId = (Guid)rowDict["entity_id"],
+                CompanyTicker = (string)rowDict["company_ticker"],
+                CompanyCik = (string)rowDict["company_cik"],
+                FilingId = rowDict["filing_id"] != null 
+                    ? FSharpOption<Guid>.Some((Guid)rowDict["filing_id"]) 
+                    : FSharpOption<Guid>.None,
+                EventType = (string)rowDict["event_type"],
+                TransactionType = rowDict["transaction_type"] != null 
+                    ? FSharpOption<string>.Some((string)rowDict["transaction_type"]) 
+                    : FSharpOption<string>.None,
+                SharesBefore = rowDict["shares_before"] != null 
+                    ? FSharpOption<long>.Some((long)rowDict["shares_before"]) 
+                    : FSharpOption<long>.None,
+                SharesTransacted = rowDict["shares_transacted"] != null 
+                    ? FSharpOption<long>.Some((long)rowDict["shares_transacted"]) 
+                    : FSharpOption<long>.None,
+                SharesAfter = (long)rowDict["shares_after"],
+                PercentOfClass = rowDict["percent_of_class"] != null 
+                    ? FSharpOption<decimal>.Some((decimal)rowDict["percent_of_class"]) 
+                    : FSharpOption<decimal>.None,
+                PricePerShare = rowDict["price_per_share"] != null 
+                    ? FSharpOption<decimal>.Some((decimal)rowDict["price_per_share"]) 
+                    : FSharpOption<decimal>.None,
+                TotalValue = rowDict["total_value"] != null 
+                    ? FSharpOption<decimal>.Some((decimal)rowDict["total_value"]) 
+                    : FSharpOption<decimal>.None,
+                TransactionDate = (string)rowDict["transaction_date"],
+                FilingDate = (string)rowDict["filing_date"],
+                IsDirect = (bool)rowDict["is_direct"],
+                OwnershipNature = rowDict["ownership_nature"] != null 
+                    ? FSharpOption<string>.Some((string)rowDict["ownership_nature"]) 
+                    : FSharpOption<string>.None,
+                CreatedAt = ToDateTimeOffset(rowDict["created_at"])
+            };
+        }
+
         // Entity Management
 
         public async Task<FSharpOption<OwnershipEntity>> FindEntityByCik(string cik)
@@ -42,13 +131,17 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, name as Name, entity_type as EntityType, cik as Cik,
-                       first_seen as FirstSeen, last_seen as LastSeen, created_at as CreatedAt
+                SELECT id, name, entity_type, cik,
+                       first_seen, last_seen, created_at
                 FROM ownership_entities
                 WHERE cik = @Cik";
 
-            var result = await db.QueryFirstOrDefaultAsync<OwnershipEntity>(query, new { Cik = cik });
-            return result != null ? FSharpOption<OwnershipEntity>.Some(result) : FSharpOption<OwnershipEntity>.None;
+            var row = await db.QueryFirstOrDefaultAsync(query, new { Cik = cik });
+            if (row == null)
+                return FSharpOption<OwnershipEntity>.None;
+
+            var entity = MapToOwnershipEntity(row);
+            return FSharpOption<OwnershipEntity>.Some(entity);
         }
 
         public async Task<IEnumerable<OwnershipEntity>> FindEntitiesByName(string name)
@@ -57,15 +150,15 @@ namespace storage.postgres
             
             // Use ILIKE for case-insensitive search and % wildcards for fuzzy matching
             var query = @"
-                SELECT id as Id, name as Name, entity_type as EntityType, cik as Cik,
-                       first_seen as FirstSeen, last_seen as LastSeen, created_at as CreatedAt
+                SELECT id, name, entity_type, cik,
+                       first_seen, last_seen, created_at
                 FROM ownership_entities
                 WHERE name ILIKE @Name
                 ORDER BY name";
 
             var searchPattern = $"%{name}%";
-            var results = await db.QueryAsync<OwnershipEntity>(query, new { Name = searchPattern });
-            return results;
+            var rows = await db.QueryAsync(query, new { Name = $"%{name}%" });
+            return rows.Select(MapToOwnershipEntity);
         }
 
         public async Task<Guid> SaveEntity(OwnershipEntity entity)
@@ -118,16 +211,16 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, relationship_type as RelationshipType,
-                       title as Title, is_active as IsActive, first_seen as FirstSeen,
-                       last_seen as LastSeen
+                SELECT id, entity_id, company_ticker,
+                       company_cik, relationship_type,
+                       title, is_active, first_seen,
+                       last_seen
                 FROM ownership_entity_company_roles
                 WHERE entity_id = @EntityId
                 ORDER BY last_seen DESC";
 
-            var results = await db.QueryAsync<OwnershipEntityCompanyRole>(query, new { EntityId = entityId });
-            return results;
+            var rows = await db.QueryAsync(query, new { EntityId = entityId });
+            return rows.Select(MapToOwnershipEntityCompanyRole);
         }
 
         public async Task<IEnumerable<OwnershipEntityCompanyRole>> GetRolesByCompany(Ticker ticker)
@@ -135,16 +228,16 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, relationship_type as RelationshipType,
-                       title as Title, is_active as IsActive, first_seen as FirstSeen,
-                       last_seen as LastSeen
+                SELECT id, entity_id, company_ticker,
+                       company_cik, relationship_type,
+                       title, is_active, first_seen,
+                       last_seen
                 FROM ownership_entity_company_roles
                 WHERE company_ticker = @Ticker AND is_active = true
                 ORDER BY last_seen DESC";
 
-            var results = await db.QueryAsync<OwnershipEntityCompanyRole>(query, new { Ticker = ticker.Value });
-            return results;
+            var rows = await db.QueryAsync(query, new { Ticker = ticker.Value });
+            return rows.Select(MapToOwnershipEntityCompanyRole);
         }
 
         public async Task<Guid> SaveRole(OwnershipEntityCompanyRole role)
@@ -261,20 +354,20 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, filing_id as FilingId, event_type as EventType,
-                       transaction_type as TransactionType, shares_before as SharesBefore,
-                       shares_transacted as SharesTransacted, shares_after as SharesAfter,
-                       percent_of_class as PercentOfClass, price_per_share as PricePerShare,
-                       total_value as TotalValue, transaction_date as TransactionDate,
-                       filing_date as FilingDate, is_direct as IsDirect,
-                       ownership_nature as OwnershipNature, created_at as CreatedAt
+                SELECT id, entity_id, company_ticker,
+                       company_cik, filing_id, event_type,
+                       transaction_type, shares_before,
+                       shares_transacted, shares_after,
+                       percent_of_class, price_per_share,
+                       total_value, transaction_date,
+                       filing_date, is_direct,
+                       ownership_nature, created_at
                 FROM ownership_events
                 WHERE company_ticker = @Ticker
                 ORDER BY transaction_date DESC";
 
-            var results = await db.QueryAsync<OwnershipEvent>(query, new { Ticker = ticker.Value });
-            return results;
+            var rows = await db.QueryAsync(query, new { Ticker = ticker.Value });
+            return rows.Select(MapToOwnershipEvent);
         }
 
         public async Task<IEnumerable<OwnershipEvent>> GetEventsByCompanyDateRange(Ticker ticker, string startDate, string endDate)
@@ -282,27 +375,27 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, filing_id as FilingId, event_type as EventType,
-                       transaction_type as TransactionType, shares_before as SharesBefore,
-                       shares_transacted as SharesTransacted, shares_after as SharesAfter,
-                       percent_of_class as PercentOfClass, price_per_share as PricePerShare,
-                       total_value as TotalValue, transaction_date as TransactionDate,
-                       filing_date as FilingDate, is_direct as IsDirect,
-                       ownership_nature as OwnershipNature, created_at as CreatedAt
+                SELECT id, entity_id, company_ticker,
+                       company_cik, filing_id, event_type,
+                       transaction_type, shares_before,
+                       shares_transacted, shares_after,
+                       percent_of_class, price_per_share,
+                       total_value, transaction_date,
+                       filing_date, is_direct,
+                       ownership_nature, created_at
                 FROM ownership_events
                 WHERE company_ticker = @Ticker 
                   AND transaction_date >= @StartDate 
                   AND transaction_date <= @EndDate
                 ORDER BY transaction_date DESC";
 
-            var results = await db.QueryAsync<OwnershipEvent>(query, new 
+            var rows = await db.QueryAsync(query, new 
             { 
                 Ticker = ticker.Value,
                 StartDate = startDate,
                 EndDate = endDate
             });
-            return results;
+            return rows.Select(MapToOwnershipEvent);
         }
 
         public async Task<IEnumerable<OwnershipEvent>> GetEventsByEntity(Guid entityId)
@@ -310,20 +403,20 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, filing_id as FilingId, event_type as EventType,
-                       transaction_type as TransactionType, shares_before as SharesBefore,
-                       shares_transacted as SharesTransacted, shares_after as SharesAfter,
-                       percent_of_class as PercentOfClass, price_per_share as PricePerShare,
-                       total_value as TotalValue, transaction_date as TransactionDate,
-                       filing_date as FilingDate, is_direct as IsDirect,
-                       ownership_nature as OwnershipNature, created_at as CreatedAt
+                SELECT id, entity_id, company_ticker,
+                       company_cik, filing_id, event_type,
+                       transaction_type, shares_before,
+                       shares_transacted, shares_after,
+                       percent_of_class, price_per_share,
+                       total_value, transaction_date,
+                       filing_date, is_direct,
+                       ownership_nature, created_at
                 FROM ownership_events
                 WHERE entity_id = @EntityId
                 ORDER BY transaction_date DESC";
 
-            var results = await db.QueryAsync<OwnershipEvent>(query, new { EntityId = entityId });
-            return results;
+            var rows = await db.QueryAsync(query, new { EntityId = entityId });
+            return rows.Select(MapToOwnershipEvent);
         }
 
         public async Task<FSharpOption<OwnershipEvent>> GetLatestEventForEntityCompany(Guid entityId, Ticker ticker)
@@ -331,25 +424,30 @@ namespace storage.postgres
             using var db = GetConnection();
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, filing_id as FilingId, event_type as EventType,
-                       transaction_type as TransactionType, shares_before as SharesBefore,
-                       shares_transacted as SharesTransacted, shares_after as SharesAfter,
-                       percent_of_class as PercentOfClass, price_per_share as PricePerShare,
-                       total_value as TotalValue, transaction_date as TransactionDate,
-                       filing_date as FilingDate, is_direct as IsDirect,
-                       ownership_nature as OwnershipNature, created_at as CreatedAt
+                SELECT id, entity_id, company_ticker,
+                       company_cik, filing_id, event_type,
+                       transaction_type, shares_before,
+                       shares_transacted, shares_after,
+                       percent_of_class, price_per_share,
+                       total_value, transaction_date,
+                       filing_date, is_direct,
+                       ownership_nature, created_at
                 FROM ownership_events
                 WHERE entity_id = @EntityId AND company_ticker = @Ticker
                 ORDER BY transaction_date DESC
                 LIMIT 1";
 
-            var result = await db.QueryFirstOrDefaultAsync<OwnershipEvent>(query, new 
+            var row = await db.QueryFirstOrDefaultAsync(query, new 
             { 
                 EntityId = entityId,
                 Ticker = ticker.Value
             });
-            return result != null ? FSharpOption<OwnershipEvent>.Some(result) : FSharpOption<OwnershipEvent>.None;
+            
+            if (row == null)
+                return FSharpOption<OwnershipEvent>.None;
+                
+            var ownershipEvent = MapToOwnershipEvent(row);
+            return FSharpOption<OwnershipEvent>.Some(ownershipEvent);
         }
 
         // Summary/Analytics
@@ -368,48 +466,42 @@ namespace storage.postgres
                     ORDER BY entity_id, transaction_date DESC
                 )
                 SELECT 
-                    e.id as Id, e.name as Name, e.entity_type as EntityType, e.cik as Cik,
-                    e.first_seen as FirstSeen, e.last_seen as LastSeen, e.created_at as CreatedAt,
-                    le.shares_after as CurrentShares,
-                    le.percent_of_class as PercentOfClass,
-                    le.transaction_date as LastUpdated
+                    e.id, e.name, e.entity_type, e.cik,
+                    e.first_seen, e.last_seen, e.created_at,
+                    le.shares_after as current_shares,
+                    le.percent_of_class,
+                    le.transaction_date as last_updated
                 FROM ownership_entities e
                 INNER JOIN latest_events le ON e.id = le.entity_id
                 WHERE le.shares_after > 0
                 ORDER BY le.shares_after DESC";
 
-            var results = await db.QueryAsync<dynamic>(query, new { Ticker = ticker.Value });
+            var results = await db.QueryAsync(query, new { Ticker = ticker.Value });
             
             // Convert to OwnershipSummary (need to manually map due to complex structure)
             var summaries = new List<OwnershipSummary>();
             foreach (var row in results)
             {
-                var entity = new OwnershipEntity
-                {
-                    Id = row.Id,
-                    Name = row.Name,
-                    EntityType = row.EntityType,
-                    Cik = row.Cik,
-                    FirstSeen = row.FirstSeen,
-                    LastSeen = row.LastSeen,
-                    CreatedAt = row.CreatedAt
-                };
+                var rowDict = (IDictionary<string, object>)row;
+                
+                // Use the mapper for the entity portion
+                var entity = MapToOwnershipEntity(row);
 
                 // Get roles for this entity
                 var roles = await GetRolesByEntity(entity.Id);
                 var rolesAsFSharpList = Microsoft.FSharp.Collections.ListModule.OfSeq(roles);
                 
-                decimal? percentOfClass = row.PercentOfClass;
-                var percentOption = percentOfClass.HasValue 
-                    ? FSharpOption<decimal>.Some(percentOfClass.Value) 
+                var percentOfClassValue = rowDict["percent_of_class"];
+                var percentOption = percentOfClassValue != null
+                    ? FSharpOption<decimal>.Some((decimal)percentOfClassValue) 
                     : FSharpOption<decimal>.None;
 
                 summaries.Add(new OwnershipSummary(
                     entity,
                     rolesAsFSharpList,
-                    (long)row.CurrentShares,
+                    (long)rowDict["current_shares"],
                     percentOption,
-                    DateTimeOffset.Parse((string)row.LastUpdated)
+                    DateTimeOffset.Parse((string)rowDict["last_updated"])
                 ));
             }
 
@@ -423,24 +515,24 @@ namespace storage.postgres
             var cutoffDate = DateTimeOffset.UtcNow.AddDays(-days).ToString("yyyy-MM-dd");
             
             var query = @"
-                SELECT id as Id, entity_id as EntityId, company_ticker as CompanyTicker,
-                       company_cik as CompanyCik, filing_id as FilingId, event_type as EventType,
-                       transaction_type as TransactionType, shares_before as SharesBefore,
-                       shares_transacted as SharesTransacted, shares_after as SharesAfter,
-                       percent_of_class as PercentOfClass, price_per_share as PricePerShare,
-                       total_value as TotalValue, transaction_date as TransactionDate,
-                       filing_date as FilingDate, is_direct as IsDirect,
-                       ownership_nature as OwnershipNature, created_at as CreatedAt
+                SELECT id, entity_id, company_ticker,
+                       company_cik, filing_id, event_type,
+                       transaction_type, shares_before,
+                       shares_transacted, shares_after,
+                       percent_of_class, price_per_share,
+                       total_value, transaction_date,
+                       filing_date, is_direct,
+                       ownership_nature, created_at
                 FROM ownership_events
                 WHERE company_ticker = @Ticker AND transaction_date >= @CutoffDate
                 ORDER BY transaction_date DESC";
 
-            var results = await db.QueryAsync<OwnershipEvent>(query, new 
+            var rows = await db.QueryAsync(query, new 
             { 
                 Ticker = ticker.Value,
                 CutoffDate = cutoffDate
             });
-            return results;
+            return rows.Select(MapToOwnershipEvent);
         }
     }
 }
