@@ -80,12 +80,19 @@ namespace di
                 ));
 
             services.AddSingleton<ISMSClient>(s => 
-                new twilioclient.TwilioClientWrapper(
-                    configuration.GetValue<string>("TWILIO_ACCOUNT_SID"),
-                    configuration.GetValue<string>("TWILIO_AUTH_TOKEN"),
-                    configuration.GetValue<string>("TWILIO_FROM_NUMBER"),
+            {
+                var accountSid = configuration.GetValue<string>("TWILIO_ACCOUNT_SID");
+                var authToken = configuration.GetValue<string>("TWILIO_AUTH_TOKEN");
+                var fromNumber = configuration.GetValue<string>("TWILIO_FROM_NUMBER");
+                var toNumber = configuration.GetValue<string>("TWILIO_TO_NUMBER");
+                
+                return new twilioclient.TwilioClientWrapper(
+                    string.IsNullOrEmpty(accountSid) ? FSharpOption<string>.None : FSharpOption<string>.Some(accountSid),
+                    string.IsNullOrEmpty(authToken) ? FSharpOption<string>.None : FSharpOption<string>.Some(authToken),
+                    string.IsNullOrEmpty(fromNumber) ? FSharpOption<string>.None : FSharpOption<string>.Some(fromNumber),
                     s.GetService<ILogger<twilioclient.TwilioClientWrapper>>()!,
-                    configuration.GetValue<string>("TWILIO_TO_NUMBER")));
+                    string.IsNullOrEmpty(toNumber) ? FSharpOption<string>.None : FSharpOption<string>.Some(toNumber));
+            });
 
             var schwabCallbackUrl = configuration.GetValue<string>("SCHWAB_CALLBACK_URL");
             

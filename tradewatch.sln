@@ -67,6 +67,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "securityutils.fs", "src\inf
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "storage.shared.fs", "src\infrastructure\storage.shared.fs\storage.shared.fs.fsproj", "{1C9512A8-3FAE-4C8A-B940-40666F3981D7}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "twilioclient.fs", "src\infrastructure\twilioclient.fs\twilioclient.fs.fsproj", "{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -413,6 +415,18 @@ Global
 		{1C9512A8-3FAE-4C8A-B940-40666F3981D7}.Release|x64.Build.0 = Release|Any CPU
 		{1C9512A8-3FAE-4C8A-B940-40666F3981D7}.Release|x86.ActiveCfg = Release|Any CPU
 		{1C9512A8-3FAE-4C8A-B940-40666F3981D7}.Release|x86.Build.0 = Release|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Debug|x64.Build.0 = Debug|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Debug|x86.Build.0 = Debug|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Release|x64.ActiveCfg = Release|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Release|x64.Build.0 = Release|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Release|x86.ActiveCfg = Release|Any CPU
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -448,5 +462,6 @@ Global
 		{7222A9A7-CE4F-4A76-9419-59AB163D5B6F} = {E32D8CC2-C013-4386-BDAF-840EC6AE86F5}
 		{D7B71713-4817-4F9E-9645-2C2AEB1A928D} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{1C9512A8-3FAE-4C8A-B940-40666F3981D7} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
+		{F7D15B36-0BF5-4B51-B54E-BDBD1816666B} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 	EndGlobalSection
 EndGlobal
