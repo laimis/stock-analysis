@@ -31,11 +31,11 @@ type StockListsController(handler: Handler) =
         this.OkOrError(handler.HandleUpdate command (this.User.Identifier()))
 
     [<HttpPut("{id}")>]
-    member this.AddStockToList([<FromBody>] command: AddStockToList, [<FromServices>] service: Handler) =
+    member this.AddStockToList([<FromBody>] command: AddStockToList) =
         this.OkOrError(handler.HandleAddStockToList (this.User.Identifier()) command)
 
     [<HttpDelete("{id}/{ticker}")>]
-    member this.RemoveStockFromList([<FromRoute>] id: Guid, [<FromRoute>] ticker: string, [<FromServices>] service: Handler) =
+    member this.RemoveStockFromList([<FromRoute>] id: Guid, [<FromRoute>] ticker: string) =
         this.OkOrError(handler.Handle({RemoveStockFromList.Id = id; UserId = this.User.Identifier(); Ticker = Ticker(ticker)}))
 
     [<HttpPut("{id}/tags")>]

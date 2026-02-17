@@ -20,6 +20,6 @@ type TextPlainInputFormatter() =
     }
     
     override this.CanRead(context: InputFormatterContext) =
-        let contentType = context.HttpContext.Request.ContentType
-        let ct = if isNull contentType then "" else contentType
+        let requestContentType = context.HttpContext.Request.ContentType
+        let ct = if isNull requestContentType then "" else requestContentType
         ct.StartsWith(contentType)

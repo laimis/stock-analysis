@@ -285,7 +285,7 @@ type PortfolioController(stockPositionHandler: StockPositionHandler, optionsHand
         )
 
     [<HttpGet("options")>]
-    member this.OptionsDashboar() : Task<ActionResult> =
+    member this.OptionsDashboard() : Task<ActionResult> =
         this.OkOrError(optionsHandler.Handle({DashboardQuery.UserId = this.User.Identifier()}))
 
     [<HttpDelete("optionpositions/{positionId}/labels/{label}")>]
