@@ -12,6 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\core\core.csproj" />
+    <ProjectReference Include="..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
     <ProjectReference Include="..\infrastructure\storage.shared.fs\storage.shared.fs.fsproj" />
   </ItemGroup>

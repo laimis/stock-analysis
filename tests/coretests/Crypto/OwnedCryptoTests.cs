@@ -16,7 +16,8 @@ namespace coretests.Crypto
             btc.Purchase(
                 quantity: 0.05437703m,
                 dollarAmountSpent: 985.32m,
-                date: System.DateTimeOffset.Parse("2017-12-19T15:05:38Z")
+                date: System.DateTimeOffset.Parse("2017-12-19T15:05:38Z"),
+                notes: null
             );
 
             Assert.Equal(0.05437703m, btc.State.Quantity);

@@ -17,7 +17,7 @@ type OwnedCrypto =
                 raise (InvalidOperationException("Missing user id"))
             this.Apply(CryptoObtained(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.UtcNow, token, userId))
 
-    member this.Purchase(quantity: decimal, dollarAmountSpent: decimal, date: DateTimeOffset, ?notes: string) =
+    member this.Purchase(quantity: decimal, dollarAmountSpent: decimal, date: DateTimeOffset, notes: string) =
         if quantity <= 0m then
             raise (InvalidOperationException("Price cannot be empty or zero"))
 
@@ -36,13 +36,9 @@ type OwnedCrypto =
                 this.State.Token,
                 quantity,
                 dollarAmountSpent,
-                defaultArg notes null
+                notes
             )
         )
-    
-    // Overload for C# compatibility
-    member this.Purchase(quantity: decimal, dollarAmountSpent: decimal, date: DateTimeOffset) =
-        this.Purchase(quantity, dollarAmountSpent, date, None)
 
     member this.Reward(quantity: decimal, dollarAmountWorth: decimal, date: DateTimeOffset, notes: string) =
         if quantity < 0m then

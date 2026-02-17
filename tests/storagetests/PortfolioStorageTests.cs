@@ -160,7 +160,7 @@ namespace storagetests
         {
             var crypto = new OwnedCrypto(new Token("BTC"), IdentifierHelper.getUserId(_userId));
 
-            crypto.Purchase(10, 2.1m, DateTimeOffset.UtcNow);
+            crypto.Purchase(10, 2.1m, DateTimeOffset.UtcNow, notes: null);
 
             var storage = CreateStorage();
 
@@ -170,15 +170,19 @@ namespace storagetests
 
             Assert.NotEmpty(loadedList);
 
-            var loaded = await storage.GetCrypto(crypto.State.Token, _userId);
+            var loadedOpt = await storage.GetCrypto(crypto.State.Token, _userId);
+            Assert.True(FSharpOption<OwnedCrypto>.get_IsSome(loadedOpt));
+            var loaded = loadedOpt.Value;
 
             Assert.Equal(loaded.State.Quantity, crypto.State.Quantity);
 
-            loaded.Purchase(5, 5, DateTime.UtcNow);
+            loaded.Purchase(5, 5, DateTime.UtcNow, notes: null);
 
             await storage.SaveCrypto(loaded, _userId);
 
-            loaded = await storage.GetCrypto(loaded.State.Token, UserId.NewUserId(loaded.State.UserId));
+            loadedOpt = await storage.GetCrypto(loaded.State.Token, UserId.NewUserId(loaded.State.UserId));
+            Assert.True(FSharpOption<OwnedCrypto>.get_IsSome(loadedOpt));
+            loaded = loadedOpt.Value;
 
             Assert.NotEqual(loaded.State.Quantity, crypto.State.Quantity);
 
@@ -234,7 +238,9 @@ namespace storagetests
 
             Assert.NotEmpty(existing);
 
-            var loaded = await storage.GetRoutine(routine.State.Id, _userId);
+            var loadedOpt = await storage.GetRoutine(routine.State.Id, _userId);
+            Assert.True(FSharpOption<Routine>.get_IsSome(loadedOpt));
+            var loaded = loadedOpt.Value;
 
             Assert.Equal(routine.State.Name, loaded.State.Name);
 
@@ -268,7 +274,9 @@ namespace storagetests
 
             Assert.NotEmpty(existing);
 
-            var loaded = await storage.GetStockList(list.State.Id, _userId);
+            var loadedOpt = await storage.GetStockList(list.State.Id, _userId);
+            Assert.True(FSharpOption<StockList>.get_IsSome(loadedOpt));
+            var loaded = loadedOpt.Value;
 
             Assert.Equal(list.State.Name, loaded.State.Name);
 

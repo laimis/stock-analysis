@@ -5,6 +5,7 @@ using core.fs.Adapters.CSV;
 using core.fs.Stocks;
 using csvparser.fs;
 using testutils;
+using Microsoft.FSharp.Core;
 using Xunit;
 
 namespace csvparsertests
@@ -33,8 +34,8 @@ namespace csvparsertests
         {
             var crypto = new OwnedCrypto("btc", Guid.NewGuid());
 
-            crypto.Purchase(quantity: 1.2m, dollarAmountSpent: 200, date: DateTimeOffset.UtcNow);
-            crypto.Sell(quantity: 0.2m, dollarAmountReceived: 100, date: DateTimeOffset.UtcNow);
+            crypto.Purchase(quantity: 1.2m, dollarAmountSpent: 200, date: DateTimeOffset.UtcNow, notes: null);
+            crypto.Sell(quantity: 0.2m, dollarAmountReceived: 100, date: DateTimeOffset.UtcNow, notes: FSharpOption<string>.None);
 
             var report = CSVExport.cryptos(_csvWriter, new[] {crypto});
 
