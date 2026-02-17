@@ -10,7 +10,7 @@ RUN npm install -g @angular/cli
 WORKDIR /app
 COPY . /app
 
-RUN dotnet publish ./src/web --self-contained -r linux-musl-x64 -c Release -o /app/out
+RUN dotnet publish ./src/web.fs --self-contained -r linux-musl-x64 -c Release -o /app/out
 RUN dotnet publish ./src/frontend --self-contained -r linux-musl-x64 -c Release -o /app/out
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine
@@ -26,4 +26,4 @@ COPY --from=build-env /app/out /app
 ENV ASPNETCORE_URLS=http://*:8080
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
-ENTRYPOINT ["dotnet", "web.dll"]
+ENTRYPOINT ["dotnet", "web.fs.dll"]

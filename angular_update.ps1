@@ -1,7 +1,7 @@
 # store current directory
 $scriptPath = $MyInvocation.MyCommand.Path | Split-Path
 
-# change directory to src/web/ClientApp
+# change directory to src/frontend
 Set-Location src/frontend
 
 # get list of packages that need updating
