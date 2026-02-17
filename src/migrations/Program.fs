@@ -18,11 +18,7 @@ let logger = loggerFactory.CreateLogger("migrations")
 
 let builder = System.Environment.GetCommandLineArgs() |> Host.CreateApplicationBuilder 
  
-DIHelper.RegisterServices(
-    builder.Configuration,
-    builder.Services,
-    logger
-)
+DIHelper.registerServices builder.Configuration builder.Services logger
 
 let host = builder.Build()
 

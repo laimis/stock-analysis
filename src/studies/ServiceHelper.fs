@@ -48,11 +48,7 @@ let init (configuration:IConfiguration option) args =
         | None -> builder.Configuration :> IConfiguration
         | Some config -> config
      
-    DIHelper.RegisterServices(
-        configuration,
-        builder.Services,
-        newLogger
-    )
+    DIHelper.registerServices configuration builder.Services newLogger
 
     let host = builder.Build()
     
