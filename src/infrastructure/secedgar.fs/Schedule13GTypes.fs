@@ -89,7 +89,8 @@ module Schedule13GHelpers =
         | Some "IC" -> Some "IC"
         | Some "BD" -> Some "BD"
         | Some "IN" -> Some "IN"
-        | Some "BK" -> Some "FI"
+        | Some "BK" -> Some "FI"  // Bank -> Financial Institution
+        | Some "FI" -> Some "FI"  // Financial Institution (used directly by SEC)
         | Some "HC" -> Some "HC"
         | Some "EP" -> Some "EP"
         | Some "OO" -> Some "OO"
