@@ -586,12 +586,14 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     failwith $"Could not parse option description format: {l.instrument.description}"
                 
                 let expirationString = rm.Groups[1].Value
+                
+                if String.IsNullOrWhiteSpace(expirationString) then
+                    failwith $"Expiration date is empty in option description: {l.instrument.description}"
 
-                match DateTimeOffset.TryParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None) with
-                | false, _ -> failwith $"Could not parse option expiration date from string: {expirationString} for {l.instrument.description}"
-                | true, _ -> ()
-
-                let expiration = DateTimeOffset.ParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture) |> OptionExpiration.createFromDateTimeOffset
+                let expiration =
+                    match DateTimeOffset.TryParseExact(expirationString, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None) with
+                    | false, _ -> failwith $"Could not parse option expiration date from string: '{expirationString}' for {l.instrument.description}"
+                    | true, dt -> dt |> OptionExpiration.createFromDateTimeOffset
                 let strikePrice = rm.Groups[2].Value |> decimal
                 let instruction = l.instruction |> parseOptionOrderInstruction
                 let quantityFactor =
