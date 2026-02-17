@@ -1,12 +1,10 @@
 namespace secedgar.fs
 
 open System
-open System.Linq
 open Microsoft.Extensions.Logging
 open core.fs
 open core.fs.Adapters.SEC
 open core.fs.Adapters.Storage
-open core.fs.Services
 open core.Shared
 
 type Schedule13GProcessingService(
