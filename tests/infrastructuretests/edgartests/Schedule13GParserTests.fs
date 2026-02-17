@@ -21,6 +21,7 @@ module EdgarClientTests =
     [<InlineData("AAPL")>]
     [<InlineData("MSFT")>]
     [<InlineData("DOCN")>]
+    [<Trait("Category", "Integration")>]
     let ``Fetch filings for ticker works`` (ticker: string) = task {
 
         let client = createEdgarClient()

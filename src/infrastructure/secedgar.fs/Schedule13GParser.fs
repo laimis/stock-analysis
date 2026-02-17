@@ -12,6 +12,7 @@ open Microsoft.Extensions.Logging
 // TODO: Implement a mechanism to retrieve XML versions for all relevant SEC Schedule 13G documents.
 
 module Schedule13GParser =
+    open System.Globalization
     
     let private xname name = XName.Get(name)
     let private xnameWithNs ns name = XName.Get(name, ns)
@@ -49,7 +50,7 @@ module Schedule13GParser =
         | Some v ->
             let cleaned = v.Trim().Replace(",", "").Replace(" ", "")
             // Try parsing as decimal first to handle fractional shares, then round
-            match Decimal.TryParse(cleaned) with
+            match Decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture) with
             | (true, num) -> Some (int64 (Math.Round(num, 0, MidpointRounding.AwayFromZero)))
             | _ -> None
     
@@ -59,8 +60,8 @@ module Schedule13GParser =
         | None -> None
         | Some v ->
             let cleaned = v.Trim().Replace(",", "").Replace(" ", "")
-            match Decimal.TryParse(cleaned) with
-            | (true, num) -> Some num
+            match Decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture) with
+            | true, num -> Some num
             | _ -> None
     
     /// Try to parse DateTimeOffset
@@ -68,7 +69,7 @@ module Schedule13GParser =
         match value with
         | None -> None
         | Some v ->
-            match DateTimeOffset.TryParse(v) with
+            match DateTimeOffset.TryParseExact(v, "yyyy-MM-dd", null, DateTimeStyles.None) with
             | (true, date) -> Some date
             | _ -> None
     
