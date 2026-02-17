@@ -205,7 +205,8 @@ module Schedule13GParserTests =
     let ``Entity type mapping works correctly`` () =
         Assert.Equal(Some "IA", Schedule13GHelpers.mapEntityType (Some "IA"))
         Assert.Equal(Some "HC", Schedule13GHelpers.mapEntityType (Some "HC"))
-        Assert.Equal(Some "FI", Schedule13GHelpers.mapEntityType (Some "BK"))
+        Assert.Equal(Some "FI", Schedule13GHelpers.mapEntityType (Some "BK"))  // BK (Bank) -> FI
+        Assert.Equal(Some "FI", Schedule13GHelpers.mapEntityType (Some "FI"))  // FI stays as FI
         Assert.Equal(None, Schedule13GHelpers.mapEntityType (Some "UNKNOWN"))
         Assert.Equal(None, Schedule13GHelpers.mapEntityType None)
     
