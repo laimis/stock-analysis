@@ -6,7 +6,7 @@ using core.Shared;
 using Microsoft.FSharp.Core;
 using storage.shared;
 
-namespace storagetests
+namespace testutils
 {
     public class FakeOutbox : IOutbox
     {

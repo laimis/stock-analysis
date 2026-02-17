@@ -49,6 +49,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "emailclient", "src\infrastr
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "emailtests", "tests\infrastructuretests\emailtests\emailtests.fsproj", "{7222A9A7-CE4F-4A76-9419-59AB163D5B6F}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "edgartests", "tests\infrastructuretests\edgartests\edgartests.fsproj", "{A8B3C4D5-E6F7-4890-9A1B-2C3D4E5F6789}"
+EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "securityutils.fs", "src\infrastructure\securityutils.fs\securityutils.fs.fsproj", "{D7B71713-4817-4F9E-9645-2C2AEB1A928D}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "storage.shared.fs", "src\infrastructure\storage.shared.fs\storage.shared.fs.fsproj", "{1C9512A8-3FAE-4C8A-B940-40666F3981D7}"

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edgarSubmission xmlns="http://www.sec.gov/edgar/schedule13g" xmlns:com="http://www.sec.gov/edgar/common">
+ <headerData>
+  <submissionType>SCHEDULE 13G/A</submissionType>
+  <filerInfo>
+   <filer>
+    <filerCredentials>
+     <cik>0000315066</cik>
+    </filerCredentials>
+   </filer>
+  </filerInfo>
+ </headerData>
+ <formData>
+  <coverPageHeader>
+   <amendmentNo>5</amendmentNo>
+   <eventDateRequiresFilingThisStatement>12/31/2025</eventDateRequiresFilingThisStatement>
+   <issuerInfo>
+    <issuerCik>0001516513</issuerCik>
+    <issuerName>DOXIMITY INC</issuerName>
+   </issuerInfo>
+  </coverPageHeader>
+  <coverPageHeaderReportingPersonDetails>
+   <reportingPersonName>FMR LLC</reportingPersonName>
+   <reportingPersonBeneficiallyOwnedNumberOfShares>
+    <soleVotingPower>2155851.97</soleVotingPower>
+    <sharedVotingPower>0.00</sharedVotingPower>
+    <soleDispositivePower>2164071.69</soleDispositivePower>
+    <sharedDispositivePower>0.00</sharedDispositivePower>
+   </reportingPersonBeneficiallyOwnedNumberOfShares>
+   <reportingPersonBeneficiallyOwnedAggregateNumberOfShares>2164071.69</reportingPersonBeneficiallyOwnedAggregateNumberOfShares>
+   <classPercent>1.6</classPercent>
+   <typeOfReportingPerson>HC</typeOfReportingPerson>
+  </coverPageHeaderReportingPersonDetails>
+  <signatureInformation>
+   <signatureDetails>
+    <date>02/04/2026</date>
+   </signatureDetails>
+  </signatureInformation>
+ </formData>
+</edgarSubmission>

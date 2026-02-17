@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Schedule13GTypes.fs" />
+    <Compile Include="Schedule13GParser.fs" />
     <Compile Include="EdgarClient.fs" />
   </ItemGroup>
 
