@@ -70,21 +70,17 @@ module Schedule13GHelpers =
     
     /// Calculate confidence score based on what was successfully parsed
     let calculateConfidence (parsed: ParsedSchedule13G) =
-        let mutable score = 0.0
-        
-        if parsed.FilerCik.IsSome then score <- score + 0.15
-        if not (String.IsNullOrWhiteSpace parsed.FilerName) then score <- score + 0.15
-        if parsed.IssuerCik.IsSome then score <- score + 0.15
-        if not (String.IsNullOrWhiteSpace parsed.IssuerName) then score <- score + 0.15
-        if parsed.SharesOwned > 0L then score <- score + 0.10
-        if parsed.PercentOfClass > 0.0m then score <- score + 0.10
-        
-        if parsed.SoleVotingPower.IsSome || parsed.SharedVotingPower.IsSome then score <- score + 0.05
-        if parsed.SoleDispositivePower.IsSome || parsed.SharedDispositivePower.IsSome then score <- score + 0.05
-        if parsed.AsOfDate.IsSome then score <- score + 0.05
-        if parsed.EntityType.IsSome then score <- score + 0.05
-        
-        score
+        [ if parsed.FilerCik.IsSome then 0.15 else 0.0
+          if not (String.IsNullOrWhiteSpace parsed.FilerName) then 0.15 else 0.0
+          if parsed.IssuerCik.IsSome then 0.15 else 0.0
+          if not (String.IsNullOrWhiteSpace parsed.IssuerName) then 0.15 else 0.0
+          if parsed.SharesOwned > 0L then 0.10 else 0.0
+          if parsed.PercentOfClass > 0.0m then 0.10 else 0.0
+          if parsed.SoleVotingPower.IsSome || parsed.SharedVotingPower.IsSome then 0.05 else 0.0
+          if parsed.SoleDispositivePower.IsSome || parsed.SharedDispositivePower.IsSome then 0.05 else 0.0
+          if parsed.AsOfDate.IsSome then 0.05 else 0.0
+          if parsed.EntityType.IsSome then 0.05 else 0.0 ]
+        |> List.sum
     
     /// Map SEC entity type codes to system codes
     let mapEntityType (secType: string option) =
