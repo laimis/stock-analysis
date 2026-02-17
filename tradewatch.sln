@@ -65,6 +65,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "coinmarketcap.fs", "src\inf
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "csvparser.fs", "src\infrastructure\csvparser.fs\csvparser.fs.fsproj", "{0616EEE4-06D9-40E6-A3A5-117B9920504E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "storage.postgres.fs", "src\infrastructure\storage.postgres.fs\storage.postgres.fs.fsproj", "{E2D1A399-631F-444D-B777-60C14C8EAEC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -399,6 +401,18 @@ Global
 		{0616EEE4-06D9-40E6-A3A5-117B9920504E}.Release|x64.Build.0 = Release|Any CPU
 		{0616EEE4-06D9-40E6-A3A5-117B9920504E}.Release|x86.ActiveCfg = Release|Any CPU
 		{0616EEE4-06D9-40E6-A3A5-117B9920504E}.Release|x86.Build.0 = Release|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Debug|x64.Build.0 = Debug|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Debug|x86.Build.0 = Debug|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Release|x64.ActiveCfg = Release|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Release|x64.Build.0 = Release|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Release|x86.ActiveCfg = Release|Any CPU
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -433,5 +447,6 @@ Global
 		{D9BF5FD7-16F4-4DEC-8E6A-CA858159B18B} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{047F0ACC-388E-4500-A4F2-BF28D96E4EB2} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 		{0616EEE4-06D9-40E6-A3A5-117B9920504E} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
+		{E2D1A399-631F-444D-B777-60C14C8EAEC0} = {C5CD2ABD-C8B8-43E9-91DD-07B42C48ED62}
 	EndGlobalSection
 EndGlobal
