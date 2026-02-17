@@ -479,35 +479,37 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                 let query = "SELECT * FROM optionpricings WHERE userid = @userId AND symbol = @symbol ORDER BY timestamp ASC"
                 use! reader = db.ExecuteReaderAsync(query, {| userId = id; symbol = symbolValue |})
                 
-                let result = List<OptionPricing>()
+                let rec readRows acc =
+                    let hasMore = reader.Read()
+                    if hasMore then
+                        let pricing = {
+                            UserId = UserId (reader.GetGuid(reader.GetOrdinal("userId")))
+                            OptionPositionId = OptionPositionId (reader.GetGuid(reader.GetOrdinal("optionPositionId")))
+                            UnderlyingTicker = Ticker(reader.GetString(reader.GetOrdinal("underlyingTicker")))
+                            Symbol = OptionTicker (reader.GetString(reader.GetOrdinal("symbol")))
+                            Expiration = OptionExpiration.create(reader.GetString(reader.GetOrdinal("expiration")))
+                            StrikePrice = reader.GetDecimal(reader.GetOrdinal("strikePrice"))
+                            OptionType = OptionType.FromString(reader.GetString(reader.GetOrdinal("optionType")))
+                            Volume = reader.GetInt32(reader.GetOrdinal("volume"))
+                            OpenInterest = reader.GetInt32(reader.GetOrdinal("openInterest"))
+                            Bid = reader.GetDecimal(reader.GetOrdinal("bid"))
+                            Ask = reader.GetDecimal(reader.GetOrdinal("ask"))
+                            Last = reader.GetDecimal(reader.GetOrdinal("last"))
+                            Mark = reader.GetDecimal(reader.GetOrdinal("mark"))
+                            Volatility = reader.GetDecimal(reader.GetOrdinal("volatility"))
+                            Delta = reader.GetDecimal(reader.GetOrdinal("delta"))
+                            Gamma = reader.GetDecimal(reader.GetOrdinal("gamma"))
+                            Theta = reader.GetDecimal(reader.GetOrdinal("theta"))
+                            Vega = reader.GetDecimal(reader.GetOrdinal("vega"))
+                            Rho = reader.GetDecimal(reader.GetOrdinal("rho"))
+                            UnderlyingPrice = Some (reader.GetDecimal(reader.GetOrdinal("underlyingPrice")))
+                            Timestamp = DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("timestamp")))
+                        }
+                        readRows (pricing :: acc)
+                    else
+                        List.rev acc
                 
-                while reader.Read() do
-                    let pricing = {
-                        UserId = UserId (reader.GetGuid(reader.GetOrdinal("userId")))
-                        OptionPositionId = OptionPositionId (reader.GetGuid(reader.GetOrdinal("optionPositionId")))
-                        UnderlyingTicker = Ticker(reader.GetString(reader.GetOrdinal("underlyingTicker")))
-                        Symbol = OptionTicker (reader.GetString(reader.GetOrdinal("symbol")))
-                        Expiration = OptionExpiration.create(reader.GetString(reader.GetOrdinal("expiration")))
-                        StrikePrice = reader.GetDecimal(reader.GetOrdinal("strikePrice"))
-                        OptionType = OptionType.FromString(reader.GetString(reader.GetOrdinal("optionType")))
-                        Volume = reader.GetInt32(reader.GetOrdinal("volume"))
-                        OpenInterest = reader.GetInt32(reader.GetOrdinal("openInterest"))
-                        Bid = reader.GetDecimal(reader.GetOrdinal("bid"))
-                        Ask = reader.GetDecimal(reader.GetOrdinal("ask"))
-                        Last = reader.GetDecimal(reader.GetOrdinal("last"))
-                        Mark = reader.GetDecimal(reader.GetOrdinal("mark"))
-                        Volatility = reader.GetDecimal(reader.GetOrdinal("volatility"))
-                        Delta = reader.GetDecimal(reader.GetOrdinal("delta"))
-                        Gamma = reader.GetDecimal(reader.GetOrdinal("gamma"))
-                        Theta = reader.GetDecimal(reader.GetOrdinal("theta"))
-                        Vega = reader.GetDecimal(reader.GetOrdinal("vega"))
-                        Rho = reader.GetDecimal(reader.GetOrdinal("rho"))
-                        UnderlyingPrice = Some (reader.GetDecimal(reader.GetOrdinal("underlyingPrice")))
-                        Timestamp = DateTimeOffset(reader.GetDateTime(reader.GetOrdinal("timestamp")))
-                    }
-                    result.Add(pricing)
-                
-                return result
+                return readRows [] |> Seq.ofList
             }
         
         member this.SaveOptionPricing pricing userId = 
