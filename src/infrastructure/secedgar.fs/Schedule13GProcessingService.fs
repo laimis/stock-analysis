@@ -165,7 +165,8 @@ type Schedule13GProcessingService(
             logger.LogInformation("Starting Schedule 13G processing service")
             
             // Query for recent 13G and 13G/A filings (last 30 days)
-            let formTypes = [| "SC 13G"; "SC 13G/A" |]
+            // Include both "SC 13G" and "SCHEDULE 13G" variations to handle different SEC API formats
+            let formTypes = [| "SC 13G"; "SC 13G/A"; "SCHEDULE 13G"; "SCHEDULE 13G/A" |]
             let! recentFilings = secFilingStorage.GetFilingsByFormType formTypes 100
             
             let filings = 
