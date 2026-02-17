@@ -98,8 +98,8 @@ module DIHelper =
             let logger = sp.GetService<ILogger<secedgar.fs.EdgarClient>>()
             let accountStorage = sp.GetService<IAccountStorage>()
             secedgar.fs.EdgarClient(
-                (if isNull (box logger) then None else Some logger),
-                (if isNull (box accountStorage) then None else Some accountStorage)
+                Some logger,
+                Some accountStorage
             ) :> ISECFilings
         ) |> ignore
         
