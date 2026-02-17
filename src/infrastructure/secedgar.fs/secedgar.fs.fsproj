@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="Schedule13GTypes.fs" />
     <Compile Include="Schedule13GParser.fs" />
+    <Compile Include="Schedule13GProcessingService.fs" />
     <Compile Include="EdgarClient.fs" />
   </ItemGroup>
 
