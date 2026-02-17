@@ -41,6 +41,7 @@ module Schedule13GParserTests =
             Assert.Fail($"Failed to parse: {msg}")
     
     [<Fact>]
+    [<Trait("Category", "Integration")>]
     let ``Parse real Schedule 13G from SEC - DOCS/FMR`` () =
         // Arrange
         let filingUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/xslSCHEDULE_13G_X01/primary_doc.xml"

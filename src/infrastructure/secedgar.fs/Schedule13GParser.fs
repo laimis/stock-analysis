@@ -8,7 +8,7 @@ open Microsoft.Extensions.Logging
 
 // used this for testing https://www.sec.gov/Archives/edgar/data/315066/000031506626000439/primary_doc.xml
 // human friendly: https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/xslSCHEDULE_13G_X01/primary_doc.xml
-// I will need to find a way to get the XML versions for all the docs
+// TODO: Implement a mechanism to retrieve XML versions for all relevant SEC Schedule 13G documents.
 
 module Schedule13GParser =
     
