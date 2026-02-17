@@ -22,6 +22,7 @@ module Schedule13GParser =
         let settings = XmlReaderSettings()
         settings.DtdProcessing <- DtdProcessing.Prohibit
         settings.XmlResolver <- null
+        settings.CloseInput <- true
         let stringReader = new StringReader(xml)
         XmlReader.Create(stringReader, settings)
     
