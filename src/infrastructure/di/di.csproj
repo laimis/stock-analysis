@@ -11,7 +11,7 @@
     <ProjectReference Include="..\twilioclient.fs\twilioclient.fs.fsproj" />
     <ProjectReference Include="..\schwabclient\schwabclient.fsproj" />
     <ProjectReference Include="..\emailclient\emailclient.fsproj" />
-    <ProjectReference Include="..\storage.postgres\storage.postgres.csproj" />
+    <ProjectReference Include="..\storage.postgres.fs\storage.postgres.fs.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

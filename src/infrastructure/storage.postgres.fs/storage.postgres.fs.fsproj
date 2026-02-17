@@ -8,6 +8,7 @@
     <Compile Include="PostgresAggregateStorage.fs" />
     <Compile Include="AccountStorage.fs" />
     <Compile Include="OwnershipStorage.fs" />
+    <Compile Include="SECFilingStorage.fs" />
   </ItemGroup>
 
   <ItemGroup>
