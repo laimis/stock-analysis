@@ -45,10 +45,13 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                 with ex ->
                     if ownsConnection && not (isNull tx) then
                         try tx.Rollback() with _ -> ()
-                    if ownsConnection then
-                        if not (isNull tx) then try tx.Dispose() with _ -> ()
-                        if not (isNull db) then try db.Dispose() with _ -> ()
                     raise ex
+                
+                if ownsConnection then
+                    if not (isNull tx) then
+                        try tx.Dispose() with _ -> ()
+                    if not (isNull db) then
+                        try db.Dispose() with _ -> ()
             } :> Task
         
         member this.DeleteAggregate(entity: string, aggregateId: Guid, userId: UserId) = 
