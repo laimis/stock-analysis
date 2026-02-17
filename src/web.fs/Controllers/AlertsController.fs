@@ -191,7 +191,7 @@ type AlertsController(handler: Handler) =
 
     [<HttpDelete("price/{alertId}")>]
     member this.DeleteStockPriceAlert([<FromRoute>] alertId: Guid) =
-        this.OkOrError(handler.Handle({DeleteStockPriceAlert.AlertId = alertId}))
+        this.OkOrError(handler.Handle({DeleteStockPriceAlert.UserId = this.User.Identifier(); AlertId = alertId}))
 
     [<HttpGet("reminders")>]
     member this.GetReminders() =
@@ -219,4 +219,4 @@ type AlertsController(handler: Handler) =
 
     [<HttpDelete("reminders/{reminderId}")>]
     member this.DeleteReminder([<FromRoute>] reminderId: Guid) =
-        this.OkOrError(handler.Handle({DeleteReminder.ReminderId = reminderId}))
+        this.OkOrError(handler.Handle({DeleteReminder.UserId = this.User.Identifier(); ReminderId = reminderId}))

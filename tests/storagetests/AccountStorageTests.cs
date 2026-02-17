@@ -263,7 +263,7 @@ namespace storagetests
             Assert.False(FSharpOption<DateTimeOffset>.get_IsNone(updatedFromDb.TriggeredAt));
             
             // Delete alert
-            await storage.DeleteStockPriceAlert(alertId);
+            await storage.DeleteStockPriceAlert(alertId, userId);
             
             var afterDelete = await storage.GetStockPriceAlerts(userId);
             
@@ -349,7 +349,7 @@ namespace storagetests
             Assert.False(FSharpOption<DateTimeOffset>.get_IsNone(sentFromDb.SentAt));
             
             // Delete reminder
-            await storage.DeleteReminder(reminderId);
+            await storage.DeleteReminder(reminderId, userId);
             
             var afterDelete = await storage.GetReminders(userId);
             
