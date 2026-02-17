@@ -8,5 +8,5 @@ REM set ADMINEmail=... # email address for admin user, when a user with this add
 
 REM set COINMARKETCAPToken=.... # coinmarketcap token that you will need for crypto prices
 
-cd src\web
+cd src\web.fs
 dotnet watch run

@@ -27,7 +27,7 @@ namespace core.fs.Alerts
     type CreateStockPriceAlertResponse = {AlertId:string}
     type UpdateStockPriceAlert = {UserId:UserId; AlertId:Guid; PriceLevel:decimal; AlertType:string; Note:string; State:string}
     type ResetStockPriceAlert = {UserId:UserId; AlertId:Guid}
-    type DeleteStockPriceAlert = {AlertId:Guid}
+    type DeleteStockPriceAlert = {UserId:UserId; AlertId:Guid}
     
     // Reminder Commands
     type GetReminders = {UserId:UserId}
@@ -35,7 +35,7 @@ namespace core.fs.Alerts
     [<CLIMutable>]
     type CreateReminderResponse = {ReminderId:string}
     type UpdateReminder = {UserId:UserId; ReminderId:Guid; Date:string; Message:string; Ticker:string option; State:string}
-    type DeleteReminder = {ReminderId:Guid}
+    type DeleteReminder = {UserId:UserId; ReminderId:Guid}
     
     type Handler(container:StockAlertContainer,smsService:ISMSClient,alertEmailService:AlertEmailService,logger:ILogger,accountStorage:IAccountStorage) =
     
@@ -174,7 +174,7 @@ namespace core.fs.Alerts
         
         member this.Handle (command:DeleteStockPriceAlert) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
             try
-                do! accountStorage.DeleteStockPriceAlert command.AlertId
+                do! accountStorage.DeleteStockPriceAlert command.AlertId command.UserId
                 return Ok ()
             with
             | ex ->
@@ -245,7 +245,7 @@ namespace core.fs.Alerts
         
         member this.Handle (command:DeleteReminder) : System.Threading.Tasks.Task<Result<Unit, ServiceError>> = task {
             try
-                do! accountStorage.DeleteReminder(command.ReminderId)
+                do! accountStorage.DeleteReminder command.ReminderId command.UserId
                 return Ok ()
             with
             | ex ->

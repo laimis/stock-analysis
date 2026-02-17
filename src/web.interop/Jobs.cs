@@ -9,7 +9,7 @@ namespace web.Utils;
 
 public static class Jobs
 {
-    public static void ConfigureJobs(IApplicationBuilder app, ILogger<Program> logger)
+    public static void ConfigureJobs(IApplicationBuilder app, ILogger logger)
     {
         var configuration = app.ApplicationServices.GetService<IConfiguration>();
         

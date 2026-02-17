@@ -9,13 +9,13 @@ Nightingale Trading (aka NGTDTrading) is a stock, options, and crypto portfolio 
 - **C# Components**: Domain aggregates, events, infrastructure adapters (in `src/core`)
 - **F# Components**: Domain aggregates, events, Business logic, handlers, services, type-safe domain modeling (in `src/core.fs`)
 - **Frontend**: Angular 20+ with TypeScript (in `src/frontend`)
-- **Host**: ASP.NET Core 10.0 web application (in `src/web`)
+- **Host**: ASP.NET Core 10.0 web application (in `src/web.fs`)
 
 ### Key Projects
 ```
 src/core           → C# domain aggregates (OwnedStock, StockList, etc.)
 src/core.fs        → F# domain aggregates, business logic and handlers, app services
-src/web            → ASP.NET Core API and hosting
+src/web.fs         → ASP.NET Core API and hosting
 src/frontend       → Angular SPA
 src/infrastructure → External service integrations (storage, APIs, messaging, emails)
 src/studies        → F# data analysis and backtesting scripts
@@ -63,7 +63,7 @@ dotnet build tradewatch.sln
 # Or use VS Code task: "build"
 
 # Watch mode for live development
-dotnet watch run --project src/web/web.csproj
+dotnet watch run --project src/web.fs/web.fs.fsproj
 # Or use VS Code task: "watch"
 ```
 
@@ -75,7 +75,7 @@ dotnet watch run --project src/web/web.csproj
    set IEXToken=your_token_here
    set COINMARKETCAPToken=your_token_here
    ```
-2. **Run**: `dotnet run --project src/web/web.csproj`
+2. **Run**: `dotnet run --project src/web.fs/web.fs.fsproj`
 3. Frontend served from `wwwroot/` (build Angular separately if developing UI)
 
 ### Deployment Workflow
@@ -94,7 +94,7 @@ dotnet watch run --project src/web/web.csproj
 
 ### Brokerage
 - **Schwab API**: Account sync, positions, orders (F# client in `infrastructure/schwabclient`)
-- OAuth flow managed in `src/web/Controllers/BrokerageController.cs`
+- OAuth flow managed in `src/web.fs/Controllers/BrokerageController.fs`
 
 ### Crypto
 - **CoinMarketCap API**: Crypto prices and metadata (adapter in `infrastructure/coinmarketcap`)
@@ -137,7 +137,7 @@ dotnet watch run --project src/web/web.csproj
 
 ## Getting Oriented Quickly
 - **Domain logic**: Start in `src/core.fs/{Stocks,Options,Portfolio}/`
-- **API endpoints**: Check `src/web/Controllers/`
+- **API endpoints**: Check `src/web.fs/Controllers/`
 - **Storage queries**: See `src/infrastructure/storage.postgres/`
 - **Frontend features**: Explore `src/frontend/src/app/` by domain area
-- **Background jobs**: Review `src/web/Utils/Jobs.cs` and F# `MonitoringServices.fs` files
+- **Background jobs**: Review `src/web.interop/Jobs.cs` and F# `MonitoringServices.fs` files

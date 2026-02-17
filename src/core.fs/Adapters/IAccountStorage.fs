@@ -38,10 +38,10 @@ type IAccountStorage =
     abstract member SaveOptionPricing : pricing:OptionPricing -> userId:UserId -> Task
     abstract member GetStockPriceAlerts: userId:UserId -> Task<StockPriceAlert seq>
     abstract member SaveStockPriceAlert: alert:StockPriceAlert -> Task
-    abstract member DeleteStockPriceAlert: alertId:Guid -> Task
+    abstract member DeleteStockPriceAlert: alertId:Guid -> userId:UserId -> Task
     abstract member GetReminders: userId:UserId -> Task<Reminder seq>
     abstract member SaveReminder: reminder:Reminder -> Task
-    abstract member DeleteReminder: reminderId:Guid -> Task
+    abstract member DeleteReminder: reminderId:Guid -> userId:UserId -> Task
     abstract member GetTickerCik: ticker:string -> Task<TickerCikMapping option>
     abstract member SaveTickerCikMappings: mappings:TickerCikMapping seq -> Task
     abstract member GetAllTickerCikMappings: unit -> Task<TickerCikMapping seq>

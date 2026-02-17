@@ -598,12 +598,13 @@ ON CONFLICT (alertid) DO UPDATE SET
                        lastresetat = alert.LastResetAt |> Option.toNullable |})
             }
         
-        member this.DeleteStockPriceAlert(alertId: Guid) = 
+        member this.DeleteStockPriceAlert alertId userId = 
             task {
                 use db = this.GetConnection()
+                let (UserId id) = userId
                 
-                let query = "DELETE FROM stockpricealerts WHERE alertid = @alertid"
-                return! db.ExecuteAsync(query, {| alertid = alertId |})
+                let query = "DELETE FROM stockpricealerts WHERE alertid = @alertid AND userid = @userid"
+                return! db.ExecuteAsync(query, {| alertid = alertId; userid = id |})
             }
         
         member this.GetReminders(userId: UserId) = 
@@ -656,12 +657,13 @@ ON CONFLICT (reminderid) DO UPDATE SET
                        sentat = reminder.SentAt |> Option.map (fun dt -> dt.ToUniversalTime()) |> Option.toNullable |})
             }
         
-        member this.DeleteReminder(reminderId: Guid) = 
+        member this.DeleteReminder reminderId userId = 
             task {
                 use db = this.GetConnection()
+                let (UserId id) = userId
                 
-                let query = "DELETE FROM reminders WHERE reminderid = @reminderid"
-                return! db.ExecuteAsync(query, {| reminderid = reminderId |})
+                let query = "DELETE FROM reminders WHERE reminderid = @reminderid AND userid = @userid"
+                return! db.ExecuteAsync(query, {| reminderid = reminderId; userid = id |})
             }
         
         member this.GetTickerCik(ticker: string) = 

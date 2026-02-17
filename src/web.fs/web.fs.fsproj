@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <InvariantGlobalization>false</InvariantGlobalization>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Utils must come before controllers as they contain extensions -->
+        <Compile Include="Utils/IdentityExtensions.fs" />
+        <Compile Include="Utils/ControllerBaseExtensions.fs" />
+        <Compile Include="Utils/TextPlainInputFormatter.fs" />
+        <Compile Include="Utils/CustomConverters.fs" />
+        <Compile Include="Utils/HealthCheck.fs" />
+        
+        <!-- Background Services -->
+        <Compile Include="BackgroundServices/GenericBackgroundServiceHost.fs" />
+        
+        <!-- Controllers -->
+        <Compile Include="Controllers/SECController.fs" />
+        <Compile Include="Controllers/TransactionsController.fs" />
+        <Compile Include="Controllers/PendingPositionsController.fs" />
+        <Compile Include="Controllers/OptionsController.fs" />
+        <Compile Include="Controllers/CryptosController.fs" />
+        <Compile Include="Controllers/StocksController.fs" />
+        <Compile Include="Controllers/StockListsController.fs" />
+        <Compile Include="Controllers/RoutinesController.fs" />
+        <Compile Include="Controllers/OwnershipController.fs" />
+        <Compile Include="Controllers/ReportsController.fs" />
+        <Compile Include="Controllers/AlertsController.fs" />
+        <Compile Include="Controllers/BrokerageController.fs" />
+        <Compile Include="Controllers/AdminController.fs" />
+        <Compile Include="Controllers/AccountController.fs" />
+        <Compile Include="Controllers/PortfolioController.fs" />
+        
+        <!-- Auth and startup -->
+        <Compile Include="AuthHelper.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Hangfire" Version="1.8.23" />
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\core\core.csproj" />
+        <ProjectReference Include="..\infrastructure\storage.postgres.fs\storage.postgres.fs.fsproj" />
+        <ProjectReference Include="..\infrastructure\coinmarketcap.fs\coinmarketcap.fs.fsproj" />
+        <ProjectReference Include="..\infrastructure\csvparser.fs\csvparser.fs.fsproj" />
+        <ProjectReference Include="..\infrastructure\securityutils.fs\securityutils.fs.fsproj" />
+        <ProjectReference Include="..\core.fs\core.fs.fsproj" />
+        <ProjectReference Include="..\infrastructure\schwabclient\schwabclient.fsproj" />
+        <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
+        <ProjectReference Include="..\web.interop\web.interop.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+</Project>
