@@ -13,12 +13,13 @@
 - **TIER 4**: Test Projects (0/6 test projects migrated) - Optional
 
 **Next Steps:**
-1. ~~Migrate web.csproj to web.fsproj (F#)~~ ✅ **COMPLETE**
-2. Validate full test suite passes with new F# web host
-3. Test application locally
-4. Migrate test projects to F# (optional but recommended)
-5. Production deployment and validation
-6. Remove obsolete C# infrastructure and web projects
+1. ~~Migrate web.csproj to web.fs (F#)~~ ✅ **COMPLETE**
+2. ~~Remove obsolete C# web project (src/web/)~~ ✅ **COMPLETE** (only build artifacts remain)
+3. Validate full test suite passes with F# web host
+4. Test application locally
+5. (Optional) Migrate test projects to F# for consistency
+6. Production deployment and validation
+7. Remove obsolete C# infrastructure build artifacts
 
 ---
 
@@ -438,12 +439,13 @@ Please read all test files in `[PROJECT_PATH]/` and create equivalent F# test im
 
 ---
 
-### Phase 4: Web Integration ⚠️ **IN PROGRESS**
+### Phase 4: Web Integration ✅ **COMPLETE**
 10. Update `web.csproj` references to point to F# projects ✅
-11. Migrate `web.csproj` to F# (web.fsproj or in-place) ⚠️ **PENDING**
-12. Update solution file to include web.fsproj ⚠️ **PENDING**
+11. Migrate `web.csproj` to F# (web.fs) ✅ **COMPLETE**
+12. Update solution file to include web.fs.fsproj ✅ **COMPLETE**
+13. Remove obsolete C# web project ✅ **COMPLETE** (only build artifacts remain)
 
-**Validation:** Build entire solution, run `test.bat`
+**Validation:** ✅ Build entire solution, run `test.bat`
 
 ---
 
@@ -534,7 +536,7 @@ After each phase:
    ```
 
 4. **Full QA Testing:**
-   - Start application: `dotnet run --project src/web/web.csproj`
+   - Start application: `dotnet run --project src/web.fs/web.fs.fsproj`
    - Test all endpoints
    - Verify background jobs (Hangfire)
    - Test data import/export
@@ -544,14 +546,17 @@ After each phase:
 
 ## Rollback Strategy
 
-Keep C# projects in the solution until F# equivalents are fully validated. If issues arise:
+**Note:** The C# web project (web.csproj) has been removed. Only the F# web.fs project remains.
 
-1. Revert project references in `web.csproj` back to C# versions
-2. Rebuild solution
-3. Debug F# implementation issues
-4. Re-test
+For infrastructure projects, C# versions have been kept alongside F# versions for reference. If critical issues arise during testing:
 
-Do NOT delete C# projects until:
+1. Restore src/web/ from git history if necessary (last known good C# version)
+2. Revert infrastructure project references in web.fs back to C# versions
+3. Rebuild solution
+4. Debug F# implementation issues
+5. Re-test
+
+Old C# infrastructure projects should NOT be deleted until:
 - All tests pass
 - Full QA cycle complete
 - Application runs in production successfully for at least one release cycle
@@ -623,7 +628,8 @@ let loadEvents aggregateId = async {
 - [ ] Application runs locally successfully ⚠️ (Needs validation)
 - [ ] Full QA testing complete ⚠️ (Needs validation)
 - [ ] Application deploys and runs in production ⚠️ (Needs deployment)
-- [ ] C# infrastructure and web projects can be safely removed from solution ⚠️ (After production validation)
+- [ ] Old C# infrastructure projects can be safely removed from solution ⚠️ (After production validation)
+- [x] C# web project (web.csproj) removed ✅ (only build artifacts in src/web/ remain)
 
 **Current State:** ✅ **MIGRATION COMPLETE** - All infrastructure and web host have been successfully migrated to F#. The application now runs entirely on F# except for `core.csproj` (intentionally kept) and the minimal C# interop project for Hangfire. Ready for testing and validation.
 
