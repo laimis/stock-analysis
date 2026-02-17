@@ -523,9 +523,9 @@ type OwnershipStorage(connectionString: string) =
                 let! dtos = db.QueryAsync<OwnershipSummaryDto>(query, {| Ticker = ticker.Value |})
                 
                 // Convert to OwnershipSummary by fetching roles for each entity
-                let summaries = 
+                let! summaries = 
                     dtos
-                    |> Seq.map (fun dto ->
+                    |> Seq.map (fun dto -> async {
                         let entity = {
                             Id = dto.id
                             Name = dto.name
@@ -538,9 +538,9 @@ type OwnershipStorage(connectionString: string) =
                         
                         // Get roles for this entity
                         // TODO: This is N+1 query, consider optimizing with a single query that aggregates roles
-                        // let storage = this :> IOwnershipStorage
-                        // let! roles = storage.GetRolesByEntity(entity.Id)
-                        // let rolesList = roles |> List.ofSeq
+                        let storage = this :> IOwnershipStorage
+                        let! roles = storage.GetRolesByEntity(entity.Id) |> Async.AwaitTask
+                        let rolesList = roles |> List.ofSeq
                         
                         let percentOption = 
                             if dto.percent_of_class.HasValue then 
@@ -548,16 +548,17 @@ type OwnershipStorage(connectionString: string) =
                             else 
                                 None
                         
-                        {
+                        return {
                             Entity = entity
-                            Roles = [] // TODO: Replace with actual roles once optimized query is implemented
+                            Roles = rolesList
                             CurrentShares = dto.current_shares
                             PercentOfClass = percentOption
                             LastUpdated = DateTimeOffset.Parse(dto.last_updated)
                         }:OwnershipSummary
-                    )
+                    })
+                    |> Async.Sequential
                 
-                return summaries
+                return summaries |> Seq.ofArray
             }
         
         member this.GetOwnershipTimeline ticker days =
