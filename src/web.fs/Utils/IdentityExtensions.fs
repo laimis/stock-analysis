@@ -23,7 +23,7 @@ module IdentityExtensions =
     type ClaimsPrincipal with
         member this.Identifier() =
             match getClaimValue this ID_CLAIM_NAME with
-            | Some guid -> UserId.NewUserId(Guid(guid))
+            | Some guid -> UserId(Guid(guid))
             | None -> raise (Exception($"User is not authenticated. Missing claim: {ID_CLAIM_NAME}"))
         
         member this.Email() =

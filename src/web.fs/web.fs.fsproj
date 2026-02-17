@@ -13,9 +13,7 @@
         <Compile Include="Utils/ControllerBaseExtensions.fs" />
         <Compile Include="Utils/TextPlainInputFormatter.fs" />
         <Compile Include="Utils/CustomConverters.fs" />
-        <Compile Include="Utils/CookieEvents.fs" />
         <Compile Include="Utils/HealthCheck.fs" />
-        <Compile Include="Utils/Jobs.fs" />
         
         <!-- Background Services -->
         <Compile Include="BackgroundServices/GenericBackgroundServiceHost.fs" />
@@ -57,6 +55,7 @@
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\schwabclient\schwabclient.fsproj" />
         <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
+        <ProjectReference Include="..\web.interop\web.interop.csproj" />
     </ItemGroup>
 
     <ItemGroup>

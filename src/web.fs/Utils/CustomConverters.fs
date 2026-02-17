@@ -36,19 +36,21 @@ type OptionTickerConverter() =
     inherit JsonConverter<OptionTicker>()
     
     override this.Read(reader: byref<Utf8JsonReader>, typeToConvert: Type, options: JsonSerializerOptions) =
-        OptionTicker.NewOptionTicker(reader.GetString())
+        OptionTicker(reader.GetString())
     
     override this.Write(writer: Utf8JsonWriter, value: OptionTicker, options: JsonSerializerOptions) =
-        writer.WriteStringValue(value.Item)
+        let (OptionTicker str) = value
+        writer.WriteStringValue(str)
 
 type UserIdConverter() =
     inherit JsonConverter<UserId>()
     
     override this.Read(reader: byref<Utf8JsonReader>, typeToConvert: Type, options: JsonSerializerOptions) =
-        UserId.NewUserId(Guid(reader.GetString()))
+        UserId(Guid(reader.GetString()))
     
     override this.Write(writer: Utf8JsonWriter, value: UserId, options: JsonSerializerOptions) =
-        writer.WriteStringValue(value.Item)
+        let (UserId guid) = value
+        writer.WriteStringValue(guid)
 
 type GapTypeConverter() =
     inherit GenericConverterWithToString<GapAnalysis.GapType>()
@@ -132,10 +134,11 @@ type StockPositionIdConverter() =
     inherit JsonConverter<StockPositionId>()
     
     override this.Read(reader: byref<Utf8JsonReader>, typeToConvert: Type, options: JsonSerializerOptions) =
-        StockPositionId.NewStockPositionId(Guid.Parse(reader.GetString()))
+        StockPositionId(Guid.Parse(reader.GetString()))
     
     override this.Write(writer: Utf8JsonWriter, value: StockPositionId, options: JsonSerializerOptions) =
-        writer.WriteStringValue(value.Item.ToString())
+        let (StockPositionId guid) = value
+        writer.WriteStringValue(guid.ToString())
 
 type SentimentTypeConverter() =
     inherit GenericConverterWithToString<SentimentType>()
@@ -222,10 +225,11 @@ type OptionPositionIdConverter() =
     inherit JsonConverter<OptionPositionId>()
     
     override this.Read(reader: byref<Utf8JsonReader>, typeToConvert: Type, options: JsonSerializerOptions) =
-        OptionPositionId.NewOptionPositionId(Guid.Parse(reader.GetString()))
+        OptionPositionId(Guid.Parse(reader.GetString()))
     
     override this.Write(writer: Utf8JsonWriter, value: OptionPositionId, options: JsonSerializerOptions) =
-        writer.WriteStringValue(value.Item.ToString())
+        let (OptionPositionId guid) = value
+        writer.WriteStringValue(guid.ToString())
 
 type OptionExpirationConverter() =
     inherit JsonConverter<OptionExpiration>()
