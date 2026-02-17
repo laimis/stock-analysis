@@ -5,7 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Schedule13GTypes.fs" />
+    <Compile Include="Schedule13GParser.fs" />
     <Compile Include="EdgarClient.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="sample_schedule_13g.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
