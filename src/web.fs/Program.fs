@@ -70,13 +70,24 @@ type Program() =
             app.UseForwardedHeaders() |> ignore
             
             app.UseExceptionHandler(fun exceptionHandlerApp ->
+                // Get a logger instance to record unhandled exceptions
+                let logger = exceptionHandlerApp.ApplicationServices.GetRequiredService<ILogger<Program>>()
+                
                 exceptionHandlerApp.Run(fun context -> task {
                     context.Response.StatusCode <- StatusCodes.Status500InternalServerError
                     context.Response.ContentType <- "text/plain"
-                    
+
                     let feature = context.Features.Get<IExceptionHandlerFeature>()
-                    
-                    do! context.Response.WriteAsync(feature.Error.Message)
+
+                    match feature with
+                    | null ->
+                        logger.LogError("Unhandled exception occurred, but no exception feature was available.")
+                    | _ when isNull feature.Error ->
+                        logger.LogError("Unhandled exception occurred, but no exception detail was available.")
+                    | _ ->
+                        logger.LogError(feature.Error, "Unhandled exception occurred while processing the request.")
+
+                    do! context.Response.WriteAsync("An unexpected error occurred. Please try again later.")
                 })
             ) |> ignore
             
