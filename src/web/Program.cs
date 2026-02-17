@@ -66,7 +66,7 @@ namespace web
             builder.Services.AddHealthChecks()
                 .AddCheck<HealthCheck>("storage based health check");
 
-            DIHelper.RegisterServices(configuration, builder.Services, logger);
+            di.DIHelper.registerServices(configuration, builder.Services, logger);
             builder.Services.AddSingleton<CookieEvents>();
             
             // configure hangfire

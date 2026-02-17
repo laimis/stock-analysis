@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\infrastructure\di\di.csproj" />
+    <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
     <ProjectReference Include="..\infrastructure\storage.shared.fs\storage.shared.fs.fsproj" />
   </ItemGroup>
 
