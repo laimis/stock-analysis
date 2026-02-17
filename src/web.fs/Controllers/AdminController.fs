@@ -1,7 +1,10 @@
 namespace web.Controllers
 
 open System
+open System.Security.Claims
 open System.Threading.Tasks
+open Microsoft.AspNetCore.Authentication
+open Microsoft.AspNetCore.Authentication.Cookies
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Authorization
 open core.fs.Accounts
@@ -20,39 +23,48 @@ type AdminController(handler: core.fs.Admin.Handler) =
         this.Ok()
 
     [<HttpGet("loginas/{userId}")>]
-    member this.LoginAs([<FromRoute>] userId: Guid, [<FromServices>] handler: core.fs.Accounts.Handler) = task {
-        let! status = handler.Handle(LookupById(UserId.NewUserId(userId)))
-        if status.IsError then
+    member this.LoginAs([<FromRoute>] userId: Guid, [<FromServices>] handler: core.fs.Accounts.Handler) : Task<ActionResult> = task {
+        let! status = handler.Handle({LookupById.UserId = UserId(userId)})
+        match status with
+        | Error _ ->
             return this.NotFound() :> ActionResult
-        else
-            do! AccountController.EstablishSignedInIdentity(this.HttpContext, status.ResultValue)
-            return this.Redirect("~/")
+        | Ok user ->
+            let claims = [
+                Claim(ClaimTypes.GivenName, user.Firstname)
+                Claim(ClaimTypes.Surname, user.Lastname)
+                Claim(ClaimTypes.Email, user.Email)
+                Claim(IdentityExtensions.ID_CLAIM_NAME, user.Id.ToString())
+            ]
+            let claimsIdentity = ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)
+            let principal = ClaimsPrincipal(claimsIdentity)
+            do! this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal)
+            return this.Redirect("~/") :> ActionResult
     }
 
     [<HttpGet("delete/{userId}")>]
-    member this.Delete([<FromRoute>] userId: Guid, [<FromServices>] service: core.fs.Accounts.Handler) =
+    member this.Delete([<FromRoute>] userId: Guid, [<FromServices>] service: core.fs.Accounts.Handler) : Task<ActionResult> =
         this.OkOrError(
-            service.HandleDelete(UserId.NewUserId(userId), Delete(None))
+            service.HandleDelete (UserId(userId)) {Delete.Feedback = ""}
         )
 
     [<HttpPost("email")>]
-    member this.Email(obj: EmailInput) =
-        this.OkOrError(handler.Handle(SendEmail(obj)))
+    member this.Email(obj: EmailInput) : Task<ActionResult> =
+        this.OkOrError(handler.Handle({SendEmail.input = obj}))
 
     [<HttpGet("welcome")>]
-    member this.Welcome([<FromQuery>] userId: Guid) =
-        this.OkOrError(handler.Handle(SendWelcomeEmail(UserId.NewUserId(userId))))
+    member this.Welcome([<FromQuery>] userId: Guid) : Task<ActionResult> =
+        this.OkOrError(handler.Handle({SendWelcomeEmail.userId = UserId(userId)}))
 
     [<HttpGet("users")>]
-    member this.ActiveAccounts() =
-        this.OkOrError(handler.Handle(Query(true)))
+    member this.ActiveAccounts() : Task<ActionResult> =
+        this.OkOrError(handler.Handle({Query.everyone = true}))
 
     [<HttpGet("users/export")>]
-    member this.Export() = task {
-        let! result = handler.Handle(Export())
+    member this.Export() : Task<ActionResult> = task {
+        let! result = handler.Handle(Unchecked.defaultof<Export>)
         return this.GenerateExport(result)
     }
 
     [<HttpGet("sec/ticker-sync")>]
-    member this.TriggerSECTickerSync() =
-        this.OkOrError(handler.Handle(TriggerSECTickerSync()))
+    member this.TriggerSECTickerSync() : Task<ActionResult> =
+        this.OkOrError(handler.Handle(Unchecked.defaultof<TriggerSECTickerSync>))

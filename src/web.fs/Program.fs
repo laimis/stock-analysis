@@ -53,7 +53,7 @@ type Program() =
             .AddCheck<HealthCheck>("storage based health check")
             |> ignore
         
-        di.DIHelper.registerServices(configuration, builder.Services, logger)
+        di.DIHelper.registerServices configuration builder.Services logger
         builder.Services.AddSingleton<CookieEvents>() |> ignore
         
         let cnn = configuration.GetValue<string>("DB_CNN")
@@ -101,7 +101,7 @@ type Program() =
         
         app.MapHealthChecks("/health") |> ignore
         app.MapControllerRoute("default", "api/{controller=Home}/{action=Index}/{id?}") |> ignore
-        app.MapHangfireDashboard("/hangfire", DashboardOptions(Authorization = [| MyAuthorizationFilter() :> IDashboardAuthorizationFilter |])) |> ignore
+        app.MapHangfireDashboard("/hangfire", DashboardOptions(Authorization = [| MyAuthorizationFilter() |])) |> ignore
         app.MapFallbackToFile("index.html") |> ignore
         
         let appLogger = app.Services.GetRequiredService<ILogger<Program>>()
@@ -109,7 +109,8 @@ type Program() =
         
         app.Run()
 
-[<EntryPoint>]
-let main args =
-    Program.Main(args)
-    0
+module Main =
+    [<EntryPoint>]
+    let main args =
+        Program.Main(args)
+        0

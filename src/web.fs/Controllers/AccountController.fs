@@ -34,12 +34,12 @@ type AccountController(handler: Handler) =
     }
 
     [<HttpGet("status")>]
-    member this.Identity() = task {
+    member this.Identity() : Task<ActionResult> = task {
         if this.User.Identity <> null && not this.User.Identity.IsAuthenticated then
             let view = AccountStatusView.notFound()
             return this.Ok(view) :> ActionResult
         else
-            return! this.OkOrError(handler.Handle(LookupById(this.User.Identifier())))
+            return! this.OkOrError(handler.Handle({LookupById.UserId = this.User.Identifier()}))
     }
 
     [<HttpPost("validate")>]
@@ -50,13 +50,15 @@ type AccountController(handler: Handler) =
             this.OkOrError(handler.Validate(command))
 
     [<HttpPost>]
-    member this.Create([<FromBody>] cmd: CreateAccount) = task {
+    member this.Create([<FromBody>] cmd: CreateAccount) : Task<ActionResult> = task {
         if this.User.Identity <> null && this.User.Identity.IsAuthenticated then
             return this.BadRequest("User already has an account") :> ActionResult
         else
             let! r = handler.Handle(cmd)
-            if r.IsOk then
-                do! AccountController.EstablishSignedInIdentity(this.HttpContext, r.ResultValue)
+            match r with
+            | Ok user ->
+                do! AccountController.EstablishSignedInIdentity(this.HttpContext, user)
+            | Error _ -> ()
             return this.OkOrError(r)
     }
 
@@ -67,35 +69,36 @@ type AccountController(handler: Handler) =
 
     [<HttpGet("integrations/brokerage/connect")>]
     [<Authorize>]
-    member this.Brokerage() = task {
-        let! url = handler.Handle(Connect())
-        return this.Redirect(url)
+    member this.Brokerage() : Task<ActionResult> = task {
+        let! url = handler.Handle(Unchecked.defaultof<Connect>)
+        return this.Redirect(url) :> ActionResult
     }
 
     [<HttpGet("integrations/brokerage")>]
     [<Authorize>]
-    member this.BrokerageInfo() =
+    member this.BrokerageInfo() : Task<ActionResult> =
         this.OkOrError(
-            handler.HandleInfo(BrokerageInfo(this.User.Identifier()))
+            handler.HandleInfo({BrokerageInfo.UserId = this.User.Identifier()})
         )
 
-    member private this.RedirectOrError(result: FSharpResult<'T, ServiceError>) =
-        if result.IsError then
-            this.BadRequest(result.ErrorValue.Message) :> ActionResult
-        else
+    member private this.RedirectOrError(result: Result<'T, ServiceError>) : ActionResult =
+        match result with
+        | Error err ->
+            this.BadRequest(err.Message) :> ActionResult
+        | Ok _ ->
             this.Redirect("~/profile") :> ActionResult
 
     [<HttpGet("integrations/brokerage/disconnect")>]
     [<Authorize>]
-    member this.BrokerageDisconnect() = task {
-        let! result = handler.HandleDisconnect(BrokerageDisconnect(this.User.Identifier()))
+    member this.BrokerageDisconnect() : Task<ActionResult> = task {
+        let! result = handler.HandleDisconnect({BrokerageDisconnect.UserId = this.User.Identifier()})
         return this.RedirectOrError(result)
     }
 
     [<HttpGet("integrations/brokerage/callback")>]
     [<Authorize>]
-    member this.BrokerageCallback([<FromQuery>] code: string) = task {
-        let! result = handler.HandleConnectCallback(ConnectCallback(code, this.User.Identifier()))
+    member this.BrokerageCallback([<FromQuery>] code: string) : Task<ActionResult> = task {
+        let! result = handler.HandleConnectCallback({ConnectCallback.Code = code; UserId = this.User.Identifier()})
         return this.RedirectOrError(result)
     }
 
@@ -105,10 +108,12 @@ type AccountController(handler: Handler) =
         this.Ok()
 
     [<HttpPost("login")>]
-    member this.Authenticate([<FromBody>] cmd: Authenticate) = task {
+    member this.Authenticate([<FromBody>] cmd: Authenticate) : Task<ActionResult> = task {
         let! response = handler.Handle(cmd)
-        if response.IsOk then
-            do! AccountController.EstablishSignedInIdentity(this.HttpContext, response.ResultValue)
+        match response with
+        | Ok user ->
+            do! AccountController.EstablishSignedInIdentity(this.HttpContext, user)
+        | Error _ -> ()
         return this.OkOrError(response)
     }
 
@@ -125,54 +130,58 @@ type AccountController(handler: Handler) =
 
     [<HttpPost("delete")>]
     [<Authorize>]
-    member this.Delete([<FromBody>] cmd: Delete) = task {
-        let! result = handler.HandleDelete(this.User.Identifier(), cmd)
-        if result.IsError then
-            return this.Error(result.ErrorValue)
-        else
+    member this.Delete([<FromBody>] cmd: Delete) : Task<ActionResult> = task {
+        let! result = handler.HandleDelete (this.User.Identifier()) cmd
+        match result with
+        | Error err ->
+            return this.Error(err)
+        | Ok _ ->
             do! this.HttpContext.SignOutAsync()
             return this.Ok() :> ActionResult
     }
 
     [<HttpPost("clear")>]
     [<Authorize>]
-    member this.Clear() = task {
-        do! handler.Handle(Clear(this.User.Identifier()))
+    member this.Clear() : Task<ActionResult> = task {
+        let! _ = handler.Handle({Clear.UserId = this.User.Identifier()})
         do! this.HttpContext.SignOutAsync()
-        return this.Ok()
+        return this.Ok() :> ActionResult
     }
 
     [<HttpPost("resetpassword")>]
-    member this.ResetPassword([<FromBody>] cmd: ResetPassword) = task {
+    member this.ResetPassword([<FromBody>] cmd: ResetPassword) : Task<ActionResult> = task {
         let! result = handler.Handle(cmd)
-        if result.IsOk then
-            do! AccountController.EstablishSignedInIdentity(this.HttpContext, result.ResultValue)
+        match result with
+        | Ok user ->
+            do! AccountController.EstablishSignedInIdentity(this.HttpContext, user)
+        | Error _ -> ()
         return this.OkOrError(result)
     }
 
     [<HttpGet("confirm/{id}")>]
-    member this.Confirm(id: Guid) = task {
-        let! result = handler.Handle(Confirm(id))
-        if result.IsOk then
-            do! AccountController.EstablishSignedInIdentity(this.HttpContext, result.ResultValue)
-            return this.Redirect("~/")
-        else
-            return this.Error(result.ErrorValue)
+    member this.Confirm(id: Guid) : Task<ActionResult> = task {
+        let! result = handler.Handle({Confirm.Id = id})
+        match result with
+        | Ok user ->
+            do! AccountController.EstablishSignedInIdentity(this.HttpContext, user)
+            return this.Redirect("~/") :> ActionResult
+        | Error err ->
+            return this.Error(err)
     }
 
     [<HttpPost("settings")>]
     [<Authorize>]
-    member this.Settings([<FromBody>] cmd: SetSetting) =
-        this.OkOrError(handler.HandleSettings(this.User.Identifier(), cmd))
+    member this.Settings([<FromBody>] cmd: SetSetting) : Task<ActionResult> =
+        this.OkOrError(handler.HandleSettings (this.User.Identifier()) cmd)
 
     [<HttpGet("transactions")>]
-    member this.GetTransactions() =
+    member this.GetTransactions() : Task<ActionResult> =
         this.OkOrError(
-            handler.Handle(GetAccountTransactions(this.User.Identifier()))
+            handler.Handle({GetAccountTransactions.UserId = this.User.Identifier()})
         )
 
     [<HttpPost("transactions/{transactionId}/applied")>]
-    member this.ApplyTransaction(transactionId: string) =
+    member this.ApplyTransaction(transactionId: string) : Task<ActionResult> =
         this.OkOrError(
-            handler.Handle(MarkAccountTransactionAsApplied(this.User.Identifier(), transactionId))
+            handler.Handle({MarkAccountTransactionAsApplied.UserId = this.User.Identifier(); TransactionId = transactionId})
         )
