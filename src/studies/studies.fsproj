@@ -20,7 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\core\core.csproj" />
-    <ProjectReference Include="..\infrastructure\di\di.csproj" />
+    <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

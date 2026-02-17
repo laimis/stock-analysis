@@ -1,10 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="RoleService.fs" />
+    <Compile Include="GenericLogger.fs" />
+    <Compile Include="IncompleteOutbox.fs" />
+    <Compile Include="DummyBrokerageClient.fs" />
+    <Compile Include="DIHelper.fs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\secedgar.fs\secedgar.fs.fsproj" />
     <ProjectReference Include="..\coinmarketcap.fs\coinmarketcap.fs.fsproj" />
     <ProjectReference Include="..\csvparser.fs\csvparser.fs.fsproj" />
     <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
+    <ProjectReference Include="..\..\core\core.csproj" />
     <ProjectReference Include="..\securityutils.fs\securityutils.fs.fsproj" />
     <ProjectReference Include="..\storage.shared.fs\storage.shared.fs.fsproj" />
     <ProjectReference Include="..\timezonesupport.fs\timezonesupport.fs.fsproj" />
@@ -18,11 +31,5 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.3" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
 
 </Project>

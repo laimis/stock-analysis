@@ -5,6 +5,7 @@
         <IsPackable>false</IsPackable>
         <LangVersion>Latest</LangVersion>
         <InvariantGlobalization>false</InvariantGlobalization>
+        <NoWarn>NU1605</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,7 +22,7 @@
         <ProjectReference Include="..\infrastructure\securityutils.fs\securityutils.fs.fsproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\schwabclient\schwabclient.fsproj" />
-        <ProjectReference Include="..\infrastructure\di\di.csproj" />
+        <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
     </ItemGroup>
 
     <ItemGroup>
