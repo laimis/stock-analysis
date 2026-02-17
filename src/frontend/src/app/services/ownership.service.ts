@@ -96,7 +96,7 @@ export class OwnershipService {
             'IA': 'Investment Adviser (IA)',
             'IC': 'Investment Company (IC)',
             'BD': 'Broker Dealer (BD)',
-            'IN': 'Insurance Company (IN)',
+            'IN': 'Individual (IN)',
             'HC': 'Holding Company (HC)',
             'FI': 'Financial Institution (FI)',
             'EP': 'Employee (EP)',
