@@ -1,15 +1,12 @@
 module core.fs.Alerts.SECFilingsMonitoring
 
 open System
-open System.Collections.Generic
-open System.Linq
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Email
 open core.fs.Adapters.Logging
 open core.fs.Adapters.SEC
 open core.fs.Adapters.Storage
-open core.fs.Services
 open core.Shared
 open core.fs.Adapters.Brokerage
 
