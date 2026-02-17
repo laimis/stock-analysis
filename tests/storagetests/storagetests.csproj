@@ -11,6 +11,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="FSharp.Core" Version="10.0.103" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
@@ -20,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\infrastructure\storage.postgres\storage.postgres.csproj" />
+    <ProjectReference Include="..\..\src\infrastructure\storage.postgres.fs\storage.postgres.fs.fsproj" />
 	  <ProjectReference Include="..\..\src\core\core.csproj" />
 	  <ProjectReference Include="..\coretests\coretests.csproj" />
 	  <ProjectReference Include="..\testutils\testutils.csproj" />

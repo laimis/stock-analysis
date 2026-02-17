@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using storage.postgres;
+using storage.shared;
 using testutils;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,7 +24,7 @@ namespace storagetests.postgres
             
             var storage = new PostgresAggregateStorage(
                 new FakeOutbox(),
-                cnn);
+                cnn) as IAggregateStorage;
 
             await storage.DoHealthCheck();
         }
