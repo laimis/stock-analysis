@@ -79,6 +79,7 @@ module Schedule13GProcessingServiceTests =
             member _.GetLatestEventForEntityCompany(_) (_) = task { return None }
             member _.GetOwnershipSummary(_) = task { return Seq.empty }
             member _.GetOwnershipTimeline(_) (_) = task { return Seq.empty }
+            member _.GetRecentTimelines(_) = task { return Seq.empty }
     
     [<Fact>]
     [<Trait("Category", "Integration")>]

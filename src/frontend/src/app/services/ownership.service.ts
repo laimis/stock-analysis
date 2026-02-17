@@ -142,6 +142,11 @@ export class OwnershipService {
         return this.http.get<OwnershipEntity[]>(`/api/ownership/entities/search?name=${encodeURIComponent(name)}`);
     }
 
+    // Get recent ownership timelines across all companies
+    getRecentTimelines(limit: number = 50): Observable<OwnershipEvent[]> {
+        return this.http.get<OwnershipEvent[]>(`/api/ownership/timelines/recent?limit=${limit}`);
+    }
+
     // Create/update operations
     createEntity(request: CreateEntityRequest): Observable<{id: string}> {
         return this.http.post<{id: string}>('/api/ownership/entity', request);

@@ -587,3 +587,25 @@ type OwnershipStorage(connectionString: string) =
                 
                 return dtos |> Seq.map this.MapToOwnershipEvent
             }
+        
+        member this.GetRecentTimelines limit =
+            task {
+                use db = this.GetConnection()
+                
+                let query = """
+                    SELECT id, entity_id, company_ticker,
+                           company_cik, filing_id, event_type,
+                           transaction_type, shares_before,
+                           shares_transacted, shares_after,
+                           percent_of_class, price_per_share,
+                           total_value, transaction_date,
+                           filing_date, is_direct,
+                           ownership_nature, created_at
+                    FROM ownership_events
+                    ORDER BY filing_date DESC
+                    LIMIT @Limit"""
+                
+                let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| Limit = limit |})
+                
+                return dtos |> Seq.map this.MapToOwnershipEvent
+            }

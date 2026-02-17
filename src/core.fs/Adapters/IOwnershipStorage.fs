@@ -126,6 +126,9 @@ type IOwnershipStorage =
     
     /// Get ownership timeline for a company (aggregated by date)
     abstract member GetOwnershipTimeline : ticker:Ticker -> days:int -> Task<IEnumerable<OwnershipEvent>>
+    
+    /// Get the most recently created ownership timelines across all companies
+    abstract member GetRecentTimelines : limit:int -> Task<IEnumerable<OwnershipEvent>>
 
 module OwnershipEntity =
     let create name entityType cik =

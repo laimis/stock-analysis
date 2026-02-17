@@ -1,20 +1,22 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { OwnershipService, OwnershipEntity } from '../services/ownership.service';
+import { OwnershipService, OwnershipEntity, OwnershipEvent } from '../services/ownership.service';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
+import { TimeAgoPipe } from '../services/time-ago.pipe';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
 
 @Component({
   selector: 'app-ownership-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, StockLinkAndTradingviewLinkComponent, TimeAgoPipe],
   templateUrl: './ownership-home.component.html'
 })
-export class OwnershipHomeComponent {
+export class OwnershipHomeComponent implements OnInit {
   private ownershipService = inject(OwnershipService);
   private router = inject(Router);
   private entitySearchTerms = new Subject<string>();
@@ -24,12 +26,19 @@ export class OwnershipHomeComponent {
   entitySearch = '';
   entitySearchResults: OwnershipEntity[] = [];
   tickerSearchResults: string[] = [];
+  recentTimelines: OwnershipEvent[] = [];
+  entityNameMap = new Map<string, string>();
   getEntityTypeDisplay = getEntityTypeDisplay;
   
   loading = {
     ticker: false,
-    entity: false
+    entity: false,
+    timelines: false
   };
+
+  ngOnInit() {
+    this.loadRecentTimelines();
+  }
 
   constructor() {
     this.setupEntitySearch();
@@ -96,5 +105,34 @@ export class OwnershipHomeComponent {
     if (this.tickerSearch.trim()) {
       this.router.navigate(['/ownership/ticker', this.tickerSearch.toUpperCase()]);
     }
+  }
+
+  loadRecentTimelines() {
+    this.loading.timelines = true;
+
+    this.ownershipService.getRecentTimelines(25).subscribe({
+      next: (timelines) => {
+        this.recentTimelines = timelines;
+        
+        // Load entity names for entities in the timelines
+        const entityIds = [...new Set(timelines.map(t => t.entityId))];
+        entityIds.forEach(id => {
+          this.ownershipService.getEntity(id).subscribe({
+            next: (entity) => this.entityNameMap.set(entity.id, entity.name),
+            error: () => {} // Silently fail, will show ID
+          });
+        });
+        
+        this.loading.timelines = false;
+      },
+      error: (err) => {
+        console.error('Failed to load recent timelines:', err);
+        this.loading.timelines = false;
+      }
+    });
+  }
+
+  getEntityName(entityId: string): string {
+    return this.entityNameMap.get(entityId) || entityId;
   }
 }

@@ -104,6 +104,13 @@ type OwnershipController(storage: IOwnershipStorage) =
             return this.Ok entities :> ActionResult
     }
 
+    [<HttpGet("timelines/recent")>]
+    member this.GetRecentTimelines([<FromQuery>] limit: Nullable<int>) = task {
+        let l = if limit.HasValue then limit.Value else 50
+        let! timelines = storage.GetRecentTimelines l
+        return this.Ok timelines
+    }
+
     [<HttpPost("entity")>]
     member this.CreateEntity([<FromBody>] request: CreateEntityRequest) = task {
         let entity = {
