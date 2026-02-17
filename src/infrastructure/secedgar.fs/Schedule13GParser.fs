@@ -295,18 +295,20 @@ module Schedule13GParser =
             
             // Calculate confidence and attach notes
             let confidence = Schedule13GHelpers.calculateConfidence parsed
-            parsed <- { parsed with 
-                          Confidence = confidence
-                          ParsingNotes = List.rev notes }
+            let parsingNotes = List.rev notes
+            let parsedWithMeta = 
+                { parsed with 
+                    Confidence = confidence
+                    ParsingNotes = parsingNotes }
             
             logger |> Option.iter (fun l -> 
                 l.LogInformation("Parsed Schedule 13G with confidence {confidence:F2}", confidence))
             
             // Determine result type based on confidence
             if confidence >= 0.7 && notes.Length = 0 then
-                Success parsed
+                Success parsedWithMeta
             elif confidence >= 0.5 then
-                PartialSuccess (parsed, notes)
+                PartialSuccess (parsedWithMeta, notes)
             else
                 let notesStr = String.Join("; ", notes)
                 Failure $"Low confidence parse ({confidence:F2}). Notes: {notesStr}"
