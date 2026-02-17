@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="Schedule13GParserTests.fs" />
+    <Compile Include="Schedule13GProcessingServiceTests.fs" />
   </ItemGroup>
   
   <ItemGroup>
