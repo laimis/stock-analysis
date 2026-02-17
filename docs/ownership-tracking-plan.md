@@ -306,6 +306,7 @@ Track insider and institutional ownership changes to:
 - ✅ Shares outstanding integration from fundamentals
 
 ### What's Next:
+- Schedule 13G parser implementation
 - Form 4 parser implementation
 - Form 144 parser implementation  
 - Background processing service
