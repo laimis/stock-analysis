@@ -2,21 +2,25 @@
 
 ## Migration Status
 
-**Overall Progress: 🟢 Infrastructure Migration Complete (9/9 projects)**
+**Overall Progress: 🟡 Infrastructure Complete, Web Host Pending (8/9 projects)**
 
 ### ✅ Completed Tiers
 - **TIER 1**: Infrastructure Foundation (6/6 projects) ✅
 - **TIER 2**: Storage & Configuration (2/2 projects) ✅  
-- **TIER 3**: Web Host (1/1 project) ✅
+
+### ⚠️ In Progress
+- **TIER 3**: Web Host (0/1 project) - References updated ✅, but web.csproj migration pending ⚠️
 
 ### ⚠️ Remaining Work
+- **TIER 3**: Complete `web.csproj` → `web.fsproj` migration
 - **TIER 4**: Test Projects (0/6 test projects migrated)
 
 **Next Steps:**
-1. Migrate test projects to F# (optional but recommended)
-2. Validate full test suite passes
-3. Production deployment and validation
-4. Remove obsolete C# infrastructure projects
+1. Migrate web.csproj to web.fsproj (F#)
+2. Migrate test projects to F# (optional but recommended)
+3. Validate full test suite passes
+4. Production deployment and validation
+5. Remove obsolete C# infrastructure projects
 
 ---
 
@@ -312,18 +316,21 @@ Please read all C# files in `src/infrastructure/storage.postgres/` and create eq
 
 ---
 
-### **TIER 3: Web Host** ✅ **COMPLETE** (Depends on everything)
+### **TIER 3: Web Host**
 
 ---
 
-### 9. `web` - Update References Only ✅ **COMPLETE**
+### 9. `web` - Migrate to F# ⚠️ **IN PROGRESS**
 
 **Project Location:** `src/web/`  
-**Action:** Update project references, DO NOT migrate to F#
+**New Location:** `src/web.fs/` (or migrate in-place)
+**Action:** Migrate entire web host from C# to F#
 
-**Status:** ✅ **COMPLETE** - All project references updated to point to F# infrastructure projects.
+**Status:** 
+- ✅ **Phase 1 Complete** - All project references updated to point to F# infrastructure projects
+- ⚠️ **Phase 2 Pending** - Migration of web.csproj to web.fsproj (controllers, startup, middleware, etc.)
 
-**Updated Dependencies:**
+**Reference Updates (Complete):**
 - `core.csproj` (kept - C#)
 - `core.fs.fsproj` (kept - already F#)
 - `schwabclient.fsproj` (kept - already F#)
@@ -333,7 +340,15 @@ Please read all C# files in `src/infrastructure/storage.postgres/` and create eq
 - `securityutils.fs.fsproj` ✅ (changed from C#)
 - `di.fs.fsproj` ✅ (changed from C#)
 
-**Note:** The web project no longer references C# infrastructure projects - all infrastructure is now in F#.
+**Migration Scope:**
+- **Controllers** (all API endpoints) → F# controllers
+- **Startup.cs/Program.cs** → F# Program.fs with app configuration
+- **Middleware** → F# equivalents
+- **Authentication/Authorization** → F# implementation
+- **Hangfire job registration** → F# job definitions
+- **Static file serving** → F# configuration
+
+**F# with ASP.NET Core** - Keep ASP.NET Core, write controllers/program in F#
 
 ---
 
@@ -399,33 +414,34 @@ Please read all test files in `[PROJECT_PATH]/` and create equivalent F# test im
 
 ---
 
-### Phase 3: Dependency Injection
-9. `di.fs` (depends on all Tier 1 & 2 projects)
-
-**Validation:** Ensure all services can be registered
-
----
-
-### Phase 4: Web Integration
-10. Update `web.csproj` references to point to F# projects
-11. Update solution file to include all new F# projects
-
-**Validation:** Build entire solution, run `test.bat`
-
----
-
-### Phase 5: Test Projects (Can overlap with Phase 1-3)
-12. Migrate all test projects to F#
- ✅ **COMPLETE**
+### Phase 3: Dependency Injection ✅ **COMPLETE**
 9. `di.fs` (depends on all Tier 1 & 2 projects)
 
 **Validation:** ✅ All services can be registered
 
 ---
 
-### Phase 4: Web Integration ✅ **COMPLETE**
+### Phase 4: Web Integration ⚠️ **IN PROGRESS**
 10. Update `web.csproj` references to point to F# projects ✅
-11. Update solution file to include all new F# projects ✅
+11. Migrate `web.csproj` to F# (web.fsproj or in-place) ⚠️ **PENDING**
+12. Update solution file to include web.fsproj ⚠️ **PENDING**
+
+**Validation:** Build entire solution, run `test.bat`
+
+---
+
+### Phase 5: Test Projects (Can overlap with Phase 1-4)
+13. Migrate all test projects to F#
+
+**Validation:** Full test suite passes
+
+---
+
+## Project File Template
+
+When creating F# projects, use this template:
+
+```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -581,6 +597,7 @@ let loadEvents aggregateId = async {
   - [x] `di.fs` - Complete
 - [x] DI project registers all F# services ✅
 - [x] Web project references F# projects and builds ✅
+- [ ] Web project (web.csproj) migrated to F# ⚠️ **PENDING**
 - [ ] All unit tests pass ⚠️ (Pending test migration)
 - [ ] All integration tests pass ⚠️ (Pending test migration)
 - [ ] Application runs locally successfully ⚠️ (Needs validation)
@@ -588,7 +605,7 @@ let loadEvents aggregateId = async {
 - [ ] Application deploys and runs in production ⚠️ (Needs deployment)
 - [ ] C# infrastructure projects can be safely removed from solution ⚠️ (After production validation)
 
-**Current State:** All core infrastructure has been successfully migrated to F#. The web application now references only F# infrastructure projects (plus core.csproj which is intentionally kept as C#). Test projects remain in C# but can be migrated incrementally.
+**Current State:** All core infrastructure has been successfully migrated to F#. The web application now references only F# infrastructure projects (plus core.csproj which is intentionally kept as C#). However, the web host itself (web.csproj) still needs to be migrated to F#. Test projects remain in C# but can be migrated incrementally.
 
 ---
 
@@ -597,18 +614,22 @@ let loadEvents aggregateId = async {
 ### What Has Been Accomplished
 1. ✅ **6 Infrastructure Foundation Projects** migrated to F# (storage.shared, securityutils, timezonesupport, csvparser, coinmarketcap, twilioclient)
 2. ✅ **2 Storage & Configuration Projects** migrated to F# (storage.postgres, di)
-3. ✅ **Web Host Integration** completed - all references updated to F# projects
+3. ✅ **Web Host References** updated - web.csproj now references all F# infrastructure
 4. ✅ **Solution file** updated with all new F# projects
 5. ✅ **Dependency injection** fully operational with F# services
 6. ✅ **CLI compatibility** maintained - all F# types callable from C#
 
 ### Next Steps
-1. Build and validate the solution compiles successfully
-2. Run existing C# tests to ensure functionality preserved
-3. Test application locally with full integration tests
-4. (Optional) Migrate test projects to F# for consistency
-5. Deploy to production and monitor
-6. After successful production run, remove obsolete C# infrastructure projects
+1. ⚠️ **CRITICAL**: Migrate web.csproj to F# (web.fsproj or in-place migration)
+   - Migrate controllers to F# (Saturn/Giraffe/F# controllers)
+   - Migrate Program.cs/Startup.cs to F#
+   - Migrate middleware and authentication to F#
+2. Build and validate the solution compiles successfully
+3. Run existing C# tests to ensure functionality preserved
+4. Test application locally with full integration tests
+5. (Optional) Migrate test projects to F# for consistency
+6. Deploy to production and monitor
+7. After successful production run, remove obsolete C# infrastructure projects
 
 ---
 
@@ -623,23 +644,23 @@ let loadEvents aggregateId = async {
 
 ---
 
-## 🎯 Infrastructure Migration Complete
+## 🟡 Infrastructure Migration Complete, Web Host Pending
 
-**Status as of latest update:** All C# infrastructure projects (Tiers 1-3) have been successfully migrated to F#. The NGTDTrading application now uses a fully F# infrastructure stack while maintaining the hybrid C#/F# domain architecture with `core.csproj` and `core.fs`.
+**Status as of latest update:** All C# infrastructure projects (Tiers 1-2) have been successfully migrated to F#. The web host (web.csproj) has been updated to reference F# infrastructure but the web project itself still needs to be migrated to F#. The NGTDTrading application uses a fully F# infrastructure stack while maintaining the hybrid C#/F# domain architecture with `core.csproj` and `core.fs`.
 
 ### Key Achievements
-- **9 projects** migrated from C# to F# 
+- **8 infrastructure projects** migrated from C# to F# 
 - **Zero breaking changes** to public APIs - full CLI compatibility maintained
-- **Web application** successfully updated to reference F# infrastructure
+- **Web application references** successfully updated to use F# infrastructure
 - **Type safety** improved with F# discriminated unions and option types
 - **Functional patterns** adopted throughout infrastructure layer
 
+### Remaining Work
+- **web.csproj → web.fsproj** - Migrate ASP.NET Core web host to F# (controllers, startup, middleware)
+- **Test projects** - Optional migration to F# for consistency
+
 ### Production Readiness
-The migrated codebase is ready for:
-1. Local development and testing
-2. CI/CD pipeline validation  
-3. Staging environment deployment
-4. Production deployment after QA sign-off
+The migrated codebase can continue running in production with the current C# web host, but for full F# migration, the web project needs to be converted. This is the final major piece of the migration plan.
 
 Test projects remain in C# but can be migrated incrementally without blocking production deployment.
 
