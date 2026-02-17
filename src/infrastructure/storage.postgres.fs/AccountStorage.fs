@@ -211,12 +211,10 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
         
         member this.Save(user: User) = 
             task {
-                let mutable db: IDbConnection = null
-                let mutable tx: IDbTransaction = null
-                
+                use db = this.GetConnection()
+                use tx = db.BeginTransaction()
+                    
                 try
-                    db <- this.GetConnection()
-                    tx <- db.BeginTransaction()
                     
                     let query = "INSERT INTO users (id, email) VALUES (@id, @email) ON CONFLICT DO NOTHING;"
                     do! db.ExecuteAsync(query, {| id = user.State.Id.ToString(); email = user.State.Email |}) :> Task
@@ -227,20 +225,17 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
                     
                     tx.Commit()
                 with ex ->
-                    if not (isNull tx) then try tx.Rollback() with _ -> ()
-                    if not (isNull tx) then try tx.Dispose() with _ -> ()
-                    if not (isNull db) then try db.Dispose() with _ -> ()
+                    try tx.Rollback() with _ -> ()
                     raise ex
             } :> Task
         
         member this.Delete(user: User) = 
             task {
-                let mutable db: IDbConnection = null
-                let mutable tx: IDbTransaction = null
                 
+                use db = this.GetConnection()
+                use tx = db.BeginTransaction()
+
                 try
-                    db <- this.GetConnection()
-                    tx <- db.BeginTransaction()
                     
                     let query = "DELETE FROM users WHERE id = @id"
                     do! db.ExecuteAsync(query, {| id = user.Id.ToString() |}) :> Task
@@ -251,11 +246,9 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
                     
                     tx.Commit()
                 with ex ->
-                    if not (isNull tx) then try tx.Rollback() with _ -> ()
-                    if not (isNull tx) then try tx.Dispose() with _ -> ()
-                    if not (isNull db) then try db.Dispose() with _ -> ()
+                    try tx.Rollback() with _ -> ()
                     raise ex
-            } :> Task
+            }
         
         member this.SaveUserAssociation(association: ProcessIdToUserAssociation) = 
             task {
@@ -263,8 +256,8 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
                 let (UserId userId) = association.UserId
                 
                 let query = "INSERT INTO processidtouserassociations (id, userId, timestamp) VALUES (@id, @userId, @timestamp)"
-                do! db.ExecuteAsync(query, {| id = association.Id; userId = userId; timestamp = association.Timestamp |}) :> Task
-            } :> Task
+                return! db.ExecuteAsync(query, {| id = association.Id; userId = userId; timestamp = association.Timestamp |})
+            }
         
         member this.GetAccountBalancesSnapshots start ``end`` userId = 
             task {
@@ -289,15 +282,15 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
                 let query = """INSERT INTO accountbalancessnapshots (cash,equity,longValue,shortValue,date,userId) VALUES (@cash,@equity,@longValue,@shortValue,@date,@userId)
 ON CONFLICT (userId, date) DO UPDATE SET cash = @cash, equity = @equity, longValue = @longValue, shortValue = @shortValue"""
                 
-                do! db.ExecuteAsync(
+                return! db.ExecuteAsync(
                     query,
                     {| cash = balances.Cash
                        equity = balances.Equity
                        longValue = balances.LongValue
                        shortValue = balances.ShortValue
                        date = balances.Date
-                       userId = id |}) :> Task
-            } :> Task
+                       userId = id |})
+            }
         
         member this.GetAccountBrokerageOrders(userId: UserId) = 
             task {
@@ -327,14 +320,10 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = @cash, equity = @equity, longVal
         
         member this.SaveAccountBrokerageStockOrders userId orders = 
             task {
-                let mutable db: IDbConnection = null
-                let mutable tx: IDbTransaction = null
                 let (UserId id) = userId
-                
+                use db = this.GetConnection()
+                use tx = db.BeginTransaction()
                 try
-                    db <- this.GetConnection()
-                    tx <- db.BeginTransaction()
-                    
                     let query = """INSERT INTO accountbrokerageorders (orderid,price,quantity,status,ticker,ordertype,instruction,assettype,executiontime,enteredtime,expirationtime,canbecancelled,userId,modified)
                     VALUES (@orderid,@price,@quantity,@status,@ticker,@ordertype,@instruction,@assettype,@executiontime,@enteredtime,@expirationtime,@canbecancelled,@userId,@modified)
 ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity, status = @status, ticker = @ticker, ordertype = @ordertype, instruction = @instruction, assettype = @assettype, executiontime = @executiontime, enteredtime = @enteredtime, expirationtime = @expirationtime, canbecancelled = @canbecancelled, modified = @modified"""
@@ -359,9 +348,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                     
                     tx.Commit()
                 with ex ->
-                    if not (isNull tx) then try tx.Rollback() with _ -> ()
-                    if not (isNull tx) then try tx.Dispose() with _ -> ()
-                    if not (isNull db) then try db.Dispose() with _ -> ()
+                    try tx.Rollback() with _ -> ()
                     raise ex
             } :> Task
         
@@ -370,14 +357,11 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
         
         member this.InsertAccountBrokerageTransactions userId transactions = 
             task {
-                let mutable db: IDbConnection = null
-                let mutable tx: IDbTransaction = null
                 let (UserId id) = userId
+                use db = this.GetConnection()
+                use tx = db.BeginTransaction()
                 
                 try
-                    db <- this.GetConnection()
-                    tx <- db.BeginTransaction()
-                    
                     let query = """INSERT INTO accountbrokeragetransactions (transactionid, description, brokeragetype, tradedate, settlementdate, netamount, inferredticker, inferredtype, userid, inserted, applied)
         VALUES (@TransactionId, @Description, @BrokerageType, @TradeDate, @SettlementDate, @NetAmount, @InferredTicker, @InferredType, @UserId, @Inserted, @Applied) ON CONFLICT (userid, transactionid) DO NOTHING"""
                     
@@ -398,22 +382,18 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                     
                     tx.Commit()
                 with ex ->
-                    if not (isNull tx) then try tx.Rollback() with _ -> ()
-                    if not (isNull tx) then try tx.Dispose() with _ -> ()
-                    if not (isNull db) then try db.Dispose() with _ -> ()
+                    try tx.Rollback() with _ -> ()
                     raise ex
             } :> Task
         
         member this.SaveAccountBrokerageTransactions userId transactions = 
             task {
-                let mutable db: IDbConnection = null
-                let mutable tx: IDbTransaction = null
                 let (UserId id) = userId
                 
-                try
-                    db <- this.GetConnection()
-                    tx <- db.BeginTransaction()
-                    
+                use db = this.GetConnection()
+                use tx = db.BeginTransaction()
+
+                try 
                     let query = """INSERT INTO accountbrokeragetransactions (transactionid, description, brokeragetype, tradedate, settlementdate, netamount, inferredticker, inferredtype, userid, inserted, applied)
         VALUES (@TransactionId, @Description, @BrokerageType, @TradeDate, @SettlementDate, @NetAmount, @InferredTicker, @InferredType, @UserId, @Inserted, @Applied) 
         ON CONFLICT (userid, transactionid) DO UPDATE 
@@ -444,9 +424,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                     
                     tx.Commit()
                 with ex ->
-                    if not (isNull tx) then try tx.Rollback() with _ -> ()
-                    if not (isNull tx) then try tx.Dispose() with _ -> ()
-                    if not (isNull db) then try db.Dispose() with _ -> ()
+                    try tx.Rollback() with _ -> ()
                     raise ex
             } :> Task
         
@@ -529,7 +507,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                     }
                     result.Add(pricing)
                 
-                return result :> IEnumerable<OptionPricing>
+                return result
             }
         
         member this.SaveOptionPricing pricing userId = 
@@ -566,7 +544,7 @@ VALUES (@userid, @optionpositionid, @underlyingticker, @symbol, @expiration, @st
                        rho = pricing.Rho
                        underlyingprice = pricing.UnderlyingPrice |> Option.toNullable
                        timestamp = pricing.Timestamp |}) :> Task
-            } :> Task
+            }
         
         member this.GetStockPriceAlerts(userId: UserId) = 
             task {
@@ -609,7 +587,7 @@ ON CONFLICT (alertid) DO UPDATE SET
     lastresetat = EXCLUDED.lastresetat
             """
                 
-                do! db.ExecuteAsync(
+                return! db.ExecuteAsync(
                     query,
                     {| alertid = alert.AlertId
                        userid = userId
@@ -620,16 +598,16 @@ ON CONFLICT (alertid) DO UPDATE SET
                        state = PriceAlertState.toString alert.State
                        createdat = alert.CreatedAt
                        triggeredat = alert.TriggeredAt |> Option.toNullable
-                       lastresetat = alert.LastResetAt |> Option.toNullable |}) :> Task
-            } :> Task
+                       lastresetat = alert.LastResetAt |> Option.toNullable |})
+            }
         
         member this.DeleteStockPriceAlert(alertId: Guid) = 
             task {
                 use db = this.GetConnection()
                 
                 let query = "DELETE FROM stockpricealerts WHERE alertid = @alertid"
-                do! db.ExecuteAsync(query, {| alertid = alertId |}) :> Task
-            } :> Task
+                return! db.ExecuteAsync(query, {| alertid = alertId |})
+            }
         
         member this.GetReminders(userId: UserId) = 
             task {
@@ -669,7 +647,7 @@ ON CONFLICT (reminderid) DO UPDATE SET
     sentat = EXCLUDED.sentat
             """
                 
-                do! db.ExecuteAsync(
+                return! db.ExecuteAsync(
                     query,
                     {| reminderid = reminder.ReminderId
                        userid = userId
@@ -678,16 +656,16 @@ ON CONFLICT (reminderid) DO UPDATE SET
                        ticker = reminder.Ticker |> Option.map (fun t -> t.Value) |> Option.toObj
                        state = ReminderState.toString reminder.State
                        createdat = reminder.CreatedAt.ToUniversalTime()
-                       sentat = reminder.SentAt |> Option.map (fun dt -> dt.ToUniversalTime()) |> Option.toNullable |}) :> Task
-            } :> Task
+                       sentat = reminder.SentAt |> Option.map (fun dt -> dt.ToUniversalTime()) |> Option.toNullable |})
+            }
         
         member this.DeleteReminder(reminderId: Guid) = 
             task {
                 use db = this.GetConnection()
                 
                 let query = "DELETE FROM reminders WHERE reminderid = @reminderid"
-                do! db.ExecuteAsync(query, {| reminderid = reminderId |}) :> Task
-            } :> Task
+                return! db.ExecuteAsync(query, {| reminderid = reminderId |})
+            }
         
         member this.GetTickerCik(ticker: string) = 
             task {
@@ -701,12 +679,10 @@ ON CONFLICT (reminderid) DO UPDATE SET
         
         member this.SaveTickerCikMappings(mappings: TickerCikMapping seq) = 
             task {
-                let mutable db: IDbConnection = null
-                let mutable tx: IDbTransaction = null
-                
+                use db = this.GetConnection()
+                use tx = db.BeginTransaction()
                 try
-                    db <- this.GetConnection()
-                    tx <- db.BeginTransaction()
+                    
                     
                     let query = """
 INSERT INTO tickercik (ticker, cik, title, lastupdated)
@@ -717,15 +693,13 @@ ON CONFLICT (ticker) DO UPDATE SET
     lastupdated = EXCLUDED.lastupdated
                 """
                     
-                    do! db.ExecuteAsync(query, mappings, transaction = tx) :> Task
+                    let! _ = db.ExecuteAsync(query, mappings, transaction = tx)
                     
                     tx.Commit()
                 with ex ->
-                    if not (isNull tx) then try tx.Rollback() with _ -> ()
-                    if not (isNull tx) then try tx.Dispose() with _ -> ()
-                    if not (isNull db) then try db.Dispose() with _ -> ()
+                    try tx.Rollback() with _ -> ()
                     raise ex
-            } :> Task
+            }
         
         member this.GetAllTickerCikMappings() = 
             task {
