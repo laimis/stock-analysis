@@ -21,10 +21,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="FSharp.Core" Version="10.0.103" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\infrastructure\csvparser\csvparser.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\csvparser.fs\csvparser.fs.fsproj" />
     <ProjectReference Include="..\..\coretests\coretests.csproj" />
   </ItemGroup>
 

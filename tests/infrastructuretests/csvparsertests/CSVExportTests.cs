@@ -3,7 +3,7 @@ using core.Cryptos;
 using core.fs.Services;
 using core.fs.Adapters.CSV;
 using core.fs.Stocks;
-using csvparser;
+using csvparser.fs;
 using testutils;
 using Xunit;
 
