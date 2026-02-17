@@ -49,8 +49,16 @@ type AuthHelper() =
 
 type MyAuthorizationFilter() =
     interface IDashboardAuthorizationFilter with
-        member this.Authorize(context: DashboardContext) =
+        member _.Authorize(context: DashboardContext) =
             let httpContext = context.GetHttpContext()
-            match httpContext.User.Identity with
-            | null -> false
-            | identity -> identity.IsAuthenticated
+            let configurationObj = httpContext.RequestServices.GetService(typeof<IConfiguration>)
+            if isNull configurationObj then
+                false
+            else
+                let configuration = configurationObj :?> IConfiguration
+                let adminEmail = configuration.GetValue<string>("ADMINEmail")
+                match httpContext.User.Identity with
+                | null -> false
+                | identity when identity.IsAuthenticated && not (System.String.IsNullOrWhiteSpace(adminEmail)) ->
+                    httpContext.User.HasClaim(ClaimTypes.Email, adminEmail)
+                | _ -> false
