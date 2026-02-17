@@ -3,6 +3,7 @@ namespace secedgar.fs
 open System
 open System.IO
 open System.Net.Http
+open System.Xml
 open System.Xml.Linq
 open Microsoft.Extensions.Logging
 
@@ -14,6 +15,14 @@ module Schedule13GParser =
     
     let private xname name = XName.Get(name)
     let private xnameWithNs ns name = XName.Get(name, ns)
+    
+    /// Create secure XmlReader to prevent XXE attacks
+    let private createSecureXmlReader (xml: string) =
+        let settings = XmlReaderSettings()
+        settings.DtdProcessing <- DtdProcessing.Prohibit
+        settings.XmlResolver <- null
+        let stringReader = new StringReader(xml)
+        XmlReader.Create(stringReader, settings)
     
     /// Helper to get XName with optional namespace
     let private getXName (ns: string option) (name: string) =
@@ -66,7 +75,8 @@ module Schedule13GParser =
     /// Parse Schedule 13G from XML document (handles real SEC format)
     let parseXml (xml: string) (logger: ILogger option) =
         try
-            let doc = XDocument.Parse(xml)
+            use reader = createSecureXmlReader xml
+            let doc = XDocument.Load(reader)
             let root = doc.Root
             
             let mutable notes = []
