@@ -5,7 +5,6 @@
         <IsPackable>false</IsPackable>
         <LangVersion>Latest</LangVersion>
         <InvariantGlobalization>false</InvariantGlobalization>
-        <NoWarn>$(NoWarn);NU1605</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
