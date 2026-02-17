@@ -12,14 +12,34 @@
             </div>
             <div class="card-body">
               <p>View who owns shares in a specific company.</p>
-              <div class="input-group">
-                <input type="text" class="form-control" 
-                       [(ngModel)]="tickerSearch" 
+              <div class="position-relative">
+                <input type="text" class="form-control pe-5" 
+                       [(ngModel)]="tickerSearch"
+                       (ngModelChange)="onTickerSearchChange()"
                        placeholder="Enter ticker (e.g., AAPL)"
-                       (keyup.enter)="searchByTicker()">
-                <button class="btn btn-primary" type="button" (click)="searchByTicker()">
-                  Search
-                </button>
+                       (keyup.enter)="searchByTicker()"
+                       autocomplete="off">
+                @if (loading.ticker) {
+                  <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                        role="status"
+                        aria-hidden="true"></span>
+                }
+
+                @if (tickerSearchResults.length > 0) {
+                  <div class="position-absolute w-100 mt-1 bg-white border rounded shadow-sm" style="z-index: 1000;">
+                    <div class="list-group list-group-flush">
+                      @for (ticker of tickerSearchResults; track ticker) {
+                        <button 
+                          type="button"
+                          class="list-group-item list-group-item-action text-start border-0"
+                          (click)="selectTicker(ticker)">
+                          <div class="fw-bold">{{ ticker }}</div>
+                          <small class="text-muted">View ownership information</small>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
               </div>
             </div>
           </div>
@@ -32,11 +52,17 @@
             </div>
             <div class="card-body">
               <p>View what companies an entity owns shares in.</p>
-              <div class="input-group">
-                <input type="text" class="form-control" 
+              <div class="position-relative">
+                <input type="text" class="form-control pe-5" 
                        [(ngModel)]="entitySearch"
                        (input)="onEntitySearchChange()"
-                       placeholder="Search investor, executive, or firm">
+                       placeholder="Search investor, executive, or firm"
+                       autocomplete="off">
+                @if (loading.entity) {
+                  <span class="spinner-border spinner-border-sm position-absolute end-0 top-0 bottom-0 my-auto me-2"
+                        role="status"
+                        aria-hidden="true"></span>
+                }
               </div>
               
               @if (entitySearchResults.length > 0) {
@@ -46,7 +72,7 @@
                        class="list-group-item list-group-item-action">
                       <div>
                         <strong>{{ entity.name }}</strong>
-                        <span class="badge bg-secondary ms-2">{{ entity.entityType }}</span>
+                        <span class="badge bg-secondary ms-2">{{ getEntityTypeDisplay(entity.entityType) }}</span>
                       </div>
                       <small class="text-muted">CIK: {{ entity.cik || 'N/A' }}</small>
                     </a>

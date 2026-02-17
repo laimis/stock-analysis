@@ -18,14 +18,38 @@ export class OwnershipHomeComponent {
   private ownershipService = inject(OwnershipService);
   private router = inject(Router);
   private entitySearchTerms = new Subject<string>();
+  private tickerSearchTerms = new Subject<string>();
 
   tickerSearch = '';
   entitySearch = '';
   entitySearchResults: OwnershipEntity[] = [];
+  tickerSearchResults: string[] = [];
   getEntityTypeDisplay = getEntityTypeDisplay;
+  
+  loading = {
+    ticker: false,
+    entity: false
+  };
 
   constructor() {
     this.setupEntitySearch();
+    this.setupTickerSearch();
+  }
+
+  setupTickerSearch() {
+    this.tickerSearchTerms.pipe(
+      debounceTime(300)
+    ).subscribe(term => {
+      if (!term.trim()) {
+        this.tickerSearchResults = [];
+        this.loading.ticker = false;
+        return;
+      }
+
+      // Simple approach: show the entered ticker as a result
+      this.tickerSearchResults = [term.trim().toUpperCase()];
+      this.loading.ticker = false;
+    });
   }
 
   setupEntitySearch() {
@@ -34,22 +58,38 @@ export class OwnershipHomeComponent {
     ).subscribe(term => {
       if (!term.trim()) {
         this.entitySearchResults = [];
+        this.loading.entity = false;
         return;
       }
 
+      this.loading.entity = true;
       this.ownershipService.searchEntities(term).subscribe({
         next: (results) => {
           this.entitySearchResults = results;
+          this.loading.entity = false;
         },
         error: (err) => {
           console.error('Failed to search entities:', err);
+          this.loading.entity = false;
         }
       });
     });
   }
 
+  onTickerSearchChange() {
+    if (this.tickerSearch.trim()) {
+      this.loading.ticker = true;
+    }
+    this.tickerSearchTerms.next(this.tickerSearch);
+  }
+
   onEntitySearchChange() {
     this.entitySearchTerms.next(this.entitySearch);
+  }
+
+  selectTicker(ticker: string) {
+    this.router.navigate(['/ownership/ticker', ticker]);
+    this.tickerSearchResults = [];
   }
 
   searchByTicker() {
