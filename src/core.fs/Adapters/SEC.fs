@@ -23,6 +23,8 @@ type CompanyFiling =
         ReportDate: string option
         Filing: string
         FilingUrl: string
+        IsXBRL: bool
+        IsInlineXBRL: bool
     }
 
     member this.IsRecentFor (referenceDate: System.DateOnly) =
@@ -48,6 +50,7 @@ type CompanyTickerEntry = {
 type ISECFilings =
  abstract GetFilings : ticker:Ticker  -> Task<Result<CompanyFilings,ServiceError>>
  abstract FetchCompanyTickers : unit -> Task<System.Collections.Generic.Dictionary<string, CompanyTickerEntry>>
+ abstract FetchPrimaryDocument : filingUrl:string -> Task<Result<string, ServiceError>>
 
 module FilingDescriptions =
     

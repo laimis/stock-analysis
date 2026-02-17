@@ -255,7 +255,7 @@ module Schedule13GParser =
             Failure $"XML parsing error: {ex.Message}"
     
     /// Parse from XML file path
-    let parseFromFile (filePath: string) (logger: ILogger option) =
+    let parseFromFile (logger: ILogger option) (filePath: string) =
         try
             let xml = File.ReadAllText(filePath)
             parseXml xml logger
@@ -265,20 +265,13 @@ module Schedule13GParser =
             Failure $"File read error: {ex.Message}"
     
     /// Parse from URL (using HttpClient with proper SEC headers)
-    let parseFromUrl (url: string) (httpClient: HttpClient) (logger: ILogger option) =
-        async {
-            try
-                logger |> Option.iter (fun l -> 
-                    l.LogDebug("Fetching Schedule 13G from URL: {url}", url))
-                
-                let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-                response.EnsureSuccessStatusCode() |> ignore
-                
-                let! xml = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-                return parseXml xml logger
-                
-            with ex ->
-                logger |> Option.iter (fun l -> 
-                    l.LogError(ex, "Error fetching Schedule 13G from URL: {url}", url))
-                return Failure $"HTTP fetch error: {ex.Message}"
-        }
+    let parseFromDocument (logger: ILogger option) (xml: string) =
+        try
+            logger |> Option.iter (fun l -> 
+                l.LogDebug "Parsing XML document")
+            
+            parseXml xml logger
+        with ex ->
+            logger |> Option.iter (fun l -> 
+                l.LogError(ex, "Error parsing Schedule 13G XML document"))
+            Failure $"XML parsing error: {ex.Message}"

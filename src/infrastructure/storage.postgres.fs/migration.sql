@@ -283,3 +283,6 @@ CREATE INDEX ownership_events_company ON ownership_events(company_ticker);
 CREATE INDEX ownership_events_company_date ON ownership_events(company_ticker, transaction_date DESC);
 CREATE INDEX ownership_events_filing ON ownership_events(filing_id);
 ALTER TABLE ownership_events OWNER TO stockanalysis;
+
+ALTER TABLE sec_filings ADD COLUMN is_xbrl BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE sec_filings ADD COLUMN is_inline_xbrl BOOLEAN NOT NULL DEFAULT false;

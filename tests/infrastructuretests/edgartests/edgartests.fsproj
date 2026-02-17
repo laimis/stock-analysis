@@ -33,6 +33,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\infrastructure\secedgar.fs\secedgar.fs.fsproj" />
     <ProjectReference Include="..\..\..\src\core.fs\core.fs.fsproj" />
+    <ProjectReference Include="..\..\testutils\testutils.csproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\storage.shared.fs\storage.shared.fs.fsproj" />
+    <ProjectReference Include="..\..\..\src\infrastructure\storage.postgres.fs\storage.postgres.fs.fsproj" />
   </ItemGroup>
 
 </Project>

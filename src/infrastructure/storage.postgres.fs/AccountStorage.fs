@@ -86,11 +86,6 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
     member private _.GetConnection() : IDbConnection =
         dataSource.OpenConnection()
     
-    // Helper to extract Guid from UserId
-    member private _.GetUserIdValue(userId: UserId) : Guid =
-        let (UserId id) = userId
-        id
-    
     // Helper functions for discriminated union conversions
     member private _.GetOrderStatusString(status: OrderStatus) : string =
         match status with

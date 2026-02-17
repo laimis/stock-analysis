@@ -19,6 +19,8 @@ type SECFilingRecord =
         FilingUrl: string
         DocumentUrl: string
         CreatedAt: DateTimeOffset
+        IsXBRL: bool
+        IsInlineXBRL: bool
     }
 
 type ISECFilingStorage =
@@ -57,6 +59,8 @@ module SECFilingRecord =
             FilingUrl = filing.FilingUrl
             DocumentUrl = filing.DocumentUrl
             CreatedAt = DateTimeOffset.UtcNow
+            IsXBRL = filing.IsXBRL
+            IsInlineXBRL = filing.IsInlineXBRL
         }
     
     /// Convert SECFilingRecord back to CompanyFiling
@@ -68,4 +72,6 @@ module SECFilingRecord =
             ReportDate = record.ReportDate
             Filing = record.FormType
             FilingUrl = record.FilingUrl
+            IsXBRL = record.IsXBRL
+            IsInlineXBRL = record.IsInlineXBRL
         }

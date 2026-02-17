@@ -21,6 +21,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\core\core.csproj" />
       <ProjectReference Include="..\..\src\core.fs\core.fs.fsproj" />
+      <ProjectReference Include="..\..\src\infrastructure\storage.shared.fs\storage.shared.fs.fsproj" />
     </ItemGroup>
 
 </Project>

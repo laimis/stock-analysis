@@ -2,9 +2,86 @@ namespace edgartests
 
 open System
 open System.IO
-open System.Net.Http
 open Xunit
 open secedgar.fs
+
+
+module EdgarClientTests =
+    open core.fs.Adapters.SEC
+    open core.Shared
+
+    let createEdgarClient() =
+        let accountStorage = new storage.postgres.AccountStorage(
+            new testutils.FakeOutbox(),
+           testutils.CredsHelper.GetDbCreds()
+        )
+        new EdgarClient(None, Some accountStorage) :> ISECFilings
+
+    [<Theory>]
+    [<InlineData("AAPL")>]
+    [<InlineData("MSFT")>]
+    [<InlineData("DOCN")>]
+    let ``Fetch filings for ticker works`` (ticker: string) = task {
+
+        let client = createEdgarClient()
+        let! result = ticker |> Ticker |> client.GetFilings
+
+        match result with
+        | Ok companyFilings ->
+            Assert.Equal(ticker, companyFilings.Ticker.Value)
+            Assert.NotEmpty(companyFilings.Filings)
+
+        | Error err ->
+            Assert.Fail($"Failed to fetch filings for {ticker}: {err}")
+    }
+    
+    [<Fact>]
+    [<Trait("Category", "Integration")>]
+    let ``Fetch and parse Schedule 13G from SEC`` () = task {
+        // Arrange
+        let client = createEdgarClient()
+
+        let! filings = "DOCS" |> Ticker |> client.GetFilings
+
+        // Assert - we expect to get at least one filing for DOCS
+        match filings with
+        | Ok companyFilings ->
+            Assert.NotEmpty(companyFilings.Filings)
+            
+            // Find a 13G filing (not all filings are 13G)
+            let filing13G = companyFilings.Filings 
+                            |> Seq.tryFind (fun f -> f.Filing.Contains("13G", StringComparison.OrdinalIgnoreCase))
+            
+            Assert.True(filing13G.IsSome, "Expected to find at least one 13G filing for DOCS")
+
+            // now, we have to parse the filing URL to get the actual XML URL for the Schedule 13G document
+            let filingUrl = filing13G.Value.FilingUrl
+            let! primaryDocument = client.FetchPrimaryDocument filingUrl
+            
+            match primaryDocument with
+            | Ok content ->
+                Assert.False(String.IsNullOrEmpty content, "XML content should not be empty")
+                
+                // now let's parse it using our Schedule13GParser
+                let result = Schedule13GParser.parseFromDocument None content
+                match result with
+                | Success parsed ->
+                    Assert.True(String.IsNullOrEmpty parsed.FilerName |> not, "Filer name should not be empty")
+                    Assert.Contains("DOXIMITY", parsed.IssuerName.ToUpper())
+                    Assert.True(parsed.SharesOwned > 0, "Expected shares owned to be greater than 0")
+                    Assert.True(parsed.PercentOfClass > 0m, "Expected percent of class to be greater than 0")
+                    Assert.True(parsed.Confidence > 0.5, $"Expected confidence > 0.5, got {parsed.Confidence}")
+                | PartialSuccess (parsed, notes) ->
+                    let notesStr = String.Join("; ", notes)
+                    Assert.True(parsed.Confidence > 0.4, 
+                                $"Confidence too low even for partial success: {parsed.Confidence}. Notes: {notesStr}")
+                | Failure msg ->
+                    Assert.Fail($"Failed to parse Schedule 13G XML: {msg}")
+            | Error err ->
+                Assert.Fail($"Failed to get XML URL: {err}")
+        | Error err ->
+            Assert.Fail($"Failed to fetch filings: {err}")
+    }
 
 module Schedule13GParserTests =
     
@@ -15,7 +92,7 @@ module Schedule13GParserTests =
         Assert.True(File.Exists(samplePath), $"Sample file not found: {samplePath}")
         
         // Act
-        let result = Schedule13GParser.parseFromFile samplePath None
+        let result = Schedule13GParser.parseFromFile None samplePath
         
         // Assert
         match result with
@@ -42,50 +119,55 @@ module Schedule13GParserTests =
     
     [<Fact>]
     [<Trait("Category", "Integration")>]
-    let ``Parse real Schedule 13G from SEC - DOCS/FMR`` () =
+    let ``Parse real Schedule 13G from SEC - DOCS/FMR`` () = task {
         // Arrange
-        let filingUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/xslSCHEDULE_13G_X01/primary_doc.xml"
+        let filingUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/0000315066-26-000439-index.html"
         
-        // Create HttpClient with proper SEC headers (matching EdgarClient pattern)
-        use httpClient = new HttpClient()
-        httpClient.DefaultRequestHeaders.Clear()
-        httpClient.DefaultRequestHeaders.Add("User-Agent", "NGTDTrading/1.0 (secclient@nightingaletrading.com)")
+        let client = EdgarClientTests.createEdgarClient()
+
+        let! content = client.FetchPrimaryDocument filingUrl
+
+        match content with
+        | Error err ->
+            Assert.Fail($"Failed to fetch primary document: {err}")
+        | Ok xmlContent ->
         
-        // Act
-        let result = Schedule13GParser.parseFromUrl filingUrl httpClient None |> Async.RunSynchronously
-        
-        // Assert
-        match result with
-        | Success parsed ->
-            // Verify core fields match expected values
-            Assert.Contains("FMR", parsed.FilerName.ToUpper())
-            Assert.True(parsed.FilerCik.IsSome, "Expected filer CIK")
-            Assert.Contains("DOXIMITY", parsed.IssuerName.ToUpper())
-            Assert.Equal(Some "0001516513", parsed.IssuerCik)
+            // Act
+            let result = Schedule13GParser.parseFromDocument None xmlContent
             
-            // Ownership should be roughly 2.16M shares
-            let lowerBound = 2164000L // Allow for rounding from 2164071.69
-            let upperBound = 2165000L
-            Assert.True(parsed.SharesOwned > lowerBound && parsed.SharesOwned < upperBound, 
-                        $"Expected ~2.16M shares, got {parsed.SharesOwned}")
-            
-            // Percent should be around 1.6%
-            Assert.True(parsed.PercentOfClass > 1.5m && parsed.PercentOfClass < 1.7m,
-                        $"Expected approximately 1.6 percent, got {parsed.PercentOfClass}")
-            
-            // Should have reasonable confidence
-            Assert.True(parsed.Confidence > 0.5, $"Expected confidence > 0.5, got {parsed.Confidence}")
-            
-        | PartialSuccess (parsed, notes) ->
-            // Partial success is acceptable - log warning but don't fail
-            // Real filings may have variations we don't handle perfectly
-            let notesStr = String.Join("; ", notes)
-            Assert.True(parsed.Confidence > 0.4, 
-                        $"Confidence too low even for partial success: {parsed.Confidence}. Notes: {notesStr}")
-            
-        | Failure msg ->
-            // For now, just fail - network issues will be evident from the error message
-            Assert.Fail($"Failed to parse: {msg}")
+            // Assert
+            match result with
+            | Success parsed ->
+                // Verify core fields match expected values
+                Assert.Contains("FMR", parsed.FilerName.ToUpper())
+                Assert.True(parsed.FilerCik.IsSome, "Expected filer CIK")
+                Assert.Contains("DOXIMITY", parsed.IssuerName.ToUpper())
+                Assert.Equal(Some "0001516513", parsed.IssuerCik)
+                
+                // Ownership should be roughly 2.16M shares
+                let lowerBound = 2164000L // Allow for rounding from 2164071.69
+                let upperBound = 2165000L
+                Assert.True(parsed.SharesOwned > lowerBound && parsed.SharesOwned < upperBound, 
+                            $"Expected ~2.16M shares, got {parsed.SharesOwned}")
+                
+                // Percent should be around 1.6%
+                Assert.True(parsed.PercentOfClass > 1.5m && parsed.PercentOfClass < 1.7m,
+                            $"Expected approximately 1.6 percent, got {parsed.PercentOfClass}")
+                
+                // Should have reasonable confidence
+                Assert.True(parsed.Confidence > 0.5, $"Expected confidence > 0.5, got {parsed.Confidence}")
+                
+            | PartialSuccess (parsed, notes) ->
+                // Partial success is acceptable - log warning but don't fail
+                // Real filings may have variations we don't handle perfectly
+                let notesStr = String.Join("; ", notes)
+                Assert.True(parsed.Confidence > 0.4, 
+                            $"Confidence too low even for partial success: {parsed.Confidence}. Notes: {notesStr}")
+                
+            | Failure msg ->
+                // For now, just fail - network issues will be evident from the error message
+                Assert.Fail($"Failed to parse: {msg}")
+    }
     
     [<Fact>]
     let ``Confidence calculation works correctly`` () =
