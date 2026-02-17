@@ -962,7 +962,7 @@ type AlertEmailService(
                         {| identifier = identifier; change = count - previousValue; previous = previousValue; current = count |}
                 )
             
-        if fromStorage = None then do! blobStorage.Save(key, alerts) |> Async.AwaitTask
+        if fromStorage = None then do! blobStorage.Save key alerts |> Async.AwaitTask
         
         // only email if we are at the end of the day
         if marketHours.IsMarketOpen(DateTimeOffset.UtcNow) |> not then

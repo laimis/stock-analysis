@@ -19,7 +19,7 @@ type IPortfolioStorage =
     
     abstract member Delete : userId:UserId -> Task
     
-    abstract member GetStockList : Id:System.Guid -> userId:UserId -> Task<StockList>
+    abstract member GetStockList : Id:System.Guid -> userId:UserId -> Task<StockList option>
     abstract member GetStockLists : userId:UserId -> Task<IEnumerable<StockList>>
     abstract member SaveStockList : list:StockList -> userId:UserId -> Task
     abstract member DeleteStockList : list:StockList -> userId:UserId -> Task
@@ -28,7 +28,7 @@ type IPortfolioStorage =
     abstract member GetPendingStockPositions : userId:UserId -> Task<IEnumerable<PendingStockPosition>>
     
     abstract member GetRoutines : userId:UserId -> Task<IEnumerable<Routine>>
-    abstract member GetRoutine : routineId:System.Guid -> userId:UserId -> Task<Routine>
+    abstract member GetRoutine : routineId:System.Guid -> userId:UserId -> Task<Routine option>
     abstract member SaveRoutine : routine:Routine -> userId:UserId -> Task
     abstract member DeleteRoutine : routine:Routine -> userId:UserId -> Task
     
@@ -37,7 +37,7 @@ type IPortfolioStorage =
     abstract member SaveOptionPosition : userId:UserId -> previousState:OptionPositionState option -> newState:OptionPositionState -> Task
     abstract member DeleteOptionPosition : userId:UserId -> previousState:OptionPositionState option -> newState:OptionPositionState -> Task
     
-    abstract member GetCrypto : token:string -> userId:UserId -> Task<OwnedCrypto>
-    abstract member GetCryptoByCryptoId : id:System.Guid -> userId:UserId -> Task<OwnedCrypto>
+    abstract member GetCrypto : token:string -> userId:UserId -> Task<OwnedCrypto option>
+    abstract member GetCryptoByCryptoId : id:System.Guid -> userId:UserId -> Task<OwnedCrypto option>
     abstract member GetCryptos : userId:UserId -> Task<IEnumerable<OwnedCrypto>>
     abstract member SaveCrypto : crypto:OwnedCrypto -> userId:UserId -> Task

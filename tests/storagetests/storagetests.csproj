@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\infrastructure\storage.postgres.fs\storage.postgres.fs.fsproj" />
-	  <ProjectReference Include="..\..\src\core\core.csproj" />
+	  <ProjectReference Include="..\..\src\core2.fs\core2.fs.fsproj" />
 	  <ProjectReference Include="..\coretests\coretests.csproj" />
 	  <ProjectReference Include="..\testutils\testutils.csproj" />
   </ItemGroup>

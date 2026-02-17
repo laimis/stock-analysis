@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\core\core.csproj" />
+    <ProjectReference Include="..\..\src\core2.fs\core2.fs.fsproj" />
     <ProjectReference Include="..\..\src\infrastructure\timezonesupport.fs\timezonesupport.fs.fsproj" />
     <ProjectReference Include="..\..\src\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\testutils\testutils.csproj" />

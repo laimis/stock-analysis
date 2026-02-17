@@ -85,7 +85,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
             this.SaveEventsAsyncInternal(agg, agg.Version, entity, userId, outsideTransaction)
         
         member this.SaveEventsAsync(oldAggregate: IAggregate, newAggregate: IAggregate, entity: string, userId: UserId, outsideTransaction: IDbTransaction) = 
-            let fromVersion = if isNull oldAggregate then 0 else oldAggregate.Version
+            let fromVersion = if isNull (box oldAggregate) then 0 else oldAggregate.Version
             this.SaveEventsAsyncInternal(newAggregate, fromVersion, entity, userId, outsideTransaction)
         
         member this.DoHealthCheck() = 
@@ -168,7 +168,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                     return Some(value)
             }
         
-        member this.Save<'T>(key: string, t: 'T) = 
+        member this.Save<'T> (key: string) (t: 'T) = 
             task {
                 let blob = JsonConvert.SerializeObject(t)
                 use db = this.GetConnection()

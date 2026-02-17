@@ -46,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\core\core.csproj" />
+        <ProjectReference Include="..\core2.fs\core2.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\storage.postgres.fs\storage.postgres.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\coinmarketcap.fs\coinmarketcap.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\csvparser.fs\csvparser.fs.fsproj" />

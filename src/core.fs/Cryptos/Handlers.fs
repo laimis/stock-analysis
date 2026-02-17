@@ -146,15 +146,16 @@ namespace core.fs.Cryptos
             match user with
             | None -> return "User not found" |> ServiceError |> Error
             | _ ->
-                let! crypto = portfolio.GetCrypto data.Token.Value userId
+                let! cryptoOpt = portfolio.GetCrypto data.Token.Value userId
                 
-                if crypto = null && isSell then
+                match cryptoOpt with
+                | None when isSell ->
                     return "Cannot sell crypto that is not owned" |> ServiceError |> Error
-                else            
+                | _ ->            
                     let cryptoToUse =
-                        match crypto with
-                        | null -> OwnedCrypto(data.Token, userId |> IdentifierHelper.getUserId)
-                        | _ -> crypto
+                        match cryptoOpt with
+                        | None -> OwnedCrypto(data.Token, userId |> IdentifierHelper.getUserId)
+                        | Some crypto -> crypto
                         
                     func data cryptoToUse
                     
@@ -188,10 +189,13 @@ namespace core.fs.Cryptos
             match user with
             | None -> return "User not found" |> ServiceError |> Error
             | _ ->
-                let! crypto = portfolio.GetCrypto cmd.Token.Value cmd.UserId
-                crypto.DeleteTransaction(cmd.TransactionId)
-                do! portfolio.SaveCrypto crypto cmd.UserId
-                return Ok ()
+                let! cryptoOpt = portfolio.GetCrypto cmd.Token.Value cmd.UserId
+                match cryptoOpt with
+                | None -> return "Crypto not found" |> ServiceError |> Error
+                | Some crypto ->
+                    crypto.DeleteTransaction(cmd.TransactionId)
+                    do! portfolio.SaveCrypto crypto cmd.UserId
+                    return Ok ()
         }
         
         member _.Handle(query:Details) = task {
@@ -339,9 +343,9 @@ namespace core.fs.Cryptos
             match user with
             | None -> return "User not found" |> ServiceError |> Error
             | _ ->
-                let! crypto = portfolio.GetCrypto query.Token.Value query.UserId
+                let! cryptoOpt = portfolio.GetCrypto query.Token.Value query.UserId
                 
-                match crypto with
-                | null -> return "Crypto not found" |> ServiceError |> Error
-                | _ -> return CryptoOwnershipView(crypto.State) |> Ok
+                match cryptoOpt with
+                | None -> return "Crypto not found" |> ServiceError |> Error
+                | Some crypto -> return CryptoOwnershipView(crypto.State) |> Ok
         }

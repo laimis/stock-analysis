@@ -99,10 +99,10 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine update.Id userId
-            match routine with
-            | null -> return "Routine not found" |> ServiceError |> Error
-            | _ ->
+            let! routineOpt = storage.GetRoutine update.Id userId
+            match routineOpt with
+            | None -> return "Routine not found" |> ServiceError |> Error
+            | Some routine ->
                 routine.Update(name=update.Name,description=update.Description)
                 do! storage.SaveRoutine routine userId
                 return routine.State |> Ok
@@ -114,10 +114,10 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine delete.Id delete.UserId
-            match routine with
-            | null -> return "Routine not found" |> ServiceError |> Error
-            | _ ->
+            let! routineOpt = storage.GetRoutine delete.Id delete.UserId
+            match routineOpt with
+            | None -> return "Routine not found" |> ServiceError |> Error
+            | Some routine ->
                 do! storage.DeleteRoutine routine delete.UserId
                 return routine.State |> Ok
     }
@@ -143,10 +143,10 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine add.Id userId
-            match routine with
-            | null -> return "Routine not found" |> ServiceError |> Error
-            | _ ->
+            let! routineOpt = storage.GetRoutine add.Id userId
+            match routineOpt with
+            | None -> return "Routine not found" |> ServiceError |> Error
+            | Some routine ->
                 routine.AddStep(label=add.Label,url=add.Url)
                 do! storage.SaveRoutine routine userId
                 return routine.State |> Ok
@@ -158,10 +158,10 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine move.Id userId
-            match routine with
-            | null -> return "Routine not found" |> ServiceError |> Error
-            | _ ->
+            let! routineOpt = storage.GetRoutine move.Id userId
+            match routineOpt with
+            | None -> return "Routine not found" |> ServiceError |> Error
+            | Some routine ->
                 routine.MoveStep(stepIndex=move.StepIndex.Value,direction=move.Direction.Value)
                 do! storage.SaveRoutine routine userId
                 return routine.State |> Ok
@@ -173,10 +173,10 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine remove.Id remove.UserId
-            match routine with
-            | null -> return "Routine not found" |> ServiceError |> Error
-            | _ ->
+            let! routineOpt = storage.GetRoutine remove.Id remove.UserId
+            match routineOpt with
+            | None -> return "Routine not found" |> ServiceError |> Error
+            | Some routine ->
                 routine.RemoveStep(index=remove.StepIndex.Value)
                 do! storage.SaveRoutine routine remove.UserId
                 return routine.State |> Ok
@@ -188,10 +188,10 @@ type Handler(accounts:IAccountStorage,storage:IPortfolioStorage) =
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! routine = storage.GetRoutine update.Id userId
-            match routine with
-            | null -> return "Routine not found" |> ServiceError |> Error
-            | _ ->
+            let! routineOpt = storage.GetRoutine update.Id userId
+            match routineOpt with
+            | None -> return "Routine not found" |> ServiceError |> Error
+            | Some routine ->
                 routine.UpdateStep(index=update.StepIndex.Value,label=update.Label,url=update.Url)
                 do! storage.SaveRoutine routine userId
                 return routine.State |> Ok

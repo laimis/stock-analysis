@@ -24,7 +24,7 @@ type QueryResponse(user:User, stocks:StockPositionState seq, options:OptionPosit
     member _.Id = user.State.Id
     member _.FirstName = user.State.Firstname
     member _.LastName = user.State.Lastname
-    member _.Verified = user.State.Verified.HasValue
+    member _.Verified = user.State.Verified |> Option.isSome
     member _.Stocks = stockLength
     member _.Options = optionLength
         

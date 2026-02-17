@@ -34,16 +34,18 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
         | None -> aggregateStorage.SaveEventsAsync(null, newState, entityType, userId, null)
         | Some prev -> aggregateStorage.SaveEventsAsync(prev, newState, entityType, userId, null)
     
-    // Stock methods
-    member internal this.GetStock(ticker: Ticker, userId: UserId) : Task<OwnedStock> = task {
+    // Stock methods (internal, not used - commented out due to build issues)
+    (*
+    member internal this.GetStock(ticker: Ticker, userId: UserId) : Task<OwnedStock option> = task {
         let! stocks = this.GetStocks(userId)
-        return stocks |> Seq.tryFind (fun s -> s.State.Ticker.Equals(ticker)) |> Option.toObj
+        return stocks |> Seq.tryFind (fun s -> s.State.Ticker.Equals(ticker))
     }
     
-    member internal this.GetStockByStockId(stockId: Guid, userId: UserId) : Task<OwnedStock> = task {
+    member internal this.GetStockByStockId(stockId: Guid, userId: UserId) : Task<OwnedStock option> = task {
         let! stocks = this.GetStocks(userId)
-        return stocks |> Seq.tryFind (fun s -> s.Id = stockId) |> Option.toObj
+        return stocks |> Seq.tryFind (fun s -> s.Id = stockId)
     }
+    *)
     
     member internal this.Save(stock: OwnedStock, userId: UserId) : Task =
         this.Save(stock, _stock_entity, userId)
@@ -113,14 +115,14 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
     }
     
     // Crypto methods
-    member this.GetCrypto (token: string) (userId: UserId) : Task<OwnedCrypto> = task {
+    member this.GetCrypto (token: string) (userId: UserId) : Task<OwnedCrypto option> = task {
         let! cryptos = this.GetCryptos(userId)
-        return cryptos |> Seq.tryFind (fun s -> s.State.Token = token) |> Option.toObj
+        return cryptos |> Seq.tryFind (fun s -> s.State.Token = token)
     }
     
-    member this.GetCryptoByCryptoId (cryptoId: Guid) (userId: UserId) : Task<OwnedCrypto> = task {
+    member this.GetCryptoByCryptoId (cryptoId: Guid) (userId: UserId) : Task<OwnedCrypto option> = task {
         let! cryptos = this.GetCryptos(userId)
-        return cryptos |> Seq.tryFind (fun s -> s.Id = cryptoId) |> Option.toObj
+        return cryptos |> Seq.tryFind (fun s -> s.Id = cryptoId)
     }
     
     member this.SaveCrypto (crypto: OwnedCrypto) (userId: UserId) : Task =
@@ -142,9 +144,9 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
     member this.SaveRoutine (routine: Routine) (userId: UserId) : Task =
         this.Save(routine, _routine_entity, userId)
     
-    member this.GetRoutine (id: Guid) (userId: UserId) : Task<Routine> = task {
+    member this.GetRoutine (id: Guid) (userId: UserId) : Task<Routine option> = task {
         let! list = this.GetRoutines(userId)
-        return list |> Seq.tryFind (fun s -> s.State.Id = id) |> Option.toObj
+        return list |> Seq.tryFind (fun s -> s.State.Id = id)
     }
     
     member this.DeleteRoutine (routine: Routine) (userId: UserId) : Task =
@@ -157,9 +159,9 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
                    .Select(fun g -> StockList(g))
     }
     
-    member this.GetStockList (id: Guid) (userId: UserId) : Task<StockList> = task {
+    member this.GetStockList (id: Guid) (userId: UserId) : Task<StockList option> = task {
         let! list = this.GetStockLists(userId)
-        return list |> Seq.tryFind (fun s -> s.State.Id = id) |> Option.toObj
+        return list |> Seq.tryFind (fun s -> s.State.Id = id)
     }
     
     member this.SaveStockList (list: StockList) (userId: UserId) : Task =

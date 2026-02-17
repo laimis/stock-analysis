@@ -216,7 +216,7 @@ type SECFilingsMonitoringService(
             let verifiedUsers = 
                 users 
                 |> Seq.choose id 
-                |> Seq.filter (fun u -> u.State.Verified.HasValue) 
+                |> Seq.filter (fun u -> u.State.Verified |> Option.isSome) 
                 |> Seq.toArray
 
             logger.LogInformation($"Processing {verifiedUsers.Length} verified users")

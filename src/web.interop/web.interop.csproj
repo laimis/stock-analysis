@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\core\core.csproj" />
+        <ProjectReference Include="..\core2.fs\core2.fs.fsproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
     </ItemGroup>
 

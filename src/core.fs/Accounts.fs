@@ -95,7 +95,7 @@ type User(events:System.Collections.Generic.IEnumerable<AggregateEvent>) =
         this.State.PasswordHashMatches(passwordHash)
         
     member this.Confirm() =
-        match this.State.Verified.HasValue with
+        match this.State.Verified |> Option.isSome with
         | true -> ()
         | false ->
             let event = UserConfirmed(Guid.NewGuid(), this.Id, DateTimeOffset.UtcNow)

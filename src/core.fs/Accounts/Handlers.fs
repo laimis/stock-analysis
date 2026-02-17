@@ -34,7 +34,7 @@ namespace core.fs.Accounts
             {
                 LoggedIn = true
                 Id = state.Id
-                Verified = state.Verified.HasValue
+                Verified = state.Verified |> Option.isSome
                 Created = state.Created
                 Email = state.Email
                 Firstname = state.Firstname

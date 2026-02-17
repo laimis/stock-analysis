@@ -650,7 +650,7 @@ type SchwabClient(blobStorage: IBlobStorage, callbackUrl: string, clientId: stri
                     | false ->
                         logInfo "Saving access token to storage" [||]
                     
-                        do! blobStorage.Save(storageKey, t)
+                        do! blobStorage.Save storageKey t
                         return t
     }
     

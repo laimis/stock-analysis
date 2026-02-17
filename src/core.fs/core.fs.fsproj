@@ -69,7 +69,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\core\core.csproj"/>
+        <ProjectReference Include="..\core2.fs\core2.fs.fsproj"/>
     </ItemGroup>
 
 </Project>

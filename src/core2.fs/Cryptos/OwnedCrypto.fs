@@ -39,6 +39,10 @@ type OwnedCrypto =
                 defaultArg notes null
             )
         )
+    
+    // Overload for C# compatibility
+    member this.Purchase(quantity: decimal, dollarAmountSpent: decimal, date: DateTimeOffset) =
+        this.Purchase(quantity, dollarAmountSpent, date, None)
 
     member this.Reward(quantity: decimal, dollarAmountWorth: decimal, date: DateTimeOffset, notes: string) =
         if quantity < 0m then
