@@ -1,10 +1,8 @@
 namespace storage.postgres
 
 open System
-open System.Collections.Generic
 open System.Data
 open System.Linq
-open System.Threading.Tasks
 open core.fs.Accounts
 open core.Shared
 open Dapper
@@ -52,7 +50,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                         try tx.Dispose() with _ -> ()
                     if not (isNull db) then
                         try db.Dispose() with _ -> ()
-            } :> Task
+            }
         
         member this.DeleteAggregate(entity: string, aggregateId: Guid, userId: UserId) = 
             task {
@@ -61,7 +59,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                 let sql = "DELETE FROM events WHERE entity = @entity AND userId = @userId AND aggregateId = @aggregateId"
                 let! _ = db.ExecuteAsync(sql, {| userId = id; entity = entity; aggregateId = aggregateId.ToString() |})
                 return ()
-            } :> Task
+            }
         
         member this.GetEventsAsync(entity: string, userId: UserId) = 
             task {
@@ -95,7 +93,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                 use db = this.GetConnection()
                 let! _ = db.QueryAsync<int>("select 1")
                 return ()
-            } :> Task
+            }
     
     member private this.SaveEventsAsyncInternal(agg: IAggregate, fromVersion: int, entity: string, userId: UserId, outsideTransaction: IDbTransaction) = 
         task {
@@ -138,7 +136,13 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                     if not (isNull tx) then try tx.Dispose() with _ -> ()
                     if not (isNull db) then try db.Dispose() with _ -> ()
                 raise ex
-        } :> Task
+            
+            if ownsConnection then  
+                if not (isNull tx) then  
+                    try tx.Dispose() with _ -> ()  
+                if not (isNull db) then  
+                    try db.Dispose() with _ -> ()  
+        }
     
     member this.GetStoredEvents(entity: string, userId: UserId) = 
         task {
@@ -172,4 +176,4 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                 let sql = "INSERT INTO blobs (key, blob, inserted) VALUES (@key, @blob, current_timestamp) ON CONFLICT (key) DO UPDATE SET blob = @blob, inserted = current_timestamp"
                 let! _ = db.ExecuteAsync(sql, {| key = key; blob = blob |})
                 return ()
-            } :> Task
+            }
