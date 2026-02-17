@@ -33,26 +33,11 @@ tests/*            → xUnit test projects for C# and F# code
 - **Component-specific styles**: Use sparingly, define in `styles.css` if absolutely necessary
 
 ### Event Sourcing Architecture
-- In C#, all domain entities inherit from `Aggregate<T>` (C#) and emit `AggregateEvent` objects:
-
-```csharp
-// C# defines the aggregate structure
-public class OwnedStock : Aggregate<OwnedStockState>
-{
-    public void Purchase(decimal shares, decimal price, DateTimeOffset date) 
-    {
-        Apply(new StockPurchased_v2(...)); // Events stored, not state
-    }
-}
-```
-
-- In F#, aggregates follow a similar pattern but leverage F#'s discriminated unions and functional paradigms:
+- Aggregates follow a similar pattern but leverage F#'s discriminated unions and functional paradigms:
 - Events are persisted to `events` table in PostgreSQL via `PostgresAggregateStorage`
 - State is reconstructed by replaying events in aggregate constructors
 - Never modify state directly; always emit events through `Apply()`
 - When writing F# code, avoid using mutable state; prefer pure functions and immutable data structures
-
-**Mark F# DTOs with `[<CLIMutable>]`** for JSON serialization compatibility
 
 ### Dependency Injection (src/infrastructure/di/DIHelper.cs)
 - Central DI registration in `DIHelper.RegisterServices()`
