@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="PostgresAggregateStorage.fs" />
     <Compile Include="AccountStorage.fs" />
+    <Compile Include="OwnershipStorage.fs" />
   </ItemGroup>
 
   <ItemGroup>
