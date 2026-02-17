@@ -24,7 +24,22 @@ type SECFilingStorage(connectionString: string) =
                     VALUES (@Id, @Ticker, @Cik, @FormType, @FilingDate, @ReportDate, @Description, @FilingUrl, @DocumentUrl, @CreatedAt, @IsXBRL, @IsInlineXBRL)
                     ON CONFLICT (filing_url) DO NOTHING"""
                 
-                let! rowsAffected = db.ExecuteAsync(query, filing)
+                let parameters = {|
+                    Id = filing.Id
+                    Ticker = filing.Ticker
+                    Cik = filing.Cik
+                    FormType = filing.FormType
+                    FilingDate = filing.FilingDate
+                    ReportDate = filing.ReportDate |> Option.toObj
+                    Description = filing.Description
+                    FilingUrl = filing.FilingUrl
+                    DocumentUrl = filing.DocumentUrl
+                    CreatedAt = filing.CreatedAt
+                    IsXBRL = filing.IsXBRL
+                    IsInlineXBRL = filing.IsInlineXBRL
+                |}
+                
+                let! rowsAffected = db.ExecuteAsync(query, parameters)
                 return rowsAffected > 0
             }
         
@@ -37,8 +52,25 @@ type SECFilingStorage(connectionString: string) =
                     VALUES (@Id, @Ticker, @Cik, @FormType, @FilingDate, @ReportDate, @Description, @FilingUrl, @DocumentUrl, @CreatedAt, @IsXBRL, @IsInlineXBRL)
                     ON CONFLICT (filing_url) DO NOTHING"""
                 
-                let filingsArray = filings.ToArray()
-                let! rowsAffected = db.ExecuteAsync(query, filingsArray)
+                let parameters = 
+                    filings 
+                    |> Seq.map (fun filing -> {|
+                        Id = filing.Id
+                        Ticker = filing.Ticker
+                        Cik = filing.Cik
+                        FormType = filing.FormType
+                        FilingDate = filing.FilingDate
+                        ReportDate = filing.ReportDate |> Option.toObj
+                        Description = filing.Description
+                        FilingUrl = filing.FilingUrl
+                        DocumentUrl = filing.DocumentUrl
+                        CreatedAt = filing.CreatedAt
+                        IsXBRL = filing.IsXBRL
+                        IsInlineXBRL = filing.IsInlineXBRL
+                    |})
+                    |> Seq.toArray
+                
+                let! rowsAffected = db.ExecuteAsync(query, parameters)
                 return rowsAffected
             }
         
