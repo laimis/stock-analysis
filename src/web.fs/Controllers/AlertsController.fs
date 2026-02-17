@@ -1,7 +1,6 @@
 namespace web.Controllers
 
 open System
-open System.Collections.Generic
 open System.Threading.Tasks
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Authorization
@@ -102,21 +101,21 @@ type AlertsController(handler: Handler) =
 
     [<HttpGet("triggerDaily")>]
     [<Authorize("admin")>]
-    member this.TriggerDaily([<FromServices>] dailyAlerts: MonitoringServices.PatternMonitoringService) =
-        dailyAlerts.RunPatternMonitoring()
-        Task.CompletedTask
+    member this.TriggerDaily([<FromServices>] dailyAlerts: MonitoringServices.PatternMonitoringService) = task {
+        return! dailyAlerts.RunPatternMonitoring()
+    }
 
     [<HttpGet("triggerPriceObvTrend")>]
     [<Authorize("admin")>]
-    member this.TriggerPriceObvTrend([<FromServices>] priceObvTrendAlerts: MonitoringServices.PriceObvTrendMonitoringService) =
-        priceObvTrendAlerts.Run()
-        Task.CompletedTask
+    member this.TriggerPriceObvTrend([<FromServices>] priceObvTrendAlerts: MonitoringServices.PriceObvTrendMonitoringService) = task {
+        return! priceObvTrendAlerts.Run()
+    }
 
     [<HttpGet("triggerEmail")>]
     [<Authorize("admin")>]
-    member this.TriggerEmail([<FromServices>] emailAlerts: MonitoringServices.AlertEmailService) =
-        emailAlerts.Execute()
-        Task.CompletedTask
+    member this.TriggerEmail([<FromServices>] emailAlerts: MonitoringServices.AlertEmailService) = task {
+        return! emailAlerts.Execute()
+    }
 
     [<HttpGet("triggerAccountMonitoring")>]
     [<Authorize("admin")>]

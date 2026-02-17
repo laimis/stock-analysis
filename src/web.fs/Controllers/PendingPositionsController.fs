@@ -1,7 +1,6 @@
 namespace web.Controllers
 
 open System
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Authorization
 open core.fs.Stocks.PendingPositions

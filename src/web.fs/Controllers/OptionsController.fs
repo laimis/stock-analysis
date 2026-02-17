@@ -16,24 +16,22 @@ type OptionsController(handler: OptionsHandler) =
     [<HttpGet("pricing")>]
     member this.GetOptionPricing([<FromQuery>] symbol: string) =
         this.OkOrError(
-            handler.Handle(
+            handler.Handle
                 {
                     OptionPricingQuery.UserId = this.User.Identifier()
                     Symbol = OptionTicker.create(symbol)
                 }
-            )
         )
 
     [<HttpGet("chain/{ticker}")>]
     member this.Chain([<FromRoute>] ticker: string) =
         this.OkOrError(
-            handler.Handle(
+            handler.Handle
                 {ChainQuery.Ticker = Ticker(ticker); UserId = this.User.Identifier()}
-            )
         )
 
     [<HttpGet("export")>]
     member this.Export() = task {
-        let! result = handler.Handle({ExportQuery.UserId = this.User.Identifier()})
-        return this.GenerateExport(result)
+        let! result = handler.Handle {ExportQuery.UserId = this.User.Identifier()}
+        return this.GenerateExport result
     }

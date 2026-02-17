@@ -1,12 +1,10 @@
 namespace web.Controllers
 
 open System
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Authorization
 open core.fs.Adapters.Storage
 open core.Shared
-open web.Utils
 
 [<CLIMutable>]
 type SearchEntitiesRequest = {
@@ -57,29 +55,29 @@ type OwnershipController(storage: IOwnershipStorage) =
 
     [<HttpGet("ticker/{ticker}")>]
     member this.GetOwnershipByTicker([<FromRoute>] ticker: string) = task {
-        let t = Ticker(ticker)
+        let t = Ticker ticker
         let! summary = storage.GetOwnershipSummary(t)
-        return this.Ok(summary)
+        return this.Ok summary
     }
 
     [<HttpGet("ticker/{ticker}/timeline")>]
     member this.GetOwnershipTimeline([<FromRoute>] ticker: string, [<FromQuery>] ?days: int) = task {
-        let t = Ticker(ticker)
+        let t = Ticker ticker
         let d = defaultArg days 365
         let! timeline = storage.GetOwnershipTimeline t d
-        return this.Ok(timeline)
+        return this.Ok timeline
     }
 
     [<HttpGet("ticker/{ticker}/events")>]
     member this.GetEventsByTicker([<FromRoute>] ticker: string) = task {
-        let t = Ticker(ticker)
+        let t = Ticker ticker
         let! events = storage.GetEventsByCompany(t)
-        return this.Ok(events)
+        return this.Ok events
     }
 
     [<HttpGet("entity/{entityId}")>]
     member this.GetEntity([<FromRoute>] entityId: Guid) = task {
-        let! entity = storage.GetEntityById(entityId)
+        let! entity = storage.GetEntityById entityId
         match entity with
         | Some e -> return this.Ok(e) :> ActionResult
         | None -> return this.NotFound() :> ActionResult
@@ -87,23 +85,23 @@ type OwnershipController(storage: IOwnershipStorage) =
 
     [<HttpGet("entity/{entityId}/roles")>]
     member this.GetEntityRoles([<FromRoute>] entityId: Guid) = task {
-        let! roles = storage.GetRolesByEntity(entityId)
+        let! roles = storage.GetRolesByEntity entityId
         return this.Ok(roles)
     }
 
     [<HttpGet("entity/{entityId}/events")>]
     member this.GetEventsByEntity([<FromRoute>] entityId: Guid) = task {
-        let! events = storage.GetEventsByEntity(entityId)
+        let! events = storage.GetEventsByEntity entityId
         return this.Ok(events)
     }
 
     [<HttpGet("entities/search")>]
     member this.SearchEntities([<FromQuery>] name: string) = task {
-        if String.IsNullOrWhiteSpace(name) then
-            return this.BadRequest("Name parameter is required") :> ActionResult
+        if String.IsNullOrWhiteSpace name then
+            return this.BadRequest "Name parameter is required" :> ActionResult
         else
-            let! entities = storage.FindEntitiesByName(name)
-            return this.Ok(entities) :> ActionResult
+            let! entities = storage.FindEntitiesByName name
+            return this.Ok entities :> ActionResult
     }
 
     [<HttpPost("entity")>]
@@ -117,8 +115,8 @@ type OwnershipController(storage: IOwnershipStorage) =
             LastSeen = DateTimeOffset.UtcNow
             CreatedAt = DateTimeOffset.UtcNow
         }
-        let! entityId = storage.SaveEntity(entity)
-        return this.Ok({| id = entityId |})
+        let! entityId = storage.SaveEntity entity
+        return this.Ok {| id = entityId |}
     }
 
     [<HttpPost("role")>]
@@ -134,8 +132,8 @@ type OwnershipController(storage: IOwnershipStorage) =
             FirstSeen = DateTimeOffset.UtcNow
             LastSeen = DateTimeOffset.UtcNow
         }
-        let! roleId = storage.SaveRole(role)
-        return this.Ok({| id = roleId |})
+        let! roleId = storage.SaveRole role
+        return this.Ok {| id = roleId |}
     }
 
     [<HttpPost("event")>]
@@ -160,13 +158,13 @@ type OwnershipController(storage: IOwnershipStorage) =
             OwnershipNature = request.OwnershipNature
             CreatedAt = DateTimeOffset.UtcNow
         }
-        let! eventId = storage.SaveEvent(ownershipEvent)
-        return this.Ok({| id = eventId |})
+        let! eventId = storage.SaveEvent ownershipEvent
+        return this.Ok {| id = eventId |}
     }
 
     [<HttpGet("ticker/{ticker}/roles")>]
     member this.GetRolesByTicker([<FromRoute>] ticker: string) = task {
-        let t = Ticker(ticker)
-        let! roles = storage.GetRolesByCompany(t)
-        return this.Ok(roles)
+        let t = Ticker ticker
+        let! roles = storage.GetRolesByCompany t
+        return this.Ok roles
     }
