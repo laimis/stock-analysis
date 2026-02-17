@@ -9,11 +9,10 @@
   <ItemGroup>
     <Compile Include="Schedule13GParserTests.fs" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <Content Include="..\..\..\src\infrastructure\secedgar.fs\sample_schedule_13g.xml">
+    <Content Include="sample_schedule_13g.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>sample_schedule_13g.xml</Link>
     </Content>
   </ItemGroup>
 

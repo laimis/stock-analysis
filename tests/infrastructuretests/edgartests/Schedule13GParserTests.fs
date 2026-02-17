@@ -130,7 +130,7 @@ module Schedule13GParserTests =
     let ``Parser handles missing elements gracefully`` () =
         // Arrange - minimal XML with just root element
         let minimalXml = """<?xml version="1.0" encoding="UTF-8"?>
-<edgarSubmission xmlns="http://www.sec.gov/edgar/document/thirteeng/20130101">
+<edgarSubmission xmlns="http://www.sec.gov/edgar/schedule13g">
     <submissionType>SC 13G</submissionType>
 </edgarSubmission>"""
         
