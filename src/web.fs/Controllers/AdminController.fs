@@ -68,3 +68,7 @@ type AdminController(handler: core.fs.Admin.Handler) =
     [<HttpGet("sec/ticker-sync")>]
     member this.TriggerSECTickerSync() : Task<ActionResult> =
         this.OkOrError(handler.Handle(Unchecked.defaultof<TriggerSECTickerSync>))
+
+    [<HttpGet("sec/filings-migration")>]
+    member this.MigrateSECFilings([<FromQuery>] userEmail: string) : Task<ActionResult> =
+        this.OkOrError(handler.Handle({MigrateSECFilings.userEmail = userEmail}))

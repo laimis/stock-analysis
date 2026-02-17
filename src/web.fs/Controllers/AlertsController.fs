@@ -157,6 +157,11 @@ type AlertsController(handler: Handler) =
     member this.TriggerSECFilings([<FromServices>] secFilingsService: SECFilingsMonitoring.SECFilingsMonitoringService) =
         secFilingsService.Execute()
 
+    [<HttpGet("triggerSchedule13G")>]
+    [<Authorize("admin")>]
+    member this.TriggerSchedule13G([<FromServices>] service: secedgar.fs.Schedule13GProcessingService) =
+        service.Execute()
+
     [<HttpGet("price")>]
     member this.GetStockPriceAlerts() =
         this.OkOrError(handler.Handle({GetStockPriceAlerts.UserId = this.User.Identifier()}))

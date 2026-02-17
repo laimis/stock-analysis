@@ -105,9 +105,16 @@ module DIHelper =
         
         // Register all IApplicationService implementations from core.fs assembly
         let markerInterface = typeof<IApplicationService>
-        let assembly = typeof<core.fs.Options.OptionsHandler>.Assembly
+        let coreAssembly = typeof<core.fs.Options.OptionsHandler>.Assembly
         
-        for t in assembly.GetTypes() do
+        for t in coreAssembly.GetTypes() do
+            if not t.IsInterface && not t.IsAbstract && markerInterface.IsAssignableFrom(t) then
+                services.AddSingleton(t) |> ignore
+        
+        // Register all IApplicationService implementations from secedgar.fs assembly
+        let secedgarAssembly = typeof<secedgar.fs.Schedule13GProcessingService>.Assembly
+        
+        for t in secedgarAssembly.GetTypes() do
             if not t.IsInterface && not t.IsAbstract && markerInterface.IsAssignableFrom(t) then
                 services.AddSingleton(t) |> ignore
         
