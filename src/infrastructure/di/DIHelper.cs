@@ -34,12 +34,17 @@ namespace di
             var marketCapToken = configuration.GetValue<string>("COINMARKETCAPToken");
             
             services.AddSingleton<ICryptoService>(s =>
-                new coinmarketcap.CoinMarketCapClient(
-                    s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>(),
+            {
+                var loggerService = s.GetService<ILogger<coinmarketcap.CoinMarketCapClient>>();
+                var loggerOption = loggerService != null 
+                    ? FSharpOption<ILogger<coinmarketcap.CoinMarketCapClient>>.Some(loggerService)
+                    : FSharpOption<ILogger<coinmarketcap.CoinMarketCapClient>>.None;
+                
+                return new coinmarketcap.CoinMarketCapClient(
+                    loggerOption,
                     marketCapToken ?? "notset"
-                )
-            );
-            // services.AddSingleton<ICryptoService>(s => s.GetService<coinmarketcap.CoinMarketCapClient>()!);
+                );
+            });
             
 
             services.AddSingleton<IPortfolioStorage, PortfolioStorage>();
