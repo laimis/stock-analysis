@@ -2,8 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\secedgar.fs\secedgar.fs.fsproj" />
-    <ProjectReference Include="..\csvparser\csvparser.csproj" />
     <ProjectReference Include="..\coinmarketcap.fs\coinmarketcap.fs.fsproj" />
+    <ProjectReference Include="..\csvparser.fs\csvparser.fs.fsproj" />
     <ProjectReference Include="..\..\core.fs\core.fs.fsproj" />
     <ProjectReference Include="..\securityutils.fs\securityutils.fs.fsproj" />
     <ProjectReference Include="..\storage.shared.fs\storage.shared.fs.fsproj" />
@@ -18,11 +18,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.3" />
   </ItemGroup>
-
-<!--  <ItemGroup>-->
-<!--    <PackageReference Include="Hangfire" Version="1.8.17" />-->
-<!--    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />-->
-<!--  </ItemGroup>-->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

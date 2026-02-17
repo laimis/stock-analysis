@@ -9,7 +9,7 @@ using core.fs.Adapters.SMS;
 using core.fs.Adapters.Storage;
 using core.fs.Alerts;
 using core.Shared;
-using csvparser;
+using csvparser.fs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
