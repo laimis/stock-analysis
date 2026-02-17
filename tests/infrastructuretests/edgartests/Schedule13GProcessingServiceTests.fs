@@ -182,3 +182,39 @@ module Schedule13GProcessingServiceTests =
         let event = events |> Seq.head
         Assert.NotEqual(Guid.Empty, event.EntityId)
     }
+    
+    [<Fact>]
+    [<Trait("Category", "Manual")>]
+    let ``End-to-end test with real database`` () = task {
+        // Arrange - use REAL storage implementations
+        let dbCreds = testutils.CredsHelper.GetDbCreds()
+        let realFilingStorage = new storage.postgres.SECFilingStorage(dbCreds)
+        let realOwnershipStorage = new storage.postgres.OwnershipStorage(dbCreds)
+        
+        let accountStorage = new storage.postgres.AccountStorage(
+            new testutils.FakeOutbox(),
+            dbCreds
+        )
+        let secClient = new EdgarClient(None, Some accountStorage)
+        
+        let loggerFactory = LoggerFactory.Create(fun builder -> 
+            builder.SetMinimumLevel(LogLevel.Information) |> ignore
+        )
+        let logger = loggerFactory.CreateLogger<Schedule13GProcessingService>()
+        
+        let service = Schedule13GProcessingService(
+            realFilingStorage,
+            realOwnershipStorage,
+            secClient,
+            logger
+        )
+        
+        // Act
+        logger.LogInformation("=== STARTING END-TO-END TEST WITH REAL DATABASE ===")
+        do! service.Execute()
+        logger.LogInformation("=== SERVICE EXECUTION COMPLETED ===")
+        
+        // Assert - This will process whatever 13G filings exist in your database
+        // Check the logs to see what was processed
+        // Note: This test intentionally has no hard assertions since it depends on your actual database state
+    }
