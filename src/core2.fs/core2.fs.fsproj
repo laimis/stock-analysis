@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Shared types - foundation -->
+    <Compile Include="Shared/AggregateEvent.fs" />
+    <Compile Include="Shared/IAggregateState.fs" />
+    <Compile Include="Shared/Aggregate.fs" />
+    <Compile Include="Shared/Ticker.fs" />
+    <Compile Include="Shared/Transaction.fs" />
+    <Compile Include="Shared/TradeGrade.fs" />
+    <Compile Include="Shared/IBlobStorage.fs" />
+    
+    <!-- Account domain -->
+    <Compile Include="Account/Events.fs" />
+    <Compile Include="Account/UserState.fs" />
+    
+    <!-- Stocks domain -->
+    <Compile Include="Stocks/Events.fs" />
+    <Compile Include="Stocks/PositionInstance.fs" />
+    <Compile Include="Stocks/OwnedStockState.fs" />
+    <Compile Include="Stocks/OwnedStock.fs" />
+    <Compile Include="Stocks/PendingStockPositionEvents.fs" />
+    <Compile Include="Stocks/PendingStockPositionState.fs" />
+    <Compile Include="Stocks/PendingStockPosition.fs" />
+    <Compile Include="Stocks/StockListEvents.fs" />
+    <Compile Include="Stocks/StockList.fs" />
+    
+    <!-- Cryptos domain -->
+    <Compile Include="Cryptos/Events.fs" />
+    <Compile Include="Cryptos/Token.fs" />
+    <Compile Include="Cryptos/CryptoTransaction.fs" />
+    <Compile Include="Cryptos/PositionInstance.fs" />
+    <Compile Include="Cryptos/OwnedCryptoState.fs" />
+    <Compile Include="Cryptos/OwnedCrypto.fs" />
+    
+    <!-- Routines domain -->
+    <Compile Include="Routines/Events.fs" />
+    <Compile Include="Routines/Routine.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>migrations</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>storage.shared</_Parameter1>
+      </AssemblyAttribute>
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+          <_Parameter1>storage.shared.fs</_Parameter1>
+      </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>coretests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>storagetests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
