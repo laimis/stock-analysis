@@ -278,7 +278,7 @@ type AccountStorage(outbox: IOutbox, connectionString: string) =
                        start = start.ToString("yyyy-MM-dd")
                        ``end`` = ``end``.ToString("yyyy-MM-dd") |})
                 
-                return result :> IEnumerable<AccountBalancesSnapshot>
+                return result
             }
         
         member this.SaveAccountBalancesSnapshot userId balances = 
@@ -322,7 +322,7 @@ ON CONFLICT (userId, date) DO UPDATE SET cash = @cash, equity = @equity, longVal
                         ExpirationTime = if isNull r.expirationtime then None else Some (DateTimeOffset.Parse(r.expirationtime))
                         CanBeCancelled = r.canbecancelled
                     } : StockOrder
-                ) :> IEnumerable<StockOrder>
+                )
             }
         
         member this.SaveAccountBrokerageStockOrders userId orders = 
@@ -471,7 +471,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                         Inserted = if isNull r.inserted then None else Some (DateTimeOffset.Parse(r.inserted))
                         Applied = if isNull r.applied then None else Some (DateTimeOffset.Parse(r.applied))
                     } : AccountTransaction
-                ) :> IEnumerable<AccountTransaction>
+                )
             }
         
         member this.GetUserAssociation(id: Guid) = 
@@ -489,7 +489,7 @@ ON CONFLICT (userId, orderid) DO UPDATE SET price = @price, quantity = @quantity
                 use db = this.GetConnection()
                 
                 let! users = db.QueryAsync<EmailIdPair>("SELECT email,id FROM users")
-                return users :> IEnumerable<EmailIdPair>
+                return users
             }
         
         member this.GetOptionPricing userId symbol = 
@@ -578,8 +578,8 @@ VALUES (@userid, @optionpositionid, @underlyingticker, @symbol, @expiration, @st
                 
                 return result.Select(fun r ->
                     {
-                        AlertId = Guid.Parse(r.alertid)
-                        UserId = UserId (Guid.Parse(r.userid))
+                        AlertId = Guid(r.alertid)
+                        UserId = UserId(Guid(r.userid))
                         Ticker = Ticker(r.ticker)
                         PriceLevel = r.pricelevel
                         AlertType = PriceAlertType.fromString(r.alerttype)
@@ -589,7 +589,7 @@ VALUES (@userid, @optionpositionid, @underlyingticker, @symbol, @expiration, @st
                         TriggeredAt = if r.triggeredat.HasValue then Some r.triggeredat.Value else None
                         LastResetAt = if r.lastresetat.HasValue then Some r.lastresetat.Value else None
                     } : StockPriceAlert
-                ) :> IEnumerable<StockPriceAlert>
+                )
             }
         
         member this.SaveStockPriceAlert(alert: StockPriceAlert) = 
@@ -649,8 +649,8 @@ ON CONFLICT (alertid) DO UPDATE SET
                         State = ReminderState.fromString(r.state)
                         CreatedAt = r.createdat
                         SentAt = if r.sentat.HasValue then Some r.sentat.Value else None
-                    } : Reminder
-                ) :> IEnumerable<Reminder>
+                    } :Reminder
+                )
             }
         
         member this.SaveReminder(reminder: Reminder) = 
@@ -733,7 +733,7 @@ ON CONFLICT (ticker) DO UPDATE SET
                 
                 let query = "SELECT ticker, cik, title, lastupdated FROM tickercik ORDER BY ticker"
                 let! result = db.QueryAsync<TickerCikMapping>(query)
-                return result :> IEnumerable<TickerCikMapping>
+                return result
             }
         
         member this.GetTickerCikLastUpdated() = 
@@ -760,5 +760,5 @@ ON CONFLICT (ticker) DO UPDATE SET
                 
                 let searchPattern = sprintf "%%%s%%" query
                 let! result = db.QueryAsync<TickerCikMapping>(sql, {| query = searchPattern |})
-                return result :> IEnumerable<TickerCikMapping>
+                return result
             }

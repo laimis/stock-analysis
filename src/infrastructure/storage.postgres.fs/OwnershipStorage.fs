@@ -523,39 +523,41 @@ type OwnershipStorage(connectionString: string) =
                 let! dtos = db.QueryAsync<OwnershipSummaryDto>(query, {| Ticker = ticker.Value |})
                 
                 // Convert to OwnershipSummary by fetching roles for each entity
-                let summaries = ResizeArray<OwnershipSummary>()
+                let summaries = 
+                    dtos
+                    |> Seq.map (fun dto ->
+                        let entity = {
+                            Id = dto.id
+                            Name = dto.name
+                            EntityType = dto.entity_type
+                            Cik = Option.ofObj dto.cik
+                            FirstSeen = dto.first_seen
+                            LastSeen = dto.last_seen
+                            CreatedAt = dto.created_at
+                        }
+                        
+                        // Get roles for this entity
+                        // TODO: This is N+1 query, consider optimizing with a single query that aggregates roles
+                        // let storage = this :> IOwnershipStorage
+                        // let! roles = storage.GetRolesByEntity(entity.Id)
+                        // let rolesList = roles |> List.ofSeq
+                        
+                        let percentOption = 
+                            if dto.percent_of_class.HasValue then 
+                                Some dto.percent_of_class.Value 
+                            else 
+                                None
+                        
+                        {
+                            Entity = entity
+                            Roles = [] // TODO: Replace with actual roles once optimized query is implemented
+                            CurrentShares = dto.current_shares
+                            PercentOfClass = percentOption
+                            LastUpdated = DateTimeOffset.Parse(dto.last_updated)
+                        }:OwnershipSummary
+                    )
                 
-                for dto in dtos do
-                    let entity = {
-                        Id = dto.id
-                        Name = dto.name
-                        EntityType = dto.entity_type
-                        Cik = Option.ofObj dto.cik
-                        FirstSeen = dto.first_seen
-                        LastSeen = dto.last_seen
-                        CreatedAt = dto.created_at
-                    }
-                    
-                    // Get roles for this entity
-                    let storage = this :> IOwnershipStorage
-                    let! roles = storage.GetRolesByEntity(entity.Id)
-                    let rolesList = roles |> List.ofSeq
-                    
-                    let percentOption = 
-                        if dto.percent_of_class.HasValue then 
-                            Some dto.percent_of_class.Value 
-                        else 
-                            None
-                    
-                    summaries.Add({
-                        Entity = entity
-                        Roles = rolesList
-                        CurrentShares = dto.current_shares
-                        PercentOfClass = percentOption
-                        LastUpdated = DateTimeOffset.Parse(dto.last_updated)
-                    })
-                
-                return summaries :> IEnumerable<OwnershipSummary>
+                return summaries
             }
         
         member this.GetOwnershipTimeline ticker days =

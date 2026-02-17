@@ -68,7 +68,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                 let! list = db.QueryAsync<StoredAggregateEvent>(sql, {| entity = entity; userId = id |})
                 
                 return list.Select(fun e -> StoredAggregateEvent.deserializeEvent(e.EventJson))
-            } :> Task<IEnumerable<AggregateEvent>>
+            }
         
         member this.GetEventsAsync(entity: string, aggregateId: Guid, userId: UserId) = 
             task {
@@ -78,7 +78,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
                 let! list = db.QueryAsync<StoredAggregateEvent>(sql, {| entity = entity; userId = id; aggregateId = aggregateId.ToString() |})
                 
                 return list.Select(fun e -> StoredAggregateEvent.deserializeEvent(e.EventJson))
-            } :> Task<IEnumerable<AggregateEvent>>
+            }
         
         member this.SaveEventsAsync(agg: IAggregate, entity: string, userId: UserId, outsideTransaction: IDbTransaction) = 
             this.SaveEventsAsyncInternal(agg, agg.Version, entity, userId, outsideTransaction)
@@ -143,7 +143,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
             let (UserId id) = userId
             let sql = "select * FROM events WHERE entity = @entity AND userId = @userId ORDER BY key, version"
             let! list = db.QueryAsync<StoredAggregateEvent>(sql, {| entity = entity; userId = id |})
-            return list :> IEnumerable<StoredAggregateEvent>
+            return list
         }
     
     interface IBlobStorage with
