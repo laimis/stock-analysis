@@ -28,7 +28,7 @@ type CoinMarketCapClient(logger: ILogger<CoinMarketCapClient> option, accessToke
         task {
             let url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
             
-            let! response = httpClient.GetAsync(url)
+            use! response = httpClient.GetAsync(url)
             let! content = response.Content.ReadAsStringAsync()
             
             if not response.IsSuccessStatusCode then
