@@ -5,32 +5,35 @@
    "version": "0.2.0",
    "configurations": [
         {
-            "name": ".NET Core Launch (web)",
+            "name": ".NET Core Debug Tests",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/web/bin/Debug/netcoreapp2.2/web.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/src/web",
+            "program": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}/tests/infrastructuretests/edgartests/edgartests.fsproj",
+                "--filter",
+                "FullyQualifiedName~${input:testName}",
+                "--logger:console;verbosity=detailed"
+            ],
+            "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
-            "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"                
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
-            }
+            "console": "internalConsole"
         },
         {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickProcess}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "testName",
+            "type": "promptString",
+            "description": "Test name pattern (e.g., 'Schedule13G' or 'Parse sample')",
+            "default": "Schedule13G"
         }
     ]
 }
