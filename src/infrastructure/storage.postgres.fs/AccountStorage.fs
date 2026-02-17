@@ -52,8 +52,8 @@ type BrokerageTransactionDto =
 [<CLIMutable>]
 type StockPriceAlertDto = 
     {
-        alertid: string
-        userid: string
+        alertid: Guid
+        userid: Guid
         ticker: string
         pricelevel: decimal
         alerttype: string
@@ -67,8 +67,8 @@ type StockPriceAlertDto =
 [<CLIMutable>]
 type ReminderDto = 
     {
-        reminderid: string
-        userid: string
+        reminderid: Guid
+        userid: Guid
         date: DateTimeOffset
         message: string
         ticker: string
@@ -558,8 +558,8 @@ VALUES (@userid, @optionpositionid, @underlyingticker, @symbol, @expiration, @st
                 
                 return result.Select(fun r ->
                     {
-                        AlertId = Guid(r.alertid)
-                        UserId = UserId(Guid(r.userid))
+                        AlertId = r.alertid
+                        UserId = UserId r.userid
                         Ticker = Ticker(r.ticker)
                         PriceLevel = r.pricelevel
                         AlertType = PriceAlertType.fromString(r.alerttype)
@@ -621,8 +621,8 @@ ON CONFLICT (alertid) DO UPDATE SET
                 
                 return result.Select(fun r ->
                     {
-                        ReminderId = Guid.Parse(r.reminderid)
-                        UserId = UserId (Guid.Parse(r.userid))
+                        ReminderId = r.reminderid
+                        UserId = UserId r.userid
                         Date = r.date
                         Message = r.message
                         Ticker = if isNull r.ticker then None else Some (Ticker(r.ticker))
