@@ -16,7 +16,7 @@ type TextPlainInputFormatter() =
         let request = context.HttpContext.Request
         use reader = new StreamReader(request.Body)
         let! content = reader.ReadToEndAsync()
-        return InputFormatterResult.SuccessAsync(content) |> Async.AwaitTask |> Async.RunSynchronously
+        return! InputFormatterResult.SuccessAsync(content)
     }
     
     override this.CanRead(context: InputFormatterContext) =
