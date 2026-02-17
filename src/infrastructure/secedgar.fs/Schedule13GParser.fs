@@ -15,21 +15,23 @@ module Schedule13GParser =
     let private xname name = XName.Get(name)
     let private xnameWithNs ns name = XName.Get(name, ns)
     
-    /// Try to get element value, handling missing elements
-    let private tryGetElementValue (element: XElement) (name: string) =
-        let el = element.Element(xname name)
+    /// Helper to get XName with optional namespace
+    let private getXName (ns: string option) (name: string) =
+        match ns with
+        | Some nsUri -> xnameWithNs nsUri name
+        | None -> xname name
+    
+    /// Try to get element value, handling missing elements and namespace
+    let private tryGetElementValue (element: XElement) (ns: string option) (name: string) =
+        let el = element.Element(getXName ns name)
         if el <> null && not (String.IsNullOrWhiteSpace(el.Value)) then
             Some el.Value
         else
             None
     
-    /// Try to get element value with namespace
-    let private tryGetElementValueNs (element: XElement) (ns: string) (name: string) =
-        let el = element.Element(xnameWithNs ns name)
-        if el <> null && not (String.IsNullOrWhiteSpace(el.Value)) then
-            Some el.Value
-        else
-            None
+    /// Try to get first descendant element with optional namespace
+    let private tryGetDescendant (element: XElement) (ns: string option) (name: string) =
+        element.Descendants(getXName ns name) |> Seq.tryHead
     
     /// Try to parse int64 from string, handling commas, whitespace, and decimals
     let private tryParseInt64 (value: string option) =
@@ -84,40 +86,25 @@ module Schedule13GParser =
                 l.LogDebug("Parsing Schedule 13G XML, namespace: {namespace}", defaultArg ns "none"))
             
             // Parse headerData section
-            let headerData = 
-                match ns with
-                | Some nsUri -> root.Descendants(xnameWithNs nsUri "headerData") |> Seq.tryHead
-                | None -> root.Descendants(xname "headerData") |> Seq.tryHead
+            let headerData = tryGetDescendant root ns "headerData"
             
             match headerData with
             | Some header ->
                 // Get submission type (SCHEDULE 13G or SCHEDULE 13G/A)
-                let submissionType = 
-                    match ns with
-                    | Some nsUri -> tryGetElementValueNs header nsUri "submissionType"
-                    | None -> tryGetElementValue header "submissionType"
+                let submissionType = tryGetElementValue header ns "submissionType"
                 
                 parsed <- { parsed with IsAmendment = submissionType |> Option.exists (fun s -> s.Contains("/A")) }
                 
                 // Get filer CIK from headerData
-                let filerInfo = 
-                    match ns with
-                    | Some nsUri -> header.Descendants(xnameWithNs nsUri "filerInfo") |> Seq.tryHead
-                    | None -> header.Descendants(xname "filerInfo") |> Seq.tryHead
+                let filerInfo = tryGetDescendant header ns "filerInfo"
                 
                 match filerInfo with
                 | Some info ->
-                    let creds = 
-                        match ns with
-                        | Some nsUri -> info.Descendants(xnameWithNs nsUri "filerCredentials") |> Seq.tryHead
-                        | None -> info.Descendants(xname "filerCredentials") |> Seq.tryHead
+                    let creds = tryGetDescendant info ns "filerCredentials"
                     
                     match creds with
                     | Some c ->
-                        let cik = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs c nsUri "cik"
-                            | None -> tryGetElementValue c "cik"
+                        let cik = tryGetElementValue c ns "cik"
                         
                         parsed <- { parsed with FilerCik = cik }
                         
@@ -131,38 +118,22 @@ module Schedule13GParser =
                 notes <- "Could not find headerData element" :: notes
             
             // Parse formData section (main content)
-            let formData = 
-                match ns with
-                | Some nsUri -> root.Descendants(xnameWithNs nsUri "formData") |> Seq.tryHead
-                | None -> root.Descendants(xname "formData") |> Seq.tryHead
+            let formData = tryGetDescendant root ns "formData"
             
             match formData with
             | Some form ->
                 // Parse coverPageHeader (issuer info, dates)
-                let coverPageHeader = 
-                    match ns with
-                    | Some nsUri -> form.Descendants(xnameWithNs nsUri "coverPageHeader") |> Seq.tryHead
-                    | None -> form.Descendants(xname "coverPageHeader") |> Seq.tryHead
+                let coverPageHeader = tryGetDescendant form ns "coverPageHeader"
                 
                 match coverPageHeader with
                 | Some header ->
                     // Get issuer information
-                    let issuerInfo = 
-                        match ns with
-                        | Some nsUri -> header.Descendants(xnameWithNs nsUri "issuerInfo") |> Seq.tryHead
-                        | None -> header.Descendants(xname "issuerInfo") |> Seq.tryHead
+                    let issuerInfo = tryGetDescendant header ns "issuerInfo"
                     
                     match issuerInfo with
                     | Some issuer ->
-                        let issuerName = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs issuer nsUri "issuerName"
-                            | None -> tryGetElementValue issuer "issuerName"
-                        
-                        let issuerCik = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs issuer nsUri "issuerCik"
-                            | None -> tryGetElementValue issuer "issuerCik"
+                        let issuerName = tryGetElementValue issuer ns "issuerName"
+                        let issuerCik = tryGetElementValue issuer ns "issuerCik"
                         
                         parsed <- { parsed with 
                                       IssuerName = defaultArg issuerName ""
@@ -174,82 +145,46 @@ module Schedule13GParser =
                         notes <- "Could not find issuerInfo element" :: notes
                     
                     // Get event date (as-of date)
-                    let eventDate = 
-                        match ns with
-                        | Some nsUri -> tryGetElementValueNs header nsUri "eventDateRequiresFilingThisStatement"
-                        | None -> tryGetElementValue header "eventDateRequiresFilingThisStatement"
+                    let eventDate = tryGetElementValue header ns "eventDateRequiresFilingThisStatement"
                     
                     parsed <- { parsed with AsOfDate = tryParseDate eventDate }
                 | None ->
                     notes <- "Could not find coverPageHeader element" :: notes
                 
                 // Parse coverPageHeaderReportingPersonDetails (filer name, ownership)
-                let reportingPerson = 
-                    match ns with
-                    | Some nsUri -> form.Descendants(xnameWithNs nsUri "coverPageHeaderReportingPersonDetails") |> Seq.tryHead
-                    | None -> form.Descendants(xname "coverPageHeaderReportingPersonDetails") |> Seq.tryHead
+                let reportingPerson = tryGetDescendant form ns "coverPageHeaderReportingPersonDetails"
                 
                 match reportingPerson with
                 | Some person ->
                     // Filer/reporting person name
-                    let filerName = 
-                        match ns with
-                        | Some nsUri -> tryGetElementValueNs person nsUri "reportingPersonName"
-                        | None -> tryGetElementValue person "reportingPersonName"
+                    let filerName = tryGetElementValue person ns "reportingPersonName"
                     
                     parsed <- { parsed with FilerName = defaultArg filerName "" }
                     
                     // Aggregate shares owned
-                    let totalShares = 
-                        match ns with
-                        | Some nsUri -> tryGetElementValueNs person nsUri "reportingPersonBeneficiallyOwnedAggregateNumberOfShares"
-                        | None -> tryGetElementValue person "reportingPersonBeneficiallyOwnedAggregateNumberOfShares"
+                    let totalShares = tryGetElementValue person ns "reportingPersonBeneficiallyOwnedAggregateNumberOfShares"
                     
                     parsed <- { parsed with SharesOwned = defaultArg (tryParseInt64 totalShares) 0L }
                     
                     // Percentage of class
-                    let percentStr = 
-                        match ns with
-                        | Some nsUri -> tryGetElementValueNs person nsUri "classPercent"
-                        | None -> tryGetElementValue person "classPercent"
+                    let percentStr = tryGetElementValue person ns "classPercent"
                     
                     parsed <- { parsed with PercentOfClass = defaultArg (tryParseDecimal percentStr) 0.0m }
                     
                     // Entity type
-                    let entityType = 
-                        match ns with
-                        | Some nsUri -> tryGetElementValueNs person nsUri "typeOfReportingPerson"
-                        | None -> tryGetElementValue person "typeOfReportingPerson"
+                    let entityType = tryGetElementValue person ns "typeOfReportingPerson"
                     
                     parsed <- { parsed with EntityType = Schedule13GHelpers.mapEntityType entityType }
                     
                     // Voting and dispositive powers
-                    let powerInfo = 
-                        match ns with
-                        | Some nsUri -> person.Descendants(xnameWithNs nsUri "reportingPersonBeneficiallyOwnedNumberOfShares") |> Seq.tryHead
-                        | None -> person.Descendants(xname "reportingPersonBeneficiallyOwnedNumberOfShares") |> Seq.tryHead
+                    let powerInfo = tryGetDescendant person ns "reportingPersonBeneficiallyOwnedNumberOfShares"
                     
                     match powerInfo with
                     | Some powers ->
-                        let soleVoting = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs powers nsUri "soleVotingPower"
-                            | None -> tryGetElementValue powers "soleVotingPower"
-                        
-                        let sharedVoting = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs powers nsUri "sharedVotingPower"
-                            | None -> tryGetElementValue powers "sharedVotingPower"
-                        
-                        let soleDispositive = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs powers nsUri "soleDispositivePower"
-                            | None -> tryGetElementValue powers "soleDispositivePower"
-                        
-                        let sharedDispositive = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs powers nsUri "sharedDispositivePower"
-                            | None -> tryGetElementValue powers "sharedDispositivePower"
+                        let soleVoting = tryGetElementValue powers ns "soleVotingPower"
+                        let sharedVoting = tryGetElementValue powers ns "sharedVotingPower"
+                        let soleDispositive = tryGetElementValue powers ns "soleDispositivePower"
+                        let sharedDispositive = tryGetElementValue powers ns "sharedDispositivePower"
                         
                         parsed <- { parsed with 
                                       SoleVotingPower = tryParseInt64 soleVoting
@@ -266,24 +201,15 @@ module Schedule13GParser =
                     notes <- "Could not find coverPageHeaderReportingPersonDetails element" :: notes
                 
                 // Parse signatureInformation for filing date
-                let sigInfo = 
-                    match ns with
-                    | Some nsUri -> form.Descendants(xnameWithNs nsUri "signatureInformation") |> Seq.tryHead
-                    | None -> form.Descendants(xname "signatureInformation") |> Seq.tryHead
+                let sigInfo = tryGetDescendant form ns "signatureInformation"
                 
                 match sigInfo with
                 | Some signature ->
-                    let sigDetails = 
-                        match ns with
-                        | Some nsUri -> signature.Descendants(xnameWithNs nsUri "signatureDetails") |> Seq.tryHead
-                        | None -> signature.Descendants(xname "signatureDetails") |> Seq.tryHead
+                    let sigDetails = tryGetDescendant signature ns "signatureDetails"
                     
                     match sigDetails with
                     | Some details ->
-                        let dateStr = 
-                            match ns with
-                            | Some nsUri -> tryGetElementValueNs details nsUri "date"
-                            | None -> tryGetElementValue details "date"
+                        let dateStr = tryGetElementValue details ns "date"
                         
                         parsed <- { parsed with FilingDate = defaultArg (tryParseDate dateStr) DateTimeOffset.UtcNow }
                     | None ->
