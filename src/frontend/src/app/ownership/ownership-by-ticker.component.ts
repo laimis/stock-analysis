@@ -25,7 +25,7 @@ export class OwnershipByTickerComponent implements OnInit {
   loading = false;
   error = '';
   getEntityTypeDisplay = getEntityTypeDisplay;
-  timelineDays = 365;
+  timelineDays = 1825;
   entityNameMap = new Map<string, string>();
   sharesOutstanding: number | null = null;
 

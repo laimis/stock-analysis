@@ -112,7 +112,7 @@ export class OwnershipService {
         return this.http.get<OwnershipSummary[]>(`/api/ownership/ticker/${ticker}`);
     }
 
-    getOwnershipTimeline(ticker: string, days: number = 365): Observable<OwnershipEvent[]> {
+    getOwnershipTimeline(ticker: string, days: number = 1825): Observable<OwnershipEvent[]> {
         return this.http.get<OwnershipEvent[]>(`/api/ownership/ticker/${ticker}/timeline?days=${days}`);
     }
 

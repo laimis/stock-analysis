@@ -102,9 +102,10 @@
           <div class="card-header d-flex justify-content-between align-items-center">
             <h4>Ownership Timeline</h4>
             <div>
-              <button (click)="loadTimeline(90)" class="btn btn-sm btn-outline-secondary me-2">90 days</button>
-              <button (click)="loadTimeline(180)" class="btn btn-sm btn-outline-secondary me-2">180 days</button>
-              <button (click)="loadTimeline(365)" class="btn btn-sm btn-outline-secondary">1 year</button>
+              <button (click)="loadTimeline(90)" class="btn btn-sm btn-outline-secondary me-2" [class.active]="timelineDays === 90">90 days</button>
+              <button (click)="loadTimeline(180)" class="btn btn-sm btn-outline-secondary me-2" [class.active]="timelineDays === 180">180 days</button>
+              <button (click)="loadTimeline(365)" class="btn btn-sm btn-outline-secondary me-2" [class.active]="timelineDays === 365">1 year</button>
+              <button (click)="loadTimeline(1825)" class="btn btn-sm btn-outline-secondary" [class.active]="timelineDays === 1825">5 years</button>
             </div>
           </div>
           <div class="card-body">
