@@ -63,7 +63,7 @@ type OwnershipController(storage: IOwnershipStorage) =
     [<HttpGet("ticker/{ticker}/timeline")>]
     member this.GetOwnershipTimeline([<FromRoute>] ticker: string, [<FromQuery>] days: Nullable<int>) = task {
         let t = Ticker ticker
-        let d = if days.HasValue then days.Value else 365
+        let d = if days.HasValue then days.Value else 1825
         let! timeline = storage.GetOwnershipTimeline t d
         return this.Ok timeline
     }
