@@ -70,54 +70,52 @@ type SECFilingsMonitoringService(
             |> Seq.toArray
     }
 
-    let getFilingsForTicker (userId: string) (ticker: Ticker) = async {
+    // Concern 1: fetch filings from SEC for a ticker and sync to DB (idempotent, no user context)
+    let fetchAndSaveFilings (ticker: Ticker) = async {
         try
             let! response = secFilings.GetFilings ticker |> Async.AwaitTask
-            
             match response with
             | Error err ->
-                logger.LogError($"Failed to get SEC filings for {ticker}: {err.Message}")
-                return None
+                logger.LogError $"Failed to get SEC filings for {ticker}: {err.Message}"
             | Ok companyFilings ->
                 if companyFilings.Filings.Length > 0 then
-                    // Get CIK for this ticker
                     let! cikMapping = accounts.GetTickerCik(ticker.Value) |> Async.AwaitTask
-                    let cik = 
+                    let cik =
                         match cikMapping with
                         | Some mapping -> mapping.Cik
-                        | None -> "unknown" // Fallback if CIK not found
-
-                    // Get this user's watermark for this ticker
-                    let! watermark = secFilingStorage.GetWatermark userId ticker |> Async.AwaitTask
-                    let since = watermark |> Option.defaultValue DateTimeOffset.MinValue
-
-                    // Save all filings to DB (idempotent)
-                    let filingRecords = 
+                        | None -> "unknown"
+                    let filingRecords =
                         companyFilings.Filings
                         |> Seq.map (SECFilingRecord.fromCompanyFiling ticker cik)
                         |> Seq.toArray
-
-                    let! _ = secFilingStorage.SaveFilings filingRecords |> Async.AwaitTask
-
-                    // Query DB for filings created since the user's watermark, then filter
-                    let! newDbFilings = secFilingStorage.GetFilingsSince ticker since |> Async.AwaitTask
-
-                    let filteredFilings =
-                        newDbFilings
-                        |> Seq.map SECFilingRecord.toCompanyFiling
-                        |> Seq.filter (fun f -> isRecentFiling f && not (ignoreFiling f))
-                        |> Seq.toArray
-
-                    if filteredFilings.Length > 0 then
-                        logger.LogInformation($"Found {filteredFilings.Length} new filing(s) for {ticker}")
-                        return Some (ticker, filteredFilings)
-                    else
-                        logger.LogInformation($"No new filings for {ticker}")
-                        return None
-                else
-                    return None
+                    let! saved = secFilingStorage.SaveFilings filingRecords |> Async.AwaitTask
+                    logger.LogInformation $"Synced {ticker}: {saved} new, {companyFilings.Filings.Length} total"
         with ex ->
-            logger.LogError($"Error checking SEC filings for {ticker}: {ex.Message}")
+            logger.LogError $"Error syncing SEC filings for {ticker}: {ex.Message}"
+    }
+
+    // Concern 2: query DB for filings since the user's watermark and apply notification filters
+    let getNewFilingsForUser (userId: string) (ticker: Ticker) = async {
+        try
+            let twoDaysAgo = DateTimeOffset.UtcNow.AddDays -2.0
+            let! watermark = secFilingStorage.GetWatermark userId ticker |> Async.AwaitTask
+            let since = watermark |> Option.defaultValue twoDaysAgo
+
+            let! dbFilings = secFilingStorage.GetFilingsSince ticker since |> Async.AwaitTask
+
+            let filteredFilings =
+                dbFilings
+                |> Seq.map SECFilingRecord.toCompanyFiling
+                |> Seq.filter (fun f -> isRecentFiling f && not (ignoreFiling f))
+                |> Seq.toArray
+
+            if filteredFilings.Length > 0 then
+                logger.LogInformation $"Found {filteredFilings.Length} new filing(s) for {ticker}"
+                return Some (ticker, filteredFilings)
+            else
+                return None
+        with ex ->
+            logger.LogError $"Error querying new filings for {ticker}: {ex.Message}"
             return None
     }
 
@@ -152,14 +150,16 @@ type SECFilingsMonitoringService(
         | _ ->
             logger.LogInformation $"Checking {tickers.Length} tickers for user {user.State.Email}"
 
-            let! results = 
+            // Step 1: sync all tickers to DB (no user context, idempotent)
+            do! tickers |> Seq.map fetchAndSaveFilings |> Async.Sequential |> Async.Ignore
+
+            // Step 2: check what's new for this user since their watermark
+            let! results =
                 tickers
-                |> Seq.map (getFilingsForTicker (user.State.Id.ToString()))
+                |> Seq.map (getNewFilingsForUser (user.State.Id.ToString()))
                 |> Async.Sequential
 
-            let tickerFilings = 
-                results
-                |> Array.choose id
+            let tickerFilings = results |> Array.choose id
 
             match tickerFilings with
             | [||] ->
