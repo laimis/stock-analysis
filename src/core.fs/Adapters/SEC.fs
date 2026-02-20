@@ -34,7 +34,7 @@ type CompanyFiling =
         this.FilingDate = todayString || this.FilingDate = yesterdayString
 
 [<Struct>]
-type CompanyFilings(ticker:Ticker, filings:seq<CompanyFiling>) =
+type CompanyFilings(ticker:Ticker, filings:CompanyFiling array) =
     member _.Ticker = ticker
     member _.Filings = filings
 

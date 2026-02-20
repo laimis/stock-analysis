@@ -286,3 +286,11 @@ ALTER TABLE ownership_events OWNER TO stockanalysis;
 
 ALTER TABLE sec_filings ADD COLUMN is_xbrl BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE sec_filings ADD COLUMN is_inline_xbrl BOOLEAN NOT NULL DEFAULT false;
+
+CREATE TABLE user_sec_filing_watermarks (
+    user_id TEXT NOT NULL,
+    ticker TEXT NOT NULL,
+    last_notified_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    PRIMARY KEY (user_id, ticker)
+);
+ALTER TABLE user_sec_filing_watermarks OWNER TO stockanalysis;

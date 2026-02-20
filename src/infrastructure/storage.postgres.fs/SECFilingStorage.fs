@@ -162,3 +162,45 @@ type SECFilingStorage(connectionString: string) =
                     let! results = db.QueryAsync<SECFilingRecord>(query, {| FormTypes = formTypesArray; Limit = limit |})
                     return results
             }
+
+        member _.GetFilingsSince(ticker: Ticker) (since: DateTimeOffset) : Task<IEnumerable<SECFilingRecord>> =
+            task {
+                use db = getConnection()
+
+                let query = """
+                    SELECT id as Id, ticker as Ticker, cik as Cik, form_type as FormType, 
+                           filing_date as FilingDate, report_date as ReportDate, description as Description,
+                           filing_url as FilingUrl, document_url as DocumentUrl, created_at as CreatedAt, is_xbrl as IsXBRL, is_inline_xbrl as IsInlineXBRL
+                    FROM sec_filings
+                    WHERE ticker = @Ticker AND created_at > @Since
+                    ORDER BY created_at ASC"""
+
+                let! results = db.QueryAsync<SECFilingRecord>(query, {| Ticker = ticker.Value; Since = since |})
+                return results
+            }
+
+        member _.GetWatermark(userId: string) (ticker: Ticker) : Task<DateTimeOffset option> =
+            task {
+                use db = getConnection()
+
+                let query = """
+                    SELECT last_notified_at
+                    FROM user_sec_filing_watermarks
+                    WHERE user_id = @UserId AND ticker = @Ticker"""
+
+                let! results = db.QueryAsync<DateTimeOffset>(query, {| UserId = userId; Ticker = ticker.Value |})
+                return results |> Seq.tryHead
+            }
+
+        member _.UpsertWatermark(userId: string) (ticker: Ticker) (timestamp: DateTimeOffset) : Task<unit> =
+            task {
+                use db = getConnection()
+
+                let query = """
+                    INSERT INTO user_sec_filing_watermarks (user_id, ticker, last_notified_at)
+                    VALUES (@UserId, @Ticker, @Timestamp)
+                    ON CONFLICT (user_id, ticker) DO UPDATE SET last_notified_at = @Timestamp"""
+
+                let! _ = db.ExecuteAsync(query, {| UserId = userId; Ticker = ticker.Value; Timestamp = timestamp |})
+                return ()
+            }

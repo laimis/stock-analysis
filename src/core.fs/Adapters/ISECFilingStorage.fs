@@ -45,6 +45,15 @@ type ISECFilingStorage =
     /// Get filings by form type(s)
     abstract member GetFilingsByFormType : formTypes:seq<string> -> limit:int -> Task<IEnumerable<SECFilingRecord>>
 
+    /// Get filings for a ticker created after the given timestamp, ordered by created_at ascending
+    abstract member GetFilingsSince : ticker:Ticker -> since:DateTimeOffset -> Task<IEnumerable<SECFilingRecord>>
+
+    /// Get the notification watermark timestamp for a user+ticker pair
+    abstract member GetWatermark : userId:string -> ticker:Ticker -> Task<DateTimeOffset option>
+
+    /// Upsert the notification watermark for a user+ticker pair
+    abstract member UpsertWatermark : userId:string -> ticker:Ticker -> timestamp:DateTimeOffset -> Task<unit>
+
 module SECFilingRecord =
     /// Convert a CompanyFiling to SECFilingRecord
     let fromCompanyFiling (ticker: Ticker) (cik: string) (filing: CompanyFiling) : SECFilingRecord =
