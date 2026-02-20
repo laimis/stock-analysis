@@ -87,13 +87,14 @@
                                 <i class="bi" [class.bi-chevron-down]="!isDetailsVisible(position.ticker)" [class.bi-chevron-up]="isDetailsVisible(position.ticker)"></i>
                             </td>
                         </tr>
-                        @if (isDetailsVisible(position.ticker)) {
+                        @let qoute = getQuote(position);
+                        @if (isDetailsVisible(position.ticker) && qoute) {
                             <tr class="table-active">
                                 <td colspan="11" class="p-0">
                                     <div class="p-4 details-row border-top">
                                         <app-stock-trading-position
                                             [position]="position"
-                                            [quote]="getQuote(position)"
+                                            [quote]="qoute"
                                             [brokerageAccount]="brokerageAccount"
                                             [positionOrders]="getOrdersForPosition(position.ticker)"
                                             (positionChanged)="positionChanged.emit()"></app-stock-trading-position>
