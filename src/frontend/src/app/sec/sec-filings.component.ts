@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
-import { SECService, CompanySearchResult, SECFilings } from '../services/sec.service';
+import { SECService, CompanySearchResult, SECFiling, SECFilings } from '../services/sec.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
 import { SecFilingsTableComponent } from '../shared/sec/sec-filings-table.component';
 
@@ -32,6 +32,7 @@ export class SecFilingsComponent implements OnInit {
   
   errors: string[] = [];
   activeTab: 'search' | 'portfolio' = 'search';
+  portfolioFormTypeFilter: string | null = null;
 
   ngOnInit() {
     this.loadPortfolioFilings();
@@ -129,6 +130,7 @@ export class SecFilingsComponent implements OnInit {
   loadPortfolioFilings() {
     this.loading.portfolio = true;
     this.errors = [];
+    this.portfolioFormTypeFilter = null;
 
     this.secService.getPortfolioFilings().subscribe({
       next: (data) => {
@@ -147,5 +149,27 @@ export class SecFilingsComponent implements OnInit {
     this.selectedFilings = null;
     this.searchQuery = '';
     this.searchResults = [];
+  }
+
+  getPortfolioFormTypes(): { type: string; count: number }[] {
+    const counts = new Map<string, number>();
+    for (const tickerFiling of this.portfolioFilings) {
+      for (const filing of tickerFiling.filings) {
+        const t = filing.filing.trim().toUpperCase();
+        counts.set(t, (counts.get(t) ?? 0) + 1);
+      }
+    }
+    return Array.from(counts.entries())
+      .map(([type, count]) => ({ type, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  filterPortfolioFilings(filings: SECFiling[]): SECFiling[] {
+    if (!this.portfolioFormTypeFilter) return filings;
+    return filings.filter(f => f.filing.trim().toUpperCase() === this.portfolioFormTypeFilter);
+  }
+
+  togglePortfolioFilter(type: string) {
+    this.portfolioFormTypeFilter = this.portfolioFormTypeFilter === type ? null : type;
   }
 }

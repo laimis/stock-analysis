@@ -127,22 +127,45 @@
     }
 
     @if (!loading.portfolio && portfolioFilings.length > 0) {
+      <!-- Form type summary / filter bar -->
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-3 p-2 bg-light rounded border">
+        <span class="text-muted small fw-semibold me-1">Form types:</span>
+        @for (ft of getPortfolioFormTypes(); track ft.type) {
+          <button
+            class="btn btn-sm"
+            [class.btn-primary]="portfolioFormTypeFilter === ft.type"
+            [class.btn-outline-secondary]="portfolioFormTypeFilter !== ft.type"
+            (click)="togglePortfolioFilter(ft.type)">
+            {{ ft.type }}
+            <span class="badge ms-1 bg-secondary">{{ ft.count }}</span>
+          </button>
+        }
+        @if (portfolioFormTypeFilter) {
+          <button class="btn btn-sm btn-link text-muted p-0 ms-1" (click)="portfolioFormTypeFilter = null">
+            <i class="fas fa-times-circle me-1"></i>Clear
+          </button>
+        }
+      </div>
+
       @for (tickerFiling of portfolioFilings; track tickerFiling.ticker) {
-        <div class="card mb-3">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <app-stock-link-and-tradingview-link [ticker]="tickerFiling.ticker"></app-stock-link-and-tradingview-link>
-            </h5>
+        @let filteredFilings = filterPortfolioFilings(tickerFiling.filings);
+        @if (filteredFilings.length > 0) {
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <app-stock-link-and-tradingview-link [ticker]="tickerFiling.ticker"></app-stock-link-and-tradingview-link>
+              </h5>
+            </div>
+            <div class="card-body p-0">
+              <app-sec-filings-table
+                [filings]="filteredFilings"
+                [loading]="false"
+                [showFilter]="false"
+                [emptyMessage]="'No recent filings for ' + tickerFiling.ticker">
+              </app-sec-filings-table>
+            </div>
           </div>
-          <div class="card-body p-0">
-            <app-sec-filings-table 
-              [filings]="tickerFiling.filings"
-              [loading]="false"
-              [showFilter]="false"
-              [emptyMessage]="'No recent filings for ' + tickerFiling.ticker">
-            </app-sec-filings-table>
-          </div>
-        </div>
+        }
       }
     }
   }

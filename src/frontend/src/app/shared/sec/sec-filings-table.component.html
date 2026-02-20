@@ -47,10 +47,15 @@
 }
 
 @if (!loading && getFilteredFilings().length > 0) {
-  <div class="card shadow-sm mb-3">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-modern table-hover align-middle mb-0">
+  <div class="table-responsive">
+        <table class="table table-modern table-hover align-middle mb-0" style="table-layout: fixed; width: 100%">
+          <colgroup>
+            <col style="width: 12%">
+            <col style="width: 12%">
+            <col style="width: 10%">
+            <col style="width: 44%">
+            <col style="width: 22%">
+          </colgroup>
           <thead class="table-light">
             <tr>
               <th scope="col">Filing Date</th>
@@ -75,7 +80,7 @@
                   <td>
                     <span class="badge bg-primary">{{ row.filing!.filing }}</span>
                   </td>
-                  <td class="text-muted">{{ row.filing!.description || 'N/A' }}</td>
+                  <td class="text-muted text-truncate" [title]="row.filing!.description || 'N/A'">{{ row.filing!.description || 'N/A' }}</td>
                   <td class="text-end text-muted">
                     <a [href]="row.filing!.filingUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2" title="View filing index" rel="noopener noreferrer">
                       <i class="bi bi-file-earmark-text"></i> Filing
@@ -90,6 +95,4 @@
           </tbody>
         </table>
       </div>
-    </div>
-  </div>
 }
