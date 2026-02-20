@@ -191,7 +191,7 @@ module Schedule13GProcessingServiceTests =
     }
     
     [<Fact>]
-    [<Trait("Category", "Manual")>]
+    [<Trait("Category", "Integration")>]
     let ``End-to-end test with real database`` () = task {
         // Arrange - use REAL storage implementations
         let dbCreds = testutils.CredsHelper.GetDbCreds()
