@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.SimpleEmail" Version="4.0.2.13" />
-    <PackageReference Include="Scriban" Version="6.5.2" />
+    <PackageReference Include="Scriban" Version="6.5.3" />
   </ItemGroup>
 
   <ItemGroup>
