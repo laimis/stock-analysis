@@ -55,6 +55,7 @@ module Schedule13GProcessingServiceTests =
         
         interface IOwnershipStorage with
             member _.GetEntityById(_) = task { return None }
+            member _.GetEntitiesByIds(_) = task { return Seq.empty }
             member _.FindEntityByCik(cik) = 
                 task {
                     return entities |> Map.tryFind cik

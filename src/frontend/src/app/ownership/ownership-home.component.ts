@@ -28,6 +28,7 @@ export class OwnershipHomeComponent implements OnInit {
   tickerSearchResults: string[] = [];
   recentTimelines: OwnershipEvent[] = [];
   entityNameMap = new Map<string, string>();
+  entityNamesLoading = false;
   getEntityTypeDisplay = getEntityTypeDisplay;
   
   loading = {
@@ -114,14 +115,20 @@ export class OwnershipHomeComponent implements OnInit {
       next: (timelines) => {
         this.recentTimelines = timelines;
         
-        // Load entity names for entities in the timelines
+        // Load all entity names in a single batch request
         const entityIds = [...new Set(timelines.map(t => t.entityId))];
-        entityIds.forEach(id => {
-          this.ownershipService.getEntity(id).subscribe({
-            next: (entity) => this.entityNameMap.set(entity.id, entity.name),
-            error: () => {} // Silently fail, will show ID
+        if (entityIds.length > 0) {
+          this.entityNamesLoading = true;
+          this.ownershipService.getEntitiesByIds(entityIds).subscribe({
+            next: (entities) => {
+              entities.forEach(e => this.entityNameMap.set(e.id, e.name));
+              this.entityNamesLoading = false;
+            },
+            error: () => {
+              this.entityNamesLoading = false;
+            }
           });
-        });
+        }
         
         this.loading.timelines = false;
       },
@@ -133,6 +140,6 @@ export class OwnershipHomeComponent implements OnInit {
   }
 
   getEntityName(entityId: string): string {
-    return this.entityNameMap.get(entityId) || entityId;
+    return this.entityNameMap.get(entityId) ?? null;
   }
 }

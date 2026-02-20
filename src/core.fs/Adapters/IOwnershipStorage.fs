@@ -73,6 +73,9 @@ type IOwnershipStorage =
     /// Get an entity by ID
     abstract member GetEntityById : entityId:Guid -> Task<OwnershipEntity option>
     
+    /// Get multiple entities by their IDs in one query
+    abstract member GetEntitiesByIds : entityIds:seq<Guid> -> Task<IEnumerable<OwnershipEntity>>
+    
     /// Find an entity by CIK (unique identifier)
     abstract member FindEntityByCik : cik:string -> Task<OwnershipEntity option>
     

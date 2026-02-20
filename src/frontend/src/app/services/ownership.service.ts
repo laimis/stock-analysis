@@ -147,6 +147,11 @@ export class OwnershipService {
         return this.http.get<OwnershipEvent[]>(`/api/ownership/timelines/recent?limit=${limit}`);
     }
 
+    // Get multiple entities by their IDs in a single request
+    getEntitiesByIds(ids: string[]): Observable<OwnershipEntity[]> {
+        return this.http.post<OwnershipEntity[]>('/api/ownership/entities/batch', { ids });
+    }
+
     // Create/update operations
     createEntity(request: CreateEntityRequest): Observable<{id: string}> {
         return this.http.post<{id: string}>('/api/ownership/entity', request);

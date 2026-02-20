@@ -135,7 +135,11 @@
                           </td>
                           <td class="py-3">
                             <a [routerLink]="['/ownership/entity', timeline.entityId]">
-                              {{ getEntityName(timeline.entityId) }}
+                              @if (entityNamesLoading && getEntityName(timeline.entityId) === null) {
+                                <span class="spinner-border spinner-border-sm text-secondary me-1" role="status" aria-hidden="true"></span>
+                              } @else {
+                                {{ getEntityName(timeline.entityId) ?? 'Unknown entity' }}
+                              }
                             </a>
                           </td>
                           <td class="py-3">

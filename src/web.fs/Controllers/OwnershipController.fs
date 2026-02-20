@@ -12,6 +12,11 @@ type SearchEntitiesRequest = {
 }
 
 [<CLIMutable>]
+type BatchEntityIdsRequest = {
+    Ids: Guid array
+}
+
+[<CLIMutable>]
 type CreateEntityRequest = {
     Name: string
     EntityType: string
@@ -93,6 +98,15 @@ type OwnershipController(storage: IOwnershipStorage) =
     member this.GetEventsByEntity([<FromRoute>] entityId: Guid) = task {
         let! events = storage.GetEventsByEntity entityId
         return this.Ok(events)
+    }
+
+    [<HttpPost("entities/batch")>]
+    member this.GetEntitiesBatch([<FromBody>] request: BatchEntityIdsRequest) = task {
+        if isNull (box request) || request.Ids = null || request.Ids.Length = 0 then
+            return this.Ok(Array.empty) :> ActionResult
+        else
+            let! entities = storage.GetEntitiesByIds(request.Ids)
+            return this.Ok entities :> ActionResult
     }
 
     [<HttpGet("entities/search")>]

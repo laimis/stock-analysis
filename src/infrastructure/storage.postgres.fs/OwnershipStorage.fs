@@ -151,6 +151,24 @@ type OwnershipStorage(connectionString: string) =
                     return Some (this.MapToOwnershipEntity(dto))
             }
         
+        member this.GetEntitiesByIds(entityIds: seq<Guid>) =
+            task {
+                use db = this.GetConnection()
+                
+                let ids = entityIds |> Seq.toArray
+                if ids.Length = 0 then
+                    return Seq.empty
+                else
+                    let query = """
+                        SELECT id, name, entity_type, cik,
+                               first_seen, last_seen, created_at
+                        FROM ownership_entities
+                        WHERE id = ANY(@Ids)"""
+                    
+                    let! dtos = db.QueryAsync<OwnershipEntityDto>(query, {| Ids = ids |})
+                    return dtos |> Seq.map this.MapToOwnershipEntity
+            }
+        
         member this.FindEntityByCik(cik: string) =
             task {
                 use db = this.GetConnection()
