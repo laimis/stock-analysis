@@ -1,129 +1,169 @@
 <section class="card shadow-sm mb-4">
   <div class="card-body">
-    <h3 class="card-title">
-      <i class="bi bi-building me-2"></i>New Order
+    <h3 class="card-title d-flex align-items-center mb-4">
+      <i class="bi bi-plus-circle me-2"></i>New Order
     </h3>
 
     <app-error-display [errors]="errors"></app-error-display>
-    <div> @if (submittedOrder === false) {
-      <div class="row">
-        <div class="col-md">
-          <app-stock-search [ticker]="selectedTicker" label="Ticker" placeholder="New position symbol"
+
+    @if (submittedOrder === false) {
+      <!-- Row 1: Ticker + Order Type + Duration -->
+      <div class="row g-3">
+        <div class="col-md-5">
+          <app-stock-search
+            [ticker]="selectedTicker"
+            label="Ticker"
+            placeholder="Symbol"
             (tickerSelected)="onTickerSelected($event)"
-          cssClass="form-control"></app-stock-search>
+            cssClass="form-control">
+          </app-stock-search>
         </div>
-        <div class="col-md">
+        <div class="col-md-4">
           <label for="brokerageOrderType" class="form-label">Order Type</label>
-          <select
-            class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType"
+          <select class="form-select" [(ngModel)]="brokerageOrderType" id="brokerageOrderType"
             (ngModelChange)="brokerageOrderTypeChanged()">
             <option value="Limit">Limit</option>
             <option value="Market">Market</option>
-            <option value="StopMarket">StopMarket</option>
+            <option value="StopMarket">Stop Market</option>
           </select>
         </div>
-        <div class="col-md">
-          <label for="brokerageOrderDuration" class="form-label">Order Duration</label>
-          <select
-            class="form-select" [(ngModel)]="brokerageOrderDuration"
-            id="brokerageOrderDuration">
+        <div class="col-md-3">
+          <label for="brokerageOrderDuration" class="form-label">Duration</label>
+          <select class="form-select" [(ngModel)]="brokerageOrderDuration" id="brokerageOrderDuration">
             @for (duration of orderDurations; track duration) {
               <option [value]="duration.key">{{ duration.value }}</option>
             }
           </select>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="col-md">
+
+      <!-- Row 2: Price + Shares + Total -->
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
           <label for="price" class="form-label">Price</label>
           <input type="number"
-            [ngClass]="{'form-control': true, 'disabled': brokerageOrderType === 'Market'}"
-            id="price" step="0.01"
+            class="form-control"
+            id="price"
+            step="0.01"
             [disabled]="brokerageOrderType === 'Market'"
             [readOnly]="brokerageOrderType === 'Market'"
-            [(ngModel)]="price">
+            [(ngModel)]="price"
+            (ngModelChange)="numberOfSharesChanged()"
+            [placeholder]="brokerageOrderType === 'Market' ? 'Market price' : '0.00'">
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <label for="stocksToBuy" class="form-label mb-0"># of Shares</label>
+            @if (positionShares) {
+              <a role="button" class="badge bg-secondary text-decoration-none"
+                style="cursor: pointer; font-size: 0.75rem;"
+                (click)="fillPositionShares()"
+                title="Click to fill with your current position size">
+                <i class="bi bi-box me-1"></i>Own {{ positionShares | number:'1.0-2' }}
+              </a>
+            }
           </div>
-          <div class="col-md">
-            <label for="stocksToBuy" class="form-label"># of Shares</label>
-            <input type="number"
-              class="form-control"
-              id="stocksToBuy"
-              [(ngModel)]="numberOfShares"
-              (ngModelChange)="numberOfSharesChanged()">
-            </div>
-          </div>
-          @if (positionId) {
-            <div class="row mt-3">
-              <div class="col-md">
-                <label for="notes" class="form-label">Notes
-                  @if (notesControl.invalid) {
-                    <span class="text-danger">*</span>
-                  }
-                </label>
-                <textarea class="form-control"
-                  id="notes" rows="3"
-                  [formControl]="notesControl"
-                [required]="true"></textarea>
-              </div>
+          <input type="number"
+            class="form-control"
+            id="stocksToBuy"
+            placeholder="0"
+            [(ngModel)]="numberOfShares"
+            (ngModelChange)="numberOfSharesChanged()">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          @if (total) {
+            <div class="w-100 p-2 rounded bg-light border text-end">
+              <div class="small text-muted mb-1">Order Total</div>
+              <div class="fs-6 fw-semibold">{{ total | currency }}</div>
             </div>
           }
-        }
-        @if (quote && submittedOrder === false) {
-          @if (quote) {
-            <div class="row mt-3">
-              <div class="col-md">
-                <div class="stat-label">bid</div>
-                <div>{{ quote.bidPrice | currency }} x {{ quote.bidSize }}</div>
-              </div>
-              <div class="col-md">
-                <div class="stat-label">ask</div>
-                <div>{{ quote.askPrice | currency }} x {{ quote.askSize }}</div>
-              </div>
-              <div class="col-md">
-                <div class="stat-label">last</div>
-                <div>{{ quote.lastPrice | currency }} x {{ quote.lastSize }}</div>
-              </div>
-              <div class="col-md">
-                <div class="stat-label">total</div>
-                <div>{{ total | currency }}</div>
-              </div>
-            </div>
-          }
-        }
-        @if (submittedOrder === false && submittingOrder === false) {
-          @if (!submittedOrder) {
-            <div class="row mt-3">
-              <div class="col-md">
-                <button class="btn btn-primary w-100" (click)="buy()">Buy</button>
-              </div>
-              <div class="col-md">
-                <button class="btn btn-primary w-100" (click)="buyToCover()">Buy to Cover</button>
-              </div>
-              <div class="col-md">
-                <button class="btn btn-primary w-100" (click)="sell()">Sell</button>
-              </div>
-              <div class="col-md">
-                <button class="btn btn-primary w-100" (click)="sellShort()">Sell Short</button>
-              </div>
-            </div>
-          }
-        } @else if (submittingOrder) {
-          @if (submittingOrder) {
-            <div class="row mt-3">
-              <div class="col-md-12">
-                <button class="btn btn-primary w-100 disabled" disabled>Submitting Order...</button>
-              </div>
-            </div>
-          }
-        } @else {
-          @if (submittedOrder) {
-            <div class="row mt-3">
-              <div class="col-md-12">
-                <button class="btn btn-primary w-100" (click)="submittedOrder = false">New Order</button>
-              </div>
-            </div>
-          }
-        }
+        </div>
       </div>
-    </div>
-  </section>
+
+      <!-- Quote info bar -->
+      @if (quote) {
+        <div class="row g-2 mt-1">
+          <div class="col-12">
+            <div class="d-flex gap-3 px-3 py-2 bg-light rounded border" style="font-size: 0.85rem;">
+              <span>
+                <span class="text-muted me-1">Bid</span>
+                <strong>{{ quote.bidPrice | currency }}</strong>
+                <span class="text-muted ms-1">× {{ quote.bidSize }}</span>
+              </span>
+              <span class="text-muted">|</span>
+              <span>
+                <span class="text-muted me-1">Ask</span>
+                <strong>{{ quote.askPrice | currency }}</strong>
+                <span class="text-muted ms-1">× {{ quote.askSize }}</span>
+              </span>
+              <span class="text-muted">|</span>
+              <span>
+                <span class="text-muted me-1">Last</span>
+                <strong>{{ quote.lastPrice | currency }}</strong>
+                <span class="text-muted ms-1">× {{ quote.lastSize }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Notes (only when linked to a position) -->
+      @if (positionId) {
+        <div class="row g-3 mt-1">
+          <div class="col-12">
+            <label for="notes" class="form-label">
+              Notes
+              @if (notesControl.invalid && notesControl.touched) {
+                <span class="text-danger ms-1">* required</span>
+              }
+            </label>
+            <textarea class="form-control" id="notes" rows="2"
+              [formControl]="notesControl"
+              placeholder="Reason for this trade...">
+            </textarea>
+          </div>
+        </div>
+      }
+
+      <!-- Action buttons -->
+      <div class="row g-2 mt-3">
+        <div class="col-6 col-md-3">
+          <button class="btn btn-success w-100" (click)="buy()">
+            <i class="bi bi-arrow-up-circle me-1"></i>Buy
+          </button>
+        </div>
+        <div class="col-6 col-md-3">
+          <button class="btn btn-outline-success w-100" (click)="buyToCover()">
+            <i class="bi bi-arrow-up-circle me-1"></i>Buy to Cover
+          </button>
+        </div>
+        <div class="col-6 col-md-3">
+          <button class="btn btn-danger w-100" (click)="sell()">
+            <i class="bi bi-arrow-down-circle me-1"></i>Sell
+          </button>
+        </div>
+        <div class="col-6 col-md-3">
+          <button class="btn btn-outline-danger w-100" (click)="sellShort()">
+            <i class="bi bi-arrow-down-circle me-1"></i>Sell Short
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (submittingOrder) {
+      <div class="mt-3">
+        <button class="btn btn-secondary w-100 disabled" disabled>
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>Submitting Order...
+        </button>
+      </div>
+    }
+
+    @if (submittedOrder && !submittingOrder) {
+      <div class="mt-3">
+        <button class="btn btn-outline-primary w-100" (click)="submittedOrder = false">
+          <i class="bi bi-plus-circle me-1"></i>New Order
+        </button>
+      </div>
+    }
+  </div>
+</section>

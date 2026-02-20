@@ -11,7 +11,7 @@ import {
 import {StockPositionsService} from "../services/stockpositions.service";
 import {StockSearchComponent} from "../stocks/stock-search/stock-search.component";
 import {ErrorDisplayComponent} from "../shared/error-display/error-display.component";
-import { CurrencyPipe, NgClass } from "@angular/common";
+import { CurrencyPipe, DecimalPipe } from "@angular/common";
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 
@@ -23,9 +23,9 @@ import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angu
     FormsModule,
     StockSearchComponent,
     ErrorDisplayComponent,
-    NgClass,
     ReactiveFormsModule,
-    CurrencyPipe
+    CurrencyPipe,
+    DecimalPipe
 ]
 })
 export class BrokerageNewOrderComponent {
@@ -37,11 +37,12 @@ export class BrokerageNewOrderComponent {
     brokerageOrderDuration: string
     brokerageOrderType: string
     numberOfShares: number | null = null
+    positionShares: number | null = null
     price: number | null = null
     selectedTicker: string
     quote: StockQuote
     total: number | null = null
-    errors: string[] | null = null;
+    errors: string[] = [];
 
     submittedOrder = false
     submittingOrder = false
@@ -104,8 +105,14 @@ export class BrokerageNewOrderComponent {
         }
     }
 
+    fillPositionShares() {
+        this.numberOfShares = this.positionShares
+        this.numberOfSharesChanged()
+    }
+
     reset() {
         this.numberOfShares = null
+        this.positionShares = null
         this.errors = null
         this.selectedTicker = null
         this.positionId = null
@@ -128,7 +135,7 @@ export class BrokerageNewOrderComponent {
                     ownership => {
                         let position = ownership.positions.filter(p => p.isOpen)[0]
                         if (position) {
-                            this.numberOfShares = position.numberOfShares
+                            this.positionShares = position.numberOfShares
                             this.positionId = position.positionId
                         }
                     }
