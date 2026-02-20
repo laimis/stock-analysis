@@ -39,7 +39,13 @@ module Schedule13GProcessingServiceTests =
                         return [mockFiling] |> Seq.ofList
                     else
                         return Seq.empty
-                }
+                }            
+            member this.GetFilingsSince(ticker: Ticker) (since: DateTimeOffset): Threading.Tasks.Task<Collections.Generic.IEnumerable<SECFilingRecord>> = 
+                failwith "Not Implemented"
+            member this.GetWatermark(userId: string) (ticker: Ticker): Threading.Tasks.Task<DateTimeOffset option> = 
+                failwith "Not Implemented"
+            member this.UpsertWatermark(userId: string) (ticker: Ticker) (timestamp: DateTimeOffset): Threading.Tasks.Task<unit> = 
+                failwith "Not Implemented"
     
     type MockOwnershipStorage() =
         let mutable entities = Map.empty<string, OwnershipEntity>
