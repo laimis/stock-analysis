@@ -714,9 +714,9 @@ ON CONFLICT (ticker) DO UPDATE SET
                 use db = this.GetConnection()
                 
                 let query = "SELECT MAX(lastupdated) FROM tickercik"
-                let! result = db.QuerySingleOrDefaultAsync<Nullable<DateTimeOffset>>(query)
+                let! result = db.QuerySingleOrDefaultAsync<Nullable<DateTime>>(query)
                 
-                return if result.HasValue then Some result.Value else None
+                return if result.HasValue then Some (DateTimeOffset(result.Value, TimeSpan.Zero)) else None
             }
         
         member this.SearchTickerCik(query: string) = 
