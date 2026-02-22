@@ -49,7 +49,7 @@ type OwnershipEventDto =
         transaction_type: string
         shares_before: Nullable<int64>
         shares_transacted: Nullable<int64>
-        shares_after: int64
+        shares_after: Nullable<int64>
         percent_of_class: Nullable<decimal>
         price_per_share: Nullable<decimal>
         total_value: Nullable<decimal>
@@ -78,6 +78,38 @@ type OwnershipSummaryDto =
 type OwnershipStorage(connectionString: string) =
     
     let dataSource = (new NpgsqlDataSourceBuilder(connectionString)).Build()
+
+    let eventInsertQuery = """
+        INSERT INTO ownership_events 
+            (id, entity_id, company_ticker, company_cik, filing_id, event_type,
+             transaction_type, shares_before, shares_transacted, shares_after,
+             percent_of_class, price_per_share, total_value, transaction_date,
+             filing_date, is_direct, ownership_nature, created_at)
+        VALUES (@Id, @EntityId, @CompanyTicker, @CompanyCik, @FilingId, @EventType,
+                @TransactionType, @SharesBefore, @SharesTransacted, @SharesAfter,
+                @PercentOfClass, @PricePerShare, @TotalValue, @TransactionDate,
+                @FilingDate, @IsDirect, @OwnershipNature, @CreatedAt)"""
+
+    let toEventParams (e: OwnershipEvent) = {|
+        Id = e.Id
+        EntityId = e.EntityId
+        CompanyTicker = e.CompanyTicker
+        CompanyCik = e.CompanyCik
+        FilingId = Option.toNullable e.FilingId
+        EventType = e.EventType
+        TransactionType = Option.toObj e.TransactionType
+        SharesBefore = Option.toNullable e.SharesBefore
+        SharesTransacted = Option.toNullable e.SharesTransacted
+        SharesAfter = Option.toNullable e.SharesAfter
+        PercentOfClass = Option.toNullable e.PercentOfClass
+        PricePerShare = Option.toNullable e.PricePerShare
+        TotalValue = Option.toNullable e.TotalValue
+        TransactionDate = e.TransactionDate
+        FilingDate = e.FilingDate
+        IsDirect = e.IsDirect
+        OwnershipNature = Option.toObj e.OwnershipNature
+        CreatedAt = e.CreatedAt
+    |}
     
     member private _.GetConnection() : IDbConnection =
         dataSource.OpenConnection()
@@ -118,7 +150,7 @@ type OwnershipStorage(connectionString: string) =
             TransactionType = Option.ofObj dto.transaction_type
             SharesBefore = if dto.shares_before.HasValue then Some dto.shares_before.Value else None
             SharesTransacted = if dto.shares_transacted.HasValue then Some dto.shares_transacted.Value else None
-            SharesAfter = dto.shares_after
+            SharesAfter = if dto.shares_after.HasValue then Some dto.shares_after.Value else None
             PercentOfClass = if dto.percent_of_class.HasValue then Some dto.percent_of_class.Value else None
             PricePerShare = if dto.price_per_share.HasValue then Some dto.price_per_share.Value else None
             TotalValue = if dto.total_value.HasValue then Some dto.total_value.Value else None
@@ -330,85 +362,14 @@ type OwnershipStorage(connectionString: string) =
         member this.SaveEvent(ownershipEvent: OwnershipEvent) =
             task {
                 use db = this.GetConnection()
-                
-                let query = """
-                    INSERT INTO ownership_events 
-                        (id, entity_id, company_ticker, company_cik, filing_id, event_type,
-                         transaction_type, shares_before, shares_transacted, shares_after,
-                         percent_of_class, price_per_share, total_value, transaction_date,
-                         filing_date, is_direct, ownership_nature, created_at)
-                    VALUES (@Id, @EntityId, @CompanyTicker, @CompanyCik, @FilingId, @EventType,
-                            @TransactionType, @SharesBefore, @SharesTransacted, @SharesAfter,
-                            @PercentOfClass, @PricePerShare, @TotalValue, @TransactionDate,
-                            @FilingDate, @IsDirect, @OwnershipNature, @CreatedAt)
-                    RETURNING id"""
-                
-                let! result = db.QuerySingleAsync<Guid>(query, {|
-                    Id = ownershipEvent.Id
-                    EntityId = ownershipEvent.EntityId
-                    CompanyTicker = ownershipEvent.CompanyTicker
-                    CompanyCik = ownershipEvent.CompanyCik
-                    FilingId = Option.toNullable ownershipEvent.FilingId
-                    EventType = ownershipEvent.EventType
-                    TransactionType = Option.toObj ownershipEvent.TransactionType
-                    SharesBefore = Option.toNullable ownershipEvent.SharesBefore
-                    SharesTransacted = Option.toNullable ownershipEvent.SharesTransacted
-                    SharesAfter = ownershipEvent.SharesAfter
-                    PercentOfClass = Option.toNullable ownershipEvent.PercentOfClass
-                    PricePerShare = Option.toNullable ownershipEvent.PricePerShare
-                    TotalValue = Option.toNullable ownershipEvent.TotalValue
-                    TransactionDate = ownershipEvent.TransactionDate
-                    FilingDate = ownershipEvent.FilingDate
-                    IsDirect = ownershipEvent.IsDirect
-                    OwnershipNature = Option.toObj ownershipEvent.OwnershipNature
-                    CreatedAt = ownershipEvent.CreatedAt
-                |})
-                
+                let! result = db.QuerySingleAsync<Guid>(eventInsertQuery + " RETURNING id", toEventParams ownershipEvent)
                 return result
             }
         
         member this.SaveEvents(events: seq<OwnershipEvent>) =
             task {
                 use db = this.GetConnection()
-                
-                let query = """
-                    INSERT INTO ownership_events 
-                        (id, entity_id, company_ticker, company_cik, filing_id, event_type,
-                         transaction_type, shares_before, shares_transacted, shares_after,
-                         percent_of_class, price_per_share, total_value, transaction_date,
-                         filing_date, is_direct, ownership_nature, created_at)
-                    VALUES (@Id, @EntityId, @CompanyTicker, @CompanyCik, @FilingId, @EventType,
-                            @TransactionType, @SharesBefore, @SharesTransacted, @SharesAfter,
-                            @PercentOfClass, @PricePerShare, @TotalValue, @TransactionDate,
-                            @FilingDate, @IsDirect, @OwnershipNature, @CreatedAt)"""
-                
-                let eventsParams = 
-                    events 
-                    |> Seq.map (fun e -> 
-                        {|
-                            Id = e.Id
-                            EntityId = e.EntityId
-                            CompanyTicker = e.CompanyTicker
-                            CompanyCik = e.CompanyCik
-                            FilingId = Option.toNullable e.FilingId
-                            EventType = e.EventType
-                            TransactionType = Option.toObj e.TransactionType
-                            SharesBefore = Option.toNullable e.SharesBefore
-                            SharesTransacted = Option.toNullable e.SharesTransacted
-                            SharesAfter = e.SharesAfter
-                            PercentOfClass = Option.toNullable e.PercentOfClass
-                            PricePerShare = Option.toNullable e.PricePerShare
-                            TotalValue = Option.toNullable e.TotalValue
-                            TransactionDate = e.TransactionDate
-                            FilingDate = e.FilingDate
-                            IsDirect = e.IsDirect
-                            OwnershipNature = Option.toObj e.OwnershipNature
-                            CreatedAt = e.CreatedAt
-                        |})
-                    |> Seq.toArray
-                
-                let! rowsAffected = db.ExecuteAsync(query, eventsParams)
-                
+                let! rowsAffected = db.ExecuteAsync(eventInsertQuery, events |> Seq.map toEventParams |> Seq.toArray)
                 return rowsAffected
             }
         
@@ -535,7 +496,7 @@ type OwnershipStorage(connectionString: string) =
                         le.transaction_date as last_updated
                     FROM ownership_entities e
                     INNER JOIN latest_events le ON e.id = le.entity_id
-                    WHERE le.shares_after > 0
+                    WHERE le.shares_after IS NOT NULL AND le.shares_after > 0
                     ORDER BY le.shares_after DESC"""
                 
                 let! dtos = db.QueryAsync<OwnershipSummaryDto>(query, {| Ticker = ticker.Value |})

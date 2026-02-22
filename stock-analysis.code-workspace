@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"dotnet.defaultSolution": "tradewatch.sln",
+		"FSharp.inlayHints.typeAnnotations": false,
+		"chat.tools.terminal.autoApprove": {
+			"dotnet build": true,
+			"dotnet test": true,
+			".\\release_prod.ps1": true
+		}
+	}
+}

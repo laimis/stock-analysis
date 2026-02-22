@@ -10,10 +10,15 @@
   <ItemGroup>
     <Compile Include="Schedule13GParserTests.fs" />
     <Compile Include="Schedule13GProcessingServiceTests.fs" />
+    <Compile Include="Form144ParserTests.fs" />
+    <Compile Include="Form144ProcessingServiceTests.fs" />
   </ItemGroup>
   
   <ItemGroup>
     <Content Include="sample_schedule_13g.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="sample_form_144.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

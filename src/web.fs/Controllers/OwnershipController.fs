@@ -42,7 +42,7 @@ type CreateOwnershipEventRequest = {
     TransactionType: string option
     SharesBefore: int64 option
     SharesTransacted: int64 option
-    SharesAfter: int64
+    SharesAfter: int64 option
     PercentOfClass: decimal option
     PricePerShare: decimal option
     TotalValue: decimal option
