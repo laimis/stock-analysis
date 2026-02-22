@@ -6,6 +6,7 @@
     "FSharp.inlayHints.typeAnnotations": false,
     "chat.tools.terminal.autoApprove": {
       "dotnet build": true,
-      "dotnet test": true
+      "dotnet test": true,
+      ".\\release_prod.ps1": true
     }
   }
