@@ -58,7 +58,11 @@
                             <div class="small text-muted">Reported: {{ summary.percentOfClass | number:'1.2-2' }}%</div>
                           }
                         } @else {
-                          <div>{{ summary.percentOfClass !== null ? (summary.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</div>
+                          @if (summary.percentOfClass !== null) {
+                            <div>{{ summary.percentOfClass | number:'1.2-2' }}%</div>
+                          } @else {
+                            <span class="text-muted">-</span>
+                          }
                         }
                       </td>
                       <td class="py-3">
@@ -119,7 +123,8 @@
                     <th scope="col">Transaction</th>
                     <th scope="col" class="text-end">Shares Before</th>
                     <th scope="col" class="text-end">Shares Transacted</th>
-                    <th scope="col" class="text-end">Shares After</th>
+                    <th scope="col" class="text-end">Shares</th>
+                    <th scope="col" class="text-end">Price / Value</th>
                     <th scope="col" class="text-end pe-4">% Ownership</th>
                   </tr>
                 </thead>
@@ -145,9 +150,44 @@
                           </span>
                         }
                       </td>
-                      <td class="text-end py-3">{{ event.sharesBefore !== null ? (event.sharesBefore | number) : 'N/A' }}</td>
-                      <td class="text-end py-3">{{ event.sharesTransacted !== null ? (event.sharesTransacted | number) : 'N/A' }}</td>
-                      <td class="text-end py-3">{{ event.sharesAfter | number }}</td>
+                      <td class="text-end py-3">
+                        @if (event.sharesBefore !== null) {
+                          {{ event.sharesBefore | number }}
+                        } @else {
+                          <span class="text-muted">-</span>
+                        }
+                      </td>
+                      <td class="text-end py-3">
+                        @if (event.sharesTransacted !== null) {
+                          {{ event.sharesTransacted | number }}
+                        } @else {
+                          <span class="text-muted">-</span>
+                        }
+                      </td>
+                      <td class="text-end py-3">
+                        @if (event.sharesAfter) {
+                          <div>{{ event.sharesAfter | number }}</div>
+                          <div class="small text-muted">after</div>
+                        } @else if (event.sharesTransacted) {
+                          <div>{{ event.sharesTransacted | number }}</div>
+                          <div class="small text-muted">transacted</div>
+                        } @else {
+                          <span class="text-muted">-</span>
+                        }
+                      </td>
+                      <td class="text-end py-3">
+                        @if (event.pricePerShare !== null) {
+                          <div>{{ event.pricePerShare | currency }}</div>
+                          <div class="small text-muted">per share</div>
+                        }
+                        @if (event.totalValue !== null) {
+                          <div class="fw-semibold">{{ event.totalValue | currency:'USD':'symbol':'1.0-0' }}</div>
+                          <div class="small text-muted">total</div>
+                        }
+                        @if (event.pricePerShare === null && event.totalValue === null) {
+                          <span class="text-muted">-</span>
+                        }
+                      </td>
                       <td class="text-end py-3 pe-4">
                         @if (sharesOutstanding) {
                           <div>{{ calculateOwnershipPercent(event.sharesAfter) | number:'1.2-2' }}%</div>
@@ -155,7 +195,11 @@
                             <div class="small text-muted">Reported: {{ event.percentOfClass | number:'1.2-2' }}%</div>
                           }
                         } @else {
-                          <div>{{ event.percentOfClass !== null ? (event.percentOfClass | number:'1.2-2') + '%' : 'N/A' }}</div>
+                          @if (event.percentOfClass !== null) {
+                            <div>{{ event.percentOfClass | number:'1.2-2' }}%</div>
+                          } @else {
+                            <span class="text-muted">-</span>
+                          }
                         }
                       </td>
                     </tr>
