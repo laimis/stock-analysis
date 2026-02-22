@@ -121,7 +121,7 @@ module Schedule13GProcessingServiceTests =
         
         let event = events |> Seq.head
         Assert.Equal("DOCS", event.CompanyTicker)
-        Assert.True(event.SharesAfter > 0L, "Expected shares after to be greater than 0")
+        Assert.True(event.SharesAfter |> Option.exists (fun s -> s > 0L), "Expected shares after to be greater than 0")
     }
     
     [<Fact>]
