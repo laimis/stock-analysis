@@ -1,7 +1,12 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-md-12">
-      <h2>Entity Holdings</h2>
+      <div class="mb-4">
+        <a routerLink="/ownership" class="text-muted small text-decoration-none">
+          <i class="fas fa-arrow-left me-1"></i>Ownership
+        </a>
+        <h2 class="mt-1 mb-0">{{ entity?.name || 'Entity Holdings' }}</h2>
+      </div>
       
       @if (loading) {
         <div class="text-center">
@@ -61,6 +66,7 @@
                   <tr [class.table-secondary]="!role.isActive">
                     <td>
                       <app-stock-link-and-tradingview-link [ticker]="role.companyTicker"></app-stock-link-and-tradingview-link>
+                      <a [routerLink]="['/ownership/ticker', role.companyTicker]" class="ms-2 small text-muted" title="View ownership for {{ role.companyTicker }}">ownership</a>
                     </td>
                     <td><span class="badge bg-info">{{ role.relationshipType }}</span></td>
                     <td>{{ role.title || 'N/A' }}</td>
@@ -106,6 +112,7 @@
                     <td>{{ event.transactionDate | date }}</td>
                     <td>
                       <app-stock-link-and-tradingview-link [ticker]="event.companyTicker"></app-stock-link-and-tradingview-link>
+                      <a [routerLink]="['/ownership/ticker', event.companyTicker]" class="ms-2 small text-muted" title="View ownership for {{ event.companyTicker }}">ownership</a>
                     </td>
                     <td><span class="badge bg-info">{{ event.eventType }}</span></td>
                     <td>

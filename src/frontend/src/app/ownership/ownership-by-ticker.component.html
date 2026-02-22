@@ -1,7 +1,12 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-md-12">
-      <h2>Ownership for {{ ticker }}</h2>
+      <div class="mb-4">
+        <a routerLink="/ownership" class="text-muted small text-decoration-none">
+          <i class="fas fa-arrow-left me-1"></i>Ownership
+        </a>
+        <h2 class="mt-1 mb-0">{{ ticker }}</h2>
+      </div>
       
       @if (loading) {
         <div class="text-center">
