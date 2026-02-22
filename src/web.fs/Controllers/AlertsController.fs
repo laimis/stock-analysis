@@ -152,6 +152,11 @@ type AlertsController(handler: Handler) =
     member this.TriggerReminders([<FromServices>] reminderService: MonitoringServices.ReminderMonitoringService) =
         reminderService.Execute()
 
+    [<HttpGet("triggerSECFilingsSync")>]
+    [<Authorize("admin")>]
+    member this.TriggerSECFilingsSync([<FromServices>] secFilingsSyncService: SECFilingsMonitoring.SECFilingsSyncService) =
+        secFilingsSyncService.Execute()
+
     [<HttpGet("triggerSECFilings")>]
     [<Authorize("admin")>]
     member this.TriggerSECFilings([<FromServices>] secFilingsService: SECFilingsMonitoring.SECFilingsMonitoringService) =
