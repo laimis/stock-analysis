@@ -34,43 +34,43 @@ type UserFilingsEmailData =
         tickerFilings: SECFilingEmailData array
     }
 
-type SECFilingsMonitoringService(
+/// Shared helper: returns open stock + option tickers for a given user.
+let private getUserTickers (portfolio: IPortfolioStorage) (userId: UserId) = task {
+    let! stocks = portfolio.GetStockPositions userId
+    let stockTickers = stocks |> Seq.filter _.IsOpen |> Seq.map _.Ticker
+
+    let! options = portfolio.GetOptionPositions userId
+    let optionTickers = options |> Seq.filter _.IsOpen |> Seq.map _.UnderlyingTicker
+
+    return
+        Seq.append stockTickers optionTickers
+        |> Seq.distinct
+        |> Seq.toArray
+}
+
+/// Shared helper: loads verified users.
+let private getVerifiedUsers (accounts: IAccountStorage) = async {
+    let! userPairs = accounts.GetUserEmailIdPairs() |> Async.AwaitTask
+    let! users =
+        userPairs
+        |> Seq.map (fun pair -> async { return! accounts.GetUser pair.Id |> Async.AwaitTask })
+        |> Async.Sequential
+    return users |> Array.choose id |> Array.filter (fun u -> u.State.Verified.HasValue)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Job 1: sync SEC filings from the SEC API into the database.
+// Runs frequently (e.g. every 10 minutes) so the DB stays up to date.
+// No user-specific logic, no emails.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type SECFilingsSyncService(
     accounts: IAccountStorage,
     portfolio: IPortfolioStorage,
     secFilings: ISECFilings,
     secFilingStorage: ISECFilingStorage,
-    emails: IEmailService,
-    marketHours: IMarketHours,
     logger: ILogger) =
 
-    let isRecentFiling (filing: CompanyFiling) =
-        let today = marketHours.ToMarketTime DateTimeOffset.UtcNow
-        today.Date |> DateOnly.FromDateTime |> filing.IsRecentFor
-
-    let ignoreFiling (filing: CompanyFiling) =
-        // ignore form 4 filings, they are just so numerous, I would be tracking them all day
-        filing.Filing = "4"
-
-    let getUserTickers (userId: UserId) = task {
-        let! stocks = portfolio.GetStockPositions userId
-        let stockTickers = 
-            stocks 
-            |> Seq.filter _.IsOpen 
-            |> Seq.map _.Ticker
-
-        let! options = portfolio.GetOptionPositions userId
-        let optionTickers = 
-            options 
-            |> Seq.filter _.IsOpen 
-            |> Seq.map _.UnderlyingTicker
-
-        return 
-            Seq.append stockTickers optionTickers
-            |> Seq.distinct
-            |> Seq.toArray
-    }
-
-    // Concern 1: fetch filings from SEC for a ticker and sync to DB (idempotent, no user context)
     let fetchAndSaveFilings (ticker: Ticker) = async {
         try
             let! response = secFilings.GetFilings ticker |> Async.AwaitTask
@@ -94,7 +94,65 @@ type SECFilingsMonitoringService(
             logger.LogError $"Error syncing SEC filings for {ticker}: {ex.Message}"
     }
 
-    // Concern 2: query DB for filings since the user's watermark and apply notification filters
+    let executeInternal() = async {
+        try
+            logger.LogInformation "Starting SEC filings sync service"
+
+            let! verifiedUsers = getVerifiedUsers accounts
+
+            logger.LogInformation $"Collecting tickers from {verifiedUsers.Length} verified user(s)"
+
+            // Collect all tickers across all users, deduplicated, to avoid redundant SEC API calls.
+            let! allTickers =
+                verifiedUsers
+                |> Seq.map (fun u -> async {
+                    return! getUserTickers portfolio (UserId u.State.Id) |> Async.AwaitTask
+                })
+                |> Async.Sequential
+
+            let uniqueTickers =
+                allTickers
+                |> Seq.concat
+                |> Seq.distinctBy _.Value
+                |> Seq.toArray
+
+            logger.LogInformation $"Syncing SEC filings for {uniqueTickers.Length} unique ticker(s)"
+
+            do! uniqueTickers |> Seq.map fetchAndSaveFilings |> Async.Sequential |> Async.Ignore
+
+            logger.LogInformation "SEC filings sync service completed successfully"
+        with ex ->
+            logger.LogError $"Error in SEC filings sync service: {ex.Message}"
+    }
+
+    interface IApplicationService
+
+    member _.Execute() = task {
+        do! executeInternal()
+    }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Job 2: notify users about new filings that have appeared in the DB since
+// each user's last watermark. Runs less frequently (e.g. every 30 minutes).
+// No SEC API calls – reads only from the DB.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type SECFilingsMonitoringService(
+    accounts: IAccountStorage,
+    portfolio: IPortfolioStorage,
+    secFilingStorage: ISECFilingStorage,
+    emails: IEmailService,
+    marketHours: IMarketHours,
+    logger: ILogger) =
+
+    let isRecentFiling (filing: CompanyFiling) =
+        let today = marketHours.ToMarketTime DateTimeOffset.UtcNow
+        today.Date |> DateOnly.FromDateTime |> filing.IsRecentFor
+
+    let ignoreFiling (filing: CompanyFiling) =
+        // ignore form 4 filings, they are just so numerous, I would be tracking them all day
+        filing.Filing = "4"
+
     let getNewFilingsForUser (userId: string) (ticker: Ticker) = async {
         try
             let twoDaysAgo = DateTimeOffset.UtcNow.AddDays -2.0
@@ -120,9 +178,9 @@ type SECFilingsMonitoringService(
     }
 
     let toEmailData (ticker: Ticker) (filings: CompanyFiling seq) =
-        let emailFilings = 
+        let emailFilings =
             filings
-            |> Seq.map (fun f -> 
+            |> Seq.map (fun f ->
                 {
                     description = f.Description
                     documentUrl = f.DocumentUrl
@@ -141,8 +199,8 @@ type SECFilingsMonitoringService(
     let processUserFilings (user: User) = async {
         logger.LogInformation $"Checking SEC filings for user {user.State.Email}"
 
-        let! tickers = getUserTickers (UserId user.State.Id) |> Async.AwaitTask
-        
+        let! tickers = getUserTickers portfolio (UserId user.State.Id) |> Async.AwaitTask
+
         match tickers with
         | [||] ->
             logger.LogInformation $"No tickers to check for user {user.State.Email}"
@@ -150,10 +208,6 @@ type SECFilingsMonitoringService(
         | _ ->
             logger.LogInformation $"Checking {tickers.Length} tickers for user {user.State.Email}"
 
-            // Step 1: sync all tickers to DB (no user context, idempotent)
-            do! tickers |> Seq.map fetchAndSaveFilings |> Async.Sequential |> Async.Ignore
-
-            // Step 2: check what's new for this user since their watermark
             let! results =
                 tickers
                 |> Seq.map (getNewFilingsForUser (user.State.Id.ToString()))
@@ -173,7 +227,7 @@ type SECFilingsMonitoringService(
     let sendEmailToUser (user: User) (tickerFilings: (Ticker * CompanyFiling[]) array) = task {
         let emailTickerFilings = tickerFilings |> Array.map (fun (ticker, filings) -> toEmailData ticker filings)
 
-        let emailData = 
+        let emailData =
             {
                 userName = if String.IsNullOrEmpty(user.State.Firstname) then user.State.Email else user.State.Firstname
                 tickerFilings = emailTickerFilings
@@ -183,7 +237,7 @@ type SECFilingsMonitoringService(
         let sender = Sender("support@nightingaletrading.com", "Nightingale Trading")
 
         let totalFilings = emailTickerFilings |> Array.sumBy (fun tf -> tf.filings.Length)
-        let subject = 
+        let subject =
             if emailTickerFilings.Length = 1 then
                 $"SEC Filing for {emailTickerFilings[0].ticker}"
             else
@@ -192,10 +246,10 @@ type SECFilingsMonitoringService(
         try
             let! result = emails.SendSECFilings recipient sender subject emailData
             match result with
-            | Ok _ -> 
+            | Ok _ ->
                 logger.LogInformation($"SEC filings email sent successfully to {user.State.Email}")
                 return true
-            | Error err -> 
+            | Error err ->
                 logger.LogError($"Failed to send SEC filings email to {user.State.Email}: {err}")
                 return false
         with ex ->
@@ -211,18 +265,9 @@ type SECFilingsMonitoringService(
 
     let executeInternal() = async {
         try
-            logger.LogInformation "Starting SEC filings monitoring service"
+            logger.LogInformation "Starting SEC filings notification service"
 
-            let! userPairs = accounts.GetUserEmailIdPairs() |> Async.AwaitTask
-            let! users = 
-                userPairs 
-                |> Seq.map (fun pair -> async { return! accounts.GetUser pair.Id |> Async.AwaitTask })
-                |> Async.Sequential
-            
-            let verifiedUsers = 
-                users 
-                |> Array.choose id 
-                |> Array.filter (fun u -> u.State.Verified.HasValue) 
+            let! verifiedUsers = getVerifiedUsers accounts
 
             logger.LogInformation $"Processing {verifiedUsers.Length} verified users"
 
@@ -240,9 +285,9 @@ type SECFilingsMonitoringService(
                 if emailSent then
                     do! updateWatermarks (user.State.Id.ToString()) tickerFilings |> Async.AwaitTask
 
-            logger.LogInformation "SEC filings monitoring service completed successfully"
+            logger.LogInformation "SEC filings notification service completed successfully"
         with ex ->
-            logger.LogError $"Error in SEC filings monitoring service: {ex.Message}"
+            logger.LogError $"Error in SEC filings notification service: {ex.Message}"
     }
 
     interface IApplicationService
