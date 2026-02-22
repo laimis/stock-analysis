@@ -57,6 +57,8 @@ type OwnershipEventDto =
         filing_date: string
         is_direct: bool
         ownership_nature: string
+        filing_url: string
+        document_url: string
         created_at: DateTimeOffset
     }
 
@@ -158,6 +160,8 @@ type OwnershipStorage(connectionString: string) =
             FilingDate = dto.filing_date
             IsDirect = dto.is_direct
             OwnershipNature = Option.ofObj dto.ownership_nature
+            FilingUrl = Option.ofObj dto.filing_url
+            DocumentUrl = Option.ofObj dto.document_url
             CreatedAt = dto.created_at
         }
     
@@ -378,17 +382,19 @@ type OwnershipStorage(connectionString: string) =
                 use db = this.GetConnection()
                 
                 let query = """
-                    SELECT id, entity_id, company_ticker,
-                           company_cik, filing_id, event_type,
-                           transaction_type, shares_before,
-                           shares_transacted, shares_after,
-                           percent_of_class, price_per_share,
-                           total_value, transaction_date,
-                           filing_date, is_direct,
-                           ownership_nature, created_at
-                    FROM ownership_events
-                    WHERE company_ticker = @Ticker
-                    ORDER BY transaction_date DESC"""
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    WHERE oe.company_ticker = @Ticker
+                    ORDER BY oe.transaction_date DESC"""
                 
                 let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| Ticker = ticker.Value |})
                 
@@ -400,19 +406,21 @@ type OwnershipStorage(connectionString: string) =
                 use db = this.GetConnection()
                 
                 let query = """
-                    SELECT id, entity_id, company_ticker,
-                           company_cik, filing_id, event_type,
-                           transaction_type, shares_before,
-                           shares_transacted, shares_after,
-                           percent_of_class, price_per_share,
-                           total_value, transaction_date,
-                           filing_date, is_direct,
-                           ownership_nature, created_at
-                    FROM ownership_events
-                    WHERE company_ticker = @Ticker 
-                      AND transaction_date >= @StartDate 
-                      AND transaction_date <= @EndDate
-                    ORDER BY transaction_date DESC"""
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    WHERE oe.company_ticker = @Ticker 
+                      AND oe.transaction_date >= @StartDate 
+                      AND oe.transaction_date <= @EndDate
+                    ORDER BY oe.transaction_date DESC"""
                 
                 let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| 
                     Ticker = ticker.Value
@@ -428,17 +436,19 @@ type OwnershipStorage(connectionString: string) =
                 use db = this.GetConnection()
                 
                 let query = """
-                    SELECT id, entity_id, company_ticker,
-                           company_cik, filing_id, event_type,
-                           transaction_type, shares_before,
-                           shares_transacted, shares_after,
-                           percent_of_class, price_per_share,
-                           total_value, transaction_date,
-                           filing_date, is_direct,
-                           ownership_nature, created_at
-                    FROM ownership_events
-                    WHERE entity_id = @EntityId
-                    ORDER BY transaction_date DESC"""
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    WHERE oe.entity_id = @EntityId
+                    ORDER BY oe.transaction_date DESC"""
                 
                 let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| EntityId = entityId |})
                 
@@ -450,17 +460,19 @@ type OwnershipStorage(connectionString: string) =
                 use db = this.GetConnection()
                 
                 let query = """
-                    SELECT id, entity_id, company_ticker,
-                           company_cik, filing_id, event_type,
-                           transaction_type, shares_before,
-                           shares_transacted, shares_after,
-                           percent_of_class, price_per_share,
-                           total_value, transaction_date,
-                           filing_date, is_direct,
-                           ownership_nature, created_at
-                    FROM ownership_events
-                    WHERE entity_id = @EntityId AND company_ticker = @Ticker
-                    ORDER BY transaction_date DESC
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    WHERE oe.entity_id = @EntityId AND oe.company_ticker = @Ticker
+                    ORDER BY oe.transaction_date DESC
                     LIMIT 1"""
                 
                 let! dto = db.QueryFirstOrDefaultAsync<OwnershipEventDto>(query, {| 
@@ -547,17 +559,19 @@ type OwnershipStorage(connectionString: string) =
                 let cutoffDate = DateTimeOffset.UtcNow.AddDays(float -days).ToString("yyyy-MM-dd")
                 
                 let query = """
-                    SELECT id, entity_id, company_ticker,
-                           company_cik, filing_id, event_type,
-                           transaction_type, shares_before,
-                           shares_transacted, shares_after,
-                           percent_of_class, price_per_share,
-                           total_value, transaction_date,
-                           filing_date, is_direct,
-                           ownership_nature, created_at
-                    FROM ownership_events
-                    WHERE company_ticker = @Ticker AND transaction_date >= @CutoffDate
-                    ORDER BY transaction_date DESC"""
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    WHERE oe.company_ticker = @Ticker AND oe.transaction_date >= @CutoffDate
+                    ORDER BY oe.transaction_date DESC"""
                 
                 let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| 
                     Ticker = ticker.Value
@@ -572,16 +586,18 @@ type OwnershipStorage(connectionString: string) =
                 use db = this.GetConnection()
                 
                 let query = """
-                    SELECT id, entity_id, company_ticker,
-                           company_cik, filing_id, event_type,
-                           transaction_type, shares_before,
-                           shares_transacted, shares_after,
-                           percent_of_class, price_per_share,
-                           total_value, transaction_date,
-                           filing_date, is_direct,
-                           ownership_nature, created_at
-                    FROM ownership_events
-                    ORDER BY filing_date DESC
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    ORDER BY oe.filing_date DESC
                     LIMIT @Limit"""
                 
                 let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| Limit = limit |})

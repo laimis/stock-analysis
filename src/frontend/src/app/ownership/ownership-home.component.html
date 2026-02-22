@@ -121,7 +121,8 @@
                         <th scope="col">Transaction</th>
                         <th scope="col" class="text-end">Shares</th>
                         <th scope="col" class="text-end">Price / Value</th>
-                        <th scope="col" class="text-end pe-4">% of Class</th>
+                        <th scope="col" class="text-end">% of Class</th>
+                        <th scope="col" class="text-end pe-4">Filing</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -182,10 +183,21 @@
                               <span class="text-muted">-</span>
                             }
                           </td>
-                          <td class="text-end py-3 pe-4">
+                          <td class="text-end py-3">
                             @if (timeline.percentOfClass !== null) {
                               {{ timeline.percentOfClass | number:'1.2-2' }}%
                             } @else {
+                              <span class="text-muted">-</span>
+                            }
+                          </td>
+                          <td class="text-end py-3 pe-4">
+                            @if (timeline.filingUrl) {
+                              <a [href]="timeline.filingUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm me-1" title="View Filing Index">Index</a>
+                            }
+                            @if (timeline.documentUrl) {
+                              <a [href]="timeline.documentUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm" title="View Document">Doc</a>
+                            }
+                            @if (!timeline.filingUrl && !timeline.documentUrl) {
                               <span class="text-muted">-</span>
                             }
                           </td>

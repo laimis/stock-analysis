@@ -54,6 +54,8 @@ type OwnershipEvent =
         FilingDate: string
         IsDirect: bool
         OwnershipNature: string option // "sole voting power", "shared voting power", etc.
+        FilingUrl: string option
+        DocumentUrl: string option
         CreatedAt: DateTimeOffset
     }
 
@@ -181,5 +183,7 @@ module OwnershipEvent =
             FilingDate = filingDate
             IsDirect = isDirect
             OwnershipNature = ownershipNature
+            FilingUrl = None
+            DocumentUrl = None
             CreatedAt = DateTimeOffset.UtcNow
         }

@@ -125,7 +125,8 @@
                     <th scope="col" class="text-end">Shares Transacted</th>
                     <th scope="col" class="text-end">Shares</th>
                     <th scope="col" class="text-end">Price / Value</th>
-                    <th scope="col" class="text-end pe-4">% Ownership</th>
+                    <th scope="col" class="text-end">% Ownership</th>
+                    <th scope="col" class="text-end pe-4">Filing</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -188,7 +189,7 @@
                           <span class="text-muted">-</span>
                         }
                       </td>
-                      <td class="text-end py-3 pe-4">
+                      <td class="text-end py-3">
                         @if (sharesOutstanding) {
                           <div>{{ calculateOwnershipPercent(event.sharesAfter) | number:'1.2-2' }}%</div>
                           @if (event.percentOfClass !== null) {
@@ -200,6 +201,17 @@
                           } @else {
                             <span class="text-muted">-</span>
                           }
+                        }
+                      </td>
+                      <td class="text-end py-3 pe-4">
+                        @if (event.filingUrl) {
+                          <a [href]="event.filingUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm me-1" title="View Filing Index">Index</a>
+                        }
+                        @if (event.documentUrl) {
+                          <a [href]="event.documentUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm" title="View Document">Doc</a>
+                        }
+                        @if (!event.filingUrl && !event.documentUrl) {
+                          <span class="text-muted">-</span>
                         }
                       </td>
                     </tr>

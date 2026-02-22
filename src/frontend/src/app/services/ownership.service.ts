@@ -42,6 +42,8 @@ export interface OwnershipEvent {
     filingDate: string;
     isDirect: boolean;
     ownershipNature: string | null;
+    filingUrl: string | null;
+    documentUrl: string | null;
     createdAt: string;
 }
 

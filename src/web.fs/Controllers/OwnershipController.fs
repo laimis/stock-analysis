@@ -177,6 +177,8 @@ type OwnershipController(storage: IOwnershipStorage) =
             FilingDate = request.FilingDate
             IsDirect = request.IsDirect
             OwnershipNature = request.OwnershipNature
+            FilingUrl = None
+            DocumentUrl = None
             CreatedAt = DateTimeOffset.UtcNow
         }
         let! eventId = storage.SaveEvent ownershipEvent
