@@ -86,6 +86,7 @@ dotnet watch run --project src/web.fs/web.fs.fsproj
   - Publishes Docker image
 - **Docker build**: Alpine-based, self-contained Linux binaries (see `Dockerfile`)
 - **Hangfire** for background jobs (requires Postgres connection)
+- **When Asked To Deploy**: Commit local changes with descriptive message, then run `.\release_prod.ps1 "Your short description of the changes"`
 
 ## External Integrations
 

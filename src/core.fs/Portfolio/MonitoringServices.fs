@@ -96,10 +96,10 @@ type PortfolioAnalysisService(
                 let! user = pair.Id |> accounts.GetUser |> Async.AwaitTask
                 match user with
                 | None -> ()
-                | Some _ ->
+                | Some user ->
                     let! positions = pair.Id |> portfolio.GetStockPositions |> Async.AwaitTask
                     
-                    let sellsOfInterest =
+                    let rawSells =
                         positions
                         |> Seq.collect _.ShareTransactions
                         |> Seq.filter (fun t ->
@@ -107,19 +107,64 @@ type PortfolioAnalysisService(
                                 match DateTimeOffset.UtcNow.Subtract(t.Date).TotalDays with
                                 | d when d >= 27.0 && d <= 31.0 -> true
                                 | _ -> false
-                            
                             t.Type = StockTransactionType.Sell && agePass
                         )
-                        |> Seq.map (fun t ->
-                            {|
-                                Ticker = t.Ticker.Value
-                                Date = t.Date.ToString "yyyy-MM-dd"
-                                Price = t.Price
-                                NumberOfShares = t.NumberOfShares
-                            |}
-                        )
+                        |> Seq.toArray
+                    
+                    if rawSells.Length > 0 then
+                        // Attempt a bulk quote fetch; any failure is non-fatal - email still sends
+                        let! quoteMap =
+                            if user.State.ConnectedToBrokerage then
+                                async {
+                                    let tickers = rawSells |> Seq.map (_.Ticker) |> Seq.distinct
+                                    try
+                                        let! result = brokerage.GetQuotes user.State tickers |> Async.AwaitTask
+                                        match result with
+                                        | Ok quotes -> return Some quotes
+                                        | Error err ->
+                                            logger.LogWarning $"Could not fetch quotes for sell tracking email: {err}"
+                                            return None
+                                    with ex ->
+                                        logger.LogWarning $"Exception fetching quotes for sell tracking email: {ex.Message}"
+                                        return None
+                                }
+                            else
+                                async { return None }
                         
-                    if Seq.isEmpty sellsOfInterest |> not then
+                        let formatShares (shares: decimal) =
+                            if shares % 1m = 0m then shares.ToString("0")
+                            else shares.ToString("0.##########")
+                        
+                        let sellsOfInterest =
+                            rawSells
+                            |> Seq.map (fun t ->
+                                let priceData =
+                                    quoteMap
+                                    |> Option.bind (fun map ->
+                                        match map.TryGetValue(t.Ticker) with
+                                        | true, quote ->
+                                            let pct = (quote.Price - t.Price) / t.Price * 100m
+                                            let pctStr = (abs pct).ToString("N1")
+                                            let direction = if pct >= 0m then "up" else "down"
+                                            Some (quote.Price.ToString("N2"), pctStr, direction)
+                                        | _ -> None
+                                    )
+                                let currentPrice, priceChangePct, priceDirection =
+                                    match priceData with
+                                    | Some (p, c, d) -> p, c, d
+                                    | None -> "", "", ""
+                                {|
+                                    Ticker = t.Ticker.Value
+                                    Date = t.Date.ToString "yyyy-MM-dd"
+                                    Price = t.Price.ToString("N2")
+                                    NumberOfShares = formatShares t.NumberOfShares
+                                    HasCurrentPrice = priceData.IsSome
+                                    CurrentPrice = currentPrice
+                                    PriceChangePct = priceChangePct
+                                    PriceDirection = priceDirection
+                                |}
+                            )
+                        
                         let recipient = Recipient(email = pair.Email, name = "")
                         let subject = "Sell Tracking Report"
                         let! emailResult = emails.SendSellAlert recipient Sender.NoReply subject {| sells = sellsOfInterest |} |> Async.AwaitTask

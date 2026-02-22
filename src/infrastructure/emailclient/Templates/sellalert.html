@@ -23,20 +23,60 @@
                     <tr>
                         <td style="padding: 32px 40px;">
                             {{for sell in sells}}
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                                <!-- Ticker + sell price header -->
                                 <tr>
-                                    <td style="padding: 16px; background-color: #f9fafb;">
-                                        <div style="margin-bottom: 8px;">
-                                            <span style="font-size: 20px; font-weight: 600; color: #1f2937;">{{sell.ticker}}</span>
-                                            <span style="margin-left: 12px; font-size: 18px; color: #374151; font-weight: 600;">${{sell.price}}</span>
-                                        </div>
-                                        <p style="margin: 4px 0; color: #4b5563; font-size: 14px;">
-                                            <strong>Shares:</strong> {{sell.number_of_shares}}
-                                        </p>
-                                        <p style="margin: 4px 0; color: #6b7280; font-size: 14px;">
-                                            <strong>Date:</strong> {{sell.date}}
-                                        </p>
-                                        <p style="margin: 4px 0 0; font-size: 12px;">
+                                    <td style="padding: 14px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td>
+                                                    <span style="font-size: 22px; font-weight: 700; color: #1f2937;">{{sell.ticker}}</span>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <span style="font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px;">Sold&nbsp;at</span>&nbsp;
+                                                    <span style="font-size: 20px; font-weight: 700; color: #1f2937;">${{sell.price}}</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- Details rows -->
+                                <tr>
+                                    <td style="padding: 14px 20px 16px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%;">
+                                                    <span style="color: #9ca3af;">Shares</span>&nbsp;&nbsp;
+                                                    <strong style="color: #1f2937;">{{sell.number_of_shares}}</strong>
+                                                </td>
+                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%;">
+                                                    <span style="color: #9ca3af;">Date</span>&nbsp;&nbsp;
+                                                    <strong style="color: #1f2937;">{{sell.date}}</strong>
+                                                </td>
+                                            </tr>
+                                            {{if sell.has_current_price}}
+                                            <tr>
+                                                <td colspan="2" style="padding-top: 12px;">
+                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;">
+                                                        <tr>
+                                                            <td style="padding: 10px 14px;">
+                                                                <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Current Price</div>
+                                                                <div style="font-size: 18px; font-weight: 700; color: #1f2937;">${{sell.current_price}}</div>
+                                                            </td>
+                                                            <td style="padding: 10px 14px; text-align: right;">
+                                                                {{if sell.price_direction == "down"}}
+                                                                <span style="display: inline-block; padding: 5px 12px; background-color: #d1fae5; color: #065f46; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8595;&nbsp;{{sell.price_change_pct}}% lower</span>
+                                                                {{else}}
+                                                                <span style="display: inline-block; padding: 5px 12px; background-color: #fee2e2; color: #991b1b; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8593;&nbsp;{{sell.price_change_pct}}% higher</span>
+                                                                {{end}}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            {{end}}
+                                        </table>
+                                        <p style="margin: 14px 6px 0; font-size: 12px;">
                                             <a href="https://app.nightingaletrading.com/stocks/{{sell.ticker}}" style="color: #2563eb; text-decoration: none;">View on NGTD</a>
                                             <span style="color: #d1d5db; margin: 0 6px;">|</span>
                                             <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{sell.ticker}}" style="color: #2563eb; text-decoration: none;">Chart</a>
