@@ -16,7 +16,8 @@ Add database backing for SEC filings and implement ownership tracking to monitor
 - ✅ **Ownership database layer** - entities, roles, events (Phase 2 - Feb 15, 2026)
 - ✅ **Ownership UI** - manual entry, viewing, timeline (Phase 3 - Feb 16, 2026)
 - ✅ **Schedule 13G Parser** - automated extraction from SEC filings (Phase 2 - Feb 17, 2026)
-- ⏳ Form 4, Form 144, Form 13F parsers (Phase 2 - planned)
+- ✅ **Form 144 Parser** - insider intent-to-sell notifications (Phase 2 - Feb 22, 2026)
+- ⏳ Form 4, Form 13F parsers (Phase 2 - planned)
 
 ## Goal
 Track insider and institutional ownership changes to:
@@ -35,7 +36,7 @@ Track insider and institutional ownership changes to:
 
 ## Phase 2: Ownership Tracking & Parsing
 **Goal**: Extract structured ownership data from specific form types  
-**Status**: ⚡ **PARTIALLY COMPLETED** (Started February 15, 2026, Schedule 13G complete February 17, 2026)
+**Status**: ⚡ **PARTIALLY COMPLETED** (Started February 15, 2026, Schedule 13G complete February 17, 2026, Form 144 complete February 22, 2026)
 
 ### Database Schema ✅ **COMPLETED** (February 15, 2026)
 - ✅ Created `ownership_entities` table
@@ -74,10 +75,14 @@ Track insider and institutional ownership changes to:
    - Confidence scoring (0.0 to 1.0) for data quality assessment
    - Handles both 13G and 13G/A (amendments)
    - Background job runs weekdays at 9:00am PT (12:00pm ET)
-2. **Form 4** - Insider transactions (after-the-fact)
+2. ✅ **Form 144** - Intent to sell restricted securities **COMPLETED** (February 22, 2026)
+   - XML parsing with secure XmlReader (prevents XXE attacks)
+   - Confidence scoring (0.0 to 1.0) for data quality assessment
+   - Handles both 144 and 144/A (amendments)
+   - Event type `intent_to_sell` with proposed sale amount
+   - Background job runs weekdays at 9:30am PT (12:30pm ET)
+3. **Form 4** - Insider transactions (after-the-fact)
    - Most common, easiest to parse, highest value
-3. **Form 144** - Intent to sell restricted securities
-   - Intent to sell restricted securities
 4. **Form 13F** - Institutional holdings (quarterly)
    - Structured format, quarterly reporting
 
@@ -116,12 +121,37 @@ Track insider and institutional ownership changes to:
     - Schedule13GParserTests.fs
     - Schedule13GProcessingServiceTests.fs
 
-- [ ] **Additional Form Parsers** (F#) - NOT STARTED
-  - [ ] Create `core.fs/SEC/FormParsers.fs` module
+- [x] **Form 144 Parser** ✅ **COMPLETED** (February 22, 2026)
+  - [x] Created types in `Form144Types.fs`
+    - ParsedForm144 record type
+    - Form144ParsingResult discriminated union (Form144Success/Form144PartialSuccess/Form144Failure)
+    - Helper functions for confidence scoring and entity type mapping
+  - [x] Implemented parser in `Form144Parser.fs`
+    - Secure XML parsing with XmlReader (XXE attack prevention)
+    - Extracts: filer CIK, person name, relationships to issuer, issuer name/CIK
+    - Securities information (shares to sell, aggregate market value, shares outstanding)
+    - Sale details (approx sale date MM/dd/yyyy, exchange, nature of acquisition)
+    - Handles both 144 and 144/A (amendments)
+    - Confidence scoring (0.0-1.0) based on data completeness
+  - [x] Created processing service in `Form144ProcessingService.fs`
+    - Fetches and parses XML documents from SEC
+    - Finds or creates entities (with CIK lookup)
+    - Creates `intent_to_sell` ownership events with `sale` transaction type
+    - Price per share derived from aggregate market value / shares to sell
+    - Deduplication (checks if filing already processed)
+    - Batch processing with rate limiting (500ms delay)
+  - [x] Registered Hangfire background job
+    - Runs weekdays at 9:30am PT (12:30pm ET)
+    - Processes last 100 144/144-A filings
+  - [x] Admin trigger endpoint `GET /api/alerts/triggerForm144`
+  - [x] Comprehensive test coverage
+    - Form144ParserTests.fs (6 unit tests + 1 integration test against real SEC filing)
+    - Form144ProcessingServiceTests.fs (integration tests with mocked storage)
+    - Real Palantir/Alexander Karp filing used as test fixture
+
+- [ ] **Additional Form Parsers** (F#) - PARTIALLY COMPLETE
   - [ ] Implement Form 4 parser
     - Extract: reporter name, relationship, transaction date, shares, price, transaction code
-  - [ ] Implement Form 144 parser
-    - Extract: seller name, shares to be sold, date
   - [ ] Implement Form 13F parser
     - Extract: fund name, positions with share counts
 
@@ -143,8 +173,8 @@ Track insider and institutional ownership changes to:
 - ✅ Tests for parser with real-world examples
 - ✅ Confidence scoring for data quality assessment
 - ✅ Deduplication prevents duplicate ownership events
+- ✅ Form 144 parser implementation (complete Feb 22, 2026)
 - ⏳ Form 4 parser implementation (pending)
-- ⏳ Form 144 parser implementation (pending)
 - ⏳ Form 13F parser implementation (pending)
 
 ---
@@ -312,8 +342,13 @@ Track insider and institutional ownership changes to:
   - Batch processing with rate limiting
   - Deduplication logic
   - Comprehensive test coverage
+- ✅ **Form 144 Parser** implemented (Feb 22, 2026)
+  - XML parser with secure XmlReader, confidence scoring, amendment support
+  - Processing service with `intent_to_sell` event type
+  - Background job (weekdays 9:30am PT)
+  - Admin trigger endpoint
+  - Comprehensive test coverage with real Palantir/Karp filing fixture
 - ⏳ Form 4 parser (pending)
-- ⏳ Form 144 parser (pending)
 - ⏳ Form 13F parser (pending)
 
 ### Phase 3 ✅ **ACHIEVED**
@@ -326,14 +361,15 @@ Track insider and institutional ownership changes to:
 ---
 
 ## Current Phase: **Phase 2/3** 🎯
-**Status**: Database, UI, and Schedule 13G Complete, Additional Parsers Pending  
+**Status**: Database, UI, Schedule 13G, and Form 144 Complete, Form 4 and 13F Parsers Pending  
 **Phase 1**: Complete (Feb 12, 2026) - Filing persistence  
-**Phase 2**: Partially Complete (Feb 15-17, 2026)  
+**Phase 2**: Partially Complete (Feb 15-22, 2026)  
   - Database schema, storage layer, backend API ✅  
   - Schedule 13G parser and processing service ✅  
-  - Form 4, Form 144, Form 13F parsers pending ⏳  
+  - Form 144 parser and processing service ✅  
+  - Form 4 and Form 13F parsers pending ⏳  
 **Phase 3**: UI Complete (Feb 16, 2026) - Full ownership tracking UI ✅  
-**Next Steps**: Build Form 4, Form 144, and Form 13F parsers to expand automated data extraction
+**Next Steps**: Build Form 4 and Form 13F parsers to expand automated data extraction
 
 ### Recent Implementation Notes (Phase 2 & 3):
 
@@ -350,7 +386,7 @@ Track insider and institutional ownership changes to:
 
 4. **Ownership Calculations**: When shares outstanding data is available (from fundamentals API), the UI calculates current ownership percentages and compares them to reported percentages from filings, helping identify when ownership has changed due to share dilution or buybacks.
 
-5. **Manual Entry**: Currently supports manual entry of ownership events via UI. Automated extraction from SEC filings requires parser implementation (pending).
+5. **Manual Entry**: Supports manual entry of ownership events via UI. Automated extraction implemented for Schedule 13G and Form 144.
 
 6. **Schedule 13G Parser Implementation** (February 17, 2026):
    - **Secure XML parsing**: Uses XmlReader with DtdProcessing.Prohibit to prevent XXE attacks
@@ -387,6 +423,21 @@ Track insider and institutional ownership changes to:
    - **Logging**: Comprehensive logging at Debug, Info, Warning, and Error levels
    - **Test coverage**: Full integration tests with mocked dependencies
 
+8. **Form 144 Parser Implementation** (February 22, 2026):
+   - **Secure XML parsing**: Uses XmlReader with DtdProcessing.Prohibit to prevent XXE attacks
+   - **Comprehensive data extraction**:
+     - Filer CIK from `headerData/filerCredentials`
+     - Person name and relationships to issuer (Director, Officer, etc.) from `issuerInfo`
+     - Issuer name and CIK
+     - Securities: shares to sell, aggregate market value, shares outstanding, approx sale date, exchange
+     - Nature of acquisition (e.g., Restricted Stock Units) from `securitiesToBeSold`
+     - Notice and plan adoption dates from `noticeSignature`
+     - Amendment status (144 vs 144/A)
+   - **Event semantics**: `eventType = "intent_to_sell"`, `transactionType = Some "sale"`, price per share derived from aggregate market value
+   - **Entity type mapping**: Officers/Directors → "EP" (Executive/C-Suite), others → "IN" (Individual)
+   - **Test fixture**: Real Palantir/Alexander Karp Form 144 filing (90,000 shares, $12.14M, NASDAQ)
+   - **Admin endpoint**: `GET /api/alerts/triggerForm144` for manual triggering
+
 ### What Works Now:
 - ✅ Manual ownership data entry with excellent UX
 - ✅ View ownership by ticker (current + timeline)
@@ -398,9 +449,10 @@ Track insider and institutional ownership changes to:
 - ✅ **Background job for daily 13G processing**
 - ✅ **Entity creation/lookup by CIK**
 - ✅ **Confidence scoring for data quality**
+- ✅ **Automated Form 144 parsing and processing** (intent-to-sell notifications)
+- ✅ **Background job for daily Form 144 processing** (weekdays 9:30am PT)
 
 ### What's Next:
-- Form 4 parser implementation (insider transactions)
-- Form 144 parser implementation (intent to sell)
-- Form 13F parser implementation (institutional holdings)
-- Background processing services for additional form types
+- Form 4 parser implementation (insider transactions - after-the-fact)
+- Form 13F parser implementation (institutional holdings - quarterly)
+- Background processing services for Form 4 and Form 13F
