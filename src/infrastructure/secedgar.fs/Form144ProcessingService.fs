@@ -91,7 +91,7 @@ type Form144ProcessingService(
             transactionType
             None                                   // No shares before (not provided in Form 144)
             (Some parsed.SharesToSell)             // Shares being proposed for sale
-            parsed.SharesToSell                    // SharesAfter = SharesToSell (best available data)
+            None
             None                                   // Percent of class not directly in Form 144
             pricePerShare
             parsed.AggregateMarketValue

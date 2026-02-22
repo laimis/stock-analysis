@@ -126,8 +126,8 @@ module Form144ProcessingServiceTests =
         Assert.True(event.SharesTransacted.IsSome, "Expected SharesTransacted to be set")
         Assert.Equal(Some 90000L, event.SharesTransacted)
 
-        // SharesAfter should also be set (equals SharesToSell for Form 144)
-        Assert.Equal(90000L, event.SharesAfter)
+        // SharesAfter is not known from Form 144, so should be None
+        Assert.Equal(None, event.SharesAfter)
 
         // IsDirect should be true
         Assert.True(event.IsDirect, "Form 144 events should be direct ownership")

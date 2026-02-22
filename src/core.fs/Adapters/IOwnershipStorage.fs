@@ -46,7 +46,7 @@ type OwnershipEvent =
         TransactionType: string option // 'purchase', 'sale', 'grant', 'exercise', 'gift'
         SharesBefore: int64 option
         SharesTransacted: int64 option
-        SharesAfter: int64
+        SharesAfter: int64 option
         PercentOfClass: decimal option
         PricePerShare: decimal option
         TotalValue: decimal option

@@ -81,7 +81,7 @@ type Schedule13GProcessingService(
             None // No transaction type for position disclosures
             None // No shares before
             None // No shares transacted
-            parsed.SharesOwned
+            (Some parsed.SharesOwned)
             (Some parsed.PercentOfClass)
             None // No price per share in 13G
             None // No total value in 13G

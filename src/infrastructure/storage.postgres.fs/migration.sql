@@ -294,3 +294,6 @@ CREATE TABLE user_sec_filing_watermarks (
     PRIMARY KEY (user_id, ticker)
 );
 ALTER TABLE user_sec_filing_watermarks OWNER TO stockanalysis;
+
+-- ownership_events shares after should allowed to be null afterall
+ALTER TABLE ownership_events ALTER COLUMN shares_after DROP NOT NULL;
