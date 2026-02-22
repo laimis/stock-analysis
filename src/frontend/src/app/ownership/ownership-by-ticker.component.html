@@ -204,15 +204,21 @@
                         }
                       </td>
                       <td class="text-end py-3 pe-4">
-                        @if (event.filingUrl) {
-                          <a [href]="event.filingUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm me-1" title="View Filing Index">Index</a>
-                        }
-                        @if (event.documentUrl) {
-                          <a [href]="event.documentUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm" title="View Document">Doc</a>
-                        }
-                        @if (!event.filingUrl && !event.documentUrl) {
-                          <span class="text-muted">-</span>
-                        }
+                        <div class="d-flex gap-2 justify-content-end">
+                          @if (event.filingUrl) {
+                            <a [href]="event.filingUrl" target="_blank" rel="noopener noreferrer" class="text-secondary" title="View Filing Index">
+                              <i class="fas fa-list-alt fa-lg"></i>
+                            </a>
+                          }
+                          @if (event.documentUrl) {
+                            <a [href]="event.documentUrl" target="_blank" rel="noopener noreferrer" class="text-primary" title="View Document">
+                              <i class="fas fa-file-alt fa-lg"></i>
+                            </a>
+                          }
+                          @if (!event.filingUrl && !event.documentUrl) {
+                            <span class="text-muted">-</span>
+                          }
+                        </div>
                       </td>
                     </tr>
                   }
