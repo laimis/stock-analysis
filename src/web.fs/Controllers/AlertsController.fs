@@ -167,6 +167,11 @@ type AlertsController(handler: Handler) =
     member this.TriggerSchedule13G([<FromServices>] service: secedgar.fs.Schedule13GProcessingService) =
         service.Execute()
 
+    [<HttpGet("triggerForm144")>]
+    [<Authorize("admin")>]
+    member this.TriggerForm144([<FromServices>] service: secedgar.fs.Form144ProcessingService) =
+        service.Execute()
+
     [<HttpGet("price")>]
     member this.GetStockPriceAlerts() =
         this.OkOrError(handler.Handle({GetStockPriceAlerts.UserId = this.User.Identifier()}))

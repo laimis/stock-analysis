@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edgarSubmission xmlns="http://www.sec.gov/edgar/ownership" xmlns:ns2="http://www.sec.gov/edgar/common">
+    <headerData>
+        <submissionType>144</submissionType>
+        <filerInfo>
+            <filer>
+                <filerCredentials>
+                    <cik>0001823951</cik>
+                    <ccc>XXXXXXXX</ccc>
+                </filerCredentials>
+            </filer>
+            <liveTestFlag>LIVE</liveTestFlag>
+        </filerInfo>
+    </headerData>
+    <formData>
+        <issuerInfo>
+            <issuerCik>0001321655</issuerCik>
+            <issuerName>Palantir Technologies Inc.</issuerName>
+            <secFileNumber>001-39540</secFileNumber>
+            <issuerAddress>
+                <ns2:street1>19505 Biscayne Boulevard, Suite 2350</ns2:street1>
+                <ns2:city>Aventura</ns2:city>
+                <ns2:stateOrCountry>FL</ns2:stateOrCountry>
+                <ns2:zipCode>33180</ns2:zipCode>
+            </issuerAddress>
+            <issuerContactPhone>7203583679</issuerContactPhone>
+            <nameOfPersonForWhoseAccountTheSecuritiesAreToBeSold>ALEXANDER KARP</nameOfPersonForWhoseAccountTheSecuritiesAreToBeSold>
+            <relationshipsToIssuer>
+                <relationshipToIssuer>Director</relationshipToIssuer>
+                <relationshipToIssuer>Officer</relationshipToIssuer>
+            </relationshipsToIssuer>
+        </issuerInfo>
+        <securitiesInformation>
+            <securitiesClassTitle>Common</securitiesClassTitle>
+            <brokerOrMarketmakerDetails>
+                <name>Morgan Stanley Smith Barney LLC Executive Financial Services</name>
+                <address>
+                    <ns2:street1>1 New York Plaza</ns2:street1>
+                    <ns2:street2>8th Floor</ns2:street2>
+                    <ns2:city>New York</ns2:city>
+                    <ns2:stateOrCountry>NY</ns2:stateOrCountry>
+                    <ns2:zipCode>10004</ns2:zipCode>
+                </address>
+            </brokerOrMarketmakerDetails>
+            <noOfUnitsSold>90000</noOfUnitsSold>
+            <aggregateMarketValue>12140100.00</aggregateMarketValue>
+            <noOfUnitsOutstanding>2291470751</noOfUnitsOutstanding>
+            <approxSaleDate>02/20/2026</approxSaleDate>
+            <securitiesExchangeName>NASDAQ</securitiesExchangeName>
+        </securitiesInformation>
+        <securitiesToBeSold>
+            <securitiesClassTitle>Common</securitiesClassTitle>
+            <acquiredDate>02/20/2026</acquiredDate>
+            <natureOfAcquisitionTransaction>Restricted Stock Units</natureOfAcquisitionTransaction>
+            <nameOfPersonfromWhomAcquired>Issuer</nameOfPersonfromWhomAcquired>
+            <isGiftTransaction>N</isGiftTransaction>
+            <amountOfSecuritiesAcquired>90000</amountOfSecuritiesAcquired>
+            <paymentDate>02/20/2026</paymentDate>
+            <natureOfPayment>N/A</natureOfPayment>
+        </securitiesToBeSold>
+        <nothingToReportFlagOnSecuritiesSoldInPast3Months>Y</nothingToReportFlagOnSecuritiesSoldInPast3Months>
+        <noticeSignature>
+            <noticeDate>02/20/2026</noticeDate>
+            <planAdoptionDates>
+                <planAdoptionDate>11/21/2025</planAdoptionDate>
+            </planAdoptionDates>
+            <signature>/s/ Alexander Karp</signature>
+        </noticeSignature>
+    </formData>
+</edgarSubmission>
