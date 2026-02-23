@@ -3,7 +3,6 @@ import {Title} from '@angular/platform-browser';
 import {Router, RouterLink} from '@angular/router';
 import {PortfolioHoldings, Reminder, StocksService} from '../services/stocks.service';
 import { AlertsComponent } from "../alerts/alerts.component";
-import { DatePipe } from '@angular/common';
 import { TimeAgoPipe } from '../services/time-ago.pipe';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
 
@@ -12,7 +11,7 @@ import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-lin
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'],
-    imports: [RouterLink, AlertsComponent, DatePipe, TimeAgoPipe, StockLinkAndTradingviewLinkComponent],
+    imports: [RouterLink, AlertsComponent, TimeAgoPipe, StockLinkAndTradingviewLinkComponent],
 })
 export class DashboardComponent implements OnInit {
     private stocks = inject(StocksService);
