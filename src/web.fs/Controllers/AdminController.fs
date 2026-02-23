@@ -11,13 +11,12 @@ open core.fs.Accounts
 open core.fs.Adapters.Email
 open core.fs.Admin
 open core.fs.Reports
-open core.fs.Reports.WeeklySummaryEmail
 open web.Utils
 
 [<ApiController>]
 [<Authorize("admin")>]
 [<Route("api/[controller]")>]
-type AdminController(handler: core.fs.Admin.Handler) =
+type AdminController(handler: Handler) =
     inherit ControllerBase()
 
     [<HttpGet("test")>]

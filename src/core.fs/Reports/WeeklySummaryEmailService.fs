@@ -1,16 +1,19 @@
-namespace core.fs.Reports.WeeklySummaryEmail
+namespace core.fs.Reports
 
 open System
 open System.Globalization
 open core.fs
-open core.fs.Accounts
 open core.fs.Adapters.Email
 open core.fs.Adapters.Logging
 open core.fs.Adapters.Storage
 open core.fs.Reports
 open core.fs.Stocks
 
-module private WeeklySummaryHelpers =
+type WeeklySummaryEmailService(
+    accounts: IAccountStorage,
+    emails: IEmailService,
+    reportsHandler: ReportsHandler,
+    logger: ILogger) =
 
     let formatCurrency (value: decimal) =
         value.ToString("C2", CultureInfo.CreateSpecificCulture("en-US"))
@@ -143,12 +146,6 @@ module private WeeklySummaryHelpers =
             fees = fees
         |}
 
-type WeeklySummaryEmailService(
-    accounts: IAccountStorage,
-    emails: IEmailService,
-    reportsHandler: ReportsHandler,
-    logger: ILogger) =
-
     interface IApplicationService
 
     member _.Execute() = task {
@@ -171,7 +168,7 @@ type WeeklySummaryEmailService(
                         }
 
                         let! view = reportsHandler.Handle(query) |> Async.AwaitTask
-                        let payload = WeeklySummaryHelpers.buildEmailPayload view
+                        let payload = buildEmailPayload view
 
                         let recipient = Recipient(user.State.Email, user.State.Name)
                         let sender = Sender.NoReply
