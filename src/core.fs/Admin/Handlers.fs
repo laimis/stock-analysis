@@ -200,8 +200,9 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                                         |> Seq.map (SECFilingRecord.fromCompanyFiling ticker cik)
                                         |> Seq.toArray
                                     
-                                    // Save filings to database (ignores duplicates)
-                                    let! savedCount = secFilingStorage.SaveFilings filingRecords
+                                    // Save filings to database (ignores duplicates); returns only inserted rows
+                                    let! savedFilings = secFilingStorage.SaveFilings filingRecords
+                                    let savedCount = savedFilings |> Seq.length
                                     totalFilingsSaved <- totalFilingsSaved + savedCount
                                     
                                     let msg = $"{ticker.Value}: Saved {savedCount}/{filings.Length} filings"

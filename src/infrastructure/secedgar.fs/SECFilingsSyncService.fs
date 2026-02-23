@@ -93,27 +93,28 @@ type SECFilingsSyncService(
                         |> Seq.map (SECFilingRecord.fromCompanyFiling ticker cik)
                         |> Seq.toArray
 
-                    let! saved = secFilingStorage.SaveFilings filingRecords |> Async.AwaitTask
+                    let! inserted = secFilingStorage.SaveFilings filingRecords |> Async.AwaitTask
+                    let insertedArray = inserted |> Seq.toArray
                     logger.LogInformation(
                         "Synced {Ticker}: {New} new, {Total} total",
-                        ticker.Value, saved, companyFilings.Filings.Length)
+                        ticker.Value, insertedArray.Length, companyFilings.Filings.Length)
 
-                    // Immediately parse ownership-relevant forms so that email
-                    // notifications (SECFilingsMonitoringService) always see
-                    // enriched ownership data without waiting for the catch-up jobs.
-                    if saved > 0 then
-                        let ownershipForms =
-                            filingRecords |> Array.filter (fun f -> isOwnershipForm f.FormType)
+                    // Immediately parse ownership-relevant forms from the newly inserted records
+                    // so that SECFilingsMonitoringService always sees enriched ownership data.
+                    // We use insertedArray (not the full API response) so we only parse filings
+                    // that were genuinely new — avoiding wasted SEC HTTP calls for already-parsed forms.
+                    let ownershipForms =
+                        insertedArray |> Array.filter (fun f -> isOwnershipForm f.FormType)
 
-                        if ownershipForms.Length > 0 then
-                            logger.LogInformation(
-                                "Triggering inline ownership parsing for {Count} new filing(s) for {Ticker}",
-                                ownershipForms.Length, ticker.Value)
+                    if ownershipForms.Length > 0 then
+                        logger.LogInformation(
+                            "Triggering inline ownership parsing for {Count} new filing(s) for {Ticker}",
+                            ownershipForms.Length, ticker.Value)
 
-                            for f in ownershipForms do
-                                // Small delay between XML fetches to respect SEC rate limits.
-                                do! System.Threading.Tasks.Task.Delay(500) |> Async.AwaitTask
-                                do! parseOwnershipFiling f |> Async.AwaitTask
+                        for f in ownershipForms do
+                            // Small delay between XML fetches to respect SEC rate limits.
+                            do! System.Threading.Tasks.Task.Delay(500) |> Async.AwaitTask
+                            do! parseOwnershipFiling f |> Async.AwaitTask
         with ex ->
             logger.LogError(ex, "Error syncing SEC filings for {Ticker}: {Message}", ticker.Value, ex.Message)
     }

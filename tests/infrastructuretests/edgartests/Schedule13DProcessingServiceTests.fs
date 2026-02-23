@@ -28,7 +28,7 @@ module Schedule13DProcessingServiceTests =
         }
         interface ISECFilingStorage with
             member _.SaveFiling(_) = task { return true }
-            member _.SaveFilings(_) = task { return 0 }
+            member _.SaveFilings(_) = task { return Seq.empty }
             member _.GetFilingsByTicker(_) = task { return Seq.empty }
             member _.GetRecentFilingsByTicker(_) (_) = task { return Seq.empty }
             member _.GetFilingsByTickers(_) (_) = task { return Seq.empty }

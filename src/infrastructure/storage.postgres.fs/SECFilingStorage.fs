@@ -43,35 +43,53 @@ type SECFilingStorage(connectionString: string) =
                 return rowsAffected > 0
             }
         
-        member _.SaveFilings(filings: seq<SECFilingRecord>) : Task<int> =
+        member _.SaveFilings(filings: seq<SECFilingRecord>) : Task<IEnumerable<SECFilingRecord>> =
             task {
-                use db = getConnection()
-                
-                let query = """
-                    INSERT INTO sec_filings (id, ticker, cik, form_type, filing_date, report_date, description, filing_url, document_url, created_at, is_xbrl, is_inline_xbrl)
-                    VALUES (@Id, @Ticker, @Cik, @FormType, @FilingDate, @ReportDate, @Description, @FilingUrl, @DocumentUrl, @CreatedAt, @IsXBRL, @IsInlineXBRL)
-                    ON CONFLICT (filing_url) DO NOTHING"""
-                
-                let parameters = 
-                    filings 
-                    |> Seq.map (fun filing -> {|
-                        Id = filing.Id
-                        Ticker = filing.Ticker
-                        Cik = filing.Cik
-                        FormType = filing.FormType
-                        FilingDate = filing.FilingDate
-                        ReportDate = filing.ReportDate |> Option.toObj
-                        Description = filing.Description
-                        FilingUrl = filing.FilingUrl
-                        DocumentUrl = filing.DocumentUrl
-                        CreatedAt = filing.CreatedAt
-                        IsXBRL = filing.IsXBRL
-                        IsInlineXBRL = filing.IsInlineXBRL
-                    |})
-                    |> Seq.toArray
-                
-                let! rowsAffected = db.ExecuteAsync(query, parameters)
-                return rowsAffected
+                let filingsArray = filings |> Seq.toArray
+
+                if filingsArray.Length = 0 then
+                    return Enumerable.Empty<SECFilingRecord>()
+                else
+                    use db = getConnection()
+
+                    let insertQuery = """
+                        INSERT INTO sec_filings (id, ticker, cik, form_type, filing_date, report_date, description, filing_url, document_url, created_at, is_xbrl, is_inline_xbrl)
+                        VALUES (@Id, @Ticker, @Cik, @FormType, @FilingDate, @ReportDate, @Description, @FilingUrl, @DocumentUrl, @CreatedAt, @IsXBRL, @IsInlineXBRL)
+                        ON CONFLICT (filing_url) DO NOTHING"""
+
+                    let parameters =
+                        filingsArray
+                        |> Array.map (fun filing -> {|
+                            Id = filing.Id
+                            Ticker = filing.Ticker
+                            Cik = filing.Cik
+                            FormType = filing.FormType
+                            FilingDate = filing.FilingDate
+                            ReportDate = filing.ReportDate |> Option.toObj
+                            Description = filing.Description
+                            FilingUrl = filing.FilingUrl
+                            DocumentUrl = filing.DocumentUrl
+                            CreatedAt = filing.CreatedAt
+                            IsXBRL = filing.IsXBRL
+                            IsInlineXBRL = filing.IsInlineXBRL
+                        |})
+
+                    let! _ = db.ExecuteAsync(insertQuery, parameters)
+
+                    // Retrieve only the rows that were actually inserted by matching on our
+                    // generated IDs. Since IDs are unique per attempt, any ID absent from the
+                    // table was a conflict (duplicate filing_url) and was not inserted.
+                    let ids = filingsArray |> Array.map _.Id
+                    let selectQuery = """
+                        SELECT id as Id, ticker as Ticker, cik as Cik, form_type as FormType,
+                               filing_date as FilingDate, report_date as ReportDate, description as Description,
+                               filing_url as FilingUrl, document_url as DocumentUrl, created_at as CreatedAt,
+                               is_xbrl as IsXBRL, is_inline_xbrl as IsInlineXBRL
+                        FROM sec_filings
+                        WHERE id = ANY(@Ids)"""
+
+                    let! inserted = db.QueryAsync<SECFilingRecord>(selectQuery, {| Ids = ids |})
+                    return inserted
             }
         
         member _.GetFilingsByTicker(ticker: Ticker) : Task<IEnumerable<SECFilingRecord>> =

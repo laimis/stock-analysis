@@ -27,8 +27,9 @@ type ISECFilingStorage =
     /// Store a new SEC filing (ignores duplicates based on filing URL)
     abstract member SaveFiling : filing:SECFilingRecord -> Task<bool>
     
-    /// Store multiple SEC filings (ignores duplicates based on filing URL)
-    abstract member SaveFilings : filings:seq<SECFilingRecord> -> Task<int>
+    /// Store multiple SEC filings (ignores duplicates based on filing URL).
+    /// Returns only the filings that were actually inserted (new rows); duplicates are excluded.
+    abstract member SaveFilings : filings:seq<SECFilingRecord> -> Task<IEnumerable<SECFilingRecord>>
     
     /// Get all filings for a ticker, ordered by filing date descending
     abstract member GetFilingsByTicker : ticker:Ticker -> Task<IEnumerable<SECFilingRecord>>
