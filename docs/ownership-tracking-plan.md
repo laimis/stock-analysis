@@ -78,7 +78,6 @@ Track insider and institutional ownership changes to:
      - Background job runs weekdays at 9:00am PT (12:00pm ET)
    - **13D**: Activist investors — XML parsing with secure XmlReader (prevents XXE attacks)
      - Narrative text extraction for shares/percent/voting powers (item 5 text)
-     - Handles Swiss-style apostrophe thousands separators (e.g. 5'288'262)
      - Handles both 13D and 13D/A (amendments)
      - Date format: MM/dd/yyyy (different from 13G's yyyy-MM-dd format)
      - Background job runs weekdays at 9:45am PT (12:45pm ET)
@@ -138,9 +137,6 @@ Track insider and institutional ownership changes to:
     - Secure XML parsing with XmlReader (XXE attack prevention)
     - Namespace: `http://www.sec.gov/edgar/schedule13D`
     - Extracts structured fields: filer CIK, issuer name/CIK/CUSIP, securities class, citizenship
-    - **Narrative text extraction** for item 5 (shares, percent, voting powers)
-      - Handles comma and apostrophe thousands separators (e.g. Swiss filers: 5'288'262)
-      - Regex patterns for sole/shared voting and dispositive powers
     - Date format: MM/dd/yyyy (dateOfEvent and signature date)
     - Filer name from `signatureInfo/signaturePerson/signatureReportingPerson`
     - Purpose of acquisition extracted from item 4 (truncated to 1000 chars)
@@ -389,7 +385,6 @@ Track insider and institutional ownership changes to:
 - ✅ **Schedule 13D Parser** implemented (Feb 23, 2026)
   - XML parser with secure XmlReader, confidence scoring, amendment support
   - Narrative text extraction for item 5 (shares, percent, voting powers)
-  - Handles Swiss-style apostrophe thousands separators
   - Processing service with `large_stake_disclosure` event type
   - Background job (weekdays 9:45am PT)
   - Admin trigger endpoint
