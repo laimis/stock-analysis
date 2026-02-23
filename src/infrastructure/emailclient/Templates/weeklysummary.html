@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Trading Summary</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="620" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb; background-color: #1e40af; border-radius: 8px 8px 0 0;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
+                                Weekly Trading Review
+                            </h1>
+                            <p style="margin: 8px 0 0; color: #bfdbfe; font-size: 14px;">
+                                {{start_date}} &ndash; {{end_date}}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Performance Summary -->
+                    <tr>
+                        <td style="padding: 32px 40px 16px;">
+                            <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Performance Summary
+                            </h2>
+
+                            <!-- Total Profit -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f9fafb; border-radius: 8px; text-align: center;">
+                                        <p style="margin: 0 0 4px; color: #6b7280; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Total Profit / Loss</p>
+                                        <p style="margin: 0; font-size: 32px; font-weight: 700; color: {{total_profit_color}};">
+                                            {{total_profit}}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Activity Counts -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 16px;">
+                                <tr>
+                                    <td width="25%" style="padding: 12px 8px; text-align: center; background-color: #eff6ff; border-radius: 6px; margin: 4px;">
+                                        <p style="margin: 0 0 2px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase;">Stocks Opened</p>
+                                        <p style="margin: 0; font-size: 22px; font-weight: 700; color: #1e40af;">{{opened_stocks_count}}</p>
+                                    </td>
+                                    <td width="4%" style="padding: 0;"></td>
+                                    <td width="25%" style="padding: 12px 8px; text-align: center; background-color: #eff6ff; border-radius: 6px;">
+                                        <p style="margin: 0 0 2px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase;">Stocks Closed</p>
+                                        <p style="margin: 0; font-size: 22px; font-weight: 700; color: #1e40af;">{{closed_stocks_count}}</p>
+                                    </td>
+                                    <td width="4%" style="padding: 0;"></td>
+                                    <td width="25%" style="padding: 12px 8px; text-align: center; background-color: #eff6ff; border-radius: 6px;">
+                                        <p style="margin: 0 0 2px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase;">Options Opened</p>
+                                        <p style="margin: 0; font-size: 22px; font-weight: 700; color: #1e40af;">{{opened_options_count}}</p>
+                                    </td>
+                                    <td width="4%" style="padding: 0;"></td>
+                                    <td width="25%" style="padding: 12px 8px; text-align: center; background-color: #eff6ff; border-radius: 6px;">
+                                        <p style="margin: 0 0 2px; color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase;">Options Closed</p>
+                                        <p style="margin: 0; font-size: 22px; font-weight: 700; color: #1e40af;">{{closed_options_count}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- P&L Breakdown -->
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                P&amp;L Breakdown
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="31%" style="padding: 14px; background-color: #f9fafb; border-radius: 6px; text-align: center;">
+                                        <p style="margin: 0 0 4px; color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase;">Stock P&amp;L</p>
+                                        <p style="margin: 0; font-size: 18px; font-weight: 700; color: {{stock_profit_color}};">{{stock_profit}}</p>
+                                    </td>
+                                    <td width="4%"></td>
+                                    <td width="31%" style="padding: 14px; background-color: #f9fafb; border-radius: 6px; text-align: center;">
+                                        <p style="margin: 0 0 4px; color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase;">Options P&amp;L</p>
+                                        <p style="margin: 0; font-size: 18px; font-weight: 700; color: {{option_profit_color}};">{{option_profit}}</p>
+                                    </td>
+                                    <td width="4%"></td>
+                                    <td width="30%" style="padding: 14px; background-color: #f9fafb; border-radius: 6px; text-align: center;">
+                                        <p style="margin: 0 0 4px; color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase;">Dividends</p>
+                                        <p style="margin: 0; font-size: 18px; font-weight: 700; color: {{dividend_profit_color}};">{{dividend_profit}}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Closed Stock Positions -->
+                    {{if closed_stocks.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Closed Stock Positions
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Profit</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">R/R</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Gain%</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: center;">Grade</td>
+                                </tr>
+                                {{for s in closed_stocks}}
+                                <tr style="border-top: 1px solid #e5e7eb; background-color: {{s.row_color}};">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{s.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: {{s.profit_color}}; font-weight: 600;">{{s.profit}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #374151;">{{s.rr}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: {{s.profit_color}};">{{s.gain_pct}}</td>
+                                    <td style="padding: 10px 12px; font-size: 18px; text-align: center; font-weight: 700;">{{s.grade}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Opened Stock Positions -->
+                    {{if opened_stocks.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Opened Stocks
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Type</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Shares</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Cost</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Date</td>
+                                </tr>
+                                {{for s in opened_stocks}}
+                                <tr style="border-top: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{s.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{s.position_type}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #374151;">{{s.shares}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #374151;">{{s.cost}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{s.opened}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Stocks P&L Transactions -->
+                    {{if pl_stock_transactions.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Stocks P&amp;L
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Shares</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">P/L</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Date</td>
+                                </tr>
+                                {{for t in pl_stock_transactions}}
+                                <tr style="border-top: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{t.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #374151;">{{t.shares}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: {{t.profit_color}}; font-weight: 600;">{{t.profit}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{t.date}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Opened Options -->
+                    {{if opened_options.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Opened Options
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Opened</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Cost</td>
+                                </tr>
+                                {{for o in opened_options}}
+                                <tr style="border-top: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{o.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{o.opened}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #374151;">{{o.cost}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Closed Options -->
+                    {{if closed_options.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Closed Options
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Profit</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Opened</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Closed</td>
+                                </tr>
+                                {{for o in closed_options}}
+                                <tr style="border-top: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{o.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: {{o.profit_color}}; font-weight: 600;">{{o.profit}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{o.opened}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{o.closed}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Dividends -->
+                    {{if dividends.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Dividends
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Amount</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Date</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Description</td>
+                                </tr>
+                                {{for d in dividends}}
+                                <tr style="border-top: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{d.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #059669; font-weight: 600;">{{d.amount}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{d.date}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{d.description}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Fees -->
+                    {{if fees.size > 0}}
+                    <tr>
+                        <td style="padding: 0 40px 24px;">
+                            <h2 style="margin: 0 0 12px; color: #1f2937; font-size: 18px; font-weight: 600; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                Fees
+                            </h2>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden;">
+                                <tr style="background-color: #f9fafb;">
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Ticker</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; text-align: right;">Amount</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Date</td>
+                                    <td style="padding: 8px 12px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Description</td>
+                                </tr>
+                                {{for f in fees}}
+                                <tr style="border-top: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 12px; font-size: 15px; font-weight: 700; color: #1e40af;">{{f.ticker}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; text-align: right; color: #dc2626; font-weight: 600;">{{f.amount}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{f.date}}</td>
+                                    <td style="padding: 10px 12px; font-size: 14px; color: #374151;">{{f.description}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </td>
+                    </tr>
+                    {{end}}
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-radius: 0 0 8px 8px; text-align: center;">
+                            <p style="margin: 0 0 8px; color: #6b7280; font-size: 13px;">
+                                <a href="https://app.nightingaletrading.com/summary" style="color: #2563eb; text-decoration: none; font-weight: 600;">View Full Summary Online</a>
+                            </p>
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                                &copy; 2026 Nightingale Trading. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
