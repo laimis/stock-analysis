@@ -142,3 +142,7 @@ dotnet watch run --project src/web.fs/web.fs.fsproj
 - **Storage queries**: See `src/infrastructure/storage.postgres/`
 - **Frontend features**: Explore `src/frontend/src/app/` by domain area
 - **Background jobs**: Review `src/web.interop/Jobs.cs` and F# `MonitoringServices.fs` files
+
+### Updating Angular and .NET Components
+- there is angular_update.ps1 script for updating Angular
+- there is dotnet_update.ps1 script for updating .NET dependencies
