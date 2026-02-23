@@ -13,6 +13,14 @@ type FilingDetails =
         PeriodOfReport: System.DateTimeOffset
     }
 
+module FilingDate =
+    /// Returns true if the given "yyyy-MM-dd" filing date string is today or yesterday
+    /// relative to the provided reference date.
+    let isRecent (referenceDate: System.DateOnly) (filingDate: string) =
+        let fmt = "yyyy-MM-dd"
+        filingDate = referenceDate.ToString fmt
+        || filingDate = referenceDate.AddDays(-1).ToString fmt
+
 [<Struct>]
 [<CLIMutable>]
 type CompanyFiling =
@@ -28,10 +36,7 @@ type CompanyFiling =
     }
 
     member this.IsRecentFor (referenceDate: System.DateOnly) =
-        let dateFormat = "yyyy-MM-dd"
-        let todayString = referenceDate.ToString dateFormat
-        let yesterdayString = referenceDate.AddDays(-1).ToString dateFormat
-        this.FilingDate = todayString || this.FilingDate = yesterdayString
+        FilingDate.isRecent referenceDate this.FilingDate
 
 [<Struct>]
 type CompanyFilings(ticker:Ticker, filings:CompanyFiling array) =
