@@ -87,11 +87,19 @@ module Schedule13DParserTests =
         <issuerName>Elastic N.V.</issuerName>
       </issuerInfo>
     </coverPageHeader>
-    <items1To7>
-      <item5>
-        <percentageOfClassSecurities>Manages 6,000,000 shares representing 5.70% of outstanding shares.</percentageOfClassSecurities>
-      </item5>
-    </items1To7>
+    <reportingPersons>
+      <reportingPersonInfo>
+        <reportingPersonName>PICTET ASSET MANAGEMENT SA</reportingPersonName>
+        <reportingPersonCIK>0001361570</reportingPersonCIK>
+        <typeOfReportingPerson>IA</typeOfReportingPerson>
+        <aggregateAmountOwned>6000000</aggregateAmountOwned>
+        <percentOfClass>5.70</percentOfClass>
+        <soleVotingPower>6000000</soleVotingPower>
+        <sharedVotingPower>0</sharedVotingPower>
+        <soleDispositivePower>6000000</soleDispositivePower>
+        <sharedDispositivePower>0</sharedDispositivePower>
+      </reportingPersonInfo>
+    </reportingPersons>
     <signatureInfo>
       <signaturePerson>
         <signatureReportingPerson>PICTET ASSET MANAGEMENT SA</signatureReportingPerson>
@@ -116,8 +124,8 @@ module Schedule13DParserTests =
             Assert.Fail($"Failed to parse amendment: {msg}")
     
     [<Fact>]
-    let ``Shares extracted from text with apostrophe thousands separator`` () =
-        // Arrange - Swiss-style thousands separator
+    let ``Shares parsed from structured XML with apostrophe thousands separator`` () =
+        // Arrange - Swiss-style thousands separator in aggregateAmountOwned (e.g. Pictet format)
         let xml = """<?xml version="1.0" encoding="UTF-8"?>
 <edgarSubmission xmlns="http://www.sec.gov/edgar/schedule13D">
   <headerData>
@@ -132,11 +140,19 @@ module Schedule13DParserTests =
         <issuerName>Test Corp</issuerName>
       </issuerInfo>
     </coverPageHeader>
-    <items1To7>
-      <item5>
-        <percentageOfClassSecurities>The filer holds 1'234'567 shares which represents 6.78% of total shares outstanding.</percentageOfClassSecurities>
-      </item5>
-    </items1To7>
+    <reportingPersons>
+      <reportingPersonInfo>
+        <reportingPersonName>TEST FILER</reportingPersonName>
+        <reportingPersonCIK>0001234567</reportingPersonCIK>
+        <typeOfReportingPerson>IA</typeOfReportingPerson>
+        <aggregateAmountOwned>1'234'567</aggregateAmountOwned>
+        <percentOfClass>6.78</percentOfClass>
+        <soleVotingPower>1'234'567</soleVotingPower>
+        <sharedVotingPower>0</sharedVotingPower>
+        <soleDispositivePower>1'234'567</soleDispositivePower>
+        <sharedDispositivePower>0</sharedDispositivePower>
+      </reportingPersonInfo>
+    </reportingPersons>
     <signatureInfo>
       <signaturePerson>
         <signatureReportingPerson>TEST FILER</signatureReportingPerson>

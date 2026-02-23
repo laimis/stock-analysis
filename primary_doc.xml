@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><edgarSubmission xmlns="http://www.sec.gov/edgar/schedule13D" xmlns:com="http://www.sec.gov/edgar/common">
+  <headerData>
+    <submissionType>SCHEDULE 13D</submissionType>
+    <filerInfo>
+      <filer>
+        <filerCredentials>
+          <cik>0001361570</cik>
+          <ccc>XXXXXXXX</ccc>
+        </filerCredentials>
+      </filer>
+      <liveTestFlag>LIVE</liveTestFlag>
+
+
+
+    </filerInfo>
+  </headerData>
+  <formData>
+    <coverPageHeader>
+      <securitiesClassTitle>COMMON STOCK</securitiesClassTitle>
+      <dateOfEvent>01/23/2026</dateOfEvent>
+      <previouslyFiledFlag>false</previouslyFiledFlag>
+      <issuerInfo>
+        <issuerCIK>0001707753</issuerCIK>
+        <issuerCUSIP>N14506104</issuerCUSIP>
+        <issuerName>Elastic N.V.</issuerName>
+        <address>
+          <com:street1>KEIZERSGRACHT 281</com:street1>
+          <com:city>AMSTERDAM</com:city>
+          <com:stateOrCountry>P7</com:stateOrCountry>
+          <com:zipCode>1016 ED</com:zipCode>
+        </address>
+      </issuerInfo>
+      <authorizedPersons>
+        <notificationInfo>
+          <personName>Mathieu CORNU</personName>
+          <personPhoneNum>0041583234506</personPhoneNum>
+          <personAddress>
+            <com:street1>Route des Acacias 60</com:street1>
+            <com:city>Geneva</com:city>
+            <com:stateOrCountry>V8</com:stateOrCountry>
+            <com:zipCode>1211</com:zipCode>
+          </personAddress>
+        </notificationInfo>
+      </authorizedPersons>
+    </coverPageHeader>
+    <reportingPersons>
+      <reportingPersonInfo>
+        <reportingPersonCIK>0001361570</reportingPersonCIK>
+        <reportingPersonNoCIK>N</reportingPersonNoCIK>
+        <reportingPersonName>PICTET ASSET MANAGEMENT SA</reportingPersonName>
+        <fundType>WC</fundType>
+        <legalProceedings>N</legalProceedings>
+        <citizenshipOrOrganization>V8</citizenshipOrOrganization>
+        <soleVotingPower>5274370.00</soleVotingPower>
+        <sharedVotingPower>0.00</sharedVotingPower>
+        <soleDispositivePower>5288262.00</soleDispositivePower>
+        <sharedDispositivePower>0.00</sharedDispositivePower>
+        <aggregateAmountOwned>5288262.00</aggregateAmountOwned>
+        <isAggregateExcludeShares>N</isAggregateExcludeShares>
+        <percentOfClass>5.0</percentOfClass>
+        <typeOfReportingPerson>IA</typeOfReportingPerson>
+      </reportingPersonInfo>
+    </reportingPersons>
+    <items1To7>
+      <item1>
+        <securityTitle>COMMON STOCK</securityTitle>
+        <issuerName>Elastic N.V.</issuerName>
+        <issuerPrincipalAddress>
+          <com:street1>KEIZERSGRACHT 281</com:street1>
+          <com:city>AMSTERDAM</com:city>
+          <com:stateOrCountry>P7</com:stateOrCountry>
+          <com:zipCode>1016 ED</com:zipCode>
+        </issuerPrincipalAddress>
+      </item1>
+      <item2>
+        <filingPersonName>Pictet Asset Management SA</filingPersonName>
+        <principalBusinessAddress>60 ROUTE DES ACACIAS
+GENEVA 73 1211
+SWITZERLAND</principalBusinessAddress>
+        <principalJob>Investment Adviser</principalJob>
+        <hasBeenConvicted>The Reporting Person has not been, during the last five years, convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</hasBeenConvicted>
+        <convictionDescription>The Reporting Person has not been, during the last five years, a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding of any violation with respect to such laws.</convictionDescription>
+        <citizenship>SWITZERLAND</citizenship>
+      </item2>
+      <item3>
+        <fundsSource>The Reporting Person acquired the shares of common stock of ELASTIC NV on behalf of its institutional clients who are managed on a discretionary basis. The purchase cost is approximately USD 423'217'533. The source of the funds comes from our institutional clients' assets
+The funds used for the acquisition did not involve any financing or borrowing.</fundsSource>
+      </item3>
+      <item4>
+        <transactionPurpose>The Reporting Person acquired shares of ELASTIC NV as part of its investment strategy, which includes considering the clarity and robustness of the issuer's long-term strategy; the functioning and calibre of governance structures and effective leadership; the financial strength and performance of issuers and the fair valuation of underlying securities; and financially-material sustainability risks &amp; opportunities. The Reporting Person is therefore actively engaging with the Issuer to discuss and promote initiatives that align with these business practices.
+
+This engagement is part of the Reporting Person's broader strategy to support companies in enhancing their approach, thereby potentially improving long-term shareholder value. As such, the Reporting Person may seek to influence the Issuer's policies and practices through discussions with the Boards and management of the companies in which we invest.
+
+The Reporting Person does not currently have any plans or proposals that would result in a change in control of the Issuer, nor does it intend to acquire additional shares for the purpose of gaining control. However, the Reporting Person reserves the right to change its intentions and take any actions that it deems appropriate in light of its ongoing engagement and evaluation of the Issuer's policies and practices.</transactionPurpose>
+      </item4>
+      <item5>
+        <percentageOfClassSecurities>Pictet Asset Management SA manages 5'288'262.00 shares of ELASTIC NV , which represents 5.02% of the total number of shares.</percentageOfClassSecurities>
+        <numberOfShares>Pictet Asset Management SA has the Sole power to vote on 5'274'370 shares out of the 5'288'262 shares under management.
+</numberOfShares>
+        <transactionDesc>In the past sixty days, the following transactions have been done :
+
+Date 	        Type	Quantity	        Price	        Exchange
+23.01.2026	BUY	55'798      	71.71	New York Stock Exchange
+23.01.2026	BUY	36'287     	71.70	New York Stock Exchange
+23.01.2026	BUY	103'174   	71.74	New York Stock Exchange
+23.01.2026	BUY	27'188     	71.77	New York Stock Exchange
+22.01.2026	BUY	1'246	        70.60	New York Stock Exchange
+20.01.2026	BUY	26'241	        70.42	New York Stock Exchange
+20.01.2026	BUY	28'923	        70.42	New York Stock Exchange
+16.01.2026	SELL	60	                71.38	New York Stock Exchange
+15.01.2026	BUY	205'067           74.19	New York Stock Exchange
+15.01.2026	BUY	43'204      	74.27	New York Stock Exchange
+15.01.2026	BUY	62'194     	74.25	New York Stock Exchange
+15.01.2026	BUY	64'215     	73.88	New York Stock Exchange
+15.01.2026	BUY	1'622               74.19	New York Stock Exchange
+15.01.2026	BUY	586                  74.25	New York Stock Exchange
+15.01.2026	BUY	448                  74.27	New York Stock Exchange
+15.01.2026	BUY	601                  73.88	New York Stock Exchange
+15.01.2026	BUY	52                    72.81	New York Stock Exchange
+15.01.2026	BUY	13'448      	74.27	New York Stock Exchange
+15.01.2026	BUY	63'678     	74.19	New York Stock Exchange
+15.01.2026	BUY	19'341     	74.25	New York Stock Exchange
+12.01.2026	SELL	426                  76.69	New York Stock Exchange
+08.01.2026	SELL	1'996               74.53	New York Stock Exchange
+06.01.2026	BUY	1'380               75.61	New York Stock Exchange
+05.01.2026	BUY	1'568     	        74.31	New York Stock Exchange
+31.12.2025	SELL	4'775 	        76.07	New York Stock Exchange
+23.12.2025	SELL	7'721	        76.86	New York Stock Exchange
+19.12.2025	BUY	341   	        76.42	New York Stock Exchange
+18.12.2025	SELL	1'944	        76.17	New York Stock Exchange
+17.12.2025	SELL	106  	        74.52	New York Stock Exchange
+17.12.2025	SELL	437  	        74.52	New York Stock Exchange
+16.12.2025	BUY	67     	        74.98	New York Stock Exchange
+12.12.2025	SELL	17    	        76.31	New York Stock Exchange
+11.12.2025	SELL	8'587	        78.55	New York Stock Exchange
+09.12.2025	BUY	17'817     	74.97	New York Stock Exchange
+09.12.2025	BUY	88     	        75.55	New York Stock Exchange
+01.12.2025	SELL	2'065 	        71.09	New York Stock Exchange
+28.11.2025	BUY	1'343 	        70.53	New York Stock Exchange
+28.11.2025	BUY	242  	        70.53	New York Stock Exchange
+25.11.2025	BUY	714  	        69.53	New York Stock Exchange
+</transactionDesc>
+        <listOfShareholders>The securities reported herein come from the assets of our institutional clients who are managed by the Reporting Person on a discretionary basis. Consequently, our clients have the right to receive dividends and any proceeds from the sale of the Issuer's securities, in proportion to their respective managed assets.
+
+The Reporting Person itself does not have any direct economic interest in the dividends or sale proceeds from the securities of ELASTIC NV, other than its entitlement to management fees and / or performance-based compensation, as agreed upon with its clients. The Reporting Person's role is limited to managing the investments in accordance with the investment objectives and strategies set forth by each of its institutional clients.
+</listOfShareholders>
+        <date5PercentOwnership>Not applicable</date5PercentOwnership>
+      </item5>
+      <item6>
+        <contractDescription>The Reporting Person's exposure to ELASTIC NV is solely through direct stock investments held by its managed institutional clients. There are no contracts, arrangements, understandings, or relationships with any third parties regarding the securities of ELASTIC NV, other than those arising from the ordinary course of discretionary management of our client assets.
+
+The Reporting Person does not have any derivative positions, options, or other financial instruments related to the securities of the Issuer. Furthermore, there are no agreements or understandings that would influence the voting or disposition of these securities beyond the Reporting Person's discretionary investment authority as an asset manager.
+</contractDescription>
+      </item6>
+      <item7>
+        <filedExhibits>N/A</filedExhibits>
+      </item7>
+    </items1To7>
+    <signatureInfo>
+      <signaturePerson>
+        <signatureReportingPerson>PICTET ASSET MANAGEMENT SA</signatureReportingPerson>
+        <signatureDetails>
+          <signature>Karine Valtanen</signature>
+          <title>Karine Valtanen Global Head of Compliance</title>
+          <date>01/26/2026</date>
+        </signatureDetails>
+      </signaturePerson>
+    </signatureInfo>
+  </formData>
+</edgarSubmission>

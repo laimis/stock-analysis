@@ -103,6 +103,22 @@ securities of ELASTIC NV.</contractDescription>
 
     </items1To7>
 
+    <!-- Structured ownership data - all share counts as discrete XML fields (no regex needed) -->
+    <reportingPersons>
+      <reportingPersonInfo>
+        <reportingPersonName>PICTET ASSET MANAGEMENT SA</reportingPersonName>
+        <reportingPersonCIK>0001361570</reportingPersonCIK>
+        <typeOfReportingPerson>IA</typeOfReportingPerson>
+        <citizenshipOrOrganization>V8</citizenshipOrOrganization>
+        <aggregateAmountOwned>5'288'262.00</aggregateAmountOwned>
+        <percentOfClass>5.02</percentOfClass>
+        <soleVotingPower>5'274'370</soleVotingPower>
+        <sharedVotingPower>0</sharedVotingPower>
+        <soleDispositivePower>5'288'262</soleDispositivePower>
+        <sharedDispositivePower>0</sharedDispositivePower>
+      </reportingPersonInfo>
+    </reportingPersons>
+
     <signatureInfo>
       <signaturePerson>
         <signatureReportingPerson>PICTET ASSET MANAGEMENT SA</signatureReportingPerson>

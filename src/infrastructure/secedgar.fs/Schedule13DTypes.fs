@@ -37,16 +37,16 @@ type ParsedSchedule13D = {
     /// Percentage of class owned
     PercentOfClass: decimal
     
-    /// Sole voting power (shares, extracted from item 5 narrative text)
+    /// Sole voting power (shares, from reportingPersonInfo/soleVotingPower)
     SoleVotingPower: int64 option
     
-    /// Shared voting power (shares, extracted from item 5 narrative text)
+    /// Shared voting power (shares, from reportingPersonInfo/sharedVotingPower)
     SharedVotingPower: int64 option
     
-    /// Sole dispositive power (shares, extracted from item 5 narrative text)
+    /// Sole dispositive power (shares, from reportingPersonInfo/soleDispositivePower)
     SoleDispositivePower: int64 option
     
-    /// Shared dispositive power (shares, extracted from item 5 narrative text)
+    /// Shared dispositive power (shares, from reportingPersonInfo/sharedDispositivePower)
     SharedDispositivePower: int64 option
     
     /// Purpose of acquisition (item 4, narrative text)
@@ -94,11 +94,19 @@ module Schedule13DHelpers =
           if parsed.EntityType.IsSome then 0.05 else 0.0 ]
         |> List.sum
     
-    /// Infer entity type from available context (13D does not have a structured entity type field)
-    let inferEntityType (citizenship: string option) =
-        // Without a structured type field, default to OO (Other Org)
-        // Subclasses can enhance this based on filer name patterns if needed
-        Some "OO"
+    /// Map SEC entity type codes to system codes (same mapping as Schedule 13G)
+    let mapEntityType (secType: string option) =
+        match secType with
+        | Some "IA" -> Some "IA"
+        | Some "IC" -> Some "IC"
+        | Some "BD" -> Some "BD"
+        | Some "IN" -> Some "IN"
+        | Some "BK" -> Some "FI"
+        | Some "FI" -> Some "FI"
+        | Some "HC" -> Some "HC"
+        | Some "EP" -> Some "EP"
+        | Some "OO" -> Some "OO"
+        | _ -> Some "OO"
     
     /// Create a default/empty ParsedSchedule13D for building up
     let empty = {
