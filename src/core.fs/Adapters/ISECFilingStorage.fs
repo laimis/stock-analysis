@@ -47,6 +47,8 @@ type ISECFilingStorage =
 
     /// Get filings by form type(s) that have no corresponding ownership events.
     /// Used by catch-up parsing jobs to find filings that failed or were missed.
+    /// TODO: Add a limit and a filing_date cutoff parameter to bound runtime and prevent
+    /// unbounded full-table scans as the sec_filings table grows.
     abstract member GetFilingsWithoutOwnershipEvents : formTypes:seq<string> -> Task<IEnumerable<SECFilingRecord>>
 
     /// Get filings for a ticker created after the given timestamp, ordered by created_at ascending

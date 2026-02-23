@@ -172,6 +172,10 @@ type SECFilingStorage(connectionString: string) =
                 else
                     use db = getConnection()
 
+                    // TODO: Add a LIMIT and a filing_date >= @CutoffDate predicate so catch-up runs
+                    // are bounded. Without them this is an unbounded full scan + sort that will
+                    // degrade as sec_filings grows. Surface both through the ISECFilingStorage
+                    // signature once the right defaults are decided (e.g. last 30 days, limit 200).
                     let query = """
                         SELECT sf.id as Id, sf.ticker as Ticker, sf.cik as Cik, sf.form_type as FormType,
                                sf.filing_date as FilingDate, sf.report_date as ReportDate, sf.description as Description,
