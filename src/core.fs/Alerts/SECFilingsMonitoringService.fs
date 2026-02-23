@@ -199,37 +199,35 @@ type SECFilingsMonitoringService(
                 || formType = "144/A"
 
             if not isOwnershipForm then
-                return "", "", "", "", ""
+                return null, null, null, null, null
             else
                 let! events = ownershipStorage.GetEventsByFilingId filing.Id
                 match events |> Seq.tryHead with
-                | None -> return "", "", "", "", ""
+                | None -> return null, null, null, null, null
                 | Some ev ->
                     let! entityOpt = ownershipStorage.GetEntityById ev.EntityId
                     let entityName = entityOpt |> Option.map _.Name |> Option.defaultValue "<Unknown Entity>"
 
                     if formType = "144" || formType = "144/A" then
-                        let shares = ev.SharesTransacted |> Option.map formatShares |> Option.defaultValue ""
-                        let value  = ev.TotalValue |> Option.map formatCurrency |> Option.defaultValue ""
+                        let shares = ev.SharesTransacted |> Option.map formatShares |> Option.defaultValue null
+                        let value  = ev.TotalValue |> Option.map formatCurrency |> Option.defaultValue null
                         let summary =
-                            match shares, value with
-                            | s, v when s <> "" && v <> "" -> $"Proposed sale of {s} shares for {v}"
-                            | s, _  when s <> ""           -> $"Proposed sale of {s} shares"
-                            | _ -> "Proposed insider sale (Form 144)"
-                        return entityName, shares, value, "", summary
+                            if not (isNull shares) && not (isNull value) then $"Proposed sale of {shares} shares for {value}"
+                            elif not (isNull shares)                     then $"Proposed sale of {shares} shares"
+                            else "Proposed insider sale (Form 144)"
+                        return entityName, shares, value, null, summary
                     else
                         // Schedule 13G / 13G-A
-                        let shares = ev.SharesAfter |> Option.map formatShares |> Option.defaultValue ""
-                        let pct    = ev.PercentOfClass |> Option.map (fun p -> $"{p:F2}%%") |> Option.defaultValue ""
+                        let shares = ev.SharesAfter |> Option.map formatShares |> Option.defaultValue null
+                        let pct    = ev.PercentOfClass |> Option.map (fun p -> $"{p:F2}%%") |> Option.defaultValue null
                         let summary =
-                            match shares, pct with
-                            | s, p when s <> "" && p <> "" -> $"{entityName} reports {s} shares ({p} of class)"
-                            | s, _  when s <> ""           -> $"{entityName} reports {s} shares"
-                            | _ -> $"{entityName} ownership disclosure"
-                        return entityName, shares, "", pct, summary
+                            if not (isNull shares) && not (isNull pct) then $"{entityName} reports {shares} shares ({pct} of class)"
+                            elif not (isNull shares)                    then $"{entityName} reports {shares} shares"
+                            else $"{entityName} ownership disclosure"
+                        return entityName, shares, null, pct, summary
         with ex ->
             logger.LogError $"Error building ownership details for filing {filing.FilingUrl}: {ex}"
-            return "", "", "", "", ""
+            return null, null, null, null, null
     }
 
     let toEmailData (ticker: Ticker) (filings: SECFilingRecord seq) = async {
