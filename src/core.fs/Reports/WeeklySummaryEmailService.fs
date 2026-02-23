@@ -77,7 +77,7 @@ module private WeeklySummaryHelpers =
                 {|
                     ticker = o.UnderlyingTicker.Value
                     opened = formatDate o.Opened
-                    cost = formatCurrency o.Cost
+                    cost = formatCurrency (o.Cost * 100m)
                 |}
             )
             |> List.toArray
