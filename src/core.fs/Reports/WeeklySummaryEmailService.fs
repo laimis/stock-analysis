@@ -43,6 +43,7 @@ module private WeeklySummaryHelpers =
                     row_color = rowColor s.Profit
                 |}
             )
+            |> List.toArray
 
         let openedStocks =
             view.OpenedStocks
@@ -55,6 +56,7 @@ module private WeeklySummaryHelpers =
                     opened = s.Opened.ToString("MM/dd/yyyy")
                 |}
             )
+            |> List.toArray
 
         let plStockTransactions =
             view.PLStockTransactions
@@ -67,6 +69,7 @@ module private WeeklySummaryHelpers =
                     date = t.Date.ToString("MM/dd/yyyy")
                 |}
             )
+            |> List.toArray
 
         let openedOptions =
             view.OpenedOptions
@@ -77,6 +80,7 @@ module private WeeklySummaryHelpers =
                     cost = formatCurrency o.Cost
                 |}
             )
+            |> List.toArray
 
         let closedOptions =
             view.ClosedOptions
@@ -89,6 +93,7 @@ module private WeeklySummaryHelpers =
                     closed = formatDate o.Closed
                 |}
             )
+            |> List.toArray
 
         let dividends =
             view.Dividends
@@ -100,6 +105,7 @@ module private WeeklySummaryHelpers =
                     description = d.Description
                 |}
             )
+            |> List.toArray
 
         let fees =
             view.Fees
@@ -111,6 +117,7 @@ module private WeeklySummaryHelpers =
                     description = f.Description
                 |}
             )
+            |> List.toArray
 
         {|
             start_date = view.Start.ToString("MM/dd/yyyy")
