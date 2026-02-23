@@ -81,6 +81,7 @@ module Schedule13GProcessingServiceTests =
                 task {
                     return events |> List.toSeq
                 }
+            member _.GetEventsByFilingId(_) = task { return Seq.empty }
             member _.GetEventsByCompanyDateRange(_) (_) (_) = task { return Seq.empty }
             member _.GetEventsByEntity(_) = task { return Seq.empty }
             member _.GetLatestEventForEntityCompany(_) (_) = task { return None }

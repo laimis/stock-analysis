@@ -114,6 +114,9 @@ type IOwnershipStorage =
     
     /// Get all ownership events for a company
     abstract member GetEventsByCompany : ticker:Ticker -> Task<IEnumerable<OwnershipEvent>>
+
+    /// Get ownership events linked to a specific SEC filing by its ID
+    abstract member GetEventsByFilingId : filingId:Guid -> Task<IEnumerable<OwnershipEvent>>
     
     /// Get ownership events for a company within date range
     abstract member GetEventsByCompanyDateRange : ticker:Ticker -> startDate:string -> endDate:string -> Task<IEnumerable<OwnershipEvent>>

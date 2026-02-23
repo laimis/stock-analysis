@@ -25,6 +25,12 @@ and [<CLIMutable>] SECFilingForEmail =
         reportDate: string
         filing: string
         filingUrl: string
+        // Ownership enrichment fields – non-empty only for Form 144 and Schedule 13G filings
+        ownershipEntityName: string
+        ownershipShares: string
+        ownershipTotalValue: string
+        ownershipPercent: string
+        ownershipSummary: string
     }
 
 [<CLIMutable>]
@@ -141,17 +147,20 @@ type SECFilingsMonitoringService(
     accounts: IAccountStorage,
     portfolio: IPortfolioStorage,
     secFilingStorage: ISECFilingStorage,
+    ownershipStorage: IOwnershipStorage,
     emails: IEmailService,
     marketHours: IMarketHours,
     logger: ILogger) =
 
-    let isRecentFiling (filing: CompanyFiling) =
+    let isRecentFiling (filingDate: string) =
         let today = marketHours.ToMarketTime DateTimeOffset.UtcNow
-        today.Date |> DateOnly.FromDateTime |> filing.IsRecentFor
+        let date = today.Date |> DateOnly.FromDateTime
+        let fmt = "yyyy-MM-dd"
+        filingDate = date.ToString(fmt) || filingDate = date.AddDays(-1).ToString(fmt)
 
-    let ignoreFiling (filing: CompanyFiling) =
+    let ignoreFiling (formType: string) =
         // ignore form 4 filings, they are just so numerous, I would be tracking them all day
-        filing.Filing = "4"
+        formType = "4"
 
     let getNewFilingsForUser (userId: string) (ticker: Ticker) = async {
         try
@@ -163,8 +172,7 @@ type SECFilingsMonitoringService(
 
             let filteredFilings =
                 dbFilings
-                |> Seq.map SECFilingRecord.toCompanyFiling
-                |> Seq.filter (fun f -> isRecentFiling f && not (ignoreFiling f))
+                |> Seq.filter (fun f -> isRecentFiling f.FilingDate && not (ignoreFiling f.FormType))
                 |> Seq.toArray
 
             if filteredFilings.Length > 0 then
@@ -177,24 +185,81 @@ type SECFilingsMonitoringService(
             return None
     }
 
-    let toEmailData (ticker: Ticker) (filings: CompanyFiling seq) =
-        let emailFilings =
+    let formatShares (shares: int64) = shares.ToString("N0")
+
+    let formatCurrency (value: decimal) =
+        if value >= 1_000_000m then $"${value / 1_000_000m:F1}M"
+        elif value >= 1_000m then $"${value / 1_000m:F1}K"
+        else $"${value:F2}"
+
+    let buildOwnershipDetails (filing: SECFilingRecord) = task {
+        try
+            let formType = filing.FormType.ToUpperInvariant()
+            let isOwnershipForm =
+                formType.Contains("13G")
+                || formType = "144"
+                || formType = "144/A"
+
+            if not isOwnershipForm then
+                return ("", "", "", "", "")
+            else
+                let! events = ownershipStorage.GetEventsByFilingId filing.Id
+                match events |> Seq.tryHead with
+                | None -> return ("", "", "", "", "")
+                | Some ev ->
+                    let! entityOpt = ownershipStorage.GetEntityById ev.EntityId
+                    let entityName = entityOpt |> Option.map _.Name |> Option.defaultValue ""
+
+                    if formType = "144" || formType = "144/A" then
+                        let shares = ev.SharesTransacted |> Option.map formatShares |> Option.defaultValue ""
+                        let value  = ev.TotalValue |> Option.map formatCurrency |> Option.defaultValue ""
+                        let summary =
+                            match shares, value with
+                            | s, v when s <> "" && v <> "" -> $"Proposed sale of {s} shares for {v}"
+                            | s, _  when s <> ""           -> $"Proposed sale of {s} shares"
+                            | _ -> "Proposed insider sale (Form 144)"
+                        return (entityName, shares, value, "", summary)
+                    else
+                        // Schedule 13G / 13G-A
+                        let shares = ev.SharesAfter |> Option.map formatShares |> Option.defaultValue ""
+                        let pct    = ev.PercentOfClass |> Option.map (fun p -> $"{p:F2}%%") |> Option.defaultValue ""
+                        let summary =
+                            match shares, pct with
+                            | s, p when s <> "" && p <> "" -> $"{entityName} reports {s} shares ({p} of class)"
+                            | s, _  when s <> ""           -> $"{entityName} reports {s} shares"
+                            | _ -> $"{entityName} ownership disclosure"
+                        return (entityName, shares, "", pct, summary)
+        with ex ->
+            logger.LogError $"Error building ownership details for filing {filing.FilingUrl}: {ex.Message}"
+            return ("", "", "", "", "")
+    }
+
+    let toEmailData (ticker: Ticker) (filings: SECFilingRecord seq) = task {
+        let! emailFilings =
             filings
-            |> Seq.map (fun f ->
-                {
+            |> Seq.map (fun f -> task {
+                let! (entityName, shares, value, pct, summary) = buildOwnershipDetails f
+                return {
                     description = f.Description
                     documentUrl = f.DocumentUrl
                     filingDate = f.FilingDate
                     reportDate = f.ReportDate |> Option.defaultValue ""
-                    filing = f.Filing
+                    filing = f.FormType
                     filingUrl = f.FilingUrl
-                } : SECFilingForEmail)
-            |> Seq.toArray
+                    ownershipEntityName = entityName
+                    ownershipShares = shares
+                    ownershipTotalValue = value
+                    ownershipPercent = pct
+                    ownershipSummary = summary
+                } : SECFilingForEmail
+            })
+            |> System.Threading.Tasks.Task.WhenAll
 
-        {
+        return {
             ticker = ticker.Value
             filings = emailFilings
         } : SECFilingEmailData
+    }
 
     let processUserFilings (user: User) = async {
         logger.LogInformation $"Checking SEC filings for user {user.State.Email}"
@@ -224,8 +289,11 @@ type SECFilingsMonitoringService(
                 return Some (user, tickerFilings)
     }
 
-    let sendEmailToUser (user: User) (tickerFilings: (Ticker * CompanyFiling[]) array) = task {
-        let emailTickerFilings = tickerFilings |> Array.map (fun (ticker, filings) -> toEmailData ticker filings)
+    let sendEmailToUser (user: User) (tickerFilings: (Ticker * SECFilingRecord[]) array) = task {
+        let! emailTickerFilings =
+            tickerFilings
+            |> Array.map (fun (ticker, filings) -> toEmailData ticker filings)
+            |> System.Threading.Tasks.Task.WhenAll
 
         let emailData =
             {
@@ -257,7 +325,7 @@ type SECFilingsMonitoringService(
             return false
     }
 
-    let updateWatermarks (userId: string) (tickerFilings: (Ticker * CompanyFiling[]) array) = task {
+    let updateWatermarks (userId: string) (tickerFilings: (Ticker * SECFilingRecord[]) array) = task {
         let now = DateTimeOffset.UtcNow
         for ticker, _ in tickerFilings do
             do! secFilingStorage.UpsertWatermark userId ticker now

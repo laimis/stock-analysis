@@ -401,6 +401,30 @@ type OwnershipStorage(connectionString: string) =
                 return dtos |> Seq.map this.MapToOwnershipEvent
             }
         
+        member this.GetEventsByFilingId(filingId: Guid) =
+            task {
+                use db = this.GetConnection()
+                
+                let query = """
+                    SELECT oe.id, oe.entity_id, oe.company_ticker,
+                           oe.company_cik, oe.filing_id, oe.event_type,
+                           oe.transaction_type, oe.shares_before,
+                           oe.shares_transacted, oe.shares_after,
+                           oe.percent_of_class, oe.price_per_share,
+                           oe.total_value, oe.transaction_date,
+                           oe.filing_date, oe.is_direct,
+                           oe.ownership_nature, oe.created_at,
+                           sf.filing_url, sf.document_url
+                    FROM ownership_events oe
+                    LEFT JOIN sec_filings sf ON oe.filing_id = sf.id
+                    WHERE oe.filing_id = @FilingId
+                    ORDER BY oe.created_at ASC"""
+                
+                let! dtos = db.QueryAsync<OwnershipEventDto>(query, {| FilingId = filingId |})
+                
+                return dtos |> Seq.map this.MapToOwnershipEvent
+            }
+        
         member this.GetEventsByCompanyDateRange ticker startDate endDate =
             task {
                 use db = this.GetConnection()
