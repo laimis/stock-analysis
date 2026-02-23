@@ -25,7 +25,7 @@ module Schedule13DParserTests =
             Assert.Equal(Some "0001707753", parsed.IssuerCik)
             Assert.Equal(Some "N14506104", parsed.IssuerCusip)
             Assert.Equal(5_288_262L, parsed.SharesOwned)
-            Assert.Equal(5.02m, parsed.PercentOfClass)
+            Assert.Equal(5m, parsed.PercentOfClass)
             Assert.Equal(Some 5_274_370L, parsed.SoleVotingPower)
             Assert.Equal(Some "COMMON STOCK", parsed.SecuritiesClassTitle)
             Assert.Equal(Some "SWITZERLAND", parsed.Citizenship)
