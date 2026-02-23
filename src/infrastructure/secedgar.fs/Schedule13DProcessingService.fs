@@ -93,10 +93,11 @@ type Schedule13DProcessingService(
             
             // Check if this filing has already been processed
             let ticker = Ticker filing.Ticker
-            let! existingEvents = ownershipStorage.GetEventsByCompany ticker
-            let alreadyProcessed = 
-                existingEvents 
-                |> Seq.exists (fun e -> e.FilingId = Some filing.Id)
+            let! existingEvents = ownershipStorage.GetEventsByFilingId filing.Id
+            let alreadyProcessed =
+                existingEvents
+                |> Seq.isEmpty
+                |> not
             
             if alreadyProcessed then
                 logger.LogInformation($"Filing already processed, skipping: {filing.FilingUrl}")
