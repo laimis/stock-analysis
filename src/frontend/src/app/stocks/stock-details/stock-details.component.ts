@@ -35,6 +35,7 @@ import { PriceAlertFormComponent } from '../../alerts/price-alert-form.component
 import { PriceAlertListComponent } from '../../alerts/price-alert-list.component';
 import { SecFilingsTableComponent } from '../../shared/sec/sec-filings-table.component';
 import { SECFilings, SECService } from 'src/app/services/sec.service';
+import { OwnershipByTickerComponent } from '../../ownership/ownership-by-ticker.component';
 
 @Component({
     selector: 'app-stock-details',
@@ -60,7 +61,8 @@ import { SECFilings, SECService } from 'src/app/services/sec.service';
     ReminderListComponent,
     PriceAlertFormComponent,
     PriceAlertListComponent,
-    SecFilingsTableComponent
+    SecFilingsTableComponent,
+    OwnershipByTickerComponent
 ],
     styleUrls: ['./stock-details.component.css']
 })
