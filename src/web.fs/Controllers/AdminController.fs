@@ -67,7 +67,7 @@ type AdminController(handler: core.fs.Admin.Handler) =
         return this.GenerateExport(result)
     }
 
-    [<HttpPost("weekly-summary-email")>]
+    [<HttpGet("weekly-summary-email")>]
     member this.TriggerWeeklySummaryEmail([<FromServices>] service: WeeklySummaryEmailService) : Task<ActionResult> = task {
         do! service.Execute()
         return this.Ok() :> ActionResult
