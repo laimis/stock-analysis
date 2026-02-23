@@ -104,12 +104,13 @@ type Form144ProcessingService(
         try
             logger.LogInformation($"Processing Form 144 filing for {filing.Ticker}: {filing.FilingUrl}")
 
-            // Check if this filing has already been processed
+            // Check if this filing has already been processed (targeted lookup by filing ID)
             let ticker = Ticker filing.Ticker
-            let! existingEvents = ownershipStorage.GetEventsByCompany ticker
+            let! existingEvents = ownershipStorage.GetEventsByFilingId filing.Id
             let alreadyProcessed =
                 existingEvents
-                |> Seq.exists (fun e -> e.FilingId = Some filing.Id)
+                |> Seq.isEmpty
+                |> not
 
             if alreadyProcessed then
                 logger.LogInformation($"Filing already processed, skipping: {filing.FilingUrl}")
