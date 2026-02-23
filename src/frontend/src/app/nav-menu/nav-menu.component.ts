@@ -64,10 +64,6 @@ export class NavMenuComponent {
     }
 
     navigateToTicker(ticker: string) {
-        this.router.navigate(['/stocks/' + ticker]).then(
-            result => {
-                this.collapseMenu();
-            }
-        )
+        window.location.href = '/stocks/' + ticker;
     }
 }
