@@ -18,14 +18,14 @@ type OptionContractView(
     let underlyingPrice = chain |> Option.bind(_.UnderlyingPrice)
     let pctItm =
         match underlyingPrice with
-        | Some(price) ->
+        | Some(price) when price <> 0m ->
             
             let itmPrice = 
                 match optionType with
                 | Call -> price - strikePrice
                 | Put -> strikePrice - price
             itmPrice / price |> Some
-        | None -> None
+        | _ -> None
     let market = chainDetail |> Option.map(_.Mark)
         
     member this.Expiration = expiration
