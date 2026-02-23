@@ -19,7 +19,14 @@ export class OwnershipByTickerComponent implements OnInit {
   private stocksService = inject(StocksService);
   private route = inject(ActivatedRoute);
 
-  @Input() ticker = '';
+  private _ticker = '';
+  @Input() set ticker(value: string) {
+    if (value && value !== this._ticker) {
+      this._ticker = value;
+      this.loadData();
+    }
+  }
+  get ticker(): string { return this._ticker; }
   @Input() embedded = false;
   ownershipSummary: OwnershipSummary[] = [];
   timeline: OwnershipEvent[] = [];
@@ -31,12 +38,9 @@ export class OwnershipByTickerComponent implements OnInit {
   sharesOutstanding: number | null = null;
 
   ngOnInit() {
-    if (this.ticker) {
-      this.loadData();
-    } else {
+    if (!this._ticker) {
       this.route.params.subscribe(params => {
         this.ticker = params['ticker'];
-        this.loadData();
       });
     }
   }
