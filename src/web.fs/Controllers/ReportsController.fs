@@ -33,8 +33,8 @@ type ReportsController(service: ReportsHandler) =
         this.OkOrError(service.HandleOutcomesReport (this.User.Identifier()) query)
 
     [<HttpGet("percentChangeDistribution/tickers/{ticker}")>]
-    member this.TickerPercentChangeDistribution(ticker: string, [<FromQuery>] ?frequency: string) =
-        let freq = frequency |> Option.defaultValue (PriceFrequency.Daily.ToString())
+    member this.TickerPercentChangeDistribution(ticker: string, [<FromQuery>] frequency: string) =
+        let freq = frequency |> Option.ofObj |> Option.defaultValue (PriceFrequency.Daily.ToString())
         this.OkOrError(
             service.Handle(
                 {
