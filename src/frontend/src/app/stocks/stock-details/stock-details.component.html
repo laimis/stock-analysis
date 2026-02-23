@@ -74,13 +74,13 @@
 <a (click)="activateTab('reminders')" [ngClass]="{'is-active': isActive('reminders')}" [routerLink]=""
   class="tab">
   Reminders @if (reminders && reminders.length > 0) {
-  <span class="badge rounded-pill bg-info">{{ reminders.length }}</span>
+  <span class="badge rounded-pill bg-secondary">{{ reminders.length }}</span>
 }
 </a>
 <a (click)="activateTab('priceAlerts')" [ngClass]="{'is-active': isActive('priceAlerts')}" [routerLink]=""
   class="tab">
   Price Alerts @if (activePriceAlertsCount > 0) {
-  <span class="badge rounded-pill bg-info">{{ activePriceAlertsCount }}</span>
+  <span class="badge rounded-pill bg-secondary">{{ activePriceAlertsCount }}</span>
 }
 </a>
 <a (click)="activateTab('sec')" [ngClass]="{'is-active': isActive('sec')}" [routerLink]="" class="tab">
