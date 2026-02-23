@@ -79,6 +79,7 @@ module Form144ProcessingServiceTests =
             member _.SaveEvents(_) = task { return 0 }
             member _.GetEventsByCompany(_) =
                 task { return events |> List.toSeq }
+            member _.GetEventsByFilingId(_) = task { return Seq.empty }
             member _.GetEventsByCompanyDateRange(_) (_) (_) = task { return Seq.empty }
             member _.GetEventsByEntity(_) = task { return Seq.empty }
             member _.GetLatestEventForEntityCompany(_) (_) = task { return None }

@@ -26,12 +26,10 @@ type CompanyFiling =
         IsXBRL: bool
         IsInlineXBRL: bool
     }
-
-    member this.IsRecentFor (referenceDate: System.DateOnly) =
-        let dateFormat = "yyyy-MM-dd"
-        let todayString = referenceDate.ToString dateFormat
-        let yesterdayString = referenceDate.AddDays(-1).ToString dateFormat
-        this.FilingDate = todayString || this.FilingDate = yesterdayString
+    static member IsRecentFor (referenceDate: System.DateOnly) (filingDate: string) =
+        let fmt = "yyyy-MM-dd"
+        filingDate = referenceDate.ToString(fmt)
+        || filingDate = referenceDate.AddDays(-1).ToString(fmt)
 
 [<Struct>]
 type CompanyFilings(ticker:Ticker, filings:CompanyFiling array) =

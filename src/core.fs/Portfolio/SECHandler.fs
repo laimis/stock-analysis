@@ -128,7 +128,7 @@ type SECHandler(accountStorage: IAccountStorage, portfolioStorage: IPortfolioSto
                 | Ok companyFilings ->
                     let recentFilings = 
                         companyFilings.Filings
-                        |> Seq.filter (fun f -> referenceDate |> f.IsRecentFor)
+                        |> Seq.filter (fun f -> referenceDate |> CompanyFiling.IsRecentFor <| f.FilingDate)
                         |> Seq.toArray
                     
                     if recentFilings.Length > 0 then
