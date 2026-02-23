@@ -152,35 +152,41 @@ type WeeklySummaryEmailService(
     interface IApplicationService
 
     member _.Execute() = task {
+        logger.LogInformation("Starting weekly summary email job")
+
         let! pairs = accounts.GetUserEmailIdPairs()
 
         let! _ =
             pairs
             |> Seq.map (fun pair -> async {
-                let! userResult = pair.Id |> accounts.GetUser |> Async.AwaitTask
-                match userResult with
-                | None ->
-                    logger.LogWarning($"User not found for id {pair.Id}, skipping weekly summary email")
-                | Some user ->
-                    let query = {
-                        WeeklySummaryQuery.Period = "last7days"
-                        UserId = pair.Id
-                    }
+                try
+                    let! userResult = pair.Id |> accounts.GetUser |> Async.AwaitTask
+                    match userResult with
+                    | None ->
+                        logger.LogWarning($"User not found for id {pair.Id}, skipping weekly summary email")
+                    | Some user ->
+                        let query = {
+                            WeeklySummaryQuery.Period = "last7days"
+                            UserId = pair.Id
+                        }
 
-                    let! view = reportsHandler.Handle(query) |> Async.AwaitTask
-                    let payload = WeeklySummaryHelpers.buildEmailPayload view
+                        let! view = reportsHandler.Handle(query) |> Async.AwaitTask
+                        let payload = WeeklySummaryHelpers.buildEmailPayload view
 
-                    let recipient = Recipient(user.State.Email, user.State.Name)
-                    let sender = Sender.NoReply
+                        let recipient = Recipient(user.State.Email, user.State.Name)
+                        let sender = Sender.NoReply
 
-                    let! result = emails.SendWeeklySummary recipient sender payload |> Async.AwaitTask
-                    match result with
-                    | Ok () ->
-                        logger.LogInformation($"Weekly summary email sent to {user.State.Email}")
-                    | Error err ->
-                        logger.LogError($"Failed to send weekly summary email to {user.State.Email}: {err}")
+                        let! result = emails.SendWeeklySummary recipient sender payload |> Async.AwaitTask
+                        match result with
+                        | Ok () ->
+                            logger.LogInformation($"Weekly summary email sent to {user.State.Email}")
+                        | Error err ->
+                            logger.LogError($"Failed to send weekly summary email to {user.State.Email}: {err}")
+                with ex ->
+                    logger.LogError($"Error sending weekly summary email to user {pair.Email}: {ex.Message}")
             })
             |> Async.Sequential
 
+        logger.LogInformation("Completed weekly summary email job")
         return ()
     }
