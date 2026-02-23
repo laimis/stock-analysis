@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Sample Schedule 13D filing for testing purposes.
+  Based on real filing: https://www.sec.gov/Archives/edgar/data/1707753/000136157026000003/0001361570-26-000003-index.html
+  Filer:  Pictet Asset Management SA (CIK: 0001361570)
+  Issuer: Elastic N.V. (CIK: 0001707753)
+  Date:   January 26, 2026
+-->
+<edgarSubmission xmlns="http://www.sec.gov/edgar/schedule13D" xmlns:com="http://www.sec.gov/edgar/common">
+
+  <headerData>
+    <submissionType>SCHEDULE 13D</submissionType>
+    <filerInfo>
+      <filer>
+        <filerCredentials>
+          <cik>0001361570</cik>
+          <ccc>XXXXXXXX</ccc>
+        </filerCredentials>
+      </filer>
+      <liveTestFlag>LIVE</liveTestFlag>
+    </filerInfo>
+  </headerData>
+
+  <formData>
+
+    <coverPageHeader>
+      <securitiesClassTitle>COMMON STOCK</securitiesClassTitle>
+      <dateOfEvent>01/23/2026</dateOfEvent>
+      <previouslyFiledFlag>false</previouslyFiledFlag>
+
+      <issuerInfo>
+        <issuerCIK>0001707753</issuerCIK>
+        <issuerCUSIP>N14506104</issuerCUSIP>
+        <issuerName>Elastic N.V.</issuerName>
+        <address>
+          <com:street1>800 West El Camino Real, Suite 350</com:street1>
+          <com:city>Mountain View</com:city>
+          <com:stateOrCountry>CA</com:stateOrCountry>
+          <com:zipCode>94040</com:zipCode>
+        </address>
+      </issuerInfo>
+    </coverPageHeader>
+
+    <items1To7>
+
+      <item2>
+        <hasBeenConvicted>The Reporting Person has not been, during the last five years, convicted in a
+criminal proceeding (excluding traffic violations or similar misdemeanors).</hasBeenConvicted>
+        <convictionDescription>The Reporting Person has not been, during the last five years, a party to a
+civil proceeding of a judicial or administrative body of competent jurisdiction and
+as a result of such proceeding was or is subject to a judgment, decree or final
+order enjoining future violations of, or prohibiting or mandating activities
+subject to, federal or state securities laws or finding of any violation with
+respect to such laws.</convictionDescription>
+        <citizenship>SWITZERLAND</citizenship>
+      </item2>
+
+      <item3>
+        <fundsSource>The Reporting Person acquired the shares of common stock of ELASTIC NV on behalf
+of its institutional clients who are managed on a discretionary basis. The
+purchase cost is approximately USD 423'217'533. The source of the funds comes from
+our institutional clients' assets. The funds used for the acquisition did not
+involve any financing or borrowing.</fundsSource>
+      </item3>
+
+      <item4>
+        <transactionPurpose>The Reporting Person acquired shares of ELASTIC NV as part of its investment
+strategy, which includes considering the clarity and robustness of the issuer's
+long-term strategy; the functioning and calibre of governance structures and
+effective leadership; the financial strength and performance of issuers and the fair
+valuation of underlying securities; and financially-material sustainability risks
+and opportunities. The Reporting Person is therefore actively engaging with the
+Issuer to discuss and promote initiatives that align with these business
+practices. The Reporting Person does not currently have any plans or proposals
+that would result in a change in control of the Issuer, nor does it intend to
+acquire additional shares for the purpose of gaining control.</transactionPurpose>
+      </item4>
+
+      <item5>
+        <percentageOfClassSecurities>Pictet Asset Management SA manages 5'288'262.00 shares of ELASTIC NV , which
+represents 5.02% of the total number of shares.</percentageOfClassSecurities>
+        <numberOfShares>Pictet Asset Management SA has the Sole power to vote on 5'274'370 shares out of
+the 5'288'262 shares under management.</numberOfShares>
+        <transactionDesc>In the past sixty days, the following transactions have been done: Date Type
+Quantity Price Exchange 23.01.2026 BUY 55'798 71.71 New York Stock Exchange
+23.01.2026 BUY 36'287 71.70 New York Stock Exchange 23.01.2026 BUY 103'174 71.74 New
+York Stock Exchange 15.01.2026 BUY 205'067 74.19 New York Stock Exchange</transactionDesc>
+        <listOfShareholders>The securities reported herein come from the assets of our institutional clients
+who are managed by the Reporting Person on a discretionary basis.</listOfShareholders>
+        <date5PercentOwnership>Not applicable</date5PercentOwnership>
+      </item5>
+
+      <item6>
+        <contractDescription>The Reporting Person's exposure to ELASTIC NV is solely through direct stock
+investments held by its managed institutional clients. There are no contracts,
+arrangements, understandings, or relationships with any third parties regarding the
+securities of ELASTIC NV.</contractDescription>
+      </item6>
+
+      <item7>
+        <filedExhibits>N/A</filedExhibits>
+      </item7>
+
+    </items1To7>
+
+    <signatureInfo>
+      <signaturePerson>
+        <signatureReportingPerson>PICTET ASSET MANAGEMENT SA</signatureReportingPerson>
+        <signatureDetails>
+          <signature>Karine Valtanen</signature>
+          <title>Karine Valtanen Global Head of Compliance</title>
+          <date>01/26/2026</date>
+        </signatureDetails>
+      </signaturePerson>
+    </signatureInfo>
+
+  </formData>
+
+</edgarSubmission>

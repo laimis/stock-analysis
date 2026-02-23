@@ -16,6 +16,7 @@ Add database backing for SEC filings and implement ownership tracking to monitor
 - ✅ **Ownership database layer** - entities, roles, events (Phase 2 - Feb 15, 2026)
 - ✅ **Ownership UI** - manual entry, viewing, timeline (Phase 3 - Feb 16, 2026)
 - ✅ **Schedule 13G Parser** - automated extraction from SEC filings (Phase 2 - Feb 17, 2026)
+- ✅ **Schedule 13D Parser** - Large activist position disclosures (>5%) (Phase 2 - Feb 23, 2026)
 - ✅ **Form 144 Parser** - insider intent-to-sell notifications (Phase 2 - Feb 22, 2026)
 - ⏳ Form 4, Form 13F parsers (Phase 2 - planned)
 
@@ -70,11 +71,18 @@ Track insider and institutional ownership changes to:
 - ✅ POST `/api/ownership/event` - create event
 
 ### Priority Form Types (in order)
-1. ✅ **Schedule 13D/13G** - Large position disclosures (>5%) **COMPLETED** (February 17, 2026)
-   - XML parsing with secure XmlReader (prevents XXE attacks)
-   - Confidence scoring (0.0 to 1.0) for data quality assessment
-   - Handles both 13G and 13G/A (amendments)
-   - Background job runs weekdays at 9:00am PT (12:00pm ET)
+1. ✅ **Schedule 13D/13G** - Large position disclosures (>5%)
+   - **13G**: Passive investors — XML parsing with secure XmlReader (prevents XXE attacks)
+     - Confidence scoring (0.0 to 1.0) for data quality assessment
+     - Handles both 13G and 13G/A (amendments)
+     - Background job runs weekdays at 9:00am PT (12:00pm ET)
+   - **13D**: Activist investors — XML parsing with secure XmlReader (prevents XXE attacks)
+     - Narrative text extraction for shares/percent/voting powers (item 5 text)
+     - Handles Swiss-style apostrophe thousands separators (e.g. 5'288'262)
+     - Handles both 13D and 13D/A (amendments)
+     - Date format: MM/dd/yyyy (different from 13G's yyyy-MM-dd format)
+     - Background job runs weekdays at 9:45am PT (12:45pm ET)
+     - Admin trigger: `GET /api/alerts/triggerSchedule13D`
 2. ✅ **Form 144** - Intent to sell restricted securities **COMPLETED** (February 22, 2026)
    - XML parsing with secure XmlReader (prevents XXE attacks)
    - Confidence scoring (0.0 to 1.0) for data quality assessment
@@ -120,6 +128,40 @@ Track insider and institutional ownership changes to:
   - [x] Comprehensive test coverage
     - Schedule13GParserTests.fs
     - Schedule13GProcessingServiceTests.fs
+
+- [x] **Schedule 13D Parser** ✅ **COMPLETED** (February 23, 2026)
+  - [x] Created types in `Schedule13DTypes.fs`
+    - ParsedSchedule13D record type (same shape as 13G, plus Citizenship, IssuerCusip, AcquisitionPurpose)
+    - Schedule13DParsingResult discriminated union (Schedule13DSuccess/Schedule13DPartialSuccess/Schedule13DFailure)
+    - Helper functions for confidence scoring
+  - [x] Implemented parser in `Schedule13DParser.fs`
+    - Secure XML parsing with XmlReader (XXE attack prevention)
+    - Namespace: `http://www.sec.gov/edgar/schedule13D`
+    - Extracts structured fields: filer CIK, issuer name/CIK/CUSIP, securities class, citizenship
+    - **Narrative text extraction** for item 5 (shares, percent, voting powers)
+      - Handles comma and apostrophe thousands separators (e.g. Swiss filers: 5'288'262)
+      - Regex patterns for sole/shared voting and dispositive powers
+    - Date format: MM/dd/yyyy (dateOfEvent and signature date)
+    - Filer name from `signatureInfo/signaturePerson/signatureReportingPerson`
+    - Purpose of acquisition extracted from item 4 (truncated to 1000 chars)
+    - Handles both 13D and 13D/A (amendments)
+    - Confidence scoring (0.0-1.0) based on data completeness
+  - [x] Created processing service in `Schedule13DProcessingService.fs`
+    - Fetches and parses XML documents from SEC
+    - Finds or creates entities (with CIK lookup)
+    - Event type: `large_stake_disclosure` (new) or `beneficial_ownership_update` (amendment)
+    - Deduplication (checks if filing already processed)
+    - Batch processing with rate limiting (500ms delay)
+  - [x] Registered Hangfire background job
+    - Runs weekdays at 9:45am PT (12:45pm ET)
+    - Processes last 100 13D/13D-A filings
+    - Admin trigger: `GET /api/alerts/triggerSchedule13D`
+  - [x] Test fixture: Pictet Asset Management SA / Elastic N.V. filing (Jan 2026)
+    - `sample_schedule_13d.xml` based on real SEC filing
+    - 5,288,262 shares, 5.02%, sole voting on 5,274,370 shares
+  - [x] Comprehensive test coverage
+    - Schedule13DParserTests.fs (6 unit tests + 1 integration test against real SEC filing)
+    - Schedule13DProcessingServiceTests.fs (integration tests with mocked storage)
 
 - [x] **Form 144 Parser** ✅ **COMPLETED** (February 22, 2026)
   - [x] Created types in `Form144Types.fs`
@@ -168,12 +210,14 @@ Track insider and institutional ownership changes to:
 
 ### Success Criteria
 - ✅ Schedule 13G transactions extracted with high accuracy (>90%)
+- ✅ Schedule 13D transactions extracted with high accuracy (>90%)
 - ✅ Ownership events stored in database with filing linkage
-- ✅ Processing job runs daily (weekdays at 9:00am PT)
-- ✅ Tests for parser with real-world examples
+- ✅ Processing job runs daily (weekdays at 9:00am PT for 13G, 9:45am PT for 13D)
+- ✅ Tests for parsers with real-world examples
 - ✅ Confidence scoring for data quality assessment
 - ✅ Deduplication prevents duplicate ownership events
 - ✅ Form 144 parser implementation (complete Feb 22, 2026)
+- ✅ Schedule 13D parser implementation (complete Feb 23, 2026)
 - ⏳ Form 4 parser implementation (pending)
 - ⏳ Form 13F parser implementation (pending)
 
@@ -342,6 +386,14 @@ Track insider and institutional ownership changes to:
   - Batch processing with rate limiting
   - Deduplication logic
   - Comprehensive test coverage
+- ✅ **Schedule 13D Parser** implemented (Feb 23, 2026)
+  - XML parser with secure XmlReader, confidence scoring, amendment support
+  - Narrative text extraction for item 5 (shares, percent, voting powers)
+  - Handles Swiss-style apostrophe thousands separators
+  - Processing service with `large_stake_disclosure` event type
+  - Background job (weekdays 9:45am PT)
+  - Admin trigger endpoint
+  - Comprehensive test coverage with Pictet/Elastic N.V. filing fixture
 - ✅ **Form 144 Parser** implemented (Feb 22, 2026)
   - XML parser with secure XmlReader, confidence scoring, amendment support
   - Processing service with `intent_to_sell` event type
@@ -361,11 +413,12 @@ Track insider and institutional ownership changes to:
 ---
 
 ## Current Phase: **Phase 2/3** 🎯
-**Status**: Database, UI, Schedule 13G, and Form 144 Complete, Form 4 and 13F Parsers Pending  
+**Status**: Database, UI, Schedule 13G, Schedule 13D, and Form 144 Complete, Form 4 and 13F Parsers Pending  
 **Phase 1**: Complete (Feb 12, 2026) - Filing persistence  
-**Phase 2**: Partially Complete (Feb 15-22, 2026)  
+**Phase 2**: Partially Complete (Feb 15-23, 2026)  
   - Database schema, storage layer, backend API ✅  
   - Schedule 13G parser and processing service ✅  
+  - Schedule 13D parser and processing service ✅  
   - Form 144 parser and processing service ✅  
   - Form 4 and Form 13F parsers pending ⏳  
 **Phase 3**: UI Complete (Feb 16, 2026) - Full ownership tracking UI ✅  
@@ -446,7 +499,9 @@ Track insider and institutional ownership changes to:
 - ✅ Calculated vs reported ownership comparison
 - ✅ Shares outstanding integration from fundamentals
 - ✅ **Automated Schedule 13G parsing and processing**
-- ✅ **Background job for daily 13G processing**
+- ✅ **Automated Schedule 13D parsing and processing** (activist investor disclosures)
+- ✅ **Background job for daily 13G processing** (weekdays 9:00am PT)
+- ✅ **Background job for daily 13D processing** (weekdays 9:45am PT)
 - ✅ **Entity creation/lookup by CIK**
 - ✅ **Confidence scoring for data quality**
 - ✅ **Automated Form 144 parsing and processing** (intent-to-sell notifications)

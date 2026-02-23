@@ -8,6 +8,9 @@
     <Compile Include="Schedule13GTypes.fs" />
     <Compile Include="Schedule13GParser.fs" />
     <Compile Include="Schedule13GProcessingService.fs" />
+    <Compile Include="Schedule13DTypes.fs" />
+    <Compile Include="Schedule13DParser.fs" />
+    <Compile Include="Schedule13DProcessingService.fs" />
     <Compile Include="Form144Types.fs" />
     <Compile Include="Form144Parser.fs" />
     <Compile Include="Form144ProcessingService.fs" />
