@@ -42,7 +42,7 @@ type Candle = {
     high: decimal
     low: decimal
     close: decimal
-    volume: int
+    volume: int64
 }
 
 type PriceHistoryResponse = {
