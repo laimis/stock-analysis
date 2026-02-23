@@ -111,6 +111,13 @@ public static class Jobs
                 options: rjo
             );
             
+            RecurringJob.AddOrUpdate<secedgar.fs.Schedule13DProcessingService>(
+                recurringJobId: nameof(secedgar.fs.Schedule13DProcessingService),
+                methodCall: service => service.Execute(),
+                cronExpression: "45 9 * * 1-5",  // 9:45am PT (12:45pm ET) weekdays, runs after Form 144 job
+                options: rjo
+            );
+            
             RecurringJob.AddOrUpdate<core.fs.Alerts.MonitoringServices.ReminderMonitoringService>(
                 recurringJobId: nameof(core.fs.Alerts.MonitoringServices.ReminderMonitoringService),
                 methodCall: service => service.Execute(),
