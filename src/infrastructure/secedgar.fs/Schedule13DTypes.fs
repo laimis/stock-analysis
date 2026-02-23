@@ -106,7 +106,9 @@ module Schedule13DHelpers =
         | Some "HC" -> Some "HC"
         | Some "EP" -> Some "EP"
         | Some "OO" -> Some "OO"
-        | _ -> Some "OO"
+        // For unknown or missing SEC type codes, return None.
+        // The persistence layer can default to "OO" if required.
+        | _ -> None
     
     /// Create a default/empty ParsedSchedule13D for building up
     let empty = {
