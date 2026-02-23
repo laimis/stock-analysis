@@ -77,7 +77,6 @@ Track insider and institutional ownership changes to:
      - Handles both 13G and 13G/A (amendments)
      - Background job runs weekdays at 9:00am PT (12:00pm ET)
    - **13D**: Activist investors — XML parsing with secure XmlReader (prevents XXE attacks)
-     - Narrative text extraction for shares/percent/voting powers (item 5 text)
      - Handles both 13D and 13D/A (amendments)
      - Date format: MM/dd/yyyy (different from 13G's yyyy-MM-dd format)
      - Background job runs weekdays at 9:45am PT (12:45pm ET)
@@ -384,7 +383,6 @@ Track insider and institutional ownership changes to:
   - Comprehensive test coverage
 - ✅ **Schedule 13D Parser** implemented (Feb 23, 2026)
   - XML parser with secure XmlReader, confidence scoring, amendment support
-  - Narrative text extraction for item 5 (shares, percent, voting powers)
   - Processing service with `large_stake_disclosure` event type
   - Background job (weekdays 9:45am PT)
   - Admin trigger endpoint

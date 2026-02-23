@@ -32,13 +32,13 @@
       </issuerInfo>
       <authorizedPersons>
         <notificationInfo>
-          <personName>Mathieu CORNU</personName>
-          <personPhoneNum>0041583234506</personPhoneNum>
+          <personName>Sample Person Name</personName>
+          <personPhoneNum>5555555555</personPhoneNum>
           <personAddress>
-            <com:street1>Route des Acacias 60</com:street1>
-            <com:city>Geneva</com:city>
-            <com:stateOrCountry>V8</com:stateOrCountry>
-            <com:zipCode>1211</com:zipCode>
+            <com:street1>Address Street 1</com:street1>
+            <com:city>City</com:city>
+            <com:stateOrCountry>State</com:stateOrCountry>
+            <com:zipCode>12345</com:zipCode>
           </personAddress>
         </notificationInfo>
       </authorizedPersons>
