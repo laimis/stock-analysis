@@ -154,7 +154,7 @@ type SECFilingsMonitoringService(
 
     let isRecentFiling (filingDate: string) =
         let today = marketHours.ToMarketTime DateTimeOffset.UtcNow
-        today.Date |> DateOnly.FromDateTime |> FilingDate.isRecent <| filingDate
+        today.Date |> DateOnly.FromDateTime |> CompanyFiling.IsRecentFor <| filingDate
 
     let ignoreFiling (formType: string) =
         // ignore form 4 filings, they are just so numerous, I would be tracking them all day
