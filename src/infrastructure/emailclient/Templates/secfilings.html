@@ -32,9 +32,18 @@
                             {{for ticker_filing in ticker_filings}}
                             <div style="margin-bottom: 32px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                                 <div style="padding: 16px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                    <h2 style="margin: 0; color: #1f2937; font-size: 18px; font-weight: 600;">
-                                        {{ticker_filing.ticker}}
-                                    </h2>
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <h2 style="margin: 0; color: #1f2937; font-size: 18px; font-weight: 600;">
+                                                    {{ticker_filing.ticker}}
+                                                </h2>
+                                            </td>
+                                            <td align="right">
+                                                <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{ticker_filing.ticker}}" style="color: #2563eb; text-decoration: none; font-size: 14px;">Chart</a>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                                 
                                 {{for filing in ticker_filing.filings}}
