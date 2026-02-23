@@ -188,8 +188,8 @@ type SECFilingStorage(connectionString: string) =
                     FROM user_sec_filing_watermarks
                     WHERE user_id = @UserId AND ticker = @Ticker"""
 
-                let! results = db.QueryAsync<DateTimeOffset>(query, {| UserId = userId; Ticker = ticker.Value |})
-                return results |> Seq.tryHead
+                let! results = db.QueryAsync<DateTime>(query, {| UserId = userId; Ticker = ticker.Value |})
+                return results |> Seq.tryHead |> Option.map (fun dt -> DateTimeOffset(dt, TimeSpan.Zero))
             }
 
         member _.UpsertWatermark(userId: string) (ticker: Ticker) (timestamp: DateTimeOffset) : Task<unit> =
