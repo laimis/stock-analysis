@@ -12,67 +12,7 @@ open Microsoft.Extensions.Logging
 // TODO: Implement a mechanism to retrieve XML versions for all relevant SEC Schedule 13G documents.
 
 module Schedule13GParser =
-    open System.Globalization
-    
-    let private xname name = XName.Get(name)
-    let private xnameWithNs ns name = XName.Get(name, ns)
-    
-    /// Create secure XmlReader to prevent XXE attacks
-    let private createSecureXmlReader (xml: string) =
-        let settings = XmlReaderSettings()
-        settings.DtdProcessing <- DtdProcessing.Prohibit
-        settings.XmlResolver <- null
-        settings.CloseInput <- true
-        let stringReader = new StringReader(xml)
-        XmlReader.Create(stringReader, settings)
-    
-    /// Helper to get XName with optional namespace
-    let private getXName (ns: string option) (name: string) =
-        match ns with
-        | Some nsUri -> xnameWithNs nsUri name
-        | None -> xname name
-    
-    /// Try to get element value, handling missing elements and namespace
-    let private tryGetElementValue (element: XElement) (ns: string option) (name: string) =
-        let el = element.Element(getXName ns name)
-        if el <> null && not (String.IsNullOrWhiteSpace(el.Value)) then
-            Some el.Value
-        else
-            None
-    
-    /// Try to get first descendant element with optional namespace
-    let private tryGetDescendant (element: XElement) (ns: string option) (name: string) =
-        element.Descendants(getXName ns name) |> Seq.tryHead
-    
-    /// Try to parse int64 from string, handling commas, whitespace, and decimals
-    let private tryParseInt64 (value: string option) =
-        match value with
-        | None -> None
-        | Some v ->
-            let cleaned = v.Trim().Replace(",", "").Replace(" ", "")
-            // Try parsing as decimal first to handle fractional shares, then round
-            match Decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture) with
-            | (true, num) -> Some (int64 (Math.Round(num, 0, MidpointRounding.AwayFromZero)))
-            | _ -> None
-    
-    /// Try to parse decimal from string, handling commas and whitespace
-    let private tryParseDecimal (value: string option) =
-        match value with
-        | None -> None
-        | Some v ->
-            let cleaned = v.Trim().Replace(",", "").Replace(" ", "")
-            match Decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture) with
-            | true, num -> Some num
-            | _ -> None
-    
-    /// Try to parse DateTimeOffset
-    let private tryParseDate (value: string option) =
-        match value with
-        | None -> None
-        | Some v ->
-            match DateTimeOffset.TryParseExact(v, "yyyy-MM-dd", null, DateTimeStyles.None) with
-            | (true, date) -> Some date
-            | _ -> None
+    open EdgarParserHelpers
     
     /// Parse Schedule 13G from XML document (handles real SEC format)
     let parseXml (xml: string) (logger: ILogger option) =

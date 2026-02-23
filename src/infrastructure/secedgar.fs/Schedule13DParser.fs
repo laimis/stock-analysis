@@ -11,69 +11,7 @@ open Microsoft.Extensions.Logging
 // Issuer: Elastic N.V. (ESTC), Filer: Pictet Asset Management SA
 
 module Schedule13DParser =
-    open System.Globalization
-    
-    let private xname name = XName.Get(name)
-    let private xnameWithNs ns name = XName.Get(name, ns)
-    
-    /// Create secure XmlReader to prevent XXE attacks
-    let private createSecureXmlReader (xml: string) =
-        let settings = XmlReaderSettings()
-        settings.DtdProcessing <- DtdProcessing.Prohibit
-        settings.XmlResolver <- null
-        settings.CloseInput <- true
-        let stringReader = new StringReader(xml)
-        XmlReader.Create(stringReader, settings)
-    
-    /// Helper to get XName with optional namespace
-    let private getXName (ns: string option) (name: string) =
-        match ns with
-        | Some nsUri -> xnameWithNs nsUri name
-        | None -> xname name
-    
-    /// Try to get element value, handling missing elements and namespace
-    let private tryGetElementValue (element: XElement) (ns: string option) (name: string) =
-        let el = element.Element(getXName ns name)
-        if el <> null && not (String.IsNullOrWhiteSpace(el.Value)) then
-            Some (el.Value.Trim())
-        else
-            None
-    
-    /// Try to get first descendant element with optional namespace
-    let private tryGetDescendant (element: XElement) (ns: string option) (name: string) =
-        element.Descendants(getXName ns name) |> Seq.tryHead
-    
-    /// Try to parse int64 from string, handling commas, apostrophes, whitespace, and decimals.
-    /// Schedule 13D filings sometimes use ' as thousands separator (e.g. Swiss filers: 5'288'262.00)
-    let private tryParseInt64 (value: string option) =
-        match value with
-        | None -> None
-        | Some v ->
-            let cleaned = v.Trim().Replace(",", "").Replace("'", "").Replace(" ", "")
-            match Decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture) with
-            | (true, num) -> Some (int64 (Math.Round(num, 0, MidpointRounding.AwayFromZero)))
-            | _ -> None
-    
-    /// Try to parse decimal from string, handling commas and whitespace
-    let private tryParseDecimal (value: string option) =
-        match value with
-        | None -> None
-        | Some v ->
-            let cleaned = v.Trim().Replace(",", "").Replace(" ", "")
-            match Decimal.TryParse(cleaned, NumberStyles.Any, CultureInfo.InvariantCulture) with
-            | true, num -> Some num
-            | _ -> None
-    
-    /// Try to parse DateTimeOffset - handles both yyyy-MM-dd and MM/dd/yyyy formats
-    /// (Schedule 13D uses MM/dd/yyyy for dateOfEvent and signature dates)
-    let private tryParseDate (value: string option) =
-        match value with
-        | None -> None
-        | Some v ->
-            let formats = [| "MM/dd/yyyy"; "yyyy-MM-dd"; "M/d/yyyy"; "M/dd/yyyy"; "MM/d/yyyy" |]
-            match DateTimeOffset.TryParseExact(v, formats, null, DateTimeStyles.None) with
-            | (true, date) -> Some date
-            | _ -> None
+    open EdgarParserHelpers
     
     /// Parse Schedule 13D from XML document.
     /// Schedule 13D filings contain a structured <reportingPersons> section with all ownership
