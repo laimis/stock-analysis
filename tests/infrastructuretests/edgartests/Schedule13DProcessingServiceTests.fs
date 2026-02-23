@@ -11,9 +11,24 @@ module Schedule13DProcessingServiceTests =
     
     // Mock implementations for testing - mirror the 13G mocks but for 13D form types
     type MockSECFilingStorage13D() =
+        let mockFilingId = Guid.NewGuid()
+        let createMockFiling () = {
+            Id = mockFilingId
+            Ticker = "ESTC"
+            Cik = "0001707753"
+            FormType = "SC 13D"
+            FilingDate = "2026-01-26"
+            ReportDate = Some "2026-01-26"
+            Description = "SC 13D"
+            FilingUrl = "https://www.sec.gov/Archives/edgar/data/1707753/000136157026000003/0001361570-26-000003-index.html"
+            DocumentUrl = "https://www.sec.gov/Archives/edgar/data/1361570/000136157026000003/primary_doc.xml"
+            CreatedAt = DateTimeOffset.UtcNow
+            IsXBRL = false
+            IsInlineXBRL = false
+        }
         interface ISECFilingStorage with
             member _.SaveFiling(_) = task { return true }
-            member _.SaveFilings(_) = task { return 0 }
+            member _.SaveFilings(_) = task { return Seq.empty }
             member _.GetFilingsByTicker(_) = task { return Seq.empty }
             member _.GetRecentFilingsByTicker(_) (_) = task { return Seq.empty }
             member _.GetFilingsByTickers(_) (_) = task { return Seq.empty }
@@ -21,21 +36,14 @@ module Schedule13DProcessingServiceTests =
             member _.GetFilingsByFormType(formTypes) (_limit) = 
                 task {
                     if Seq.contains "SC 13D" formTypes then
-                        let mockFiling = {
-                            Id = Guid.NewGuid()
-                            Ticker = "ESTC"
-                            Cik = "0001707753"
-                            FormType = "SC 13D"
-                            FilingDate = "2026-01-26"
-                            ReportDate = Some "2026-01-26"
-                            Description = "SC 13D"
-                            FilingUrl = "https://www.sec.gov/Archives/edgar/data/1707753/000136157026000003/0001361570-26-000003-index.html"
-                            DocumentUrl = "https://www.sec.gov/Archives/edgar/data/1361570/000136157026000003/primary_doc.xml"
-                            CreatedAt = DateTimeOffset.UtcNow
-                            IsXBRL = false
-                            IsInlineXBRL = false
-                        }
-                        return [mockFiling] |> Seq.ofList
+                        return [createMockFiling()] |> Seq.ofList
+                    else
+                        return Seq.empty
+                }
+            member _.GetFilingsWithoutOwnershipEvents(formTypes) =
+                task {
+                    if Seq.contains "SC 13D" formTypes then
+                        return [createMockFiling()] |> Seq.ofList
                     else
                         return Seq.empty
                 }
@@ -73,7 +81,8 @@ module Schedule13DProcessingServiceTests =
             member _.SaveEvents(_) = task { return 0 }
             member _.GetEventsByCompany(_) = 
                 task { return events |> List.toSeq }
-            member _.GetEventsByFilingId(_) = task { return Seq.empty }
+            member _.GetEventsByFilingId(filingId) =
+                task { return events |> List.filter (fun e -> e.FilingId = Some filingId) |> List.toSeq }
             member _.GetEventsByCompanyDateRange(_) (_) (_) = task { return Seq.empty }
             member _.GetEventsByEntity(_) = task { return Seq.empty }
             member _.GetLatestEventForEntityCompany(_) (_) = task { return None }

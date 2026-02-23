@@ -83,8 +83,8 @@ public static class Jobs
                 options: rjo
             );
             
-            RecurringJob.AddOrUpdate<core.fs.Alerts.SECFilingsMonitoring.SECFilingsSyncService>(
-                recurringJobId: nameof(core.fs.Alerts.SECFilingsMonitoring.SECFilingsSyncService),
+            RecurringJob.AddOrUpdate<secedgar.fs.SECFilingsSyncService>(
+                recurringJobId: nameof(secedgar.fs.SECFilingsSyncService),
                 methodCall: service => service.Execute(),
                 cronExpression: "*/10 6-19 * * 1-5",  // every 10 minutes from 6am-7pm PT weekdays
                 options: rjo

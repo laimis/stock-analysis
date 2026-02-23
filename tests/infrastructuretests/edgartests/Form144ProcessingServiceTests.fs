@@ -12,32 +12,39 @@ module Form144ProcessingServiceTests =
 
     // Mock ISECFilingStorage which returns a Form 144 filing pointing to the real Palantir/Karp document
     type MockForm144FilingStorage() =
+        let mockFilingId = Guid.NewGuid()
+        let createMockFiling () = {
+            Id = mockFilingId
+            Ticker = "PLTR"
+            Cik = "0001321655"
+            FormType = "144"
+            FilingDate = "2026-02-20"
+            ReportDate = Some "2026-02-20"
+            Description = "144"
+            FilingUrl = "https://www.sec.gov/Archives/edgar/data/1321655/000195004726001584/0001950047-26-001584-index.html"
+            DocumentUrl = "https://www.sec.gov/Archives/edgar/data/1321655/000195004726001584/primary_doc.xml"
+            CreatedAt = DateTimeOffset.UtcNow
+            IsXBRL = false
+            IsInlineXBRL = false
+        }
         interface ISECFilingStorage with
             member _.SaveFiling(_) = task { return true }
-            member _.SaveFilings(_) = task { return 0 }
+            member _.SaveFilings(_) = task { return Seq.empty }
             member _.GetFilingsByTicker(_) = task { return Seq.empty }
             member _.GetRecentFilingsByTicker(_) (_) = task { return Seq.empty }
             member _.GetFilingsByTickers(_) (_) = task { return Seq.empty }
             member _.FilingExists(_) = task { return false }
             member _.GetFilingsByFormType(formTypes) (_limit) =
                 task {
-                    // Return a mock Form 144 filing for Palantir/Alexander Karp
                     if Seq.contains "144" formTypes then
-                        let mockFiling = {
-                            Id = Guid.NewGuid()
-                            Ticker = "PLTR"
-                            Cik = "0001321655"
-                            FormType = "144"
-                            FilingDate = "2026-02-20"
-                            ReportDate = Some "2026-02-20"
-                            Description = "144"
-                            FilingUrl = "https://www.sec.gov/Archives/edgar/data/1321655/000195004726001584/0001950047-26-001584-index.html"
-                            DocumentUrl = "https://www.sec.gov/Archives/edgar/data/1321655/000195004726001584/primary_doc.xml"
-                            CreatedAt = DateTimeOffset.UtcNow
-                            IsXBRL = false
-                            IsInlineXBRL = false
-                        }
-                        return [mockFiling] |> Seq.ofList
+                        return [createMockFiling()] |> Seq.ofList
+                    else
+                        return Seq.empty
+                }
+            member _.GetFilingsWithoutOwnershipEvents(formTypes) =
+                task {
+                    if Seq.contains "144" formTypes then
+                        return [createMockFiling()] |> Seq.ofList
                     else
                         return Seq.empty
                 }
@@ -79,7 +86,8 @@ module Form144ProcessingServiceTests =
             member _.SaveEvents(_) = task { return 0 }
             member _.GetEventsByCompany(_) =
                 task { return events |> List.toSeq }
-            member _.GetEventsByFilingId(_) = task { return Seq.empty }
+            member _.GetEventsByFilingId(filingId) =
+                task { return events |> List.filter (fun e -> e.FilingId = Some filingId) |> List.toSeq }
             member _.GetEventsByCompanyDateRange(_) (_) (_) = task { return Seq.empty }
             member _.GetEventsByEntity(_) = task { return Seq.empty }
             member _.GetLatestEventForEntityCompany(_) (_) = task { return None }

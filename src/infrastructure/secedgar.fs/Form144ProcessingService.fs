@@ -104,12 +104,13 @@ type Form144ProcessingService(
         try
             logger.LogInformation($"Processing Form 144 filing for {filing.Ticker}: {filing.FilingUrl}")
 
-            // Check if this filing has already been processed
+            // Check if this filing has already been processed (targeted lookup by filing ID)
             let ticker = Ticker filing.Ticker
-            let! existingEvents = ownershipStorage.GetEventsByCompany ticker
+            let! existingEvents = ownershipStorage.GetEventsByFilingId filing.Id
             let alreadyProcessed =
                 existingEvents
-                |> Seq.exists (fun e -> e.FilingId = Some filing.Id)
+                |> Seq.isEmpty
+                |> not
 
             if alreadyProcessed then
                 logger.LogInformation($"Filing already processed, skipping: {filing.FilingUrl}")
@@ -170,20 +171,23 @@ type Form144ProcessingService(
 
     interface IApplicationService
 
+    /// Exposed for inline invocation from SECFilingsSyncService after saving new filings.
+    member _.ProcessFiling(filing: SECFilingRecord) = processForm144Filing filing
+
     member _.Execute() = task {
         try
-            logger.LogInformation("Starting Form 144 processing service")
+            logger.LogInformation("Starting Form 144 catch-up processing service")
 
-            // Query for recent Form 144 and 144/A filings
+            // Query for Form 144 filings that have no ownership events yet (missed or failed during sync).
             let formTypes = [| "144"; "144/A" |]
-            let! recentFilings = secFilingStorage.GetFilingsByFormType formTypes 100
+            let! unprocessedFilings = secFilingStorage.GetFilingsWithoutOwnershipEvents formTypes
 
             let filings =
-                recentFilings
+                unprocessedFilings
                 |> Seq.filter (fun f -> isForm144 f.FormType)
                 |> Seq.toArray
 
-            logger.LogInformation($"Found {filings.Length} Form 144/144-A filings to process")
+            logger.LogInformation($"Found {filings.Length} unprocessed Form 144/144-A filings")
 
             if filings.Length = 0 then
                 logger.LogInformation("No Form 144 filings to process")
@@ -203,5 +207,5 @@ type Form144ProcessingService(
                 logger.LogInformation($"Form 144 processing completed. Success: {successCount}, Failures: {failureCount}")
 
         with ex ->
-            logger.LogError(ex, "Error in Form 144 processing service: {Message}", ex.Message)
+            logger.LogError(ex, "Error in Form 144 catch-up processing service: {Message}", ex.Message)
     }

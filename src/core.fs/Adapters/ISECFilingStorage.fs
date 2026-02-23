@@ -27,8 +27,9 @@ type ISECFilingStorage =
     /// Store a new SEC filing (ignores duplicates based on filing URL)
     abstract member SaveFiling : filing:SECFilingRecord -> Task<bool>
     
-    /// Store multiple SEC filings (ignores duplicates based on filing URL)
-    abstract member SaveFilings : filings:seq<SECFilingRecord> -> Task<int>
+    /// Store multiple SEC filings (ignores duplicates based on filing URL).
+    /// Returns only the filings that were actually inserted (new rows); duplicates are excluded.
+    abstract member SaveFilings : filings:seq<SECFilingRecord> -> Task<IEnumerable<SECFilingRecord>>
     
     /// Get all filings for a ticker, ordered by filing date descending
     abstract member GetFilingsByTicker : ticker:Ticker -> Task<IEnumerable<SECFilingRecord>>
@@ -44,6 +45,12 @@ type ISECFilingStorage =
     
     /// Get filings by form type(s)
     abstract member GetFilingsByFormType : formTypes:seq<string> -> limit:int -> Task<IEnumerable<SECFilingRecord>>
+
+    /// Get filings by form type(s) that have no corresponding ownership events.
+    /// Used by catch-up parsing jobs to find filings that failed or were missed.
+    /// TODO: Add a limit and a filing_date cutoff parameter to bound runtime and prevent
+    /// unbounded full-table scans as the sec_filings table grows.
+    abstract member GetFilingsWithoutOwnershipEvents : formTypes:seq<string> -> Task<IEnumerable<SECFilingRecord>>
 
     /// Get filings for a ticker created after the given timestamp, ordered by created_at ascending
     abstract member GetFilingsSince : ticker:Ticker -> since:DateTimeOffset -> Task<IEnumerable<SECFilingRecord>>

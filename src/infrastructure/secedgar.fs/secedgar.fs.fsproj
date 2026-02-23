@@ -15,6 +15,7 @@
     <Compile Include="Form144Types.fs" />
     <Compile Include="Form144Parser.fs" />
     <Compile Include="Form144ProcessingService.fs" />
+    <Compile Include="SECFilingsSyncService.fs" />
     <Compile Include="EdgarClient.fs" />
   </ItemGroup>
 

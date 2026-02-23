@@ -11,35 +11,42 @@ module Schedule13GProcessingServiceTests =
     
     // Mock implementations for testing
     type MockSECFilingStorage() =
+        let mockFilingId = Guid.NewGuid()
+        let createMockFiling () = {
+            Id = mockFilingId
+            Ticker = "DOCS"
+            Cik = "0001516513"
+            FormType = "SC 13G"
+            FilingDate = "2026-01-31"
+            ReportDate = Some "2026-01-31"
+            Description = "SC 13G"
+            FilingUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/0000315066-26-000439-index.html"
+            DocumentUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/primary_doc.xml"
+            CreatedAt = DateTimeOffset.UtcNow
+            IsXBRL = false
+            IsInlineXBRL = false
+        }
         interface ISECFilingStorage with
             member _.SaveFiling(_) = task { return true }
-            member _.SaveFilings(_) = task { return 0 }
+            member _.SaveFilings(_) = task { return Seq.empty }
             member _.GetFilingsByTicker(_) = task { return Seq.empty }
             member _.GetRecentFilingsByTicker(_) (_) = task { return Seq.empty }
             member _.GetFilingsByTickers(_) (_) = task { return Seq.empty }
             member _.FilingExists(_) = task { return false }
-            member _.GetFilingsByFormType(formTypes) (limit) = 
+            member _.GetFilingsByFormType(formTypes) (_limit) = 
                 task {
-                    // Return a mock SC 13G filing
                     if Seq.contains "SC 13G" formTypes then
-                        let mockFiling = {
-                            Id = Guid.NewGuid()
-                            Ticker = "DOCS"
-                            Cik = "0001516513"
-                            FormType = "SC 13G"
-                            FilingDate = "2026-01-31"
-                            ReportDate = Some "2026-01-31"
-                            Description = "SC 13G"
-                            FilingUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/0000315066-26-000439-index.html"
-                            DocumentUrl = "https://www.sec.gov/Archives/edgar/data/1516513/000031506626000439/primary_doc.xml"
-                            CreatedAt = DateTimeOffset.UtcNow
-                            IsXBRL = false
-                            IsInlineXBRL = false
-                        }
-                        return [mockFiling] |> Seq.ofList
+                        return [createMockFiling()] |> Seq.ofList
                     else
                         return Seq.empty
                 }            
+            member _.GetFilingsWithoutOwnershipEvents(formTypes) =
+                task {
+                    if Seq.contains "SC 13G" formTypes then
+                        return [createMockFiling()] |> Seq.ofList
+                    else
+                        return Seq.empty
+                }
             member this.GetFilingsSince(ticker: Ticker) (since: DateTimeOffset): Threading.Tasks.Task<Collections.Generic.IEnumerable<SECFilingRecord>> = 
                 failwith "Not Implemented"
             member this.GetWatermark(userId: string) (ticker: Ticker): Threading.Tasks.Task<DateTimeOffset option> = 
@@ -81,7 +88,8 @@ module Schedule13GProcessingServiceTests =
                 task {
                     return events |> List.toSeq
                 }
-            member _.GetEventsByFilingId(_) = task { return Seq.empty }
+            member _.GetEventsByFilingId(filingId) =
+                task { return events |> List.filter (fun e -> e.FilingId = Some filingId) |> List.toSeq }
             member _.GetEventsByCompanyDateRange(_) (_) (_) = task { return Seq.empty }
             member _.GetEventsByEntity(_) = task { return Seq.empty }
             member _.GetLatestEventForEntityCompany(_) (_) = task { return None }
