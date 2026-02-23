@@ -26,6 +26,7 @@ type Program() =
         let logger = loggerFactory.CreateLogger(typeof<Program>.FullName)
         
         AuthHelper.Configure(configuration, builder.Services)
+        DataProtection.configureDataProtection builder.Services configuration
         
         Jobs.AddJobs(configuration, builder.Services, logger)
         

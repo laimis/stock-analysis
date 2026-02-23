@@ -35,6 +35,7 @@
         <Compile Include="Controllers/PortfolioController.fs" />
         
         <!-- Auth and startup -->
+        <Compile Include="DataProtection.fs" />
         <Compile Include="AuthHelper.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
