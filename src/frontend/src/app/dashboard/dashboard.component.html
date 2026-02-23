@@ -91,6 +91,48 @@
                 </div>
             </div>
 
+            <!-- Reminders Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper bg-info-subtle rounded-circle p-3 me-3">
+                                        <i class="bi bi-calendar-event text-info fs-4"></i>
+                                    </div>
+                                    <h5 class="card-title mb-0">Upcoming Reminders</h5>
+                                </div>
+                                <a [routerLink]="['/alerts/reminders']" class="btn btn-outline-info">
+                                    Manage Reminders
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                            @if (upcomingReminders.length === 0) {
+                                <div class="alert alert-info mb-0">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    No reminders in the next 7 days.
+                                </div>
+                            } @else {
+                                <ul class="list-group list-group-flush">
+                                    @for (reminder of upcomingReminders; track reminder.reminderId) {
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <span class="badge bg-info text-dark mt-1">{{ reminder.date | date:'mediumDate' }}</span>
+                                                <span class="flex-grow-1">{{ reminder.message }}</span>
+                                                @if (reminder.ticker) {
+                                                    <span class="badge bg-secondary">{{ reminder.ticker }}</span>
+                                                }
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tools Section -->
             <div class="row mb-4">
                 <div class="col-12">

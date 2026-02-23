@@ -1,15 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {Router, RouterLink} from '@angular/router';
-import {PortfolioHoldings, StocksService} from '../services/stocks.service';
+import {PortfolioHoldings, Reminder, StocksService} from '../services/stocks.service';
 import { AlertsComponent } from "../alerts/alerts.component";
+import { DatePipe } from '@angular/common';
 
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'],
-    imports: [RouterLink, AlertsComponent],
+    imports: [RouterLink, AlertsComponent, DatePipe],
 })
 export class DashboardComponent implements OnInit {
     private stocks = inject(StocksService);
@@ -19,6 +20,7 @@ export class DashboardComponent implements OnInit {
 
     dashboard: PortfolioHoldings
     loaded: boolean = false
+    upcomingReminders: Reminder[] = []
 
     toolLinks = [
         {path: '/summary', label: 'Weekly Summary'},
@@ -44,6 +46,17 @@ export class DashboardComponent implements OnInit {
             console.log(error);
             this.loaded = false;
         })
+
+        this.stocks.getReminders().subscribe(reminders => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const in7Days = new Date(today);
+            in7Days.setDate(today.getDate() + 7);
+            this.upcomingReminders = reminders.filter(r => {
+                const d = new Date(r.date);
+                return r.state === 'pending' && d >= today && d <= in7Days;
+            }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        });
     }
 
     onTickerSelected(ticker: string) {
