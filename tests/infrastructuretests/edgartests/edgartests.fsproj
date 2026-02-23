@@ -5,6 +5,7 @@
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <IsTestProject>true</IsTestProject>
+    <NoWarn>FS0988</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
