@@ -166,6 +166,13 @@ public static class Jobs
                 options: rjo
             );
 
+            RecurringJob.AddOrUpdate<core.fs.Reports.WeeklySummaryEmailService>(
+                recurringJobId: nameof(core.fs.Reports.WeeklySummaryEmailService),
+                methodCall: service => service.Execute(),
+                cronExpression: Cron.Weekly(DayOfWeek.Friday, 18),
+                options: rjo
+            );
+
             RecurringJob.AddOrUpdate<core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService>(
                 recurringJobId: nameof(core.fs.Portfolio.MonitoringServices.PortfolioAnalysisService.ReportOnMaxProfitBasedOnDaysHeld),
                 methodCall: service => service.ReportOnMaxProfitBasedOnDaysHeld(),

@@ -10,12 +10,13 @@ open Microsoft.AspNetCore.Authorization
 open core.fs.Accounts
 open core.fs.Adapters.Email
 open core.fs.Admin
+open core.fs.Reports
 open web.Utils
 
 [<ApiController>]
 [<Authorize("admin")>]
 [<Route("api/[controller]")>]
-type AdminController(handler: core.fs.Admin.Handler) =
+type AdminController(handler: Handler) =
     inherit ControllerBase()
 
     [<HttpGet("test")>]
@@ -63,6 +64,12 @@ type AdminController(handler: core.fs.Admin.Handler) =
     member this.Export() : Task<ActionResult> = task {
         let! result = handler.Handle(Unchecked.defaultof<Export>)
         return this.GenerateExport(result)
+    }
+
+    [<HttpGet("weekly-summary-email")>]
+    member this.TriggerWeeklySummaryEmail([<FromServices>] service: WeeklySummaryEmailService) : Task<ActionResult> = task {
+        do! service.Execute()
+        return this.Ok() :> ActionResult
     }
 
     [<HttpGet("sec/ticker-sync")>]
