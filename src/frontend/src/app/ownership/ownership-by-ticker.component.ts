@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -19,7 +19,8 @@ export class OwnershipByTickerComponent implements OnInit {
   private stocksService = inject(StocksService);
   private route = inject(ActivatedRoute);
 
-  ticker = '';
+  @Input() ticker = '';
+  @Input() embedded = false;
   ownershipSummary: OwnershipSummary[] = [];
   timeline: OwnershipEvent[] = [];
   loading = false;
@@ -30,10 +31,14 @@ export class OwnershipByTickerComponent implements OnInit {
   sharesOutstanding: number | null = null;
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.ticker = params['ticker'];
+    if (this.ticker) {
       this.loadData();
-    });
+    } else {
+      this.route.params.subscribe(params => {
+        this.ticker = params['ticker'];
+        this.loadData();
+      });
+    }
   }
 
   loadData() {
