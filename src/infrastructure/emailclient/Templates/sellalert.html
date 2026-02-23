@@ -49,29 +49,23 @@
                                                     <span style="color: #9ca3af;">Shares</span>&nbsp;&nbsp;
                                                     <strong style="color: #1f2937;">{{sell.number_of_shares}}</strong>
                                                 </td>
-                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%;">
+                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%; text-align: right;">
                                                     <span style="color: #9ca3af;">Date</span>&nbsp;&nbsp;
                                                     <strong style="color: #1f2937;">{{sell.date}}</strong>
                                                 </td>
                                             </tr>
                                             {{if sell.has_current_price}}
                                             <tr>
-                                                <td colspan="2" style="padding-top: 12px;">
-                                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;">
-                                                        <tr>
-                                                            <td style="padding: 10px 14px;">
-                                                                <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Current Price</div>
-                                                                <div style="font-size: 18px; font-weight: 700; color: #1f2937;">${{sell.current_price}}</div>
-                                                            </td>
-                                                            <td style="padding: 10px 14px; text-align: right;">
-                                                                {{if sell.price_direction == "down"}}
-                                                                <span style="display: inline-block; padding: 5px 12px; background-color: #d1fae5; color: #065f46; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8595;&nbsp;{{sell.price_change_pct}}% lower</span>
-                                                                {{else}}
-                                                                <span style="display: inline-block; padding: 5px 12px; background-color: #fee2e2; color: #991b1b; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8593;&nbsp;{{sell.price_change_pct}}% higher</span>
-                                                                {{end}}
-                                                            </td>
-                                                        </tr>
-                                                    </table>
+                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%;">
+                                                    <span style="color: #9ca3af;">Current Price</span>&nbsp;&nbsp;
+                                                    <strong style="color: #1f2937;">${{sell.current_price}}</strong>
+                                                </td>
+                                                <td style="padding: 3px 6px; font-size: 13px; width: 50%; text-align: right;">
+                                                    {{if sell.price_direction == "down"}}
+                                                    <span style="display: inline-block; padding: 3px 10px; background-color: #d1fae5; color: #065f46; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8595;&nbsp;{{sell.price_change_pct}}% lower</span>
+                                                    {{else}}
+                                                    <span style="display: inline-block; padding: 3px 10px; background-color: #fee2e2; color: #991b1b; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8593;&nbsp;{{sell.price_change_pct}}% higher</span>
+                                                    {{end}}
                                                 </td>
                                             </tr>
                                             {{end}}
