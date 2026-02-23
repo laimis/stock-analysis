@@ -169,7 +169,7 @@ public static class Jobs
             RecurringJob.AddOrUpdate<core.fs.Reports.WeeklySummaryEmail.WeeklySummaryEmailService>(
                 recurringJobId: nameof(core.fs.Reports.WeeklySummaryEmail.WeeklySummaryEmailService),
                 methodCall: service => service.Execute(),
-                cronExpression: "0 18 * * 5",  // 6pm PT every Friday
+                cronExpression: Cron.Weekly(DayOfWeek.Friday, 18),
                 options: rjo
             );
 
