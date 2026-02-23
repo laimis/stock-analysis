@@ -49,13 +49,18 @@ export class DashboardComponent implements OnInit {
 
         this.stocks.getReminders().subscribe(reminders => {
             const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const pad = (n: number) => String(n).padStart(2, '0');
+            const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+            const todayStr = toDateStr(today);
             const in7Days = new Date(today);
             in7Days.setDate(today.getDate() + 7);
+            const in7DaysStr = toDateStr(in7Days);
             this.upcomingReminders = reminders.filter(r => {
-                const d = new Date(r.date);
-                return r.state === 'pending' && d >= today && d <= in7Days;
-            }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                const dateStr = r.date.substring(0, 10);
+                return r.state === 'pending' && dateStr >= todayStr && dateStr <= in7DaysStr;
+            }).sort((a, b) => a.date.localeCompare(b.date));
+        }, error => {
+            console.log(error);
         });
     }
 
