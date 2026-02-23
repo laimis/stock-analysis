@@ -154,7 +154,7 @@ type AlertsController(handler: Handler) =
 
     [<HttpGet("triggerSECFilingsSync")>]
     [<Authorize("admin")>]
-    member this.TriggerSECFilingsSync([<FromServices>] secFilingsSyncService: SECFilingsMonitoring.SECFilingsSyncService) =
+    member this.TriggerSECFilingsSync([<FromServices>] secFilingsSyncService: secedgar.fs.SECFilingsSyncService) =
         secFilingsSyncService.Execute()
 
     [<HttpGet("triggerSECFilings")>]

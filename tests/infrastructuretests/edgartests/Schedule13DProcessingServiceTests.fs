@@ -39,6 +39,7 @@ module Schedule13DProcessingServiceTests =
                     else
                         return Seq.empty
                 }
+            member _.GetFilingsWithoutOwnershipEvents(_) = task { return Seq.empty }
             member _.GetFilingsSince(_) (_) = failwith "Not Implemented"
             member _.GetWatermark(_) (_) = failwith "Not Implemented"
             member _.UpsertWatermark(_) (_) (_) = failwith "Not Implemented"

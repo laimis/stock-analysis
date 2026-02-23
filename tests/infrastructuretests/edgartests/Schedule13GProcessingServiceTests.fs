@@ -40,6 +40,7 @@ module Schedule13GProcessingServiceTests =
                     else
                         return Seq.empty
                 }            
+            member _.GetFilingsWithoutOwnershipEvents(_) = task { return Seq.empty }
             member this.GetFilingsSince(ticker: Ticker) (since: DateTimeOffset): Threading.Tasks.Task<Collections.Generic.IEnumerable<SECFilingRecord>> = 
                 failwith "Not Implemented"
             member this.GetWatermark(userId: string) (ticker: Ticker): Threading.Tasks.Task<DateTimeOffset option> = 

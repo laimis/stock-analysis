@@ -41,6 +41,7 @@ module Form144ProcessingServiceTests =
                     else
                         return Seq.empty
                 }
+            member _.GetFilingsWithoutOwnershipEvents(_) = task { return Seq.empty }
             member _.GetFilingsSince(_) (_) : System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<SECFilingRecord>> =
                 failwith "Not Implemented"
             member _.GetWatermark(_) (_) : System.Threading.Tasks.Task<DateTimeOffset option> =

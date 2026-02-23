@@ -151,19 +151,23 @@ type Schedule13DProcessingService(
 
     interface IApplicationService
 
+    /// Exposed for inline invocation from SECFilingsSyncService after saving new filings.
+    member _.ProcessFiling(filing: SECFilingRecord) = processSchedule13DFiling filing
+
     member _.Execute() = task {
         try
-            logger.LogInformation("Starting Schedule 13D processing service")
-            
+            logger.LogInformation("Starting Schedule 13D catch-up processing service")
+
+            // Query for 13D filings that have no ownership events yet (missed or failed during sync).
             let formTypes = [| "SC 13D"; "SC 13D/A"; "SCHEDULE 13D"; "SCHEDULE 13D/A" |]
-            let! recentFilings = secFilingStorage.GetFilingsByFormType formTypes 100
-            
-            let filings = 
-                recentFilings
+            let! unprocessedFilings = secFilingStorage.GetFilingsWithoutOwnershipEvents formTypes
+
+            let filings =
+                unprocessedFilings
                 |> Seq.filter (fun f -> isSchedule13D f.FormType)
                 |> Seq.toArray
-            
-            logger.LogInformation($"Found {filings.Length} Schedule 13D/13D-A filings to process")
+
+            logger.LogInformation($"Found {filings.Length} unprocessed Schedule 13D/13D-A filings")
             
             if filings.Length = 0 then
                 logger.LogInformation("No Schedule 13D filings to process")
@@ -183,5 +187,5 @@ type Schedule13DProcessingService(
                 logger.LogInformation($"Schedule 13D processing completed. Success: {successCount}, Failures: {failureCount}")
         
         with ex ->
-            logger.LogError(ex, "Error in Schedule 13D processing service: {Message}", ex.Message)
+            logger.LogError(ex, "Error in Schedule 13D catch-up processing service: {Message}", ex.Message)
     }

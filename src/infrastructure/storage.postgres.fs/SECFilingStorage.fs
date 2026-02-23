@@ -163,6 +163,31 @@ type SECFilingStorage(connectionString: string) =
                     return results
             }
 
+        member _.GetFilingsWithoutOwnershipEvents(formTypes: seq<string>) : Task<IEnumerable<SECFilingRecord>> =
+            task {
+                let formTypesArray = formTypes.ToArray()
+
+                if formTypesArray.Length = 0 then
+                    return Enumerable.Empty<SECFilingRecord>()
+                else
+                    use db = getConnection()
+
+                    let query = """
+                        SELECT sf.id as Id, sf.ticker as Ticker, sf.cik as Cik, sf.form_type as FormType,
+                               sf.filing_date as FilingDate, sf.report_date as ReportDate, sf.description as Description,
+                               sf.filing_url as FilingUrl, sf.document_url as DocumentUrl, sf.created_at as CreatedAt,
+                               sf.is_xbrl as IsXBRL, sf.is_inline_xbrl as IsInlineXBRL
+                        FROM sec_filings sf
+                        WHERE sf.form_type = ANY(@FormTypes)
+                          AND NOT EXISTS (
+                            SELECT 1 FROM ownership_events oe WHERE oe.filing_id = sf.id
+                          )
+                        ORDER BY sf.filing_date DESC"""
+
+                    let! results = db.QueryAsync<SECFilingRecord>(query, {| FormTypes = formTypesArray |})
+                    return results
+            }
+
         member _.GetFilingsSince(ticker: Ticker) (since: DateTimeOffset) : Task<IEnumerable<SECFilingRecord>> =
             task {
                 use db = getConnection()

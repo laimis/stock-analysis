@@ -158,21 +158,23 @@ type Schedule13GProcessingService(
 
     interface IApplicationService
 
+    /// Exposed for inline invocation from SECFilingsSyncService after saving new filings.
+    member _.ProcessFiling(filing: SECFilingRecord) = processSchedule13GFiling filing
+
     member _.Execute() = task {
         try
-            logger.LogInformation("Starting Schedule 13G processing service")
-            
-            // Query for recent 13G and 13G/A filings (last 30 days)
-            // Include both "SC 13G" and "SCHEDULE 13G" variations to handle different SEC API formats
+            logger.LogInformation("Starting Schedule 13G catch-up processing service")
+
+            // Query for 13G filings that have no ownership events yet (missed or failed during sync).
             let formTypes = [| "SC 13G"; "SC 13G/A"; "SCHEDULE 13G"; "SCHEDULE 13G/A" |]
-            let! recentFilings = secFilingStorage.GetFilingsByFormType formTypes 100
-            
-            let filings = 
-                recentFilings
+            let! unprocessedFilings = secFilingStorage.GetFilingsWithoutOwnershipEvents formTypes
+
+            let filings =
+                unprocessedFilings
                 |> Seq.filter (fun f -> isSchedule13G f.FormType)
                 |> Seq.toArray
-            
-            logger.LogInformation($"Found {filings.Length} Schedule 13G/13G-A filings to process")
+
+            logger.LogInformation($"Found {filings.Length} unprocessed Schedule 13G/13G-A filings")
             
             if filings.Length = 0 then
                 logger.LogInformation("No Schedule 13G filings to process")
@@ -193,5 +195,5 @@ type Schedule13GProcessingService(
                 logger.LogInformation($"Schedule 13G processing completed. Success: {successCount}, Failures: {failureCount}")
         
         with ex ->
-            logger.LogError(ex, "Error in Schedule 13G processing service: {Message}", ex.Message)
+            logger.LogError(ex, "Error in Schedule 13G catch-up processing service: {Message}", ex.Message)
     }
