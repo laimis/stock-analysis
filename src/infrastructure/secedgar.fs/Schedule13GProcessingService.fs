@@ -180,18 +180,13 @@ type Schedule13GProcessingService(
             if filings.Length = 0 then
                 logger.LogInformation("No Schedule 13G filings to process")
             else
-                // Process each filing
-                let mutable successCount = 0
-                let mutable failureCount = 0
-                
-                for filing in filings do
-                    let! result = processSchedule13GFiling filing
-                    match result with
-                    | Ok _ -> successCount <- successCount + 1
-                    | Error _ -> failureCount <- failureCount + 1
-                    
-                    // Add a small delay between processing to respect rate limits
-                    do! System.Threading.Tasks.Task.Delay(500)
+                let! processed = 
+                    filings
+                    |> Array.map(fun f -> async { return! processSchedule13GFiling f |> Async.AwaitTask })
+                    |> Async.Sequential
+
+                let successCount = processed |> Array.filter (function Ok _ -> true | Error _ -> false) |> Array.length
+                let failureCount = processed.Length - successCount
                 
                 logger.LogInformation($"Schedule 13G processing completed. Success: {successCount}, Failures: {failureCount}")
         

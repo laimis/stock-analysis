@@ -172,19 +172,16 @@ type Schedule13DProcessingService(
             if filings.Length = 0 then
                 logger.LogInformation("No Schedule 13D filings to process")
             else
-                let mutable successCount = 0
-                let mutable failureCount = 0
                 
-                for filing in filings do
-                    let! result = processSchedule13DFiling filing
-                    match result with
-                    | Ok _ -> successCount <- successCount + 1
-                    | Error _ -> failureCount <- failureCount + 1
-                    
-                    // Respect SEC rate limits
-                    do! System.Threading.Tasks.Task.Delay(500)
+                let! results = 
+                    filings
+                    |> Array.map (fun filing -> async { return! processSchedule13DFiling filing |> Async.AwaitTask })
+                    |> Async.Sequential
+
+                let successCount = results |> Array.filter (function Ok () -> true | Error _ -> false) |> Array.length
+                let failureCount = results.Length - successCount
                 
-                logger.LogInformation($"Schedule 13D processing completed. Success: {successCount}, Failures: {failureCount}")
+                logger.LogInformation $"Schedule 13D processing completed. Success: {successCount}, Failures: {failureCount}"
         
         with ex ->
             logger.LogError(ex, "Error in Schedule 13D catch-up processing service: {Message}", ex.Message)
