@@ -117,12 +117,14 @@
                                 <ul class="list-group list-group-flush">
                                     @for (reminder of upcomingReminders; track reminder.reminderId) {
                                         <li class="list-group-item px-0">
-                                            <div class="d-flex align-items-center gap-3 flex-wrap">
-                                                @if (reminder.ticker) {
-                                                    <app-stock-link-and-tradingview-link [ticker]="reminder.ticker"></app-stock-link-and-tradingview-link>
-                                                }
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div style="min-width: 8rem;">
+                                                    @if (reminder.ticker) {
+                                                        <app-stock-link-and-tradingview-link [ticker]="reminder.ticker"></app-stock-link-and-tradingview-link>
+                                                    }
+                                                </div>
                                                 <span class="flex-grow-1">{{ reminder.message }}</span>
-                                                <span class="text-muted small">{{ reminder.date | timeAgo }}</span>
+                                                <span class="text-muted small text-nowrap">{{ reminder.date | timeAgo }}</span>
                                             </div>
                                         </li>
                                     }
