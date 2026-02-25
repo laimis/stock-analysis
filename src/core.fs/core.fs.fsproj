@@ -46,6 +46,7 @@
         <Compile Include="Options\MonitoringServices.fs" />
         <Compile Include="Accounts\Handlers.fs"/>
         <Compile Include="Accounts\RefreshBrokerageConnectionService.fs" />
+        <Compile Include="Admin\AdminCleanUp.fs"/>
         <Compile Include="Admin\Handlers.fs"/>
         <Compile Include="Alerts\Types.fs" />
         <Compile Include="Alerts\MonitoringServices.fs" />
