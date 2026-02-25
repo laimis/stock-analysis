@@ -355,5 +355,69 @@ namespace storagetests
             
             Assert.Empty(afterDelete);
         }
+
+        [Fact]
+        public async Task DeleteSentRemindersBefore_RemovesOnlyOldSentReminders()
+        {
+            var storage = GetStorage();
+            var userId = UserId.NewUserId(Guid.NewGuid());
+            var cutoff = DateTimeOffset.UtcNow.AddDays(-7);
+
+            // Sent reminder older than the cutoff → should be deleted
+            var oldSentReminder = new Reminder
+            {
+                ReminderId = Guid.NewGuid(),
+                UserId = userId,
+                Date = cutoff.AddDays(-10),
+                Message = "Old sent reminder",
+                Ticker = FSharpOption<Ticker>.None,
+                State = ReminderState.Sent,
+                CreatedAt = cutoff.AddDays(-10),
+                SentAt = FSharpOption<DateTimeOffset>.Some(cutoff.AddDays(-1))  // 1 day before cutoff → deleted
+            };
+
+            // Sent reminder newer than the cutoff → should be kept
+            var recentSentReminder = new Reminder
+            {
+                ReminderId = Guid.NewGuid(),
+                UserId = userId,
+                Date = cutoff.AddDays(3),
+                Message = "Recent sent reminder",
+                Ticker = FSharpOption<Ticker>.None,
+                State = ReminderState.Sent,
+                CreatedAt = cutoff.AddDays(3),
+                SentAt = FSharpOption<DateTimeOffset>.Some(cutoff.AddDays(1))   // 1 day after cutoff → kept
+            };
+
+            // Pending reminder (not sent) → should always be kept
+            var pendingReminder = new Reminder
+            {
+                ReminderId = Guid.NewGuid(),
+                UserId = userId,
+                Date = DateTimeOffset.UtcNow.AddDays(3),
+                Message = "Pending reminder",
+                Ticker = FSharpOption<Ticker>.None,
+                State = ReminderState.Pending,
+                CreatedAt = DateTimeOffset.UtcNow,
+                SentAt = FSharpOption<DateTimeOffset>.None
+            };
+
+            await storage.SaveReminder(oldSentReminder);
+            await storage.SaveReminder(recentSentReminder);
+            await storage.SaveReminder(pendingReminder);
+
+            var beforeDelete = await storage.GetReminders(userId);
+            Assert.Equal(3, beforeDelete.Count());
+
+            var deleted = await storage.DeleteSentRemindersBefore(cutoff);
+
+            Assert.True(deleted >= 1, $"Expected at least 1 sent reminder to be deleted, but got {deleted}");
+
+            var remaining = (await storage.GetReminders(userId)).ToList();
+            Assert.Equal(2, remaining.Count);
+            Assert.DoesNotContain(remaining, r => r.ReminderId == oldSentReminder.ReminderId);
+            Assert.Contains(remaining, r => r.ReminderId == recentSentReminder.ReminderId);
+            Assert.Contains(remaining, r => r.ReminderId == pendingReminder.ReminderId);
+        }
     }
 }
