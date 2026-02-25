@@ -1,7 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {TickerCorrelation} from '../../services/stocks.service';
 import { DecimalPipe, NgClass } from "@angular/common";
-import {LoadingComponent} from "../loading/loading.component";
 import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tradingview-link.component";
 
 @Component({
@@ -25,8 +24,7 @@ export class CorrelationsComponent {
     @Input()
     set correlations(value: TickerCorrelation[]) {
         this._correlations = value;
-        this.correlationTickers = value.map(c => c.ticker)
-        this.sortByCorrelation(this.correlationTickers[0])
+        this.sortByCorrelation(value[0].ticker)
         this.avgCorrelation = value.reduce((acc, c) => acc + c.averageCorrelation, 0) / value.length
     }
     get correlations() {
@@ -35,6 +33,11 @@ export class CorrelationsComponent {
     
     @Input()
     days: number
+
+    getCorrelation(row: TickerCorrelation, colTicker: string): number {
+        const colIndex = this._correlations.findIndex(c => c.ticker === colTicker)
+        return row.correlations[colIndex]
+    }
 
     sortByAverageCorrelation() {
         this.sortDirection = this.sortDirection * -1
@@ -49,9 +52,10 @@ export class CorrelationsComponent {
                 
                 return bAverage - aAverage
             })
+        this.correlationTickers = this.sortedCorrelations.map(c => c.ticker)
     }
-    sortByCorrelation(ticker: string) {
 
+    sortByCorrelation(ticker: string) {
         if (this.selectedTicker === ticker) {
             this.sortDirection = this.sortDirection * -1
         } else {
@@ -76,6 +80,7 @@ export class CorrelationsComponent {
                 
                 return bCorrelation - aCorrelation
             })
+        this.correlationTickers = this.sortedCorrelations.map(c => c.ticker)
     }
     
 }

@@ -528,7 +528,7 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
             
             return successOnly
             |> Array.mapi (fun index (ticker, _) ->
-                let row = correlations.GetValue(index) :?> float[]
+                let row = correlations[index]
                 let averageCorrelationMinusItself =
                     row |> Array.sum |> fun sum -> (sum - row[index]) / (float (row.Length - 1))
                 {|ticker=ticker; correlations=row; averageCorrelation=averageCorrelationMinusItself|}

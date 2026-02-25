@@ -22,7 +22,8 @@
             <td class="fixed-side">
               <app-stock-link-and-tradingview-link [ticker]="correlation.ticker"></app-stock-link-and-tradingview-link>
             </td>
-            @for (c of correlation.correlations; track c) {
+            @for (colTicker of correlationTickers; track colTicker) {
+              @let c = getCorrelation(correlation, colTicker);
               <td
                 [ngClass]="{'high-negative': c <= -0.5, 'high-positive': c >= 0.5, 'middle-negative': c <= -0.3 && c > -0.5, 'middle-positive': c >= 0.3 && c < 0.5}">
                 {{ c | number:'1.2-2' }}
