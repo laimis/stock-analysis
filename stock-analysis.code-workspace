@@ -12,10 +12,6 @@
 			"dotnet build": true,
 			"dotnet test": true,
 			".\\release_prod.ps1": true
-		},
-		"[fsharp]": {
-			"editor.formatOnSave": true,
-			"editor.defaultFormatter": "Ionide.Ionide-fsharp"
 		}
 	}
 }
