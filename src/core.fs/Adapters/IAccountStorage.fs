@@ -42,6 +42,7 @@ type IAccountStorage =
     abstract member GetReminders: userId:UserId -> Task<Reminder seq>
     abstract member SaveReminder: reminder:Reminder -> Task
     abstract member DeleteReminder: reminderId:Guid -> userId:UserId -> Task
+    abstract member DeleteSentRemindersBefore: cutoffDate:DateTimeOffset -> Task<int>
     abstract member GetTickerCik: ticker:string -> Task<TickerCikMapping option>
     abstract member SaveTickerCikMappings: mappings:TickerCikMapping seq -> Task
     abstract member GetAllTickerCikMappings: unit -> Task<TickerCikMapping seq>

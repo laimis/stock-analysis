@@ -194,6 +194,13 @@ public static class Jobs
                 cronExpression: Cron.Daily(20, 0),
                 options: rjo
             );
+
+            RecurringJob.AddOrUpdate<core.fs.Admin.AdminCleanUpService>(
+                recurringJobId: nameof(core.fs.Admin.AdminCleanUpService),
+                methodCall: service => service.Execute(),
+                cronExpression: Cron.Daily(2), // 2am daily
+                options: rjo
+            );
         }
         else
         {

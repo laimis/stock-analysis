@@ -666,6 +666,14 @@ ON CONFLICT (reminderid) DO UPDATE SET
                 return! db.ExecuteAsync(query, {| reminderid = reminderId; userid = id |})
             }
         
+        member this.DeleteSentRemindersBefore(cutoffDate: DateTimeOffset) =
+            task {
+                use db = this.GetConnection()
+                let sentState = ReminderState.toString ReminderState.Sent
+                let query = "DELETE FROM reminders WHERE state = @state AND sentat < @cutoffDate"
+                return! db.ExecuteAsync(query, {| state = sentState; cutoffDate = cutoffDate.ToUniversalTime() |})
+            }
+        
         member this.GetTickerCik(ticker: string) = 
             task {
                 use db = this.GetConnection()
