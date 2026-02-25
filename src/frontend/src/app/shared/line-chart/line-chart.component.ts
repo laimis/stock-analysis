@@ -110,7 +110,8 @@ function toChartData(container: DataPointContainer) {
 function toChart(containers: DataPointContainer[], titleOverride?: string) {
 
     let title = titleOverride !== undefined ? titleOverride : containers.map(c => c.label).join(", ")
-    let isDate = containers[0].data[0].isDate
+    const firstDataPoint = containers.find(c => c.data.length > 0)?.data[0]
+    let isDate = firstDataPoint?.isDate ?? false
     let data = []
     containers.forEach(c => {
         toChartData(c).forEach(d => data.push(d))
