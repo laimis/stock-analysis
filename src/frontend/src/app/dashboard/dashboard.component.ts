@@ -61,7 +61,7 @@ export class DashboardComponent implements OnInit {
             const in7DaysStr = toDateStr(in7Days);
             this.upcomingReminders = reminders.filter(r => {
                 const dateStr = r.date.substring(0, 10);
-                return r.state === 'pending' && dateStr >= yesterdayStr && dateStr <= in7DaysStr;
+                return dateStr >= yesterdayStr && dateStr <= in7DaysStr;
             }).sort((a, b) => a.date.localeCompare(b.date));
         }, error => {
             console.log(error);
