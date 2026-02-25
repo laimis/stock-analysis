@@ -42,6 +42,12 @@ tests/*            → xUnit test projects for C# and F# code
 - **Custom CSS**: Define in `styles.css`, avoid inline styles or component-specific styles that are located in component css files
 - **Component-specific styles**: Use sparingly, define in `styles.css` if absolutely necessary
 
+### F# Coding Conventions
+- **Never use `printfn`** in generated F# code — it is strictly forbidden
+- Prefer `Console.WriteLine` and `Console.Write` for all console output
+- Avoid mutable state; prefer pure functions and immutable data structures
+- **Prefer functional collection operations** (`List.map`, `List.filter`, `List.fold`, `Seq.map`, `Array.map`, etc.) over imperative `for x in ... do` loops or `if/else` chains; use pattern matching and pipeline operators (`|>`) to express logic idiomatically
+
 ### Event Sourcing Architecture
 - Aggregates follow a similar pattern but leverage F#'s discriminated unions and functional paradigms:
 - Events are persisted to `events` table in PostgreSQL via `PostgresAggregateStorage`
