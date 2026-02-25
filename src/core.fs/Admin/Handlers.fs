@@ -123,7 +123,8 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
     
     member _.Handle (cmd:MigrateSECFilings) : System.Threading.Tasks.Task<Result<MigrateSECFilingsResponse,ServiceError>> = task {
         try
-            logger.LogInformation($"Starting SEC filings migration for user: {cmd.userEmail}")
+            
+            logger.LogInformation $"Starting SEC filings migration for user: {cmd.userEmail}"
             
             // Get user by email
             let! user = storage.GetUserByEmail(cmd.userEmail)
@@ -217,11 +218,10 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                             do! System.Threading.Tasks.Task.Delay(100)
                             
                         with ex ->
-                            let msg = $"Error processing {ticker.Value}: {ex.Message}"
-                            logger.LogError(msg)
-                            details.Add(msg)
+                            logger.LogError $"Error processing ticker {ticker.Value}: {ex}"
+                            details.Add $"Error processing {ticker.Value}: {ex.Message}"
                     
-                    logger.LogInformation($"SEC filings migration completed. Processed {allTickers.Length} tickers, saved {totalFilingsSaved} total filings")
+                    logger.LogInformation $"SEC filings migration completed. Processed {allTickers.Length} tickers, saved {totalFilingsSaved} total filings"
                     
                     return Ok {
                         UserEmail = cmd.userEmail
@@ -230,6 +230,6 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
                         Details = details |> Seq.toList
                     }
         with ex ->
-            logger.LogError($"Error in SEC filings migration: {ex.Message}")
+            logger.LogError($"Error in SEC filings migration: {ex}")
             return Error (ServiceError ex.Message)
     }

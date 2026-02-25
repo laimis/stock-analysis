@@ -3,15 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { OwnershipService, OwnershipSummary, OwnershipEvent } from '../services/ownership.service';
-import { StocksService } from '../services/stocks.service';
+import { StocksService, DataPoint, DataPointContainer, ChartType } from '../services/stocks.service';
 import { TimeAgoPipe } from '../services/time-ago.pipe';
+import { LineChartComponent } from '../shared/line-chart/line-chart.component';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
 
 @Component({
   selector: 'app-ownership-by-ticker',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TimeAgoPipe],
+  imports: [CommonModule, FormsModule, RouterModule, TimeAgoPipe, LineChartComponent],
   templateUrl: './ownership-by-ticker.component.html'
 })
 export class OwnershipByTickerComponent implements OnInit {
@@ -36,6 +37,12 @@ export class OwnershipByTickerComponent implements OnInit {
   timelineDays = 1825;
   entityNameMap = new Map<string, string>();
   sharesOutstanding: number | null = null;
+  ownershipChartContainers: DataPointContainer[] = [];
+
+  private readonly chartColors = [
+    '#2196F3', '#F44336', '#4CAF50', '#FF9800', '#9C27B0',
+    '#00BCD4', '#795548', '#607D8B', '#E91E63', '#FF5722'
+  ];
 
   ngOnInit() {
     if (!this._ticker) {
@@ -81,6 +88,7 @@ export class OwnershipByTickerComponent implements OnInit {
           this.entityNameMap.set(s.entity.id, s.entity.name);
         });
         this.loading = false;
+        this.buildOwnershipChartData();
       },
       error: (err) => {
         this.error = `Failed to load ownership summary: ${err.message}`;
@@ -95,6 +103,7 @@ export class OwnershipByTickerComponent implements OnInit {
     this.ownershipService.getOwnershipTimeline(this.ticker, days).subscribe({
       next: (timeline) => {
         this.timeline = timeline;
+        this.buildOwnershipChartData();
         // Load entity names for any entities not in summary
         const missingEntityIds = timeline
           .map(e => e.entityId)
@@ -140,5 +149,47 @@ export class OwnershipByTickerComponent implements OnInit {
       return 0;
     }
     return (this.totalShares / this.sharesOutstanding) * 100;
+  }
+
+  buildOwnershipChartData() {
+    if (this.ownershipSummary.length === 0 || this.timeline.length === 0) {
+      this.ownershipChartContainers = [];
+      return;
+    }
+
+    // Take top owners by current share count (max 10 for readability)
+    const topOwners = [...this.ownershipSummary]
+      .sort((a, b) => b.currentShares - a.currentShares)
+      .slice(0, 10);
+
+    const today = new Date().toISOString().split('T')[0];
+
+    this.ownershipChartContainers = topOwners
+      .map((owner, idx) => {
+        const entityEvents = this.timeline
+          .filter(e => e.entityId === owner.entity.id)
+          .sort((a, b) => a.transactionDate.localeCompare(b.transactionDate));
+
+        const dataPoints: DataPoint[] = entityEvents.map(e => ({
+          value: e.sharesAfter,
+          label: e.transactionDate.split('T')[0],
+          isDate: true
+        }));
+
+        // Extend the line to today with the last known share count
+        const lastPoint = dataPoints[dataPoints.length - 1];
+        if (lastPoint && lastPoint.label < today) {
+          dataPoints.push({ value: lastPoint.value, label: today, isDate: true });
+        }
+
+        return {
+          label: owner.entity.name,
+          chartType: ChartType.Line,
+          data: dataPoints,
+          color: this.chartColors[idx % this.chartColors.length],
+          includeZero: false
+        } as DataPointContainer;
+      })
+      .filter(c => c.data.length > 0);
   }
 }

@@ -980,6 +980,7 @@ export interface DataPointContainer {
     data: DataPoint[],
     annotationLine?: ChartAnnotationLine
     includeZero?: boolean
+    color?: string
 }
 
 export interface StockTradingPerformanceCollection {
