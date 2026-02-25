@@ -53,12 +53,15 @@ export class DashboardComponent implements OnInit {
             const pad = (n: number) => String(n).padStart(2, '0');
             const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
             const todayStr = toDateStr(today);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const yesterdayStr = toDateStr(yesterday);
             const in7Days = new Date(today);
             in7Days.setDate(today.getDate() + 7);
             const in7DaysStr = toDateStr(in7Days);
             this.upcomingReminders = reminders.filter(r => {
                 const dateStr = r.date.substring(0, 10);
-                return r.state === 'pending' && dateStr >= todayStr && dateStr <= in7DaysStr;
+                return r.state === 'pending' && dateStr >= yesterdayStr && dateStr <= in7DaysStr;
             }).sort((a, b) => a.date.localeCompare(b.date));
         }, error => {
             console.log(error);
