@@ -177,9 +177,11 @@ export class OwnershipByTickerComponent implements OnInit {
         }));
 
         // Extend the line to today with the last known share count
-        const lastPoint = dataPoints[dataPoints.length - 1];
-        if (lastPoint && lastPoint.label < today) {
-          dataPoints.push({ value: lastPoint.value, label: today, isDate: true });
+        if (dataPoints.length > 0) {
+          const lastPoint = dataPoints[dataPoints.length - 1];
+          if (lastPoint.label < today) {
+            dataPoints.push({ value: lastPoint.value, label: today, isDate: true });
+          }
         }
 
         return {
