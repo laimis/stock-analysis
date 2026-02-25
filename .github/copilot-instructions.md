@@ -5,6 +5,16 @@ Nightingale Trading (aka NGTDTrading) is a stock, options, and crypto portfolio 
 
 ## Architecture
 
+### Onion Architecture
+This project follows **onion architecture**. Dependencies always point inward — outer layers depend on inner layers, never the reverse:
+
+1. **Core** (`src/core`, `src/core.fs`) — innermost ring; zero dependencies on infrastructure or web. Defines domain types, aggregates, events, and **port interfaces** (under `src/core.fs/Adapters/`) that outer layers must implement.
+2. **Infrastructure** (`src/infrastructure/*`) — middle ring; implements the core's port interfaces. Each infra project depends only on `core.fs`/`core`, never on other infra projects (except `storage.shared.fs` as a shared utility). Includes storage, email, SMS, brokerage clients, SEC, CSV parsing, etc.
+3. **Composition Root** (`src/infrastructure/di.fs`) — wires all infra implementations to core interfaces via DI; the only place allowed to reference all infra projects simultaneously.
+4. **Web / Entry Point** (`src/web.fs`) — outermost ring; references only `core.fs` (for types/interfaces), `core` (transitional), `di.fs` (for DI wiring), and `web.interop`. Must **not** reference individual infra projects directly.
+
+> When adding new features: define interfaces in `core.fs/Adapters/`, implement them in the appropriate `infrastructure/` project, register in `di.fs`, and consume via the interface in `web.fs` or `core.fs` handlers.
+
 ### Polyglot .NET Structure
 - **C# Components**: Domain aggregates, events, infrastructure adapters (in `src/core`)
 - **F# Components**: Domain aggregates, events, Business logic, handlers, services, type-safe domain modeling (in `src/core.fs`)
