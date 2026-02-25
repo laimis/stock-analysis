@@ -88,7 +88,9 @@ function toChartData(container: DataPointContainer) {
     let data: any = [{
         type: chartType,
         markerSize: markerSize,
-        color: blue,
+        color: container.color || blue,
+        name: container.label,
+        showInLegend: true,
         dataPoints: chartJSDataPoints
     }]
 
@@ -105,10 +107,11 @@ function toChartData(container: DataPointContainer) {
     return data
 }
 
-function toChart(containers: DataPointContainer[]) {
+function toChart(containers: DataPointContainer[], titleOverride?: string) {
 
-    let title = containers.map(c => c.label).join(", ")
-    let isDate = containers[0].data[0].isDate
+    let title = titleOverride !== undefined ? titleOverride : containers.map(c => c.label).join(", ")
+    const firstDataPoint = containers.find(c => c.data.length > 0)?.data[0]
+    let isDate = firstDataPoint?.isDate ?? false
     let data = []
     containers.forEach(c => {
         toChartData(c).forEach(d => data.push(d))
@@ -150,6 +153,17 @@ export class LineChartComponent {
 
     options: any // don't have type from canvasjs .... blerg
 
+    private _containers: DataPointContainer[] = [];
+    private _title: string | undefined = undefined;
+
+    @Input()
+    set chartTitle(value: string) {
+        this._title = value;
+        if (this._containers.length > 0) {
+            this.renderChart(this._containers);
+        }
+    }
+
     @Input()
     set dataContainer(container: DataPointContainer) {
         if (container) {
@@ -165,7 +179,8 @@ export class LineChartComponent {
     }
 
     private renderChart(containers: DataPointContainer[]) {
+        this._containers = containers;
         this.options = containers.length === 0 || containers[0].data.length === 0 ?
-            emptyChart(containers) : toChart(containers);
+            emptyChart(containers) : toChart(containers, this._title);
     }
 }

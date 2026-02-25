@@ -107,6 +107,18 @@
         </div>
       }
 
+      <!-- Ownership Chart -->
+      @if (!loading && ownershipChartContainers.length > 0) {
+        <div class="card mb-4">
+          <div class="card-header">
+            <h4 class="mb-0">Ownership Over Time</h4>
+          </div>
+          <div class="card-body">
+            <app-line-chart [dataContainers]="ownershipChartContainers" chartTitle=""></app-line-chart>
+          </div>
+        </div>
+      }
+
       <!-- Ownership Timeline -->
       @if (!loading && timeline.length > 0) {
         <div class="card">
