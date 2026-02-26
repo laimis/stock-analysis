@@ -102,8 +102,8 @@
                                             <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
                                             <app-stock-link [ticker]="position.ticker"></app-stock-link>
                                         </div>
-                                        <div class="col">{{ position.opened | date:'shortDate' }}</div>
-                                        <div class="col">{{ position.closed | date:'shortDate' }}</div>
+                                        <div class="col">{{ position.opened | date:'shortDate':'UTC' }}</div>
+                                        <div class="col">{{ position.closed | date:'shortDate':'UTC' }}</div>
                                         <div class="col">{{ position.rr | number:'1.0-2' }}</div>
                                         <div class="col">{{ position.profit | currency }}</div>
                                         <div class="col">{{ position.grade }}</div>
@@ -127,8 +127,8 @@
                                             <app-trading-view-link [ticker]="position.ticker"></app-trading-view-link>
                                             <app-stock-link [ticker]="position.ticker"></app-stock-link>
                                         </div>
-                                        <div class="col">{{ position.opened | date:'shortDate' }}</div>
-                                        <div class="col">{{ position.closed | date:'shortDate' }}</div>
+                                        <div class="col">{{ position.opened | date:'shortDate':'UTC' }}</div>
+                                        <div class="col">{{ position.closed | date:'shortDate':'UTC' }}</div>
                                         <div class="col">{{ position.rr | number:'1.0-2' }}</div>
                                         <div class="col">{{ position.profit | currency }}</div>
                                         <div class="col">{{ position.grade }}</div>
@@ -165,7 +165,7 @@
                             @if (i === 0 || getPropertyForSeperatorGrouping(p) !== getPropertyForSeperatorGrouping(positions[i - 1])) {
                                 <tr>
                                     <td colspan="3" class="text-center fw-bold pt-3">
-                                        {{ getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy' }}
+                                        {{ getPropertyForSeperatorGrouping(p) | date:'MMMM yyyy':'UTC' }}
                                     </td>
                                     <td class="pt-3 pb-3">R:R Sum <span
                                         class="fw-bold">{{ getRRSumForMonth(p) | number }}</span></td>
@@ -196,8 +196,8 @@
                                         <app-trading-view-link [ticker]="p.ticker"></app-trading-view-link>
                                         <app-stock-link [ticker]="p.ticker"></app-stock-link>
                                     </td>
-                                    <td>{{ p.opened | date }}</td>
-                                    <td>{{ p.closed | date }}</td>
+                                    <td>{{ p.opened | date:'mediumDate':'UTC' }}</td>
+                                    <td>{{ p.closed | date:'mediumDate':'UTC' }}</td>
                                     <td>{{ p.daysHeld }}</td>
                                     <td>{{ p.rr | number:'1.0-2' }}</td>
                                     <td>{{ p.profit | currency }}</td>

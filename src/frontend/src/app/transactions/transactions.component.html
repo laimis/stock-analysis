@@ -167,7 +167,7 @@
                             <tbody>
                                 @for (t of g.transactions; track t) {
                                     <tr>
-                                        <td class="ps-4">{{ t.date | date:'shortDate' }}</td>
+                                        <td class="ps-4">{{ t.date | date:'shortDate':'UTC' }}</td>
                                         <td>
                                             @if (t.isOption) {
                                                 <a [routerLink]="[ '/optiondetails', t.aggregateId ]"

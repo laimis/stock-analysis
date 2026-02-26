@@ -33,7 +33,7 @@
               (click)="loadPosition(position)">
               <div>
                 <span class="fw-bold">{{ position.ticker }}</span>
-                <small class="text-muted ms-2">{{ position.opened | date:'mediumDate' }}</small>
+                <small class="text-muted ms-2">{{ position.opened | date:'mediumDate':'UTC' }}</small>
               </div>
               <span [class]="position.profit >= 0 ? 'profit-positive' : 'profit-negative'">
                 {{ position.profit | currency }}
@@ -139,7 +139,7 @@
                         @for (p of transactions; track p; let i = $index) {
                           <div class="transaction-row d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                              <span class="me-3">{{ p.date | date:'shortDate' }}</span>
+                              <span class="me-3">{{ p.date | date:'shortDate':'UTC' }}</span>
                               <span class="badge bg-light text-dark me-3">{{ p.type }}</span>
                               <span class="me-3">{{ p.price | currency }}</span>
                               <span class="me-3">{{ p.numberOfShares | number }} shares</span>

@@ -32,7 +32,7 @@
             @for (reminder of reminders; track reminder.reminderId) {
               <tr [class.table-warning]="isOverdue(reminder)">
                 <td class="ps-4 py-3">
-                  <div>{{ reminder.date | date:'mediumDate' }}</div>
+                  <div>{{ reminder.date | date:'mediumDate':'UTC' }}</div>
                   @if (isOverdue(reminder)) {
                     <span class="badge bg-danger">Overdue</span>
                   }

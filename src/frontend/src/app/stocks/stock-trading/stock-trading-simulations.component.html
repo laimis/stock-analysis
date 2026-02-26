@@ -21,8 +21,8 @@
       <div class="row mb-3">
         <div class="col-10">
           <div>
-            <span class="text-muted">Earliest date:</span> {{ results[0].performance.earliestDate | date }},
-            <span class="text-muted">latest date:</span> {{ results[0].performance.latestDate | date }}
+            <span class="text-muted">Earliest date:</span> {{ results[0].performance.earliestDate | date:'mediumDate':'UTC' }},
+            <span class="text-muted">latest date:</span> {{ results[0].performance.latestDate | date:'mediumDate':'UTC' }}
           </div>
         </div>
         <div class="col-2">

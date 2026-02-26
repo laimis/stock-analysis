@@ -23,7 +23,7 @@
                                 [ngClass]="{'bg-success': g.type === 'Up', 'bg-secondary': g.type === 'Down', 'text-white': true, 'bi': true, 'bi-arrow-up-circle': g.type === 'Up', 'bi-arrow-down-circle': g.type === 'Down'}"
                                 class="ps-2 pe-2">
                             </i>
-                            {{ g.bar.dateStr | date }}
+                            {{ g.bar.dateStr | date:'mediumDate':'UTC' }}
                         </td>
                         <td>{{ g.gapSizePct | percent:'1.2-2' }}</td>
                         <td>{{ g.percentChange | percent:'1.2-2' }}</td>

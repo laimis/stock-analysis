@@ -17,7 +17,7 @@
             <input
               type="date"
               class="form-control border-start-0 ps-0"
-              [ngModel]="selectedStartDate | date:'yyyy-MM-dd'"
+              [ngModel]="selectedStartDate | date:'yyyy-MM-dd':'UTC'"
               (ngModelChange)="onStartDateChange($event)"
               aria-label="Select start date">
             </div>
@@ -34,7 +34,7 @@
               <input
                 type="date"
                 class="form-control border-start-0 ps-0"
-                [ngModel]="selectedEndDate | date:'yyyy-MM-dd'"
+                [ngModel]="selectedEndDate | date:'yyyy-MM-dd':'UTC'"
                 (ngModelChange)="onEndDateChange($event)"
                 aria-label="Select end date">
               </div>

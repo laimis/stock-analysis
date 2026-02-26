@@ -75,8 +75,8 @@
                         {{ role.isActive ? 'Active' : 'Inactive' }}
                       </span>
                     </td>
-                    <td>{{ role.firstSeen | date }}</td>
-                    <td>{{ role.lastSeen | date }}</td>
+                    <td>{{ role.firstSeen | date:'mediumDate':'UTC' }}</td>
+                    <td>{{ role.lastSeen | date:'mediumDate':'UTC' }}</td>
                   </tr>
                 }
               </tbody>
@@ -109,7 +109,7 @@
               <tbody>
                 @for (event of events; track event.id) {
                   <tr>
-                    <td>{{ event.transactionDate | date }}</td>
+                    <td>{{ event.transactionDate | date:'mediumDate':'UTC' }}</td>
                     <td>
                       <app-stock-link-and-tradingview-link [ticker]="event.companyTicker"></app-stock-link-and-tradingview-link>
                       <a [routerLink]="['/ownership/ticker', event.companyTicker]" class="ms-2 small text-muted" title="View ownership for {{ event.companyTicker }}">ownership</a>

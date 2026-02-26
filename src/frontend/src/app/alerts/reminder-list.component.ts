@@ -29,6 +29,9 @@ export class ReminderListComponent {
   }
 
   isOverdue(reminder: Reminder): boolean {
-    return reminder.state === 'pending' && new Date(reminder.date) < new Date();
+    if (reminder.state !== 'pending') return false;
+    // Compare date strings in 'YYYY-MM-DD' format (ISO lexicographic comparison is valid)
+    const todayStr = new Date().toLocaleDateString('en-CA'); // returns 'YYYY-MM-DD' in local time
+    return reminder.date < todayStr;
   }
 }

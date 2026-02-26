@@ -233,7 +233,7 @@
                     <div class="col">
                         <div class="metric-card">
                             <div class="metric-name">Dividend Date</div>
-                            <div class="metric-value">{{ profile.fundamentals['dividendDate'] | date }}</div>
+                            <div class="metric-value">{{ profile.fundamentals['dividendDate'] | date:'mediumDate':'UTC' }}</div>
                         </div>
                     </div>
                     <div class="col">

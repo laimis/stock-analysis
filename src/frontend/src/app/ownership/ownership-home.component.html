@@ -136,7 +136,7 @@
                       @for (timeline of recentTimelines; track timeline.id) {
                         <tr>
                           <td class="ps-4 py-3">
-                            <div>{{ timeline.filingDate | date:'mediumDate' }}</div>
+                            <div>{{ timeline.filingDate | date:'mediumDate':'UTC' }}</div>
                             <div class="small text-muted">{{ timeline.createdAt | timeAgo }}</div>
                           </td>
                           <td class="py-3">

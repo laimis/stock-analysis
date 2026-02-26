@@ -59,7 +59,7 @@ module Reminder =
 type ReminderDto = {
     ReminderId: string
     UserId: string
-    Date: DateTimeOffset
+    Date: string  // Serialized as "yyyy-MM-dd" to avoid timezone shifting on the frontend
     Message: string
     Ticker: string option
     State: string
@@ -72,7 +72,7 @@ module ReminderDto =
         {
             ReminderId = reminder.ReminderId.ToString()
             UserId = reminder.UserId |> IdentifierHelper.getUserId |> string
-            Date = reminder.Date
+            Date = reminder.Date.ToString("yyyy-MM-dd")
             Message = reminder.Message
             Ticker = reminder.Ticker |> Option.map (fun (t:Ticker) -> t.Value)
             State = ReminderState.toString reminder.State
