@@ -126,6 +126,16 @@ dotnet watch run --project src/web.fs/web.fs.fsproj
 - **SEC EDGAR**: Financial filings parsing (`infrastructure/secedgar`)
 - **Hangfire**: Scheduled background jobs (daily alerts, price monitoring)
 
+## F# Coding Style
+
+- **No unnecessary parentheses on single-argument calls**: In F#, single-argument method and function calls do not require parentheses. Always omit them.
+  - Correct: `logger.LogInformation "message"`
+  - Wrong: `logger.LogInformation("message")`
+  - Correct: `logger.LogError ex.Message`
+  - Wrong: `logger.LogError(ex.Message)`
+- **Parentheses are only required** when passing a tuple (multiple arguments to a .NET method), or when grouping an expression: `obj.Method(arg1, arg2)` or `foo (bar baz)`.
+- This applies to all F# code across `src/core.fs/`, `src/infrastructure/`, `src/web.fs/`, `src/studies/`, and `src/migrations/`.
+
 ## Project-Specific Conventions
 
 ### Naming
