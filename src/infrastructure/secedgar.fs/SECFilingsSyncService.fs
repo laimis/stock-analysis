@@ -78,6 +78,8 @@ type SECFilingsSyncService(
         try
             let! response = secFilings.GetFilings ticker |> Async.AwaitTask
             match response with
+            | Error err when err.Message.StartsWith("No CIK mapping found") ->
+                logger.LogDebug("Skipping SEC filings sync for {Ticker}: no CIK mapping (likely ETF or fund)", ticker.Value)
             | Error err ->
                 logger.LogError("Failed to get SEC filings for {Ticker}: {Error}", ticker.Value, err.Message)
             | Ok companyFilings ->

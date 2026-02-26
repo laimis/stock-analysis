@@ -85,7 +85,7 @@ type EdgarClient(logger: ILogger<EdgarClient> option, accountStorage: IAccountSt
                 logger |> Option.iter (fun l -> l.LogDebug("Resolved ticker {ticker} to CIK {cik}", ticker.Value, mapping.Cik))
                 return Ok mapping.Cik
             | None ->
-                logger |> Option.iter (fun l -> l.LogWarning("No CIK mapping found for ticker {ticker}", ticker.Value))
+                logger |> Option.iter (fun l -> l.LogDebug("No CIK mapping found for ticker {ticker}, skipping SEC filings sync", ticker.Value))
                 return Error (ServiceError $"No CIK mapping found for ticker {ticker.Value}. Please sync ticker data first.")
     }
 
