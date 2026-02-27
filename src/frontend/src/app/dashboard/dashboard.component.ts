@@ -71,4 +71,15 @@ export class DashboardComponent implements OnInit {
     onTickerSelected(ticker: string) {
         this.router.navigateByUrl('/stocks/' + ticker)
     }
+
+    dismissReminder(reminder: Reminder) {
+        this.stocks.deleteReminder(reminder.reminderId).subscribe({
+            next: () => {
+                this.upcomingReminders = this.upcomingReminders.filter(r => r.reminderId !== reminder.reminderId);
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    }
 }
