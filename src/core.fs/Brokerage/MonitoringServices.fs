@@ -24,6 +24,7 @@ type AccountMonitoringService(
         [
             "WISDOMTREE FLOATING RATETREASRY ETF", "USFR"
             "WISDOMTREE FLOATING RTETREAS ETF IV", "USFR"
+            "WISDOMTREE FLOATING RATETREASURY FUND", "USFR"
             "NEWMONT CORP", "NEM"
             "GLOBAL PAYMENTS INC", "GPN"
             "SOUTHWEST AIRLINES", "LUV"
