@@ -25,18 +25,23 @@
       <!-- Entity Information -->
       @if (entity) {
         <div class="card mb-4">
-          <div class="card-header">
-            <h4>{{ entity.name }}</h4>
-          </div>
           <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <p><strong>Entity Type:</strong> <span class="badge bg-secondary">{{ getEntityTypeDisplay(entity.entityType) }}</span></p>
-                <p><strong>CIK:</strong> {{ entity.cik || 'N/A' }}</p>
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <div>{{ getEntityTypeDisplay(entity.entityType) }}</div>
+                <div class="text-muted small">Entity Type</div>
               </div>
-              <div class="col-md-6">
-                <p><strong>First Seen:</strong> {{ entity.firstSeen | date:'short' }}</p>
-                <p><strong>Last Seen:</strong> {{ entity.lastSeen | date:'short' }}</p>
+              <div class="col-6 col-md-3">
+                <div>{{ entity.cik || 'N/A' }}</div>
+                <div class="text-muted small">CIK</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div>{{ entity.firstSeen | date:'mediumDate' }}</div>
+                <div class="text-muted small">First Seen</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div>{{ entity.lastSeen | date:'mediumDate' }}</div>
+                <div class="text-muted small">Last Seen</div>
               </div>
             </div>
           </div>
@@ -47,18 +52,18 @@
       @if (roles.length > 0) {
         <div class="card mb-4">
           <div class="card-header">
-            <h4>Company Relationships</h4>
+            <span class="text-muted small">Company Relationships</span>
           </div>
           <div class="card-body">
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>Company</th>
-                  <th>Relationship</th>
-                  <th>Title</th>
-                  <th>Status</th>
-                  <th>First Seen</th>
-                  <th>Last Seen</th>
+                  <th class="fw-normal text-muted small">Company</th>
+                  <th class="fw-normal text-muted small">Relationship</th>
+                  <th class="fw-normal text-muted small">Title</th>
+                  <th class="fw-normal text-muted small">Status</th>
+                  <th class="fw-normal text-muted small">First Seen</th>
+                  <th class="fw-normal text-muted small">Last Seen</th>
                 </tr>
               </thead>
               <tbody>
@@ -89,21 +94,21 @@
       @if (events.length > 0) {
         <div class="card">
           <div class="card-header">
-            <h4>Holdings History</h4>
+            <span class="text-muted small">Holdings History</span>
           </div>
           <div class="card-body">
             <table class="table table-sm">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Company</th>
-                  <th>Event Type</th>
-                  <th>Transaction</th>
-                  <th>Shares Before</th>
-                  <th>Shares Transacted</th>
-                  <th>Shares After</th>
-                  <th>% of Class</th>
-                  <th>Price/Share</th>
+                  <th class="fw-normal text-muted small">Date</th>
+                  <th class="fw-normal text-muted small">Company</th>
+                  <th class="fw-normal text-muted small">Event Type</th>
+                  <th class="fw-normal text-muted small">Transaction</th>
+                  <th class="fw-normal text-muted small">Shares Before</th>
+                  <th class="fw-normal text-muted small">Shares Transacted</th>
+                  <th class="fw-normal text-muted small">Shares After</th>
+                  <th class="fw-normal text-muted small">% of Class</th>
+                  <th class="fw-normal text-muted small">Price/Share</th>
                 </tr>
               </thead>
               <tbody>
@@ -114,7 +119,7 @@
                       <app-stock-link-and-tradingview-link [ticker]="event.companyTicker"></app-stock-link-and-tradingview-link>
                       <a [routerLink]="['/ownership/ticker', event.companyTicker]" class="ms-2 small text-muted" title="View ownership for {{ event.companyTicker }}">ownership</a>
                     </td>
-                    <td><span class="badge bg-info">{{ event.eventType }}</span></td>
+                    <td>{{ getEventTypeDisplay(event.eventType) }}</td>
                     <td>
                       @if (event.transactionType) {
                         <span class="badge" 

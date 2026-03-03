@@ -109,6 +109,16 @@ export class OwnershipService {
         return typeMap[entityType] || entityType;
     }
 
+    static getEventTypeDisplay(eventType: string): string {
+        const typeMap: { [key: string]: string } = {
+            'transaction': 'Transaction',
+            'position_disclosure': 'Position Disclosure',
+            'beneficial_ownership_update': 'Ownership Update',
+            'intent_to_sell': 'Intent to Sell',
+        };
+        return typeMap[eventType] || eventType;
+    }
+
     // Get ownership by ticker
     getOwnershipByTicker(ticker: string): Observable<OwnershipSummary[]> {
         return this.http.get<OwnershipSummary[]>(`/api/ownership/ticker/${ticker}`);

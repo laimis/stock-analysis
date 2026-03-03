@@ -79,7 +79,7 @@
                        class="list-group-item list-group-item-action">
                       <div>
                         <strong>{{ entity.name }}</strong>
-                        <span class="badge bg-secondary ms-2">{{ getEntityTypeDisplay(entity.entityType) }}</span>
+                        <span class="text-muted small ms-2">{{ getEntityTypeDisplay(entity.entityType) }}</span>
                       </div>
                       <small class="text-muted">CIK: {{ entity.cik || 'N/A' }}</small>
                     </a>
@@ -95,7 +95,7 @@
         <div class="col-md-12">
           <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-              <h4 class="mb-0">Recent Ownership Activity</h4>
+              <span class="text-muted small">Recent Ownership Activity</span>
               <button class="btn btn-sm btn-outline-secondary" (click)="loadRecentTimelines()" [disabled]="loading.timelines">
                 <i class="fas fa-sync" [ngClass]="{'fa-spin': loading.timelines}"></i>
                 Refresh
@@ -121,15 +121,15 @@
                   <table class="table table-modern table-hover align-middle mb-0">
                     <thead class="table-light">
                       <tr>
-                        <th scope="col" class="ps-4">Filing Date</th>
-                        <th scope="col">Company</th>
-                        <th scope="col">Entity</th>
-                        <th scope="col">Event Type</th>
-                        <th scope="col">Transaction</th>
-                        <th scope="col" class="text-end">Shares</th>
-                        <th scope="col" class="text-end">Price / Value</th>
-                        <th scope="col" class="text-end">% of Class</th>
-                        <th scope="col" class="text-end pe-4">Filing</th>
+                        <th scope="col" class="ps-4 fw-normal text-muted small">Filing Date</th>
+                        <th scope="col" class="fw-normal text-muted small">Company</th>
+                        <th scope="col" class="fw-normal text-muted small">Entity</th>
+                        <th scope="col" class="fw-normal text-muted small">Event Type</th>
+                        <th scope="col" class="fw-normal text-muted small">Transaction</th>
+                        <th scope="col" class="text-end fw-normal text-muted small">Shares</th>
+                        <th scope="col" class="text-end fw-normal text-muted small">Price / Value</th>
+                        <th scope="col" class="text-end fw-normal text-muted small">% of Class</th>
+                        <th scope="col" class="text-end pe-4 fw-normal text-muted small">Filing</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -153,7 +153,7 @@
                             </a>
                           </td>
                           <td class="py-3">
-                            <span class="badge bg-info">{{ timeline.eventType }}</span>
+                            {{ getEventTypeDisplay(timeline.eventType) }}
                           </td>
                           <td class="py-3">
                             @if (timeline.transactionType) {

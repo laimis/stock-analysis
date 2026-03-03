@@ -9,6 +9,7 @@ import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-lin
 import { TimeAgoPipe } from '../services/time-ago.pipe';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
+const getEventTypeDisplay = OwnershipService.getEventTypeDisplay;
 
 @Component({
   selector: 'app-ownership-home',
@@ -30,6 +31,7 @@ export class OwnershipHomeComponent implements OnInit {
   entityNameMap = new Map<string, string>();
   entityNamesLoading = false;
   getEntityTypeDisplay = getEntityTypeDisplay;
+  getEventTypeDisplay = getEventTypeDisplay;
   
   loading = {
     ticker: false,
