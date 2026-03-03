@@ -166,4 +166,8 @@ export class OwnershipService {
     createOwnershipEvent(request: CreateOwnershipEventRequest): Observable<{id: string}> {
         return this.http.post<{id: string}>('/api/ownership/event', request);
     }
+
+    syncOwnershipForTicker(ticker: string): Observable<{message: string}> {
+        return this.http.post<{message: string}>(`/api/ownership/ticker/${ticker}/sync`, {});
+    }
 }
