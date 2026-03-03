@@ -802,40 +802,38 @@ ON CONFLICT (ticker) DO UPDATE SET
                 return lists |> Seq.tryFind (fun l -> l.Id = id)
             }
 
-        member this.CreateStockList(name: string) (description: string) (userId: UserId) =
-            task {
-                use db = this.GetConnection()
-                let (UserId id) = userId
-                let listId = Guid.NewGuid()
-
-                do! db.ExecuteAsync(
-                    "INSERT INTO stock_lists (id, user_id, name, description, tags) VALUES (@id, @userId, @name, @description, @tags)",
-                    {| id = listId; userId = id; name = name; description = (if isNull description then "" else description); tags = Array.empty<string> |}) :> Task
-
-                return {
-                    Id = listId
-                    UserId = id
-                    Name = name
-                    Description = if isNull description then "" else description
-                    Tickers = []
-                    Tags = []
-                } : StockList
-            }
-
-        member this.UpdateStockList(id: Guid) (name: string) (description: string) (userId: UserId) =
+        member this.SaveStockList (id: Guid option) (name: string) (description: string) (userId: UserId) =
             task {
                 use db = this.GetConnection()
                 let (UserId uid) = userId
+                let listId = id |> Option.defaultWith Guid.NewGuid
+                let desc = if isNull description then "" else description
 
                 let! affected = db.ExecuteAsync(
-                    "UPDATE stock_lists SET name = @name, description = @description WHERE id = @id AND user_id = @userId",
-                    {| id = id; userId = uid; name = name; description = (if isNull description then "" else description) |})
+                    """INSERT INTO stock_lists (id, user_id, name, description, tags)
+                       VALUES (@id, @userId, @name, @description, @tags)
+                       ON CONFLICT (id) DO UPDATE SET
+                           name = EXCLUDED.name,
+                           description = EXCLUDED.description
+                       WHERE stock_lists.user_id = @userId""",
+                    {| id = listId; userId = uid; name = name; description = desc; tags = Array.empty<string> |})
 
                 if affected = 0 then
                     return None
                 else
-                    let storage = this :> IStockListStorage
-                    return! storage.GetStockList id userId
+                    match id with
+                    | None ->
+                        return Some {
+                            Id = listId
+                            UserId = uid
+                            Name = name
+                            Description = desc
+                            Tickers = []
+                            Tags = []
+                        }
+                    | Some _ ->
+                        let storage = this :> IStockListStorage
+                        return! storage.GetStockList listId userId
             }
 
         member this.DeleteStockList(id: Guid) (userId: UserId) =

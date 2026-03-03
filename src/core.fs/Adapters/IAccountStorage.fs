@@ -54,8 +54,7 @@ type IAccountStorage =
 type IStockListStorage =
     abstract member GetStockLists : userId:UserId -> Task<StockList seq>
     abstract member GetStockList : id:Guid -> userId:UserId -> Task<StockList option>
-    abstract member CreateStockList : name:string -> description:string -> userId:UserId -> Task<StockList>
-    abstract member UpdateStockList : id:Guid -> name:string -> description:string -> userId:UserId -> Task<StockList option>
+    abstract member SaveStockList : id:Guid option -> name:string -> description:string -> userId:UserId -> Task<StockList option>
     abstract member DeleteStockList : id:Guid -> userId:UserId -> Task
     abstract member DeleteAllStockLists : userId:UserId -> Task
     abstract member AddTickerToStockList : id:Guid -> ticker:Ticker -> note:string -> userId:UserId -> Task<StockList option>

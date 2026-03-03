@@ -186,13 +186,10 @@ type Handler(accounts: IAccountStorage, stockLists: IStockListStorage, csvWriter
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! lists = stockLists.GetStockLists userId
-            let exists = lists |> Seq.exists (fun x -> x.Name = command.Name)
-            match exists with
-            | true -> return "List already exists" |> ServiceError |> Error
-            | false ->
-                let! newList = stockLists.CreateStockList command.Name command.Description userId
-                return newList |> Ok
+            let! result = stockLists.SaveStockList None command.Name command.Description userId
+            match result with
+            | None -> return "Failed to create list" |> ServiceError |> Error
+            | Some l -> return l |> Ok
     }
     
     member _.HandleUpdate (command: Update) userId = task {
@@ -201,7 +198,7 @@ type Handler(accounts: IAccountStorage, stockLists: IStockListStorage, csvWriter
         match user with
         | None -> return "User not found" |> ServiceError |> Error
         | _ ->
-            let! result = stockLists.UpdateStockList command.Id command.Name command.Description userId
+            let! result = stockLists.SaveStockList (Some command.Id) command.Name command.Description userId
             match result with
             | None -> return "List not found" |> ServiceError |> Error
             | Some l -> return l |> Ok
