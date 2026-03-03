@@ -103,7 +103,6 @@
                   <th class="fw-normal text-muted small">Date</th>
                   <th class="fw-normal text-muted small">Company</th>
                   <th class="fw-normal text-muted small">Event Type</th>
-                  <th class="fw-normal text-muted small">Transaction</th>
                   <th class="fw-normal text-muted small">Shares Before</th>
                   <th class="fw-normal text-muted small">Shares Transacted</th>
                   <th class="fw-normal text-muted small">Shares After</th>
@@ -120,15 +119,6 @@
                       <a [routerLink]="['/ownership/ticker', event.companyTicker]" class="ms-2 small text-muted" title="View ownership for {{ event.companyTicker }}">ownership</a>
                     </td>
                     <td>{{ getEventTypeDisplay(event.eventType) }}</td>
-                    <td>
-                      @if (event.transactionType) {
-                        <span class="badge" 
-                              [class.bg-success]="event.transactionType === 'purchase'"
-                              [class.bg-danger]="event.transactionType === 'sale'">
-                          {{ event.transactionType }}
-                        </span>
-                      }
-                    </td>
                     <td>{{ event.sharesBefore !== null ? (event.sharesBefore | number) : 'N/A' }}</td>
                     <td>{{ event.sharesTransacted !== null ? (event.sharesTransacted | number) : 'N/A' }}</td>
                     <td>{{ event.sharesAfter | number }}</td>

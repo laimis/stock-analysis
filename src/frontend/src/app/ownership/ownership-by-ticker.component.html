@@ -158,7 +158,6 @@
                     <th scope="col" class="ps-4 fw-normal text-muted small">Date</th>
                     <th scope="col" class="fw-normal text-muted small">Owner</th>
                     <th scope="col" class="fw-normal text-muted small">Event Type</th>
-                    <th scope="col" class="fw-normal text-muted small">Transaction</th>
                     <th scope="col" class="text-end fw-normal text-muted small">Shares Before</th>
                     <th scope="col" class="text-end fw-normal text-muted small">Shares Transacted</th>
                     <th scope="col" class="text-end fw-normal text-muted small">Shares</th>
@@ -180,15 +179,6 @@
                         </a>
                       </td>
                       <td class="py-3">{{ getEventTypeDisplay(event.eventType) }}</td>
-                      <td class="py-3">
-                        @if (event.transactionType) {
-                          <span class="badge" 
-                                [class.bg-success]="event.transactionType === 'purchase'"
-                                [class.bg-danger]="event.transactionType === 'sale'">
-                            {{ event.transactionType }}
-                          </span>
-                        }
-                      </td>
                       <td class="text-end py-3">
                         @if (event.sharesBefore !== null) {
                           {{ event.sharesBefore | number }}

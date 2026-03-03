@@ -125,7 +125,6 @@
                         <th scope="col" class="fw-normal text-muted small">Company</th>
                         <th scope="col" class="fw-normal text-muted small">Entity</th>
                         <th scope="col" class="fw-normal text-muted small">Event Type</th>
-                        <th scope="col" class="fw-normal text-muted small">Transaction</th>
                         <th scope="col" class="text-end fw-normal text-muted small">Shares</th>
                         <th scope="col" class="text-end fw-normal text-muted small">Price / Value</th>
                         <th scope="col" class="text-end fw-normal text-muted small">% of Class</th>
@@ -154,18 +153,6 @@
                           </td>
                           <td class="py-3">
                             {{ getEventTypeDisplay(timeline.eventType) }}
-                          </td>
-                          <td class="py-3">
-                            @if (timeline.transactionType) {
-                              <span class="badge" 
-                                    [class.bg-success]="timeline.transactionType === 'purchase'"
-                                    [class.bg-danger]="timeline.transactionType === 'sale'"
-                                    [class.bg-secondary]="timeline.transactionType !== 'purchase' && timeline.transactionType !== 'sale'">
-                                {{ timeline.transactionType }}
-                              </span>
-                            } @else {
-                              <span class="text-muted">-</span>
-                            }
                           </td>
                           <td class="text-end py-3">
                             @if (timeline.sharesAfter) {
