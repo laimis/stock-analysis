@@ -786,7 +786,7 @@ ON CONFLICT (ticker) DO UPDATE SET
                         | _ -> []
                     {
                         Id = l.id
-                        UserId = l.user_id
+                        UserId = UserId l.user_id
                         Name = l.name
                         Description = if isNull l.description then "" else l.description
                         Tickers = tickers
@@ -825,7 +825,7 @@ ON CONFLICT (ticker) DO UPDATE SET
                     | None ->
                         return Some {
                             Id = listId
-                            UserId = uid
+                            UserId = UserId uid
                             Name = name
                             Description = desc
                             Tickers = []

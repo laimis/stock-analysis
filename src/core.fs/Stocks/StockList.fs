@@ -2,6 +2,7 @@ namespace core.fs.Stocks
 
 open System
 open core.Shared
+open core.fs.Accounts
 
 type StockListTicker =
     {
@@ -13,7 +14,7 @@ type StockListTicker =
 type StockList =
     {
         Id: Guid
-        UserId: Guid
+        UserId: UserId
         Name: string
         Description: string
         Tickers: StockListTicker list
