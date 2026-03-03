@@ -73,6 +73,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastru
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "finviz.fs", "src\infrastructure\finviz.fs\finviz.fs.fsproj", "{CB5824A0-1D84-491A-83D9-F3B31AB310CB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructuretests", "infrastructuretests", "{71555E10-19FF-F7AA-62EC-BEF19F2C2C3C}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "finviztests", "tests\infrastructuretests\finviztests\finviztests.fsproj", "{7D08ED34-C638-4F5D-9188-99BDBBBBD692}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -443,6 +447,18 @@ Global
 		{CB5824A0-1D84-491A-83D9-F3B31AB310CB}.Release|x64.Build.0 = Release|Any CPU
 		{CB5824A0-1D84-491A-83D9-F3B31AB310CB}.Release|x86.ActiveCfg = Release|Any CPU
 		{CB5824A0-1D84-491A-83D9-F3B31AB310CB}.Release|x86.Build.0 = Release|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Debug|x64.Build.0 = Debug|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Debug|x86.Build.0 = Debug|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Release|x64.ActiveCfg = Release|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Release|x64.Build.0 = Release|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Release|x86.ActiveCfg = Release|Any CPU
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -480,5 +496,6 @@ Global
 		{8BC4DFDB-77B3-4569-8009-5C7133A73A76} = {D067D9A3-32FE-4B01-85C3-9158417FE12C}
 		{CB936063-43D1-41DF-BA20-F9AF485882DA} = {E32D8CC2-C013-4386-BDAF-840EC6AE86F5}
 		{CB5824A0-1D84-491A-83D9-F3B31AB310CB} = {DFEE68D8-A7D0-1A41-506C-9B74AA9A7B7B}
+		{7D08ED34-C638-4F5D-9188-99BDBBBBD692} = {71555E10-19FF-F7AA-62EC-BEF19F2C2C3C}
 	EndGlobalSection
 EndGlobal
