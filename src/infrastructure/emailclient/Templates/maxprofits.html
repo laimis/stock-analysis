@@ -5,112 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maximum Profit Analysis</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #f0f0f0; font-family: Arial, Helvetica, sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <td align="center" style="padding: 32px 16px;">
+                <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #cccccc;">
+
+                    <!-- Header -->
                     <tr>
-                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-                            <h1 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 600;">
-                                Maximum Profit Analysis
-                            </h1>
-                            <p style="margin: 8px 0 0; color: #6b7280; font-size: 16px;">
-                                Optimal Hold Time Performance Review
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 32px 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 24px;">
-                                Based on {{actual_data.number_of_positions}} closed positions, here's how your actual performance compares to optimal hold times:
-                            </p>
-                            
-                            <!-- Actual Performance -->
-                            <div style="margin-bottom: 32px; padding: 20px; background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
-                                <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
-                                    Your Actual Performance
-                                </h2>
-                                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td style="padding: 8px 0;">
-                                            <span style="color: #6b7280; font-size: 14px;">Profit:</span>
-                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">${{actual_data.profit}}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0;">
-                                            <span style="color: #6b7280; font-size: 14px;">Average Hold Days:</span>
-                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actual_data.days}}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="padding: 8px 0;">
-                                            <span style="color: #6b7280; font-size: 14px;">Efficiency:</span>
-                                            <span style="color: #1f2937; font-size: 18px; font-weight: 700; float: right;">{{actual_data.percentage}}%</span>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            
-                            <!-- Optimal Performance by Hold Period -->
-                            <h2 style="margin: 0 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
-                                Maximum Profit by Hold Period
-                            </h2>
-                            <p style="margin: 0 0 16px; color: #6b7280; font-size: 14px; line-height: 20px;">
-                                Shows what your profit would have been if you held all positions for specific durations:
-                            </p>
-                            
-                            {{for item in profit_data}}
-                            <div style="margin-bottom: 12px; padding: 16px; background-color: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
-                                <div style="margin-bottom: 8px;">
-                                    <span style="color: #1f2937; font-size: 16px; font-weight: 600;">{{item.days}} days</span>
-                                    <span style="color: #059669; font-size: 18px; font-weight: 700; float: right;">${{item.profit}}</span>
-                                </div>
-                                <div style="background-color: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
-                                    <div style="background-color: #2563eb; height: 100%; width: {{item.percentage}}%;"></div>
-                                </div>
-                            </div>
-                            {{end}}
-                            
-                            <!-- Sorted by Best Performance -->
-                            <h2 style="margin: 32px 0 16px; color: #1f2937; font-size: 20px; font-weight: 600;">
-                                Top Performing Hold Periods
-                            </h2>
-                            <p style="margin: 0 0 16px; color: #6b7280; font-size: 14px; line-height: 20px;">
-                                Ranked by maximum potential profit:
-                            </p>
-                            
-                            {{for item in sorted_profit_data}}
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 8px; border: 1px solid #e5e7eb; border-radius: 4px;">
+                        <td style="padding: 0; background-color: #1a3a5c;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="padding: 12px; background-color: {{if for.first}}#f9fafb{{else}}#ffffff{{end}};">
-                                        <span style="color: #1f2937; font-size: 15px; font-weight: 600;">
-                                            {{for.index + 1}}. Hold for {{item.days}} days
-                                        </span>
-                                        <span style="color: #059669; font-size: 16px; font-weight: 700; float: right;">
-                                            ${{item.profit}}
-                                        </span>
+                                    <td style="padding: 24px 32px 20px;">
+                                        <p style="margin: 0 0 2px; color: #ffffff; font-size: 20px; font-weight: bold; letter-spacing: 0.02em;">Nightingale Trading</p>
+                                        <p style="margin: 0; color: #a8c4e0; font-size: 13px;">Maximum Profit Analysis &mdash; Optimal Hold Time Performance Review</p>
                                     </td>
                                 </tr>
                             </table>
-                            {{end}}
-                            
-                            <div style="margin-top: 24px; padding: 16px; background-color: #f9fafb; border-left: 3px solid #2563eb; border-radius: 4px;">
-                                <p style="margin: 0; color: #1f2937; font-size: 13px; font-weight: 600;">Insight:</p>
-                                <p style="margin: 8px 0 0; color: #4b5563; font-size: 14px; line-height: 20px;">
-                                    This analysis shows the historical optimal hold times for your closed positions. Use this data to inform future trading decisions, but remember past performance doesn't guarantee future results.
-                                </p>
-                            </div>
                         </td>
                     </tr>
+
                     <tr>
-                        <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #6b7280; font-size: 14px; text-align: center;">
-                                &copy; 2026 Nightingale Trading. All rights reserved.
+                        <td style="padding: 28px 32px 20px;">
+
+                            <p style="margin: 0 0 20px; color: #333333; font-size: 13px; line-height: 20px;">
+                                Based on {{actual_data.number_of_positions}} closed positions, here is how your actual performance compares to optimal hold times.
+                            </p>
+
+                            <!-- Actual Performance -->
+                            <p style="margin: 0 0 10px; color: #1a3a5c; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px;">
+                                Your Actual Performance
+                            </p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0; border-collapse: collapse; margin-bottom: 28px;">
+                                <tr>
+                                    <td style="padding: 10px 14px; font-size: 12px; color: #555555; font-weight: bold; border-bottom: 1px solid #d0d0d0; border-right: 1px solid #d0d0d0; width: 40%;">Profit</td>
+                                    <td style="padding: 10px 14px; font-size: 14px; color: #333333; border-bottom: 1px solid #d0d0d0;">${{actual_data.profit}}</td>
+                                </tr>
+                                <tr style="background-color: #f5f7fa;">
+                                    <td style="padding: 10px 14px; font-size: 12px; color: #555555; font-weight: bold; border-bottom: 1px solid #d0d0d0; border-right: 1px solid #d0d0d0;">Average Hold Days</td>
+                                    <td style="padding: 10px 14px; font-size: 14px; color: #333333; border-bottom: 1px solid #d0d0d0;">{{actual_data.days}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 14px; font-size: 12px; color: #555555; font-weight: bold; border-right: 1px solid #d0d0d0;">Efficiency</td>
+                                    <td style="padding: 10px 14px; font-size: 14px; color: #333333;">{{actual_data.percentage}}%</td>
+                                </tr>
+                            </table>
+
+                            <!-- Maximum Profit by Hold Period -->
+                            <p style="margin: 0 0 10px; color: #1a3a5c; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px;">
+                                Maximum Profit by Hold Period
+                            </p>
+                            <p style="margin: 0 0 12px; color: #555555; font-size: 12px; line-height: 18px;">
+                                Shows what your profit would have been if you held all positions for specific durations.
+                            </p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0; border-collapse: collapse; margin-bottom: 28px;">
+                                <tr style="background-color: #1a3a5c;">
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Hold Period</td>
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-align: right; border-right: 1px solid #2a4a6c;">Profit</td>
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-align: right;">Efficiency</td>
+                                </tr>
+                                {{for item in profit_data}}
+                                <tr style="border-top: 1px solid #d0d0d0;">
+                                    <td style="padding: 9px 12px; font-size: 13px; color: #333333; border-right: 1px solid #d0d0d0;">{{item.days}} days</td>
+                                    <td style="padding: 9px 12px; font-size: 13px; text-align: right; color: #1a7a3c; border-right: 1px solid #d0d0d0;">${{item.profit}}</td>
+                                    <td style="padding: 9px 12px; font-size: 13px; text-align: right; color: #333333;">{{item.percentage}}%</td>
+                                </tr>
+                                {{end}}
+                            </table>
+
+                            <!-- Top Performing Hold Periods -->
+                            <p style="margin: 0 0 10px; color: #1a3a5c; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px;">
+                                Top Performing Hold Periods
+                            </p>
+                            <p style="margin: 0 0 12px; color: #555555; font-size: 12px; line-height: 18px;">
+                                Ranked by maximum potential profit.
+                            </p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0; border-collapse: collapse; margin-bottom: 28px;">
+                                <tr style="background-color: #1a3a5c;">
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Rank</td>
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Hold Period</td>
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-align: right;">Profit</td>
+                                </tr>
+                                {{for item in sorted_profit_data}}
+                                <tr style="border-top: 1px solid #d0d0d0;">
+                                    <td style="padding: 9px 12px; font-size: 13px; color: #555555; border-right: 1px solid #d0d0d0;">{{for.index + 1}}</td>
+                                    <td style="padding: 9px 12px; font-size: 13px; color: #333333; border-right: 1px solid #d0d0d0;">{{item.days}} days</td>
+                                    <td style="padding: 9px 12px; font-size: 13px; text-align: right; color: #1a7a3c;">${{item.profit}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
+
+                            <!-- Insight note -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0;">
+                                <tr>
+                                    <td style="padding: 10px 14px; font-size: 12px; color: #555555; border-left: 3px solid #1a3a5c; line-height: 18px;">
+                                        <strong style="color: #1a3a5c;">Insight:</strong>&nbsp; This analysis shows the historical optimal hold times for your closed positions. Use this data to inform future trading decisions. Past performance does not guarantee future results.
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 18px 32px; background-color: #1a3a5c; border-top: 3px solid #0f2540; text-align: center;">
+                            <p style="margin: 0; color: #6b8fa8; font-size: 11px;">
+                                &copy; 2026 Nightingale Trading. All rights reserved. This statement is for informational purposes only.
                             </p>
                         </td>
                     </tr>
+
                 </table>
             </td>
         </tr>
