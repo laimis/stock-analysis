@@ -15,7 +15,7 @@ type PostgresAggregateStorage(outbox: IOutbox, connectionString: string) =
     
     let dataSource = (new NpgsqlDataSourceBuilder(connectionString)).Build()
     
-    member private _.GetConnection() : IDbConnection =
+    member _.GetConnection() : IDbConnection =
         dataSource.OpenConnection()
     
     interface IAggregateStorage with

@@ -80,11 +80,7 @@ type ReminderDto =
 type AccountStorage(outbox: IOutbox, connectionString: string) =
     inherit PostgresAggregateStorage(outbox, connectionString)
     
-    let dataSource = (new NpgsqlDataSourceBuilder(connectionString)).Build()
     let userEntity = "users"
-    
-    member private _.GetConnection() : IDbConnection =
-        dataSource.OpenConnection()
     
     // Helper functions for discriminated union conversions
     member private _.GetOrderStatusString(status: OrderStatus) : string =
