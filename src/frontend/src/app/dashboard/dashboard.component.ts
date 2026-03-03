@@ -24,7 +24,7 @@ export class DashboardComponent implements OnInit {
     upcomingReminders: Reminder[] = []
 
     toolLinks = [
-        {path: '/summary', label: 'Weekly Summary'},
+        {path: '/summary', label: 'Summary'},
         {path: '/trading/review', label: 'Trading Review'},
         {path: '/stocks/analysis', label: 'Stock Position Analysis'},
         {path: '/stocks/tradingsimulations', label: 'Simulations'},
