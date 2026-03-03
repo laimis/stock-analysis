@@ -297,3 +297,29 @@ ALTER TABLE user_sec_filing_watermarks OWNER TO stockanalysis;
 
 -- ownership_events shares after should allowed to be null afterall
 ALTER TABLE ownership_events ALTER COLUMN shares_after DROP NOT NULL;
+
+
+CREATE TABLE IF NOT EXISTS stock_lists (
+    id          UUID        NOT NULL DEFAULT gen_random_uuid(),
+    user_id     UUID        NOT NULL,
+    name        TEXT        NOT NULL,
+    description TEXT        NOT NULL DEFAULT '',
+    tags        TEXT[]      NOT NULL DEFAULT '{}',
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT pk_stock_lists PRIMARY KEY (id),
+    CONSTRAINT uq_stock_lists_user_name UNIQUE (user_id, name)
+);
+
+CREATE INDEX IF NOT EXISTS ix_stock_lists_user_id ON stock_lists (user_id);
+
+CREATE TABLE IF NOT EXISTS stock_list_tickers (
+    list_id  UUID        NOT NULL,
+    ticker   TEXT        NOT NULL,
+    note     TEXT        NOT NULL DEFAULT '',
+    added_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT pk_stock_list_tickers PRIMARY KEY (list_id, ticker),
+    CONSTRAINT fk_stock_list_tickers_list FOREIGN KEY (list_id)
+        REFERENCES stock_lists (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS ix_stock_list_tickers_list_id ON stock_list_tickers (list_id);

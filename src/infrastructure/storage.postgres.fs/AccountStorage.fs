@@ -10,6 +10,7 @@ open core.fs.Adapters.Brokerage
 open core.fs.Adapters.Storage
 open core.fs.Alerts
 open core.fs.Options
+open core.fs.Stocks
 open core.Shared
 open Dapper
 open Microsoft.FSharp.Core
@@ -75,6 +76,25 @@ type ReminderDto =
         state: string
         createdat: DateTimeOffset
         sentat: Nullable<DateTimeOffset>
+    }
+
+[<CLIMutable>]
+type StockListDto =
+    {
+        id: Guid
+        user_id: Guid
+        name: string
+        description: string
+        tags: string[]
+    }
+
+[<CLIMutable>]
+type StockListTickerDto =
+    {
+        list_id: Guid
+        ticker: string
+        note: string
+        added_at: DateTimeOffset
     }
 
 type AccountStorage(outbox: IOutbox, connectionString: string) =
@@ -736,4 +756,202 @@ ON CONFLICT (ticker) DO UPDATE SET
                 let searchPattern = sprintf "%%%s%%" query
                 let! result = db.QueryAsync<TickerCikMapping>(sql, {| query = searchPattern |})
                 return result
+            }
+
+    interface IStockListStorage with
+
+        member this.GetStockLists(userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId id) = userId
+
+                let! listRows = db.QueryAsync<StockListDto>(
+                    "SELECT id, user_id, name, description, tags FROM stock_lists WHERE user_id = @userId ORDER BY name",
+                    {| userId = id |})
+
+                let! tickerRows = db.QueryAsync<StockListTickerDto>(
+                    "SELECT list_id, ticker, note, added_at FROM stock_list_tickers WHERE list_id IN (SELECT id FROM stock_lists WHERE user_id = @userId)",
+                    {| userId = id |})
+
+                let tickersByListId =
+                    tickerRows
+                    |> Seq.groupBy _.list_id
+                    |> Seq.map (fun (listId, tickers) -> listId, tickers |> Seq.toList)
+                    |> dict
+
+                return listRows |> Seq.map (fun l ->
+                    let tickers =
+                        match tickersByListId.TryGetValue(l.id) with
+                        | true, ts -> ts |> List.map (fun t -> { Ticker = Ticker(t.ticker); Note = t.note; When = t.added_at })
+                        | _ -> []
+                    {
+                        Id = l.id
+                        UserId = l.user_id
+                        Name = l.name
+                        Description = if isNull l.description then "" else l.description
+                        Tickers = tickers
+                        Tags = if l.tags = null then [] else l.tags |> Array.toList
+                    } : StockList
+                )
+            }
+
+        member this.GetStockList(id: Guid) (userId: UserId) =
+            task {
+                let storage = this :> IStockListStorage
+                let! lists = storage.GetStockLists userId
+                return lists |> Seq.tryFind (fun l -> l.Id = id)
+            }
+
+        member this.CreateStockList(name: string) (description: string) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId id) = userId
+                let listId = Guid.NewGuid()
+
+                do! db.ExecuteAsync(
+                    "INSERT INTO stock_lists (id, user_id, name, description, tags) VALUES (@id, @userId, @name, @description, @tags)",
+                    {| id = listId; userId = id; name = name; description = (if isNull description then "" else description); tags = Array.empty<string> |}) :> Task
+
+                return {
+                    Id = listId
+                    UserId = id
+                    Name = name
+                    Description = if isNull description then "" else description
+                    Tickers = []
+                    Tags = []
+                } : StockList
+            }
+
+        member this.UpdateStockList(id: Guid) (name: string) (description: string) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+
+                let! affected = db.ExecuteAsync(
+                    "UPDATE stock_lists SET name = @name, description = @description WHERE id = @id AND user_id = @userId",
+                    {| id = id; userId = uid; name = name; description = (if isNull description then "" else description) |})
+
+                if affected = 0 then
+                    return None
+                else
+                    let storage = this :> IStockListStorage
+                    return! storage.GetStockList id userId
+            }
+
+        member this.DeleteStockList(id: Guid) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+                do! db.ExecuteAsync(
+                    "DELETE FROM stock_lists WHERE id = @id AND user_id = @userId",
+                    {| id = id; userId = uid |}) :> Task
+            }
+
+        member this.DeleteAllStockLists(userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+                do! db.ExecuteAsync(
+                    "DELETE FROM stock_lists WHERE user_id = @userId",
+                    {| userId = uid |}) :> Task
+            }
+
+        member this.AddTickerToStockList(id: Guid) (ticker: Ticker) (note: string) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+                let now = DateTimeOffset.UtcNow
+
+                let! exists = db.QuerySingleOrDefaultAsync<int>(
+                    "SELECT COUNT(*) FROM stock_lists WHERE id = @id AND user_id = @userId",
+                    {| id = id; userId = uid |})
+
+                if exists = 0 then
+                    return None
+                else
+                    do! db.ExecuteAsync(
+                        """INSERT INTO stock_list_tickers (list_id, ticker, note, added_at)
+                           VALUES (@listId, @ticker, @note, @addedAt)
+                           ON CONFLICT (list_id, ticker) DO NOTHING""",
+                        {| listId = id; ticker = ticker.Value; note = (if isNull note then "" else note); addedAt = now |}) :> Task
+
+                    let storage = this :> IStockListStorage
+                    return! storage.GetStockList id userId
+            }
+
+        member this.RemoveTickerFromStockList(id: Guid) (ticker: Ticker) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+
+                let! exists = db.QuerySingleOrDefaultAsync<int>(
+                    "SELECT COUNT(*) FROM stock_lists WHERE id = @id AND user_id = @userId",
+                    {| id = id; userId = uid |})
+
+                if exists = 0 then
+                    return None
+                else
+                    let! affected = db.ExecuteAsync(
+                        "DELETE FROM stock_list_tickers WHERE list_id = @listId AND ticker = @ticker",
+                        {| listId = id; ticker = ticker.Value |})
+
+                    if affected = 0 then
+                        return None
+                    else
+                        let storage = this :> IStockListStorage
+                        return! storage.GetStockList id userId
+            }
+
+        member this.AddTagToStockList(id: Guid) (tag: string) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+
+                let! affected = db.ExecuteAsync(
+                    """UPDATE stock_lists
+                       SET tags = CASE WHEN @tag = ANY(tags) THEN tags ELSE array_append(tags, @tag) END
+                       WHERE id = @id AND user_id = @userId""",
+                    {| id = id; userId = uid; tag = tag |})
+
+                if affected = 0 then
+                    return None
+                else
+                    let storage = this :> IStockListStorage
+                    return! storage.GetStockList id userId
+            }
+
+        member this.RemoveTagFromStockList(id: Guid) (tag: string) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+
+                let! affected = db.ExecuteAsync(
+                    "UPDATE stock_lists SET tags = array_remove(tags, @tag) WHERE id = @id AND user_id = @userId",
+                    {| id = id; userId = uid; tag = tag |})
+
+                if affected = 0 then
+                    return None
+                else
+                    let storage = this :> IStockListStorage
+                    return! storage.GetStockList id userId
+            }
+
+        member this.ClearStockListTickers(id: Guid) (userId: UserId) =
+            task {
+                use db = this.GetConnection()
+                let (UserId uid) = userId
+
+                let! exists = db.QuerySingleOrDefaultAsync<int>(
+                    "SELECT COUNT(*) FROM stock_lists WHERE id = @id AND user_id = @userId",
+                    {| id = id; userId = uid |})
+
+                if exists = 0 then
+                    return None
+                else
+                    do! db.ExecuteAsync(
+                        "DELETE FROM stock_list_tickers WHERE list_id = @listId",
+                        {| listId = id |}) :> Task
+
+                    let storage = this :> IStockListStorage
+                    return! storage.GetStockList id userId
             }

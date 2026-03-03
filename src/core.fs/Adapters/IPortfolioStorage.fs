@@ -19,11 +19,6 @@ type IPortfolioStorage =
     
     abstract member Delete : userId:UserId -> Task
     
-    abstract member GetStockList : Id:System.Guid -> userId:UserId -> Task<StockList>
-    abstract member GetStockLists : userId:UserId -> Task<IEnumerable<StockList>>
-    abstract member SaveStockList : list:StockList -> userId:UserId -> Task
-    abstract member DeleteStockList : list:StockList -> userId:UserId -> Task
-    
     abstract member SavePendingPosition : position:PendingStockPosition -> userId:UserId -> Task
     abstract member GetPendingStockPositions : userId:UserId -> Task<IEnumerable<PendingStockPosition>>
     

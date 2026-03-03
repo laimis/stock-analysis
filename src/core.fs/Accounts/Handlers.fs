@@ -237,6 +237,7 @@ namespace core.fs.Accounts
         storage:IAccountStorage,
         hashProvider:IPasswordHashProvider,
         portfolioStorage:IPortfolioStorage,
+        stockListStorage:IStockListStorage,
         roles:IRoleService,
         logger:ILogger) =
         let INVALID_EMAIL_PASSWORD = "Invalid email/password combination"
@@ -296,6 +297,7 @@ namespace core.fs.Accounts
             | None -> return "User not found" |> ServiceError |> Error
             | Some user ->
                 do! portfolioStorage.Delete(user.Id |> UserId)
+                do! stockListStorage.DeleteAllStockLists(user.Id |> UserId)
                 return Ok ()
         }
         
@@ -316,6 +318,7 @@ namespace core.fs.Accounts
                     
                 do! storage.Delete(user)
                 do! portfolioStorage.Delete(user.Id |> UserId)
+                do! stockListStorage.DeleteAllStockLists(user.Id |> UserId)
                 return Ok ()
         }
         member this.Handle (command:Confirm) = task {
