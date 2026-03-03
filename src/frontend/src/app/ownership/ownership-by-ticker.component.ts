@@ -33,6 +33,8 @@ export class OwnershipByTickerComponent implements OnInit {
   timeline: OwnershipEvent[] = [];
   loading = false;
   error = '';
+  syncing = false;
+  syncMessage = '';
   getEntityTypeDisplay = getEntityTypeDisplay;
   timelineDays = 1825;
   entityNameMap = new Map<string, string>();
@@ -127,6 +129,22 @@ export class OwnershipByTickerComponent implements OnInit {
 
   getEntityName(entityId: string): string {
     return this.entityNameMap.get(entityId) || entityId;
+  }
+
+  syncOwnership() {
+    this.syncing = true;
+    this.syncMessage = '';
+    this.ownershipService.syncOwnershipForTicker(this.ticker).subscribe({
+      next: () => {
+        this.syncing = false;
+        this.syncMessage = 'Sync complete. Ownership data has been refreshed from SEC EDGAR.';
+        this.loadData();
+      },
+      error: (err) => {
+        this.syncing = false;
+        this.syncMessage = `Sync failed: ${err.message}`;
+      }
+    });
   }
 
   calculateOwnershipPercent(shares: number): number {

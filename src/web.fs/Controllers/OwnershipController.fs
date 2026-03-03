@@ -5,6 +5,7 @@ open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Authorization
 open core.fs.Adapters.Storage
 open core.Shared
+open secedgar.fs
 
 [<CLIMutable>]
 type SearchEntitiesRequest = {
@@ -71,6 +72,14 @@ type OwnershipController(storage: IOwnershipStorage) =
         let d = if days.HasValue then days.Value else 1825
         let! timeline = storage.GetOwnershipTimeline t d
         return this.Ok timeline
+    }
+
+    [<HttpPost("ticker/{ticker}/sync")>]
+    member this.SyncOwnershipForTicker(
+        [<FromRoute>] ticker: string,
+        [<FromServices>] syncService: SECFilingsSyncService) = task {
+        do! syncService.SyncOwnershipForTicker ticker
+        return this.Ok {| message = "Ownership sync completed. Data has been refreshed from SEC EDGAR." |}
     }
 
     [<HttpGet("ticker/{ticker}/events")>]
