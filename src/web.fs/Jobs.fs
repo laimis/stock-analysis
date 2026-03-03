@@ -46,57 +46,57 @@ let configureJobs (app: IApplicationBuilder) (logger: ILogger) =
         let pacificTmz = System.TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles")
         let rjo = new RecurringJobOptions(TimeZone = pacificTmz)
 
-        RecurringJob.AddOrUpdate<PortfolioAnalysisService>("ThirtyDayTransactions", (fun (s:PortfolioAnalysisService) -> s.ReportOnThirtyDayTransactions() |> ignore), Cron.Daily(9, 0), rjo)
+        RecurringJob.AddOrUpdate<PortfolioAnalysisService>("ThirtyDayTransactions", (fun (s:PortfolioAnalysisService) -> s.ReportOnThirtyDayTransactions() :> System.Threading.Tasks.Task), Cron.Daily(9, 0), rjo)
         
-        RecurringJob.AddOrUpdate<PatternMonitoringService>("PatternMonitoring", (fun (s:PatternMonitoringService) -> s.RunPatternMonitoring() |> ignore), "45 6-13 * * 1-5", rjo)
-        BackgroundJob.Schedule<PatternMonitoringService>((fun (s:PatternMonitoringService) -> s.RunPatternMonitoring() |> ignore), System.TimeSpan.FromMinutes 2.0) |> ignore
+        RecurringJob.AddOrUpdate<PatternMonitoringService>("PatternMonitoring", (fun (s:PatternMonitoringService) -> s.RunPatternMonitoring() :> System.Threading.Tasks.Task), "45 6-13 * * 1-5", rjo)
+        BackgroundJob.Schedule<PatternMonitoringService>((fun (s:PatternMonitoringService) -> s.RunPatternMonitoring() :> System.Threading.Tasks.Task), System.TimeSpan.FromMinutes 2.0) |> ignore
         
-        RecurringJob.AddOrUpdate<PriceObvTrendMonitoringService>("PriceObvTrendMonitoring", (fun (s:PriceObvTrendMonitoringService) -> s.Run() |> ignore), "55 13 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<PriceObvTrendMonitoringService>("PriceObvTrendMonitoring", (fun (s:PriceObvTrendMonitoringService) -> s.Run() :> System.Threading.Tasks.Task), "55 13 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<PriceMonitoringService>("PriceMonitoring", (fun (s:PriceMonitoringService) -> s.Run() |> ignore), "35 6-14 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<PriceMonitoringService>("PriceMonitoring", (fun (s:PriceMonitoringService) -> s.Run() :> System.Threading.Tasks.Task), "35 6-14 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<ExpirationMonitoringService>("ExpirationMonitoring", (fun (s:ExpirationMonitoringService) -> s.Run() |> ignore), "5 16 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<ExpirationMonitoringService>("ExpirationMonitoring", (fun (s:ExpirationMonitoringService) -> s.Run() :> System.Threading.Tasks.Task), "5 16 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<StopLossMonitoringService>("StopLossMonitoring", (fun (s:StopLossMonitoringService) -> s.RunStopLossMonitoring() |> ignore), "*/5 6-13 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<StopLossMonitoringService>("StopLossMonitoring", (fun (s:StopLossMonitoringService) -> s.RunStopLossMonitoring() :> System.Threading.Tasks.Task), "*/5 6-13 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<PriceAlertMonitoringService>("PriceAlertMonitoring", (fun (s:PriceAlertMonitoringService) -> s.Execute() |> ignore), "*/5 6-13 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<PriceAlertMonitoringService>("PriceAlertMonitoring", (fun (s:PriceAlertMonitoringService) -> s.Execute() :> System.Threading.Tasks.Task), "*/5 6-13 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<PriceAlertNearTriggerMonitoringService>("PriceAlertNearTriggerMonitoring", (fun (s:PriceAlertNearTriggerMonitoringService) -> s.Execute() |> ignore), "0 14 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<PriceAlertNearTriggerMonitoringService>("PriceAlertNearTriggerMonitoring", (fun (s:PriceAlertNearTriggerMonitoringService) -> s.Execute() :> System.Threading.Tasks.Task), "0 14 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<SECFilingsSyncService>("SECFilingsSyncService", (fun (s:SECFilingsSyncService) -> s.Execute() |> ignore), "*/10 6-19 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<SECFilingsSyncService>("SECFilingsSyncService", (fun (s:SECFilingsSyncService) -> s.Execute() :> System.Threading.Tasks.Task), "*/10 6-19 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<SECFilingsMonitoringService>("SECFilingsMonitoringService", (fun (s:SECFilingsMonitoringService) -> s.Execute() |> ignore), "*/30 6-19 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<SECFilingsMonitoringService>("SECFilingsMonitoringService", (fun (s:SECFilingsMonitoringService) -> s.Execute() :> System.Threading.Tasks.Task), "*/30 6-19 * * 1-5", rjo)
 
-        RecurringJob.AddOrUpdate<Schedule13GProcessingService>("Schedule13GProcessingService", (fun (s:Schedule13GProcessingService) -> s.Execute() |> ignore), "0 9 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<Schedule13GProcessingService>("Schedule13GProcessingService", (fun (s:Schedule13GProcessingService) -> s.Execute() :> System.Threading.Tasks.Task), "0 9 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<Form144ProcessingService>("Form144ProcessingService", (fun (s:Form144ProcessingService) -> s.Execute() |> ignore), "30 9 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<Form144ProcessingService>("Form144ProcessingService", (fun (s:Form144ProcessingService) -> s.Execute() :> System.Threading.Tasks.Task), "30 9 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<Schedule13DProcessingService>("Schedule13DProcessingService", (fun (s:Schedule13DProcessingService) -> s.Execute() |> ignore), "45 9 * * 1-5", rjo)
+        RecurringJob.AddOrUpdate<Schedule13DProcessingService>("Schedule13DProcessingService", (fun (s:Schedule13DProcessingService) -> s.Execute() :> System.Threading.Tasks.Task), "45 9 * * 1-5", rjo)
         
-        RecurringJob.AddOrUpdate<ReminderMonitoringService>("ReminderMonitoringService", (fun (s:ReminderMonitoringService) -> s.Execute() |> ignore), "0 6 * * *", rjo)
+        RecurringJob.AddOrUpdate<ReminderMonitoringService>("ReminderMonitoringService", (fun (s:ReminderMonitoringService) -> s.Execute() :> System.Threading.Tasks.Task), "0 6 * * *", rjo)
             
-        RecurringJob.AddOrUpdate<AccountMonitoringService>("AccountMonitoringService", (fun (s:AccountMonitoringService) -> s.RunAccountValueOrderAndTransactionSync() |> ignore), Cron.Daily(15), rjo)
+        RecurringJob.AddOrUpdate<AccountMonitoringService>("AccountMonitoringService", (fun (s:AccountMonitoringService) -> s.RunAccountValueOrderAndTransactionSync() :> System.Threading.Tasks.Task), Cron.Daily(15), rjo)
         
-        RecurringJob.AddOrUpdate<AccountMonitoringService>("AccountMonitoringServiceProcessTransactions", (fun (s:AccountMonitoringService) -> s.RunTransactionProcessing() |> ignore), Cron.Daily(15, 10), rjo)
+        RecurringJob.AddOrUpdate<AccountMonitoringService>("AccountMonitoringServiceProcessTransactions", (fun (s:AccountMonitoringService) -> s.RunTransactionProcessing() :> System.Threading.Tasks.Task), Cron.Daily(15, 10), rjo)
             
-        RecurringJob.AddOrUpdate<RefreshBrokerageConnectionService>("RefreshBrokerageConnectionService", (fun (s:RefreshBrokerageConnectionService) -> s.Execute() |> ignore), Cron.Daily(20), rjo)
+        RecurringJob.AddOrUpdate<RefreshBrokerageConnectionService>("RefreshBrokerageConnectionService", (fun (s:RefreshBrokerageConnectionService) -> s.Execute() :> System.Threading.Tasks.Task), Cron.Daily(20), rjo)
         
         // 6:50am and 2:20pm
         [| "50 6 * * 1-5"; "20 14 * * 1-5" |]
         |> Array.iteri (fun i exp ->
-            RecurringJob.AddOrUpdate<AlertEmailService>(nameof(AlertEmailService) + i.ToString(), (fun (s:AlertEmailService) -> s.Execute() |> ignore), exp, rjo)
+            RecurringJob.AddOrUpdate<AlertEmailService>(nameof(AlertEmailService) + i.ToString(), (fun (s:AlertEmailService) -> s.Execute() :> System.Threading.Tasks.Task), exp, rjo)
         )
 
-        RecurringJob.AddOrUpdate<WeeklyMonitoringService>("WeeklyMonitoringService", (fun (s:WeeklyMonitoringService) -> s.Execute(false) |> ignore), Cron.Weekly(System.DayOfWeek.Saturday, 10), rjo)
+        RecurringJob.AddOrUpdate<WeeklyMonitoringService>("WeeklyMonitoringService", (fun (s:WeeklyMonitoringService) -> s.Execute(false) :> System.Threading.Tasks.Task), Cron.Weekly(System.DayOfWeek.Saturday, 10), rjo)
 
-        RecurringJob.AddOrUpdate<SECTickerSyncService>("SECTickerSyncService", (fun (s:SECTickerSyncService) -> s.Execute() |> ignore), Cron.Weekly(System.DayOfWeek.Saturday, 9), rjo)
+        RecurringJob.AddOrUpdate<SECTickerSyncService>("SECTickerSyncService", (fun (s:SECTickerSyncService) -> s.Execute() :> System.Threading.Tasks.Task), Cron.Weekly(System.DayOfWeek.Saturday, 9), rjo)
 
-        RecurringJob.AddOrUpdate<SummaryEmailService>("WeeklySummaryService", (fun (s:SummaryEmailService) -> s.ExecuteWeekly() |> ignore), Cron.Weekly(System.DayOfWeek.Friday, 18), rjo)
+        RecurringJob.AddOrUpdate<SummaryEmailService>("WeeklySummaryService", (fun (s:SummaryEmailService) -> s.ExecuteWeekly() :> System.Threading.Tasks.Task), Cron.Weekly(System.DayOfWeek.Friday, 18), rjo)
 
-        RecurringJob.AddOrUpdate<SummaryEmailService>("MonthlySummaryService", (fun (s:SummaryEmailService) -> s.ExecuteMonthly() |> ignore), Cron.Monthly(1, 6), rjo)
+        RecurringJob.AddOrUpdate<SummaryEmailService>("MonthlySummaryService", (fun (s:SummaryEmailService) -> s.ExecuteMonthly() :> System.Threading.Tasks.Task), Cron.Monthly(1, 6), rjo)
 
-        RecurringJob.AddOrUpdate<PortfolioAnalysisService>("PortfolioAnalysisServiceReportOnMaxProfitBasedOnDaysHeld", (fun (s:PortfolioAnalysisService) -> s.ReportOnMaxProfitBasedOnDaysHeld() |> ignore), Cron.Weekly(System.DayOfWeek.Saturday, 8), rjo)
+        RecurringJob.AddOrUpdate<PortfolioAnalysisService>("PortfolioAnalysisServiceReportOnMaxProfitBasedOnDaysHeld", (fun (s:PortfolioAnalysisService) -> s.ReportOnMaxProfitBasedOnDaysHeld() :> System.Threading.Tasks.Task), Cron.Weekly(System.DayOfWeek.Saturday, 8), rjo)
         
-        RecurringJob.AddOrUpdate<PortfolioAnalysisService>("PortfolioAnalysisServiceRecentlyClosedPositionUpdates", (fun (s:PortfolioAnalysisService) -> s.RecentlyClosedPositionUpdates() |> ignore), Cron.Daily(20, 0), rjo)
+        RecurringJob.AddOrUpdate<PortfolioAnalysisService>("PortfolioAnalysisServiceRecentlyClosedPositionUpdates", (fun (s:PortfolioAnalysisService) -> s.RecentlyClosedPositionUpdates() :> System.Threading.Tasks.Task), Cron.Daily(20, 0), rjo)
 
-        RecurringJob.AddOrUpdate<AdminCleanUpService>("AdminCleanUpService", (fun (s:AdminCleanUpService) -> s.Execute() |> ignore), Cron.Daily 2, rjo)
+        RecurringJob.AddOrUpdate<AdminCleanUpService>("AdminCleanUpService", (fun (s:AdminCleanUpService) -> s.Execute() :> System.Threading.Tasks.Task), Cron.Daily 2, rjo)
