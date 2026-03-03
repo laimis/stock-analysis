@@ -9,11 +9,8 @@ open core.fs.Adapters.Storage
 open core.fs.Reports
 open core.fs.Stocks
 
-type WeeklySummaryEmailService(
-    accounts: IAccountStorage,
-    emails: IEmailService,
-    reportsHandler: ReportsHandler,
-    logger: ILogger) =
+// Shared helpers used by both the weekly and monthly email services.
+module private SummaryEmailPayload =
 
     let formatCurrency (value: decimal) =
         value.ToString("C2", CultureInfo.CreateSpecificCulture("en-US"))
@@ -32,7 +29,7 @@ type WeeklySummaryEmailService(
         | Some d -> d.ToString("MM/dd/yyyy")
         | None -> ""
 
-    let buildEmailPayload (view: WeeklySummaryView) =
+    let build (subtitle: string) (view: WeeklySummaryView) =
         let closedStocks =
             view.ClosedStocks
             |> List.map (fun s ->
@@ -123,6 +120,7 @@ type WeeklySummaryEmailService(
             |> List.toArray
 
         {|
+            report_subtitle = subtitle
             start_date = view.Start.ToString("MM/dd/yyyy")
             end_date = view.End.ToString("MM/dd/yyyy")
             total_profit = formatCurrency view.TotalProfit
@@ -146,10 +144,15 @@ type WeeklySummaryEmailService(
             fees = fees
         |}
 
-    interface IApplicationService
 
-    member _.Execute() = task {
-        logger.LogInformation("Starting weekly summary email job")
+type SummaryEmailService(
+    accounts: IAccountStorage,
+    emails: IEmailService,
+    reportsHandler: ReportsHandler,
+    logger: ILogger) =
+
+    let execute (subject: string) (period: string) = task {
+        logger.LogInformation $"Starting {subject} email job"
 
         let! pairs = accounts.GetUserEmailIdPairs()
 
@@ -160,30 +163,38 @@ type WeeklySummaryEmailService(
                     let! userResult = pair.Id |> accounts.GetUser |> Async.AwaitTask
                     match userResult with
                     | None ->
-                        logger.LogWarning($"User not found for id {pair.Id}, skipping weekly summary email")
+                        logger.LogWarning $"User not found for id {pair.Id}, skipping {subject} email"
                     | Some user ->
                         let query = {
-                            WeeklySummaryQuery.Period = "thisweek"
+                            WeeklySummaryQuery.Period = period
                             UserId = pair.Id
                         }
 
                         let! view = reportsHandler.Handle(query) |> Async.AwaitTask
-                        let payload = buildEmailPayload view
+                        let payload = SummaryEmailPayload.build subject view
 
                         let recipient = Recipient(user.State.Email, user.State.Name)
                         let sender = Sender.NoReply
 
-                        let! result = emails.SendWeeklySummary recipient sender payload |> Async.AwaitTask
+                        let! result = emails.SendSummary recipient sender subject payload |> Async.AwaitTask
                         match result with
                         | Ok () ->
-                            logger.LogInformation($"Weekly summary email sent to {user.State.Email}")
+                            logger.LogInformation $"{subject} email sent to {user.State.Email}"
                         | Error err ->
-                            logger.LogError($"Failed to send weekly summary email to {user.State.Email}: {err}")
+                            logger.LogError $"Failed to send {subject} email to {user.State.Email}: {err}"
                 with ex ->
-                    logger.LogError($"Error sending weekly summary email to user {pair.Email}: {ex.Message}")
+                    logger.LogError $"Error sending {subject} email to user {pair.Email}: {ex.Message}"
             })
             |> Async.Sequential
 
-        logger.LogInformation("Completed weekly summary email job")
+        logger.LogInformation $"Completed {subject} email job"
         return ()
     }
+
+    interface IApplicationService
+
+    member _.ExecuteWeekly() =
+        execute "Weekly Trading Summary" "thisweek"
+
+    member _.ExecuteMonthly() =
+        execute "Monthly Trading Summary" "previousmonth"

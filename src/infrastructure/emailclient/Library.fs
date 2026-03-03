@@ -142,8 +142,8 @@ type SESEmailService(accessKeyId: string, secretAccessKey: string, region: strin
         member _.SendSECFilings recipient sender subject properties =
             sendWithTemplate recipient sender "secfilings" subject properties
         
-        member _.SendWeeklySummary recipient sender properties =
-            sendWithTemplate recipient sender "weeklysummary" "Weekly Trading Summary" properties
+        member _.SendSummary recipient sender subject properties =
+            sendWithTemplate recipient sender "weeklysummary" subject properties
         
         member _.Send recipient sender subject plainTextBody htmlBody =
             sendRaw recipient sender subject plainTextBody htmlBody

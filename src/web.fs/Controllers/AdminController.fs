@@ -67,8 +67,14 @@ type AdminController(handler: Handler) =
     }
 
     [<HttpGet("weekly-summary-email")>]
-    member this.TriggerWeeklySummaryEmail([<FromServices>] service: WeeklySummaryEmailService) : Task<ActionResult> = task {
-        do! service.Execute()
+    member this.TriggerWeeklySummaryEmail([<FromServices>] service: SummaryEmailService) : Task<ActionResult> = task {
+        do! service.ExecuteWeekly()
+        return this.Ok() :> ActionResult
+    }
+
+    [<HttpGet("monthly-summary-email")>]
+    member this.TriggerMonthlySummaryEmail([<FromServices>] service: SummaryEmailService) : Task<ActionResult> = task {
+        do! service.ExecuteMonthly()
         return this.Ok() :> ActionResult
     }
 
