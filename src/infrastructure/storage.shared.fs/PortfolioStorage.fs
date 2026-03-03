@@ -18,7 +18,6 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
     let _stock_entity = "ownedstock3"
     let _option_entity = "soldoption3"
     let _crypto_entity = "ownedcrypto"
-    let _stock_list_entity = "stocklist"
     let _routine_entity = "routine"
     let _pending_stock_position_entity = "pendingstockposition"
     let _stock_position_entity = "stockposition"
@@ -150,24 +149,6 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
     member this.DeleteRoutine (routine: Routine) (userId: UserId) : Task =
         aggregateStorage.DeleteAggregate(_routine_entity, routine.Id, userId)
     
-    // Stock list methods
-    member this.GetStockLists(userId: UserId) : Task<seq<StockList>> = task {
-        let! list = aggregateStorage.GetEventsAsync(_stock_list_entity, userId)
-        return list.GroupBy(fun e -> e.AggregateId)
-                   .Select(fun g -> StockList(g))
-    }
-    
-    member this.GetStockList (id: Guid) (userId: UserId) : Task<StockList> = task {
-        let! list = this.GetStockLists(userId)
-        return list |> Seq.tryFind (fun s -> s.State.Id = id) |> Option.toObj
-    }
-    
-    member this.SaveStockList (list: StockList) (userId: UserId) : Task =
-        this.Save(list, _stock_list_entity, userId)
-    
-    member this.DeleteStockList (list: StockList) (userId: UserId) : Task =
-        aggregateStorage.DeleteAggregate(_stock_list_entity, list.Id, userId)
-    
     // Pending position methods
     member this.SavePendingPosition (position: PendingStockPosition) (userId: UserId) : Task =
         this.Save(position, _pending_stock_position_entity, userId)
@@ -185,7 +166,6 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
         do! aggregateStorage.DeleteAggregates(_option_position_entity, userId, null)
         do! aggregateStorage.DeleteAggregates(_stock_entity, userId, null)
         do! aggregateStorage.DeleteAggregates(_crypto_entity, userId, null)
-        do! aggregateStorage.DeleteAggregates(_stock_list_entity, userId, null)
         do! aggregateStorage.DeleteAggregates(_pending_stock_position_entity, userId, null)
         do! aggregateStorage.DeleteAggregates(_stock_position_entity, userId, null)
     }
@@ -200,10 +180,6 @@ type PortfolioStorage(aggregateStorage: IAggregateStorage, blobStorage: IBlobSto
         member this.SaveOptionPosition userId previousState newState = this.SaveOptionPosition userId previousState newState
         member this.DeleteOptionPosition userId previousState newState = this.DeleteOptionPosition userId previousState newState
         member this.Delete userId = this.Delete userId
-        member this.GetStockList id userId = this.GetStockList id userId
-        member this.GetStockLists userId = this.GetStockLists userId
-        member this.SaveStockList list userId = this.SaveStockList list userId
-        member this.DeleteStockList list userId = this.DeleteStockList list userId
         member this.SavePendingPosition position userId = this.SavePendingPosition position userId
         member this.GetPendingStockPositions userId = this.GetPendingStockPositions userId
         member this.GetRoutines userId = this.GetRoutines userId

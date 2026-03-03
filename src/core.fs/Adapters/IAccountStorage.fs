@@ -3,10 +3,12 @@ namespace core.fs.Adapters.Storage
 open System
 open System.Collections.Generic
 open System.Threading.Tasks
+open core.Shared
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
 open core.fs.Options
 open core.fs.Alerts
+open core.fs.Stocks
 
 [<CLIMutable>]
 type TickerCikMapping = 
@@ -48,3 +50,15 @@ type IAccountStorage =
     abstract member GetAllTickerCikMappings: unit -> Task<TickerCikMapping seq>
     abstract member GetTickerCikLastUpdated: unit -> Task<DateTimeOffset option>
     abstract member SearchTickerCik: query:string -> Task<TickerCikMapping seq>
+
+type IStockListStorage =
+    abstract member GetStockLists : userId:UserId -> Task<StockList seq>
+    abstract member GetStockList : id:Guid -> userId:UserId -> Task<StockList option>
+    abstract member SaveStockList : id:Guid option -> name:string -> description:string -> userId:UserId -> Task<StockList option>
+    abstract member DeleteStockList : id:Guid -> userId:UserId -> Task
+    abstract member DeleteAllStockLists : userId:UserId -> Task
+    abstract member AddTickerToStockList : id:Guid -> ticker:Ticker -> note:string -> userId:UserId -> Task<StockList option>
+    abstract member RemoveTickerFromStockList : id:Guid -> ticker:Ticker -> userId:UserId -> Task<StockList option>
+    abstract member AddTagToStockList : id:Guid -> tag:string -> userId:UserId -> Task<StockList option>
+    abstract member RemoveTagFromStockList : id:Guid -> tag:string -> userId:UserId -> Task<StockList option>
+    abstract member ClearStockListTickers : id:Guid -> userId:UserId -> Task<StockList option>

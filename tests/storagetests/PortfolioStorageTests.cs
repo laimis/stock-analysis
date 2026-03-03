@@ -250,42 +250,6 @@ namespace storagetests
         }
 
         [Fact]
-        public async Task StockList_Works()
-        {
-            var storage = CreateStorage();
-
-            var existing = await storage.GetStockLists(_userId);
-
-            Assert.Empty(existing);
-
-            var list = new StockList("description", "name", _userId.Item);
-
-            list.AddStock(TestDataGenerator.AMD, "yeah yeah");
-
-            await storage.SaveStockList(list, _userId);
-
-            existing = await storage.GetStockLists(_userId);
-
-            Assert.NotEmpty(existing);
-
-            var loaded = await storage.GetStockList(list.State.Id, _userId);
-
-            Assert.Equal(list.State.Name, loaded.State.Name);
-
-            var ticker = loaded.State.Tickers.SingleOrDefault(t => t.Ticker.Equals(TestDataGenerator.AMD));
-
-            Assert.NotNull(ticker);
-
-            await storage.DeleteStockList(loaded, _userId);
-
-            existing = await storage.GetStockLists(_userId);
-
-            Assert.Empty(existing);
-
-            await storage.Delete(_userId);
-        }
-
-        [Fact]
         public async Task PendingStockPosition_Works()
         {
             var storage = CreateStorage();

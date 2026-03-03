@@ -203,7 +203,7 @@ module CSVExport =
             
         writer.Generate(rows)
         
-    let stockList (writer:ICSVWriter) (list:StockListState) (justTickers:bool) =
+    let stockList (writer:ICSVWriter) (list:StockList) (justTickers:bool) =
         
         match justTickers with
         | true -> writer.Generate(list.Tickers |> Seq.map (fun s -> { Ticker = s.Ticker.Value }))

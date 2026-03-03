@@ -33,9 +33,17 @@ module DIHelper =
             if String.IsNullOrEmpty(cnn) then
                 raise (InvalidOperationException("DB_CNN configuration is required for postgres storage"))
             
-            services.AddSingleton<IAccountStorage>(fun sp ->
+            services.AddSingleton<AccountStorage>(fun sp ->
                 let outbox = sp.GetRequiredService<IOutbox>()
-                AccountStorage(outbox, cnn) :> IAccountStorage
+                AccountStorage(outbox, cnn)
+            ) |> ignore
+            
+            services.AddSingleton<IAccountStorage>(fun sp ->
+                sp.GetRequiredService<AccountStorage>() :> IAccountStorage
+            ) |> ignore
+            
+            services.AddSingleton<IStockListStorage>(fun sp ->
+                sp.GetRequiredService<AccountStorage>() :> IStockListStorage
             ) |> ignore
             
             services.AddSingleton<IBlobStorage>(fun sp ->

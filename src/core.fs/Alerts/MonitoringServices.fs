@@ -165,6 +165,7 @@ type PatternMonitoringService(
     container:StockAlertContainer,
     marketHours:IMarketHours,
     portfolio:IPortfolioStorage,
+    stockLists:IStockListStorage,
     logger:ILogger) =
 
     let generateAlertListForUser (emailIdPair:EmailIdPair) = async {
@@ -202,11 +203,11 @@ type PatternMonitoringService(
                 |> Seq.map _.UnderlyingTicker
                 |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionsPendingIdentifier]; user=userId})
 
-            let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
+            let! lists = emailIdPair.Id |> stockLists.GetStockLists |> Async.AwaitTask
             let stockList =
                 lists
-                |> Seq.filter _.State.ContainsTag(Constants.MonitorTagPattern)
-                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=userId}))
+                |> Seq.filter (fun l -> l.ContainsTag Constants.MonitorTagPattern)
+                |> Seq.map (fun l -> l.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.Name]; user=userId}))
                 |> Seq.concat
 
             // create a map of all the tickers we are checking so we can remove duplicates, and we want to prefer portfolio list entries
@@ -343,6 +344,7 @@ type PriceObvTrendMonitoringService(
     container:StockAlertContainer,
     marketHours:IMarketHours,
     portfolio:IPortfolioStorage,
+    stockLists:IStockListStorage,
     logger:ILogger) =
     let createAlertForTrendChange identifier (establishedTrendStrength:float) (newTrendStrength:float) ticker description sourceLists userId =
         {
@@ -393,11 +395,11 @@ type PriceObvTrendMonitoringService(
                 |> Seq.map _.UnderlyingTicker
                 |> Seq.map (fun t -> {ticker=t; listNames=[Constants.OptionsPendingIdentifier]; user=userId})
 
-            let! lists = emailIdPair.Id |> portfolio.GetStockLists |> Async.AwaitTask
+            let! lists = emailIdPair.Id |> stockLists.GetStockLists |> Async.AwaitTask
             let stockList =
                 lists
-                |> Seq.filter _.State.ContainsTag(Constants.MonitorNameObvPriceTrend)
-                |> Seq.map (fun l -> l.State.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.State.Name]; user=userId}))
+                |> Seq.filter (fun l -> l.ContainsTag Constants.MonitorNameObvPriceTrend)
+                |> Seq.map (fun l -> l.Tickers |> Seq.map (fun t -> {ticker=t.Ticker; listNames=[l.Name]; user=userId}))
                 |> Seq.concat
 
             // create a map of all the tickers we are checking so we can remove duplicates, and we want to prefer portfolio list entries
@@ -582,7 +584,7 @@ type PriceObvTrendMonitoringService(
     }
 
 
-type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage, logger:ILogger) =
+type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, emails:IEmailService, marketHours:IMarketHours, portfolio:IPortfolioStorage, stockLists:IStockListStorage, logger:ILogger) =
 
     let tickersToCheck = Dictionary<UserState, HashSet<Ticker>>()
     let weeklyAlertsDiscovered = Dictionary<UserState, List<TriggeredAlert>>()
@@ -596,11 +598,11 @@ type WeeklyMonitoringService(accounts:IAccountStorage, brokerage:IBrokerage, ema
             let tickersFromPositions = stocks |> Seq.filter _.IsOpen |> Seq.map _.Ticker
             let! options = pair.Id |> portfolio.GetOptionPositions |> Async.AwaitTask
             let tickersFromOptions = options |> Seq.filter _.IsOpen |> Seq.map _.UnderlyingTicker
-            let! lists = pair.Id |> portfolio.GetStockLists |> Async.AwaitTask
+            let! lists = pair.Id |> stockLists.GetStockLists |> Async.AwaitTask
             let tickersFromLists =
                 lists
-                |> Seq.filter _.State.ContainsTag(Constants.MonitorTagPattern)
-                |> Seq.map (fun l -> l.State.Tickers |> Seq.map _.Ticker)
+                |> Seq.filter (fun l -> l.ContainsTag Constants.MonitorTagPattern)
+                |> Seq.map (fun l -> l.Tickers |> Seq.map _.Ticker)
                 |> Seq.concat
 
             let set = HashSet<Ticker>([tickersFromLists; tickersFromPositions; tickersFromOptions] |> Seq.concat);
