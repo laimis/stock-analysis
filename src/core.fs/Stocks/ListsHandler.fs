@@ -181,6 +181,9 @@ type Handler(accounts: IAccountStorage, stockLists: IStockListStorage, csvWriter
     }
     
     member _.HandleCreate userId (command: Create) = task {
+        if String.IsNullOrWhiteSpace command.Name then
+            return "List name cannot be empty" |> ServiceError |> Error
+        else
         let! user = accounts.GetUser userId
         
         match user with
@@ -193,6 +196,9 @@ type Handler(accounts: IAccountStorage, stockLists: IStockListStorage, csvWriter
     }
     
     member _.HandleUpdate (command: Update) userId = task {
+        if String.IsNullOrWhiteSpace command.Name then
+            return "List name cannot be empty" |> ServiceError |> Error
+        else
         let! user = accounts.GetUser userId
         
         match user with
