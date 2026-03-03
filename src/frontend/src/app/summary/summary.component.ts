@@ -56,6 +56,18 @@ export class SummaryComponent implements OnInit {
         return this.result.closedStocks.reduce((acc, cur) => acc + cur.rr, 0)
     }
 
+    periodTitle(): string {
+        if (!this.result) return ''
+        const start = new Date(this.result.start)
+        switch (this.timePeriod) {
+            case 'currentmonth':
+            case 'previousmonth':
+                return start.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + ' Review'
+            default:
+                return 'Week of ' + start.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' Review'
+        }
+    }
+
     private loadEntries() {
         this.stockService.reportsWeeklySummary(this.timePeriod).subscribe((r: WeeklyReport) => {
             this.loaded = true

@@ -7,10 +7,12 @@
     <div class="row mb-4">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
-          <h2 class="m-0">Week of {{ result.start | date }} Review</h2>
+          <h2 class="m-0">{{ periodTitle() }}</h2>
           <select class="form-select w-auto" [(ngModel)]="timePeriod" (ngModelChange)="periodChanged()">
             <option value="thisweek" selected>This week</option>
-            <option value="last7days">Last 7 days</option>
+            <option value="previousweek">Previous week</option>
+            <option value="currentmonth">Current month</option>
+            <option value="previousmonth">Previous month</option>
           </select>
         </div>
       </div>

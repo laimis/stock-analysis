@@ -163,7 +163,7 @@ type WeeklySummaryEmailService(
                         logger.LogWarning($"User not found for id {pair.Id}, skipping weekly summary email")
                     | Some user ->
                         let query = {
-                            WeeklySummaryQuery.Period = "last7days"
+                            WeeklySummaryQuery.Period = "thisweek"
                             UserId = pair.Id
                         }
 

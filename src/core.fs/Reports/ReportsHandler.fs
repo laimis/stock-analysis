@@ -289,24 +289,28 @@ type WeeklySummaryQuery =
     }
     
     member this.GetDates() =
-        let start = DateTimeOffset.UtcNow.Date.AddDays(-7)
-        let ``end`` = DateTimeOffset.UtcNow.Date.AddDays(1);
+        let today = DateTimeOffset.UtcNow.Date
 
         match this.Period with
-        | "last7days" ->
-            (start, ``end``)
-        | _ ->
-            let date = DateTimeOffset.UtcNow.Date;
-            let offset = int date.DayOfWeek - 1;
-            let toSubtract =
-                match offset with
-                | x when x < 0 -> 6
-                | _ -> offset
-
-            let monday = date.AddDays(-1.0 * (toSubtract |> float));
-            let sunday = monday.AddDays(7)
-            
-            (monday, sunday)
+        | "previousweek" ->
+            // Sunday-to-Sunday: go back to this week's Sunday, then subtract 7 more days
+            let thisWeekSunday = today.AddDays(-float (int today.DayOfWeek))
+            let prevWeekSunday = thisWeekSunday.AddDays -7.0
+            prevWeekSunday, thisWeekSunday
+        | "currentmonth" ->
+            let start = DateTime(today.Year, today.Month, 1)
+            let ``end`` = start.AddMonths(1)
+            start, ``end``
+        | "previousmonth" ->
+            let thisMonthStart = DateTime(today.Year, today.Month, 1)
+            let start = thisMonthStart.AddMonths -1
+            start, thisMonthStart
+        | "thisweek" ->
+            // "thisweek" (default): Sunday through next Sunday (end may be in the future)
+            let thisSunday = today.AddDays(-float (int today.DayOfWeek))
+            let nextSunday = thisSunday.AddDays 7.0
+            thisSunday, nextSunday
+        | _ -> failwith $"Unexpected period {this.Period}"
             
 type WeeklySummaryView(
     start,
