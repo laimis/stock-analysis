@@ -35,7 +35,7 @@
       @if (!loading && ownershipSummary.length > 0) {
         <div class="card mb-4">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Current Ownership</h4>
+            <span class="text-muted small">Current Ownership</span>
             <div class="d-flex align-items-center gap-3">
               @if (sharesOutstanding) {
                 <div class="text-muted">
@@ -61,12 +61,12 @@
               <table class="table table-modern table-hover align-middle">
                 <thead class="table-light">
                   <tr>
-                    <th scope="col" class="ps-4">Owner</th>
-                    <th scope="col">Type</th>
-                    <th scope="col" class="text-end">Shares</th>
-                    <th scope="col" class="text-end">% Ownership</th>
-                    <th scope="col">Roles</th>
-                    <th scope="col" class="text-end pe-4">Last Updated</th>
+                    <th scope="col" class="ps-4 fw-normal text-muted small">Owner</th>
+                    <th scope="col" class="fw-normal text-muted small">Type</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">Shares</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">% Ownership</th>
+                    <th scope="col" class="fw-normal text-muted small">Roles</th>
+                    <th scope="col" class="text-end pe-4 fw-normal text-muted small">Last Updated</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -77,7 +77,7 @@
                           {{ summary.entity.name }}
                         </a>
                       </td>
-                      <td class="py-3"><span class="badge bg-secondary">{{ getEntityTypeDisplay(summary.entity.entityType) }}</span></td>
+                      <td class="py-3">{{ getEntityTypeDisplay(summary.entity.entityType) }}</td>
                       <td class="text-end py-3">{{ summary.currentShares | number }}</td>
                       <td class="text-end py-3">
                         @if (sharesOutstanding) {
@@ -95,9 +95,7 @@
                       </td>
                       <td class="py-3">
                         @for (role of summary.roles; track role.id) {
-                          <span class="badge bg-info me-1">
-                            {{ role.relationshipType }}
-                          </span>
+                          <span class="me-1">{{ role.relationshipType }}</span>
                         }
                       </td>
                       <td class="text-end py-3 pe-4">
@@ -132,7 +130,7 @@
       @if (!loading && ownershipChartContainers.length > 0) {
         <div class="card mb-4">
           <div class="card-header">
-            <h4 class="mb-0">Ownership Over Time</h4>
+            <span class="text-muted small">Ownership Over Time</span>
           </div>
           <div class="card-body">
             <app-line-chart [dataContainers]="ownershipChartContainers" chartTitle=""></app-line-chart>
@@ -144,7 +142,7 @@
       @if (!loading && timeline.length > 0) {
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Ownership Timeline</h4>
+            <span class="text-muted small">Ownership Timeline</span>
             <div>
               <button (click)="loadTimeline(90)" class="btn btn-sm btn-outline-secondary me-2" [class.active]="timelineDays === 90">90 days</button>
               <button (click)="loadTimeline(180)" class="btn btn-sm btn-outline-secondary me-2" [class.active]="timelineDays === 180">180 days</button>
@@ -157,16 +155,16 @@
               <table class="table table-modern table-hover align-middle">
                 <thead class="table-light">
                   <tr>
-                    <th scope="col" class="ps-4">Date</th>
-                    <th scope="col">Owner</th>
-                    <th scope="col">Event Type</th>
-                    <th scope="col">Transaction</th>
-                    <th scope="col" class="text-end">Shares Before</th>
-                    <th scope="col" class="text-end">Shares Transacted</th>
-                    <th scope="col" class="text-end">Shares</th>
-                    <th scope="col" class="text-end">Price / Value</th>
-                    <th scope="col" class="text-end">% Ownership</th>
-                    <th scope="col" class="text-end pe-4">Filing</th>
+                    <th scope="col" class="ps-4 fw-normal text-muted small">Date</th>
+                    <th scope="col" class="fw-normal text-muted small">Owner</th>
+                    <th scope="col" class="fw-normal text-muted small">Event Type</th>
+                    <th scope="col" class="fw-normal text-muted small">Transaction</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">Shares Before</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">Shares Transacted</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">Shares</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">Price / Value</th>
+                    <th scope="col" class="text-end fw-normal text-muted small">% Ownership</th>
+                    <th scope="col" class="text-end pe-4 fw-normal text-muted small">Filing</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -181,7 +179,7 @@
                           {{ getEntityName(event.entityId) }}
                         </a>
                       </td>
-                      <td class="py-3"><span class="badge bg-info">{{ event.eventType }}</span></td>
+                      <td class="py-3">{{ getEventTypeDisplay(event.eventType) }}</td>
                       <td class="py-3">
                         @if (event.transactionType) {
                           <span class="badge" 

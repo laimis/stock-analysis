@@ -8,6 +8,7 @@ import { TimeAgoPipe } from '../services/time-ago.pipe';
 import { LineChartComponent } from '../shared/line-chart/line-chart.component';
 
 const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
+const getEventTypeDisplay = OwnershipService.getEventTypeDisplay;
 
 @Component({
   selector: 'app-ownership-by-ticker',
@@ -36,6 +37,7 @@ export class OwnershipByTickerComponent implements OnInit {
   syncing = false;
   syncMessage = '';
   getEntityTypeDisplay = getEntityTypeDisplay;
+  getEventTypeDisplay = getEventTypeDisplay;
   timelineDays = 1825;
   entityNameMap = new Map<string, string>();
   sharesOutstanding: number | null = null;
