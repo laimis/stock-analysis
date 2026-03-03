@@ -37,6 +37,7 @@
         <!-- Auth and startup -->
         <Compile Include="DataProtection.fs" />
         <Compile Include="AuthHelper.fs" />
+        <Compile Include="Jobs.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
@@ -50,7 +51,6 @@
         <ProjectReference Include="..\core\core.csproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
-        <ProjectReference Include="..\web.interop\web.interop.csproj" />
     </ItemGroup>
 
     <ItemGroup>

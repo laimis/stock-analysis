@@ -28,7 +28,7 @@ type Program() =
         AuthHelper.Configure(configuration, builder.Services)
         DataProtection.configureDataProtection builder.Services configuration
         
-        Jobs.AddJobs(configuration, builder.Services, logger)
+        web.Jobs.addJobs configuration builder.Services logger
         
         builder.Services
             .AddControllers(fun o ->
@@ -117,7 +117,7 @@ type Program() =
         app.MapFallbackToFile("index.html") |> ignore
         
         let appLogger = app.Services.GetRequiredService<ILogger<Program>>()
-        Jobs.ConfigureJobs(app, appLogger)
+        web.Jobs.configureJobs app appLogger
         
         app.Run()
 
