@@ -5,147 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SEC Filings Update</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #f0f0f0; font-family: Arial, Helvetica, sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <td align="center" style="padding: 32px 16px;">
+                <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #cccccc;">
+                    <!-- Header -->
                     <tr>
-                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-                            <h1 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 600;">
-                                📋 SEC Filings Update
-                            </h1>
-                            <p style="margin: 8px 0 0; color: #6b7280; font-size: 14px;">
-                                Recent filings for your portfolio
-                            </p>
+                        <td style="background-color: #1a3a5c; padding: 24px 32px;">
+                            <div style="font-size: 20px; font-weight: bold; color: #ffffff; letter-spacing: 0.5px;">Nightingale Trading</div>
+                            <div style="font-size: 12px; color: #a8c4e0; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">SEC Filings Update</div>
                         </td>
                     </tr>
+                    <!-- Body -->
                     <tr>
-                        <td style="padding: 32px 40px;">
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 24px;">
-                                Hi {{user_name}},
+                        <td style="padding: 28px 32px;">
+                            <p style="margin: 0 0 20px; color: #333333; font-size: 14px; line-height: 21px;">
+                                Dear {{user_name}},
                             </p>
-                            <p style="margin: 0 0 24px; color: #4b5563; font-size: 16px; line-height: 24px;">
+                            <p style="margin: 0 0 24px; color: #333333; font-size: 14px; line-height: 21px;">
                                 The following companies in your portfolio have filed new documents with the SEC in the last two days:
                             </p>
-                            
+
                             {{for ticker_filing in ticker_filings}}
-                            <div style="margin-bottom: 32px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                                <div style="padding: 16px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td>
-                                                <h2 style="margin: 0; color: #1f2937; font-size: 18px; font-weight: 600;">
-                                                    {{ticker_filing.ticker}}
-                                                </h2>
-                                            </td>
-                                            <td align="right">
-                                                <a href="https://app.nightingaletrading.com/stocks/{{ticker_filing.ticker}}" style="color: #2563eb; text-decoration: none; font-size: 14px;">Details</a>
-                                                &nbsp;|&nbsp;
-                                                <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{ticker_filing.ticker}}" style="color: #2563eb; text-decoration: none; font-size: 14px;">Chart</a>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                
+                            <!-- Ticker section -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px; border: 1px solid #d0d0d0; border-collapse: collapse;">
+                                <!-- Ticker header -->
+                                <tr>
+                                    <td style="padding: 10px 14px; background-color: #1a3a5c;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="font-size: 14px; font-weight: bold; color: #ffffff; letter-spacing: 0.5px;">{{ticker_filing.ticker}}</td>
+                                                <td align="right" style="font-size: 12px;">
+                                                    <a href="https://app.nightingaletrading.com/stocks/{{ticker_filing.ticker}}" style="color: #a8c4e0; text-decoration: none;">Details</a>
+                                                    <span style="color: #a8c4e0; margin: 0 6px;">|</span>
+                                                    <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{ticker_filing.ticker}}" style="color: #a8c4e0; text-decoration: none;">Chart</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
                                 {{for filing in ticker_filing.filings}}
-                                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
-                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td style="padding: 0 0 12px 0;">
-                                                <div style="display: inline-block; padding: 4px 12px; background-color: #dbeafe; color: #1e40af; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                                    {{filing.filing}}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 0 0 12px 0;">
-                                                <p style="margin: 0; color: #1f2937; font-size: 15px; font-weight: 600;">
-                                                    {{filing.description}}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 0 0 16px 0;">
-                                                <p style="margin: 0; color: #6b7280; font-size: 14px;">
-                                                    Filed: {{filing.filing_date}}
-                                                </p>
-                                                {{if filing.report_date}}
-                                                <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">
-                                                    Report Date: {{filing.report_date}}
-                                                </p>
-                                                {{end}}
-                                            </td>
-                                        </tr>
+                                <tr style="{{if !for.first}}border-top: 1px solid #d0d0d0;{{end}}">
+                                    <td style="padding: 16px 14px; background-color: {{if for.index % 2 == 1}}#f5f7fa{{else}}#ffffff{{end}};">
+                                        <!-- Filing type badge -->
+                                        <div style="margin-bottom: 10px;">
+                                            <span style="display: inline-block; padding: 2px 10px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">{{filing.filing}}</span>
+                                        </div>
+                                        <!-- Description -->
+                                        <div style="font-size: 14px; font-weight: bold; color: #1a1a1a; margin-bottom: 8px;">{{filing.description}}</div>
+                                        <!-- Dates -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom: 12px;">
+                                            <tr>
+                                                <td style="padding: 2px 16px 2px 0; font-size: 12px; color: #555555;">Filed</td>
+                                                <td style="padding: 2px 0; font-size: 12px; color: #333333; font-weight: bold;">{{filing.filing_date}}</td>
+                                            </tr>
+                                            {{if filing.report_date}}
+                                            <tr>
+                                                <td style="padding: 2px 16px 2px 0; font-size: 12px; color: #555555;">Report Date</td>
+                                                <td style="padding: 2px 0; font-size: 12px; color: #333333; font-weight: bold;">{{filing.report_date}}</td>
+                                            </tr>
+                                            {{end}}
+                                        </table>
                                         {{if filing.ownership_entity_name}}
-                                        <tr>
-                                            <td style="padding: 0 0 16px 0;">
-                                                <div style="padding: 12px 16px; background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;">
-                                                    <p style="margin: 0 0 6px; color: #0369a1; font-size: 13px; font-weight: 600;">
-                                                        Ownership Details
-                                                    </p>
-                                                    <p style="margin: 0; color: #0c4a6e; font-size: 14px; font-weight: 600;">
-                                                        {{filing.ownership_entity_name}}
-                                                    </p>
-                                                    {{if filing.ownership_summary}}
-                                                    <p style="margin: 4px 0 0; color: #075985; font-size: 13px;">
-                                                        {{filing.ownership_summary}}
-                                                    </p>
-                                                    {{end}}
-                                                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top: 8px;">
-                                                        {{if filing.ownership_shares}}
-                                                        <tr>
-                                                            <td style="padding: 2px 12px 2px 0; color: #6b7280; font-size: 12px;">Shares</td>
-                                                            <td style="padding: 2px 0; color: #0c4a6e; font-size: 12px; font-weight: 600;">{{filing.ownership_shares}}</td>
-                                                        </tr>
-                                                        {{end}}
-                                                        {{if filing.ownership_percent}}
-                                                        <tr>
-                                                            <td style="padding: 2px 12px 2px 0; color: #6b7280; font-size: 12px;">% of Class</td>
-                                                            <td style="padding: 2px 0; color: #0c4a6e; font-size: 12px; font-weight: 600;">{{filing.ownership_percent}}</td>
-                                                        </tr>
-                                                        {{end}}
-                                                        {{if filing.ownership_total_value}}
-                                                        <tr>
-                                                            <td style="padding: 2px 12px 2px 0; color: #6b7280; font-size: 12px;">Est. Value</td>
-                                                            <td style="padding: 2px 0; color: #0c4a6e; font-size: 12px; font-weight: 600;">{{filing.ownership_total_value}}</td>
-                                                        </tr>
-                                                        {{end}}
-                                                    </table>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <!-- Ownership details -->
+                                        <div style="margin-bottom: 14px; padding: 12px 14px; border-left: 3px solid #1a3a5c; background-color: #f5f7fa;">
+                                            <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #1a3a5c; letter-spacing: 0.5px; margin-bottom: 6px;">Ownership Details</div>
+                                            <div style="font-size: 13px; font-weight: bold; color: #1a1a1a; margin-bottom: 4px;">{{filing.ownership_entity_name}}</div>
+                                            {{if filing.ownership_summary}}
+                                            <div style="font-size: 12px; color: #555555; margin-bottom: 8px;">{{filing.ownership_summary}}</div>
+                                            {{end}}
+                                            <table role="presentation" cellpadding="0" cellspacing="0">
+                                                {{if filing.ownership_shares}}
+                                                <tr>
+                                                    <td style="padding: 2px 16px 2px 0; font-size: 12px; color: #555555;">Shares</td>
+                                                    <td style="padding: 2px 0; font-size: 12px; color: #333333; font-weight: bold;">{{filing.ownership_shares}}</td>
+                                                </tr>
+                                                {{end}}
+                                                {{if filing.ownership_percent}}
+                                                <tr>
+                                                    <td style="padding: 2px 16px 2px 0; font-size: 12px; color: #555555;">% of Class</td>
+                                                    <td style="padding: 2px 0; font-size: 12px; color: #333333; font-weight: bold;">{{filing.ownership_percent}}</td>
+                                                </tr>
+                                                {{end}}
+                                                {{if filing.ownership_total_value}}
+                                                <tr>
+                                                    <td style="padding: 2px 16px 2px 0; font-size: 12px; color: #555555;">Est. Value</td>
+                                                    <td style="padding: 2px 0; font-size: 12px; color: #333333; font-weight: bold;">{{filing.ownership_total_value}}</td>
+                                                </tr>
+                                                {{end}}
+                                            </table>
+                                        </div>
                                         {{end}}
-                                        <tr>
-                                            <td style="padding: 0;">
-                                                <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
-                                                    <tr>
-                                                        <td style="padding: 0 8px 0 0;" width="50%">
-                                                            <a href="{{filing.filing_url}}" style="display: block; padding: 10px 16px; background-color: #2563eb; color: #ffffff; text-decoration: none; text-align: center; border-radius: 6px; font-size: 14px; font-weight: 600;">
-                                                                View Filing
-                                                            </a>
-                                                        </td>
-                                                        <td style="padding: 0 0 0 8px;" width="50%">
-                                                            <a href="{{filing.document_url}}" style="display: block; padding: 10px 16px; background-color: #ffffff; color: #2563eb; text-decoration: none; text-align: center; border-radius: 6px; font-size: 14px; font-weight: 600; border: 1px solid #2563eb;">
-                                                                View Document
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
+                                        <!-- Links -->
+                                        <table role="presentation" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding-right: 12px;">
+                                                    <a href="{{filing.filing_url}}" style="font-size: 13px; color: #1a3a5c; text-decoration: none; font-weight: bold;">View Filing &rsaquo;</a>
+                                                </td>
+                                                <td>
+                                                    <a href="{{filing.document_url}}" style="font-size: 13px; color: #1a3a5c; text-decoration: none; font-weight: bold;">View Document &rsaquo;</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
                                 {{end}}
-                            </div>
+                            </table>
                             {{end}}
                         </td>
                     </tr>
+                    <!-- Footer -->
                     <tr>
-                        <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #6b7280; font-size: 14px; text-align: center;">
-                                &copy; 2026 Nightingale Trading. All rights reserved.
-                            </p>
+                        <td style="background-color: #1a3a5c; border-top: 3px solid #0f2540; padding: 20px 32px;">
+                            <p style="margin: 0; font-size: 12px; color: #6b8fa8; text-align: center;">&copy; 2026 Nightingale Trading. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
