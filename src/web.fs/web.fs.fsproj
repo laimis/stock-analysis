@@ -51,7 +51,6 @@
         <ProjectReference Include="..\core\core.csproj" />
         <ProjectReference Include="..\core.fs\core.fs.fsproj" />
         <ProjectReference Include="..\infrastructure\di.fs\di.fs.fsproj" />
-        <ProjectReference Include="..\web.interop\web.interop.csproj" />
     </ItemGroup>
 
     <ItemGroup>
