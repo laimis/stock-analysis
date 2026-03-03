@@ -3,90 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell Alert</title>
+    <title>Sell Tracking Report</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #f0f0f0; font-family: Arial, Helvetica, sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <td align="center" style="padding: 32px 16px;">
+                <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #cccccc;">
+                    <!-- Header -->
                     <tr>
-                        <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-                            <h1 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 600;">
-                                Sell Tracking Report
-                            </h1>
-                            <p style="margin: 8px 0 0; color: #6b7280; font-size: 14px;">
-                                Sell transactions that have occurred in your account around 30 days ago
-                            </p>
+                        <td style="background-color: #1a3a5c; padding: 24px 32px;">
+                            <div style="font-size: 20px; font-weight: bold; color: #ffffff; letter-spacing: 0.5px;">Nightingale Trading</div>
+                            <div style="font-size: 12px; color: #a8c4e0; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Sell Tracking Report</div>
                         </td>
                     </tr>
+                    <!-- Body -->
                     <tr>
-                        <td style="padding: 32px 40px;">
-                            {{for sell in sells}}
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 20px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                                <!-- Ticker + sell price header -->
+                        <td style="padding: 28px 32px;">
+                            <p style="margin: 0 0 6px; font-size: 12px; color: #555555; text-transform: uppercase; letter-spacing: 0.5px;">Sell transactions from approximately 30 days ago</p>
+
+                            <!-- Sells table -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0; border-collapse: collapse; margin-top: 16px;">
                                 <tr>
-                                    <td style="padding: 14px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td>
-                                                    <span style="font-size: 22px; font-weight: 700; color: #1f2937;">{{sell.ticker}}</span>
-                                                </td>
-                                                <td style="text-align: right;">
-                                                    <span style="font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px;">Sold&nbsp;at</span>&nbsp;
-                                                    <span style="font-size: 20px; font-weight: 700; color: #1f2937;">${{sell.price}}</span>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
+                                    <th style="padding: 8px 12px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; text-align: left;">Ticker</th>
+                                    <th style="padding: 8px 12px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; text-align: right;">Sold At</th>
+                                    <th style="padding: 8px 12px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; text-align: right;">Shares</th>
+                                    <th style="padding: 8px 12px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; text-align: right;">Date</th>
+                                    <th style="padding: 8px 12px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; text-align: right;">Current Price</th>
+                                    <th style="padding: 8px 12px; background-color: #1a3a5c; color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; text-align: right;">Change</th>
                                 </tr>
-                                <!-- Details rows -->
-                                <tr>
-                                    <td style="padding: 14px 20px 16px;">
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%;">
-                                                    <span style="color: #9ca3af;">Shares</span>&nbsp;&nbsp;
-                                                    <strong style="color: #1f2937;">{{sell.number_of_shares}}</strong>
-                                                </td>
-                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%; text-align: right;">
-                                                    <span style="color: #9ca3af;">Date</span>&nbsp;&nbsp;
-                                                    <strong style="color: #1f2937;">{{sell.date}}</strong>
-                                                </td>
-                                            </tr>
-                                            {{if sell.has_current_price}}
-                                            <tr>
-                                                <td style="padding: 3px 6px; font-size: 13px; color: #4b5563; width: 50%;">
-                                                    <span style="color: #9ca3af;">Current Price</span>&nbsp;&nbsp;
-                                                    <strong style="color: #1f2937;">${{sell.current_price}}</strong>
-                                                </td>
-                                                <td style="padding: 3px 6px; font-size: 13px; width: 50%; text-align: right;">
-                                                    {{if sell.price_direction == "down"}}
-                                                    <span style="display: inline-block; padding: 3px 10px; background-color: #d1fae5; color: #065f46; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8595;&nbsp;{{sell.price_change_pct}}% lower</span>
-                                                    {{else}}
-                                                    <span style="display: inline-block; padding: 3px 10px; background-color: #fee2e2; color: #991b1b; font-size: 13px; font-weight: 600; border-radius: 20px;">&#8593;&nbsp;{{sell.price_change_pct}}% higher</span>
-                                                    {{end}}
-                                                </td>
-                                            </tr>
+                                {{for sell in sells}}
+                                <tr style="background-color: {{if for.index % 2 == 1}}#f5f7fa{{else}}#ffffff{{end}};">
+                                    <td style="padding: 10px 12px; font-size: 13px; color: #1a1a1a; font-weight: bold; border-top: 1px solid #d0d0d0;">
+                                        <a href="https://app.nightingaletrading.com/stocks/{{sell.ticker}}" style="color: #1a3a5c; text-decoration: none;">{{sell.ticker}}</a>
+                                        <span style="padding-left: 6px; font-size: 11px; font-weight: normal;">
+                                            <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{sell.ticker}}" style="color: #1a3a5c; text-decoration: none;">Chart</a>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">${{sell.price}}</td>
+                                    <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">{{sell.number_of_shares}}</td>
+                                    <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">{{sell.date}}</td>
+                                    <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">
+                                        {{if sell.has_current_price}}&dollar;{{sell.current_price}}{{else}}&mdash;{{end}}
+                                    </td>
+                                    <td style="padding: 10px 12px; font-size: 12px; text-align: right; border-top: 1px solid #d0d0d0;">
+                                        {{if sell.has_current_price}}
+                                            {{if sell.price_direction == "down"}}
+                                            <span style="color: #1a7a3c; font-weight: bold;">&#8595; {{sell.price_change_pct}}% lower</span>
+                                            {{else}}
+                                            <span style="color: #b91c1c; font-weight: bold;">&#8593; {{sell.price_change_pct}}% higher</span>
                                             {{end}}
-                                        </table>
-                                        <p style="margin: 14px 6px 0; font-size: 12px;">
-                                            <a href="https://app.nightingaletrading.com/stocks/{{sell.ticker}}" style="color: #2563eb; text-decoration: none;">View on NGTD</a>
-                                            <span style="color: #d1d5db; margin: 0 6px;">|</span>
-                                            <a href="https://www.tradingview.com/chart/kQn4rgoA/?symbol={{sell.ticker}}" style="color: #2563eb; text-decoration: none;">Chart</a>
-                                        </p>
+                                        {{else}}&mdash;{{end}}
                                     </td>
                                 </tr>
+                                {{end}}
                             </table>
-                            {{end}}
-                        
                         </td>
                     </tr>
+                    <!-- Footer -->
                     <tr>
-                        <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; color: #6b7280; font-size: 14px; text-align: center;">
-                                &copy; 2026 Nightingale Trading. All rights reserved.
-                            </p>
+                        <td style="background-color: #1a3a5c; border-top: 3px solid #0f2540; padding: 20px 32px;">
+                            <p style="margin: 0; font-size: 12px; color: #6b8fa8; text-align: center;">&copy; 2026 Nightingale Trading. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
