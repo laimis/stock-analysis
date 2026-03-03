@@ -770,7 +770,7 @@ ON CONFLICT (ticker) DO UPDATE SET
                     {| userId = id |})
 
                 let! tickerRows = db.QueryAsync<StockListTickerDto>(
-                    "SELECT list_id, ticker, note, added_at FROM stock_list_tickers WHERE list_id IN (SELECT id FROM stock_lists WHERE user_id = @userId)",
+                    "SELECT list_id, ticker, note, added_at FROM stock_list_tickers WHERE list_id IN (SELECT id FROM stock_lists WHERE user_id = @userId) ORDER BY list_id, added_at, ticker",
                     {| userId = id |})
 
                 let tickersByListId =
