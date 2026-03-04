@@ -27,7 +27,7 @@ let addJobs (configuration: IConfiguration) (services: IServiceCollection) (logg
 
     match backendJobsEnabled configuration with
     | false -> 
-        logger.LogInformation "Jobs: backend jobs are disabled"
+        logger.LogWarning "Jobs: backend jobs are disabled"
     | true ->
         logger.LogInformation "Jobs: backend jobs are enabled"
         services.AddHangfireServer(fun (options:BackgroundJobServerOptions) ->
@@ -39,7 +39,7 @@ let configureJobs (app: IApplicationBuilder) (logger: ILogger) =
     let configuration = app.ApplicationServices.GetService<IConfiguration>()
 
     match backendJobsEnabled configuration with
-    | false -> logger.LogInformation "Jobs: backend jobs are disabled"
+    | false -> logger.LogWarning "Jobs: backend jobs are disabled"
     | true ->
         logger.LogInformation "Jobs: backend jobs are enabled"
     
