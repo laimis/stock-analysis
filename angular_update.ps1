@@ -5,7 +5,7 @@ $scriptPath = $MyInvocation.MyCommand.Path | Split-Path
 Set-Location src/frontend
 
 # get list of packages that need updating
-$updates = ng update | Where-Object { $_.Contains("ng update")} 
+$updates = ng update | Where-Object { $_ -match "ng update \S+" }
 
 # if there are no updates available, tell that and exit
 if ($updates.Count -eq 0) {
