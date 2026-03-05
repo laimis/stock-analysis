@@ -13,7 +13,6 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Primitives
 open Hangfire
-open Hangfire.PostgreSql
 open web.Utils
 
 type Program() =
@@ -56,12 +55,6 @@ type Program() =
         
         di.DIHelper.registerServices configuration builder.Services logger
         builder.Services.AddSingleton<CookieEvents>() |> ignore
-        
-        let cnn = configuration.GetValue<string>("DB_CNN")
-        if not (String.IsNullOrEmpty(cnn)) then
-            GlobalConfiguration.Configuration.UsePostgreSqlStorage(fun opt ->
-                opt.UseNpgsqlConnection(cnn) |> ignore
-            ) |> ignore
         
         let app = builder.Build()
         

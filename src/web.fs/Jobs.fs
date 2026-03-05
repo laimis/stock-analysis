@@ -1,6 +1,7 @@
 module web.Jobs
 
 open Hangfire
+open Hangfire.PostgreSql
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
@@ -21,8 +22,14 @@ let backendJobsEnabled (configuration: IConfiguration) =
     backendJobsSwitch <> "off"
 
 let addJobs (configuration: IConfiguration) (services: IServiceCollection) (logger: ILogger) =
+    let cnn = configuration.GetValue<string>("DB_CNN")
+
     services.AddHangfire(fun config ->
         config.UseDashboardMetrics() |> ignore
+        if not (System.String.IsNullOrEmpty cnn) then
+            config.UsePostgreSqlStorage(fun opt ->
+                opt.UseNpgsqlConnection cnn |> ignore
+            ) |> ignore
     ) |> ignore 
 
     match backendJobsEnabled configuration with
