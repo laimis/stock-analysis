@@ -103,17 +103,17 @@ export class BrokerageOrdersComponent {
 
     cancelOrder(orderId: string) {
         this.brokerage.cancelOrder(orderId)
-            .subscribe(
-                () => this.refreshOrders(),
-                err => this.errors = GetErrors(err)
-            )
+            .subscribe({
+                next: () => this.refreshOrders(),
+                error: err => this.errors = GetErrors(err)
+            })
     }
     
     refreshOrders() {
-        this.brokerage.brokerageAccount().subscribe(
-            a => { this.account = a },
-            err => this.errors = GetErrors(err)
-        )
+        this.brokerage.brokerageAccount().subscribe({
+            next: a => { this.account = a },
+            error: err => this.errors = GetErrors(err)
+        })
     }
 
     recordOrder(order: BrokerageStockOrder) {
@@ -127,15 +127,15 @@ export class BrokerageOrdersComponent {
         };
 
         if (order.isBuyOrder) {
-            this.stocks.purchase(obj).subscribe(
-                _ => this.orderRecorded.emit(),
-                err => this.errors = GetErrors(err)
-            )
+            this.stocks.purchase(obj).subscribe({
+                next: _ => this.orderRecorded.emit(),
+                error: err => this.errors = GetErrors(err)
+            })
         } else if (order.isSellOrder) {
-            this.stocks.sell(obj).subscribe(
-                _ => this.orderRecorded.emit(),
-                err => this.errors = GetErrors(err)
-            )
+            this.stocks.sell(obj).subscribe({
+                next: _ => this.orderRecorded.emit(),
+                error: err => this.errors = GetErrors(err)
+            })
         }
     }
 

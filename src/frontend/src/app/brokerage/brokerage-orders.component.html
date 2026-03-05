@@ -2,6 +2,9 @@
   <div class="card-body">
     <h3 class="card-title d-flex align-items-center mb-4">
       <i class="bi bi-building me-2"></i>Brokerage Orders
+      <button class="btn btn-outline-secondary btn-sm ms-auto" (click)="refreshOrders()" title="Refresh orders">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
     </h3>
 
     <app-error-display [errors]="errors"></app-error-display>
