@@ -45,9 +45,9 @@ if ($null -ne $gitStatus) {
 
 # loop through each package and update
 $updates | ForEach-Object {
-    $package = [regex]::Match($_, "@[^\s]+").Value
-    Write-Host "Applying update: $package"
-    ng update $package
+    $command = [regex]::Match($_, "(ng update \S+)").Groups[1].Value
+    Write-Host "Applying update: $command"
+    Invoke-Expression $command
 
     # check if the above commit was successful, if not, exit
     if ($LASTEXITCODE -ne 0) {
@@ -56,6 +56,7 @@ $updates | ForEach-Object {
         exit 1
     }
 
+    $package = [regex]::Match($command, "ng update (.+)").Groups[1].Value
     git add .
     git commit -m "Angular updates: $package"
     git push
