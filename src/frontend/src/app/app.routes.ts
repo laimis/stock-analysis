@@ -129,6 +129,7 @@ export const routes: Routes = [
     {path: 'stocks/newposition/:tab', component: StockTradingPendingPositionsDashboardComponent, canActivate: [AuthGuard], title: 'Stock Trading'},
     {path: 'stocks/:ticker', component: StockDetailsComponent, canActivate: [AuthGuard]},
     {path: 'stocks/:ticker/:tab', component: StockDetailsComponent, canActivate: [AuthGuard]},
+    {path: 'stocks', component: StockTradingDashboardComponent, canActivate: [AuthGuard]},
 
     {path: 'transactions', component: TransactionsComponent, canActivate: [AuthGuard]},
     {path: 'terms', component: TermsComponent},
