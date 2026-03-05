@@ -62,6 +62,23 @@ $updates | ForEach-Object {
     git push
 }
 
+# run npm audit fix
+Write-Host "Run npm audit fix? (y/n)"
+$auditAnswer = Read-Host
+
+if ($auditAnswer -eq "y") {
+    npm audit fix
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "npm audit fix failed, exiting"
+        Set-Location $scriptPath
+        exit 1
+    }
+
+    git add .
+    git commit -m "npm audit fix"
+    git push
+}
 
 # change directory back to original
 Set-Location $scriptPath
