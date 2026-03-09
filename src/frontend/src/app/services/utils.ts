@@ -21,8 +21,9 @@ export function GetErrors(err: any): string[] {
             return [objToMap]
         }
 
-        return Object.keys(objToMap).map<string>(v => {
-            return Object.getOwnPropertyDescriptor(objToMap, v).value
+        return Object.keys(objToMap).flatMap<string>(v => {
+            const value = Object.getOwnPropertyDescriptor(objToMap, v).value
+            return Array.isArray(value) ? value : [value]
         })
     } catch (e) {
         console.log("Failed to get errors: " + e)

@@ -44,7 +44,7 @@
                                     <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">{{sell.number_of_shares}}</td>
                                     <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">{{sell.date}}</td>
                                     <td style="padding: 10px 12px; font-size: 13px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0;">
-                                        {{if sell.has_current_price}}&dollar;{{sell.current_price}}{{else}}&mdash;{{end}}
+                                        {{if sell.has_current_price}}${{sell.current_price}}{{else}}&mdash;{{end}}
                                     </td>
                                     <td style="padding: 10px 12px; font-size: 12px; text-align: right; border-top: 1px solid #d0d0d0;">
                                         {{if sell.has_current_price}}
