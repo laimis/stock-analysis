@@ -1,18 +1,19 @@
 # store current directory
 $scriptPath = $MyInvocation.MyCommand.Path | Split-Path
 
+function Assert-NoUncommittedChanges {
+    $gitStatus = git status --porcelain
+    if ($null -ne $gitStatus) {
+        Write-Host "There are uncommitted changes in git. Please commit or stash them and try again."
+        Write-Host "Git status:"
+        Write-Host $gitStatus
+        Set-Location $scriptPath
+        exit 1
+    }
+}
+
 # change directory to src/frontend
 Set-Location src/frontend
-
-# check if there are any git changes, and if there are, report them and exit
-$gitStatus = git status --porcelain
-if ($null -ne $gitStatus) {
-    Write-Host "There are uncommitted changes in git. Please commit or stash them and try again."
-    Write-Host "Git status:"
-    Write-Host $gitStatus
-    Set-Location $scriptPath
-    exit 1
-}
 
 # --- Angular updates ---
 
@@ -33,6 +34,8 @@ if ($updates.Count -eq 0) {
     $answer = Read-Host
 
     if ($answer -eq "y") {
+        Assert-NoUncommittedChanges
+
         $updates | ForEach-Object {
             $command = [regex]::Match($_, "(ng update \S+)").Groups[1].Value
             Write-Host "Applying update: $command"
@@ -65,6 +68,8 @@ if ($LASTEXITCODE -eq 0) {
     $auditAnswer = Read-Host
 
     if ($auditAnswer -eq "y") {
+        Assert-NoUncommittedChanges
+
         npm audit fix
 
         if ($LASTEXITCODE -ne 0) {

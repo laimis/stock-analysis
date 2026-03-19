@@ -29,6 +29,11 @@ export class TransactionsComponent implements OnInit {
     loading: boolean = true
     showDetails: string = ''
     errors: string[] = []
+    exportStartDate: string = ''
+
+    getExportUrl(): string {
+        return `/api/reports/transactions/export?ticker=${this.ticker}&startDate=${this.exportStartDate}`
+    }
 
     ngOnInit() {
         const ticker = this.route.snapshot.queryParamMap.get("ticker");

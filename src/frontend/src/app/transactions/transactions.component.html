@@ -74,6 +74,25 @@
                     </select>
                 </div>
             </div>
+            <div class="row g-3 align-items-end mt-1">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-2">
+                        <i class="bi bi-calendar-date me-1"></i>
+                        Export From Date
+                    </label>
+                    <input type="date"
+                           [(ngModel)]="exportStartDate"
+                           class="form-control shadow-sm"
+                           id="exportStartDate"
+                           name="exportStartDate" />
+                </div>
+                <div class="col-md-3">
+                    <a [href]="getExportUrl()" class="btn btn-outline-secondary">
+                        <i class="bi bi-download me-1"></i>
+                        Export CSV
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

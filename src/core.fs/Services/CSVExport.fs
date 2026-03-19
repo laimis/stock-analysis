@@ -351,4 +351,45 @@ module CSVExport =
     let generateFilename prefix =
         prefix + "_" + DateTime.UtcNow.ToString("yyyyMMdd_hhmss") + ".csv"
 
+    let transactionsExport (positions: StockPositionState seq) (startDate: DateTimeOffset option) : string =
+        let formatDate (d: DateTimeOffset) = d.ToString("yyyy-MM-dd H:mm:ss")
+        let formatDecimal (d: decimal) = d.ToString(System.Globalization.CultureInfo.InvariantCulture)
+
+        let header = "Symbol,Side,Qty,Fill Price,Commission,Closing Time"
+
+        let rows =
+            positions
+            |> Seq.collect (fun pos ->
+                let calc = StockPositionWithCalculations(pos)
+
+                let shareTxs =
+                    pos.ShareTransactions
+                    |> Seq.filter (fun t -> startDate.IsNone || t.Date >= startDate.Value)
+                    |> Seq.map (fun t ->
+                        let side = match t.Type with | Buy -> "Buy" | Sell -> "Sell"
+                        (t.Date, $"{pos.Ticker.Value},{side},{formatDecimal t.NumberOfShares},{formatDecimal t.Price},0,{formatDate t.Date}")
+                    )
+
+                let dividendTxs =
+                    calc.Dividends
+                    |> Seq.filter (fun d -> startDate.IsNone || d.Date >= startDate.Value)
+                    |> Seq.map (fun d ->
+                        (d.Date, $"{pos.Ticker.Value},Dividend,{formatDecimal d.NetAmount},,0,{formatDate d.Date}")
+                    )
+
+                let feeTxs =
+                    calc.Fees
+                    |> Seq.filter (fun f -> startDate.IsNone || f.Date >= startDate.Value)
+                    |> Seq.map (fun f ->
+                        (f.Date, $"{pos.Ticker.Value},Fee,{formatDecimal f.NetAmount},,0,{formatDate f.Date}")
+                    )
+
+                [shareTxs; dividendTxs; feeTxs] |> Seq.concat
+            )
+            |> Seq.sortBy fst
+            |> Seq.map snd
+
+        let allRows = rows |> String.concat "\n"
+        $"{header}\n{allRows}"
+
 

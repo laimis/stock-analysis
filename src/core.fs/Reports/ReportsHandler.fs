@@ -10,6 +10,7 @@ open core.Shared
 open core.fs
 open core.fs.Accounts
 open core.fs.Adapters.Brokerage
+open core.fs.Adapters.CSV
 open core.fs.Adapters.Stocks
 open core.fs.Adapters.Storage
 open core.fs.Options
@@ -79,6 +80,13 @@ type TransactionsQuery =
         GroupBy:string
         TxType:string
         Ticker:Ticker option
+    }
+
+type TransactionsExportQuery =
+    {
+        UserId: UserId
+        Ticker: Ticker option
+        StartDate: string option
     }
     
 type OutcomesReportDuration =
@@ -1155,4 +1163,25 @@ type ReportsHandler(accounts:IAccountStorage,brokerage:IBrokerage,marketHours:IM
         let transactionsView = toTransactionsView stocks options cryptos 
         
         return transactionsView |> Ok
+    }
+
+    member _.Handle(query: TransactionsExportQuery) : Task<Result<ExportResponse, ServiceError>> = task {
+        let startDate =
+            query.StartDate
+            |> Option.bind (fun s ->
+                match DateTimeOffset.TryParse(s) with
+                | true, dt -> Some dt
+                | _ -> None
+            )
+
+        let! stocks = storage.GetStockPositions(query.UserId)
+
+        let filtered =
+            match query.Ticker with
+            | None -> stocks
+            | Some ticker -> stocks |> Seq.filter (fun s -> s.Ticker = ticker)
+
+        let csv = CSVExport.transactionsExport filtered startDate
+        let filename = CSVExport.generateFilename "transactions"
+        return ExportResponse(filename, csv) |> Ok
     }

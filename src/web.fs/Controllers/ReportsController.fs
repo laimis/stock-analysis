@@ -144,3 +144,21 @@ type ReportsController(service: ReportsHandler) =
                 }
             )
         )
+
+    [<HttpGet("transactions/export")>]
+    member this.TransactionsExport(ticker: string, startDate: string) =
+        let tickerOption =
+            if String.IsNullOrWhiteSpace(ticker) then None
+            else Some(Ticker(ticker))
+        let startDateOption =
+            if String.IsNullOrWhiteSpace(startDate) then None
+            else Some startDate
+        this.GenerateExport(
+            service.Handle(
+                {
+                    TransactionsExportQuery.UserId = this.User.Identifier()
+                    Ticker = tickerOption
+                    StartDate = startDateOption
+                }
+            )
+        )
