@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="10.0.103" />
+    <PackageReference Include="FSharp.Core" Version="10.1.201" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
