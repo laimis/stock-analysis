@@ -31,6 +31,7 @@ type AccountMonitoringService(
             "WILEY & SONS INC JOHN CLASS A", "WLY"
             "KAISER ALUMINUM CORP", "KALU"
             "AMERICAN STATES WTR", "AWR"
+            "STATE STREET ENERGY SELECT SECTOR SPDR ETF", "XLE"
         ]
         
     let resolveType (t:AccountTransaction) =
