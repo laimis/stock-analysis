@@ -1,0 +1,102 @@
+name: Release to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Release message (defaults to last commit message)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x.x
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Test
+        run: dotnet test --filter "Category!=Integration&Category!=Postgres" -l:"console;verbosity=quiet" --nologo --configuration Release --no-build
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+
+      - name: Install npm packages
+        working-directory: src/frontend
+        run: npm ci
+
+      - name: Angular lint
+        working-directory: src/frontend
+        run: ng lint
+
+      - name: Angular pre-build
+        working-directory: src/frontend
+        run: npm run prebuild
+
+      - name: Angular build
+        working-directory: src/frontend
+        run: ng build --configuration production
+
+      - name: Calculate new version
+        id: version
+        run: |
+          CURRENT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Current tag: $CURRENT_TAG"
+          VERSION=${CURRENT_TAG#v}
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+          NEW_TAG="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+          echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+          echo "New tag: $NEW_TAG"
+
+      - name: Resolve release message
+        id: release_message
+        run: |
+          MSG="${{ github.event.inputs.message }}"
+          if [ -z "$MSG" ]; then
+            MSG=$(git log -1 --pretty=%B)
+          fi
+          # Escape single quotes for git tag -m
+          MSG="${MSG//\'/\'\'}"
+          echo "message=$MSG" >> "$GITHUB_OUTPUT"
+
+      - name: Tag new version
+        run: |
+          git tag -a "${{ steps.version.outputs.new_tag }}" -m "${{ steps.release_message.outputs.message }}"
+          git push origin "${{ steps.version.outputs.new_tag }}"
+
+      - name: Merge main to prod
+        run: |
+          git checkout prod
+          git pull origin prod
+          git merge --no-ff main -m "${{ steps.release_message.outputs.message }}"
+          git push origin prod
+          git checkout main
