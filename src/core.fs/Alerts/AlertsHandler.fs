@@ -66,7 +66,6 @@ namespace core.fs.Alerts
         member this.Handle (_:QueryAvailableMonitors) =
             [
                 {| name = Constants.MonitorNamePattern; tag = Constants.MonitorTagPattern |}
-                {| name = Constants.MonitorNameObvPriceTrend; tag = Constants.MonitorTagObvPriceTrend |}
             ]
             
         member this.Handle (_:Run) : Result<Unit,ServiceError> =
