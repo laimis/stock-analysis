@@ -457,7 +457,7 @@ type PriceObvTrendMonitoringService(
         return prices
     }
 
-    let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
+    let runCheck (alertCheck:PatternCheck) = async {
         let obvDivergenceIdentifier = "Trend: Price/OBV Divergence"
         container.Deregister alertCheck.ticker obvDivergenceIdentifier alertCheck.user
         return Some (alertCheck, 0)
@@ -473,7 +473,7 @@ type PriceObvTrendMonitoringService(
         
         let! checks =
             alertsToCheck
-            |> Seq.map (runCheck logger)
+            |> Seq.map runCheck
             |> Async.Sequential
             |> Async.StartAsTask
 
