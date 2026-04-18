@@ -265,7 +265,7 @@ type PatternMonitoringService(
         return prices
     }
 
-    let runCheck (_:ILogger) (alertCheck:PatternCheck) = async {
+    let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
 
         let! user = accounts.GetUser alertCheck.user |> Async.AwaitTask
         
