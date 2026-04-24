@@ -457,89 +457,10 @@ type PriceObvTrendMonitoringService(
         return prices
     }
 
-    let runCheck (logger:ILogger) (alertCheck:PatternCheck) = async {
-
-        let! user = accounts.GetUser alertCheck.user |> Async.AwaitTask
-        
-        match user with
-        | None -> return None
-        | Some user ->
-            match user.State.ConnectedToBrokerage with
-            | false -> return None
-            | true ->
-                let! priceResponse = getPrices logger user.State alertCheck.ticker |> Async.AwaitTask
-
-                match priceResponse with
-                | Error _ -> return None
-                | Ok prices ->
-
-                    let bearishOrBullishAsString fromDirection toDirection =
-                        match fromDirection, toDirection with
-                        | Uptrend, Downtrend -> "Bearish"
-                        | Downtrend, Uptrend -> "Bullish"
-                        | _ -> "Continuation"
-
-                    let getIdentifier (s:string) = $"Trend: {s}"
-
-                    let obvDivergenceIdentifier = getIdentifier "Price/OBV Divergence"
-                        
-                    // first remove it if it has been triggered
-                    [obvDivergenceIdentifier]
-                    |> List.iter (fun identifier -> container.Deregister alertCheck.ticker identifier alertCheck.user)
-                    
-                    let analysis = getCompleteTrendAnalysis prices.Bars
-
-                    // NOTE: not using this right now, too many repeating signals, leaving just obv/price divergence
-                    // but keeping this code commented out so that I can get reminded that this exists
-                    // if we see trend change, we register the alert
-                    // match priceAnalysis.EstablishedTrend.Trend <> priceAnalysis.PotentialChange.Direction &&
-                    //     priceAnalysis.PotentialChange.Detected with
-                    // | true -> 
-                    //     let description = $"{bearishOrBullishAsString priceAnalysis.EstablishedTrend.Trend priceAnalysis.PotentialChange.Direction}: from {priceAnalysis.EstablishedTrend.Trend} to {priceAnalysis.PotentialChange.Direction}"
-                    //     createAlertForTrendChange priceIdentifier priceAnalysis.EstablishedTrend.Confidence priceAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                    //     counter.Value <- counter.Value + 1
-                    // | false -> ()
-
-                    // NOTE: same as with price trends, keeping it to remind myself that this exists and noodle on it
-                    // match obvTrendAnalysis.EstablishedTrend.Trend <> obvTrendAnalysis.PotentialChange.Direction && obvTrendAnalysis.PotentialChange.Detected with
-                    // | true -> 
-                    //     let description = $"{bearishOrBullishAsString obvTrendAnalysis.EstablishedTrend.Trend obvTrendAnalysis.PotentialChange.Direction}: from {obvTrendAnalysis.EstablishedTrend.Trend} to {obvTrendAnalysis.PotentialChange.Direction}"
-                    //     createAlertForTrendChange obvIdentifier obvTrendAnalysis.EstablishedTrend.Confidence obvTrendAnalysis.PotentialChange.Strength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                    //     counter.Value <- counter.Value + 1
-                    // | false -> ()
-
-                    let establishedPriceTrend = analysis.Price.EstablishedTrend.Direction
-                    let potentialNewPriceTrend = analysis.Price.LatestTrend.Direction
-                    let establishedObvTrend = analysis.OnBalanceVolume.EstablishedTrend.Direction
-                    let potentialNewObvTrend = analysis.OnBalanceVolume.LatestTrend.Direction
-                    let establishedTrendConfidence = analysis.OnBalanceVolume.EstablishedTrend.Strength
-                    let potentialNewTrendStrength = analysis.OnBalanceVolume.LatestTrend.Strength
-
-                    let created = 
-                        match establishedPriceTrend, potentialNewPriceTrend, establishedObvTrend, potentialNewObvTrend with
-                        // price existing and new trend continuing, obv existing trend matches price, but new obv trend is changing
-                        // this is the case where we try to get ahead of the trend change by buying cheap and selling high, or selling high and buying back cheap
-                        | pte, ptn, ote, otn when pte = ptn && pte = ote && pte <> otn -> 
-                            let description = $"Strong {bearishOrBullishAsString pte otn} divergence: from {ote} to {otn}"
-                            createAlertForTrendChange obvDivergenceIdentifier establishedTrendConfidence potentialNewTrendStrength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                            true
-                        // price ecisting and new trend continuing, obv has changed where new trend is matching price
-                        | pte, ptn, ote, otn when pte = ptn && pte = otn && ote <> otn -> 
-                            let description = $"{bearishOrBullishAsString ote otn}: divergence: from {ote} to {otn}"
-                            createAlertForTrendChange obvDivergenceIdentifier establishedTrendConfidence potentialNewTrendStrength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                            true
-                        // this is where established trends are matching, and new trends are matching and are flipping, also could
-                        // present buy low/sell high, or sell high/buy low opportunities
-                        | pte, ptn, ote, otn when pte = ote && ptn = otn && pte <> ptn -> 
-                            let description = $"{bearishOrBullishAsString pte ptn}: divergence: from {pte} to {ptn}"
-                            createAlertForTrendChange obvDivergenceIdentifier establishedTrendConfidence potentialNewTrendStrength alertCheck.ticker description alertCheck.listNames alertCheck.user |> container.Register
-                            true
-                        | _ -> 
-                            false
-
-                    let count = match created with | true -> 1 | false -> 0
-
-                    return Some (alertCheck,count)
+    let runCheck (alertCheck:PatternCheck) = async {
+        let obvDivergenceIdentifier = "Trend: Price/OBV Divergence"
+        container.Deregister alertCheck.ticker obvDivergenceIdentifier alertCheck.user
+        return Some (alertCheck, 0)
     }
 
     let runThroughMonitoringChecks (logger:ILogger) = task {
@@ -552,7 +473,7 @@ type PriceObvTrendMonitoringService(
         
         let! checks =
             alertsToCheck
-            |> Seq.map (runCheck logger)
+            |> Seq.map runCheck
             |> Async.Sequential
             |> Async.StartAsTask
 

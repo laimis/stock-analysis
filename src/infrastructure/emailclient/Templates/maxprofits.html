@@ -50,6 +50,28 @@
                                     <td style="padding: 10px 14px; font-size: 14px; color: #333333;">{{actual_data.percentage}}%</td>
                                 </tr>
                             </table>
+                            
+                            <!-- Top Performing Hold Periods -->
+                            <p style="margin: 0 0 10px; color: #1a3a5c; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px;">
+                                Top Performing Hold Periods
+                            </p>
+                            <p style="margin: 0 0 12px; color: #555555; font-size: 12px; line-height: 18px;">
+                                Ranked by maximum potential profit.
+                            </p>
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0; border-collapse: collapse; margin-bottom: 28px;">
+                                <tr style="background-color: #1a3a5c;">
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Rank</td>
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Hold Period</td>
+                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-align: right;">Profit</td>
+                                </tr>
+                                {{for item in sorted_profit_data}}
+                                <tr style="border-top: 1px solid #d0d0d0;">
+                                    <td style="padding: 9px 12px; font-size: 13px; color: #555555; border-right: 1px solid #d0d0d0;">{{for.index + 1}}</td>
+                                    <td style="padding: 9px 12px; font-size: 13px; color: #333333; border-right: 1px solid #d0d0d0;">{{item.days}} days</td>
+                                    <td style="padding: 9px 12px; font-size: 13px; text-align: right; color: #1a7a3c;">${{item.profit}}</td>
+                                </tr>
+                                {{end}}
+                            </table>
 
                             <!-- Maximum Profit by Hold Period -->
                             <p style="margin: 0 0 10px; color: #1a3a5c; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px;">
@@ -73,37 +95,7 @@
                                 {{end}}
                             </table>
 
-                            <!-- Top Performing Hold Periods -->
-                            <p style="margin: 0 0 10px; color: #1a3a5c; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #1a3a5c; padding-bottom: 6px;">
-                                Top Performing Hold Periods
-                            </p>
-                            <p style="margin: 0 0 12px; color: #555555; font-size: 12px; line-height: 18px;">
-                                Ranked by maximum potential profit.
-                            </p>
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0; border-collapse: collapse; margin-bottom: 28px;">
-                                <tr style="background-color: #1a3a5c;">
-                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Rank</td>
-                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; border-right: 1px solid #2a4a6c;">Hold Period</td>
-                                    <td style="padding: 8px 12px; font-size: 11px; font-weight: bold; color: #ffffff; text-transform: uppercase; text-align: right;">Profit</td>
-                                </tr>
-                                {{for item in sorted_profit_data}}
-                                <tr style="border-top: 1px solid #d0d0d0;">
-                                    <td style="padding: 9px 12px; font-size: 13px; color: #555555; border-right: 1px solid #d0d0d0;">{{for.index + 1}}</td>
-                                    <td style="padding: 9px 12px; font-size: 13px; color: #333333; border-right: 1px solid #d0d0d0;">{{item.days}} days</td>
-                                    <td style="padding: 9px 12px; font-size: 13px; text-align: right; color: #1a7a3c;">${{item.profit}}</td>
-                                </tr>
-                                {{end}}
-                            </table>
-
-                            <!-- Insight note -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #d0d0d0;">
-                                <tr>
-                                    <td style="padding: 10px 14px; font-size: 12px; color: #555555; border-left: 3px solid #1a3a5c; line-height: 18px;">
-                                        <strong style="color: #1a3a5c;">Insight:</strong>&nbsp; This analysis shows the historical optimal hold times for your closed positions. Use this data to inform future trading decisions. Past performance does not guarantee future results.
-                                    </td>
-                                </tr>
-                            </table>
-
+                            
                         </td>
                     </tr>
 
