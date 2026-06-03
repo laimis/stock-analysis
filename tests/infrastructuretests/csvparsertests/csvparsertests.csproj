@@ -21,7 +21,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="FSharp.Core" Version="10.1.300" />
+    <PackageReference Include="FSharp.Core" Version="10.1.204" />
   </ItemGroup>
 
   <ItemGroup>
