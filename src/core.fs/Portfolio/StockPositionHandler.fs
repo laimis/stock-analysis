@@ -77,7 +77,7 @@ type StockTransaction =
     {
         [<Required>]
         PositionId: StockPositionId
-        [<Range(1, 1000000)>]
+        [<Range(0, 1000000)>]
         NumberOfShares: decimal
         [<Range(0, 100000)>]
         Price: decimal
