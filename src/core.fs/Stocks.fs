@@ -532,13 +532,28 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         
     let feeTotal = fees |> List.sumBy _.NetAmount
         
-    let buySlots = buys |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
-    let sellSlots = sells |> List.collect (fun x -> List.replicate (int x.NumberOfShares |> abs) x.Price)
-    
-    let liquidationSource, liquidationSlots, acquisitionSource, acquisitionSlots = 
+    let liquidationSource, acquisitionSource = 
         match stockPosition.StockPositionType with
-        | Short -> buys, buySlots, sells, sellSlots
-        | Long -> sells, sellSlots, buys, buySlots
+        | Short -> buys, sells
+        | Long -> sells, buys
+    
+    // FIFO queue: list of (quantity, price) pairs supporting fractional shares
+    let makeQueue (source: StockPositionShareTransaction list) =
+        source |> List.map (fun x -> (x.NumberOfShares |> abs, x.Price))
+    
+    // Consume qty from front of FIFO queue; returns (weighted avg price, remaining queue)
+    let consumeFromQueue (qty: decimal) (queue: (decimal * decimal) list) =
+        let rec loop remaining q costAcc =
+            match q with
+            | [] -> ((if qty > 0m then costAcc / qty else 0m), [])
+            | (headQty, headPrice) :: rest ->
+                if headQty <= remaining then
+                    loop (remaining - headQty) rest (costAcc + headQty * headPrice)
+                else
+                    ((costAcc + remaining * headPrice) / qty, (headQty - remaining, headPrice) :: rest)
+        loop qty queue 0m
+    
+    let acquisitionQueue = makeQueue acquisitionSource
     
     let completedPositionTransactions =
         stockPosition.ShareTransactions
@@ -554,21 +569,11 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
         )
         
     let plTransactions =
-        // we fold over sells, and for each sell create a PLTransaction
+        // we fold over liquidations, and for each create a PLTransaction using FIFO matching
         liquidationSource
-        |> List.fold (fun (acc:PLTransaction list) (liquidation:StockPositionShareTransaction) ->
-            
-            let offset =
-                match acc with
-                [] -> 0m
-                | _ -> acc |> List.sumBy _.NumberOfShares
-            
-            let slotsOfInterest =
-                acquisitionSlots
-                |> List.skip (int offset)
-                |> List.take (liquidation.NumberOfShares |> abs |> int)
-                
-            let averageAcquisitionPrice = slotsOfInterest |> List.average
+        |> List.fold (fun (acc: PLTransaction list, queue: (decimal * decimal) list) (liquidation: StockPositionShareTransaction) ->
+            let liquidationQty = liquidation.NumberOfShares |> abs
+            let averageAcquisitionPrice, remainingQueue = consumeFromQueue liquidationQty queue
             let profitPerShare, gainPct =
                 match stockPosition.StockPositionType with
                 | Long ->
@@ -583,7 +588,6 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                     )
             let profit = liquidation.NumberOfShares * profitPerShare
             
-            // we then create a PLTransaction
             let pl = {
                 Ticker = stockPosition.Ticker
                 Date = liquidation.Date
@@ -595,42 +599,49 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
                 Type = liquidation.Type 
             }
             
-            // and add it to the accumulator
-            acc @ [pl]
-        ) []
+            (acc @ [pl], remainingQueue)
+        ) ([], acquisitionQueue)
+        |> fst
         
     let profit = 
         // profit is generating whenever we sell shares of a long position or buy shares of a short position
-        liquidationSlots
-        |> List.indexed
-        |> List.fold (fun (acc:decimal) (index, liquidationPrice) ->
-            
-            let acquisitionPrice = acquisitionSlots[index]
-            let profit =
+        liquidationSource
+        |> List.fold (fun (acc: decimal, queue: (decimal * decimal) list) (liquidation: StockPositionShareTransaction) ->
+            let liquidationQty = liquidation.NumberOfShares |> abs
+            let avgAcqPrice, remainingQueue = consumeFromQueue liquidationQty queue
+            let profitForTx =
                 match stockPosition.StockPositionType with
-                | Long -> liquidationPrice - acquisitionPrice
-                | Short -> acquisitionPrice - liquidationPrice
-            acc + profit
-        ) 0m
+                | Long -> liquidationQty * (liquidation.Price - avgAcqPrice)
+                | Short -> liquidationQty * (avgAcqPrice - liquidation.Price)
+            (acc + profitForTx, remainingQueue)
+        ) (0m, acquisitionQueue)
+        |> fst
     
-    let averageBuyCostPerShare =
-        match acquisitionSlots with
-            | [] -> 0m
-            | _ -> acquisitionSlots |> List.average
+    let weightedAvg (source: StockPositionShareTransaction list) =
+        let totalQty = source |> List.sumBy (fun x -> x.NumberOfShares |> abs)
+        if totalQty = 0m then 0m
+        else
+            let totalCost = source |> List.sumBy (fun x -> (x.NumberOfShares |> abs) * x.Price)
+            totalCost / totalQty
+    
+    let averageBuyCostPerShare = weightedAvg acquisitionSource
             
-            
-    let averageSaleCostPerShare =
-        match liquidationSlots with
-            | [] -> 0m
-            | _ -> liquidationSlots |> List.average
-            
-    let averageCostPerShare =
-        let liquidatedTotal = liquidationSource |> List.sumBy _.NumberOfShares |> int
-        let remainingShares = acquisitionSlots |> List.skip liquidatedTotal
-        match remainingShares with
-        | [] -> averageBuyCostPerShare
-        | _ -> remainingShares |> List.average
+    let averageSaleCostPerShare = weightedAvg liquidationSource
         
+    let averageCostPerShare =
+        let liquidatedTotal = liquidationSource |> List.sumBy (fun x -> x.NumberOfShares |> abs)
+        if liquidatedTotal = 0m then
+            averageBuyCostPerShare
+        else
+            let _, remainingQueue = consumeFromQueue liquidatedTotal acquisitionQueue
+            match remainingQueue with
+            | [] -> averageBuyCostPerShare
+            | q ->
+                let totalQty = q |> List.sumBy fst
+                let totalCost = q |> List.sumBy (fun (qty, price) -> qty * price)
+                if totalQty = 0m then 0m
+                else totalCost / totalQty
+    
     let events =
         stockPosition.Transactions
         |> List.map (fun t ->
@@ -733,9 +744,9 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.InitialRiskedAmount = riskAmounts |> List.tryHead |> Option.map _.RiskAmount
     
     member this.PositionOpenPrice =
-        match acquisitionSlots with
+        match acquisitionSource with
         | [] -> 0m
-        | _ -> acquisitionSlots |> List.head
+        | first :: _ -> first.Price
         
     member this.CompletedPositionCostPerShare =
         match completedPositionTransactions with
@@ -748,9 +759,9 @@ type StockPositionWithCalculations(stockPosition:StockPositionState) =
     member this.CompletedPositionShares = completedPositionTransactions |> List.sumBy _.NumberOfShares
         
     member this.ClosePrice =
-        match liquidationSlots with
+        match liquidationSource with
         | [] -> None
-        | _ -> liquidationSlots |> List.last |> Some
+        | _ -> liquidationSource |> List.last |> _.Price |> Some
         
     member this.RR =
         match this.RiskedAmount with
