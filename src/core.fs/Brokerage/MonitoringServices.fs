@@ -32,6 +32,7 @@ type AccountMonitoringService(
             "KAISER ALUMINUM CORP", "KALU"
             "AMERICAN STATES WTR", "AWR"
             "STATE STREET ENERGY SELECT SECTOR SPDR ETF", "XLE"
+            "ALPHABET INC CLASS CLASS A", "GOOGL"
         ]
         
     let resolveType (t:AccountTransaction) =
