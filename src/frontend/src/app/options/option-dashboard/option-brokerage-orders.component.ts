@@ -4,7 +4,6 @@ import {BrokerageService} from "../../services/brokerage.service";
 import {
     BrokerageOptionOrder,
     BrokerageOptionPosition, OptionContract,
-    OptionOrderLeg,
     OptionPosition, OptionService
 } from "../../services/option.service";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";

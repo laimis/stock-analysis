@@ -12,7 +12,7 @@ export class TimeAgoPipe implements PipeTransform {
         try {
             const date = typeof value === 'string' ? new Date(value) : value;
             return formatDistanceToNow(date, { addSuffix: true });
-        } catch (error) {
+        } catch (_error) {
             return 'Invalid date';
         }
     }

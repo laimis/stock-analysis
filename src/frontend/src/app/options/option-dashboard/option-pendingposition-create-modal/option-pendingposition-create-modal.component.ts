@@ -1,8 +1,8 @@
 import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
 import { CurrencyPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
-import {BrokerageOptionPosition, OptionLeg, OptionService} from "../../../services/option.service";
-import {GetErrors, GetOptionStrategies} from "../../../services/utils";
+import {OptionLeg, OptionService} from "../../../services/option.service";
+import {GetErrors} from "../../../services/utils";
 import {
     BrokerageService,
     OptionOrderCommand,
@@ -85,7 +85,7 @@ export class OptionPendingPositionCreateModalComponent {
         }
 
         this.brokerageService.issueOptionOrder(order).subscribe(
-            (data) => {
+            () => {
                 alert("Order created")
                 this.close()
                 this.positionCreated.emit()

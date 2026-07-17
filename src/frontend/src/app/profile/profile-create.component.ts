@@ -54,7 +54,7 @@ export class ProfileCreateComponent implements OnInit {
 
         const obj = this.createUserData()
 
-        this.stockService.validateAccount(obj).subscribe(r => {
+        this.stockService.validateAccount(obj).subscribe(() => {
             if (this.planName == this.PLUS_PLAN) {
                 this.payPlus()
             } else if (this.planName == this.FULL_PLAN) {
@@ -97,12 +97,10 @@ export class ProfileCreateComponent implements OnInit {
 
     pay(planId: string, planName: string) {
 
-        const capture = this;
-
-        const handler = (<any>window).StripeCheckout.configure({
+        const handler = (window as Window & { StripeCheckout: { configure: (opts: object) => { open: (opts: object) => void } } }).StripeCheckout.configure({
             key: 'pk_live_dls5NvmF6iwb4W19DlqsYvYR0006lBNU20',
             locale: 'auto',
-            token: function (token: any) {
+            token: (token: object) => {
                 console.log(token)
 
                 const paymentData = {
@@ -110,8 +108,8 @@ export class ProfileCreateComponent implements OnInit {
                     planId: planId
                 }
 
-                capture.createAccount(
-                    capture.createUserData(),
+                this.createAccount(
+                    this.createUserData(),
                     paymentData)
             }
         });

@@ -76,32 +76,32 @@ export class BrokerageService {
     private brokerageAccountData: BrokerageAccount = null
 
 
-    buy(obj: BrokerageOrderCommand): Observable<any> {
+    buy(obj: BrokerageOrderCommand): Observable<object> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/buy', obj)
     }
 
-    sell(obj: BrokerageOrderCommand): Observable<any> {
+    sell(obj: BrokerageOrderCommand): Observable<object> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/sell', obj)
     }
 
-    sellShort(obj: BrokerageOrderCommand): Observable<any> {
+    sellShort(obj: BrokerageOrderCommand): Observable<object> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/sellshort', obj)
     }
 
-    buyToCover(obj: BrokerageOrderCommand): Observable<any> {
+    buyToCover(obj: BrokerageOrderCommand): Observable<object> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/buytocover', obj)
     }
     
-    issueOptionOrder(obj: OptionOrderCommand): Observable<any> {
+    issueOptionOrder(obj: OptionOrderCommand): Observable<object> {
         this.brokerageAccountData = null
         return this.http.post('/api/brokerage/optionsorder', obj)
     }
 
-    cancelOrder(orderId: string): Observable<any> {
+    cancelOrder(orderId: string): Observable<object> {
         this.brokerageAccountData = null
         return this.http.delete('/api/brokerage/orders/' + orderId)
     }

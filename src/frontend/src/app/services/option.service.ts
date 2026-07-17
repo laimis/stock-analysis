@@ -13,7 +13,7 @@ function toSellLeg(option: OptionDefinition) : OptionLeg {
 
 function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDefinition[]> {
     const expirationMap = new Map<string, OptionDefinition[]>();
-    options.forEach(function (value, index, arr) {
+    options.forEach(function (value) {
         if (!expirationMap.has(value.expiration)) {
             expirationMap[value.expiration] = [value];
         } else {
@@ -350,11 +350,11 @@ export class OptionService {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/notes', notes)
     }
     
-    closeContracts(id: string, contracts: any[]) {
+    closeContracts(id: string, contracts: object[]) {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/closecontracts', contracts)
     }
 
-    openContracts(id: string, contracts: any[]) {
+    openContracts(id: string, contracts: object[]) {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/opencontracts', contracts)
     }
     
@@ -362,15 +362,15 @@ export class OptionService {
         return this.http.post('/api/portfolio/optionpositions/' + id + '/close', {positionId:id, notes})
     }
 
-    buyOption(obj: object): Observable<any> {
+    buyOption(obj: object): Observable<object> {
         return this.http.post<string>('/api/options/buy', obj)
     }
 
-    sellOption(obj: object): Observable<any> {
+    sellOption(obj: object): Observable<object> {
         return this.http.post<string>('/api/options/sell', obj)
     }
 
-    closeOption(obj: object): Observable<any> {
+    closeOption(obj: object): Observable<object> {
         return this.http.post('/api/options/close', obj)
     }
 
@@ -378,11 +378,11 @@ export class OptionService {
         return this.http.post('/api/options/import', formData)
     }
 
-    expireOption(optionId: string): Observable<any> {
+    expireOption(optionId: string): Observable<object> {
         return this.http.post('/api/options/' + optionId + '/expire', {})
     }
 
-    assignOption(optionId: string): Observable<any> {
+    assignOption(optionId: string): Observable<object> {
         return this.http.post('/api/options/' + optionId + '/assign', {})
     }
 
@@ -491,7 +491,7 @@ export class OptionService {
         expirationMap.forEach(function (value) {
             const calls = value.filter(x => x.optionType == "call")
 
-            calls.forEach(function (buyOption, index, arr) {
+            calls.forEach(function (buyOption, index) {
                 // we will buy the call at the index, and sell the next call, if available.
                 if (index + 1 < calls.length) {
                     const sellOption = calls[index + 1]

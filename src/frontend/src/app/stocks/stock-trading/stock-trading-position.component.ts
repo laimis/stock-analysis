@@ -310,7 +310,7 @@ export class StockTradingPositionComponent {
             this._position.positionId,
             this.assignedGrade,
             note).subscribe(
-            (_: any) => {
+            (_: object) => {
                 this.gradingSuccess = "Grade assigned successfully"
                 setTimeout(() => {
                     this.gradingSuccess = null

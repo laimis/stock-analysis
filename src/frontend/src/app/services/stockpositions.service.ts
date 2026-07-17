@@ -61,8 +61,8 @@ export class StockPositionsService {
         )
     }
 
-    assignGrade(positionId: string, grade: string, gradeNote: string): Observable<any> {
-        return this.http.post<any>(
+    assignGrade(positionId: string, grade: string, gradeNote: string): Observable<object> {
+        return this.http.post<object>(
             `/api/portfolio/stockpositions/${positionId}/grade`,
             {grade, gradeNote, positionId}
         )
@@ -104,11 +104,11 @@ export class StockPositionsService {
         return this.http.post(`/api/portfolio/stockpositions/${positionId}/risk`, {riskAmount, positionId})
     }
 
-    purchase(obj: stocktransactioncommand): Observable<any> {
+    purchase(obj: stocktransactioncommand): Observable<object> {
         return this.http.post(`/api/portfolio/stockpositions/${obj.positionId}/buy`, obj)
     }
 
-    sell(obj: stocktransactioncommand): Observable<any> {
+    sell(obj: stocktransactioncommand): Observable<object> {
         return this.http.post(`/api/portfolio/stockpositions/${obj.positionId}/sell`, obj)
     }
 

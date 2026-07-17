@@ -214,7 +214,7 @@ export class TrendsReportComponent implements OnInit {
         concat(...allObservables).subscribe()
     }
     
-    loadSummaryIncremental(tickers: string[], trendSummaryContainer: {}) {
+    loadSummaryIncremental(tickers: string[], trendSummaryContainer: Record<string, unknown>) {
         // if there are no tickers, do nothing
         if (tickers.length == 0) {
             return

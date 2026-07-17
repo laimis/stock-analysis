@@ -1,6 +1,6 @@
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import { Injectable, inject } from '@angular/core';
-import {AccountStatus, StocksService} from '../services/stocks.service';
+import {StocksService} from '../services/stocks.service';
 import {GlobalService} from '../services/global.service';
 import { firstValueFrom } from 'rxjs';
 

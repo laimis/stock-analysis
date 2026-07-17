@@ -9,14 +9,6 @@ import {ErrorDisplayComponent} from "../shared/error-display/error-display.compo
 import {BrokerageOptionOrder} from "../services/option.service";
 import {formatDistance} from "date-fns";
 
-const orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
-    const tickerComparison = a.ticker.localeCompare(b.ticker)
-    if (tickerComparison === 0) {
-        return a.executionTime > b.executionTime ? -1 : 1
-    } else {
-        return tickerComparison
-    }
-}
 @Component({
     selector: 'app-brokerage-orders',
     templateUrl: './brokerage-orders.component.html',

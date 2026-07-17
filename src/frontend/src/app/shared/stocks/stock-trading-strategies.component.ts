@@ -36,14 +36,14 @@ export class StockTradingStrategiesComponent {
     }
 
     doSort() {
-        this.sortedResults = this._results.sort((a:any, b:any) => {
-            let aVal = a[this._sortProperty]
+        this.sortedResults = this._results.sort((a: TradingStrategyPerformance, b: TradingStrategyPerformance) => {
+            let aVal = (a as Record<string, unknown>)[this._sortProperty]
             if (!aVal) {
-                aVal = a.performance[this._sortProperty]
+                aVal = (a as Record<string, Record<string, unknown>>).performance[this._sortProperty]
             }
-            let bVal = b[this._sortProperty]
+            let bVal = (b as Record<string, unknown>)[this._sortProperty]
             if (!bVal) {
-                bVal = b.performance[this._sortProperty]
+                bVal = (b as Record<string, Record<string, unknown>>).performance[this._sortProperty]
             }
 
             if (aVal < bVal) {

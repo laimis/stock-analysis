@@ -205,7 +205,7 @@ export class StockPositionReportsComponent {
         this.tickerFilter = ticker
     }
 
-    private handleApiError(errorMessage: string, error: any, assignFunc: (error: any) => void) {
+    private handleApiError(errorMessage: string, error: unknown, assignFunc: (error: string[]) => void) {
         const extractedErrors = GetErrors(error);
         extractedErrors.forEach(e => console.log(e))
         const fullError = errorMessage + ": " + extractedErrors.join(", ")

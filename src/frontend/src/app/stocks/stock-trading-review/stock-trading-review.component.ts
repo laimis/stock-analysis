@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
-    BrokerageStockOrder,
     PositionChartInformation,
     StockPosition,
     PriceFrequency,
@@ -55,7 +54,7 @@ export class StockTradingReviewComponent {
     @Input()
     brokerageAccount: BrokerageAccount | null = null
     @Output()
-    positionChanged: EventEmitter<any> = new EventEmitter()
+    positionChanged: EventEmitter<void> = new EventEmitter()
     private _index: number = 0
 
     private _positions: StockPosition[] = [];

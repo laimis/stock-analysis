@@ -453,19 +453,19 @@ export class OptionSpreadBuilderComponent implements OnInit {
         this.selectedLegs = newLegs;
     }
     
-    adjustStrikes(strike: string) {
+    adjustStrikes(_strike: string) {
         // this.filterMinimumStrike = strike;
         // this.applyFiltersAndSort();
     }
 
-    adjustWidth(width: string) {
+    adjustWidth(_width: string) {
         // this.filterWidth = width;
         // this.applyFiltersAndSort();
     }
 
     flipPosition() {}
     mirrorStrikes() {}
-    rollToExpiration(input) {}
+    rollToExpiration(_input: unknown) {}
 
     builtSpreads: SpreadCandidate[] = null
     candidateOptions : OptionDefinition[] = []

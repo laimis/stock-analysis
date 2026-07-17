@@ -1,6 +1,6 @@
 import { DatePipe, NgClass, PercentPipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import {StocksService} from 'src/app/services/stocks.service';
+import {Sell, StocksService} from 'src/app/services/stocks.service';
 import { StockLinkComponent } from "../shared/stocks/stock-link.component";
 
 @Component({
@@ -12,7 +12,7 @@ import { StockLinkComponent } from "../shared/stocks/stock-link.component";
 export class RecentSellsComponent implements OnInit {
     private service = inject(StocksService);
 
-    sells: any;
+    sells: Sell[];
 
 
     ngOnInit(): void {

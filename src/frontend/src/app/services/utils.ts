@@ -1,6 +1,6 @@
 import {formatDistance, parse} from "date-fns";
 
-export function GetErrors(err: any): string[] {
+export function GetErrors(err: unknown): string[] {
     try {
 
         if (err.status && err.status === 401) {

@@ -3,7 +3,6 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
     AccountStatus,
     BrokerageAccount, BrokerageAccountSnapshot,
-    OutcomeValueTypeEnum,
     StockPosition,
     StockQuote,
     StockTradingPositions,

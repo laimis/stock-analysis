@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ChartMarker, InfectionPointType, InflectionPoint, InflectionPointsReportDetails, LatestTrendAnalysis, PositionChartInformation, PriceBar, TrendAnalysisResult } from '../../services/stocks.service';
+import { ChartMarker, InfectionPointType, InflectionPoint, InflectionPointsReportDetails, LatestTrendAnalysis, PositionChartInformation, TrendAnalysisResult } from '../../services/stocks.service';
 import { PriceChartComponent } from "../price-chart/price-chart.component";
 import { NgClass, PercentPipe } from '@angular/common';
 import { green, red } from 'src/app/services/charts.service';

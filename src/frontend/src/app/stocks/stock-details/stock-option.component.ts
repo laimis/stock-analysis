@@ -76,7 +76,7 @@ export class StockOptionComponent implements OnInit {
     }
 
     recordBuy(opt: object) {
-        this.service.buyOption(opt).subscribe(r => {
+        this.service.buyOption(opt).subscribe(() => {
             this.ownershipChanged.emit("buy")
             this.clearFields()
             this.success = true
@@ -86,7 +86,7 @@ export class StockOptionComponent implements OnInit {
     }
 
     recordSell(opt: object) {
-        this.service.sellOption(opt).subscribe(r => {
+        this.service.sellOption(opt).subscribe(() => {
             this.ownershipChanged.emit("sell")
             this.clearFields()
             this.success = true

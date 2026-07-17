@@ -50,12 +50,13 @@ export class TradingActualVsSimulatedPositionComponent {
 
     sortResults() {
         console.log('sortResults', this.sortColumn, this.sortDirection);
-        this.sortedResults = this.results.sort((a:any, b:any) => {
-            
+        this.sortedResults = this.results.sort((a: TradingStrategyResult, b: TradingStrategyResult) => {
+            const aRecord = a as unknown as Record<string, Record<string, unknown>>;
+            const bRecord = b as unknown as Record<string, Record<string, unknown>>;
             // we either use a and b directory or .position on a and b
             // depending on the sort column
-            const bSort = (b.position[this.sortColumn] == null) ? b[this.sortColumn] : b.position[this.sortColumn];
-            const aSort = (a.position[this.sortColumn] == null) ? a[this.sortColumn] : a.position[this.sortColumn];
+            const bSort = (bRecord.position[this.sortColumn] == null) ? bRecord[this.sortColumn] : bRecord.position[this.sortColumn];
+            const aSort = (aRecord.position[this.sortColumn] == null) ? aRecord[this.sortColumn] : aRecord.position[this.sortColumn];
             
             if (this.sortDirection == 'desc') {
                 return bSort - aSort;

@@ -95,7 +95,7 @@ export class PlaygroundComponent implements OnInit {
         })
     }
 
-    chartOptions: any[] = []
+    chartOptions: object[] = []
     loadingScatterPlot: boolean = false
     runScatterPlot() {
         this.loadingScatterPlot = true

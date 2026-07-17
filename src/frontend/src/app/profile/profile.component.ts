@@ -50,7 +50,7 @@ export class ProfileComponent implements OnInit {
 
     clearData() {
         this.service.clearAccount()
-            .subscribe(s => this.router.navigate(['/']))
+            .subscribe(() => this.router.navigate(['/']))
     }
 
     undoDelete() {
@@ -68,7 +68,7 @@ export class ProfileComponent implements OnInit {
 
     deleteFinal() {
         this.service.deleteAccount({feedback: this.deleteFeedback})
-            .subscribe(s => this.router.navigate(['/landing']))
+            .subscribe(() => this.router.navigate(['/landing']))
     }
 
     markError(msg) {
@@ -141,7 +141,7 @@ export class ProfileComponent implements OnInit {
         )
     }
 
-    private getFormData($event: any) {
+    private getFormData($event: Event) {
         const file = $event.target.files[0];
         const formData: FormData = new FormData();
         formData.append("file", file, file.name);

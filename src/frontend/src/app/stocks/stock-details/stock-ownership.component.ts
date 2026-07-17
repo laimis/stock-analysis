@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {BrokerageAccount, BrokerageStockOrder, PositionChartInformation, StockPosition, StockQuote} from '../../services/stocks.service';
+import {BrokerageAccount, PositionChartInformation, StockPosition, StockQuote} from '../../services/stocks.service';
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {CurrencyPipe} from "@angular/common";
 import {PriceChartComponent} from "../../shared/price-chart/price-chart.component";
@@ -31,5 +31,5 @@ export class StockOwnershipComponent {
     positionChartInformation: PositionChartInformation
 
     @Output()
-    positionChanged: EventEmitter<any> = new EventEmitter();
+    positionChanged: EventEmitter<void> = new EventEmitter();
 }

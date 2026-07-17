@@ -99,7 +99,7 @@ export class OptionChainComponent implements OnInit {
         this.loading = false;
 
         const expirationMap = new Map<string, OptionDefinition[]>();
-        this.filteredOptions.forEach(function (value, index, arr) {
+        this.filteredOptions.forEach(function (value) {
             if (!expirationMap.has(value.expiration)) {
                 expirationMap.set(value.expiration, [value])
             } else {

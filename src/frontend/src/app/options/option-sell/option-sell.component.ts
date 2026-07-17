@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {DatePipe, Location, PercentPipe} from '@angular/common';
+import {DatePipe, Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from 'src/app/services/utils';
 import {tick} from "@angular/core/testing";

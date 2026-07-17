@@ -7,7 +7,7 @@ import {BrokerageOptionOrder, OptionPosition, OptionService} from "../../service
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {OptionPositionComponent} from "../option-position/option-position.component";
 import {BrokerageService} from "../../services/brokerage.service";
-import {concat} from "rxjs";
+
 
 @Component({
     selector: 'app-owned-option-detail',

@@ -29,7 +29,7 @@ function toChartJSPoint(p: DataPoint) {
     }
 }
 
-function toAnnotationDataPoints(annotationLine: ChartAnnotationLine, dataPoints: any[]) {
+function toAnnotationDataPoints(annotationLine: ChartAnnotationLine, dataPoints: object[]) {
     // it can be either horizontal or vertical
     // if it is horizontal, it's x is the x of the data points and y is a constant value
 
@@ -85,7 +85,7 @@ function toChartData(container: DataPointContainer) {
     const markerSize = chartType === "scatter" ? 10 : 1
 
     const chartJSDataPoints = container.data.map(p => toChartJSPoint(p))
-    const data: any = [{
+    const data: object[] = [{
         type: chartType,
         markerSize: markerSize,
         color: container.color || blue,
@@ -151,7 +151,7 @@ function toChart(containers: DataPointContainer[], titleOverride?: string) {
 })
 export class LineChartComponent {
 
-    options: any // don't have type from canvasjs .... blerg
+    options: object // don't have type from canvasjs .... blerg
 
     private _containers: DataPointContainer[] = [];
     private _title: string | undefined = undefined;

@@ -55,7 +55,6 @@ export class DashboardComponent implements OnInit {
             const today = new Date();
             const pad = (n: number) => String(n).padStart(2, '0');
             const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-            const todayStr = toDateStr(today);
             const yesterday = new Date(today);
             yesterday.setDate(today.getDate() - 1);
             const yesterdayStr = toDateStr(yesterday);

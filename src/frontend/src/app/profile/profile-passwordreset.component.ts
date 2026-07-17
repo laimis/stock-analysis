@@ -35,7 +35,7 @@ export class ProfilePasswordResetComponent implements OnInit {
             password: this.password
         }
 
-        this.stockService.resetPassword(obj).subscribe(r => {
+        this.stockService.resetPassword(obj).subscribe(() => {
             this.router.navigate(['/dashboard'])
         }, err => {
             this.errors = GetErrors(err)

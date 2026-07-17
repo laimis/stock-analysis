@@ -73,7 +73,7 @@ export class OptionPositionComponent {
     removeLabel(label:KeyValuePair) {
         
         this.optionService.deleteLabel(this.position.positionId, label.key).subscribe({
-            next: (result) => {
+            next: () => {
                 this.position.labels = this.position.labels.filter(l => l.key != label.key);
                 this.positionChanged.emit();
             },
@@ -89,7 +89,7 @@ export class OptionPositionComponent {
     
     addLabel() {
         this.optionService.setLabel(this.position.positionId, this.newLabelKey, this.newLabelValue).subscribe({
-            next: (result) => {
+            next: () => {
                 this.position.labels.push({key: this.newLabelKey, value: this.newLabelValue});
                 this.positionChanged.emit();
             },
@@ -113,7 +113,7 @@ export class OptionPositionComponent {
     
     addNote() {
         this.optionService.addNotes(this.position.positionId, this.notesControl.value).subscribe({
-            next: (result) => {
+            next: () => {
                 const note = {content: this.notesControl.value, created: new Date().toDateString(), id: "0"};
                 this.position.notes.push(note);
                 this.showNotesForm = false;
@@ -142,7 +142,7 @@ export class OptionPositionComponent {
             // provide reason
             const reason = prompt("Please provide a reason for closing this position");
             this.optionService.closePosition(this.position.positionId, reason).subscribe({
-                next: (result) => {
+                next: () => {
                     console.log("Closed pending position: " + this.position.positionId);
                     this.positionChanged.emit();
                 },
@@ -166,11 +166,11 @@ export class OptionPositionComponent {
     deletePosition() {
         if (confirm("Are you sure you want to delete this position?")) {
             this.optionService.delete(this.position.positionId).subscribe({
-                next: (result) => {
+                next: () => {
                     console.log("Deleted position: " + this.position.positionId);
                     this.positionDeleted.emit();
                 },
-                error: (error) => {
+                error: () => {
                     console.error("Error deleting position: " + this.position.positionId);
                 },
                 complete: () => {

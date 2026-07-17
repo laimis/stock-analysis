@@ -146,8 +146,8 @@ export class StockTradingPositionsComponent {
 
     private applySorting() {
         this._positions = [...this._positions].sort((a, b) => {
-            let aValue: any;
-            let bValue: any;
+            let aValue: string | number;
+            let bValue: string | number;
 
             switch (this.sortColumn) {
                 case 'ticker':
