@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {NavigationEnd, Router, RouterLink} from '@angular/router';
 import {GlobalService} from '../services/global.service';
 import {GetErrors} from "../services/utils";
@@ -11,6 +11,7 @@ import { ErrorDisplayComponent } from "../shared/error-display/error-display.com
     selector: 'app-nav-menu',
     templateUrl: './nav-menu.component.html',
     styleUrls: ['./nav-menu.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, NgClass, RouterLink, StockSearchComponent, ErrorDisplayComponent]
 })
 export class NavMenuComponent {

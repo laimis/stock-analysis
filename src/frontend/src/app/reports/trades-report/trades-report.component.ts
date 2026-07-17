@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {OutcomesReport, StockAnalysisOutcome, StocksService, TickerOutcomes} from "../../services/stocks.service";
 import {GetErrors} from "../../services/utils";
@@ -335,6 +335,7 @@ function selectFunctionsToUse(screenerId: string) {
     selector: 'app-trades-report',
     templateUrl: './trades-report.component.html',
     styleUrl: './trades-report.component.css',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [OutcomesComponent, LoadingComponent, ErrorDisplayComponent]
 })
 export class TradesReportComponent implements OnInit {

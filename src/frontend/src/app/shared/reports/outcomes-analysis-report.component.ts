@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {
     AnalysisOutcomeEvaluation,
     OutcomesReport,
@@ -17,6 +17,7 @@ import {OutcomesComponent} from "./outcomes.component";
     selector: 'app-outcomes-analysis-report',
     templateUrl: './outcomes-analysis-report.component.html',
     styleUrls: ['./outcomes-analysis-report.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         LoadingComponent,
         NgClass,

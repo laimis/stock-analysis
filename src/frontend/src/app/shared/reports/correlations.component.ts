@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {TickerCorrelation} from '../../services/stocks.service';
 import { DecimalPipe, NgClass } from "@angular/common";
 import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tradingview-link.component";
@@ -7,6 +7,7 @@ import {StockLinkAndTradingviewLinkComponent} from "../stocks/stock-link-and-tra
     selector: 'app-correlations',
     templateUrl: './correlations.component.html',
     styleUrls: ['./correlations.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     DecimalPipe,
     NgClass,

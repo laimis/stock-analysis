@@ -10,8 +10,8 @@
           <div class="modal-body">
             <div class="mb-3">
               <span>{{position?.underlyingTicker}}</span>,
-              {{ contract?.cost | currency }} cost basis,
-              {{ contract?.details?.mark | currency }} market value
+              {{ $safeNavigationMigration(contract?.cost) | currency }} cost basis,
+              {{ $safeNavigationMigration(contract?.details?.mark) | currency }} market value
             </div>
             <div class="mb-4">
               <h6 class="text-muted mb-3">Contract Details</h6>

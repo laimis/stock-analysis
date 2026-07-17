@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {TradingStrategyPerformance} from '../../services/stocks.service';
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
 
@@ -7,6 +7,7 @@ import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
     templateUrl: './stock-trading-strategies.component.html',
     styleUrls: ['./stock-trading-strategies.component.css'],
     imports: [DecimalPipe, CurrencyPipe, PercentPipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class StockTradingStrategiesComponent {

@@ -1,5 +1,5 @@
 import { DatePipe, NgClass, PercentPipe } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Sell, StocksService} from 'src/app/services/stocks.service';
 import { StockLinkComponent } from "../shared/stocks/stock-link.component";
 
@@ -7,6 +7,7 @@ import { StockLinkComponent } from "../shared/stocks/stock-link.component";
     selector: 'app-recentsells',
     templateUrl: './recentsells.component.html',
     styleUrls: ['./recentsells.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgClass, StockLinkComponent, DatePipe, PercentPipe]
 })
 export class RecentSellsComponent implements OnInit {

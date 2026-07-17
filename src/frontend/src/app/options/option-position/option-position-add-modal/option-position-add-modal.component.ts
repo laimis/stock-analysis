@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { BrokerageService, OptionOrderCommand, OptionOrderInstruction, OptionOrderType } from 'src/app/services/brokerage.service';
 import { OptionPosition, OptionService } from 'src/app/services/option.service';
 import { GetErrors } from 'src/app/services/utils';
@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-option-position-add-modal',
   imports: [ErrorDisplayComponent, CurrencyPipe, FormsModule],
   templateUrl: './option-position-add-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './option-position-add-modal.component.css'
 })
 export class OptionPositionAddModalComponent implements OnChanges {

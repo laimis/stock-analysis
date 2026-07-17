@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {GetErrors} from 'src/app/services/utils';
 import {BrokerageService} from "../../services/brokerage.service";
 import {
@@ -19,6 +19,7 @@ import {ErrorDisplayComponent} from "../../shared/error-display/error-display.co
     selector: 'app-option-brokerage-orders',
     templateUrl: './option-brokerage-orders.component.html',
     styleUrls: ['./option-brokerage-orders.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     TradingViewLinkComponent,
     StockLinkComponent,

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DataPointContainer, StocksService, TransactionsView} from '../services/stocks.service';
 import {ActivatedRoute, RouterModule} from '@angular/router';
 import {Title} from '@angular/platform-browser';
@@ -14,6 +14,7 @@ import { StockLinkComponent } from "../shared/stocks/stock-link.component";
     selector: 'app-transactions',
     imports: [CurrencyPipe, ErrorDisplayComponent, FormsModule, LoadingComponent, LineChartComponent, StockLinkComponent, RouterModule, DatePipe],
     templateUrl: './transactions.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {

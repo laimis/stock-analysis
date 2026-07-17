@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
 import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../services/option.service";
@@ -16,6 +16,7 @@ import { StockLinkComponent } from "../../shared/stocks/stock-link.component";
     StockSearchComponent,
     StockLinkComponent
 ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./option-positions.component.css']
 })
 

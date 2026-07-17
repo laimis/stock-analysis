@@ -10,8 +10,8 @@
           <div class="modal-body">
             <div class="mb-3">
               <span>{{position?.underlyingTicker}}</span>,
-              {{ position?.cost | currency }} cost basis,
-              {{ position?.market | currency }} market value
+              {{ $safeNavigationMigration(position?.cost) | currency }} cost basis,
+              {{ $safeNavigationMigration(position?.market) | currency }} market value
             </div>
             <div class="mb-4">
               <h6 class="text-muted mb-3">Position Details</h6>
@@ -37,7 +37,7 @@
               </div>
             </div>
             <div class="mb-3">
-              <label for="price" class="form-label">Price (<small>{{price/position?.spread | percent}} of spread</small>)</label>
+              <label for="price" class="form-label">Price (<small>{{price/$safeNavigationMigration(position?.spread) | percent}} of spread</small>)</label>
               <input
                 type="number"
                 class="form-control"
@@ -65,8 +65,8 @@
                 </div>
                 <div class="mb-3">
                   <h6 class="text-muted">Helper Section</h6>
-                  <p>Current Market Price: {{ position?.market | currency }}</p>
-                  <p>Spread: {{ position?.spread | currency }}</p>
+                  <p>Current Market Price: {{ $safeNavigationMigration(position?.market) | currency }}</p>
+                  <p>Spread: {{ $safeNavigationMigration(position?.spread) | currency }}</p>
                   <p>50% of Spread: {{ spreadValues['50%'] | currency }}</p>
                   <p>60% of Spread: {{ spreadValues['60%'] | currency }}</p>
                   <p>70% of Spread: {{ spreadValues['70%'] | currency }}</p>

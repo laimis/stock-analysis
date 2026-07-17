@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {Location} from '@angular/common';
@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './profile-login.component.html',
     styleUrls: ['./profile-login.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, FormsModule, RouterLink]
 })
 export class ProfileLoginComponent implements OnInit {

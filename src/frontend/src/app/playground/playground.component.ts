@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     StockPosition,
@@ -57,6 +57,7 @@ function createProfitScatter(entries: StockPosition[], quotes: Record<string, St
     selector: 'app-playground',
     templateUrl: './playground.component.html',
     styleUrls: ['./playground.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     LoadingComponent,
     CorrelationsComponent,

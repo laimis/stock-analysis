@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {StocksService} from 'src/app/services/stocks.service';
 
@@ -9,6 +9,7 @@ import {StocksService} from 'src/app/services/stocks.service';
     templateUrl: './admin-users.component.html',
     styleUrls: ['./admin-users.component.css'],
     imports: [RouterLink, DatePipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class AdminUsersComponent implements OnInit {

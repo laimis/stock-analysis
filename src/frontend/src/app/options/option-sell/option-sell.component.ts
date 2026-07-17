@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DatePipe, Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from 'src/app/services/utils';
@@ -13,6 +13,7 @@ import { ErrorDisplayComponent } from "src/app/shared/error-display/error-displa
     templateUrl: './option-sell.component.html',
     providers: [DatePipe],
     imports: [FormsModule, StockSearchComponent, ErrorDisplayComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class OptionSellComponent implements OnInit {

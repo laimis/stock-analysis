@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AccountStatus, KeyValuePair, StocksService} from '../services/stocks.service';
 import {Router} from '@angular/router';
 import {GetErrors} from '../services/utils';
@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, CurrencyPipe, DatePipe, FormsModule]
 })
 export class ProfileComponent implements OnInit {

@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from 'src/app/services/stocks.service';
 
 @Component({
     selector: 'app-admin-dashboard',
     templateUrl: './admin-dashboard.component.html',
     styleUrls: ['./admin-dashboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class AdminDashboardComponent {

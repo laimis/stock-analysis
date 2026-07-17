@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
     StockPosition,
@@ -19,6 +19,7 @@ import { StockTradingPerformanceComponent } from "./stock-trading-performance.co
     templateUrl: './stock-trading-review-dashboard.component.html',
     styleUrls: ['./stock-trading-review-dashboard.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [LoadingComponent, NgClass, RouterLink, StockTradingReviewComponent, StockTradingStrategiesComponent, StockTradingClosedPositionsComponent, StockTradingPerformanceComponent]
 })
 export class StockTradingReviewDashboardComponent implements OnInit {

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ChangeDetectionStrategy} from '@angular/core';
 import {
     BrokerageAccount,
     StockViolation
@@ -14,6 +14,7 @@ import { BrokerageNewOrderComponent } from "src/app/brokerage/brokerage-new-orde
     selector: 'app-stock-violations',
     templateUrl: './stock-violations.component.html',
     styleUrls: ['./stock-violations.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, StockTradingNewPositionComponent, BrokerageOrdersComponent, BrokerageNewOrderComponent]
 })
 export class StockViolationsComponent {

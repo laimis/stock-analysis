@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Location, NgClass} from '@angular/common';
@@ -11,6 +11,7 @@ import { ErrorDisplayComponent } from "../shared/error-display/error-display.com
     templateUrl: './profile-create.component.html',
     styleUrls: ['./profile-create.component.css'],
     imports: [FormsModule, NgClass, ErrorDisplayComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class ProfileCreateComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { TickerFundamentals, StockQuote } from 'src/app/services/stocks.service';
 import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 import { blue, green, red } from 'src/app/services/charts.service';
@@ -196,6 +196,7 @@ function createMarginProfileChart(data: TickerFundamentals[]) {
   standalone: true,
   imports: [CanvasJSAngularChartsModule],
   templateUrl: './fundamentals.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './fundamentals.component.css'
 })
 export class FundamentalsComponent {

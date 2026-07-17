@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {DailyPositionReport, DataPointContainer} from '../../services/stocks.service';
 import {LineChartComponent} from "../line-chart/line-chart.component";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
@@ -57,6 +57,7 @@ function createCombinedDailyChart(report:DailyPositionReport, showClose: boolean
     selector: 'app-daily-outcome-scores',
     templateUrl: './daily-outcome-scores.component.html',
     styleUrls: ['./daily-outcome-scores.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     LineChartComponent,
     CanvasJSAngularChartsModule,

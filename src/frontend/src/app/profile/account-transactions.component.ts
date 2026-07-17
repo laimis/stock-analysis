@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {AccountTransaction, StocksService} from "../services/stocks.service";
 import {ParsedDatePipe} from "../services/parsedDate.filter";
 import { CurrencyPipe, NgClass } from "@angular/common";
@@ -14,6 +14,7 @@ import {ErrorDisplayComponent} from "../shared/error-display/error-display.compo
     NgClass
 ],
     templateUrl: './account-transactions.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './account-transactions.component.css'
 })
 export class AccountTransactionsComponent implements OnInit {

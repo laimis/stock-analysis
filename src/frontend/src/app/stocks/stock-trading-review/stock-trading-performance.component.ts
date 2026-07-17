@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {
     DataPointContainer,
     StockTradingPerformance,
@@ -13,6 +13,7 @@ import { TradingPerformanceSummaryComponent } from "src/app/shared/stocks/tradin
     templateUrl: './stock-trading-performance.component.html',
     styleUrls: ['./stock-trading-performance.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [LineChartComponent, TradingPerformanceSummaryComponent]
 })
 export class StockTradingPerformanceComponent {

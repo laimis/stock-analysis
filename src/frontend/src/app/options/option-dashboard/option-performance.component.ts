@@ -1,11 +1,12 @@
 import { CurrencyPipe, DecimalPipe, PercentPipe } from '@angular/common';
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, ChangeDetectionStrategy} from '@angular/core';
 import { OptionPerformanceView, OptionTradePerformanceMetrics } from 'src/app/services/option.service';
 
 @Component({
     selector: 'app-option-performance',
     templateUrl: './option-performance.component.html',
     styleUrls: ['./option-performance.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         PercentPipe,
         CurrencyPipe,

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { StockPriceAlert } from '../services/stocks.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
@@ -7,6 +7,7 @@ import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-lin
   selector: 'app-price-alert-list',
   templateUrl: './price-alert-list.component.html',
   styleUrls: ['./price-alert-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, DatePipe, DecimalPipe, StockLinkAndTradingviewLinkComponent]
 })
 export class PriceAlertListComponent {

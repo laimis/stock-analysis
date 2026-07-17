@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {StockPosition} from "../../services/stocks.service";
 import {stockClosedPositionExportLink} from "../../services/links.service";
 import {GetStockStrategies} from "../../services/utils";
@@ -12,6 +12,7 @@ import { StockLinkComponent } from "src/app/shared/stocks/stock-link.component";
     templateUrl: './stock-trading-closed-positions.component.html',
     styleUrls: ['./stock-trading-closed-positions.component.css'],
     imports: [DatePipe, PercentPipe, CurrencyPipe, DecimalPipe, NgClass, TradingViewLinkComponent, StockLinkComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class StockTradingClosedPositionsComponent {

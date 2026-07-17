@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StocksService, Reminder } from '../services/stocks.service';
@@ -10,6 +10,7 @@ import { ReminderListComponent } from './reminder-list.component';
   selector: 'app-reminders',
   templateUrl: './reminders.component.html',
   styleUrls: ['./reminders.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, FormsModule, ReminderFormComponent, ReminderListComponent]
 })
 export class RemindersComponent implements OnInit {

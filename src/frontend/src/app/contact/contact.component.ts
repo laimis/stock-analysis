@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {GetErrors} from '../services/utils';
 import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
     selector: 'app-contact',
     templateUrl: './contact.component.html',
     styleUrls: ['./contact.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, FormsModule]
 })
 export class ContactComponent {

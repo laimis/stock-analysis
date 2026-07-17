@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {StockDetails, StockProfile} from '../../services/stocks.service';
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 import { MarketCapPipe } from 'src/app/services/marketcap.filter';
@@ -14,6 +14,7 @@ import { MarketCapPipe } from 'src/app/services/marketcap.filter';
         DatePipe,
         NgClass
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./stock-fundamentals.component.css']
 })
 

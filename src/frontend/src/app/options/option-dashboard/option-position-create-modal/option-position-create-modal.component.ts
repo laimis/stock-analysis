@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CurrencyPipe } from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {GetErrors, GetOptionStrategies} from "../../../services/utils";
@@ -12,6 +12,7 @@ import {BrokerageOptionPosition, OptionService} from "../../../services/option.s
     FormsModule
 ],
   templateUrl: './option-position-create-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './option-position-create-modal.component.css'
 })
 export class OptionPositionCreateModalComponent {

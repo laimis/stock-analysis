@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {BrokerageAccount} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
@@ -16,6 +16,7 @@ import {BrokerageNewOrderComponent} from "../../brokerage/brokerage-new-order.co
     selector: 'app-stock-trading-pending-positions-dashboard',
     templateUrl: './stock-trading-pending-positions-dashboard.component.html',
     styleUrls: ['./stock-trading-pending-positions-dashboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     StockTradingNewPositionComponent,
     StockTradingPendingPositionsComponent,

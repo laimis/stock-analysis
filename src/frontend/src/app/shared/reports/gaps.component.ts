@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {StockGaps} from '../../services/stocks.service';
 import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 
@@ -6,6 +6,7 @@ import {CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe} from "@angula
     selector: 'app-gaps',
     templateUrl: './gaps.component.html',
     styleUrls: ['./gaps.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         NgClass,
         DatePipe,

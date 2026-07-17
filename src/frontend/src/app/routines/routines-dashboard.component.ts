@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Routine, StocksService} from '../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
@@ -11,6 +11,7 @@ import { RouterLink } from '@angular/router';
     templateUrl: './routines-dashboard.component.html',
     styleUrls: ['./routines-dashboard.component.css'],
     imports: [ErrorDisplayComponent, LoadingComponent, RoutinesActiveRoutineComponent, RouterLink],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 

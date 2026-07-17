@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     ChartType,
     DataPoint,
@@ -35,6 +35,7 @@ import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.co
     TradingViewLinkComponent
 ],
     templateUrl: './trends-report.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './trends-report.component.css'
 })
 export class TrendsReportComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 
@@ -16,6 +16,7 @@ import { OutcomesComponent } from "../../shared/reports/outcomes.component";
     OutcomesComponent
 ],
     templateUrl: './stock-trading-pendingposition-analysis.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './stock-trading-pendingposition-analysis.component.css'
 })
 export class StockTradingPendingpositionAnalysisComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {debounceTime, switchMap} from 'rxjs/operators';
 import {StockSearchResult, StocksService} from "../../services/stocks.service";
@@ -11,6 +11,7 @@ import {FormsModule} from "@angular/forms";
     imports: [
         FormsModule
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./stock-search.component.css']
 })
 export class StockSearchComponent implements OnInit {

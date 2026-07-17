@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SECFiling } from 'src/app/services/sec.service';
@@ -14,6 +14,7 @@ interface FilingRow {
   selector: 'app-sec-filings-table',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sec-filings-table.component.html'
 })
 export class SecFilingsTableComponent {

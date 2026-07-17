@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
     StockPosition,
@@ -22,6 +22,7 @@ import { ParsedDatePipe } from "../../services/parsedDate.filter";
     selector: 'app-stock-trading-simulations',
     templateUrl: './stock-trading-simulations.component.html',
     styleUrls: ['./stock-trading-simulations.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     FormsModule,
     ErrorDisplayComponent,

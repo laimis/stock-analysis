@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {PortfolioHoldings, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from 'src/app/services/utils';
 import { ErrorDisplayComponent } from "src/app/shared/error-display/error-display.component";
@@ -10,6 +10,7 @@ import { StockPositionReportsComponent } from "src/app/stocks/stock-trading/stoc
     templateUrl: './stock-trading-analysis-dashboard.component.html',
     styleUrls: ['./stock-trading-analysis-dashboard.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, LoadingComponent, StockPositionReportsComponent]
 })
 export class StockTradingAnalysisDashboardComponent implements OnInit {

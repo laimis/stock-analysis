@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {
     ChartAnnotationLine,
     ChartAnnotationLineType,
@@ -146,6 +146,7 @@ function toChart(containers: DataPointContainer[], titleOverride?: string) {
 @Component({
     selector: 'app-line-chart',
     templateUrl: './line-chart.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CanvasJSAngularChartsModule
     ]

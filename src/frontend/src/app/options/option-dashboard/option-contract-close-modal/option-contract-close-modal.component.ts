@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {FormsModule} from "@angular/forms";
 import {OptionContract, OptionPosition, OptionService} from "../../../services/option.service";
 import {
@@ -17,6 +17,7 @@ import { CurrencyPipe } from "@angular/common";
     CurrencyPipe
 ],
   templateUrl: './option-contract-close-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './option-contract-close-modal.component.css'
 })
 export class OptionContractCloseModalComponent implements OnChanges {

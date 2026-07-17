@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     InflectionPointsReport,
     OutcomesReport,
@@ -29,6 +29,7 @@ import { LoadingComponent } from "../../shared/loading/loading.component";
     templateUrl: './stock-analysis.component.html',
     styleUrls: ['./stock-analysis.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     NgClass,
     DatePipe,

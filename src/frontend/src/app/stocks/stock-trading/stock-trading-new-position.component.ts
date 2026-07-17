@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, NgClass, PercentPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     MovingAverages,
     openpositioncommand,
@@ -23,6 +23,7 @@ import {StockAnalysisComponent} from "../stock-details/stock-analysis.component"
     templateUrl: './stock-trading-new-position.component.html',
     styleUrls: ['./stock-trading-new-position.component.css'],
     providers: [DatePipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     CurrencyPipe,
     StockSearchComponent,

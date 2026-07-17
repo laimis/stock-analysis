@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import {GetErrors} from "../../services/utils";
 import {
     OutcomesReport,
@@ -26,6 +26,7 @@ import { FundamentalsComponent } from "src/app/shared/reports/fundamentals/funda
     templateUrl: './stock-trading-outcomes-reports.component.html',
     styleUrls: ['./stock-trading-outcomes-reports.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, LoadingComponent, OutcomesComponent, StockLinkAndTradingviewLinkComponent, NgClass, OutcomesAnalysisReportComponent, GapsComponent, CorrelationsComponent, FundamentalsComponent]
 })
 

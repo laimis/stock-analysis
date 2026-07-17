@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnDestroy} from '@angular/core';
+import {AfterViewInit, Component, Input, OnDestroy, ChangeDetectionStrategy} from '@angular/core';
 import {
     ChartMarker,
     MovingAverages,
@@ -69,6 +69,7 @@ export function toSeriesMarker(marker: ChartMarker): SeriesMarker<Time> {
 @Component({
     selector: 'app-price-chart',
     templateUrl: './price-chart.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [],
 })
 export class PriceChartComponent implements OnDestroy, AfterViewInit {
