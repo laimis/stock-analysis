@@ -82,7 +82,7 @@ export class StockTradingReviewComponent {
     }
 
     getPrice(position: StockPosition) {
-        let quote = this.getQuote(position)
+        const quote = this.getQuote(position)
 
         if (quote) {
             return quote.price
@@ -90,7 +90,7 @@ export class StockTradingReviewComponent {
 
         // check if we have prices perhaps available
         if (this.positionChartInformation && this.positionChartInformation.prices) {
-            let prices = this.positionChartInformation.prices
+            const prices = this.positionChartInformation.prices
             return prices[prices.length - 1].close
         }
 

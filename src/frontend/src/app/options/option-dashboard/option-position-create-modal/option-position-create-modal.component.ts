@@ -50,7 +50,7 @@ export class OptionPositionCreateModalComponent {
     turnIntoPosition(position: BrokerageOptionPosition, filledDate: string) {
         console.log('mapping', position, filledDate)
         // this will need to be completely rewritten
-        let command = {
+        const command = {
 
             underlyingTicker: position.brokerageContracts[0].ticker,
             filled: filledDate,

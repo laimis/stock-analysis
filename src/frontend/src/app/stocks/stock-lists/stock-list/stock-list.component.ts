@@ -44,7 +44,7 @@ export class StockListComponent implements OnInit {
         );
     }
 
-    add(tickers: string, controlToHide: HTMLElement) {
+    add(tickers: string, controlToHide?: HTMLElement) {
         const tickerArray = tickers.split(/[\s,]+/).filter(t => t.length > 0)
         this.controlToHide = controlToHide
         this.addTickersToList(tickerArray)

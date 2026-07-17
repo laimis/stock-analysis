@@ -117,7 +117,7 @@ export class PlaygroundComponent implements OnInit {
 
         this.status = "Running"
 
-        let positionReport = this.stocks.reportPositions().pipe(
+        const positionReport = this.stocks.reportPositions().pipe(
             tap((data) => {
                 this.status = "Positions done"
                 console.log("Positions")
@@ -125,7 +125,7 @@ export class PlaygroundComponent implements OnInit {
             })
         )
 
-        let singleBarDaily = this.stocks.reportOutcomesSingleBarDaily(this.tickers).pipe(
+        const singleBarDaily = this.stocks.reportOutcomesSingleBarDaily(this.tickers).pipe(
             tap((data) => {
                 this.status = "Single bar daily done"
                 console.log("Single bar daily")
@@ -136,7 +136,7 @@ export class PlaygroundComponent implements OnInit {
             })
         )
 
-        let multiBarDaily = this.stocks.reportOutcomesAllBars(this.tickers).pipe(
+        const multiBarDaily = this.stocks.reportOutcomesAllBars(this.tickers).pipe(
             tap((data) => {
                 this.status = "Multi bar daily done"
                 console.log("Multi bar daily")
@@ -147,7 +147,7 @@ export class PlaygroundComponent implements OnInit {
             })
         )
 
-        let singleBarWeekly = this.stocks.reportOutcomesSingleBarWeekly(this.tickers).pipe(
+        const singleBarWeekly = this.stocks.reportOutcomesSingleBarWeekly(this.tickers).pipe(
             tap((data) => {
                 this.status = "Single bar weekly done"
                 console.log("Single bar weekly")
@@ -155,7 +155,7 @@ export class PlaygroundComponent implements OnInit {
             })
         )
 
-        let gapReport = this.stocks.reportTickerGaps(this.tickers[0]).pipe(
+        const gapReport = this.stocks.reportTickerGaps(this.tickers[0]).pipe(
             tap((data) => {
                 this.status = "Gaps done"
                 console.log("Gaps")

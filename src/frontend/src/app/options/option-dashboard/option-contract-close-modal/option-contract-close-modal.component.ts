@@ -74,16 +74,16 @@ export class OptionContractCloseModalComponent implements OnChanges {
     }
 
     createCloseContractOrder(position:OptionPosition, contract: OptionContract) {
-        let price = this.price;
-        let orderType = OptionOrderType.LIMIT
-        let session = "NORMAL";
-        let duration = "GOOD_TILL_CANCEL";
-        let orderStrategyType = "SINGLE";
-        let instruction = 
+        const price = this.price;
+        const orderType = OptionOrderType.LIMIT
+        const session = "NORMAL";
+        const duration = "GOOD_TILL_CANCEL";
+        const orderStrategyType = "SINGLE";
+        const instruction = 
             contract.quantity < 0 ?
                 OptionOrderInstruction.BUY_TO_CLOSE : OptionOrderInstruction.SELL_TO_CLOSE
 
-        let order: OptionOrderCommand = {
+        const order: OptionOrderCommand = {
             orderType: orderType,
             session: session,
             price: price,

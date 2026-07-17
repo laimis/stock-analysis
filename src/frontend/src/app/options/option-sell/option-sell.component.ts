@@ -40,7 +40,7 @@ export class OptionSellComponent implements OnInit {
 
 
     ngOnInit() {
-        var ticker = this.route.snapshot.paramMap.get('ticker');
+        const ticker = this.route.snapshot.paramMap.get('ticker');
         if (ticker) {
             this.ticker = ticker;
         }
@@ -51,7 +51,7 @@ export class OptionSellComponent implements OnInit {
     }
 
     record() {
-        var opt = {
+        const opt = {
             ticker: this.ticker,
             strikePrice: this.strikePrice,
             optionType: this.optionType,

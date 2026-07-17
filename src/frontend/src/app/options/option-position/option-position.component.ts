@@ -78,7 +78,7 @@ export class OptionPositionComponent {
                 this.positionChanged.emit();
             },
             error: (error) => {
-                let errors = GetErrors(error);
+                const errors = GetErrors(error);
                 this.errorOccurred.emit(errors);
             },
             complete: () => {
@@ -94,7 +94,7 @@ export class OptionPositionComponent {
                 this.positionChanged.emit();
             },
             error: (error) => {
-                let errors = GetErrors(error);
+                const errors = GetErrors(error);
                 this.errorOccurred.emit(errors);
             },
             complete: () => {
@@ -114,13 +114,13 @@ export class OptionPositionComponent {
     addNote() {
         this.optionService.addNotes(this.position.positionId, this.notesControl.value).subscribe({
             next: (result) => {
-                let note = {content: this.notesControl.value, created: new Date().toDateString(), id: "0"};
+                const note = {content: this.notesControl.value, created: new Date().toDateString(), id: "0"};
                 this.position.notes.push(note);
                 this.showNotesForm = false;
                 this.notesControl.setValue("");
             },
             error: (error) => {
-                let errors = GetErrors(error);
+                const errors = GetErrors(error);
                 this.errorOccurred.emit(errors);
             },
             complete: () => {
@@ -140,7 +140,7 @@ export class OptionPositionComponent {
     closePendingPosition() {
         if (confirm("Are you sure you want to close this pending position?")) {
             // provide reason
-            let reason = prompt("Please provide a reason for closing this position");
+            const reason = prompt("Please provide a reason for closing this position");
             this.optionService.closePosition(this.position.positionId, reason).subscribe({
                 next: (result) => {
                     console.log("Closed pending position: " + this.position.positionId);
@@ -148,7 +148,7 @@ export class OptionPositionComponent {
                 },
                 error: (error) => {
                     console.error("Error closing pending position: " + this.position.positionId);
-                    let errors = GetErrors(error);
+                    const errors = GetErrors(error);
                     this.errorOccurred.emit(errors);
                 },
                 complete: () => {
@@ -196,8 +196,8 @@ export class OptionPositionComponent {
         if (contracts.length == 0) {
             return 0;
         }
-        let quantity = Math.abs(contracts[0].quantity)
-        let sum = contracts.reduce((sum, c) => sum + c.cost * c.quantity, 0);
+        const quantity = Math.abs(contracts[0].quantity)
+        const sum = contracts.reduce((sum, c) => sum + c.cost * c.quantity, 0);
         return sum / quantity;
     }
 
@@ -205,8 +205,8 @@ export class OptionPositionComponent {
         if (contracts.length == 0) {
             return 0;
         }
-        let quantity = Math.abs(contracts[0].quantity)
-        let sum = contracts.reduce((sum, c) => sum + c.market * c.quantity, 0);
+        const quantity = Math.abs(contracts[0].quantity)
+        const sum = contracts.reduce((sum, c) => sum + c.market * c.quantity, 0);
         return sum / quantity;
     }
 

@@ -105,7 +105,7 @@ export class StockTradingPositionComponent {
             (profitPoints) => {
                 this.positionProfitPoints = profitPoints
             }, (err) => {
-                let errors = GetErrors(err)
+                const errors = GetErrors(err)
                 alert("Error fetching profit points: " + errors.join(", "))
             }
         )
@@ -144,7 +144,7 @@ export class StockTradingPositionComponent {
                     this._position.riskedAmount = null
                 },
                 error => {
-                    let errors = GetErrors(error)
+                    const errors = GetErrors(error)
                     alert("Error deleting stop price: " + errors.join(", "))
                 }
             )
@@ -160,7 +160,7 @@ export class StockTradingPositionComponent {
                     this._position.riskedAmount = this.candidateRiskAmount
                 },
                 error => {
-                    let errors = GetErrors(error)
+                    const errors = GetErrors(error)
                     alert('Unable to set risk: ' + errors.join(", "))
                 }
             )
@@ -181,7 +181,7 @@ export class StockTradingPositionComponent {
                         this.positionChanged.emit()
                     },
                     err => {
-                        let errors = GetErrors(err)
+                        const errors = GetErrors(err)
                         alert("Error deleting position: " + errors.join(", "))
                     })
         }
@@ -194,17 +194,17 @@ export class StockTradingPositionComponent {
                     this.positionChanged.emit()
                 },
                 err => {
-                    let errors = GetErrors(err)
+                    const errors = GetErrors(err)
                     alert("Error closing position: " + errors.join(", "))
                 })
     }
 
     reinvestDividend(activityId:string) {
-        let price = prompt("Please provide the price at which the dividend will be reinvested")
+        const price = prompt("Please provide the price at which the dividend will be reinvested")
         if (!price) {
             return
         }
-        let numPrice = parseFloat(price)
+        const numPrice = parseFloat(price)
         if (isNaN(numPrice)) {
             alert("Please provide a valid price")
             return
@@ -215,7 +215,7 @@ export class StockTradingPositionComponent {
                     this.positionChanged.emit()
                 },
                 err => {
-                    let errors = GetErrors(err)
+                    const errors = GetErrors(err)
                     alert("Error reinvesting dividend: " + errors.join(", "))
                 }
             )
@@ -252,7 +252,7 @@ export class StockTradingPositionComponent {
     confirmStop(stopPriceValue: string) {
         this.stopErrors = []
         // Parse the stop price value
-        let stopPrice = parseFloat(stopPriceValue)
+        const stopPrice = parseFloat(stopPriceValue)
         if (isNaN(stopPrice)) {
             this.stopErrors = ["Please provide a valid stop"]
             return
@@ -271,7 +271,7 @@ export class StockTradingPositionComponent {
                 this.closeStopModal()
             },
             err => {
-                let errors = GetErrors(err)
+                const errors = GetErrors(err)
                 alert("Error setting stop price: " + errors.join(", "))
                 this.closeStopModal()
             }
@@ -292,7 +292,7 @@ export class StockTradingPositionComponent {
                     this.notesControl.setValue('')
                 },
                 err => {
-                    let errors = GetErrors(err)
+                    const errors = GetErrors(err)
                     alert("Error adding notes: " + errors.join(", "))
                 }
             )
@@ -317,7 +317,7 @@ export class StockTradingPositionComponent {
                 }, 5000)
             },
             (error) => {
-                let errors = GetErrors(error)
+                const errors = GetErrors(error)
                 this.gradingError = errors.join(', ')
             }
         );
@@ -360,7 +360,7 @@ export class StockTradingPositionComponent {
             return
         }
 
-        let label = {
+        const label = {
             key: "strategy",
             value: strategy
         }
@@ -396,7 +396,7 @@ export class StockTradingPositionComponent {
             return
         }
 
-        let label = {
+        const label = {
             key: this.newLabelKey,
             value: this.newLabelValue
         }

@@ -11,7 +11,7 @@ function createData(container: DataPointContainer, useY2: boolean, color: string
     return {
         type: "line",
         dataPoints: container.data.map(d => {
-            let parsedDate = parseDate(d.label)
+            const parsedDate = parseDate(d.label)
             return {x: parsedDate, y: d.value}
         }),
         showInLegend: true,

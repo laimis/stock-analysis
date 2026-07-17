@@ -54,8 +54,8 @@ export class TradingActualVsSimulatedPositionComponent {
             
             // we either use a and b directory or .position on a and b
             // depending on the sort column
-            let bSort = (b.position[this.sortColumn] == null) ? b[this.sortColumn] : b.position[this.sortColumn];
-            let aSort = (a.position[this.sortColumn] == null) ? a[this.sortColumn] : a.position[this.sortColumn];
+            const bSort = (b.position[this.sortColumn] == null) ? b[this.sortColumn] : b.position[this.sortColumn];
+            const aSort = (a.position[this.sortColumn] == null) ? a[this.sortColumn] : a.position[this.sortColumn];
             
             if (this.sortDirection == 'desc') {
                 return bSort - aSort;

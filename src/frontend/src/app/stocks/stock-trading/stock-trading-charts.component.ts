@@ -22,7 +22,7 @@ function generateHistogramData(data: number[], numIntervals: number): HistogramR
 
     for (let i = 0; i < numIntervals; i++) {
         const lowerBound = minPercentage + i * intervalSize;
-        let upperBound = i === numIntervals - 1 ? maxPercentage + 1 : lowerBound + intervalSize;
+        const upperBound = i === numIntervals - 1 ? maxPercentage + 1 : lowerBound + intervalSize;
         const count = data.filter(percentage => percentage >= lowerBound && percentage < upperBound).length;
         histogramData.push({ x: lowerBound, y: count });
     }

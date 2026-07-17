@@ -27,7 +27,7 @@ export class StockListsDashboardComponent implements OnInit {
     }
 
     createList() {
-        var obj = {
+        const obj = {
             name: this.newName,
             description: this.newDescription
         }

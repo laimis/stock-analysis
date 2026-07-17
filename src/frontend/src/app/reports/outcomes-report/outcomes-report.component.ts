@@ -44,22 +44,22 @@ export class OutcomesReportComponent implements OnInit {
 
 
     ngOnInit(): void {
-        var titleParam = this.route.snapshot.queryParamMap.get("title");
+        const titleParam = this.route.snapshot.queryParamMap.get("title");
         if (titleParam) {
             this.title = titleParam;
         }
 
-        var earningsParam = this.route.snapshot.queryParamMap.get("earnings");
+        const earningsParam = this.route.snapshot.queryParamMap.get("earnings");
         if (earningsParam) {
             this.earnings = earningsParam.split(",")
         }
 
-        var startDateParam = this.route.snapshot.queryParamMap.get("startDate");
+        const startDateParam = this.route.snapshot.queryParamMap.get("startDate");
         if (startDateParam) {
             this.startDate = startDateParam;
         }
 
-        var endDateParam = this.route.snapshot.queryParamMap.get("endDate");
+        const endDateParam = this.route.snapshot.queryParamMap.get("endDate");
         if (endDateParam) {
             this.endDate = endDateParam;
         }

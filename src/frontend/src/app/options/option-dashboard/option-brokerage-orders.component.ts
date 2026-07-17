@@ -50,13 +50,13 @@ export class OptionBrokerageOrdersComponent {
                 if (!a.has(key)) {
                     a.set(key, [])
                 }
-                let arr = a.get(key)
+                const arr = a.get(key)
                 arr.push(b);
                 return a
             }, new Map<string, BrokerageOptionOrder[]>())
         
         // find the first status that has orders and set it as the active filter
-        let status = this.availableOrderStatuses.find(status => this._orders.has(status))
+        const status = this.availableOrderStatuses.find(status => this._orders.has(status))
         
         this.filterOrders(status)
     }
@@ -85,15 +85,15 @@ export class OptionBrokerageOrdersComponent {
     }
 
     applyOrderToPosition(order: BrokerageOptionOrder) {
-        let isOpen = order.contracts.filter(leg => leg.instruction.endsWith('ToOpen'))
-        let isClose = order.contracts.filter(leg => leg.instruction.endsWith('ToClose'))
+        const isOpen = order.contracts.filter(leg => leg.instruction.endsWith('ToOpen'))
+        const isClose = order.contracts.filter(leg => leg.instruction.endsWith('ToClose'))
         
         if (isOpen.length === 0 && isClose.length === 0) {
             this.errors = ['Order must have at least one open or close leg']
             return
         }
 
-        let contracts =
+        const contracts =
             order.contracts.map(contract =>
                 {
                     return {
@@ -107,7 +107,7 @@ export class OptionBrokerageOrdersComponent {
                 }
             )
         
-        let promise = isOpen.length > 0 ? this.optionService.openContracts(this.position.positionId, contracts) : this.optionService.closeContracts(this.position.positionId, contracts) 
+        const promise = isOpen.length > 0 ? this.optionService.openContracts(this.position.positionId, contracts) : this.optionService.closeContracts(this.position.positionId, contracts) 
         
         promise.subscribe(
             {

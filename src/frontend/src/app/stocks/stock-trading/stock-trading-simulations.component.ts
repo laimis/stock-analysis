@@ -85,7 +85,7 @@ export class StockTradingSimulationsComponent implements OnInit {
     }
 
     findTrade(position:StockPosition) {
-        let alternateStrategy = this.getStrategyEntry(this.alternateStrategy);
+        const alternateStrategy = this.getStrategyEntry(this.alternateStrategy);
         return alternateStrategy.results.find(r => r.position.ticker === position.ticker && r.position.opened === position.opened)
     }
     
@@ -93,8 +93,8 @@ export class StockTradingSimulationsComponent implements OnInit {
         const positions = this.getStrategyEntry(this.mainStrategy).results.slice();
         
         positions.sort((a, b) => {
-                let bActualProfit = this.findTrade(b.position).position.profit;
-                let aActualProfit = this.findTrade(a.position).position.profit;
+                const bActualProfit = this.findTrade(b.position).position.profit;
+                const aActualProfit = this.findTrade(a.position).position.profit;
                 return (b.position.profit - bActualProfit) - (a.position.profit - aActualProfit)
             }
         );
@@ -110,8 +110,8 @@ export class StockTradingSimulationsComponent implements OnInit {
         const earliestDate = earliest.substring(0, earliest.indexOf('T'));
         const latestDate = latest.substring(0, latest.indexOf('T'));
         
-        let benchmarkTickers = ["SPY", "QQQ", "ARKK", "IWM"];
-        let observables = benchmarkTickers.map(benchmark =>
+        const benchmarkTickers = ["SPY", "QQQ", "ARKK", "IWM"];
+        const observables = benchmarkTickers.map(benchmark =>
             this.stocks.getStockPricesForDates(benchmark, PriceFrequency.Daily, earliestDate, latestDate).pipe(
                 tap(
                     prices => {

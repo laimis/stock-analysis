@@ -31,11 +31,9 @@
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ],
-            "aot": false,
             "extractLicenses": false,
             "sourceMap": true,
-            "optimization": false,
-            "namedChunks": true
+            "optimization": false
           },
           "configurations": {
             "production": {
@@ -60,7 +58,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false,
               "aot": true,
               "extractLicenses": true
             },
@@ -68,8 +65,6 @@
               "optimization": false,
               "outputHashing": "none",
               "sourceMap": true,
-              "namedChunks": true,
-              "aot": true,
               "extractLicenses": false
             }
           },
@@ -105,33 +100,6 @@
               "src/**/*.html"
             ]
           }
-        },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
-          "options": {
-            "outputPath": "dist-server",
-            "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.server.json",
-            "sourceMap": true,
-            "optimization": false
-          },
-          "configurations": {
-            "dev": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-          "extractLicenses": true
-            },
-            "production": {
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true
-            }
-          },
-          "defaultConfiguration": "dev"
         }
       }
     }

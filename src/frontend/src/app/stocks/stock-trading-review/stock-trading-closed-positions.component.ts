@@ -48,19 +48,19 @@ export class StockTradingClosedPositionsComponent {
             .map(p => p.ticker)
             .filter((v, i, a) => a.indexOf(v) === i)
             .sort()
-        let groupedByMonth = value.reduce((a, b) => {
-            var key = b.closed.substring(0, 7)
+        const groupedByMonth = value.reduce((a, b) => {
+            const key = b.closed.substring(0, 7)
             if (!a.has(key)) {
                 a.set(key, [])
             }
-            let arr = a.get(key)
+            const arr = a.get(key)
             if (arr) {
                 arr.push(b)
             }
             return a
         }, new Map<string, StockPosition[]>())
 
-        let groupedByMonthArray : { month: string, positions: StockPosition[], wins: StockPosition[], losses: StockPosition[] }[] = []
+        const groupedByMonthArray : { month: string, positions: StockPosition[], wins: StockPosition[], losses: StockPosition[] }[] = []
         groupedByMonth.forEach((value, key) => {
             groupedByMonthArray.push(
                 {
@@ -75,7 +75,7 @@ export class StockTradingClosedPositionsComponent {
 
         value.map(
             (s) => {
-                let strategyLabel = s.labels.findIndex(l => l.key === 'strategy')
+                const strategyLabel = s.labels.findIndex(l => l.key === 'strategy')
                 if (strategyLabel === -1) {
                     return null
                 }
@@ -115,7 +115,7 @@ export class StockTradingClosedPositionsComponent {
         }
 
         if (this.plFilter != 'all') {
-            let value = parseFloat(this.plFilter)
+            const value = parseFloat(this.plFilter)
             if (value > 0) {
                 return position.profit >= value
             } else {
@@ -123,8 +123,8 @@ export class StockTradingClosedPositionsComponent {
             }
         }
 
-        let winMasmatch = position.profit >= 0 && this.outcomeFilter === 'loss'
-        let lossMismatch = position.profit < 0 && this.outcomeFilter === 'win'
+        const winMasmatch = position.profit >= 0 && this.outcomeFilter === 'loss'
+        const lossMismatch = position.profit < 0 && this.outcomeFilter === 'win'
 
         return !(this.outcomeFilter != 'all' && (winMasmatch || lossMismatch));
     }
@@ -166,7 +166,7 @@ export class StockTradingClosedPositionsComponent {
 
     // returned as we want no separator in that case (ie, if sorted by gain, grouping those by month makes no sense)
     getPropertyForSeperatorGrouping(position: StockPosition) {
-        var groupingInput = ""
+        let groupingInput = ""
         if (this.sortColumn === 'opened') {
             groupingInput = position.opened
         }
@@ -186,12 +186,12 @@ export class StockTradingClosedPositionsComponent {
     }
 
     getRRSumForMonth(position: StockPosition) {
-        var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
+        const positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return positions.reduce((a, b) => a + b.rr, 0)
     }
 
     getProfitSumForMonth(position: StockPosition) {
-        var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
+        const positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return this.getProfitSum(positions)
     }
 
@@ -200,17 +200,17 @@ export class StockTradingClosedPositionsComponent {
     }
 
     getTradeCountByGradeForMonth(position: StockPosition, grade: string) {
-        var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
+        const positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return positions.filter(p => p.grade === grade).length
     }
 
     getTradeCountForMonth(position: StockPosition) {
-        var positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
+        const positions = this.getPositionsForMonth(this.getPropertyForSeperatorGrouping(position))
         return positions.length
     }
 
     sort(column: string) {
-        var func = this.getSortFunc(column);
+        const func = this.getSortFunc(column);
 
         if (this.sortColumn != column) {
             this.sortDirection = -1
@@ -219,12 +219,12 @@ export class StockTradingClosedPositionsComponent {
         }
         this.sortColumn = column
 
-        var finalFunc = (a: StockPosition, b: StockPosition) => {
+        const finalFunc = (a: StockPosition, b: StockPosition) => {
             if (!func) {
                 return 0
             }
             
-            var result = func(a, b)
+            const result = func(a, b)
             return result * this.sortDirection
         }
 

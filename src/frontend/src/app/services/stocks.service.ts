@@ -379,7 +379,7 @@ export class StocksService {
     }
 
     reportDailyPositionReport(positionId: string) {
-        var endpoint = '/api/reports/dailypositionreport/' + positionId
+        const endpoint = '/api/reports/dailypositionreport/' + positionId
         return this.http.get<DailyPositionReport>(endpoint)
     }
     
@@ -398,7 +398,7 @@ export class StocksService {
         ticker: string,
         start: string,
         end: string = null): Observable<DailyOutcomeScoresReport> {
-        var endpoint = '/api/reports/dailyoutcomescoresreport/' + ticker
+        let endpoint = '/api/reports/dailyoutcomescoresreport/' + ticker
 
         if (start) {
             endpoint += '?start=' + start
@@ -416,7 +416,7 @@ export class StocksService {
         start: string,
         end: string = null): Observable<InflectionPointsReport> {
     
-        var endpoint = '/api/reports/inflectionpoints/' + ticker + '?start=' + start
+        let endpoint = '/api/reports/inflectionpoints/' + ticker + '?start=' + start
         if (end) {
             endpoint += '&end=' + end
         }
@@ -429,7 +429,7 @@ export class StocksService {
         trendType: TrendType,
         start: string,
         end: string = null): Observable<Trends> {
-        var endpoint = '/api/reports/trends/' + ticker + '?start=' + start
+        let endpoint = '/api/reports/trends/' + ticker + '?start=' + start
         if (end) {
             endpoint += '&end=' + end
         }
@@ -566,7 +566,7 @@ export interface Chain {
 
 export interface TickerFundamentals {
     ticker: string
-    fundamentals: Map<string, string>
+    fundamentals: Record<string, any>
 }
 
 export interface TickerCorrelation {
@@ -822,7 +822,7 @@ export interface StockProfile {
     securityName: string
     symbol: string
     exchange: string
-    fundamentals: Map<string, string>
+    fundamentals: Record<string, any>
 }
 
 export interface StockOwnership {

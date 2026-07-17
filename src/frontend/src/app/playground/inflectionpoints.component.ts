@@ -21,8 +21,8 @@ import { FormsModule } from '@angular/forms';
 import { LineChartComponent } from "../shared/line-chart/line-chart.component";
 
 function nextDay(currentDate: string): string {
-    let d = new Date(currentDate + " 23:00:00") // adding hours to make sure that when input is treated as midnight UTC, it is still the same day as the input
-    let date = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    const d = new Date(currentDate + " 23:00:00") // adding hours to make sure that when input is treated as midnight UTC, it is still the same day as the input
+    const date = new Date(d.getFullYear(), d.getMonth(), d.getDate())
     date.setDate(date.getDate() + 1)
     return date.toISOString().substring(0, 10)
 }
@@ -45,14 +45,14 @@ export function toValley(gradient: Gradient): InflectionPoint {
 
 function toInflectionPointLog(inflectionPoints: InflectionPoint[]): InflectionPointLog[] {
 
-    let log: InflectionPointLog[] = []
+    const log: InflectionPointLog[] = []
     let i = 1
     while (i < inflectionPoints.length) {
-        let point1 = inflectionPoints[i - 1]
-        let point2 = inflectionPoints[i]
-        let days = (new Date(point2.gradient.dataPoint.dateStr).getTime() - new Date(point1.gradient.dataPoint.dateStr).getTime()) / (1000 * 3600 * 24)
-        let change = point2.gradient.dataPoint.close - point1.gradient.dataPoint.close
-        let percentChange = change / point2.gradient.dataPoint.close
+        const point1 = inflectionPoints[i - 1]
+        const point2 = inflectionPoints[i]
+        const days = (new Date(point2.gradient.dataPoint.dateStr).getTime() - new Date(point1.gradient.dataPoint.dateStr).getTime()) / (1000 * 3600 * 24)
+        const change = point2.gradient.dataPoint.close - point1.gradient.dataPoint.close
+        const percentChange = change / point2.gradient.dataPoint.close
         log.push({from: point1, to: point2, days: days, change: change, percentChange: percentChange})
         i += 1
     }
@@ -63,13 +63,13 @@ function toHistogram(inflectionPoints: InflectionPoint[]) {
     // build a histogram of the inflection points
     // the histogram will have a key for each price
     // and the value will be the number of times that price was hit
-    let histogram = {}
+    const histogram = {}
 
     for (let i = 0; i < inflectionPoints.length; i++) {
-        let price = inflectionPoints[i].priceValue
+        const price = inflectionPoints[i].priceValue
 
         // we will round the price to the nearest dollar
-        let rounded = Math.round(price)
+        const rounded = Math.round(price)
 
         if (histogram[rounded]) {
             histogram[rounded] += 1
@@ -88,8 +88,8 @@ export function age(point: InflectionPoint): number {
 }
 
 function histogramToDataPointContainer(title: string, histogram: {}) {
-    let dataPoints: DataPoint[] = []
-    for (let key in histogram) {
+    const dataPoints: DataPoint[] = []
+    for (const key in histogram) {
         dataPoints.push({
             label: key,
             isDate: false,
@@ -104,9 +104,9 @@ function histogramToDataPointContainer(title: string, histogram: {}) {
 }
 
 function logToDataPointContainer(label: string, log: InflectionPointLog[]) {
-    let dataPoints: DataPoint[] = []
+    const dataPoints: DataPoint[] = []
     for (let i = 0; i < log.length; i++) {
-        let point = log[i]
+        const point = log[i]
         dataPoints.push({
             label: point.from.gradient.dataPoint.dateStr,
             isDate: true,
@@ -124,7 +124,7 @@ function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPo
 
     if (priceFunc) {
         points = points.map(p => {
-            let bar: PriceBar = {
+            const bar: PriceBar = {
                 dateStr: p.gradient.dataPoint.dateStr,
                 close: priceFunc(p.gradient.dataPoint.close),
                 open: priceFunc(p.gradient.dataPoint.open),
@@ -132,7 +132,7 @@ function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPo
                 low: priceFunc(p.gradient.dataPoint.low),
                 volume: p.gradient.dataPoint.volume
             }
-            let newGradient: Gradient = {
+            const newGradient: Gradient = {
                 dataPoint: bar,
                 delta: p.gradient.delta,
                 index: p.gradient.index
@@ -145,7 +145,7 @@ function toDailyBreakdownDataPointCointainer(label: string, points: InflectionPo
     // start with the first date and keep on going until we reach the last date
     let currentDate = points[0].gradient.dataPoint.dateStr
     let currentIndex = 0
-    let dataPoints: DataPoint[] = []
+    const dataPoints: DataPoint[] = []
 
     while (currentIndex < points.length) {
 
@@ -219,9 +219,9 @@ export class InflectionPointsComponent implements OnInit {
     }
 
     renderPrices(tickers: string[]) {
-        let startDate = new Date();
+        const startDate = new Date();
         startDate.setDate(startDate.getDate() - 365);
-        let startDateStr = startDate.toISOString().split('T')[0];
+        const startDateStr = startDate.toISOString().split('T')[0];
 
         this.stocks.reportInflectionPoints(tickers[0], startDateStr).subscribe(
             result => {

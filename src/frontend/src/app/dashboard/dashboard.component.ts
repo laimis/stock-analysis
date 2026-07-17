@@ -5,13 +5,15 @@ import {PortfolioHoldings, Reminder, StocksService} from '../services/stocks.ser
 import { AlertsComponent } from "../alerts/alerts.component";
 import { TimeAgoPipe } from '../services/time-ago.pipe';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
+import { ErrorDisplayComponent } from '../shared/error-display/error-display.component';
+import { GetErrors } from '../services/utils';
 
 
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'],
-    imports: [RouterLink, AlertsComponent, TimeAgoPipe, StockLinkAndTradingviewLinkComponent],
+    imports: [RouterLink, AlertsComponent, TimeAgoPipe, StockLinkAndTradingviewLinkComponent, ErrorDisplayComponent],
 })
 export class DashboardComponent implements OnInit {
     private stocks = inject(StocksService);
@@ -21,6 +23,7 @@ export class DashboardComponent implements OnInit {
 
     dashboard: PortfolioHoldings
     loaded: boolean = false
+    errors: string[] = []
     upcomingReminders: Reminder[] = []
 
     toolLinks = [
@@ -44,7 +47,7 @@ export class DashboardComponent implements OnInit {
             this.dashboard = result;
             this.loaded = true;
         }, error => {
-            console.log(error);
+            this.errors = GetErrors(error);
             this.loaded = false;
         })
 

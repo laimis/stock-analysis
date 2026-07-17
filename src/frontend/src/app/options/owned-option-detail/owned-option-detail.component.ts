@@ -38,7 +38,7 @@ export class OwnedOptionComponent implements OnInit {
         this.filled = Date()
         this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
 
-        let id = this.route.snapshot.paramMap.get('id');
+        const id = this.route.snapshot.paramMap.get('id');
 
         this.getOption(id)
     }

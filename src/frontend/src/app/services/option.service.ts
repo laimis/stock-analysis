@@ -12,7 +12,7 @@ function toSellLeg(option: OptionDefinition) : OptionLeg {
 }
 
 function createExpirationMap(options: OptionDefinition[]): Map<string, OptionDefinition[]> {
-    let expirationMap = new Map<string, OptionDefinition[]>();
+    const expirationMap = new Map<string, OptionDefinition[]>();
     options.forEach(function (value, index, arr) {
         if (!expirationMap.has(value.expiration)) {
             expirationMap[value.expiration] = [value];
@@ -33,7 +33,7 @@ export interface OptionContract {
     quantity: number
     cost: number
     market: number
-    pctInTheMoney: number | undefined
+    pctInTheMoney: number
     details: OptionDefinition | undefined
     instruction: string | undefined
     isShort: boolean
@@ -306,7 +306,7 @@ export class OptionService {
     getOptionPricing(symbol: string): Observable<OptionPricing[]> {
         // add symbols as part of query string, separated by commas
         // but each symbol should be URL encoded
-        let url = '/api/options/pricing?symbol=' + encodeURIComponent(symbol)
+        const url = '/api/options/pricing?symbol=' + encodeURIComponent(symbol)
         
         return this.http.get<OptionPricing[]>(url)
     }
@@ -387,22 +387,22 @@ export class OptionService {
     }
 
     findBullPutSpreads(options: OptionDefinition[]): OptionSpread[] {
-        let expirationMap = createExpirationMap(options)
+        const expirationMap = createExpirationMap(options)
 
         // find spreads
-        let spreads = new Array<OptionSpread>()
+        const spreads = new Array<OptionSpread>()
         expirationMap.forEach(function (value, key, map) {
-            let puts = value.filter(x => x.optionType == "put")
+            const puts = value.filter(x => x.optionType == "put")
 
             puts.forEach(function (buyOption, index, arr) {
                 // we will buy the lower put, and sell the put at the index, if available.
                 if (index + 1 < puts.length) {
-                    let sellOption = puts[index + 1]
+                    const sellOption = puts[index + 1]
 
-                    let premiumReceived = sellOption.bid - buyOption.ask
-                    let risk = sellOption.strikePrice - buyOption.strikePrice - premiumReceived
+                    const premiumReceived = sellOption.bid - buyOption.ask
+                    const risk = sellOption.strikePrice - buyOption.strikePrice - premiumReceived
 
-                    let legs: OptionSpread = {
+                    const legs: OptionSpread = {
                         name: "Bull Put Spread " + sellOption.strikePrice + "-" + buyOption.strikePrice,
                         legs: [toBuyLeg(buyOption), toSellLeg(sellOption)],
                         premiumReceived,
@@ -419,23 +419,23 @@ export class OptionService {
     }
 
     findBearPutSpreads(options: OptionDefinition[]): OptionSpread[] {
-        let expirationMap = createExpirationMap(options)
+        const expirationMap = createExpirationMap(options)
 
         // find spreads
-        let spreads = new Array<OptionSpread>()
+        const spreads = new Array<OptionSpread>()
         expirationMap.forEach(function (value, key, map) {
-            let puts = value.filter(x => x.optionType == "put")
+            const puts = value.filter(x => x.optionType == "put")
 
             puts.forEach(function (sellOption, index, arr) {
                 // we will sell the put at the index, and buy the next put, if available.
                 if (index + 1 < puts.length) {
-                    let buyOption = puts[index + 1]
+                    const buyOption = puts[index + 1]
 
-                    let premiumPaid = buyOption.ask - sellOption.bid
-                    let risk = premiumPaid
-                    let maxGain = buyOption.strikePrice - sellOption.strikePrice - premiumPaid
+                    const premiumPaid = buyOption.ask - sellOption.bid
+                    const risk = premiumPaid
+                    const maxGain = buyOption.strikePrice - sellOption.strikePrice - premiumPaid
 
-                    let legs: OptionSpread = {
+                    const legs: OptionSpread = {
                         name: "Bear Put Spread " + sellOption.strikePrice + "-" + buyOption.strikePrice,
                         legs: [toSellLeg(sellOption), toBuyLeg(buyOption)],
                         premiumPaid,
@@ -452,21 +452,21 @@ export class OptionService {
     }
 
     findStraddles(options: OptionDefinition[]): OptionSpread[] {
-        let expirationMap = createExpirationMap(options)
+        const expirationMap = createExpirationMap(options)
 
         // find straddles
-        let straddles = new Array<OptionSpread>()
+        const straddles = new Array<OptionSpread>()
         expirationMap.forEach(function (value, key, map) {
-            let calls = value.filter(x => x.optionType == "call")
-            let puts = value.filter(x => x.optionType == "put")
+            const calls = value.filter(x => x.optionType == "call")
+            const puts = value.filter(x => x.optionType == "put")
 
             calls.forEach(function (call, index, arr) {
                 puts.forEach(function (put, index, arr) {
                     if (call.strikePrice == put.strikePrice) {
 
-                        let premiumPaid = call.ask + put.ask
+                        const premiumPaid = call.ask + put.ask
 
-                        let legs: OptionSpread = {
+                        const legs: OptionSpread = {
                             name: "Straddle " + call.strikePrice,
                             legs: [toBuyLeg(call), toBuyLeg(put)],
                             premiumPaid,
@@ -484,23 +484,23 @@ export class OptionService {
     }
 
     findBullCallSpreads(options: OptionDefinition[]) {
-        let expirationMap = createExpirationMap(options)
+        const expirationMap = createExpirationMap(options)
 
         // find spreads
-        let spreads = new Array<OptionSpread>()
+        const spreads = new Array<OptionSpread>()
         expirationMap.forEach(function (value, key, map) {
-            let calls = value.filter(x => x.optionType == "call")
+            const calls = value.filter(x => x.optionType == "call")
 
             calls.forEach(function (buyOption, index, arr) {
                 // we will buy the call at the index, and sell the next call, if available.
                 if (index + 1 < calls.length) {
-                    let sellOption = calls[index + 1]
+                    const sellOption = calls[index + 1]
 
-                    let premiumPaid = buyOption.ask - sellOption.bid
-                    let risk = premiumPaid
-                    let maxGain = (sellOption.strikePrice - buyOption.strikePrice) - premiumPaid
+                    const premiumPaid = buyOption.ask - sellOption.bid
+                    const risk = premiumPaid
+                    const maxGain = (sellOption.strikePrice - buyOption.strikePrice) - premiumPaid
 
-                    let legs: OptionSpread = {
+                    const legs: OptionSpread = {
                         name: "Bull Call Spread " + buyOption.strikePrice + "-" + sellOption.strikePrice,
                         legs: [toBuyLeg(buyOption), toSellLeg(sellOption)],
                         premiumPaid,
@@ -517,23 +517,23 @@ export class OptionService {
     }
 
     findBearCallSpreads(options: OptionDefinition[]) {
-        let expirationMap = createExpirationMap(options)
+        const expirationMap = createExpirationMap(options)
 
         // find spreads
-        let spreads = new Array<OptionSpread>()
+        const spreads = new Array<OptionSpread>()
         expirationMap.forEach(function (value, key, map) {
-            let calls = value.filter(x => x.optionType == "call")
+            const calls = value.filter(x => x.optionType == "call")
 
             calls.forEach(function (sellOption, index, arr) {
                 // we will sell the call at the index, and buy the next call, if available.
                 if (index + 1 < calls.length) {
-                    let buyOption = calls[index + 1]
+                    const buyOption = calls[index + 1]
 
-                    let premiumReceived = sellOption.bid - buyOption.ask
-                    let risk = buyOption.strikePrice - sellOption.strikePrice - premiumReceived
-                    let maxGain = premiumReceived
+                    const premiumReceived = sellOption.bid - buyOption.ask
+                    const risk = buyOption.strikePrice - sellOption.strikePrice - premiumReceived
+                    const maxGain = premiumReceived
 
-                    let legs: OptionSpread = {
+                    const legs: OptionSpread = {
                         name: "Bear Call Spread " + sellOption.strikePrice + "-" + buyOption.strikePrice,
                         legs: [toSellLeg(sellOption), toBuyLeg(buyOption)],
                         premiumReceived,

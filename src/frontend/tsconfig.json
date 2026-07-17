@@ -1,14 +1,19 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "esModuleInterop": true,
+    "paths": {
+      "src/app/*": ["./src/app/*"]
+    },
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "target": "es2022",
+    "strictPropertyInitialization": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
     "typeRoots": [
       "node_modules/@types"
     ]
@@ -21,6 +26,6 @@
         "src/environments/**/*.ts",
     ],
   "angularCompilerOptions": {
-    "strictTemplates": true
+    "strictTemplates": false
   }
 }

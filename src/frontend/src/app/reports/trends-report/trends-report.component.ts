@@ -78,14 +78,14 @@ export class TrendsReportComponent implements OnInit {
             this.currentTrend = data.currentTrend
 
             // chronological
-            let barsChronological: DataPoint[] = data.trends.map((t: Trend) => {
+            const barsChronological: DataPoint[] = data.trends.map((t: Trend) => {
                 return {
                     label: t.startDateStr,
                     isDate: true,
                     value: t.direction === TrendDirection.Up ? t.numberOfBars : -t.numberOfBars
                 }
             })
-            let gainsChronological: DataPoint[] = data.trends.map((t: Trend) => {
+            const gainsChronological: DataPoint[] = data.trends.map((t: Trend) => {
                 return {label: t.startDateStr, isDate: true, value: t.gainPercent}
             })
 
@@ -140,7 +140,7 @@ export class TrendsReportComponent implements OnInit {
     }
 
     sortAndCreateContainer(numbers: number[], title: string) {
-        let sorted: DataPoint[] = numbers.sort((a, b) => a - b).map((value: number, index: number) => {
+        const sorted: DataPoint[] = numbers.sort((a, b) => a - b).map((value: number, index: number) => {
             return {label: (index + 1).toString(), isDate: false, value: value}
         })
         return {
@@ -151,7 +151,7 @@ export class TrendsReportComponent implements OnInit {
     }
 
     createContainer(data: ValueWithFrequency[], title: string) {
-        let dataPoints: DataPoint[] = []
+        const dataPoints: DataPoint[] = []
         data.forEach((b: ValueWithFrequency) => {
             dataPoints.push({
                 label: b.value.toString(),
@@ -170,7 +170,7 @@ export class TrendsReportComponent implements OnInit {
     ngOnInit(): void {
         this.route.queryParams.subscribe(params => {
             if (params['tickers']) {
-                let tickers = params['tickers'].split(',');
+                const tickers = params['tickers'].split(',');
                 this.loadSummary(tickers)
             }
         }, error => {
@@ -185,7 +185,7 @@ export class TrendsReportComponent implements OnInit {
         
         // for each ticker in the list, setup an observable that will make reportTrends call
         // when the observable is subscribed to
-        let shortTermObservables = tickers.map(ticker => {
+        const shortTermObservables = tickers.map(ticker => {
             return this.stockService.reportTrends(ticker, TrendType.Ema20OverSma50, "10")
                 .pipe(
                     tap(data => this.shortTermTrendSummary[ticker] = data),
@@ -197,7 +197,7 @@ export class TrendsReportComponent implements OnInit {
                 )
         })
         
-        let longTermObservables = tickers.map(ticker => {
+        const longTermObservables = tickers.map(ticker => {
             return this.stockService.reportTrends(ticker, TrendType.Sma50OverSma200, "10")
                 .pipe(
                     tap(data => this.longTermTrendSummary[ticker] = data),
@@ -209,7 +209,7 @@ export class TrendsReportComponent implements OnInit {
                 )
         })
         
-        let allObservables = shortTermObservables.concat(longTermObservables)
+        const allObservables = shortTermObservables.concat(longTermObservables)
         
         concat(...allObservables).subscribe()
     }
@@ -221,7 +221,7 @@ export class TrendsReportComponent implements OnInit {
         }
         
         // take the first ticker
-        let ticker = tickers[0]
+        const ticker = tickers[0]
 
         this.stockService.reportTrends(ticker, TrendType.Ema20OverSma50, "10")
             .subscribe(

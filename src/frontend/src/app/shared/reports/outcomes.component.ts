@@ -69,7 +69,7 @@ export class OutcomesComponent {
 
     sort(column: string) {
 
-        var func = this.getSortFunc(column);
+        const func = this.getSortFunc(column);
 
         if (this.sortColumn != column) {
             this.sortDirection = -1
@@ -78,8 +78,8 @@ export class OutcomesComponent {
         }
         this.sortColumn = column
 
-        var finalFunc = (a, b) => {
-            var result = func(a, b)
+        const finalFunc = (a, b) => {
+            const result = func(a, b)
             return result * this.sortDirection
         }
 
@@ -101,17 +101,17 @@ export class OutcomesComponent {
     }
 
     async copyOutcomesToClipboard() {
-        let data =
+        const data =
             this.outcomes
                 .map(o => {
                     return `${o.ticker},${o.outcomes.filter(o => o.key === 'Gain').map(o => this.getValue(o).replace(",", "")).join(',')}`
                 })
 
         // let header = `Ticker,${this.getKeys(this.outcomes).join(',')}`
-        let header = `Ticker,Gain`
+        const header = `Ticker,Gain`
         data.unshift(header)
 
-        let text = data.join('\n')
+        const text = data.join('\n')
 
         await navigator.clipboard.writeText(text)
     }

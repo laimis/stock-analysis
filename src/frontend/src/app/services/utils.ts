@@ -12,7 +12,7 @@ export function GetErrors(err: any): string[] {
             return [err.message ?? "Unknown error"]
         }
 
-        var objToMap = err.error.errors
+        let objToMap = err.error.errors
         if (objToMap === undefined) {
             objToMap = err.error
         }
@@ -114,7 +114,7 @@ export function convertToLocalTime(date: Date) {
 
 export function humanFriendlyDuration(numberOfDays: number) {
     // use date-fns to convert number of days to human friendly duration
-    let today = new Date()
-    let numberOfDaysAgoAsDate = new Date(today.setDate(today.getDate() - numberOfDays))
+    const today = new Date()
+    const numberOfDaysAgoAsDate = new Date(today.setDate(today.getDate() - numberOfDays))
     return formatDistance(numberOfDaysAgoAsDate, new Date(), {includeSeconds: false, addSuffix: true})
 }

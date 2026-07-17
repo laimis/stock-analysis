@@ -59,7 +59,7 @@ export class ProfileComponent implements OnInit {
 
     updateMaxLoss(value: string) {
         this.errors = null
-        let keyValue: KeyValuePair = {key: "maxLoss", value: value}
+        const keyValue: KeyValuePair = {key: "maxLoss", value: value}
         this.service.updateAccountSettings(keyValue).subscribe(
             s => this.profile.maxLoss = s.maxLoss,
             error => this.errors = GetErrors(error)
@@ -93,7 +93,7 @@ export class ProfileComponent implements OnInit {
 
         this.markProgress('Importing shares')
 
-        let formData: FormData = this.getFormData($event);
+        const formData: FormData = this.getFormData($event);
 
         this.service.importStocks(formData).subscribe(
             _ => this.markSuccess('Shares imported successfully'),
@@ -105,7 +105,7 @@ export class ProfileComponent implements OnInit {
 
         this.markProgress('Importing options')
 
-        let formData: FormData = this.getFormData($event);
+        const formData: FormData = this.getFormData($event);
 
         this.optionService.importOptions(formData).subscribe(
             _ => this.markSuccess('Options imported'),
@@ -117,7 +117,7 @@ export class ProfileComponent implements OnInit {
 
         this.markProgress('Importing transactions')
 
-        let formData: FormData = this.getFormData($event);
+        const formData: FormData = this.getFormData($event);
 
         this.service.importTransactions(formData).subscribe(
             _ => {
@@ -131,7 +131,7 @@ export class ProfileComponent implements OnInit {
 
         this.markProgress('Importing crypto')
 
-        let formData: FormData = this.getFormData($event);
+        const formData: FormData = this.getFormData($event);
 
         this.service.importCrypto(formData).subscribe(
             _ => {
@@ -142,8 +142,8 @@ export class ProfileComponent implements OnInit {
     }
 
     private getFormData($event: any) {
-        var file = $event.target.files[0];
-        let formData: FormData = new FormData();
+        const file = $event.target.files[0];
+        const formData: FormData = new FormData();
         formData.append("file", file, file.name);
         return formData;
     }

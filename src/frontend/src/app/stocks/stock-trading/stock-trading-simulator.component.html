@@ -231,7 +231,7 @@
                                 <td class="value">
                                   {{ stopPrice | currency }}
                                   <small class="text-muted d-block">
-                                    ({{ (stopPrice - averageCostPerShare) / averageCostPerShare | percent:'1.0-2' }})
+                                    ({{ ((stopPrice ?? 0) - averageCostPerShare) / averageCostPerShare | percent:'1.0-2' }})
                                   </small>
                                 </td>
                               </tr>

@@ -48,7 +48,7 @@ export class OptionChainComponent implements OnInit {
     selectedSpread: string = null
 
     ngOnInit() {
-        var ticker = this.route.snapshot.paramMap.get('ticker');
+        const ticker = this.route.snapshot.paramMap.get('ticker');
         if (ticker) {
             this.ticker = ticker;
         }
@@ -98,12 +98,12 @@ export class OptionChainComponent implements OnInit {
         this.filteredOptionsWithBothSides = this.options.filter(opt => this.includeOption(opt, false), this);
         this.loading = false;
 
-        let expirationMap = new Map<string, OptionDefinition[]>();
+        const expirationMap = new Map<string, OptionDefinition[]>();
         this.filteredOptions.forEach(function (value, index, arr) {
             if (!expirationMap.has(value.expiration)) {
                 expirationMap.set(value.expiration, [value])
             } else {
-                var temp = expirationMap.get(value.expiration)
+                const temp = expirationMap.get(value.expiration)
                 temp.push(value)
             }
         })
@@ -197,17 +197,17 @@ export class OptionChainComponent implements OnInit {
     }
 
     setStrikePriceFilterNearMoney() {
-        let closestPriceFunc = function (target, prev, curr) {
+        const closestPriceFunc = function (target, prev, curr) {
             return (Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev);
         }
 
-        let strikePrices = this.options.map(x => x.strikePrice)
+        const strikePrices = this.options.map(x => x.strikePrice)
 
-        let minStrikePrice = Math.floor(this.stockPrice - this.stockPrice * 0.1)
+        const minStrikePrice = Math.floor(this.stockPrice - this.stockPrice * 0.1)
         let closestStrikePrice = strikePrices.reduce((prev, curr) => closestPriceFunc(minStrikePrice, prev, curr));
         this.minStrikePrice = closestStrikePrice
 
-        let maxStrikePrice = Math.ceil(this.stockPrice + this.stockPrice * 0.1)
+        const maxStrikePrice = Math.ceil(this.stockPrice + this.stockPrice * 0.1)
         closestStrikePrice = strikePrices.reduce((prev, curr) => closestPriceFunc(maxStrikePrice, prev, curr));
         this.maxStrikePrice = closestStrikePrice
 

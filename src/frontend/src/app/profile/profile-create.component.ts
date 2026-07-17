@@ -37,7 +37,7 @@ export class ProfileCreateComponent implements OnInit {
     private FULL_PLAN: string = 'FULL'
 
     ngOnInit() {
-        var plan = this.route.snapshot.paramMap.get("plan")
+        const plan = this.route.snapshot.paramMap.get("plan")
         if (plan) {
             if (plan == 'plus') this.planName = this.PLUS_PLAN
             if (plan == 'full') this.planName = this.FULL_PLAN
@@ -52,7 +52,7 @@ export class ProfileCreateComponent implements OnInit {
         this.errors = null
         this.disableButton = true
 
-        var obj = this.createUserData()
+        const obj = this.createUserData()
 
         this.stockService.validateAccount(obj).subscribe(r => {
             if (this.planName == this.PLUS_PLAN) {
@@ -69,7 +69,7 @@ export class ProfileCreateComponent implements OnInit {
     }
 
     createAccount(userData, paymentToken) {
-        var obj = {
+        const obj = {
             userInfo: userData,
             paymentInfo: paymentToken
         }
@@ -97,15 +97,15 @@ export class ProfileCreateComponent implements OnInit {
 
     pay(planId: string, planName: string) {
 
-        var capture = this;
+        const capture = this;
 
-        var handler = (<any>window).StripeCheckout.configure({
+        const handler = (<any>window).StripeCheckout.configure({
             key: 'pk_live_dls5NvmF6iwb4W19DlqsYvYR0006lBNU20',
             locale: 'auto',
             token: function (token: any) {
                 console.log(token)
 
-                var paymentData = {
+                const paymentData = {
                     token: token,
                     planId: planId
                 }

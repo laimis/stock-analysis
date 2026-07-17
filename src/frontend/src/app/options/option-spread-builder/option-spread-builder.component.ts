@@ -155,9 +155,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
         // to refresh, create a new leg array and load the options from the
         // option chain
         if (this.selectedLegs.length > 0) {
-            let newLegs = []
-            for (let leg of this.selectedLegs) {
-                let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expiration == leg.option.expiration)
+            const newLegs = []
+            for (const leg of this.selectedLegs) {
+                const option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expiration == leg.option.expiration)
                 if (option) {
                     newLegs.push({ option, action: leg.action, quantity: leg.quantity });
                 }
@@ -242,7 +242,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
             this.maxCostSpreadRatio = filters.maxCostSpreadRatio;
             if (filters.minExpirationDate) {
                 // see if you can find them in the unique expirations
-                let exists = this.uniqueExpirations.find(x => x === filters.minExpirationDate);
+                const exists = this.uniqueExpirations.find(x => x === filters.minExpirationDate);
                 if (exists) {
                     this.minExpirationDate = filters.minExpirationDate;
                 } else {
@@ -250,7 +250,7 @@ export class OptionSpreadBuilderComponent implements OnInit {
                 }
             }
             if (filters.maxExpirationDate) {
-                let exists = this.uniqueExpirations.find(x => x === filters.maxExpirationDate);
+                const exists = this.uniqueExpirations.find(x => x === filters.maxExpirationDate);
                 if (exists) {
                     this.maxExpirationDate = filters.maxExpirationDate;
                 } else {
@@ -443,9 +443,9 @@ export class OptionSpreadBuilderComponent implements OnInit {
         
         // now rebuild the legs by selecting the same strike price and option type
         // but with the new expiration date
-        let newLegs = []
-        for (let leg of this.selectedLegs) {
-            let option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expiration == this.uniqueExpirations[newIndex])
+        const newLegs = []
+        for (const leg of this.selectedLegs) {
+            const option = this.options.find(x => x.optionType == leg.option.optionType && x.strikePrice == leg.option.strikePrice && x.expiration == this.uniqueExpirations[newIndex])
             if (option) {
                 newLegs.push({ option, action: leg.action, quantity: leg.quantity });
             }
@@ -502,12 +502,12 @@ export class OptionSpreadBuilderComponent implements OnInit {
 
         console.log("findSpreads", spreadType)
         
-        let spreads: SpreadCandidate[] = [];
+        const spreads: SpreadCandidate[] = [];
         const isCall = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.CREDIT_CALL;
         const isDebit = spreadType === SpreadType.DEBIT_CALL || spreadType === SpreadType.DEBIT_PUT;
         
         // Filter options based on option type and other criteria
-        let filteredOptions = this.options.filter(x =>
+        const filteredOptions = this.options.filter(x =>
             x.optionType == (isCall ? "Call" : "Put")
             && x.openInterest > 0
             && x.volume > 0
@@ -525,8 +525,8 @@ export class OptionSpreadBuilderComponent implements OnInit {
         const processedPairs = new Set<string>();
         
         // Loop through options to find spreads
-        for (let firstOption of filteredOptions) {
-            for (let secondOption of filteredOptions) {
+        for (const firstOption of filteredOptions) {
+            for (const secondOption of filteredOptions) {
                 // Determine long and short legs based on strike and spread type
                 const longOption = longIsLowerStrike ? 
                     (firstOption.strikePrice < secondOption.strikePrice ? firstOption : secondOption) :
@@ -596,12 +596,12 @@ export class OptionSpreadBuilderComponent implements OnInit {
     // Utility method for sorting credit spreads
     sortCreditSpreads(spreads: SpreadCandidate[]): SpreadCandidate[] {
         return spreads.sort((a, b) => {
-            let aSpreadWidth = Math.abs(a.shortOption.strikePrice - a.longOption.strikePrice)
-            let bSpreadWidth = Math.abs(b.shortOption.strikePrice - b.longOption.strikePrice)
+            const aSpreadWidth = Math.abs(a.shortOption.strikePrice - a.longOption.strikePrice)
+            const bSpreadWidth = Math.abs(b.shortOption.strikePrice - b.longOption.strikePrice)
 
             // Return on Risk = credit / (spread width - credit)
-            let aReturnOnRisk = a.cost / (aSpreadWidth - a.cost)
-            let bReturnOnRisk = b.cost / (bSpreadWidth - b.cost)
+            const aReturnOnRisk = a.cost / (aSpreadWidth - a.cost)
+            const bReturnOnRisk = b.cost / (bSpreadWidth - b.cost)
 
             if (aReturnOnRisk === bReturnOnRisk) {
                 // If return on risk is equal, prefer the trade with higher credit
@@ -617,15 +617,15 @@ export class OptionSpreadBuilderComponent implements OnInit {
     sortDebitSpreads(spreads: SpreadCandidate[]): SpreadCandidate[] {
         return spreads.sort((a, b) => {
             // Maximum profit is the difference in strikes minus the cost
-            let aSpreadWidth = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice)
-            let bSpreadWidth = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice)
+            const aSpreadWidth = Math.abs(a.longOption.strikePrice - a.shortOption.strikePrice)
+            const bSpreadWidth = Math.abs(b.longOption.strikePrice - b.shortOption.strikePrice)
             
-            let aMaxProfit = aSpreadWidth - a.cost
-            let bMaxProfit = bSpreadWidth - b.cost
+            const aMaxProfit = aSpreadWidth - a.cost
+            const bMaxProfit = bSpreadWidth - b.cost
 
             // Return on Investment (ROI) = maxProfit / cost
-            let aROI = aMaxProfit / a.cost
-            let bROI = bMaxProfit / b.cost
+            const aROI = aMaxProfit / a.cost
+            const bROI = bMaxProfit / b.cost
 
             if (aROI === bROI) {
                 // If ROI is the same, prefer the spread with lower cost

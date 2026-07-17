@@ -186,7 +186,7 @@ export class StockTradingNewPositionComponent {
             console.log("not enough info to calculate")
             return
         }
-        let singleShareLoss = this.price - this.positionStopPrice
+        const singleShareLoss = this.price - this.positionStopPrice
         this.updateBuyingValues(singleShareLoss)
     }
 
@@ -202,8 +202,8 @@ export class StockTradingNewPositionComponent {
         }
         // right now we don't have a toggle for short or long, so we determine that
         // based on sizeStopPrice, if it's above price, then it's a short
-        let singleShareLoss = this.sizeStopPrice > this.price ? this.sizeStopPrice - this.price : this.price - this.sizeStopPrice
-        let numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
+        const singleShareLoss = this.sizeStopPrice > this.price ? this.sizeStopPrice - this.price : this.price - this.sizeStopPrice
+        const numberOfShares = Math.floor(this.maxLoss / singleShareLoss)
 
         this.numberOfShares = this.sizeStopPrice > this.price ? -numberOfShares : numberOfShares
 
@@ -215,7 +215,7 @@ export class StockTradingNewPositionComponent {
             console.log("positionStopChanged: not enough info to calculate the rest")
             return
         }
-        let singleShareLoss = this.price - this.positionStopPrice
+        const singleShareLoss = this.price - this.positionStopPrice
         this.updateBuyingValues(singleShareLoss)
     }
 
@@ -240,7 +240,7 @@ export class StockTradingNewPositionComponent {
 
     openPosition() {
         this.recordInProgress = true
-        let cmd = this.createOpenPositionCommand();
+        const cmd = this.createOpenPositionCommand();
 
         if (!this.recordPositions) {
             this.positionOpened.emit(cmd)
@@ -256,8 +256,8 @@ export class StockTradingNewPositionComponent {
                 this.reset()
             },
             err => {
-                let errors = GetErrors(err)
-                let errorMessages = errors.join(", ")
+                const errors = GetErrors(err)
+                const errorMessages = errors.join(", ")
                 alert('purchase failed: ' + errorMessages)
                 this.recordInProgress = false
             }
@@ -273,7 +273,7 @@ export class StockTradingNewPositionComponent {
     }
 
     createPendingPosition(useLimitOrder: boolean) {
-        let cmd = this.createPendingPositionCommand(useLimitOrder)
+        const cmd = this.createPendingPositionCommand(useLimitOrder)
 
         this.stockService.createPendingStockPosition(cmd).subscribe(
             _ => {
@@ -284,7 +284,7 @@ export class StockTradingNewPositionComponent {
                 this.reset()
             },
             errors => {
-                let errorMessages = GetErrors(errors).join(", ")
+                const errorMessages = GetErrors(errors).join(", ")
                 alert('pending position failed: ' + errorMessages)
             }
         )
@@ -300,7 +300,7 @@ export class StockTradingNewPositionComponent {
     lookupPendingPosition(ticker: string) {
         this.stockService.getPendingStockPositions().subscribe(
             positions => {
-                let position = positions.find(p => p.ticker === ticker)
+                const position = positions.find(p => p.ticker === ticker)
                 if (position) {
                     this.price = position.bid
                     this.numberOfShares = null
@@ -323,7 +323,8 @@ export class StockTradingNewPositionComponent {
         return this.price - this.prices.atr.data[this.prices.atr.data.length-1].value * this.atrMultiplier
     }
 
-    assignSizeStopPrice(value: number) {
+    assignSizeStopPrice(value: number | undefined) {
+        if (value === undefined) return
 
         // round to 2 decimal places
         value = Math.round(value * 100) / 100
@@ -337,7 +338,7 @@ export class StockTradingNewPositionComponent {
     }
 
     private createPendingPositionCommand(useLimitOrder: boolean) {
-        let cmd = new pendingstockpositioncommand();
+        const cmd = new pendingstockpositioncommand();
         cmd.ticker = this.ticker;
         cmd.numberOfShares = this.numberOfShares;
         cmd.price = this.price;

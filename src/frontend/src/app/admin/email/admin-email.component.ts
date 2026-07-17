@@ -20,7 +20,7 @@ export class AdminEmailComponent {
     body: string
 
     send() {
-        var obj = {
+        const obj = {
             to: this.to,
             from: this.from,
             fromName: this.fromName,

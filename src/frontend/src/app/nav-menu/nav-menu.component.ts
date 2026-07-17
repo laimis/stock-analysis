@@ -20,6 +20,10 @@ export class NavMenuComponent {
     isLoggedIn = false
     errors: string[] = []
 
+    get currentPath() {
+        return this.router.url;
+    }
+
     links = [
         {path: '/stocks/positions', label: 'Stocks'},
         {path: '/options', label: 'Options'},
@@ -31,7 +35,6 @@ export class NavMenuComponent {
         {path: '/routines', label: 'Routines'},
         {path: '/profile', label: 'Profile'}
     ];
-    currentPath: string = '';
     // doesn't collapse automatically
     navbarSupportedContentId = 'navbarSupportedContent';
 
@@ -49,15 +52,13 @@ export class NavMenuComponent {
 
         this.router.events.subscribe((val) => {
             if (val instanceof NavigationEnd) {
-                this.currentPath = val.url;
+                // trigger change detection so currentPath getter re-evaluates
             }
-        }, (error) => {
-            this.errors = GetErrors(error);
         })
     }
 
     collapseMenu() {
-        let element = document.getElementById(this.navbarSupportedContentId);
+        const element = document.getElementById(this.navbarSupportedContentId);
         if (element) {
             element.classList.remove('show');
         }

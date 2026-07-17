@@ -62,12 +62,12 @@ export class StockTradingSummaryComponent {
     }
 
     getStrategy(position: StockPosition): string {
-        let strategy = position.labels.find(l => l.key == 'strategy')
+        const strategy = position.labels.find(l => l.key == 'strategy')
         return strategy ? strategy.value : "none"
     }
 
     getUnrealizedProfit(position: StockPosition): number {
-        let quote = this.quotes[position.ticker]
+        const quote = this.quotes[position.ticker]
         return quote ? (quote.price - position.averageCostPerShare) * position.numberOfShares + position.profitWithoutDividendsAndFees : 0
     }
 
@@ -103,7 +103,7 @@ export class StockTradingSummaryComponent {
 
         if (!positions) return []
 
-        let strategyGroups: { [key: string]: StockPosition[] } = {}
+        const strategyGroups: { [key: string]: StockPosition[] } = {}
 
         // custom groups
         strategyGroups["allbutlongterm"] = positions.filter(p => !isLongTermStrategy(this.getStrategy(p)))
@@ -111,7 +111,7 @@ export class StockTradingSummaryComponent {
         strategyGroups["short"] = positions.filter((p: StockPosition) => p.isShort === true && !isLongTermStrategy(this.getStrategy(p)))
 
         positions.reduce((acc, cur) => {
-            let strategyKey = this.getStrategy(cur)
+            const strategyKey = this.getStrategy(cur)
 
             if (!acc[strategyKey]) {
                 acc[strategyKey] = []
@@ -122,12 +122,12 @@ export class StockTradingSummaryComponent {
             return acc
         }, strategyGroups)
 
-        let groupsArray = []
+        const groupsArray = []
 
         for (const key in strategyGroups) {
-            let groupPositions = strategyGroups[key]
+            const groupPositions = strategyGroups[key]
 
-            let group = {
+            const group = {
                 strategy: key,
                 positions,
                 cost: this.reduce(groupPositions, (p: StockPosition) => p.isShort === false ? p.averageCostPerShare * p.numberOfShares : 0),

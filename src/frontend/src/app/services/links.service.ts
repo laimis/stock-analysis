@@ -1,12 +1,12 @@
 import {StockList} from "./stocks.service"
 
 export function stockLists_getAnalysisLink(list: StockList) {
-    var paramList = list.tickers.map(t => t.ticker).join(',')
+    const paramList = list.tickers.map(t => t.ticker).join(',')
     return `/reports/outcomes?tickers=${paramList}&title=${list.name}`
 }
 
 export function stockLists_getExportLink(list: StockList, justTickers: boolean = true) {
-    var url = `/api/stocks/lists/${list.id}/export`
+    let url = `/api/stocks/lists/${list.id}/export`
 
     if (justTickers) {
         url += '?justTickers=true'

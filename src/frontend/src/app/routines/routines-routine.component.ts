@@ -57,12 +57,12 @@ export class RoutineComponent implements OnInit {
     }
 
     moveUp(routine: Routine, stepIndex: number) {
-        let direction = -1;
+        const direction = -1;
         this.moveStep(routine, stepIndex, direction);
     }
 
     moveDown(routine: Routine, stepIndex: number) {
-        let direction = 1;
+        const direction = 1;
         this.moveStep(routine, stepIndex, direction);
     }
 
@@ -110,7 +110,7 @@ export class RoutineComponent implements OnInit {
         )
     }
 
-    private fetchRoutines(id:String) {
+    private fetchRoutines(id:string) {
         this.service.getRoutines().subscribe(
             data => {
                 this.routine = data.filter(routine => routine.id === id)[0];

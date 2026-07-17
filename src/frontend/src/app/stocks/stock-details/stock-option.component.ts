@@ -60,7 +60,7 @@ export class StockOptionComponent implements OnInit {
     }
 
     record() {
-        var opt = {
+        const opt = {
             ticker: this.ticker,
             strikePrice: this.strikePrice,
             optionType: this.optionType,

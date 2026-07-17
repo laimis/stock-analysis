@@ -18,7 +18,7 @@ export class TradingPerformanceSummaryComponent {
     public performance!: StockTradingPerformance
 
     getPercentageOfGrade(grade: LabelWithFrequency): number {
-        let total = this.performance.gradeDistribution.map(g => g.frequency).reduce((a, b) => a + b, 0);
+        const total = this.performance.gradeDistribution.map(g => g.frequency).reduce((a, b) => a + b, 0);
         return grade.frequency / total;
     }
 }

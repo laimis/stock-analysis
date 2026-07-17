@@ -31,7 +31,7 @@ export class ProfileVerifyComponent implements OnInit {
 
         this.errors = null
 
-        var obj = {
+        const obj = {
             id: this.id,
             password: this.password
         }

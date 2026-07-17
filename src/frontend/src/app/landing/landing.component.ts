@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
 })
 export class LandingComponent {
 
-    success: Boolean = false
+    success: boolean = false
     errors: string[]
 
     constructor() {
