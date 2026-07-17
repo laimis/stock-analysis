@@ -15,15 +15,6 @@ function Assert-NoUncommittedChanges {
 # change directory to src/frontend
 Set-Location src/frontend
 
-# Pre-install typescript-eslint@^8.64.0 so that ng update's dependency check
-# doesn't fail due to a stale version (8.64+ supports typescript >=4.8.4 <6.1.0).
-npm install typescript-eslint@^8.64.0 --save-dev --legacy-peer-deps --silent
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Pre-install of typescript-eslint failed, exiting"
-    Set-Location $scriptPath
-    exit 1
-}
-
 # --- Angular updates ---
 
 $updates = ng update | Where-Object { $_ -match "ng update \S+" }
