@@ -557,8 +557,8 @@ export interface Sells {
     sells: Sell[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Sell {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 }
 
 export interface Chain {
