@@ -160,7 +160,8 @@ export class BrokerageNewOrderComponent {
         this.execute(cmd => this.brokerage.sellShort(cmd))
     }
 
-    execute(fn: (cmd: BrokerageOrderCommand) => Observable<string>) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execute(fn: (cmd: BrokerageOrderCommand) => Observable<any>) {
         this.errors = null
         
         if (this.notesControl.invalid) {

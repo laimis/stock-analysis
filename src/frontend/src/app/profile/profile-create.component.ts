@@ -97,7 +97,8 @@ export class ProfileCreateComponent implements OnInit {
 
     pay(planId: string, planName: string) {
 
-        const handler = (window as Window & { StripeCheckout: { configure: (opts: object) => { open: (opts: object) => void } } }).StripeCheckout.configure({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handler = (window as unknown as Window & { StripeCheckout: { configure: (opts: object) => { open: (opts: object) => void } } }).StripeCheckout.configure({
             key: 'pk_live_dls5NvmF6iwb4W19DlqsYvYR0006lBNU20',
             locale: 'auto',
             token: (token: object) => {

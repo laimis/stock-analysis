@@ -206,7 +206,7 @@ export class StockTradingPositionsComponent {
                 const comparison = aValue.localeCompare(bValue);
                 return this.sortDirection === 'asc' ? comparison : -comparison;
             } else {
-                const comparison = (aValue || 0) - (bValue || 0);
+                const comparison = ((aValue as number) || 0) - ((bValue as number) || 0);
                 return this.sortDirection === 'asc' ? comparison : -comparison;
             }
         });

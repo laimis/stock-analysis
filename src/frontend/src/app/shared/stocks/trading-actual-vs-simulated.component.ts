@@ -59,9 +59,9 @@ export class TradingActualVsSimulatedPositionComponent {
             const aSort = (aRecord.position[this.sortColumn] == null) ? aRecord[this.sortColumn] : aRecord.position[this.sortColumn];
             
             if (this.sortDirection == 'desc') {
-                return bSort - aSort;
+                return (bSort as number) - (aSort as number);
             } else {
-                return aSort - bSort;
+                return (aSort as number) - (bSort as number);
             }});
         
     }

@@ -363,11 +363,11 @@ export class OptionService {
     }
 
     buyOption(obj: object): Observable<object> {
-        return this.http.post<string>('/api/options/buy', obj)
+        return this.http.post<object>('/api/options/buy', obj)
     }
 
     sellOption(obj: object): Observable<object> {
-        return this.http.post<string>('/api/options/sell', obj)
+        return this.http.post<object>('/api/options/sell', obj)
     }
 
     closeOption(obj: object): Observable<object> {

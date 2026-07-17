@@ -67,7 +67,8 @@ export class OptionSellComponent implements OnInit {
     }
 
     recordBuy(opt: object) {
-        this.service.buyOption(opt).subscribe(r => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.service.buyOption(opt).subscribe((r: any) => {
             this.navigateToOption(r.id)
         }, err => {
             this.errors = GetErrors(err)
@@ -75,7 +76,8 @@ export class OptionSellComponent implements OnInit {
     }
 
     recordSell(opt: object) {
-        this.service.sellOption(opt).subscribe(r => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.service.sellOption(opt).subscribe((r: any) => {
             this.navigateToOption(r.id)
         }, err => {
             this.errors = GetErrors(err)

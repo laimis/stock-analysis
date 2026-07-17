@@ -29,7 +29,8 @@ function toChartJSPoint(p: DataPoint) {
     }
 }
 
-function toAnnotationDataPoints(annotationLine: ChartAnnotationLine, dataPoints: object[]) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toAnnotationDataPoints(annotationLine: ChartAnnotationLine, dataPoints: any[]) {
     // it can be either horizontal or vertical
     // if it is horizontal, it's x is the x of the data points and y is a constant value
 

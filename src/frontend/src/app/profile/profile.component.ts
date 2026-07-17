@@ -142,7 +142,7 @@ export class ProfileComponent implements OnInit {
     }
 
     private getFormData($event: Event) {
-        const file = $event.target.files[0];
+        const file = ($event.target as HTMLInputElement).files[0];
         const formData: FormData = new FormData();
         formData.append("file", file, file.name);
         return formData;

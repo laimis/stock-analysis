@@ -2,19 +2,21 @@ import {formatDistance, parse} from "date-fns";
 
 export function GetErrors(err: unknown): string[] {
     try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const e = err as any;
 
-        if (err.status && err.status === 401) {
+        if (e.status && e.status === 401) {
             return ["Unauthorized, please login to continue"]
         }
 
-        if (err.error === undefined) {
-            console.error("Failed to get errors: " + err)
-            return [err.message ?? "Unknown error"]
+        if (e.error === undefined) {
+            console.error("Failed to get errors: " + e)
+            return [e.message ?? "Unknown error"]
         }
 
-        let objToMap = err.error.errors
+        let objToMap = e.error.errors
         if (objToMap === undefined) {
-            objToMap = err.error
+            objToMap = e.error
         }
 
         if (typeof (objToMap) === 'string') {
