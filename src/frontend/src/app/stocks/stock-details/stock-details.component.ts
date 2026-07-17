@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     PendingStockPosition,
     PositionChartInformation,
@@ -64,6 +64,7 @@ import { OwnershipByTickerComponent } from '../../ownership/ownership-by-ticker.
     SecFilingsTableComponent,
     OwnershipByTickerComponent
 ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./stock-details.component.css']
 })
 export class StockDetailsComponent implements OnInit {

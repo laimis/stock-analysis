@@ -1,11 +1,12 @@
 import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Chain, StocksService} from 'src/app/services/stocks.service';
 
 @Component({
     selector: 'app-failuresuccesschain',
     templateUrl: './failuresuccesschain.component.html',
     styleUrls: ['./failuresuccesschain.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [NgClass, CurrencyPipe, DatePipe]
 })
 export class FailuresuccesschainComponent implements OnInit {

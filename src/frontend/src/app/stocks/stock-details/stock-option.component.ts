@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {OptionPosition, OptionService} from "../../services/option.service";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
@@ -14,6 +14,7 @@ import {GetErrors} from "../../services/utils";
         RouterLink,
         OptionSpreadBuilderComponent
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     providers: [DatePipe]
 })
 export class StockOptionComponent implements OnInit {

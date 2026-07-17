@@ -10,8 +10,8 @@
           <div class="modal-body">
             <div class="mb-3">
               <span>{{selectedOption?.brokerageContracts[0]?.ticker}}</span>,
-              {{ selectedOption?.cost | currency }} cost basis,
-              {{ selectedOption?.marketValue | currency }} market value
+              {{ $safeNavigationMigration(selectedOption?.cost) | currency }} cost basis,
+              {{ $safeNavigationMigration(selectedOption?.marketValue) | currency }} market value
             </div>
             <div class="mb-4">
               <h6 class="text-muted mb-3">Position Details</h6>

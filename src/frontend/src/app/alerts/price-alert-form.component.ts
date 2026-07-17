@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, SimpleChanges, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -9,6 +9,7 @@ import { StockSearchComponent } from '../stocks/stock-search/stock-search.compon
   selector: 'app-price-alert-form',
   templateUrl: './price-alert-form.component.html',
   styleUrls: ['./price-alert-form.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, FormsModule, StockSearchComponent, DecimalPipe]
 })
 export class PriceAlertFormComponent implements OnChanges, OnDestroy {

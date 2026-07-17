@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ChangeDetectionStrategy} from '@angular/core';
 import {BrokerageOptionContract, BrokerageOptionPosition} from "../../services/option.service";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {TradingViewLinkComponent} from "../../shared/stocks/trading-view-link.component";
@@ -20,6 +20,7 @@ import {
         DatePipe,
         OptionPositionCreateModalComponent
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./option-brokerage-positions.component.css']
 })
 export class OptionBrokeragePositionsComponent {

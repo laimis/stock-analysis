@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Observable} from 'rxjs';
 import {KeyValuePair, StockQuote, StocksService} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
@@ -19,6 +19,7 @@ import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angu
     selector: 'app-brokerage-new-order',
     templateUrl: './brokerage-new-order.component.html',
     styleUrls: ['./brokerage-new-order.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     FormsModule,
     StockSearchComponent,

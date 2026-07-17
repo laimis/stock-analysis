@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from '../services/utils';
@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
     templateUrl: './profile-passwordreset.component.html',
     styleUrls: ['./profile-passwordreset.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, FormsModule]
 })
 export class ProfilePasswordResetComponent implements OnInit {

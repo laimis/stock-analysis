@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors, toggleVisuallyHidden} from 'src/app/services/utils';
 import {OutcomesReport, StocksService, TickerCorrelation, TickerFundamentals, TickerOutcomes} from '../../services/stocks.service';
@@ -17,6 +17,7 @@ import { FundamentalsComponent } from "src/app/shared/reports/fundamentals/funda
     templateUrl: './outcomes-report.component.html',
     styleUrls: ['./outcomes-report.component.css'],
     imports: [FormsModule, ErrorDisplayComponent, OutcomesComponent, OutcomesAnalysisReportComponent, LoadingComponent, CorrelationsComponent, FundamentalsComponent],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class OutcomesReportComponent implements OnInit {

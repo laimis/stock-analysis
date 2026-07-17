@@ -22,7 +22,7 @@
             <div class="stock-metrics d-flex flex-wrap gap-4 align-items-center">
               <div class="metric price-metric">
                 <span class="text-muted">Price:</span>
-                <span class="fw-bold">{{ stock.quote?.price | currency }}</span>
+                <span class="fw-bold">{{ $safeNavigationMigration(stock.quote?.price) | currency }}</span>
               </div>
               <div class="metric">
                 <span class="text-muted">Market Cap:</span>
@@ -147,7 +147,7 @@
 <app-brokerage-orders
   [filteredTickers]="[stock.ticker]"
   [account]="account"
-  [positionId]="currentPosition?.positionId"
+  [positionId]="$safeNavigationMigration(currentPosition?.positionId)"
   (orderRecorded)="positionChanged()"
   >
 </app-brokerage-orders>
@@ -204,7 +204,7 @@
     @if (showReminderForm) {
       <app-reminder-form
         [editingReminder]="editingReminder"
-        [presetTicker]="stock?.ticker"
+        [presetTicker]="$safeNavigationMigration(stock?.ticker)"
         [showTickerField]="false"
         [loading]="loading.reminders"
         [errors]="errors.reminders || []"
@@ -217,7 +217,7 @@
       [reminders]="reminders"
       [loading]="loading.reminders"
       [showTickerColumn]="false"
-      [emptyMessage]="'No reminders found for ' + stock?.ticker + '. Create your first reminder to get started!'"
+      [emptyMessage]="'No reminders found for ' + $safeNavigationMigration(stock?.ticker) + '. Create your first reminder to get started!'"
       (edit)="editReminder($event)"
       (delete)="deleteReminder($event)">
     </app-reminder-list>
@@ -245,7 +245,7 @@
     @if (showPriceAlertForm) {
       <app-price-alert-form
         [editingAlert]="editingPriceAlert"
-        [presetTicker]="stock?.ticker"
+        [presetTicker]="$safeNavigationMigration(stock?.ticker)"
         [showTickerField]="false"
         [loading]="loading.priceAlerts"
         [errors]="errors.priceAlerts || []"
@@ -258,7 +258,7 @@
       [alerts]="priceAlerts"
       [loading]="loading.priceAlerts"
       [showTickerColumn]="false"
-      [emptyMessage]="'No price alerts found for ' + stock?.ticker + '. Create your first price alert to get started!'"
+      [emptyMessage]="'No price alerts found for ' + $safeNavigationMigration(stock?.ticker) + '. Create your first price alert to get started!'"
       (edit)="editPriceAlert($event)"
       (delete)="deletePriceAlert($event)"
       (resetAlert)="resetPriceAlert($event)">

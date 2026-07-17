@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -11,6 +11,7 @@ import { SecFilingsTableComponent } from '../shared/sec/sec-filings-table.compon
   selector: 'app-sec-filings',
   standalone: true,
   imports: [CommonModule, FormsModule, StockLinkAndTradingviewLinkComponent, SecFilingsTableComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './sec-filings.component.html'
 })
 export class SecFilingsComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {DailyOutcomeScoresComponent} from "../reports/daily-outcome-scores.component";
 import { DatePipe } from "@angular/common";
 import {ErrorDisplayComponent} from "../error-display/error-display.component";
@@ -24,6 +24,7 @@ interface DailyScoresInput {
     FormsModule
 ],
   templateUrl: './stock-daily-scores.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './stock-daily-scores.component.css'
 })
 export class StockDailyScoresComponent {

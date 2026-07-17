@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { DatePipe } from '@angular/common';
 import {Title} from '@angular/platform-browser';
@@ -17,6 +17,7 @@ import {BrokerageService} from "../../services/brokerage.service";
     ErrorDisplayComponent,
     OptionPositionComponent
 ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     providers: [DatePipe]
 })
 export class OwnedOptionComponent implements OnInit {

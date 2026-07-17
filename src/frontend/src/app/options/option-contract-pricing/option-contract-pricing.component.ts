@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import {convertToLocalTime, GetErrors} from "../../services/utils";
 import {forkJoin} from 'rxjs';
@@ -17,6 +17,7 @@ import { PriceChartComponent } from "../../shared/price-chart/price-chart.compon
     PriceChartComponent
 ],
   templateUrl: './option-contract-pricing.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './option-contract-pricing.component.css'
 })
 export class OptionContractPricingComponent {

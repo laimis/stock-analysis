@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Routine, StocksService} from '../services/stocks.service';
 import {GetErrors, toggleVisuallyHidden} from '../services/utils';
 import {ActivatedRoute, RouterLink} from '@angular/router';
@@ -10,6 +10,7 @@ import { RoutinesActiveRoutineComponent } from "./routines-active-routine.compon
     selector: 'app-routine',
     templateUrl: './routines-routine.component.html',
     styleUrls: ['./routines-routine.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, ErrorDisplayComponent, NgClass, RoutinesActiveRoutineComponent],
 })
 

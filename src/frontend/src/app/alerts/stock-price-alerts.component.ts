@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StocksService, StockPriceAlert } from '../services/stocks.service';
@@ -10,6 +10,7 @@ import { PriceAlertListComponent } from './price-alert-list.component';
   selector: 'app-stock-price-alerts',
   templateUrl: './stock-price-alerts.component.html',
   styleUrls: ['./stock-price-alerts.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, FormsModule, PriceAlertFormComponent, PriceAlertListComponent]
 })
 export class StockPriceAlertsComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Reminder } from '../services/stocks.service';
@@ -8,6 +8,7 @@ import { StockSearchComponent } from '../stocks/stock-search/stock-search.compon
   selector: 'app-reminder-form',
   templateUrl: './reminder-form.component.html',
   styleUrls: ['./reminder-form.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, FormsModule, StockSearchComponent]
 })
 export class ReminderFormComponent implements OnChanges {

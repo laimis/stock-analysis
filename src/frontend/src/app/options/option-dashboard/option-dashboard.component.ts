@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {OptionsContainer, OptionService} from "../../services/option.service";
@@ -27,6 +27,7 @@ import {OptionSpreadBuilderComponent} from "../option-spread-builder/option-spre
     OptionPerformanceComponent,
     OptionSpreadBuilderComponent
 ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./option-dashboard.component.css']
 })
 export class OptionsComponent implements OnInit {

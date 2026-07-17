@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CurrencyPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {OptionLeg, OptionService} from "../../../services/option.service";
@@ -19,6 +19,7 @@ import {ErrorDisplayComponent} from "../../../shared/error-display/error-display
     ErrorDisplayComponent
 ],
   templateUrl: './option-pendingposition-create-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './option-pendingposition-create-modal.component.css'
 })
 export class OptionPendingPositionCreateModalComponent {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
@@ -11,6 +11,7 @@ import { ErrorDisplayComponent } from "src/app/shared/error-display/error-displa
     templateUrl: './stock-lists-dashboard.component.html',
     styleUrls: ['./stock-lists-dashboard.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, FormsModule, RouterLink]
 })
 export class StockListsDashboardComponent implements OnInit {

@@ -94,7 +94,7 @@
                   <td>{{ trade.position.profit | currency }}</td>
                   <td>{{ result.position.profit - trade.position.profit | currency }}</td>
                   <td>{{ result.position.gainPct | percent }}</td>
-                  <td>{{ trade?.position?.gainPct | percent }}</td>
+                  <td>{{ $safeNavigationMigration(trade?.position?.gainPct) | percent }}</td>
                   <td>{{ result.position.gainPct - (trade?.position?.gainPct ?? 0) | percent }}</td>
                 </tr>
               }

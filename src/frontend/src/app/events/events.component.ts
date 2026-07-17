@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute} from '@angular/router';
 import {GetErrors} from "../services/utils";
@@ -8,6 +8,7 @@ import { ErrorDisplayComponent } from "../shared/error-display/error-display.com
     selector: 'app-events',
     templateUrl: './events.component.html',
     styleUrls: ['./events.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent]
 })
 export class EventsComponent implements OnInit {

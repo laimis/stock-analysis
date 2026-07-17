@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {StocksService} from 'src/app/services/stocks.service';
 
@@ -7,6 +7,7 @@ import {StocksService} from 'src/app/services/stocks.service';
     templateUrl: './admin-email.component.html',
     styleUrls: ['./admin-email.component.css'],
     imports: [FormsModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class AdminEmailComponent {

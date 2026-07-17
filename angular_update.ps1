@@ -36,22 +36,27 @@ if ($updates.Count -eq 0) {
     if ($answer -eq "y") {
         Assert-NoUncommittedChanges
 
-        $updates | ForEach-Object {
-            $command = [regex]::Match($_, "(ng update \S+)").Groups[1].Value
-            Write-Host "Applying update: $command"
-            Invoke-Expression $command
-
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "Update failed, exiting"
-                Set-Location $scriptPath
-                exit 1
-            }
-
-            $package = [regex]::Match($command, "ng update (.+)").Groups[1].Value
-            git add .
-            git commit -m "Angular updates: $package"
-            git push
+        # Collect all packages and run a single ng update command so peer
+        # dependencies across packages (e.g. angular-eslint <-> @angular/cli,
+        # typescript-eslint <-> typescript) are resolved together instead of
+        # failing one-by-one.
+        $packages = $updates | ForEach-Object {
+            [regex]::Match($_, "ng update (\S+)").Groups[1].Value
         }
+        $allPackages = $packages -join ' '
+        $command = "ng update $allPackages"
+        Write-Host "Applying update: $command"
+        Invoke-Expression $command
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Update failed, exiting"
+            Set-Location $scriptPath
+            exit 1
+        }
+
+        git add .
+        git commit -m "Angular updates: $allPackages"
+        git push
     }
 }
 

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {StockPosition, StockQuote} from "../../services/stocks.service";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {blue} from "../../services/charts.service";
@@ -755,6 +755,7 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<
     selector: 'app-stock-trading-charts',
     templateUrl: './stock-trading-charts.component.html',
     styleUrls: ['./stock-trading-charts.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CanvasJSAngularChartsModule,
         FormsModule

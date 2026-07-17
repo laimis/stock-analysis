@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {OptionDefinition, OptionService, OptionSpread} from 'src/app/services/option.service';
@@ -12,6 +12,7 @@ import { OptionSpreadsComponent } from "./option-spreads.component";
     templateUrl: './option-chain.component.html',
     styleUrls: ['./option-chain.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, StockLinkAndTradingviewLinkComponent, CurrencyPipe, PercentPipe, DecimalPipe, FormsModule, NgClass, OptionSpreadsComponent]
 })
 export class OptionChainComponent implements OnInit {

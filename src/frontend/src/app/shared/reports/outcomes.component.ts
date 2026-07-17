@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     AnalysisOutcomeEvaluation,
     OutcomeValueTypeEnum,
@@ -14,6 +14,7 @@ import {StockLinkComponent} from "../stocks/stock-link.component";
     templateUrl: './outcomes.component.html',
     styleUrls: ['./outcomes.component.css'],
     providers: [PercentPipe, CurrencyPipe, DecimalPipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     NgClass,
     TradingViewLinkComponent,

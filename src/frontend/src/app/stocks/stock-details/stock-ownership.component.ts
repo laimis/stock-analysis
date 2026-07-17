@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, ChangeDetectionStrategy} from '@angular/core';
 import {BrokerageAccount, PositionChartInformation, StockPosition, StockQuote} from '../../services/stocks.service';
 import {ParsedDatePipe} from "../../services/parsedDate.filter";
 import {CurrencyPipe} from "@angular/common";
@@ -14,6 +14,7 @@ import {StockTradingPositionComponent} from "../stock-trading/stock-trading-posi
         PriceChartComponent,
         StockTradingPositionComponent
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./stock-ownership.component.css']
 })
 export class StockOwnershipComponent {

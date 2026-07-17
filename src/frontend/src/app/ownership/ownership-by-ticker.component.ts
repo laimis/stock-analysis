@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -14,6 +14,7 @@ const getEventTypeDisplay = OwnershipService.getEventTypeDisplay;
   selector: 'app-ownership-by-ticker',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, TimeAgoPipe, LineChartComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './ownership-by-ticker.component.html'
 })
 export class OwnershipByTickerComponent implements OnInit {

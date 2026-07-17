@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
     BrokerageAccount,
     PendingStockPosition,
@@ -18,6 +18,7 @@ import {FormsModule} from "@angular/forms";
     selector: 'app-stock-trading-pendingpositions',
     templateUrl: './stock-trading-pendingpositions.component.html',
     styleUrls: ['./stock-trading-pendingpositions.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         ErrorDisplayComponent,
         LoadingComponent,

@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from 'src/app/services/stocks.service';
 
 @Component({
     selector: 'app-admin-weekly',
     templateUrl: './admin-weekly.component.html',
     styleUrls: ['./admin-weekly.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class AdminWeeklyComponent {

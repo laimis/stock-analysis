@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {TradingStrategyResult, TradingStrategyResults} from "../../services/stocks.service";
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
 import { ParsedDatePipe } from 'src/app/services/parsedDate.filter';
@@ -9,6 +9,7 @@ import { ParsedDatePipe } from 'src/app/services/parsedDate.filter';
     templateUrl: './trading-actual-vs-simulated.component.html',
     styleUrls: ['./trading-actual-vs-simulated.component.css'],
     imports: [CurrencyPipe, DecimalPipe, ParsedDatePipe, NgClass, PercentPipe, DecimalPipe],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class TradingActualVsSimulatedPositionComponent {

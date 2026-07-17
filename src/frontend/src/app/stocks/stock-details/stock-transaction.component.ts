@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {openpositioncommand, StockPosition, stocktransactioncommand} from '../../services/stocks.service';
 import {DatePipe} from '@angular/common';
 import {GetErrors} from 'src/app/services/utils';
@@ -12,6 +12,7 @@ import {FormsModule} from "@angular/forms";
     imports: [
         FormsModule
     ],
+    changeDetection: ChangeDetectionStrategy.Eager,
     providers: [DatePipe]
 })
 export class StockTransactionComponent implements OnInit {

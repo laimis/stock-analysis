@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {StockGaps, StocksService} from '../../services/stocks.service';
 import {GetErrors} from "../../services/utils";
@@ -9,6 +9,7 @@ import { GapsComponent } from "src/app/shared/reports/gaps.component";
     selector: 'app-gaps-report',
     templateUrl: './gaps-report.component.html',
     styleUrls: ['./gaps-report.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, GapsComponent]
 })
 export class GapsReportComponent implements OnInit {

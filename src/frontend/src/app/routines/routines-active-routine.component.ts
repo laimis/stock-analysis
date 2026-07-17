@@ -1,10 +1,11 @@
-import {Component, EventEmitter, HostListener, Input, Output} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, Output, ChangeDetectionStrategy} from '@angular/core';
 import {Routine, RoutineStep} from "../services/stocks.service";
 
 @Component({
     selector: 'app-routines-active-routine',
     templateUrl: './routines-active-routine.component.html',
     styleUrls: ['./routines-active-routine.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: true
 })
 export class RoutinesActiveRoutineComponent {

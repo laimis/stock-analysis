@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -15,6 +15,7 @@ const getEventTypeDisplay = OwnershipService.getEventTypeDisplay;
   selector: 'app-ownership-home',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, StockLinkAndTradingviewLinkComponent, TimeAgoPipe],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './ownership-home.component.html'
 })
 export class OwnershipHomeComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {stockLists_getAnalysisLink, stockLists_getExportLink} from 'src/app/services/links.service';
 import {Monitor, StockList, StockListTicker, StocksService} from 'src/app/services/stocks.service';
@@ -10,6 +10,7 @@ import { TradingViewLinkComponent } from "src/app/shared/stocks/trading-view-lin
     selector: 'app-stock-list',
     templateUrl: './stock-list.component.html',
     styleUrls: ['./stock-list.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent, TradingViewLinkComponent, RouterLink]
 })
 export class StockListComponent implements OnInit {

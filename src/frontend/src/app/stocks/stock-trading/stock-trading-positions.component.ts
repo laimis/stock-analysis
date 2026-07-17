@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { BrokerageAccount, StockPosition, StockQuote} from '../../services/stocks.service';
 import {CurrencyPipe, DecimalPipe, NgClass, PercentPipe} from "@angular/common";
 import {toggleVisuallyHidden} from "../../services/utils";
@@ -12,6 +12,7 @@ import { ParsedDatePipe } from '../../services/parsedDate.filter';
     selector: 'app-stock-trading-positions',
     templateUrl: './stock-trading-positions.component.html',
     styleUrls: ['./stock-trading-positions.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [StockTradingPositionComponent, CurrencyPipe, PercentPipe, StockLinkAndTradingviewLinkComponent, NgClass, TimeAgoPipe, ParsedDatePipe, DecimalPipe]
 })
 export class StockTradingPositionsComponent {

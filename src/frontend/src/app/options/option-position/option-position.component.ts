@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {BrokerageOptionOrder, OptionContract, OptionPosition, OptionService} from "../../services/option.service";
 import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -35,6 +35,7 @@ import { ParsedDatePipe } from "../../services/parsedDate.filter";
     ParsedDatePipe
 ],
   templateUrl: './option-position.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './option-position.component.css'
 })
 export class OptionPositionComponent {

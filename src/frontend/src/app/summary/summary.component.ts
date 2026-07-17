@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {StockPosition, StocksService, WeeklyReport} from '../services/stocks.service';
 import {GetErrors} from "../services/utils";
@@ -14,6 +14,7 @@ import { StockTradingPositionComponent } from "../stocks/stock-trading/stock-tra
     selector: 'app-review',
     templateUrl: './summary.component.html',
     styleUrls: ['./summary.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     DatePipe, CurrencyPipe, LoadingComponent, ErrorDisplayComponent, DecimalPipe, FormsModule, NgClass, TradingViewLinkComponent, StockLinkComponent, PercentPipe,
     StockTradingPositionComponent

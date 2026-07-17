@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {
     AccountStatus,
     BrokerageAccount,
@@ -23,6 +23,7 @@ interface PositionGroup {
     selector: 'app-stock-trading-summary',
     templateUrl: './stock-trading-summary.component.html',
     styleUrls: ['./stock-trading-summary.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [CurrencyPipe, PercentPipe, CanvasJSAngularChartsModule]
 })
 export class StockTradingSummaryComponent {

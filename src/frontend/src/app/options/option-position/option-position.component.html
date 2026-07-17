@@ -250,8 +250,8 @@
                               }
                             }
                           </td>
-                          <td>{{ contract.details?.delta | number }}</td>
-                          <td>{{ contract.details?.volatility | number}}</td>
+                          <td>{{ $safeNavigationMigration(contract.details?.delta) | number }}</td>
+                          <td>{{ $safeNavigationMigration(contract.details?.volatility) | number}}</td>
                           <td>
                             @if (position.isOpen) {
                               <button class="btn btn-outline-secondary btn-sm" (click)="closeContract(contract)">

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, inject } from '@angular/core';
+import { Component, OnInit, Input, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CurrencyPipe, DecimalPipe, NgClass, PercentPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
@@ -40,6 +40,7 @@ enum SpreadType {
     OptionPendingPositionCreateModalComponent
 ],
     templateUrl: './option-spread-builder.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './option-spread-builder.component.css'
 })
 export class OptionSpreadBuilderComponent implements OnInit {

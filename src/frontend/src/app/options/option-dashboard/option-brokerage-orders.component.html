@@ -128,8 +128,8 @@
                                         }">{{ contract.instruction }}</span>
                   </td>
                   <td class="text-end pe-4">{{ contract.market | currency }}</td>
-                  <td>{{ contract.details?.delta | number }}</td>
-                  <td>{{ contract.details?.volatility | number}}</td>
+                  <td>{{ $safeNavigationMigration(contract.details?.delta) | number }}</td>
+                  <td>{{ $safeNavigationMigration(contract.details?.volatility) | number}}</td>
                 </tr>
               }
               @if (order.isActive) {

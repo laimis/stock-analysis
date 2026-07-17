@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Reminder } from '../services/stocks.service';
 import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-link-and-tradingview-link.component';
@@ -7,6 +7,7 @@ import { StockLinkAndTradingviewLinkComponent } from '../shared/stocks/stock-lin
   selector: 'app-reminder-list',
   templateUrl: './reminder-list.component.html',
   styleUrls: ['./reminder-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, DatePipe, StockLinkAndTradingviewLinkComponent]
 })
 export class ReminderListComponent {

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { NavMenuComponent } from "./nav-menu/nav-menu.component";
 import { VERSION_INFO } from './version.generated';
@@ -7,6 +7,7 @@ import { VERSION_INFO } from './version.generated';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, RouterOutlet, NavMenuComponent]
 })
 export class AppComponent {

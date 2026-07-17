@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StockPosition, StocksService} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
@@ -19,6 +19,7 @@ class StockTransaction {
     selector: 'app-stock-trading-simulation',
     templateUrl: './stock-trading-simulator.component.html',
     styleUrls: ['./stock-trading-simulator.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [CurrencyPipe, DecimalPipe, DatePipe, PercentPipe, FormsModule, ErrorDisplayComponent, LoadingComponent, StockSearchComponent]
 })
 

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {BrokerageAccount, BrokerageStockOrder, stocktransactioncommand} from 'src/app/services/stocks.service';
 import {GetErrors} from '../services/utils';
 import {BrokerageService} from "../services/brokerage.service";
@@ -12,6 +12,7 @@ import {formatDistance} from "date-fns";
 @Component({
     selector: 'app-brokerage-orders',
     templateUrl: './brokerage-orders.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
     NgClass,
     StockLinkAndTradingviewLinkComponent,

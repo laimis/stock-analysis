@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {StocksService} from '../services/stocks.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from '../services/utils';
@@ -9,6 +9,7 @@ import { ErrorDisplayComponent } from "../shared/error-display/error-display.com
     templateUrl: './profile-verify.component.html',
     styleUrls: ['./profile-verify.component.css'],
     standalone: true,
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [ErrorDisplayComponent],
     
 })

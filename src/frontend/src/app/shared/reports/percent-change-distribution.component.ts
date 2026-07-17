@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {ChartType, DataPointContainer, StockPercentChangeResponse} from '../../services/stocks.service';
 import {LineChartComponent} from "../line-chart/line-chart.component";
 
@@ -6,6 +6,7 @@ import {LineChartComponent} from "../line-chart/line-chart.component";
     selector: 'app-percent-change-distribution',
     templateUrl: './percent-change-distribution.component.html',
     styleUrls: ['./percent-change-distribution.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         LineChartComponent
     ]

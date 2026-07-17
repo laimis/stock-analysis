@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
 import {BrokerageOptionOrder, OptionPosition} from "../../services/option.service";
 import {CurrencyPipe, PercentPipe} from "@angular/common";
 import {ReactiveFormsModule} from "@angular/forms";
@@ -8,6 +8,7 @@ import {OptionPositionComponent} from "../option-position/option-position.compon
     selector: 'app-option-closed',
     templateUrl: './option-closed.component.html',
     styleUrls: ['./option-closed.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         CurrencyPipe,
         PercentPipe,

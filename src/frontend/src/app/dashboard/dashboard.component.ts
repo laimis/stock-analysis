@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {Router, RouterLink} from '@angular/router';
 import {PortfolioHoldings, Reminder, StocksService} from '../services/stocks.service';
@@ -13,6 +13,7 @@ import { GetErrors } from '../services/utils';
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [RouterLink, AlertsComponent, TimeAgoPipe, StockLinkAndTradingviewLinkComponent, ErrorDisplayComponent],
 })
 export class DashboardComponent implements OnInit {

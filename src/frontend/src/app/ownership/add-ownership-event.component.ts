@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -13,6 +13,7 @@ const getEntityTypeDisplay = OwnershipService.getEntityTypeDisplay;
   selector: 'app-add-ownership-event',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './add-ownership-event.component.html'
 })
 export class AddOwnershipEventComponent implements OnInit {

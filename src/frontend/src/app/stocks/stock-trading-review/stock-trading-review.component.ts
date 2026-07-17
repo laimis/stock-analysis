@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {
     PositionChartInformation,
@@ -27,6 +27,7 @@ import { StockDailyScoresComponent } from "src/app/shared/stock-daily-scores/sto
     selector: 'app-stock-trading-review',
     templateUrl: './stock-trading-review.component.html',
     styleUrls: ['./stock-trading-review.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [
         StockLinkComponent,
         CurrencyPipe,
