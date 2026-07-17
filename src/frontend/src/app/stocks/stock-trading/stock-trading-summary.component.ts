@@ -42,7 +42,7 @@ export class StockTradingSummaryComponent {
     brokerageAccount: BrokerageAccount | null = null;
     @Input()
     userState: AccountStatus | null = null;
-    chartOptionsArray: any[] = [];
+    chartOptionsArray: {title: {text: string}, data: {type: string, dataPoints: {y: number}[], markerSize: number}[], axisY: {gridThickness: number, gridColor: string}}[] = [];
 
     @Input()
     set positions(value: StockPosition[]) {

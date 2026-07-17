@@ -391,10 +391,10 @@ export class OptionService {
 
         // find spreads
         const spreads = new Array<OptionSpread>()
-        expirationMap.forEach(function (value, key, map) {
+        expirationMap.forEach(function (value) {
             const puts = value.filter(x => x.optionType == "put")
 
-            puts.forEach(function (buyOption, index, arr) {
+            puts.forEach(function (buyOption, index) {
                 // we will buy the lower put, and sell the put at the index, if available.
                 if (index + 1 < puts.length) {
                     const sellOption = puts[index + 1]
@@ -423,10 +423,10 @@ export class OptionService {
 
         // find spreads
         const spreads = new Array<OptionSpread>()
-        expirationMap.forEach(function (value, key, map) {
+        expirationMap.forEach(function (value) {
             const puts = value.filter(x => x.optionType == "put")
 
-            puts.forEach(function (sellOption, index, arr) {
+            puts.forEach(function (sellOption, index) {
                 // we will sell the put at the index, and buy the next put, if available.
                 if (index + 1 < puts.length) {
                     const buyOption = puts[index + 1]
@@ -456,12 +456,12 @@ export class OptionService {
 
         // find straddles
         const straddles = new Array<OptionSpread>()
-        expirationMap.forEach(function (value, key, map) {
+        expirationMap.forEach(function (value) {
             const calls = value.filter(x => x.optionType == "call")
             const puts = value.filter(x => x.optionType == "put")
 
-            calls.forEach(function (call, index, arr) {
-                puts.forEach(function (put, index, arr) {
+            calls.forEach(function (call) {
+                puts.forEach(function (put) {
                     if (call.strikePrice == put.strikePrice) {
 
                         const premiumPaid = call.ask + put.ask
@@ -488,7 +488,7 @@ export class OptionService {
 
         // find spreads
         const spreads = new Array<OptionSpread>()
-        expirationMap.forEach(function (value, key, map) {
+        expirationMap.forEach(function (value) {
             const calls = value.filter(x => x.optionType == "call")
 
             calls.forEach(function (buyOption, index, arr) {
@@ -521,10 +521,10 @@ export class OptionService {
 
         // find spreads
         const spreads = new Array<OptionSpread>()
-        expirationMap.forEach(function (value, key, map) {
+        expirationMap.forEach(function (value) {
             const calls = value.filter(x => x.optionType == "call")
 
-            calls.forEach(function (sellOption, index, arr) {
+            calls.forEach(function (sellOption, index) {
                 // we will sell the call at the index, and buy the next call, if available.
                 if (index + 1 < calls.length) {
                     const buyOption = calls[index + 1]

@@ -5,7 +5,7 @@ import {GetErrors} from "../services/utils";
 import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
 import { LoadingComponent } from "../shared/loading/loading.component";
 import { ErrorDisplayComponent } from "../shared/error-display/error-display.component";
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { TradingViewLinkComponent } from "../shared/stocks/trading-view-link.component";
 import { StockLinkComponent } from "../shared/stocks/stock-link.component";
 import { StockTradingPositionComponent } from "../stocks/stock-trading/stock-trading-position.component";

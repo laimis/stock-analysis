@@ -249,19 +249,21 @@ export class StockTradingNewPositionComponent {
         }
 
         this.stockPositionsService.openPosition(cmd).subscribe(
-            _ => {
-                this.positionOpened.emit(cmd)
-                this.recordInProgress = false
-                this.positionEntered = true
-                this.reset()
-            },
-            err => {
-                const errors = GetErrors(err)
-                const errorMessages = errors.join(", ")
-                alert('purchase failed: ' + errorMessages)
-                this.recordInProgress = false
+            {
+                next: () => {
+                    this.positionOpened.emit(cmd)
+                    this.recordInProgress = false
+                    this.positionEntered = true
+                    this.reset()
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    const errorMessages = errors.join(", ")
+                    alert('purchase failed: ' + errorMessages)
+                    this.recordInProgress = false
+                }
             }
-        )
+        );
     }
 
     createPendingPositionLimit() {

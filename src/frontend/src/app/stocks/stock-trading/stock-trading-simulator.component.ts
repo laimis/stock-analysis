@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {openpositioncommand, StockPosition, StocksService} from '../../services/stocks.service';
+import {StockPosition, StocksService} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
 import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
@@ -211,7 +211,6 @@ export class StockTradingSimulatorComponent implements OnInit {
     loadPosition(p: StockPosition) {
 
         this.reset()
-        const first = true;
         this.riskedAmount = p.riskedAmount
         this.ticker = p.ticker
         this.stopPrice = p.stopPrice

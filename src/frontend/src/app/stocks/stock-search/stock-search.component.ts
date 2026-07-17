@@ -71,8 +71,6 @@ export class StockSearchComponent implements OnInit {
         this.searchTerms.next('')
         this.loading = false
         this.errors = []
-        if (!this.selectedValue) {
-        }
     }
 
     clicked(ticker: string) {

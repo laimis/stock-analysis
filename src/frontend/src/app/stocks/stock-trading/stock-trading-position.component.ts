@@ -326,13 +326,10 @@ export class StockTradingPositionComponent {
     deleteTransaction(transactionId: string) {
         if (confirm("are you sure you want to delete the transaction?")) {
             this.stockService.deleteTransaction(this._position.positionId, transactionId)
-                .subscribe(
-                    _ => {
-                        // refresh UI somehow here, tbd
-                    }, (err) => {
+                .subscribe({error: (err) => {
                         const errors = GetErrors(err);
                         alert("Error deleting transaction: " + errors.join(", "))
-                    })
+                    }})
         }
     }
 
@@ -341,15 +338,13 @@ export class StockTradingPositionComponent {
             return false
         }
 
-        this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe(
-            _ => {
-                this.positionStrategy = null
-            },
-            (err) => {
+        this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe({
+            next: () => this.positionStrategy = null,
+            error: (err) => {
                 const errors = GetErrors(err)
                 alert("Error clearing strategy: " + errors.join(", "))
             }
-        )
+        })
 
         return false
     }
@@ -366,12 +361,14 @@ export class StockTradingPositionComponent {
         }
 
         this.stockService.setLabel(this._position.positionId, label).subscribe(
-            _ => {
-                this.positionStrategy = strategy
-            },
-            (err) => {
-                const errors = GetErrors(err)
-                alert("Error setting strategy: " + errors.join(", "))
+            {
+                next: () => {
+                    this.positionStrategy = strategy
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    alert("Error setting strategy: " + errors.join(", "))
+                }
             }
         )
     }
@@ -381,14 +378,15 @@ export class StockTradingPositionComponent {
     newLabelValue: string = '';
     removeLabel(pair:KeyValuePair) {
         this.stockService.deleteLabel(this._position.positionId, pair.key).subscribe(
-            _ => {
-                this._position.labels = this._position.labels.filter(l => l.key != pair.key)
-            },
-            (err) => {
-                const errors = GetErrors(err)
-                alert("Error removing label: " + errors.join(", "))
-            }
-        )
+            {
+                next: () => {
+                    this._position.labels = this._position.labels.filter(l => l.key != pair.key)
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    alert("Error removing label: " + errors.join(", "))
+                }
+            })
     }
     addLabel() {
         if (this.newLabelKey === '' || this.newLabelValue === '') {
@@ -402,15 +400,17 @@ export class StockTradingPositionComponent {
         }
 
         this.stockService.setLabel(this._position.positionId, label).subscribe(
-            _ => {
-                this._position.labels.push(label)
-                this.newLabelKey = ''
-                this.newLabelValue = ''
-                this.showAddLabelForm = false
-            },
-            (err) => {
-                const errors = GetErrors(err)
-                alert("Error adding label: " + errors.join(", "))
+            {
+                next: () => {
+                    this._position.labels.push(label)
+                    this.newLabelKey = ''
+                    this.newLabelValue = ''
+                    this.showAddLabelForm = false
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    alert("Error adding label: " + errors.join(", "))
+                }
             }
         )
     }

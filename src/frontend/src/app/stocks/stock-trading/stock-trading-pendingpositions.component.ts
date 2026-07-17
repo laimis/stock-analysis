@@ -1,7 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import {
     BrokerageAccount,
-    BrokerageStockOrder,
     PendingStockPosition,
     StocksService
 } from 'src/app/services/stocks.service';
@@ -11,7 +10,7 @@ import {BrokerageService} from "../../services/brokerage.service";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {StockLinkAndTradingviewLinkComponent} from "../../shared/stocks/stock-link-and-tradingview-link.component";
-import {CurrencyPipe, DatePipe, PercentPipe} from "@angular/common";
+import {CurrencyPipe, DatePipe} from "@angular/common";
 import {BrokerageOrdersComponent} from "../../brokerage/brokerage-orders.component";
 import {FormsModule} from "@angular/forms";
 
