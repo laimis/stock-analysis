@@ -13,6 +13,7 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      "@angular-eslint/prefer-on-push-component-change-detection": "off",
       "@typescript-eslint/no-unused-vars": ["error", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_",
