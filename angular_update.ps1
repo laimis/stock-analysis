@@ -36,6 +36,16 @@ if ($updates.Count -eq 0) {
     if ($answer -eq "y") {
         Assert-NoUncommittedChanges
 
+        # Pre-install typescript-eslint@^8.64.0 so ng update sees a version
+        # that supports TypeScript 6.x before evaluating peer dependencies.
+        Write-Host "Pre-installing compatible typescript-eslint..."
+        npm install typescript-eslint@^8.64.0 --save-dev --legacy-peer-deps
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Pre-install of typescript-eslint failed, exiting"
+            Set-Location $scriptPath
+            exit 1
+        }
+
         # Collect all packages and run a single ng update command so peer
         # dependencies across packages (e.g. angular-eslint <-> @angular/cli,
         # typescript-eslint <-> typescript) are resolved together instead of
