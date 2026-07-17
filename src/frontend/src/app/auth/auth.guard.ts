@@ -1,7 +1,8 @@
-import {ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
+import {ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import { Injectable, inject } from '@angular/core';
-import {AccountStatus, StocksService} from '../services/stocks.service';
+import {StocksService} from '../services/stocks.service';
 import {GlobalService} from '../services/global.service';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class WithLoginStatus {
@@ -11,7 +12,7 @@ export class WithLoginStatus {
 
     async canActivate(): Promise<boolean> {
         //get user data
-        const result = await this.stocks.getProfile().toPromise();
+        const result = await firstValueFrom(this.stocks.getProfile());
         this.globalService.markLoggedIn(result)
         return true;
     }
@@ -24,19 +25,20 @@ export class AuthGuard {
     private router = inject(Router);
 
 
-    async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-        //get user data
-        const result = await this.stocks.getProfile().toPromise();
-        if (!result.loggedIn) {
-            this.router.navigate(['/profile/login'], {queryParams: {returnUrl: state.url}})
-            return false;
+    async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean | UrlTree> {
+        try {
+            const result = await firstValueFrom(this.stocks.getProfile());
+            if (!result.loggedIn) {
+                return this.router.createUrlTree(['/profile/login'], {queryParams: {returnUrl: state.url}});
+            }
+            if (!result.verified) {
+                return this.router.createUrlTree(['/profile/verify']);
+            }
+            this.globalService.markLoggedIn(result)
+            return true;
+        } catch {
+            return this.router.createUrlTree(['/profile/login'], {queryParams: {returnUrl: state.url}});
         }
-        if (!result.verified) {
-            this.router.navigate(['/profile/verify'])
-            return false;
-        }
-        this.globalService.markLoggedIn(result)
-        return true;
     }
 }
 
@@ -47,15 +49,17 @@ export class AuthGuardUnverifiedAllowed {
     private router = inject(Router);
 
 
-    async canActivate(): Promise<boolean> {
-        //get user data
-        const result = await this.stocks.getProfile().toPromise();
-        if (!result.loggedIn) {
-            this.router.navigate(['/landing'])
-            return false;
+    async canActivate(): Promise<boolean | UrlTree> {
+        try {
+            const result = await firstValueFrom(this.stocks.getProfile());
+            if (!result.loggedIn) {
+                return this.router.createUrlTree(['/landing']);
+            }
+            this.globalService.markLoggedIn(result)
+            return true;
+        } catch {
+            return this.router.createUrlTree(['/landing']);
         }
-        this.globalService.markLoggedIn(result)
-        return true;
     }
 }
 
@@ -66,14 +70,16 @@ export class AuthGuardAdminOnly {
     private router = inject(Router);
 
 
-    async canActivate(): Promise<boolean> {
-        //get user data
-        const result = await this.stocks.getProfile().toPromise();
-        if (!result.isAdmin) {
-            this.router.navigate(['/unauthorized'])
-            return false;
+    async canActivate(): Promise<boolean | UrlTree> {
+        try {
+            const result = await firstValueFrom(this.stocks.getProfile());
+            if (!result.isAdmin) {
+                return this.router.createUrlTree(['/unauthorized']);
+            }
+            this.globalService.markLoggedIn(result)
+            return true;
+        } catch {
+            return this.router.createUrlTree(['/unauthorized']);
         }
-        this.globalService.markLoggedIn(result)
-        return true;
     }
 }

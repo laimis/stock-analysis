@@ -8,7 +8,7 @@ const lightgray = '#d0d0d0';
 const scatterPointMarkerSize = 10;
 
 function getVal(item: TickerFundamentals, key: string): number {
-    const v = (item.fundamentals as any)[key];
+    const v = (item.fundamentals as Record<string, unknown>)[key];
     return v != null && v !== '' ? +v : NaN;
 }
 
@@ -125,7 +125,7 @@ function createWeek52RangeChart(data: TickerFundamentals[], quotes: Record<strin
             })
         : [];
 
-    const series: any[] = [{
+    const series: object[] = [{
         type: 'rangeBar',
         color: lightgray,
         dataPoints: rangePoints
@@ -199,7 +199,7 @@ function createMarginProfileChart(data: TickerFundamentals[]) {
   styleUrl: './fundamentals.component.css'
 })
 export class FundamentalsComponent {
-    chartOptions: any[] = [];
+    chartOptions: object[] = [];
     private _data: TickerFundamentals[] = [];
     private _quotes: Record<string, StockQuote> = {};
 

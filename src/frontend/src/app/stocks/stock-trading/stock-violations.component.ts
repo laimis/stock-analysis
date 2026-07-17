@@ -4,7 +4,7 @@ import {
     StockViolation
 } from "../../services/stocks.service";
 import {showElement, toggleVisuallyHidden} from "../../services/utils";
-import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { StockLinkAndTradingviewLinkComponent } from "src/app/shared/stocks/stock-link-and-tradingview-link.component";
 import { StockTradingNewPositionComponent } from "./stock-trading-new-position.component";
 import { BrokerageOrdersComponent } from "src/app/brokerage/brokerage-orders.component";

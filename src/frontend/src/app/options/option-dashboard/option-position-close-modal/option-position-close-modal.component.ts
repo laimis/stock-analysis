@@ -72,13 +72,13 @@ export class OptionPositionCloseModalComponent implements OnChanges {
 
     createClosePositionOrder(position: OptionPosition) {
         // this will need to be completely rewritten
-        let price = this.price
-        let orderType = price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
-        let session = "NORMAL"
-        let duration = "GOOD_TILL_CANCEL"
-        let orderStrategyType = "SINGLE"
+        const price = this.price
+        const orderType = price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
+        const session = "NORMAL"
+        const duration = "GOOD_TILL_CANCEL"
+        const orderStrategyType = "SINGLE"
 
-        let collections = position.contracts.map(x => {
+        const collections = position.contracts.map(x => {
             return {
                 instruction: x.quantity < 0 ? OptionOrderInstruction.BUY_TO_CLOSE : OptionOrderInstruction.SELL_TO_CLOSE,
                 quantity: Math.abs(this.quantity),
@@ -89,7 +89,7 @@ export class OptionPositionCloseModalComponent implements OnChanges {
             };
         });
 
-        let order: OptionOrderCommand = {
+        const order: OptionOrderCommand = {
             orderType,
             session,
             price,

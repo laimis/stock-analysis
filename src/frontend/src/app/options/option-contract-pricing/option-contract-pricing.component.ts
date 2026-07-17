@@ -42,27 +42,27 @@ export class OptionContractPricingComponent {
     }
     
     @Input() set contracts (contracts : OptionContract[]) {
-        let dateWithoutMilliseconds = (date: Date) => {
+        const dateWithoutMilliseconds = (date: Date) => {
             return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds())
         }
 
-        let dateStr = (date: Date) => {
+        const dateStr = (date: Date) => {
             return date.toISOString()
         }
         
         this.loading = true;
-        let observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.brokerageSymbol))
+        const observables = contracts.map((contract) => this.optionService.getOptionPricing(contract.brokerageSymbol))
 
         forkJoin(observables).subscribe({
             next: (pricingResults) => {
 
-                let cost : number[] = []
+                const cost : number[] = []
                 let minPrice = Number.MAX_VALUE
                 let maxPrice = -Number.MAX_VALUE
                 for (let pricingIndex = 0; pricingIndex < pricingResults[0].length; pricingIndex++) {
                     let total = 0
                     for (let contractIndex = 0; contractIndex < pricingResults.length; contractIndex++) {
-                        let multiplier = contracts[contractIndex].isShort ? -1 : 1
+                        const multiplier = contracts[contractIndex].isShort ? -1 : 1
                         total += pricingResults[contractIndex][pricingIndex].mark * multiplier
                     }
                     // always use absolute value for total as we might be doing credit spreads
@@ -76,10 +76,10 @@ export class OptionContractPricingComponent {
                     cost.push(total)
                 }
 
-                let underlyingPrice = pricingResults[0].map((op) => op.underlyingPrice)
+                const underlyingPrice = pricingResults[0].map((op) => op.underlyingPrice)
 
-                let costData = cost.map((c, idx) => {
-                    let date = convertToLocalTime(
+                const costData = cost.map((c, idx) => {
+                    const date = convertToLocalTime(
                         dateWithoutMilliseconds(
                             new Date(pricingResults[0][idx].timestamp)
                         )
@@ -87,8 +87,8 @@ export class OptionContractPricingComponent {
                     return {label: dateStr(date), value: c, isDate: false}
                 })
 
-                let underlyingData = underlyingPrice.map((c, idx) => {
-                    let date = convertToLocalTime(
+                const underlyingData = underlyingPrice.map((c, idx) => {
+                    const date = convertToLocalTime(
                         dateWithoutMilliseconds(
                             new Date(pricingResults[0][idx].timestamp)
                         )
@@ -97,23 +97,23 @@ export class OptionContractPricingComponent {
                 })
 
                 this.chartInfos.push(this.createChartInfo('Cost', costData))
-                let underlyingPriceChartInfo = this.createChartInfo('Underlying Price', underlyingData)
-                let longStrikePrices = contracts.filter((contract) => !contract.isShort).map((contract) => contract.strikePrice)
-                let shortStrikePrices = contracts.filter((contract) => contract.isShort).map((contract) => contract.strikePrice)
+                const underlyingPriceChartInfo = this.createChartInfo('Underlying Price', underlyingData)
+                const longStrikePrices = contracts.filter((contract) => !contract.isShort).map((contract) => contract.strikePrice)
+                const shortStrikePrices = contracts.filter((contract) => contract.isShort).map((contract) => contract.strikePrice)
                 underlyingPriceChartInfo.buyOrders = longStrikePrices
                 underlyingPriceChartInfo.sellOrders = shortStrikePrices
                 
                 this.chartInfos.push(underlyingPriceChartInfo)
 
-                let individualContractOI = pricingResults.map((pricing) => {
+                const individualContractOI = pricingResults.map((pricing) => {
                     return pricing.map((op) => op.openInterest);
                 });
-                let individualContractOIContainers = individualContractOI.map((mark, idx) => {
+                const individualContractOIContainers = individualContractOI.map((mark, idx) => {
                     return {
                         label: "$" + this.getOptionContractLabel(contracts[idx]) + " Open Interest",
                         chartType: ChartType.Line,
                         data: mark.map((m, i) => {
-                            let date = convertToLocalTime(
+                            const date = convertToLocalTime(
                                 dateWithoutMilliseconds(
                                     new Date(pricingResults[0][i].timestamp)
                                 )
@@ -123,15 +123,15 @@ export class OptionContractPricingComponent {
                     }
                 });
 
-                let individualIV = pricingResults.map((pricing) => {
+                const individualIV = pricingResults.map((pricing) => {
                     return pricing.map((op) => op.volatility);
                 });
-                let individualIVContainers = individualIV.map((iv, idx) => {
+                const individualIVContainers = individualIV.map((iv, idx) => {
                     return {
                         label: "$" + this.getOptionContractLabel(contracts[idx]) + " IV",
                         chartType: ChartType.Line,
                         data: iv.map((m, i) => {
-                            let date = convertToLocalTime(
+                            const date = convertToLocalTime(
                                 dateWithoutMilliseconds(
                                     new Date(pricingResults[0][i].timestamp)
                                 )

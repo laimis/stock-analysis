@@ -133,7 +133,7 @@ export class BrokerageNewOrderComponent {
 
                 this.stockPositions.getStockOwnership(ticker).subscribe(
                     ownership => {
-                        let position = ownership.positions.filter(p => p.isOpen)[0]
+                        const position = ownership.positions.filter(p => p.isOpen)[0]
                         if (position) {
                             this.positionShares = position.numberOfShares
                             this.positionId = position.positionId
@@ -160,7 +160,8 @@ export class BrokerageNewOrderComponent {
         this.execute(cmd => this.brokerage.sellShort(cmd))
     }
 
-    execute(fn: (cmd: BrokerageOrderCommand) => Observable<string>) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    execute(fn: (cmd: BrokerageOrderCommand) => Observable<any>) {
         this.errors = null
         
         if (this.notesControl.invalid) {

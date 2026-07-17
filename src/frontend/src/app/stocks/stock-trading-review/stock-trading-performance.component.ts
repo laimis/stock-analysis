@@ -34,7 +34,7 @@ export class StockTradingPerformanceComponent {
     }
 
     selectPerformanceToRenderBasedOnTradePeriodFilter() {
-        let index = this.performance.performances.findIndex(p => p.name == this.performanceTitle)
+        const index = this.performance.performances.findIndex(p => p.name == this.performanceTitle)
         this.performanceSelection = this.performance.performances[index]
         this.performanceTitle = this.performanceSelection.name
         this.trends = this.performance.trends[index]

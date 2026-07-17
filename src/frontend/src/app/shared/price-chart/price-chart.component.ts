@@ -30,18 +30,18 @@ function toPriceBar(p: PriceBar) {
 }
 
 function toVolumeBar(p: PriceBar) {
-    let color = p.close > p.open ? green : red
+    const color = p.close > p.open ? green : red
     return {time: p.dateStr, value: p.volume, color: color}
 }
 
 function addLineSeries(chart: IChartApi, movingaAverages: MovingAverages, color: string, interval: number, priceBars) {
     const smaSeries = chart.addLineSeries({color: color, lineWidth: 1, crosshairMarkerVisible: false});
-    let smaLineData = createLineData(movingaAverages, interval, priceBars)
+    const smaLineData = createLineData(movingaAverages, interval, priceBars)
     smaSeries.setData(smaLineData);
 }
 
 function createPriceLine(title: string, price: number, color: string) {
-    let priceLine: PriceLineOptions = {
+    const priceLine: PriceLineOptions = {
         'title': title,
         price: price,
         color: color,
@@ -120,7 +120,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
 
         this.removeChart();
 
-        let priceScaleMode = this.priceScaleMode == 'logarithmic' ? PriceScaleMode.Logarithmic : PriceScaleMode.Normal
+        const priceScaleMode = this.priceScaleMode == 'logarithmic' ? PriceScaleMode.Logarithmic : PriceScaleMode.Normal
 
         this.chart = createChart(
             element,
@@ -135,7 +135,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             }
         );
 
-        let priceBars = info.prices.map(toPriceBar)
+        const priceBars = info.prices.map(toPriceBar)
         
         let mainSeries;
 
@@ -194,7 +194,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
             addLineSeries(this.chart, info.movingAverages.sma200, blue, info.movingAverages.sma200.interval, priceBars);
         }
 
-        let markers = []
+        const markers = []
 
         info.transactions
             .filter((t: StockTransaction) => t.type == 'buy')
@@ -213,7 +213,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
         console.log("markers: " + markers.length)
 
         if (markers.length > 0) {
-            let seriesMarkers = markers.map(toSeriesMarker)
+            const seriesMarkers = markers.map(toSeriesMarker)
             console.log(seriesMarkers)
             seriesMarkers.sort((a, b) => a.time.toLocaleString().localeCompare(b.time.toLocaleString()))
             mainSeries.setMarkers(seriesMarkers)
@@ -227,7 +227,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
         });
 
         // volume, only add if if the priceBars have volume data
-        let hasVolume = info.prices.some((p: PriceBar) => p.volume > 0);
+        const hasVolume = info.prices.some((p: PriceBar) => p.volume > 0);
         if (!hasVolume) {
             const volumeSeries = this.chart.addHistogramSeries({
                 priceFormat: {
@@ -243,7 +243,7 @@ export class PriceChartComponent implements OnDestroy, AfterViewInit {
                     bottom: 0,
                 },
             });
-            let volumeData = info.prices.map(toVolumeBar)
+            const volumeData = info.prices.map(toVolumeBar)
             volumeSeries.setData(volumeData);
         }
 

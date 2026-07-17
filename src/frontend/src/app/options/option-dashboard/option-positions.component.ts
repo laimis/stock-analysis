@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {toggleVisuallyHidden} from "../../services/utils";
 import {BrokerageOptionOrder, OptionContract, OptionPosition} from "../../services/option.service";
 import {OptionPositionComponent} from "../option-position/option-position.component";
-import { CurrencyPipe, NgClass } from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import {StockSearchComponent} from "../../stocks/stock-search/stock-search.component";
 import { StockLinkComponent } from "../../shared/stocks/stock-link.component";
 

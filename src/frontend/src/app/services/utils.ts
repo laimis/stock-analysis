@@ -1,20 +1,22 @@
 import {formatDistance, parse} from "date-fns";
 
-export function GetErrors(err: any): string[] {
+export function GetErrors(err: unknown): string[] {
     try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const e = err as any;
 
-        if (err.status && err.status === 401) {
+        if (e.status && e.status === 401) {
             return ["Unauthorized, please login to continue"]
         }
 
-        if (err.error === undefined) {
-            console.error("Failed to get errors: " + err)
-            return [err.message ?? "Unknown error"]
+        if (e.error === undefined) {
+            console.error("Failed to get errors: " + e)
+            return [e.message ?? "Unknown error"]
         }
 
-        var objToMap = err.error.errors
+        let objToMap = e.error.errors
         if (objToMap === undefined) {
-            objToMap = err.error
+            objToMap = e.error
         }
 
         if (typeof (objToMap) === 'string') {
@@ -114,7 +116,7 @@ export function convertToLocalTime(date: Date) {
 
 export function humanFriendlyDuration(numberOfDays: number) {
     // use date-fns to convert number of days to human friendly duration
-    let today = new Date()
-    let numberOfDaysAgoAsDate = new Date(today.setDate(today.getDate() - numberOfDays))
+    const today = new Date()
+    const numberOfDaysAgoAsDate = new Date(today.setDate(today.getDate() - numberOfDays))
     return formatDistance(numberOfDaysAgoAsDate, new Date(), {includeSeconds: false, addSuffix: true})
 }

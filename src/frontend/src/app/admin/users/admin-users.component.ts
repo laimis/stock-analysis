@@ -15,7 +15,7 @@ export class AdminUsersComponent implements OnInit {
     private stocks = inject(StocksService);
 
 
-    public users: any
+    public users: object[]
 
     ngOnInit() {
 

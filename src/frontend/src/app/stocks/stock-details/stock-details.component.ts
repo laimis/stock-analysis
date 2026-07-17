@@ -184,7 +184,7 @@ export class StockDetailsComponent implements OnInit {
 
     loadPendingPosition() {
         this.stocks.getPendingStockPositions().subscribe(result => {
-            let position = result.filter(p => p.ticker == this.ticker)[0]
+            const position = result.filter(p => p.ticker == this.ticker)[0]
             if (position) {
                 this.pendingPosition = position
             }
@@ -218,7 +218,7 @@ export class StockDetailsComponent implements OnInit {
     }
 
     loadStockOwnership() {
-        let pricesPromise =
+        const pricesPromise =
             this.stocks.getStockPricesForDates(this.ticker, PriceFrequency.Daily, this.startDate, this.endDate)
                 .pipe(
                     tap(result => this.prices = result),
@@ -228,7 +228,7 @@ export class StockDetailsComponent implements OnInit {
                     })
                 )
 
-        let ownershipPromise =
+        const ownershipPromise =
             this.stockPositions.getStockOwnership(this.ticker)
                 .pipe(
                     tap(result => {
@@ -246,8 +246,8 @@ export class StockDetailsComponent implements OnInit {
         concat(pricesPromise, ownershipPromise).subscribe(() => {
             if (this.currentPosition && this.prices) {
 
-                let buyOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
-                let sellOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
+                const buyOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && o.isBuyOrder).map(o => o.price)
+                const sellOrders = this.account?.stockOrders?.filter(o => o.ticker == this.ticker && !o.isBuyOrder).map(o => o.price)
 
                 this.currentPositionChartInfo = {
                     averageBuyPrice: this.currentPosition.averageCostPerShare,

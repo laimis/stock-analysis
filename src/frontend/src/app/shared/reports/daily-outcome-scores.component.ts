@@ -4,14 +4,14 @@ import {LineChartComponent} from "../line-chart/line-chart.component";
 import {CanvasJSAngularChartsModule} from "@canvasjs/angular-charts";
 import {NgClass} from '@angular/common';
 
-import {parse} from "date-fns";
+
 import {parseDate} from "../../services/utils";
 
 function createData(container: DataPointContainer, useY2: boolean, color: string) {
     return {
         type: "line",
         dataPoints: container.data.map(d => {
-            let parsedDate = parseDate(d.label)
+            const parsedDate = parseDate(d.label)
             return {x: parsedDate, y: d.value}
         }),
         showInLegend: true,
@@ -68,7 +68,7 @@ export class DailyOutcomeScoresComponent {
     gainContainer : DataPointContainer
     profitContainer: DataPointContainer
     
-    obvAndCloseOptions: any
+    obvAndCloseOptions: object
     private currentReport: DailyPositionReport
     chartKey: number = 0 // Force chart re-render
     

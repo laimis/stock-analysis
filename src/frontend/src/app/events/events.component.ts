@@ -14,7 +14,7 @@ export class EventsComponent implements OnInit {
     private stockService = inject(StocksService);
     private route = inject(ActivatedRoute);
 
-    events: any[]
+    events: object[]
     errors = null
 
 

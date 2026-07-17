@@ -37,7 +37,7 @@ export class ProfileCreateComponent implements OnInit {
     private FULL_PLAN: string = 'FULL'
 
     ngOnInit() {
-        var plan = this.route.snapshot.paramMap.get("plan")
+        const plan = this.route.snapshot.paramMap.get("plan")
         if (plan) {
             if (plan == 'plus') this.planName = this.PLUS_PLAN
             if (plan == 'full') this.planName = this.FULL_PLAN
@@ -52,9 +52,9 @@ export class ProfileCreateComponent implements OnInit {
         this.errors = null
         this.disableButton = true
 
-        var obj = this.createUserData()
+        const obj = this.createUserData()
 
-        this.stockService.validateAccount(obj).subscribe(r => {
+        this.stockService.validateAccount(obj).subscribe(() => {
             if (this.planName == this.PLUS_PLAN) {
                 this.payPlus()
             } else if (this.planName == this.FULL_PLAN) {
@@ -69,7 +69,7 @@ export class ProfileCreateComponent implements OnInit {
     }
 
     createAccount(userData, paymentToken) {
-        var obj = {
+        const obj = {
             userInfo: userData,
             paymentInfo: paymentToken
         }
@@ -97,21 +97,20 @@ export class ProfileCreateComponent implements OnInit {
 
     pay(planId: string, planName: string) {
 
-        var capture = this;
-
-        var handler = (<any>window).StripeCheckout.configure({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handler = (window as unknown as Window & { StripeCheckout: { configure: (opts: object) => { open: (opts: object) => void } } }).StripeCheckout.configure({
             key: 'pk_live_dls5NvmF6iwb4W19DlqsYvYR0006lBNU20',
             locale: 'auto',
-            token: function (token: any) {
+            token: (token: object) => {
                 console.log(token)
 
-                var paymentData = {
+                const paymentData = {
                     token: token,
                     planId: planId
                 }
 
-                capture.createAccount(
-                    capture.createUserData(),
+                this.createAccount(
+                    this.createUserData(),
                     paymentData)
             }
         });

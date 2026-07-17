@@ -59,8 +59,8 @@ export class OptionClosedComponent {
     }
 
     dropdownClick(et: EventTarget) {
-        let target = et as HTMLSelectElement;
-        let index = target.selectedIndex;
+        const target = et as HTMLSelectElement;
+        const index = target.selectedIndex;
         this.setCurrentPosition(index);
     }
     

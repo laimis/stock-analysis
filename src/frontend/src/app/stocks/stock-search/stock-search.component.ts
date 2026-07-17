@@ -71,8 +71,6 @@ export class StockSearchComponent implements OnInit {
         this.searchTerms.next('')
         this.loading = false
         this.errors = []
-        if (!this.selectedValue) {
-        }
     }
 
     clicked(ticker: string) {
@@ -98,7 +96,7 @@ export class StockSearchComponent implements OnInit {
             }
 
             if ($event.key === 'Enter' && this.highlightedIndex >= 0) {
-                let ticker = this.searchResultsSubscribedArray[this.highlightedIndex].symbol
+                const ticker = this.searchResultsSubscribedArray[this.highlightedIndex].symbol
                 this.loseFocus()
                 this.clicked(ticker)
             }

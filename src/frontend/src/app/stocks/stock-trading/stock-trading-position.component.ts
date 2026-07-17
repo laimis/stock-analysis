@@ -105,7 +105,7 @@ export class StockTradingPositionComponent {
             (profitPoints) => {
                 this.positionProfitPoints = profitPoints
             }, (err) => {
-                let errors = GetErrors(err)
+                const errors = GetErrors(err)
                 alert("Error fetching profit points: " + errors.join(", "))
             }
         )
@@ -144,7 +144,7 @@ export class StockTradingPositionComponent {
                     this._position.riskedAmount = null
                 },
                 error => {
-                    let errors = GetErrors(error)
+                    const errors = GetErrors(error)
                     alert("Error deleting stop price: " + errors.join(", "))
                 }
             )
@@ -160,7 +160,7 @@ export class StockTradingPositionComponent {
                     this._position.riskedAmount = this.candidateRiskAmount
                 },
                 error => {
-                    let errors = GetErrors(error)
+                    const errors = GetErrors(error)
                     alert('Unable to set risk: ' + errors.join(", "))
                 }
             )
@@ -181,7 +181,7 @@ export class StockTradingPositionComponent {
                         this.positionChanged.emit()
                     },
                     err => {
-                        let errors = GetErrors(err)
+                        const errors = GetErrors(err)
                         alert("Error deleting position: " + errors.join(", "))
                     })
         }
@@ -194,17 +194,17 @@ export class StockTradingPositionComponent {
                     this.positionChanged.emit()
                 },
                 err => {
-                    let errors = GetErrors(err)
+                    const errors = GetErrors(err)
                     alert("Error closing position: " + errors.join(", "))
                 })
     }
 
     reinvestDividend(activityId:string) {
-        let price = prompt("Please provide the price at which the dividend will be reinvested")
+        const price = prompt("Please provide the price at which the dividend will be reinvested")
         if (!price) {
             return
         }
-        let numPrice = parseFloat(price)
+        const numPrice = parseFloat(price)
         if (isNaN(numPrice)) {
             alert("Please provide a valid price")
             return
@@ -215,7 +215,7 @@ export class StockTradingPositionComponent {
                     this.positionChanged.emit()
                 },
                 err => {
-                    let errors = GetErrors(err)
+                    const errors = GetErrors(err)
                     alert("Error reinvesting dividend: " + errors.join(", "))
                 }
             )
@@ -252,7 +252,7 @@ export class StockTradingPositionComponent {
     confirmStop(stopPriceValue: string) {
         this.stopErrors = []
         // Parse the stop price value
-        let stopPrice = parseFloat(stopPriceValue)
+        const stopPrice = parseFloat(stopPriceValue)
         if (isNaN(stopPrice)) {
             this.stopErrors = ["Please provide a valid stop"]
             return
@@ -271,7 +271,7 @@ export class StockTradingPositionComponent {
                 this.closeStopModal()
             },
             err => {
-                let errors = GetErrors(err)
+                const errors = GetErrors(err)
                 alert("Error setting stop price: " + errors.join(", "))
                 this.closeStopModal()
             }
@@ -292,7 +292,7 @@ export class StockTradingPositionComponent {
                     this.notesControl.setValue('')
                 },
                 err => {
-                    let errors = GetErrors(err)
+                    const errors = GetErrors(err)
                     alert("Error adding notes: " + errors.join(", "))
                 }
             )
@@ -310,14 +310,14 @@ export class StockTradingPositionComponent {
             this._position.positionId,
             this.assignedGrade,
             note).subscribe(
-            (_: any) => {
+            (_: object) => {
                 this.gradingSuccess = "Grade assigned successfully"
                 setTimeout(() => {
                     this.gradingSuccess = null
                 }, 5000)
             },
             (error) => {
-                let errors = GetErrors(error)
+                const errors = GetErrors(error)
                 this.gradingError = errors.join(', ')
             }
         );
@@ -326,13 +326,10 @@ export class StockTradingPositionComponent {
     deleteTransaction(transactionId: string) {
         if (confirm("are you sure you want to delete the transaction?")) {
             this.stockService.deleteTransaction(this._position.positionId, transactionId)
-                .subscribe(
-                    _ => {
-                        // refresh UI somehow here, tbd
-                    }, (err) => {
+                .subscribe({error: (err) => {
                         const errors = GetErrors(err);
                         alert("Error deleting transaction: " + errors.join(", "))
-                    })
+                    }})
         }
     }
 
@@ -341,15 +338,13 @@ export class StockTradingPositionComponent {
             return false
         }
 
-        this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe(
-            _ => {
-                this.positionStrategy = null
-            },
-            (err) => {
+        this.stockService.deleteLabel(this._position.positionId, "strategy").subscribe({
+            next: () => this.positionStrategy = null,
+            error: (err) => {
                 const errors = GetErrors(err)
                 alert("Error clearing strategy: " + errors.join(", "))
             }
-        )
+        })
 
         return false
     }
@@ -360,18 +355,20 @@ export class StockTradingPositionComponent {
             return
         }
 
-        let label = {
+        const label = {
             key: "strategy",
             value: strategy
         }
 
         this.stockService.setLabel(this._position.positionId, label).subscribe(
-            _ => {
-                this.positionStrategy = strategy
-            },
-            (err) => {
-                const errors = GetErrors(err)
-                alert("Error setting strategy: " + errors.join(", "))
+            {
+                next: () => {
+                    this.positionStrategy = strategy
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    alert("Error setting strategy: " + errors.join(", "))
+                }
             }
         )
     }
@@ -381,14 +378,15 @@ export class StockTradingPositionComponent {
     newLabelValue: string = '';
     removeLabel(pair:KeyValuePair) {
         this.stockService.deleteLabel(this._position.positionId, pair.key).subscribe(
-            _ => {
-                this._position.labels = this._position.labels.filter(l => l.key != pair.key)
-            },
-            (err) => {
-                const errors = GetErrors(err)
-                alert("Error removing label: " + errors.join(", "))
-            }
-        )
+            {
+                next: () => {
+                    this._position.labels = this._position.labels.filter(l => l.key != pair.key)
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    alert("Error removing label: " + errors.join(", "))
+                }
+            })
     }
     addLabel() {
         if (this.newLabelKey === '' || this.newLabelValue === '') {
@@ -396,21 +394,23 @@ export class StockTradingPositionComponent {
             return
         }
 
-        let label = {
+        const label = {
             key: this.newLabelKey,
             value: this.newLabelValue
         }
 
         this.stockService.setLabel(this._position.positionId, label).subscribe(
-            _ => {
-                this._position.labels.push(label)
-                this.newLabelKey = ''
-                this.newLabelValue = ''
-                this.showAddLabelForm = false
-            },
-            (err) => {
-                const errors = GetErrors(err)
-                alert("Error adding label: " + errors.join(", "))
+            {
+                next: () => {
+                    this._position.labels.push(label)
+                    this.newLabelKey = ''
+                    this.newLabelValue = ''
+                    this.showAddLabelForm = false
+                },
+                error: (err) => {
+                    const errors = GetErrors(err)
+                    alert("Error adding label: " + errors.join(", "))
+                }
             }
         )
     }

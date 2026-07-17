@@ -1,8 +1,8 @@
 import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
 import { CurrencyPipe } from "@angular/common";
 import {FormsModule} from "@angular/forms";
-import {BrokerageOptionPosition, OptionLeg, OptionService} from "../../../services/option.service";
-import {GetErrors, GetOptionStrategies} from "../../../services/utils";
+import {OptionLeg, OptionService} from "../../../services/option.service";
+import {GetErrors} from "../../../services/utils";
 import {
     BrokerageService,
     OptionOrderCommand,
@@ -59,12 +59,12 @@ export class OptionPendingPositionCreateModalComponent {
     }
     
     private brokerageOrder() {
-        let orderType = this.price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
-        let session = "NORMAL"
-        let duration = "GOOD_TILL_CANCEL"
-        let orderStrategyType = "SINGLE"
+        const orderType = this.price < 0 ? OptionOrderType.NET_DEBIT : OptionOrderType.NET_CREDIT
+        const session = "NORMAL"
+        const duration = "GOOD_TILL_CANCEL"
+        const orderStrategyType = "SINGLE"
 
-        let collections = this.selectedLegs.map(x => {
+        const collections = this.selectedLegs.map(x => {
             return {
                 instruction: x.action === "buy" ? OptionOrderInstruction.BUY_TO_OPEN : OptionOrderInstruction.SELL_TO_OPEN,
                 quantity: x.quantity,
@@ -75,7 +75,7 @@ export class OptionPendingPositionCreateModalComponent {
             }
         })
 
-        let order : OptionOrderCommand = {
+        const order : OptionOrderCommand = {
             orderType,
             session,
             price: this.price,
@@ -85,7 +85,7 @@ export class OptionPendingPositionCreateModalComponent {
         }
 
         this.brokerageService.issueOptionOrder(order).subscribe(
-            (data) => {
+            () => {
                 alert("Order created")
                 this.close()
                 this.positionCreated.emit()
@@ -101,9 +101,9 @@ export class OptionPendingPositionCreateModalComponent {
         
         // the reason for this is that the cost is negative for a credit spread
         // but the cost is positive for a debit spread, but it's entered as negative as in I am buying, debiting
-        let cost = this.price * -1
+        const cost = this.price * -1
         
-        let command = {
+        const command = {
 
             underlyingTicker: this.ticker,
             cost: cost,

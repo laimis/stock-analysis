@@ -58,7 +58,7 @@ export class StockTransactionComponent implements OnInit {
     record() {
         // if position is set, then we are updating an existing position, otherwise we will be opening short/long position
         if (this.position) {
-            let op = new stocktransactioncommand()
+            const op = new stocktransactioncommand()
             op.positionId = this.position.positionId
             op.numberOfShares = this.numberOfShares
             op.price = this.pricePerShare
@@ -67,7 +67,7 @@ export class StockTransactionComponent implements OnInit {
             if (this.positionType == 'buy') this.recordBuy(op)
             if (this.positionType == 'sell') this.recordSell(op)
         } else {
-            let command = new openpositioncommand()
+            const command = new openpositioncommand()
             command.ticker = this.ticker
             command.numberOfShares = this.numberOfShares
             command.price = this.pricePerShare

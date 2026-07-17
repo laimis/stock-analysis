@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {openpositioncommand, StockPosition, StocksService} from '../../services/stocks.service';
+import {StockPosition, StocksService} from '../../services/stocks.service';
 import {StockPositionsService} from "../../services/stockpositions.service";
 import {GetErrors} from "../../services/utils";
 import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
@@ -64,9 +64,9 @@ export class StockTradingSimulatorComponent implements OnInit {
     filteredPositions: StockPosition[] = []
 
     ngOnInit(): void {
-        var simulations = localStorage.getItem('simulations')
+        const simulations = localStorage.getItem('simulations')
         if (simulations) {
-            var data = JSON.parse(simulations)
+            const data = JSON.parse(simulations)
 
             this.ticker = data.ticker
             this.stopPrice = data.stopPrice
@@ -120,7 +120,7 @@ export class StockTradingSimulatorComponent implements OnInit {
     addTransaction(type: string) {
 
         if (this.price && this.quantity) {
-            var transaction = {
+            const transaction = {
                 numberOfShares: this.quantity,
                 price: this.price,
                 date: this.date,
@@ -211,7 +211,6 @@ export class StockTradingSimulatorComponent implements OnInit {
     loadPosition(p: StockPosition) {
 
         this.reset()
-        var first = true;
         this.riskedAmount = p.riskedAmount
         this.ticker = p.ticker
         this.stopPrice = p.stopPrice
@@ -227,16 +226,16 @@ export class StockTradingSimulatorComponent implements OnInit {
     }
 
     runCalculations() {
-        var slots: number[] = []
-        var cost: number = 0
-        var profit: number = 0
-        var numberOfShares: number = 0
+        const slots: number[] = []
+        let cost: number = 0
+        let profit: number = 0
+        let numberOfShares: number = 0
 
-        var totalSale: number = 0
-        var totalNumberOfSharesSold = 0
+        let totalSale: number = 0
+        let totalNumberOfSharesSold = 0
 
-        var totalBuy: number = 0
-        var totalNumberOfSharesBought = 0
+        let totalBuy: number = 0
+        let totalNumberOfSharesBought = 0
 
         this.transactions.forEach(transaction => {
             if (transaction.type == 'buy') {
@@ -250,7 +249,7 @@ export class StockTradingSimulatorComponent implements OnInit {
                 totalNumberOfSharesBought += transaction.numberOfShares
             } else {
                 // remove quantity number of slots from the beginning of an array
-                var removed = slots.splice(0, transaction.numberOfShares)
+                const removed = slots.splice(0, transaction.numberOfShares)
                 removed.forEach(removedElement => {
                     profit += transaction.price - removedElement
                     cost -= removedElement

@@ -11,9 +11,9 @@ import {blue} from "../../services/charts.service";
 import {parseDate} from "../../services/utils";
 
 function toChartJSPoint(p: DataPoint) {
-    let toolTipContent = p.ticker ? p.ticker + ": {y}" : undefined
+    const toolTipContent = p.ticker ? p.ticker + ": {y}" : undefined
     if (p.isDate) {
-        let parsedDate = parseDate(p.label)
+        const parsedDate = parseDate(p.label)
         return {
             x: parsedDate,
             y: p.value,
@@ -29,6 +29,7 @@ function toChartJSPoint(p: DataPoint) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toAnnotationDataPoints(annotationLine: ChartAnnotationLine, dataPoints: any[]) {
     // it can be either horizontal or vertical
     // if it is horizontal, it's x is the x of the data points and y is a constant value
@@ -84,8 +85,8 @@ function toChartData(container: DataPointContainer) {
     
     const markerSize = chartType === "scatter" ? 10 : 1
 
-    let chartJSDataPoints = container.data.map(p => toChartJSPoint(p))
-    let data: any = [{
+    const chartJSDataPoints = container.data.map(p => toChartJSPoint(p))
+    const data: object[] = [{
         type: chartType,
         markerSize: markerSize,
         color: container.color || blue,
@@ -95,7 +96,7 @@ function toChartData(container: DataPointContainer) {
     }]
 
     if (container.annotationLine) {
-        let annotationDataPoints = toAnnotationDataPoints(container.annotationLine, chartJSDataPoints)
+        const annotationDataPoints = toAnnotationDataPoints(container.annotationLine, chartJSDataPoints)
         if (annotationDataPoints !== null) {
             data.push({
                 type: "line",
@@ -109,10 +110,10 @@ function toChartData(container: DataPointContainer) {
 
 function toChart(containers: DataPointContainer[], titleOverride?: string) {
 
-    let title = titleOverride !== undefined ? titleOverride : containers.map(c => c.label).join(", ")
+    const title = titleOverride !== undefined ? titleOverride : containers.map(c => c.label).join(", ")
     const firstDataPoint = containers.find(c => c.data.length > 0)?.data[0]
-    let isDate = firstDataPoint?.isDate ?? false
-    let data = []
+    const isDate = firstDataPoint?.isDate ?? false
+    const data = []
     containers.forEach(c => {
         toChartData(c).forEach(d => data.push(d))
     })
@@ -151,7 +152,7 @@ function toChart(containers: DataPointContainer[], titleOverride?: string) {
 })
 export class LineChartComponent {
 
-    options: any // don't have type from canvasjs .... blerg
+    options: object // don't have type from canvasjs .... blerg
 
     private _containers: DataPointContainer[] = [];
     private _title: string | undefined = undefined;

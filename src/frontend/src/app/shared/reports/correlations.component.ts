@@ -43,8 +43,8 @@ export class CorrelationsComponent {
         this.sortDirection = this.sortDirection * -1
         this.sortedCorrelations = this.correlations.map(c => c)
             .sort((a, b) => {
-                let aAverage = a.averageCorrelation
-                let bAverage = b.averageCorrelation
+                const aAverage = a.averageCorrelation
+                const bAverage = b.averageCorrelation
                 
                 if (this.sortDirection === -1) {
                     return aAverage - bAverage
@@ -63,16 +63,16 @@ export class CorrelationsComponent {
         }
         this.selectedTicker = ticker
         
-        let correlationsToSortBy = this.correlations.find(c => c.ticker === ticker)
+        const correlationsToSortBy = this.correlations.find(c => c.ticker === ticker)
 
         // copy the array so we don't sort the original
         this.sortedCorrelations = this.correlations.map(c => c)
             .sort((a, b) => {
-                let aIndex = this.correlations.findIndex(c => c.ticker === a.ticker)
-                let bIndex = this.correlations.findIndex(c => c.ticker === b.ticker)
+                const aIndex = this.correlations.findIndex(c => c.ticker === a.ticker)
+                const bIndex = this.correlations.findIndex(c => c.ticker === b.ticker)
 
-                let aCorrelation = correlationsToSortBy.correlations[aIndex]
-                let bCorrelation = correlationsToSortBy.correlations[bIndex]
+                const aCorrelation = correlationsToSortBy.correlations[aIndex]
+                const bCorrelation = correlationsToSortBy.correlations[bIndex]
                 
                 if (this.sortDirection === -1) {
                     return aCorrelation - bCorrelation

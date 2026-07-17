@@ -7,7 +7,7 @@ import {BrokerageOptionOrder, OptionPosition, OptionService} from "../../service
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import {OptionPositionComponent} from "../option-position/option-position.component";
 import {BrokerageService} from "../../services/brokerage.service";
-import {concat} from "rxjs";
+
 
 @Component({
     selector: 'app-owned-option-detail',
@@ -38,7 +38,7 @@ export class OwnedOptionComponent implements OnInit {
         this.filled = Date()
         this.filled = this.datePipe.transform(this.filled, 'yyyy-MM-dd');
 
-        let id = this.route.snapshot.paramMap.get('id');
+        const id = this.route.snapshot.paramMap.get('id');
 
         this.getOption(id)
     }

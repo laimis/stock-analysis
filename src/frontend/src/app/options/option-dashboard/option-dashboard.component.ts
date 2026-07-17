@@ -48,7 +48,7 @@ export class OptionsComponent implements OnInit {
         // get the active tab based on the url. The url is in the format /options/:tab
         // use route snapshot to get the current url
         this.route.paramMap.subscribe(params => {
-            let tab = params.get('tab')
+            const tab = params.get('tab')
             if (tab) {
                 this.activeTab = tab
             }

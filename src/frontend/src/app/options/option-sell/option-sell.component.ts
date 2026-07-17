@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {DatePipe, Location, PercentPipe} from '@angular/common';
+import {DatePipe, Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {GetErrors} from 'src/app/services/utils';
 import {tick} from "@angular/core/testing";
@@ -40,7 +40,7 @@ export class OptionSellComponent implements OnInit {
 
 
     ngOnInit() {
-        var ticker = this.route.snapshot.paramMap.get('ticker');
+        const ticker = this.route.snapshot.paramMap.get('ticker');
         if (ticker) {
             this.ticker = ticker;
         }
@@ -51,7 +51,7 @@ export class OptionSellComponent implements OnInit {
     }
 
     record() {
-        var opt = {
+        const opt = {
             ticker: this.ticker,
             strikePrice: this.strikePrice,
             optionType: this.optionType,
@@ -67,7 +67,8 @@ export class OptionSellComponent implements OnInit {
     }
 
     recordBuy(opt: object) {
-        this.service.buyOption(opt).subscribe(r => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.service.buyOption(opt).subscribe((r: any) => {
             this.navigateToOption(r.id)
         }, err => {
             this.errors = GetErrors(err)
@@ -75,7 +76,8 @@ export class OptionSellComponent implements OnInit {
     }
 
     recordSell(opt: object) {
-        this.service.sellOption(opt).subscribe(r => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.service.sellOption(opt).subscribe((r: any) => {
             this.navigateToOption(r.id)
         }, err => {
             this.errors = GetErrors(err)

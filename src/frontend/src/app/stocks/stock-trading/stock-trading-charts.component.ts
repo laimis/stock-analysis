@@ -22,7 +22,7 @@ function generateHistogramData(data: number[], numIntervals: number): HistogramR
 
     for (let i = 0; i < numIntervals; i++) {
         const lowerBound = minPercentage + i * intervalSize;
-        let upperBound = i === numIntervals - 1 ? maxPercentage + 1 : lowerBound + intervalSize;
+        const upperBound = i === numIntervals - 1 ? maxPercentage + 1 : lowerBound + intervalSize;
         const count = data.filter(percentage => percentage >= lowerBound && percentage < upperBound).length;
         histogramData.push({ x: lowerBound, y: count });
     }
@@ -124,7 +124,7 @@ function createDaysHeldVsGainPercentChart(positions: StockPosition[], quotes: Re
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return e.value.toFixed(2) + "%";
             }
         },
@@ -159,7 +159,7 @@ function createProfitDistributionChart(positions: StockPosition[], quotes: Recor
             interval: interval,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return "$" + e.value.toFixed(2);
             }
         },
@@ -283,7 +283,7 @@ function createUnrealizedGainPercentageDistributionChart(positions: StockPositio
             interval: interval,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return e.value.toFixed(2) + "%";
             }
         },
@@ -324,7 +324,7 @@ function createUnrealizedRRDistributionChart(positions: StockPosition[], quotes:
             interval: interval,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return e.value.toFixed(2);
             }
         },
@@ -383,7 +383,7 @@ function createStopPriceDistanceChart(positions: StockPosition[], quotes: Record
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return e.value.toFixed(2) + "%";
             }
         },
@@ -391,7 +391,7 @@ function createStopPriceDistanceChart(positions: StockPosition[], quotes: Record
             title: "Unrealized Gain %",
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return e.value.toFixed(2) + "%";
             }
         },
@@ -493,7 +493,7 @@ function createProfitByStrategyChart(positions: StockPosition[], quotes: Record<
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return "$" + e.value.toFixed(2);
             }
         },
@@ -544,7 +544,7 @@ function createRealizedVsUnrealizedProfitChart(positions: StockPosition[], quote
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return "$" + e.value.toFixed(2);
             }
         },
@@ -592,7 +592,7 @@ function createPositionsByCostChart(positions: StockPosition[]) {
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return "$" + e.value.toFixed(2);
             }
         },
@@ -687,7 +687,7 @@ function createPositionsByMarketValueChart(positions: StockPosition[], quotes: R
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return "$" + e.value.toFixed(2);
             }
         },
@@ -737,7 +737,7 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<
             gridThickness: 0.1,
             titleFontSize: 12,
             labelFontSize: 10,
-            labelFormatter: function(e: any) {
+            labelFormatter: function(e: { value: number }) {
                 return "$" + e.value.toFixed(2);
             }
         },
@@ -762,7 +762,7 @@ function createPositionsByGainsChart(positions: StockPosition[], quotes: Record<
 })
 export class StockTradingChartsComponent {
 
-    chartOptions : any[] = []
+    chartOptions : object[] = []
     allTickers: string[] = [];
     private excludedTickers: Set<string> = new Set<string>(['USFR']);
     private _positions: StockPosition[] = [];

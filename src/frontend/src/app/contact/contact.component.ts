@@ -21,7 +21,7 @@ export class ContactComponent {
 
 
     sendMessage() {
-        var obj = {
+        const obj = {
             email: this.email,
             message: this.message
         }

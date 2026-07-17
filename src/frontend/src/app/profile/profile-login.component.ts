@@ -43,7 +43,7 @@ export class ProfileLoginComponent implements OnInit {
         this.errors = null
         this.inProgress = true
 
-        var obj = {
+        const obj = {
             email: this.email,
             password: this.password
         }
@@ -63,7 +63,7 @@ export class ProfileLoginComponent implements OnInit {
         this.errors = null
         this.passwordRequestSuccess = false
 
-        let obj = {
+        const obj = {
             email: this.email
         }
 

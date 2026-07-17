@@ -39,17 +39,17 @@ export class OptionBrokeragePositionsComponent {
         
         this.positionCollections = []
         
-        let grouped = this._positions.reduce((acc, pos) => {
-            let key = pos.ticker
+        const grouped = this._positions.reduce((acc, pos) => {
+            const key = pos.ticker
             if (!acc[key]) acc[key] = []
             acc[key].push(pos)
             return acc
         }, {} as {[key: string]: BrokerageOptionContract[]})
         
-        for (let key in grouped) {
-            let positions = grouped[key]
-            let cost = positions.reduce((acc, pos) => acc + pos.averageCost * pos.quantity, 0) * 100
-            let marketValue = positions.reduce((acc, pos) => acc + pos.marketValue, 0)
+        for (const key in grouped) {
+            const positions = grouped[key]
+            const cost = positions.reduce((acc, pos) => acc + pos.averageCost * pos.quantity, 0) * 100
+            const marketValue = positions.reduce((acc, pos) => acc + pos.marketValue, 0)
             this.positionCollections.push({brokerageContracts: positions, cost, marketValue, showPL: false})
         }
     }
@@ -75,13 +75,13 @@ export class OptionBrokeragePositionsComponent {
     }
     
     getExpirationInDays(option: BrokerageOptionPosition) {
-        let numberOfDaysFromNow = (date: string) => {
-            let millisPerDay = 1000 * 60 * 60 * 24
+        const numberOfDaysFromNow = (date: string) => {
+            const millisPerDay = 1000 * 60 * 60 * 24
             return Math.floor((new Date(Date.parse(date)).getTime() - new Date().getTime()) / (millisPerDay))
         }
         
         // all the expiration dates in number of days, sorted and deduped
-        let expirations =
+        const expirations =
             option.brokerageContracts.map(p => numberOfDaysFromNow(p.expirationDate))
                 .sort((a, b) => a - b)
                 .filter((val, idx, arr) => arr.indexOf(val) === idx)

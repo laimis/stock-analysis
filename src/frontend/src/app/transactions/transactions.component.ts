@@ -55,7 +55,7 @@ export class TransactionsComponent implements OnInit {
         })
     }
     
-    breakdownSelected(groupBy: any) {
+    breakdownSelected(groupBy: string) {
         this.groupBy = groupBy
         this.loadData()
     }

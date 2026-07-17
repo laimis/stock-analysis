@@ -1,4 +1,5 @@
 <div class="dashboard py-4">
+    <app-error-display [errors]="errors"></app-error-display>
     @if (loaded) {
         <div class="container-fluid">
             <!-- Asset Categories -->
@@ -191,6 +192,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    } @else {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     }

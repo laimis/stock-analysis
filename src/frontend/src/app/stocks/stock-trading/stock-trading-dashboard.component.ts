@@ -3,7 +3,6 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {
     AccountStatus,
     BrokerageAccount, BrokerageAccountSnapshot,
-    OutcomeValueTypeEnum,
     StockPosition,
     StockQuote,
     StockTradingPositions,
@@ -110,7 +109,7 @@ export class StockTradingDashboardComponent implements OnInit {
                     return true
                 }
 
-                let positionStrategy = p.labels.find(l => l.key === "strategy")
+                const positionStrategy = p.labels.find(l => l.key === "strategy")
                 if (!positionStrategy) {
                     return this.strategyToFilter === this.NONE
                 }
@@ -147,7 +146,7 @@ export class StockTradingDashboardComponent implements OnInit {
             // create an array of strategies where value is the stratey name and count of positions that match
             this.strategies = []
 
-            let stratsWithCounts = GetStockStrategies().map(
+            const stratsWithCounts = GetStockStrategies().map(
                 (s) => {
                     const count = this.positions.filter(i => this.matchesStrategyCheck(i, s.key)).length;
                     return {key: s.key, value: s.value + " - " + count}
@@ -155,10 +154,10 @@ export class StockTradingDashboardComponent implements OnInit {
             )
             this.strategies.push({key: "all", value: "All - " + this.positions.length})
 
-            let shorts = this.positions.filter((p) => p.isShort)
-            let longs = this.positions.filter((p) => !p.isShort)
+            const shorts = this.positions.filter((p) => p.isShort)
+            const longs = this.positions.filter((p) => !p.isShort)
 
-            let noStrategy = this.positions.filter(i => this.matchesStrategyCheck(i, this.NONE))
+            const noStrategy = this.positions.filter(i => this.matchesStrategyCheck(i, this.NONE))
 
             this.strategies.push({key: this.LONGS, value: "Longs - " + longs.length})
             this.strategies.push({key: this.SHORTS, value: "Shorts - " + shorts.length})

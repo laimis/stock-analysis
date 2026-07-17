@@ -36,14 +36,18 @@ export class StockTradingStrategiesComponent {
     }
 
     doSort() {
-        this.sortedResults = this._results.sort((a:any, b:any) => {
-            let aVal = a[this._sortProperty]
+        this.sortedResults = this._results.sort((a: TradingStrategyPerformance, b: TradingStrategyPerformance) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let aVal = (a as unknown as Record<string, unknown>)[this._sortProperty]
             if (!aVal) {
-                aVal = a.performance[this._sortProperty]
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                aVal = (a as unknown as Record<string, Record<string, unknown>>).performance[this._sortProperty]
             }
-            let bVal = b[this._sortProperty]
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let bVal = (b as unknown as Record<string, unknown>)[this._sortProperty]
             if (!bVal) {
-                bVal = b.performance[this._sortProperty]
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                bVal = (b as unknown as Record<string, Record<string, unknown>>).performance[this._sortProperty]
             }
 
             if (aVal < bVal) {

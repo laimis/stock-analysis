@@ -28,7 +28,7 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     container: AlertsContainer;
     alertGroups: StockAlertGroup[];
-    intervalId: any;
+    intervalId: ReturnType<typeof setInterval> | null;
     lastRefreshed: string;
     scheduled: boolean = false
     sortColumn = 'description'
@@ -177,8 +177,8 @@ export class AlertsComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
     
-    sourceListSelection(event:any) {
-        this.selectedSourceList = event.target.value;
+    sourceListSelection(event: Event) {
+        this.selectedSourceList = (event.target as HTMLSelectElement).value;
         this.expandedIdentifiers.clear(); // Clear expanded states when changing source list
         this.createGroups();
     }

@@ -13,16 +13,16 @@ export class StocksService {
     }
 
     // ----------------- alerts ---------------------
-    smsOff(): Observable<any> {
-        return this.http.post<any>('/api/alerts/sms/off', {})
+    smsOff(): Observable<object> {
+        return this.http.post<object>('/api/alerts/sms/off', {})
     }
 
-    smsOn(): Observable<any> {
-        return this.http.post<any>('/api/alerts/sms/on', {})
+    smsOn(): Observable<object> {
+        return this.http.post<object>('/api/alerts/sms/on', {})
     }
 
-    scheduleAlertRun(): Observable<any> {
-        return this.http.post<any>('/api/alerts/run', {})
+    scheduleAlertRun(): Observable<object> {
+        return this.http.post<object>('/api/alerts/run', {})
     }
 
     getAlerts(): Observable<AlertsContainer> {
@@ -175,13 +175,13 @@ export class StocksService {
         return this.http.post<PendingStockPosition>('/api/stocks/pendingpositions', cmd)
     }
 
-    closePendingPosition(id: string, reason: string): Observable<any> {
+    closePendingPosition(id: string, reason: string): Observable<object> {
         const cmd = {positionId: id, reason}
-        return this.http.post<any>('/api/stocks/pendingpositions/' + id + '/close', cmd)
+        return this.http.post<object>('/api/stocks/pendingpositions/' + id + '/close', cmd)
     }
 
-    getCryptos(): Observable<any> {
-        return this.http.get<any>('/api/cryptos')
+    getCryptos(): Observable<object> {
+        return this.http.get<object>('/api/cryptos')
     }
 
     importCrypto(formData: FormData) {
@@ -220,7 +220,7 @@ export class StocksService {
         return this.http.get<Prices>(`/api/stocks/${symbol}/prices/${start}/${end}?frequency=${frequency}`)
     }
 
-    importTransactions(file: any): Observable<any> {
+    importTransactions(file: FormData): Observable<object> {
         return this.http.post('/api/transactions/import', file)
     }
 
@@ -237,7 +237,7 @@ export class StocksService {
 
     // ------- portfolio ----------------
 
-    importStocks(file: any): Observable<any> {
+    importStocks(file: FormData): Observable<object> {
         return this.http.post('/api/portfolio/stockpositions/import', file)
     }
 
@@ -246,8 +246,8 @@ export class StocksService {
         return this.http.get<AccountTransaction[]>('/api/account/transactions')
     }
     
-    markTransactionAsApplied(transactionId: string): Observable<any> {
-        return this.http.post<any>('/api/account/transactions/' + transactionId + '/applied', {})
+    markTransactionAsApplied(transactionId: string): Observable<object> {
+        return this.http.post<object>('/api/account/transactions/' + transactionId + '/applied', {})
     }
     
     getProfile(): Observable<AccountStatus> {
@@ -379,7 +379,7 @@ export class StocksService {
     }
 
     reportDailyPositionReport(positionId: string) {
-        var endpoint = '/api/reports/dailypositionreport/' + positionId
+        const endpoint = '/api/reports/dailypositionreport/' + positionId
         return this.http.get<DailyPositionReport>(endpoint)
     }
     
@@ -398,7 +398,7 @@ export class StocksService {
         ticker: string,
         start: string,
         end: string = null): Observable<DailyOutcomeScoresReport> {
-        var endpoint = '/api/reports/dailyoutcomescoresreport/' + ticker
+        let endpoint = '/api/reports/dailyoutcomescoresreport/' + ticker
 
         if (start) {
             endpoint += '?start=' + start
@@ -416,7 +416,7 @@ export class StocksService {
         start: string,
         end: string = null): Observable<InflectionPointsReport> {
     
-        var endpoint = '/api/reports/inflectionpoints/' + ticker + '?start=' + start
+        let endpoint = '/api/reports/inflectionpoints/' + ticker + '?start=' + start
         if (end) {
             endpoint += '&end=' + end
         }
@@ -429,7 +429,7 @@ export class StocksService {
         trendType: TrendType,
         start: string,
         end: string = null): Observable<Trends> {
-        var endpoint = '/api/reports/trends/' + ticker + '?start=' + start
+        let endpoint = '/api/reports/trends/' + ticker + '?start=' + start
         if (end) {
             endpoint += '&end=' + end
         }
@@ -557,6 +557,7 @@ export interface Sells {
     sells: Sell[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Sell {
 }
 
@@ -566,7 +567,7 @@ export interface Chain {
 
 export interface TickerFundamentals {
     ticker: string
-    fundamentals: Map<string, string>
+    fundamentals: Record<string, unknown>
 }
 
 export interface TickerCorrelation {
@@ -822,7 +823,7 @@ export interface StockProfile {
     securityName: string
     symbol: string
     exchange: string
-    fundamentals: Map<string, string>
+    fundamentals: Record<string, unknown>
 }
 
 export interface StockOwnership {

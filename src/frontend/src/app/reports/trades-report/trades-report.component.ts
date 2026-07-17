@@ -23,8 +23,8 @@ function firstOutcomeMatchByKey(outcome: TickerOutcomes, key: string): StockAnal
 
 // NEW HIGH
 function newHighBuyWhenGapUp(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let gapUp = firstOutcomeMatchByKey(outcome, 'GapPercentage').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const gapUp = firstOutcomeMatchByKey(outcome, 'GapPercentage').value
         return gapUp > 0
     })
 
@@ -42,9 +42,9 @@ function newHighBuyWhenGapUp(report: OutcomesReport): TradeRecommendation {
 }
 
 function newHighBuyWhenPriceAbove200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice > sma200
     })
 
@@ -61,9 +61,9 @@ function newHighBuyWhenPriceAbove200(report: OutcomesReport): TradeRecommendatio
 
 // TOP GAINER
 function topGainerBuyWhenPriceAbove200AndSpySTDown(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice > sma200
     })
 
@@ -77,9 +77,9 @@ function topGainerBuyWhenPriceAbove200AndSpySTDown(report: OutcomesReport): Trad
 }
 
 function topGainerShortWhenPriceBelow200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice < sma200
     })
 
@@ -93,12 +93,12 @@ function topGainerShortWhenPriceBelow200(report: OutcomesReport): TradeRecommend
 }
 
 function topGainerShortWhenPriceBelowSMAAlign(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
-        let sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
-        let sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        const sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
+        const sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice < sma20 && sma20 < sma50 && sma50 < sma150 && sma150 < sma200
     })
 
@@ -119,9 +119,9 @@ function topGainerShortWhenPriceBelowSMAAlign(report: OutcomesReport): TradeReco
 
 // TOP LOSER
 function topLoserBuyWhenPriceAbove20(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
         return currentPrice > sma20
     })
 
@@ -135,10 +135,10 @@ function topLoserBuyWhenPriceAbove20(report: OutcomesReport): TradeRecommendatio
 }
 
 function topLoserBuyWhenPriceAbove200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
         return currentPrice > sma200 && currentPrice < sma20
     })
 
@@ -152,12 +152,12 @@ function topLoserBuyWhenPriceAbove200(report: OutcomesReport): TradeRecommendati
 }
 
 function topLoserBuyWhenPriceAboveSMAAlign(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
-        let sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
-        let sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        const sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
+        const sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice > sma20 && sma20 > sma50 && sma50 > sma150 && sma150 > sma200
     })
 
@@ -171,9 +171,9 @@ function topLoserBuyWhenPriceAboveSMAAlign(report: OutcomesReport): TradeRecomme
 }
 
 function topLoserShortWhenPriceBelow200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice < sma200
     })
 
@@ -191,12 +191,12 @@ function topLoserShortWhenPriceBelow200(report: OutcomesReport): TradeRecommenda
 }
 
 function topLoserShortWhenPriceBelowSMAAlign(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
-        let sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
-        let sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        const sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
+        const sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice < sma20 && sma20 < sma50 && sma50 < sma150 && sma150 < sma200
     })
 
@@ -217,10 +217,10 @@ function topLoserShortWhenPriceBelowSMAAlign(report: OutcomesReport): TradeRecom
 
 // NEW LOW
 function newLowBuyWhenPriceAbove20AND200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
         return currentPrice > sma200 && currentPrice > sma20
     })
 
@@ -234,9 +234,9 @@ function newLowBuyWhenPriceAbove20AND200(report: OutcomesReport): TradeRecommend
 }
 
 function newLowBuyWhenPriceAbove200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice > sma200
     })
 
@@ -250,8 +250,8 @@ function newLowBuyWhenPriceAbove200(report: OutcomesReport): TradeRecommendation
 }
 
 function newLowBuyWhenGapDown(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let gapDown = firstOutcomeMatchByKey(outcome, 'GapPercentage').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const gapDown = firstOutcomeMatchByKey(outcome, 'GapPercentage').value
         return gapDown < 0
     })
 
@@ -269,9 +269,9 @@ function newLowBuyWhenGapDown(report: OutcomesReport): TradeRecommendation {
 }
 
 function newLowShortWhenPriceBelow200(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice < sma200
     })
 
@@ -285,12 +285,12 @@ function newLowShortWhenPriceBelow200(report: OutcomesReport): TradeRecommendati
 }
 
 function newLowShortWhenPriceBelowSMAAlign(report: OutcomesReport): TradeRecommendation {
-    let matchingOutcomes = report.outcomes.filter(outcome => {
-        let currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
-        let sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
-        let sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
-        let sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
-        let sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
+    const matchingOutcomes = report.outcomes.filter(outcome => {
+        const currentPrice = firstOutcomeMatchByKey(outcome, 'CurrentPrice').value
+        const sma20 = firstOutcomeMatchByKey(outcome, 'sma_20').value
+        const sma50 = firstOutcomeMatchByKey(outcome, 'sma_50').value
+        const sma150 = firstOutcomeMatchByKey(outcome, 'sma_150').value
+        const sma200 = firstOutcomeMatchByKey(outcome, 'sma_200').value
         return currentPrice < sma20 && sma20 < sma50 && sma50 < sma150 && sma150 < sma200
     })
 
@@ -368,7 +368,7 @@ export class TradesReportComponent implements OnInit {
 
         this.tickers = this.route.snapshot.queryParamMap.get('tickers').split(',')
 
-        let funcs = selectFunctionsToUse(this.screenerId)
+        const funcs = selectFunctionsToUse(this.screenerId)
 
         // multiple bar daily report
         this.service.reportOutcomesAllBars(this.tickers).subscribe(

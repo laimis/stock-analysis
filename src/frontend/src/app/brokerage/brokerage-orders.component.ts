@@ -9,14 +9,6 @@ import {ErrorDisplayComponent} from "../shared/error-display/error-display.compo
 import {BrokerageOptionOrder} from "../services/option.service";
 import {formatDistance} from "date-fns";
 
-let orderBy = (a: BrokerageStockOrder, b: BrokerageStockOrder) => {
-    let tickerComparison = a.ticker.localeCompare(b.ticker)
-    if (tickerComparison === 0) {
-        return a.executionTime > b.executionTime ? -1 : 1
-    } else {
-        return tickerComparison
-    }
-}
 @Component({
     selector: 'app-brokerage-orders',
     templateUrl: './brokerage-orders.component.html',
@@ -47,7 +39,7 @@ export class BrokerageOrdersComponent {
     optionOrders: BrokerageOptionOrder[];
 
     @Input()
-    set account(value: BrokerageAccount) {
+    set account(value: BrokerageAccount | null) {
         if (!value) {
             this._stockOrders = [];
             this._optionOrders = [];
@@ -75,7 +67,7 @@ export class BrokerageOrdersComponent {
     orderRecorded = new EventEmitter<BrokerageStockOrder>();
 
     groupAndRenderOrders() {
-        let isTickerVisible = (ticker: string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
+        const isTickerVisible = (ticker: string) => this.filteredTickers.length === 0 || this.filteredTickers.indexOf(ticker) !== -1
 
         if (this._stockOrders) {
             // Active orders (buy and sell together, sorted by entry time)

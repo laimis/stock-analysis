@@ -79,8 +79,8 @@ export class OutcomesAnalysisReportComponent {
     }
 
     copyTickersToClipboard(c: AnalysisOutcomeEvaluation) {
-        var tickers = c.matchingTickers.map(t => t.ticker)
-        var text = tickers.join('\r')
+        const tickers = c.matchingTickers.map(t => t.ticker)
+        const text = tickers.join('\r')
         navigator.clipboard.writeText(text)
     }
 

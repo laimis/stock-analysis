@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {BrokerageAccount, BrokerageStockOrder} from "../../services/stocks.service";
+import {BrokerageAccount} from "../../services/stocks.service";
 import {BrokerageService} from "../../services/brokerage.service";
 import {GetErrors} from "../../services/utils";
 import {StockTradingNewPositionComponent} from "../stock-trading/stock-trading-new-position.component";

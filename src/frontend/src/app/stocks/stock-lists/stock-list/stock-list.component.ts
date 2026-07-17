@@ -44,7 +44,7 @@ export class StockListComponent implements OnInit {
         );
     }
 
-    add(tickers: string, controlToHide: HTMLElement) {
+    add(tickers: string, controlToHide?: HTMLElement) {
         const tickerArray = tickers.split(/[\s,]+/).filter(t => t.length > 0)
         this.controlToHide = controlToHide
         this.addTickersToList(tickerArray)
@@ -93,30 +93,43 @@ export class StockListComponent implements OnInit {
     }
 
     removeTag(tag: string) {
-        this.stockService.removeTagFromStockList(this.list.id, tag).subscribe(_ => {
-            this.loadList(this.list.id)
-        }, e => {
-            this.errors = GetErrors(e);
-        });
+        this.stockService.removeTagFromStockList(this.list.id, tag)
+            .subscribe({
+                next: () => {
+                    this.loadList(this.list.id)
+                },
+                error: (e) => {
+                    this.errors = GetErrors(e);
+                }
+            });
     }
 
-    update(name, description) {
-        this.stockService.updateStockList(this.list.id, name, description).subscribe(_ => {
-            this.loadList(this.list.id)
-        }, e => {
-            this.errors = GetErrors(e);
-        });
+    update(name:string, description:string) {
+        this.stockService.updateStockList(this.list.id, name, description)
+            .subscribe({
+                next: () => {
+                    this.loadList(this.list.id)
+                },
+                error: (e) => {
+                    this.errors = GetErrors(e);
+                }
+            });
     }
 
     private loadList(id: string) {
-        this.stockService.getStockList(id).subscribe(list => {
-            this.list = list;
-            this.analysisLink = this.getAnalysisLink(list)
-            this.exportLink = this.getExportLink(list, false)
-            this.exportLinkJustTickers = this.getExportLink(list, true)
-        }, e => {
-            this.errors = GetErrors(e);
-        });
+        this.stockService.getStockList(id).subscribe(
+            {
+                next: (list) => {
+                    this.list = list;
+                    this.analysisLink = this.getAnalysisLink(list)
+                    this.exportLink = this.getExportLink(list, false)
+                    this.exportLinkJustTickers = this.getExportLink(list, true)
+                },
+                error: (e) => {
+                    this.errors = GetErrors(e);
+                }
+            }
+        );
     }
 
     private loadMonitors() {
@@ -146,16 +159,15 @@ export class StockListComponent implements OnInit {
 
         if (ticker) {
             this.stockService.addToStockList(this.list.id, ticker).subscribe(
-                _ => {
+            {
+                next: () => {
                     this.addTickersToList(tickerArray.slice(1))
                 },
-                e => {
+                error: (e) => {
                     this.errors = GetErrors(e);
                     this.addTickersToList(tickerArray.slice(1))
                 }
-            );
-        } else {
-            this.addTickersToList(tickerArray.slice(1))
+            });
         }
     }
 }

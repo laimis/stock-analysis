@@ -69,7 +69,7 @@ export class OwnershipByTickerComponent implements OnInit {
           const tickerFundamentals = fundamentals[0];
           const sharesOutstandingStr = tickerFundamentals.fundamentals['sharesOutstanding'];
           if (sharesOutstandingStr) {
-            this.sharesOutstanding = parseFloat(sharesOutstandingStr);
+            this.sharesOutstanding = parseFloat(sharesOutstandingStr as string);
           }
         }
       },
