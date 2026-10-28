@@ -32,6 +32,12 @@
         (click)="activateTab('spreadbuilder')">
         Spread Builder
       </a>
+      <a class="tab" [href]="getClosedPositionExportLink()">
+        Export Closed
+      </a>
+      <a class="tab" [href]="getTransactionsExportLink()">
+        Export Transactions
+      </a>
       <a class="tab" [routerLink]="" (click)="refreshOptions()">
         @if (loading) {
           <div class="spinner-border text-info spinner-border-sm" role="status">

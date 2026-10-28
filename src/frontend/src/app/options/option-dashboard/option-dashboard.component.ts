@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/cor
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {OptionsContainer, OptionService} from "../../services/option.service";
+import {optionClosedPositionExportLink, optionTransactionsExportLink} from "../../services/links.service";
 import {LoadingComponent} from "../../shared/loading/loading.component";
 import {ErrorDisplayComponent} from "../../shared/error-display/error-display.component";
 import { NgClass } from "@angular/common";
@@ -79,6 +80,14 @@ export class OptionsComponent implements OnInit {
 
     activateTab(tabName: string) {
         this.activeTab = tabName
+    }
+
+    getClosedPositionExportLink() {
+        return optionClosedPositionExportLink()
+    }
+
+    getTransactionsExportLink() {
+        return optionTransactionsExportLink()
     }
 
     refreshOptions() {
