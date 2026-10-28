@@ -35,3 +35,9 @@ type OptionsController(handler: OptionsHandler) =
         let! result = handler.Handle {ExportQuery.UserId = this.User.Identifier()}
         return this.GenerateExport result
     }
+
+    [<HttpGet("export/closed")>]
+    member this.ExportClosed() = task {
+        let! result = handler.Handle {ExportClosedQuery.UserId = this.User.Identifier()}
+        return this.GenerateExport result
+    }

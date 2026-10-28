@@ -27,6 +27,14 @@ export function stockOpenPositionExportLink() {
     return '/api/portfolio/stockpositions/export/open'
 }
 
+export function optionTransactionsExportLink() {
+    return '/api/options/export'
+}
+
+export function optionClosedPositionExportLink() {
+    return '/api/options/export/closed'
+}
+
 export function stockClosedPositionExportLink() {
     return '/api/portfolio/stockpositions/export/closed'
 }

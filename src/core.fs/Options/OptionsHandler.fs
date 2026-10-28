@@ -36,6 +36,7 @@ type OptionTransactionInput =
     
 type DashboardQuery = { UserId:UserId }
 type ExportQuery = { UserId: UserId }
+type ExportClosedQuery = { UserId: UserId }
 type ExpireData = { PositionId: OptionPositionId; UserId: UserId }
 type ExpireCommand =
     | Expire of ExpireData
@@ -113,6 +114,62 @@ type CloseOptionPositionCommand = {
     [<Required>]
     Notes:string option
 }
+
+type ClosedOptionPositionRecord =
+    {
+        Ticker: string
+        Strategy: string
+        Contracts: string
+        Opened: string
+        Closed: string
+        DaysHeld: string
+        Cost: string
+        ClosingCost: string
+        Spread: string
+        Risked: string
+        Profit: string
+        GainPct: string
+        Notes: string
+    }
+
+module private ClosedOptionPositionRecord =
+    let private culture = Globalization.CultureInfo.InvariantCulture
+    let private number (value: decimal) = value.ToString("0.00", culture)
+    let private numberOption (value: decimal option) = value |> Option.map number |> Option.defaultValue ""
+    let private date (value: DateTimeOffset option) = value |> Option.map _.ToString("yyyy-MM-dd") |> Option.defaultValue ""
+
+    let ofView (view: OptionPositionView) =
+        let contracts =
+            view.ClosedContracts
+            |> Seq.map (fun c ->
+                let sign = if c.IsShort then "-" else "+"
+                let expiration = c.Expiration.ToDateTimeOffset().ToString("yyyy-MM-dd")
+                $"{sign}{c.Quantity} {c.OptionType} {c.StrikePrice} {expiration}")
+            |> String.concat "; "
+
+        let strategy =
+            match view.Labels |> Array.tryFind (fun l -> l.Key = "strategy") with
+            | Some l -> l.Value
+            | None -> ""
+
+        // naked short calls have unbounded risk, which is not meaningful in a CSV
+        let risked = if view.Risked = Decimal.MaxValue then None else Some view.Risked
+
+        {
+            Ticker = view.UnderlyingTicker.Value
+            Strategy = strategy
+            Contracts = contracts
+            Opened = view.Opened |> date
+            Closed = view.Closed |> date
+            DaysHeld = view.DaysHeld |> Option.map string |> Option.defaultValue ""
+            Cost = view.Cost |> number
+            ClosingCost = view.ClosingCost |> numberOption
+            Spread = view.Spread |> number
+            Risked = risked |> numberOption
+            Profit = view.Profit |> number
+            GainPct = view.GainPct.ToString("0.0000", culture)
+            Notes = view.Notes |> List.map _.content |> String.concat " | "
+        }
 
 type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: IPortfolioStorage, csvWriter: ICSVWriter, logger:ILogger) =
 
@@ -403,6 +460,20 @@ type OptionsHandler(accounts: IAccountStorage, brokerage: IBrokerage, storage: I
         let csv = options |> CSVExport.options csvWriter
 
         return ExportResponse("options" |> CSVExport.generateFilename, csv)
+    }
+
+    member _.Handle(request: ExportClosedQuery) = task {
+        let! options = request.UserId |> storage.GetOptionPositions
+
+        let rows =
+            options
+            |> Seq.filter _.IsClosed
+            |> Seq.sortByDescending _.Closed.Value
+            |> Seq.map (fun o -> OptionPositionView(o, None) |> ClosedOptionPositionRecord.ofView)
+
+        let csv = csvWriter.Generate(rows)
+
+        return ExportResponse("options_closed" |> CSVExport.generateFilename, csv)
     }
 
     member this.Handle(command: ExpireCommand) =
