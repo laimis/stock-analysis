@@ -144,7 +144,7 @@ module private ClosedOptionPositionRecord =
             |> Seq.map (fun c ->
                 let sign = if c.IsShort then "-" else "+"
                 let expiration = c.Expiration.ToDateTimeOffset().ToString("yyyy-MM-dd")
-                $"{sign}{c.Quantity} {c.OptionType} {c.StrikePrice} {expiration}")
+                $"{sign}{abs c.Quantity} {c.OptionType} {c.StrikePrice} {expiration}")
             |> String.concat "; "
 
         let strategy =
@@ -164,7 +164,7 @@ module private ClosedOptionPositionRecord =
             DaysHeld = view.DaysHeld |> Option.map string |> Option.defaultValue ""
             Cost = view.Cost |> number
             ClosingCost = view.ClosingCost |> numberOption
-            Spread = view.Spread |> number
+            Spread = view.TotalSpread |> number
             Risked = risked |> numberOption
             Profit = view.Profit |> number
             GainPct = view.GainPct.ToString("0.0000", culture)
