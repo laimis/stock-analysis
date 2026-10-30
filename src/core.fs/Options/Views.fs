@@ -137,26 +137,20 @@ type OptionPositionView(state:OptionPositionState, chain:OptionChain option) =
             let minStrike = contracts |> Seq.map _.StrikePrice |> Seq.min
             let maxStrike = contracts |> Seq.map _.StrikePrice |> Seq.max
             maxStrike - minStrike
-    // number of spreads/contracts in the position; Spread is the width of one, Cost is the total
-    member this.Quantity =
-        match contracts with
-        | [] -> 0
-        | _ -> contracts |> Seq.map (fun c -> abs c.Quantity) |> Seq.max
-    member this.TotalSpread = this.Spread * decimal this.Quantity
     member this.Risked =
         // for spreads, the risk is the cost of the spread
         match contracts with
         | x when x.Length > 1 ->
             match this.Cost with
-            | cost when cost < 0m -> this.TotalSpread + this.Cost
+            | cost when cost < 0m -> this.Spread + this.Cost
             | _ -> this.Cost
-        | x when x.Length = 1 ->
+        | x when x.Length = 1 -> 
             let contract = x[0]
             match contract.IsShort with
-            | true ->
+            | true -> 
                 match contract.OptionType with
                 | Call -> Decimal.MaxValue
-                | Put -> contract.StrikePrice * decimal (abs contract.Quantity)
+                | Put -> contract.StrikePrice
             | false -> this.Cost
         | _ -> 0m
         

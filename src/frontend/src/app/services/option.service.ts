@@ -52,7 +52,6 @@ export interface OptionPosition {
     desiredCost: number
     market: number
     spread: number
-    totalSpread: number
     risked: number
     profit: number
     gainPct: number

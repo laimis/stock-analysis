@@ -11,7 +11,7 @@
           <div class="col-md-3">
             <div class="stat-label">Risked/Spread</div>
             <div>
-              {{ position.totalSpread > 0 ? (position.risked / position.totalSpread | percent) : 'N/A' }}
+              {{ position.spread > 0 ? (position.risked / position.spread | percent) : 'N/A' }}
             </div>
           </div>
           @if(position.isPending || position.isOpen) {
@@ -69,9 +69,9 @@
             <div class="stat-label">Closing Cost</div>
             <div>
               {{ position.closingCost | currency }}
-              @if (position.totalSpread > 0) {
+              @if (position.spread > 0) {
                 <span>
-                  ({{ position.closingCost / position.totalSpread | percent }} of spread)
+                  ({{ position.closingCost / position.spread | percent }} of spread)
                 </span>
               }
             </div>
