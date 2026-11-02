@@ -195,6 +195,9 @@ type StockPositionFee(id, aggregateId, ``when``, activityId, description, netAmo
     
 module StockPosition =
         
+    // fractional share rounding can leave dust behind, anything below this counts as fully closed
+    let closedShareThreshold = 0.001m
+
     let createInitialState (event: StockPositionOpened) =
         {
             PositionId = event.PositionId
@@ -291,8 +294,14 @@ module StockPosition =
     let createFromEvents (events: AggregateEvent seq) =
         // build state from the first event, casting it to PositionOpened
         let state = events |> Seq.head :?> StockPositionOpened |> createInitialState
-        events |> Seq.skip 1 |> Seq.fold (fun acc e -> apply e acc) state
-        
+        let rebuilt = events |> Seq.skip 1 |> Seq.fold (fun acc e -> apply e acc) state
+
+        // positions recorded before the dust threshold existed never got a closed event,
+        // treat them as closed as of their last share transaction
+        match rebuilt.Closed, rebuilt.ShareTransactions |> List.tryLast with
+        | None, Some last when abs rebuilt.NumberOfShares < closedShareThreshold -> { rebuilt with Closed = Some last.Date }
+        | _ -> rebuilt
+
     let private applyNotesIfApplicable notes date stockPosition =
         match notes with
             | None -> stockPosition
@@ -303,11 +312,11 @@ module StockPosition =
                 apply e stockPosition
         
     let private closePositionIfApplicable date (stockPosition:StockPositionState) =
-        match stockPosition.NumberOfShares with
-        | 0m -> 
+        match abs stockPosition.NumberOfShares < closedShareThreshold with
+        | true ->
             let e = StockPositionClosed(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date)
             apply e stockPosition
-        | _ -> stockPosition
+        | false -> stockPosition
         
     let buy numberOfShares price date (stockPosition:StockPositionState) =
         if numberOfShares <= 0m then
