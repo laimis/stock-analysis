@@ -95,7 +95,9 @@ namespace core.Stocks
         public DateTimeOffset LastTransaction { get; private set; }
         public decimal LastSellPrice { get; private set; }
         public int DaysSinceLastTransaction => (int)(DateTimeOffset.UtcNow - LastTransaction).TotalDays;
-        private readonly List<decimal> _slots = new();
+        // positions with fewer shares than this (fractional share rounding residue) are considered closed
+        public const decimal ClosedShareThreshold = 0.001m;
+        private readonly List<(decimal Shares, decimal Price)> _slots = new();
 
         private bool _positionCompleted;
         public decimal CompletedPositionCost { get; private set; }
@@ -163,7 +165,7 @@ namespace core.Stocks
 
         public void Sell(decimal numberOfShares, decimal price, Guid transactionId, DateTimeOffset when, string notes = null)
         {
-            if (NumberOfShares - numberOfShares < 0)
+            if (NumberOfShares - numberOfShares < -ClosedShareThreshold)
             {
                 var details = $"Sell {numberOfShares} @ ${price} on {when} for {Ticker}";
                 throw new InvalidOperationException("Transaction would make amount owned invalid: " + details);
@@ -197,7 +199,7 @@ namespace core.Stocks
 
             RunCalculations();
 
-            if (NumberOfShares == 0)
+            if (NumberOfShares < ClosedShareThreshold)
             {
                 Closed = when;
             }
@@ -261,39 +263,55 @@ namespace core.Stocks
             Transactions.ForEach(transaction => {
             if (transaction.Type == "buy")
             {
-                for (var i = 0; i < transaction.NumberOfShares; i++)
-                {
-                    _slots.Add(transaction.Price);
-                    cost += transaction.Price;
-                    numberOfShares++;
-                }
+                _slots.Add((transaction.NumberOfShares, transaction.Price));
+                cost += transaction.Price * transaction.NumberOfShares;
+                numberOfShares += transaction.NumberOfShares;
 
                 totalBuy += transaction.Price * transaction.NumberOfShares;
                 totalNumberOfSharesBought += transaction.NumberOfShares;
             }
             else
             {
-                // remove quantity number of slots from the beginning of an array
-                var removed = _slots.Take((int)transaction.NumberOfShares).ToList();
-                _slots.RemoveRange(0, (int)transaction.NumberOfShares);
-                removed.ForEach(
-                    removedElement =>
+                // consume lots from the beginning (FIFO), supporting fractional shares
+                var remainingToSell = transaction.NumberOfShares;
+                while (remainingToSell > 0 && _slots.Count > 0)
+                {
+                    var (lotShares, lotPrice) = _slots[0];
+                    var taken = Math.Min(lotShares, remainingToSell);
+
+                    profit += (transaction.Price - lotPrice) * taken;
+                    cost -= lotPrice * taken;
+                    numberOfShares -= taken;
+                    remainingToSell -= taken;
+
+                    if (taken == lotShares)
                     {
-                        profit += transaction.Price - removedElement;
-                        cost -= removedElement;
-                        numberOfShares--;
+                        _slots.RemoveAt(0);
                     }
-                );
-                
+                    else
+                    {
+                        _slots[0] = (lotShares - taken, lotPrice);
+                    }
+                }
+
                 totalSale += transaction.Price * transaction.NumberOfShares;
                 totalNumberOfSharesSold += transaction.NumberOfShares;
             }
             });
 
-            // calculate average cost per share using slots
-            AverageCostPerShare = _slots.Count switch {
+            // anything below the threshold is rounding residue, treat as fully sold
+            if (Math.Abs(numberOfShares) < ClosedShareThreshold)
+            {
+                numberOfShares = 0;
+                cost = 0;
+                _slots.Clear();
+            }
+
+            // calculate average cost per share using lots
+            var slotShares = _slots.Sum(s => s.Shares);
+            AverageCostPerShare = slotShares switch {
                 0 => 0,
-                _ => _slots.Sum() / _slots.Count
+                _ => _slots.Sum(s => s.Shares * s.Price) / slotShares
             };
             Cost = cost;
             Profit = profit;
