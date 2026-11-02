@@ -11,7 +11,7 @@ open core.fs.Stocks
 
 type BuyOrSellData =
     {
-        [<Range(1, 1000)>]
+        [<Range(0.01, 1000.0)>]
         NumberOfShares:decimal
         [<Range(0, 2000)>]
         Price:decimal
