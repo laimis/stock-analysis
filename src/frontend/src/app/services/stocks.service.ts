@@ -1049,6 +1049,7 @@ export interface PastStockTradingPositions {
 export interface PastStockTradingPerformance {
     performance: StockTradingPerformanceCollection
     strategyPerformance: TradingStrategyPerformance[]
+    availableStrategies: string[]
 }
 
 export interface PriceWithDate {

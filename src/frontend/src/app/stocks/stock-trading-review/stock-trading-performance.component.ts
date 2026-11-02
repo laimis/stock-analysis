@@ -1,4 +1,4 @@
-import {Component, Input, ChangeDetectionStrategy} from '@angular/core';
+import {Component, Input, Output, EventEmitter, ChangeDetectionStrategy} from '@angular/core';
 import {
     DataPointContainer,
     StockTradingPerformance,
@@ -40,6 +40,10 @@ export class StockTradingPerformanceComponent {
         this.performanceTitle = this.performanceSelection.name
         this.trends = this.performance.trends[index]
     }
+
+    @Input() strategies: string[] = []
+    @Input() strategy = ''
+    @Output() strategyChange = new EventEmitter<string>()
 
     performanceTradePeriodChanged(value: string) {
         if (value != this.performanceTitle) {
