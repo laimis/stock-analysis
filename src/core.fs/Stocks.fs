@@ -193,8 +193,13 @@ type StockPositionFee(id, aggregateId, ``when``, activityId, description, netAmo
     member this.Description = description
     member this.NetAmount = netAmount
     
+// forward split, ratio of 8 means 8:1 (each share becomes 8 shares). Fractions are allowed for e.g. 3:2 (ratio 1.5)
+type StockPositionSplit(id, aggregateId, ``when``, ratio:decimal) =
+    inherit AggregateEvent(id, aggregateId, ``when``)
+    member this.Ratio = ratio
+
 module StockPosition =
-        
+
     // fractional share rounding can leave dust behind, anything below this counts as fully closed
     let closedShareThreshold = 0.001m
 
@@ -282,8 +287,31 @@ module StockPosition =
             let newTransactions = p.Transactions @ [Fee { ActivityId = x.ActivityId; Description = x.Description; NetAmount = x.NetAmount; Date = x.When; Ticker = p.Ticker }]
             { p with Transactions = newTransactions; Version = p.Version + 1; Events = p.Events @ [x]  }
             
+        | :? StockPositionSplit as x ->
+            // only transactions that happened before the split date are expressed in pre-split terms.
+            // Anything on or after the split date was already executed at post-split prices.
+            let isPreSplit (date:DateTimeOffset) = date.Date < x.When.Date
+
+            let adjusted =
+                p.Transactions
+                |> List.map (fun t ->
+                    match t with
+                    | Share s when isPreSplit s.Date -> Share { s with NumberOfShares = s.NumberOfShares * x.Ratio; Price = s.Price / x.Ratio }
+                    | Stop s when isPreSplit s.Date -> Stop { s with StopPrice = s.StopPrice |> Option.map (fun v -> v / x.Ratio) }
+                    | other -> other)
+
+            // current stop is whatever the latest stop transaction says; fall back to existing if there are none
+            let stopPrice =
+                adjusted
+                |> List.choose (fun t -> match t with | Stop s -> Some s.StopPrice | _ -> None)
+                |> List.tryLast
+                |> Option.defaultValue p.StopPrice
+
+            // risk amount is in dollars so it does not change with the split
+            { p with Transactions = adjusted; StopPrice = stopPrice; Version = p.Version + 1; Events = p.Events @ [x] }
+
         | _ -> failwith ("Unknown event: " + event.GetType().Name)
-    
+
     let failIfInvalidDate date =
         if date < DateTimeOffset.UnixEpoch then
             failwith ("Date after " + DateTimeOffset.UnixEpoch.ToString() + " is required")
@@ -499,6 +527,30 @@ module StockPosition =
         | Some _ -> failwith "Found transaction but it's not a dividend"
         | None -> failwith "Dividend not found"
             
+    let split (ratio:decimal) date (stockPosition:StockPositionState) =
+
+        if ratio <= 0m || ratio = 1m then
+            failwith "Split ratio must be greater than zero and not equal to one"
+
+        if stockPosition.IsClosed then
+            failwith "Cannot apply split to closed position"
+
+        date |> failIfInvalidDate
+
+        // applying the same split twice would multiply shares twice, so make it idempotent
+        let alreadyApplied =
+            stockPosition.Events
+            |> List.exists (fun e ->
+                match e with
+                | :? StockPositionSplit as s -> s.When.Date = date.Date && s.Ratio = ratio
+                | _ -> false)
+
+        match alreadyApplied with
+        | true -> stockPosition
+        | false ->
+            let e = StockPositionSplit(Guid.NewGuid(), stockPosition.PositionId |> StockPositionId.guid, date, ratio)
+            apply e stockPosition
+
     let processFee activityId date description netAmount stockPosition =
         
         // check if the fee is already processed

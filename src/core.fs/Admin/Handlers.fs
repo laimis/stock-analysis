@@ -52,6 +52,22 @@ type MigrateSECFilingsResponse = {
     Details: string list
 }
         
+type ApplyStockSplit = {
+    ticker: string
+    ratio: decimal
+    date: System.DateTimeOffset
+    dryRun: bool
+}
+
+type ApplyStockSplitResponse = {
+    Ticker: string
+    Ratio: decimal
+    Date: System.DateTimeOffset
+    DryRun: bool
+    Updated: {| UserEmail: string; PositionId: System.Guid; SharesBefore: decimal; SharesAfter: decimal |} list
+    Skipped: string list
+}
+
 type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioStorage, csvWriter:ICSVWriter, secTickerSync:SECTickerSyncService, secFilings:ISECFilings, secFilingStorage:ISECFilingStorage, logger:ILogger) =
             
     let buildQueryResponse userId =
@@ -121,6 +137,56 @@ type Handler(storage:IAccountStorage, email:IEmailService, portfolio:IPortfolioS
         return Ok ()
     }
     
+    // applies a forward stock split to every open position of the ticker (all users) that was opened before the split date
+    member _.Handle (cmd:ApplyStockSplit) : System.Threading.Tasks.Task<Result<ApplyStockSplitResponse,ServiceError>> = task {
+        try
+            if System.String.IsNullOrWhiteSpace cmd.ticker then
+                return Error (ServiceError "Ticker is required")
+            elif cmd.ratio <= 0m || cmd.ratio = 1m then
+                return Error (ServiceError "Ratio must be greater than zero and not equal to one")
+            else
+                let ticker = cmd.ticker.ToUpperInvariant() |> Ticker
+                let updated = System.Collections.Generic.List<_>()
+                let skipped = System.Collections.Generic.List<string>()
+
+                let! pairs = storage.GetUserEmailIdPairs()
+
+                for pair in pairs do
+                    let userId = pair.Id
+                    let! positions = portfolio.GetStockPositions userId
+
+                    let candidates =
+                        positions
+                        |> Seq.filter (fun p -> p.Ticker = ticker && p.IsOpen)
+
+                    for position in candidates do
+                        if position.Opened.Date >= cmd.date.Date then
+                            skipped.Add $"{pair.Email} {position.PositionId |> StockPositionId.guid}: opened on or after split date"
+                        else
+                            let after = position |> StockPosition.split cmd.ratio cmd.date
+
+                            if after.Version = position.Version then
+                                skipped.Add $"{pair.Email} {position.PositionId |> StockPositionId.guid}: split already applied"
+                            else
+                                if not cmd.dryRun then
+                                    do! portfolio.SaveStockPosition userId (Some position) after
+
+                                logger.LogInformation $"Split {cmd.ratio}:1 {ticker.Value} for {pair.Email}, shares {position.NumberOfShares} -> {after.NumberOfShares}, dryRun={cmd.dryRun}"
+                                updated.Add {| UserEmail = pair.Email; PositionId = position.PositionId |> StockPositionId.guid; SharesBefore = position.NumberOfShares; SharesAfter = after.NumberOfShares |}
+
+                return Ok {
+                    Ticker = ticker.Value
+                    Ratio = cmd.ratio
+                    Date = cmd.date
+                    DryRun = cmd.dryRun
+                    Updated = updated |> Seq.toList
+                    Skipped = skipped |> Seq.toList
+                }
+        with ex ->
+            logger.LogError $"Error applying stock split: {ex}"
+            return Error (ServiceError ex.Message)
+    }
+
     member _.Handle (cmd:MigrateSECFilings) : System.Threading.Tasks.Task<Result<MigrateSECFilingsResponse,ServiceError>> = task {
         try
             
