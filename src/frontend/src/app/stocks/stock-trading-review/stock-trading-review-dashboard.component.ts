@@ -30,6 +30,8 @@ export class StockTradingReviewDashboardComponent implements OnInit {
     past: StockPosition[];
     performance: StockTradingPerformanceCollection;
     strategies: TradingStrategyPerformance[]
+    availableStrategies: string[] = []
+    performanceStrategy = ''
     errors: string[] = []
     loading = {
         positions: true,
@@ -57,16 +59,22 @@ export class StockTradingReviewDashboardComponent implements OnInit {
     }
 
     loadPerformance() {
-        this.stockService.getPastTradingPerformance().subscribe(
+        this.stockService.getPastTradingPerformance(this.performanceStrategy).subscribe(
             response => {
                 this.performance = response.performance
                 this.strategies = response.strategyPerformance
+                this.availableStrategies = response.availableStrategies
                 this.loading.performance = false
             }, err => {
                 this.loading.performance = false
                 this.errors = GetErrors(err)
             }
         )
+    }
+
+    performanceStrategyChanged(strategy: string) {
+        this.performanceStrategy = strategy
+        this.loadPerformance()
     }
 
     refresh() {

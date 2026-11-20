@@ -117,9 +117,10 @@ type PortfolioController(stockPositionHandler: StockPositionHandler, optionsHand
         )
 
     [<HttpGet("stockpositions/pasttradingperformance")>]
-    member this.PastTradingPerformance() : Task<ActionResult> =
+    member this.PastTradingPerformance([<FromQuery>] strategy:string) : Task<ActionResult> =
+        let strategy = if String.IsNullOrWhiteSpace(strategy) then None else Some strategy
         this.OkOrError(
-            stockPositionHandler.Handle({QueryPastTradingPerformance.UserId = this.User.Identifier()})
+            stockPositionHandler.Handle({QueryPastTradingPerformance.UserId = this.User.Identifier(); Strategy = strategy})
         )
 
     [<HttpPost("stockpositions/import")>]

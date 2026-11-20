@@ -31,8 +31,9 @@ export class StockPositionsService {
         return this.http.get<PastStockTradingPositions>('/api/portfolio/stockpositions/pasttradingentries')
     }
 
-    getPastTradingPerformance(): Observable<PastStockTradingPerformance> {
-        return this.http.get<PastStockTradingPerformance>('/api/portfolio/stockpositions/pasttradingperformance')
+    getPastTradingPerformance(strategy: string = ''): Observable<PastStockTradingPerformance> {
+        const query = strategy ? `?strategy=${encodeURIComponent(strategy)}` : ''
+        return this.http.get<PastStockTradingPerformance>(`/api/portfolio/stockpositions/pasttradingperformance${query}`)
     }
 
     simulatePosition(positionId: string, closeIfOpenAtTheEnd: boolean): Observable<TradingStrategyResults> {

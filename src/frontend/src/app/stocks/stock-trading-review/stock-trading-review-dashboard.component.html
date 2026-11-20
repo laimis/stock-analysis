@@ -26,7 +26,10 @@
         <app-stock-trading-closed-positions [positions]=past></app-stock-trading-closed-positions>
     }
     @if (isActive('performance') && performance) {
-        <app-stock-trading-performance [performance]=performance></app-stock-trading-performance>
+        <app-stock-trading-performance [performance]=performance
+                                       [strategies]="availableStrategies"
+                                       [strategy]="performanceStrategy"
+                                       (strategyChange)="performanceStrategyChanged($event)"></app-stock-trading-performance>
     }
     @if (isActive('strategies') && strategies) {
         <app-stock-trading-strategies [results]=strategies></app-stock-trading-strategies>

@@ -245,6 +245,7 @@ type QueryPastTradingEntries =
 type QueryPastTradingPerformance =
     {
         UserId: UserId
+        Strategy: string option
     }
     
 type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWriter:ICSVWriter,storage:IPortfolioStorage,marketHours:IMarketHours,csvParser:ICSVParser,logger:ILogger) =
@@ -964,8 +965,20 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 |> Seq.map StockPositionWithCalculations
                 |> Seq.toArray
             
-            let performance = TradingPerformanceContainerView(past)
-            
+            let availableStrategies =
+                past
+                |> Seq.choose _.TryGetLabelValue("strategy")
+                |> Seq.distinct
+                |> Seq.sort
+                |> Seq.toArray
+
+            let filtered =
+                match query.Strategy with
+                | Some strategy -> past |> Array.filter (fun p -> p.TryGetLabelValue("strategy") = Some strategy)
+                | None -> past
+
+            let performance = TradingPerformanceContainerView(filtered)
+
             let strategyByPerformance =
                 past
                 |> Seq.filter _.ContainsLabel(key="strategy")
@@ -982,6 +995,7 @@ type StockPositionHandler(accounts:IAccountStorage,brokerage:IBrokerage,csvWrite
                 {
                     performance=performance;
                     strategyPerformance=strategyByPerformance;
+                    availableStrategies=availableStrategies;
                 }
                 
             return tradingEntries |> Ok

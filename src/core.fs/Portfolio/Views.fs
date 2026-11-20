@@ -362,4 +362,5 @@ type PastTradingPerformanceView =
     {
         performance: TradingPerformanceContainerView
         strategyPerformance: TradingStrategyPerformance array
+        availableStrategies: string array
     }

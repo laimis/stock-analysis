@@ -11,6 +11,16 @@
                         }
                     </select>
                 </div>
+                <div class="form-group col">
+                    <label class="form-label" for="performanceStrategy">Strategy</label>
+                    <select #performanceStrategyDropdown (change)="strategyChange.emit(performanceStrategyDropdown.value)" class="form-select"
+                            id="performanceStrategy">
+                        <option value="" [selected]="!strategy">All</option>
+                        @for (s of strategies; track s) {
+                            <option [value]="s" [selected]="strategy === s">{{ s }}</option>
+                        }
+                    </select>
+                </div>
             </div>
         </form>
     </div>

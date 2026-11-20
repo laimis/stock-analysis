@@ -82,6 +82,13 @@ type AdminController(handler: Handler) =
     member this.TriggerSECTickerSync() : Task<ActionResult> =
         this.OkOrError(handler.Handle(Unchecked.defaultof<TriggerSECTickerSync>))
 
+    // dryRun defaults to true so nothing is saved until explicitly asked, e.g.
+    // POST api/admin/stock-split?ticker=SNDK&ratio=8&date=2026-11-20&dryRun=false
+    [<HttpPost("stock-split")>]
+    member this.ApplyStockSplit([<FromQuery>] ticker: string, [<FromQuery>] ratio: decimal, [<FromQuery>] date: DateTimeOffset, [<FromQuery>] dryRun: Nullable<bool>) : Task<ActionResult> =
+        let dryRun = if dryRun.HasValue then dryRun.Value else true
+        this.OkOrError(handler.Handle({ApplyStockSplit.ticker = ticker; ratio = ratio; date = date; dryRun = dryRun}))
+
     [<HttpGet("sec/filings-migration")>]
     member this.MigrateSECFilings([<FromQuery>] userEmail: string) : Task<ActionResult> =
         this.OkOrError(handler.Handle({MigrateSECFilings.userEmail = userEmail}))
